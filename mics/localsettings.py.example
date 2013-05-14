@@ -1,0 +1,22 @@
+import sys
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "mics_development",
+        "USER": "mics",
+        "PASSWORD": "mics",
+        "HOST": "localhost",
+    }
+}
+
+if ('test' in sys.argv) or ('harvest' in sys.argv):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": "mics_test",
+            "USER": "mics",
+            "PASSWORD": "mics",
+            "HOST": "localhost",
+        }
+    }
