@@ -123,6 +123,7 @@ INSTALLED_APPS = (
     'django_nose',
     'south',
     'survey',
+    'lettuce.django',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
