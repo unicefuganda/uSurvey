@@ -6,6 +6,7 @@ python:
 # command to install dependencies
 install:
   - pip install -r pip-requires.txt --use-mirrors
+  - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
 
 before_script:
   - psql -c 'create database mics_test;' -U postgres
