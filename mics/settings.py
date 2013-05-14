@@ -120,6 +120,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nose',
+    'south',
+    'survey',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -154,6 +157,8 @@ LOGGING = {
         },
     }
 }
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 try:
     from localsettings import *

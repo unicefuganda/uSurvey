@@ -1,3 +1,4 @@
 Django==1.5.1
 psycopg2==2.5
 South==0.7.6
+django-nose==1.1
