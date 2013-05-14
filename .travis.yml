@@ -17,4 +17,4 @@ before_script:
 # command to run tests
 script:
   - python manage.py test
-  - python manage.py harvest
+  - python manage.py harvest survey
