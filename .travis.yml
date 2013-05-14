@@ -8,9 +8,6 @@ python:
 install:
   - pip install -r pip-requires.txt --use-mirrors
 
-services:
-  - postgres
-
 before_script:
   - psql -c 'create database mics_test;' -U postgres
   - cp mics/localsettings.py.example mics/localsettings.py
