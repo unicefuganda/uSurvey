@@ -18,7 +18,7 @@ before_script:
 # command to run tests
 script:
   - coverage run manage.py test
-  - coverage run manage.py harvest survey
+  - python manage.py harvest survey
 
 after_success:
   - coveralls
