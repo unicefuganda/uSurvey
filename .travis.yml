@@ -6,6 +6,7 @@ python:
 # command to install dependencies
 install:
   - pip install -r pip-requires.txt --use-mirrors
+  - pip install coveralls
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
 
 before_script:
@@ -18,3 +19,7 @@ before_script:
 script:
   - python manage.py test
   - python manage.py harvest survey
+  - coverage run manage.py test
+
+after_success:
+  - coveralls
