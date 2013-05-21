@@ -12,8 +12,6 @@ install:
 before_script:
   - psql -c 'create database mics_test;' -U postgres
   - cp mics/localsettings.py.example mics/localsettings.py
-  - python manage.py syncdb --noinput
-  - python manage.py migrate
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 

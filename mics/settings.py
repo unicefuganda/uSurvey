@@ -123,9 +123,11 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django_nose',
     'south',
-    'survey',
     'lettuce.django',
     'django_extensions',
+    'rapidsms.contrib.locations',
+    'rapidsms.contrib.locations.nested',
+    'survey',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
