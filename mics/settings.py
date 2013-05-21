@@ -125,9 +125,7 @@ INSTALLED_APPS = (
     'south',
     'survey',
     'lettuce.django',
-    'mptt',
     'django_extensions',
-    'rapidsms.contrib.locations',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
