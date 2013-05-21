@@ -128,7 +128,6 @@ INSTALLED_APPS = (
     'mptt',
     'django_extensions',
     'rapidsms.contrib.locations',
-    'django_mptt_admin',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
