@@ -6,6 +6,14 @@ from rapidsms.contrib.locations.models import Location, LocationType
 
 class InvestigatorTest(TestCase):
 
+    def test_fields(self):
+        investigator = Investigator()
+        fields = [str(item.attname) for item in investigator._meta.fields]
+        print fields
+        self.assertEqual(len(fields), 9)
+        for field in ['id', 'name', 'mobile_number', 'created', 'modified', 'male', 'age', 'level_of_education', 'location_id']:
+            self.assertIn(field, fields)
+
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
         self.failUnless(investigator.id)
