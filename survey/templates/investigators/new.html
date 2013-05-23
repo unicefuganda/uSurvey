@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block content %}
+<h3>
+  New Investigator
+</h3>
+{% include "investigators/form.html" with action="/investigators" id="create-investigator-form" button_label="Create Investigator" %}
+{% endblock %}

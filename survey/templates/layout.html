@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" href="{{STATIC_URL}}/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="{{STATIC_URL}}/bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen" charset="utf-8">
+  </head>
+  <body>
+    <header class="container">
+      <!-- Navigation bar starts here -->
+      <div class="navbar">
+        <div class="navbar-inner">
+          <a class="brand" href="#">MICS</a>
+          <ul class="nav">
+            <li class="active"><a href="#">Investigators</a></li>
+            <li><a href="#">Surveys</a></li>
+          </ul>
+        </div>
+      </div>
+      <!-- Navigation bar end here -->
+    </header>
+    <div id="content" class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="{{STATIC_URL}}/bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+  </body>
+</html>
