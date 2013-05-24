@@ -50,3 +50,7 @@ class LocationAutoCompleteTest(TestCase):
 
         soroti = Location.objects.create(name="Soroti", tree_parent=kampala)
         self.assertEqual(soroti.auto_complete_text(), "Soroti, Kampala, Uganda")
+
+        kampala.name = "Kampala Changed"
+        kampala.save()
+        self.assertEqual(kampala.auto_complete_text(), "Kampala Changed, Uganda")
