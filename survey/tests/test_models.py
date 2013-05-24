@@ -9,7 +9,6 @@ class InvestigatorTest(TestCase):
     def test_fields(self):
         investigator = Investigator()
         fields = [str(item.attname) for item in investigator._meta.fields]
-        print fields
         self.assertEqual(len(fields), 9)
         for field in ['id', 'name', 'mobile_number', 'created', 'modified', 'male', 'age', 'level_of_education', 'location_id']:
             self.assertIn(field, fields)
@@ -37,3 +36,17 @@ class LocationTest(TestCase):
         self.assertEqual(len(report_locations), 2)
         self.assertIn(uganda, report_locations)
         self.assertIn(kampala, report_locations)
+
+class LocationAutoCompleteTest(TestCase):
+    def test_store(self):
+        self.assertEqual(len(LocationAutoComplete.objects.all()), 0)
+        uganda = Location.objects.create(name="Uganda")
+        self.assertEqual(len(LocationAutoComplete.objects.all()), 1)
+        self.assertEqual(uganda.auto_complete_text(), "Uganda")
+        self.assertEqual(LocationAutoComplete.objects.all()[0].text, "Uganda")
+
+        kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
+        self.assertEqual(kampala.auto_complete_text(), "Kampala, Uganda")
+
+        soroti = Location.objects.create(name="Soroti", tree_parent=kampala)
+        self.assertEqual(soroti.auto_complete_text(), "Soroti, Kampala, Uganda")
