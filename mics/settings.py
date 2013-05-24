@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     'rapidsms.contrib.locations',
     'rapidsms.contrib.locations.nested',
     'survey',
+    'autocomplete_light',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

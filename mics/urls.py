@@ -1,11 +1,15 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from survey.urls import urlpatterns as survey_urls
+import autocomplete_light
+
+autocomplete_light.autodiscover()
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
+    (r'^autocomplete/', include('autocomplete_light.urls')),
     # Examples:
     # url(r'^$', 'mics.views.home', name='home'),
     # url(r'^mics/', include('mics.foo.urls')),
