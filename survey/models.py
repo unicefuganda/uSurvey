@@ -20,6 +20,10 @@ class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
 
+    class Meta:
+        app_label = 'survey'
+
+
 @receiver(post_save, sender=Location)
 def create_location_auto_complete_text(sender, instance, **kwargs):
     auto_complete = LocationAutoComplete.objects.filter(location=instance)
