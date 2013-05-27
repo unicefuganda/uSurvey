@@ -10,7 +10,7 @@ install:
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
 
 before_script:
-  - psql -c 'create database mics_test;' -U postgres
+  - psql -c 'create database mics;' -U postgres
   - cp mics/localsettings.py.example mics/localsettings.py
   - cp survey/investigator_configs.py.example survey/investigator_configs.py
   - export DISPLAY=:99.0
