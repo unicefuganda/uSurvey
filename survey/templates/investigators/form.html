@@ -38,8 +38,9 @@
     <label class="control-label" for="investigator-level-of-education">Level of education</label>
     <div class="controls">
       <select name="level_of_education" id="investigator-level-of-education">
-        <option value="hsc">HSC</option>
-        <option value="phd">PHD</option>
+        {% for education in list_of_eductional_levels %}
+          <option value="{{ education }}">{{ education }}</option>
+        {% endfor %}
       </select>
     </div>
   </div>
@@ -48,19 +49,17 @@
     <label class="control-label" for="investigator-language">Written language</label>
     <div class="controls">
       <select name="language" id="investigator-language">
-        <option value="Luganda">Luganda</option>
-        <option value="Swahili">Swahili</option>
+        {% for language in list_of_languages %}
+          <option value="{{ language }}">{{ language }}</option>
+        {% endfor %}
       </select>
     </div>
   </div>
 
   <div class="control-group">
-    <label class="control-label" for="investigator-country">Country</label>
+    <label class="control-label" for="investigator-location">Location</label>
     <div class="controls">
-      <select name="location" id="investigator-country">
-        <option value="" selected="selected">Select a country</option>
-        <option value="Uganda">Uganda</option>
-      </select>
+      <input type="text" name="location" value="Type location" id="investigator-location" data-provide="typeahead">
     </div>
   </div>
 
