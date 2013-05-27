@@ -1,0 +1,17 @@
+LEVEL_OF_EDUCATION = (  "Did not attend school",
+                        "Nursery",
+                        "Primary",
+                        "'O' Level",
+                        "'A' Level",
+                        "Tertiary",
+                        "University",
+                    )
+
+LANGUAGES = (   "Luganda",
+                "Runyankore-Rukiga",
+                "Runyoro-Rutoro",
+                "Swahili",
+                "Ateso-Karimojong",
+                "Luo",
+                "Lugbara",
+            )
