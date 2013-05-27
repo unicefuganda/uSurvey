@@ -16,4 +16,21 @@ $(function(){
       return location;
     }
   })
+
+  jQuery.validator.addMethod("dependentField", function(value, element) {
+    var e = $(element);
+    return !(_($(e.attr('data-dependent')).val()).isEmpty());
+  }, "This field is required");
+
+  $('.investigator-form').validate({
+      rules: {
+        "name": "required",
+        "mobile_number": "required",
+        "age": "required",
+        "location-name":{
+          required: true,
+          dependentField: true
+        }
+    }
+  });
 });
