@@ -2,6 +2,7 @@
 from lettuce.django import django_url
 from random import randint
 from time import sleep
+from rapidsms.contrib.locations.models import Location
 
 class PageObject(object):
     def __init__(self, browser):
@@ -24,7 +25,8 @@ class NewInvestigatorPage(PageObject):
             'age': '25',
             'level_of_education': 'Primary',
             'language': 'Luo',
-            'location': 'Uganda',
+            'location-name': 'Uganda',
+            'location': Location.objects.create(name="Uganda").id,
         })
 
     def submit(self):
