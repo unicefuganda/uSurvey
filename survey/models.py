@@ -3,14 +3,16 @@ from django_extensions.db.models import TimeStampedModel
 from rapidsms.contrib.locations.models import Location
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from investigator_configs import *
 
 class Investigator(TimeStampedModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     mobile_number = models.CharField(max_length=20, unique=True, null=False, blank=False)
     male = models.BooleanField(default=True)
     age = models.PositiveIntegerField(max_length=2, null=True)
-    level_of_education = models.CharField(max_length=100, null=True)
+    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION)
     location = models.ForeignKey(Location, null=True)
+    language = models.CharField(max_length=100, null=True, choices=LANGUAGES)
 
 
     class Meta:

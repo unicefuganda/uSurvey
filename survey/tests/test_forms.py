@@ -17,8 +17,9 @@ class InvestigatorFormTest(TestCase):
                         'mobile_number': '9876543210',
                         'male': 't',
                         'age': '20',
-                        'level_of_education': 'HSC',
+                        'level_of_education': 'Primary',
                         'location': self.location.id,
+                        'language': 'Luganda',
                         'id': 200
                     }
         investigator_form = InvestigatorForm(form_data)
@@ -34,6 +35,7 @@ class InvestigatorFormTest(TestCase):
                         'male': 't',
                         'age': '20',
                         'level_of_education': 'HSC',
+                        'language': 'Luganda',
                         'location': self.location.id
                     }
         for key in ['name', 'mobile_number','age', 'level_of_education', 'location']:
@@ -42,3 +44,8 @@ class InvestigatorFormTest(TestCase):
             print modified_form_data
             investigator_form = InvestigatorForm(modified_form_data)
             self.assertFalse(investigator_form.is_valid())
+
+    def test_langugage_and_level_of_education_validity(self):
+        for key in ['language', 'level_of_education']:
+            investigator = InvestigatorForm({key: 'something'})
+            self.assertEqual(investigator.errors[key][0], 'Select a valid choice. something is not one of the available choices.')
