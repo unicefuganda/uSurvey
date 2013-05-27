@@ -54,3 +54,6 @@ class LocationAutoCompleteTest(TestCase):
         kampala.name = "Kampala Changed"
         kampala.save()
         self.assertEqual(kampala.auto_complete_text(), "Kampala Changed, Uganda")
+
+        soroti = Location.objects.get(name="Soroti")
+        self.assertEqual(soroti.auto_complete_text(), "Soroti, Kampala Changed, Uganda")

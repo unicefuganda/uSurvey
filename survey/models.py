@@ -23,24 +23,24 @@ class LocationAutoComplete(models.Model):
     class Meta:
         app_label = 'survey'
 
+def generate_auto_complete_text_for_location(location):
+    auto_complete = LocationAutoComplete.objects.filter(location=location)
+    if not auto_complete:
+        auto_complete = LocationAutoComplete(location=location)
+    else:
+        auto_complete = auto_complete[0]
+    parents = [location.name]
+    while location.tree_parent:
+        location = location.tree_parent
+        parents.append(location.name)
+    auto_complete.text = ", ".join(parents)
+    auto_complete.save()
 
 @receiver(post_save, sender=Location)
 def create_location_auto_complete_text(sender, instance, **kwargs):
-    auto_complete = LocationAutoComplete.objects.filter(location=instance)
-
-    if not auto_complete:
-        auto_complete = LocationAutoComplete(location=instance)
-    else:
-        auto_complete = auto_complete[0]
-
-    parents = [instance.name]
-
-    while instance.tree_parent:
-        instance = instance.tree_parent
-        parents.append(instance.name)
-
-    auto_complete.text = ", ".join(parents)
-    auto_complete.save()
+    generate_auto_complete_text_for_location(instance)
+    for location in instance.get_descendants():
+        generate_auto_complete_text_for_location(location)
 
 def auto_complete_text(self):
     return LocationAutoComplete.objects.get(location=self).text
