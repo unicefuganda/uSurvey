@@ -31,6 +31,15 @@ $(function(){
           required: true,
           dependentField: true
         }
-    }
+      },
+      submitHandler: function(form, e){
+        e.preventDefault()
+        form = $(form);
+        $.post(form.attr('action'), form.serializeArray(), function(data){
+          console.log(data);
+        })
+        return false;
+      }
   });
+
 });
