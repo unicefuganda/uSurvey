@@ -35,8 +35,11 @@ $(function(){
       submitHandler: function(form, e){
         e.preventDefault()
         form = $(form);
+        var button = form.find('button'),
+            value = button.val();
+        button.attr('disabled', true).val(button.attr("data-disabled-text"));
         $.post(form.attr('action'), form.serializeArray(), function(data){
-          console.log(data);
+          button.val(value).removeAttr('disabled');
         })
         return false;
       }
