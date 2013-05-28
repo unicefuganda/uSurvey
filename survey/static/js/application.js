@@ -37,9 +37,9 @@ $(function(){
         form = $(form);
         var button = form.find('button'),
             value = button.val();
-        button.attr('disabled', true).val(button.attr("data-disabled-text"));
+        button.attr('disabled', true);
         $.post(form.attr('action'), form.serializeArray(), function(data){
-          button.val(value).removeAttr('disabled');
+          window.location.href = $("#next-page").val();
         })
         return false;
       }

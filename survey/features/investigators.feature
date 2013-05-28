@@ -6,3 +6,8 @@ Feature: Investigators feature
     And I fill all necessary fields
     And I submit the form
     Then I should see that the investigator is created
+
+  Scenario: List investigators
+    Given I have 100 investigators
+    And I visit investigators listing page
+    And I should see the investigators list paginated

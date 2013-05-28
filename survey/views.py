@@ -32,4 +32,4 @@ def create_investigator(request):
 
 def list_investigators(request):
     investigators = Investigator.objects.all()
-    return render(request, 'investigators/index.html', {'investigators': investigators})
+    return render(request, 'investigators/index.html', {'investigators': investigators, 'request': request})

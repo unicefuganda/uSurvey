@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+{% load pagination_tags %}
+{% autopaginate investigators 50 %}
+  <h3>
+    Investigators List
+  </h3>
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>
+          Name
+        </th>
+        <th>
+          Mobile Number
+        </th>
+        <th>
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for investigator in investigators %}
+        <tr>
+          <td>
+            {{ investigator.name }}
+          </td>
+          <td>
+            {{ investigator.mobile_number }}
+          </td>
+          <td>
+            <div class="btn-group">
+              <a class="btn btn-mini btn-primary" href="#"><i class="icon-user icon-white"></i> Actions</a>
+              <a class="btn btn-mini btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#"><i class="icon-pencil"></i> Edit</a></li>
+                <li><a href="#"><i class="icon-trash"></i> Delete</a></li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% paginate %}
+{% endblock %}

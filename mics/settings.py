@@ -98,6 +98,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'bootstrap_pagination.middleware.PaginationMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -127,6 +128,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'rapidsms.contrib.locations',
     'rapidsms.contrib.locations.nested',
+    'bootstrap_pagination',
     'survey',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',

@@ -17,8 +17,12 @@ class PageObject(object):
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
+    def get_investigator_values(self):
+        return self.values
+
     def fill_valid_values(self):
-        self.browser.fill_form({
+        self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
+        self.values = {
             'name': self.random_text('Investigator Name'),
             'mobile_number': "9876543210",
             'male': 't',
@@ -26,8 +30,25 @@ class NewInvestigatorPage(PageObject):
             'level_of_education': 'Primary',
             'language': 'Luo',
             'location-name': 'Uganda',
-            'location': Location.objects.create(name="Uganda").id,
-        })
+        }
+        self.browser.fill_form(self.values)
+        self.browser.find_by_css("ul.typeahead a").first.click()
 
     def submit(self):
         self.browser.find_by_css("form button").first.click()
+
+class InvestigatorsListPage(PageObject):
+    url = '/investigators/'
+
+    def validate_fields(self):
+        assert self.browser.is_text_present('Investigators List')
+        assert self.browser.is_text_present('Name')
+        assert self.browser.is_text_present('Mobile Number')
+        assert self.browser.is_text_present('Action')
+
+    def validate_pagination(self):
+        self.browser.click_link_by_text("2")
+
+    def validate_presence_of_investigator(self, values):
+        assert self.browser.is_text_present(values['name'])
+        assert self.browser.is_text_present(values['mobile_number'])

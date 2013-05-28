@@ -47,7 +47,7 @@ class InvestigatorsViewTest(TestCase):
                     }
         investigator = Investigator.objects.filter(name=form_data['name'])
         self.failIf(investigator)
-        response = self.client.post('/investigators', data=form_data)
+        response = self.client.post('/investigators/', data=form_data)
         self.failUnlessEqual(response.status_code, 201)
         investigator = Investigator.objects.get(name=form_data['name'])
         self.failUnless(investigator.id)
@@ -61,7 +61,7 @@ class InvestigatorsViewTest(TestCase):
     def test_list_investigators(self):
         uganda = Location.objects.create(name="Uganda")
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location=uganda)
-        response = self.client.get("/investigators")
+        response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
         templates = [ template.name for template in response.templates]
         self.assertIn('investigators/index.html', templates)
