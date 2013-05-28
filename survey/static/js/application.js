@@ -25,11 +25,19 @@ $(function(){
   $('.investigator-form').validate({
       rules: {
         "name": "required",
-        "mobile_number": "required",
+        "mobile_number": {
+          required: true,
+          remote: '/investigators/check_mobile_number'
+        },
         "age": "required",
         "location-name":{
           required: true,
           dependentField: true
+        }
+      },
+      messages: {
+        "mobile_number": {
+          remote: jQuery.format("{0} is already registered.")
         }
       },
       submitHandler: function(form, e){

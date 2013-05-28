@@ -14,6 +14,12 @@ class PageObject(object):
     def random_text(self, text):
         return text +  str(randint(1, 999))
 
+    def fill(self, name, value):
+        self.browser.fill(name, value)
+
+    def is_text_present(self, text):
+        assert self.browser.is_text_present(text)
+
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 

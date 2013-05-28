@@ -45,3 +45,12 @@ def and_i_should_see_the_investigators_list_paginated(step):
     world.page.validate_fields()
     world.page.validate_pagination()
     world.page.validate_fields()
+
+@step(u'And I fill in already registered mobile number')
+def and_i_fill_in_already_registered_mobile_number(step):
+    world.investigator = Investigator.objects.create(name="investigator", mobile_number="987654321")
+    world.page.fill("mobile_number", world.investigator.mobile_number)
+
+@step(u'Then I should see that mobile number is already taken')
+def then_i_should_see_that_mobile_number_is_already_taken(step):
+    world.page.is_text_present(world.investigator.mobile_number + " is already registered.")
