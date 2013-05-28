@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block title %}
+  Investigators List
+{% endblock %}
 {% block content %}
 {% load pagination_tags %}
 {% autopaginate investigators 50 %}
