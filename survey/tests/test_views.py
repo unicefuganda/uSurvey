@@ -57,3 +57,13 @@ class InvestigatorsViewTest(TestCase):
 
         self.assertTrue(investigator.male)
         self.assertEqual(investigator.location, uganda)
+
+    def test_list_investigators(self):
+        uganda = Location.objects.create(name="Uganda")
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location=uganda)
+        response = self.client.get("/investigators")
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [ template.name for template in response.templates]
+        self.assertIn('investigators/index.html', templates)
+        self.assertEqual(len(response.context['investigators']), 1)
+        self.assertIn(investigator, response.context['investigators'])
