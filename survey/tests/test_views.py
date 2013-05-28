@@ -67,3 +67,15 @@ class InvestigatorsViewTest(TestCase):
         self.assertIn('investigators/index.html', templates)
         self.assertEqual(len(response.context['investigators']), 1)
         self.assertIn(investigator, response.context['investigators'])
+
+    def test_check_mobile_number(self):
+        investigator = Investigator.objects.create(name="investigator", mobile_number="1234567890")
+        response = self.client.get("/investigators/check_mobile_number?mobile_number=0987654321")
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)
+
+        response = self.client.get("/investigators/check_mobile_number?mobile_number=" + investigator.mobile_number)
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertFalse(json_response)

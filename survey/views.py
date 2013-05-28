@@ -33,3 +33,7 @@ def create_investigator(request):
 def list_investigators(request):
     investigators = Investigator.objects.all()
     return render(request, 'investigators/index.html', {'investigators': investigators, 'request': request})
+
+def check_mobile_number(request):
+    response = Investigator.objects.filter(mobile_number = request.GET['mobile_number']).exists()
+    return HttpResponse(json.dumps(not response), content_type="application/json")
