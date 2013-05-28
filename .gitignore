@@ -39,3 +39,4 @@ localsettings.py
 testsettings.py
 *.log
 investigator_configs.py
+*.csv
