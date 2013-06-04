@@ -7,7 +7,8 @@ LEVEL_OF_EDUCATION = (  ("Did not attend school", "Did not attend school"),
                         ("University", "University"),
                     )
 
-LANGUAGES = (   ("Luganda", "Luganda"),
+LANGUAGES = (   ("English", "English"),
+                ("Luganda", "Luganda"),
                 ("Runyankore-Rukiga", "Runyankore-Rukiga"),
                 ("Runyoro-Rutoro", "Runyoro-Rutoro"),
                 ("Swahili", "Swahili"),
