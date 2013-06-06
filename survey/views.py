@@ -14,10 +14,11 @@ def new_investigator(request):
     return render(request, 'investigators/new.html', {'list_of_eductional_levels': list_of_eductional_levels, 'list_of_languages': list_of_languages, 'country_phone_code': COUNTRY_PHONE_CODE, 'form': investigator })
 
 def get_locations(request):
-    locations = Location.objects.filter(name__icontains=request.GET['q'])
+    tree_parent= request.GET['parent'] if request.GET.has_key('parent') else None
+    locations = Location.objects.filter(name__icontains=request.GET['q'], tree_parent=tree_parent)
     location_hash = {}
     for location in locations:
-        location_hash[location.auto_complete_text()] = location.id
+        location_hash[location.name] = location.id
     return HttpResponse(json.dumps(location_hash), content_type="application/json")
 
 def create_or_list_investigators(request):

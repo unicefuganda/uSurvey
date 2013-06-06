@@ -26,18 +26,28 @@ class InvestigatorsViewTest(TestCase):
         templates = [ template.name for template in response.templates]
         self.assertIn('investigators/new.html', templates)
 
-    def test_get_location(self):
+    def test_get_district_location(self):
         uganda = Location.objects.create(name="Uganda")
-        uganda_region = Location.objects.create(name="Uganda Region", tree_parent = uganda)
         uganda_duplicate = Location.objects.create(name="Uganda something else")
         response = self.client.get('/investigators/locations?q=uga')
         self.failUnlessEqual(response.status_code, 200)
         locations = json.loads(response.content)
         self.failUnlessEqual(locations, {
                                             'Uganda': uganda.id,
-                                            'Uganda Region, Uganda': uganda_region.id,
                                             'Uganda something else': uganda_duplicate.id,
                                         })
+                                        
+    def test_get_district_location_with_specified_parent_tree(self):
+        uganda = Location.objects.create(name="Uganda")
+        uganda_region = Location.objects.create(name="Uganda Region", tree_parent = uganda)
+
+        response = self.client.get("/investigators/locations?q=uga&parent=" + str(uganda.id)) 
+        self.failUnlessEqual(response.status_code, 200)
+        locations = json.loads(response.content)
+        self.failUnlessEqual(locations, {
+                                            'Uganda Region': uganda_region.id,
+                                        })
+                                    
 
     def test_get_location_failures(self):
         response = self.client.get('/investigators/locations?q=uga')

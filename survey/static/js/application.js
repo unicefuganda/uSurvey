@@ -6,7 +6,7 @@ $(function(){
   $("#investigator-location").typeahead({
     minLength: 4,
     source: function (query, process) {
-      $.getJSON('/investigators/locations', {q: query}, function(data){
+      $.getJSON('/investigators/locations', {d: query}, function(data){
         loaded_locations = data;
         process(_.keys(data))
       })
