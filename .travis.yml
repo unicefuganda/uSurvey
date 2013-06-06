@@ -11,9 +11,7 @@ install:
 
 before_script:
   - psql -c 'create database mics;' -U postgres
-  - psql -c "CREATE ROLE mics WITH ENCRYPTED PASSWORD 'mics'"
-  - psql -c "ALTER USER mics LOGIN"
-  - cp mics/localsettings.py.example mics/localsettings.py
+  - cp mics/travis-settings.py mics/localsettings.py
   - cp survey/investigator_configs.py.example survey/investigator_configs.py
   - python manage.py syncdb --noinput
   - python manage.py migrate
