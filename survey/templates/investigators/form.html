@@ -61,13 +61,16 @@
     </div>
   </div>
 
-  <div class="control-group">
-    <label class="control-label" for="investigator-location">Location</label>
-    <div class="controls">
-      <input type="text" name="location-name" value="" placeholder="Type location" id="investigator-location" data-dependent="#location-value" autocomplete="off" class="input-xxlarge">
-      <input type="hidden" name="location" id="location-value" value="">
-    </div>
-  </div>
+  {% for type in location_type %}
+      <div class="control-group">
+        <label class="control-label" for="investigator-location">{{type.name.capitalize}}</label>
+        <div class="controls">
+          <input type="text" name="{{type.name}}-name" value="" placeholder="Type {{type.name}} " id="investigator-{{type.name}}" data-dependent="#location-value" autocomplete="off" >
+        </div>
+      </div>
+ {% endfor %}      
+ 
+ <input type="hidden" name="location" id="location-value" value="">
 
   <div class="form-actions">
     <button type="submit" class="btn btn-primary" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>

@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, render, redirect
 from investigator_configs import *
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import *
 from survey.forms import *
 from survey.models import Investigator
 import json
@@ -11,7 +11,12 @@ def new_investigator(request):
     list_of_eductional_levels = [education[0] for education in LEVEL_OF_EDUCATION]
     list_of_languages = [language[0] for language in LANGUAGES]
     investigator = InvestigatorForm()
-    return render(request, 'investigators/new.html', {'list_of_eductional_levels': list_of_eductional_levels, 'list_of_languages': list_of_languages, 'country_phone_code': COUNTRY_PHONE_CODE, 'form': investigator })
+      
+    return render(request, 'investigators/new.html', {'list_of_eductional_levels': list_of_eductional_levels, 
+                                                      'list_of_languages': list_of_languages,
+                                                      'country_phone_code': COUNTRY_PHONE_CODE,
+                                                      'form': investigator,
+                                                      'location_type': LocationType.objects.all()})
 
 def get_locations(request):
     tree_parent= request.GET['parent'] if request.GET.has_key('parent') else None
