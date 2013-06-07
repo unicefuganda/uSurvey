@@ -37,3 +37,6 @@ def list_investigators(request):
 def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number = request.GET['mobile_number']).exists()
     return HttpResponse(json.dumps(not response), content_type="application/json")
+
+def ussd(request):
+    return HttpResponse(status=200)

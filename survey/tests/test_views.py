@@ -79,3 +79,10 @@ class InvestigatorsViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
         self.assertFalse(json_response)
+
+    def test_url(self):
+        response = self.client.get('/ussd')
+        self.failUnlessEqual(response.status_code, 200)
+
+        response = self.client.get('/ussd/')
+        self.failUnlessEqual(response.status_code, 200)
