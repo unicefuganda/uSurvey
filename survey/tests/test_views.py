@@ -3,11 +3,22 @@ from django.test.client import Client
 from rapidsms.contrib.locations.models import Location
 from survey.models import *
 import json
+import datetime
+import urllib2
+from survey.investigator_configs import *
 
 class InvestigatorsViewTest(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.ussd_params = {
+                                'transactionId': 123344,
+                                'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
+                                'msisdn': '256776520831',
+                                'ussdServiceCode': '130',
+                                'ussdRequestString': '',
+                                'response': False
+                            }
 
     def test_new(self):
         response = self.client.get('/investigators/new')
@@ -80,16 +91,28 @@ class InvestigatorsViewTest(TestCase):
         json_response = json.loads(response.content)
         self.assertFalse(json_response)
 
-    def test_url(self):
-        response = self.client.get('/ussd')
-        self.failUnlessEqual(response.status_code, 200)
+    def test_ussd_url(self):
+        response = self.client.get('/ussd', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 404)
 
-        response = self.client.get('/ussd/')
-        self.failUnlessEqual(response.status_code, 200)
+        response = self.client.get('/ussd/', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 404)
 
         client = Client(enforce_csrf_checks=True)
-        response = self.client.post('/ussd')
-        self.failUnlessEqual(response.status_code, 200)
+        response = self.client.post('/ussd', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 404)
 
-        response = self.client.post('/ussd/')
+        response = self.client.post('/ussd/', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 404)
+
+    def test_ussd_non_registered_user(self):
+        response = self.client.post('/ussd', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 404)
+
+    def test_ussd_registered_user(self):
+        investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''))
+        response = self.client.post('/ussd', data=self.ussd_params)
         self.failUnlessEqual(response.status_code, 200)
+        templates = [ template.name for template in response.templates]
+        self.assertIn('ussd/' + USSD_PROVIDER + '.txt', templates)
+        self.assertEquals(urllib2.unquote(response.content), "responseString=Welcome investigator name. You can now start to collect responses on survey questions.&action=end")

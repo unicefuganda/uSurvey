@@ -41,4 +41,12 @@ def check_mobile_number(request):
 
 @csrf_exempt
 def ussd(request):
-    return HttpResponse(status=200)
+    params = request.POST if request.method == 'POST' else request.GET
+    mobile_number = params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+    try:
+        investigator = Investigator.objects.get(mobile_number=mobile_number)
+        responseString = "Welcome %s. You can now start to collect responses on survey questions." % investigator.name
+        template = "ussd/%s.txt" % USSD_PROVIDER
+        return render(request, template, { 'action': 'end', 'responseString': responseString })
+    except Investigator.DoesNotExist:
+        return HttpResponse(status=404)
