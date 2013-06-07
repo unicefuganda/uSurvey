@@ -1,0 +1,38 @@
+upstream app_server {
+  server 127.0.0.1:8000 fail_timeout=0;
+}
+
+server {
+  listen 80 default;
+  client_max_body_size 4G;
+  server_name %(DOMAINS)s;
+  keepalive_timeout 5;
+  access_log /var/log/nginx/mics.access.log;
+  error_log /var/log/nginx/mics.error.log;
+  root %(PROJECT_PATH)s;
+
+  location / {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    if (!-f $request_filename) {
+      proxy_pass http://app_server;
+      break;
+    }
+  }
+
+  # https://docs.djangoproject.com/en/dev/howto/static-files/#serving-static-files-in-production
+  location /static/ { # STATIC_URL
+    access_log off;
+    # Some basic cache-control for static files to be sent to the browser
+    expires max;
+    add_header Pragma public;
+    add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+    alias %(CURRENT_PATH)s/survey/static/;
+  }
+
+  location /media/ { # MEDIA_URL
+      alias /static/; # MEDIA_ROOT
+      expires 30d;
+  }
+}
