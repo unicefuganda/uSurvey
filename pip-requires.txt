@@ -11,3 +11,4 @@ Werkzeug==0.8.3
 django-autocomplete-light==1.2.0
 git+git://github.com/tgdn/django-bootstrap-pagination.git
 uWSGI==1.9.12
+gunicorn==0.17.4
