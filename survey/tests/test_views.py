@@ -86,3 +86,10 @@ class InvestigatorsViewTest(TestCase):
 
         response = self.client.get('/ussd/')
         self.failUnlessEqual(response.status_code, 200)
+
+        client = Client(enforce_csrf_checks=True)
+        response = self.client.post('/ussd')
+        self.failUnlessEqual(response.status_code, 200)
+
+        response = self.client.post('/ussd/')
+        self.failUnlessEqual(response.status_code, 200)

@@ -5,6 +5,7 @@ from rapidsms.contrib.locations.models import Location
 from survey.forms import *
 from survey.models import Investigator
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 def new_investigator(request):
     list_of_eductional_levels = [education[0] for education in LEVEL_OF_EDUCATION]
@@ -38,5 +39,6 @@ def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number = request.GET['mobile_number']).exists()
     return HttpResponse(json.dumps(not response), content_type="application/json")
 
+@csrf_exempt
 def ussd(request):
     return HttpResponse(status=200)
