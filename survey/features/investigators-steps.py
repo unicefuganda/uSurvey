@@ -54,3 +54,11 @@ def and_i_fill_in_already_registered_mobile_number(step):
 @step(u'Then I should see that mobile number is already taken')
 def then_i_should_see_that_mobile_number_is_already_taken(step):
     world.page.is_text_present(world.investigator.mobile_number + " is already registered.")
+
+@step(u'And I see all the fields are present')
+def and_i_see_all_the_fields_are_present(step):
+    world.page.valid_page()
+
+@step(u'Then I should see the error messages')
+def then_i_should_see_the_error_messages(step):
+    world.page.is_text_present("This field is required.")

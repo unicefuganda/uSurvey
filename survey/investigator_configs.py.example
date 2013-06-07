@@ -15,3 +15,5 @@ LANGUAGES = (   ("Luganda", "Luganda"),
                 ("Luo", "Luo"),
                 ("Lugbara", "Lugbara"),
             )
+
+COUNTRY_PHONE_CODE = "256"

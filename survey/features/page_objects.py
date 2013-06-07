@@ -3,6 +3,7 @@ from lettuce.django import django_url
 from random import randint
 from time import sleep
 from rapidsms.contrib.locations.models import Location
+from investigator_configs import *
 
 class PageObject(object):
     def __init__(self, browser):
@@ -22,6 +23,12 @@ class PageObject(object):
 
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
+
+    def valid_page(self):
+        fields = ['name', 'mobile_number', 'male', 'age', 'level_of_education', 'language', 'location-name']
+        for field in fields:
+            assert self.browser.is_element_present_by_name(field)
+        assert self.browser.find_by_css("span.add-on")[0].text == COUNTRY_PHONE_CODE
 
     def get_investigator_values(self):
         return self.values

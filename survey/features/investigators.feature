@@ -1,5 +1,12 @@
 Feature: Investigators feature
 
+  Scenario: Investigator new page
+    Given I am logged in as researcher
+    And I visit new investigator page
+    And I see all the fields are present
+    And I submit the form
+    Then I should see the error messages
+
   Scenario: Create an investigator
     Given I am logged in as researcher
     And I visit new investigator page
