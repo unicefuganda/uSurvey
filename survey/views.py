@@ -20,7 +20,7 @@ def new_investigator(request):
 
 def get_locations(request):
     tree_parent= request.GET['parent'] if request.GET.has_key('parent') else None
-    locations = Location.objects.filter(name__icontains=request.GET['q'], tree_parent=tree_parent)
+    locations = Location.objects.filter(tree_parent=tree_parent)
     location_hash = {}
     for location in locations:
         location_hash[location.name] = location.id

@@ -63,15 +63,16 @@
 
   {% for type in location_type %}
       <div class="control-group">
-        <label class="control-label" for="investigator-location">{{type.name.capitalize}}</label>
+        <label class="control-label">{{type.name.capitalize}}</label>
         <div class="controls">
-          <input type="text" name="{{type.name}}-name" value="" placeholder="Type {{type.name}} " id="investigator-{{type.name}}" data-dependent="#location-value" autocomplete="off" >
+        <select name="{{type.name}}-name"  id="investigator-{{type.name}}" data-placeholder="Select or Type {{type.name}} "  single  class="chzn-select">
+        <option value=""></option>
+        </select>
         </div>
       </div>
  {% endfor %}      
- 
- <input type="hidden" name="location" id="location-value" value="">
 
+ <input type="hidden" name="location" id="location-value" value="">
   <div class="form-actions">
     <button type="submit" class="btn btn-primary" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
   </div>

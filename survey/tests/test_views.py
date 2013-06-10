@@ -26,10 +26,10 @@ class InvestigatorsViewTest(TestCase):
         templates = [ template.name for template in response.templates]
         self.assertIn('investigators/new.html', templates)
 
-    def test_get_district_location(self):
+    def test_get_district_location_returns_all_locations_if_parent_not_specified(self):
         uganda = Location.objects.create(name="Uganda")
         uganda_duplicate = Location.objects.create(name="Uganda something else")
-        response = self.client.get('/investigators/locations?q=uga')
+        response = self.client.get('/investigators/locations')
         self.failUnlessEqual(response.status_code, 200)
         locations = json.loads(response.content)
         self.failUnlessEqual(locations, {
@@ -40,8 +40,9 @@ class InvestigatorsViewTest(TestCase):
     def test_get_district_location_with_specified_parent_tree(self):
         uganda = Location.objects.create(name="Uganda")
         uganda_region = Location.objects.create(name="Uganda Region", tree_parent = uganda)
+        other_location_that_is_not_child_of_uganda = Location.objects.create(name="Uganda Something else")
 
-        response = self.client.get("/investigators/locations?q=uga&parent=" + str(uganda.id)) 
+        response = self.client.get("/investigators/locations?parent=" + str(uganda.id)) 
         self.failUnlessEqual(response.status_code, 200)
         locations = json.loads(response.content)
         self.failUnlessEqual(locations, {
@@ -50,7 +51,7 @@ class InvestigatorsViewTest(TestCase):
                                     
 
     def test_get_location_failures(self):
-        response = self.client.get('/investigators/locations?q=uga')
+        response = self.client.get('/investigators/locations')
         self.failUnlessEqual(response.status_code, 200)
         locations = json.loads(response.content)
         self.failUnlessEqual(locations, {})

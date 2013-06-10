@@ -1,49 +1,28 @@
 ;
 
-function populate_location_typeahead(location_type, parent_id){
-  var loaded_locations,
-      location_value = $('input[name=location]');
-  $(location_type.id_name).typeahead({
-    minLength: 4,
-    source: function (query, process) {
-      $.getJSON('/investigators/locations', {q: query, parent: parent_id}, function(data){
-        loaded_locations = data;
-        process(_.keys(data))
-        })
-      },
-      updater: function(location){
-        if (location_type.child){
-          populate_location_typeahead(location_type.child, loaded_locations[location]);
-        }
-        else {
-          location_value.val(loaded_locations[location]);
-        }  
-        return location;
-      }
-    })
-}
+$(".chzn-select").chosen();
 
-var village = {id_name:"#investigator-village"};
-var parish = {id_name:"#investigator-parish", child: village};
-var subcounty = {id_name:"#investigator-subcounty", child: parish};
-var county = {id_name:"#investigator-county", child: subcounty};
- 
+function populate_location_chosen(location_type, parent_id){
+  $.getJSON('/investigators/locations', {parent: parent_id}, function(data) {
+      $.each(data, function(key, value) {   
+           $(location_type)
+                .append($('<option>')
+                .val(value)
+                .text(key)); 
+      });
+      
+      $(location_type).trigger("liszt:updated");
+      
+    });
+};
+
+function update_location_list(parent, child){
+  $(parent).chosen().change( function(){
+       populate_location_chosen(child, $(parent).val());
+     });
+};
 
 $(function(){
-  var loaded_locations
-  $("#investigator-district").typeahead({
-    minLength: 4,
-    source: function (query, process) {
-      $.getJSON('/investigators/locations', {q: query}, function(data){
-        loaded_locations = data;
-        process(_.keys(data))
-        })
-      },
-      updater: function(location){
-        populate_location_typeahead(county, loaded_locations[location])
-        return location;
-      }
-    })
 
   jQuery.validator.addMethod("dependentField", function(value, element) {
     var e = $(element);
@@ -80,6 +59,16 @@ $(function(){
         return false;
       }
   });
-
+  
+  populate_location_chosen('#investigator-district');
+  update_location_list('#investigator-district', '#investigator-county');
+  update_location_list('#investigator-county', '#investigator-subcounty');
+  update_location_list('#investigator-subcounty', '#investigator-parish');
+  update_location_list('#investigator-parish', '#investigator-village');
+  
+  $('#investigator-village').chosen().change( function(){
+       $("#location-value").val($("#investigator-village").val());
+     });
+  
 });
 
