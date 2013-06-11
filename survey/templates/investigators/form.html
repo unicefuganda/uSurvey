@@ -13,7 +13,7 @@
     <div class="controls">
       <div class="input-prepend">
         <span class="add-on">{{ country_phone_code }}</span>
-        <input type="number" id="investigator-mobile-number" placeholder="Mobile Number" name="mobile_number">
+        <input type="number" id="investigator-mobile-number" placeholder="Format: 791234567" name="mobile_number">
       </div>
     </div>
   </div>
@@ -35,7 +35,7 @@
   <div class="control-group">
     <label class="control-label" for="investigator-age">Age</label>
     <div class="controls">
-      <input type="number" id="investigator-age" placeholder="Age" name="age">
+      <input type="number" min=18 max=70  id="investigator-age" placeholder="Age" name="age">
     </div>
   </div>
 
@@ -65,7 +65,7 @@
       <div class="control-group">
         <label class="control-label">{{type.name.capitalize}}</label>
         <div class="controls">
-        <select name="{{type.name}}-name"  id="investigator-{{type.name}}" data-placeholder="Select or Type {{type.name}} "  single  class="chzn-select">
+        <select name="{{type.name}}" id="investigator-{{type.name}}" data-placeholder="Select or Type {{type.name}} "  single  class="chzn-select">
         <option value=""></option>
         </select>
         </div>
