@@ -25,7 +25,7 @@ class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
     def valid_page(self):
-        fields = ['name', 'mobile_number', 'male', 'age', 'level_of_education', 'language', 'location-name']
+        fields = ['name', 'mobile_number', 'confirm-mobile_number', 'male', 'age', 'level_of_education', 'language']
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
         assert self.browser.find_by_css("span.add-on")[0].text == COUNTRY_PHONE_CODE
@@ -37,13 +37,12 @@ class NewInvestigatorPage(PageObject):
         self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
         self.values = {
             'name': self.random_text('Investigator Name'),
-            'mobile_number': "9876543210",
+            'mobile_number': "987654321",
             'male': 't',
             'age': '25',
             'level_of_education': 'Primary',
             'language': 'Luo',
-            'location-name': 'Uganda',
-        }
+      }
         self.browser.fill_form(self.values)
         self.browser.find_by_css("ul.typeahead a").first.click()
 
