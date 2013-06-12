@@ -43,13 +43,7 @@ def initialize_location_type():
     selected_location[location_type.name]={ 'value': '', 'text':'All'}
   return selected_location  
 
-def no_location_selected(location):
-  return location.__class__.__name__=='QuerySet'
-
 def update_location_type(selected_location, location):
-  if no_location_selected(location):
-    return selected_location
-    
   assigned_type = Location.objects.get(id=location).get_ancestors(include_self=True)
   for loca in assigned_type:
     selected_location[loca.type.name]['value'] = loca.id
