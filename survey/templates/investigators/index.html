@@ -21,7 +21,7 @@
       <tr>
         {% for name, type in location_type.items %}
         <td>
-          <select name="{{name}}" id="investigator-{{name}}"  data-placeholder="All" style="width:160px;" single  class="chzn-select">
+          <select name="{{name}}" id="investigator-{{name.lower}}"  data-placeholder="All" style="width:160px;" single  class="chzn-select">
           <option value="{{type.value}}" selected>{{type.text}}</option>
           {% for location in type.siblings %}
             <option value="{{location.id}}">{{location.name}}</option>
