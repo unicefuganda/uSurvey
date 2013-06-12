@@ -114,7 +114,8 @@ class InvestigatorsViewTest(TestCase):
       self.assertEquals(selected_location['county'], {'value':  '' ,'text': 'All'})
 
     def test_list_investigators(self):
-        uganda = Location.objects.create(name="Uganda")
+        country = LocationType.objects.create(name="country", slug=slugify("country"))
+        uganda = Location.objects.create(name="Uganda", type=country)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location=uganda)
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
@@ -123,6 +124,10 @@ class InvestigatorsViewTest(TestCase):
 
         self.assertEqual(len(response.context['investigators']), 1)
         self.assertIn(investigator, response.context['investigators'])
+        
+        self.assertEqual(len(response.context['location_type']), 1)
+        self.assertEquals({ 'value': '', 'text':'All'}, response.context['location_type'][country.name])
+        
 
     def test_check_mobile_number(self):
         investigator = Investigator.objects.create(name="investigator", mobile_number="1234567890")

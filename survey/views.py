@@ -66,7 +66,7 @@ def list_investigators(request):
 
     return render(request, 'investigators/index.html', 
                           {'investigators': investigators,
-                           'location_type': LocationType.objects.all(),
+                           'location_type': selected_location,
                            'request': request})
 
 def check_mobile_number(request):
