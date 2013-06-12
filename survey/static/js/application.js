@@ -54,6 +54,10 @@ var subcounty = {'id_name': '#investigator-subcounty', 'child': parish};
 var county = {'id_name': '#investigator-county', 'child': subcounty};
 var district = {'id_name': '#investigator-district', 'child': county};
 
+function clean_number(value){
+  return value.replace(/\s+/g, '').replace(/-/g, '');
+};
+
 $(function(){
   
   jQuery.validator.addMethod("mobile_number_length", function(value, element) {
@@ -62,7 +66,13 @@ $(function(){
 
   jQuery.validator.addMethod("no_leading_zero", function(value, element) {
       return !(value[0]==0)
-    }, "No leading zero. Please follow format.");
+    }, "No leading zero. Please follow format: 791234567.");
+  
+  jQuery.validator.addMethod("validate_confirm_number", function(value, element) {
+        var cleaned_original = clean_number($("#investigator-mobile-number").val());
+        var cleaned_confirm = clean_number(value);
+        return (cleaned_original==cleaned_confirm)
+      }, "Mobile number not matched.");
   
   $('.investigator-form').validate({
       ignore: ":hidden:not(select)",
@@ -74,6 +84,7 @@ $(function(){
           no_leading_zero: true,
           remote: '/investigators/check_mobile_number'
         },
+        "confirm-mobile_number":{validate_confirm_number: true, required: true},
         "age": "required",
         "district":"required",
         "county":"required",
@@ -104,6 +115,10 @@ $(function(){
         })
         return false;
       }
+  });
+  
+  $("#confirm-investigator-number").on('paste', function(e) {
+    e.preventDefault();
   });
   
   populate_location_chosen(district);
