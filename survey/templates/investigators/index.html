@@ -8,6 +8,31 @@
   <h3>
     Investigators List
   </h3>
+  
+  <table class="table" >
+    <thead>
+      <tr>
+          {% for type in location_type %}
+              <th>{{type.name.capitalize}}</th>
+          {% endfor%}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% for type in location_type %}
+        <td>
+          <select name="{{type.name}}" id="investigator-{{type.name}}" data-placeholder="All "  style="width:160px;" single  class="chzn-select">
+          <option value=""></option>
+        </td>
+        {% endfor %}
+        <td>
+          <a class="btn btn-primary" href="#"> Get List</a>
+        </td>
+      </tr>
+    </tbody>
+    </table>
+      
+  
   <table class="table table-striped table-bordered table-hover">
     <thead>
       <tr>

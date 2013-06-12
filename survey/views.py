@@ -37,9 +37,37 @@ def create_investigator(request):
     investigator.save()
     return HttpResponse(status=201)
 
+def initialize_location_type():
+  selected_location = {}
+  for location_type in LocationType.objects.all():
+    selected_location[location_type.name]={ 'value': '', 'text':'All'}
+  return selected_location  
+
+def no_location_selected(location):
+  return location.__class__.__name__=='QuerySet'
+
+def update_location_type(selected_location, location):
+  if no_location_selected(location):
+    return selected_location
+    
+  assigned_type = location.get_ancestors(include_self=True)
+  for loca in assigned_type:
+    selected_location[loca.type.name]['value'] = loca.id
+    selected_location[loca.type.name]['text'] = loca.name
+    
+  return selected_location  
+
+
 def list_investigators(request):
-    investigators = Investigator.objects.all()
-    return render(request, 'investigators/index.html', {'investigators': investigators, 'request': request})
+    selected_location = initialize_location_type()
+    location= request.GET['parent'] if request.GET.has_key('parent') else Location.objects.all()
+    investigators = Investigator.objects.filter(location__in=location)
+    selected_location = update_location_type(selected_location, location)
+
+    return render(request, 'investigators/index.html', 
+                          {'investigators': investigators,
+                           'location_type': LocationType.objects.all(),
+                           'request': request})
 
 def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number = request.GET['mobile_number']).exists()

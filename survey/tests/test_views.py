@@ -6,6 +6,9 @@ import json
 import datetime
 import urllib2
 from survey.investigator_configs import *
+from mock import *
+from survey.views import *
+from django.template.defaultfilters import slugify
 
 class InvestigatorsViewTest(TestCase):
 
@@ -79,6 +82,36 @@ class InvestigatorsViewTest(TestCase):
 
         self.assertTrue(investigator.male)
         self.assertEqual(investigator.location, uganda)
+        
+    @patch('rapidsms.contrib.locations.models.LocationType.objects.all')    
+    def test_initialize_location_type(self, mock_location_type): 
+      some_type = MagicMock()
+      some_type.name='some type'
+      mock_location_type.return_value = [some_type]
+      ltype = initialize_location_type()
+      self.assertEquals(ltype['some type'], {'value': '','text':'All'})
+
+    def test_update_location_type(self): 
+      country = LocationType.objects.create(name="country", slug=slugify("country"))
+      uganda = Location.objects.create(name="Uganda", type=country)
+      
+      region = LocationType.objects.create(name="region", slug=slugify("region"))
+      central = Location.objects.create(name="Central", type=region, tree_parent=uganda)
+      
+      district = LocationType.objects.create(name="district", slug=slugify("district"))
+      kampala = Location.objects.create(name="Kampala", type=district, tree_parent=central)
+      
+      county = LocationType.objects.create(name="county", slug=slugify("county"))
+      
+      print(kampala.get_ancestors(include_self=True))
+      
+      selected_location = initialize_location_type()
+      selected_location = update_location_type(selected_location, kampala)
+
+      self.assertEquals(selected_location['country'], {'value':  uganda.id ,'text': uganda.name})
+      self.assertEquals(selected_location['region'], {'value':  central.id ,'text': central.name})
+      self.assertEquals(selected_location['district'], {'value':  kampala.id ,'text': kampala.name})
+      self.assertEquals(selected_location['county'], {'value':  '' ,'text': 'All'})
 
     def test_list_investigators(self):
         uganda = Location.objects.create(name="Uganda")
@@ -87,6 +120,7 @@ class InvestigatorsViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         templates = [ template.name for template in response.templates]
         self.assertIn('investigators/index.html', templates)
+
         self.assertEqual(len(response.context['investigators']), 1)
         self.assertIn(investigator, response.context['investigators'])
 
