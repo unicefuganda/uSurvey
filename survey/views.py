@@ -50,7 +50,7 @@ def update_location_type(selected_location, location):
   if no_location_selected(location):
     return selected_location
     
-  assigned_type = location.get_ancestors(include_self=True)
+  assigned_type = Location.objects.get(id=location).get_ancestors(include_self=True)
   for loca in assigned_type:
     selected_location[loca.type.name]['value'] = loca.id
     selected_location[loca.type.name]['text'] = loca.name

@@ -34,6 +34,8 @@ function update_location_list(location_type){
   $(location_type.id_name).chosen().change( function(){
        populate_location_chosen(location_type.child, $(location_type.id_name).val());
        
+       $("#a-investigator-list").attr("href", "/investigators/?parent="+$(location_type.id_name).val())
+       
        if (location_type.child){
          notify(location_type.child);    
        };

@@ -12,21 +12,21 @@
   <table class="table" >
     <thead>
       <tr>
-          {% for type in location_type %}
-              <th>{{type.name.capitalize}}</th>
+          {% for name, type in location_type.items %}
+              <th>{{name.capitalize}}</th>
           {% endfor%}
       </tr>
     </thead>
     <tbody>
       <tr>
-        {% for type in location_type %}
+        {% for name, type in location_type.items %}
         <td>
-          <select name="{{type.name}}" id="investigator-{{type.name}}" data-placeholder="All "  style="width:160px;" single  class="chzn-select">
-          <option value=""></option>
+          <select name="{{name}}" id="investigator-{{name}}"  data-placeholder="All" style="width:160px;" single  class="chzn-select">
+          <option value={{type.value}} selected>{{type.text}}</option>
         </td>
         {% endfor %}
         <td>
-          <a class="btn btn-primary" href="#"> Get List</a>
+          <a class="btn btn-primary" id="a-investigator-list"> Get List</a>
         </td>
       </tr>
     </tbody>
