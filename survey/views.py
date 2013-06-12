@@ -40,15 +40,28 @@ def create_investigator(request):
 def initialize_location_type():
   selected_location = {}
   for location_type in LocationType.objects.all():
-    selected_location[location_type.name]={ 'value': '', 'text':'All'}
+    selected_location[location_type.name]={ 'value': '', 'text':'All', 'siblings':[]}
   return selected_location  
 
-def update_location_type(selected_location, location):
-  assigned_type = Location.objects.get(id=location).get_ancestors(include_self=True)
-  for loca in assigned_type:
+def assign_ancestors_locations(selected_location, location):
+  ancestors = location.get_ancestors(include_self=True)
+  for loca in ancestors:
     selected_location[loca.type.name]['value'] = loca.id
     selected_location[loca.type.name]['text'] = loca.name
-    
+    selected_location[loca.type.name]['siblings'] = loca.get_siblings()
+  return selected_location  
+  
+def assign_immediate_child_locations(selected_location, location):
+  children = location.get_descendants()
+  if children:
+    immediate_child = children[0]
+    selected_location[immediate_child.type.name]['siblings'] =  immediate_child.get_siblings(include_self=True)
+  return selected_location  
+
+def update_location_type(selected_location, location_id):
+  location =  Location.objects.get(id=location_id)
+  selected_location = assign_ancestors_locations(selected_location, location)
+  selected_location = assign_immediate_child_locations(selected_location, location)
   return selected_location  
 
 
