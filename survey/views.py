@@ -60,14 +60,24 @@ def update_location_type(selected_location, location):
 
 def list_investigators(request):
     selected_location = initialize_location_type()
-    location= request.GET['parent'] if request.GET.has_key('parent') else Location.objects.all()
-    investigators = Investigator.objects.filter(location__in=location)
-    selected_location = update_location_type(selected_location, location)
+    investigators = Investigator.objects.all()
 
     return render(request, 'investigators/index.html', 
                           {'investigators': investigators,
                            'location_type': selected_location,
                            'request': request})
+                           
+def filter_list_investigators(request, location_id):
+   selected_location = initialize_location_type()
+   investigators = Investigator.objects.filter(location=location_id)
+   selected_location = update_location_type(selected_location, location_id)
+
+   return render(request, 'investigators/index.html', 
+                         {'investigators': investigators,
+                          'location_type': selected_location,
+                          'request': request})
+                           
+                           
 
 def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number = request.GET['mobile_number']).exists()

@@ -30,11 +30,15 @@ function notify(location_type){
   
 };
 
+function update_get_investigator_list_link(id){
+  $("#a-investigator-list").attr("href", "/investigators/filter/"+id +"/");
+};  
+
 function update_location_list(location_type){
   $(location_type.id_name).chosen().change( function(){
        populate_location_chosen(location_type.child, $(location_type.id_name).val());
        
-       $("#a-investigator-list").attr("href", "/investigators/?parent="+$(location_type.id_name).val())
+       update_get_investigator_list_link($(location_type.id_name).val())
        
        if (location_type.child){
          notify(location_type.child);    
@@ -110,5 +114,6 @@ $(function(){
   
   $('#investigator-village').chosen().change( function(){
        $("#location-value").val($("#investigator-village").val());
-     });     
+       update_get_investigator_list_link($('#investigator-village').val())
+   });     
 });

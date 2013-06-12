@@ -103,10 +103,8 @@ class InvestigatorsViewTest(TestCase):
       
       county = LocationType.objects.create(name="county", slug=slugify("county"))
       
-      print(kampala.get_ancestors(include_self=True))
-      
       selected_location = initialize_location_type()
-      selected_location = update_location_type(selected_location, kampala)
+      selected_location = update_location_type(selected_location, kampala.id)
 
       self.assertEquals(selected_location['country'], {'value':  uganda.id ,'text': uganda.name})
       self.assertEquals(selected_location['region'], {'value':  central.id ,'text': central.name})
@@ -114,8 +112,8 @@ class InvestigatorsViewTest(TestCase):
       self.assertEquals(selected_location['county'], {'value':  '' ,'text': 'All'})
 
     def test_list_investigators(self):
-        country = LocationType.objects.create(name="country", slug=slugify("country"))
-        uganda = Location.objects.create(name="Uganda", type=country)
+        country = LocationType.objects.create(name="country", slug=slugify("country"))      
+        uganda = Location.objects.create(name="Uganda")
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location=uganda)
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
@@ -127,6 +125,21 @@ class InvestigatorsViewTest(TestCase):
         
         self.assertEqual(len(response.context['location_type']), 1)
         self.assertEquals({ 'value': '', 'text':'All'}, response.context['location_type'][country.name])
+        
+    def test_filter_list_investigators(self):
+        country = LocationType.objects.create(name="country", slug=slugify("country"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location=uganda)
+        response = self.client.get("/investigators/filter/"+ str(uganda.id)+"/")
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [ template.name for template in response.templates]
+        self.assertIn('investigators/index.html', templates)
+
+        self.assertEqual(len(response.context['investigators']), 1)
+        self.assertIn(investigator, response.context['investigators'])
+
+        self.assertEqual(len(response.context['location_type']), 1)
+        self.assertEquals({ 'value': uganda.id, 'text': uganda.name}, response.context['location_type'][country.name])
         
 
     def test_check_mobile_number(self):
