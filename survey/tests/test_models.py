@@ -57,3 +57,70 @@ class LocationAutoCompleteTest(TestCase):
 
         soroti = Location.objects.get(name="Soroti")
         self.assertEqual(soroti.auto_complete_text(), "Soroti, Kampala Changed, Uganda")
+
+class SurveyTest(TestCase):
+    def test_store(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        self.failUnless(survey.id)
+
+class BatchTest(TestCase):
+    def test_store(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        self.failUnless(batch.id)
+
+class IndicatorTest(TestCase):
+    def setUp(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        self.batch = Batch.objects.create(survey=survey)
+
+    def test_store(self):
+        indicator = Indicator.objects.create(batch=self.batch)
+        self.failUnless(indicator.id)
+
+    def test_order(self):
+        indicator_2 = Indicator.objects.create(batch=self.batch, order=2)
+        indicator_1 = Indicator.objects.create(batch=self.batch, order=1)
+        indicators = self.batch.indicators.order_by('order').all()
+        self.assertEqual(indicators[0], indicator_1)
+        self.assertEqual(indicators[1], indicator_2)
+
+class QuestionTest(TestCase):
+    def setUp(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        self.indicator = Indicator.objects.create(batch=batch)
+
+    def test_numerical_question(self):
+        question = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type=Question.NUMBER)
+        self.failUnless(question.id)
+
+    def test_text_question(self):
+        question = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type=Question.TEXT)
+        self.failUnless(question.id)
+
+    def test_multichoice_question(self):
+        question = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type=Question.MULTICHOICE)
+        self.failUnless(question.id)
+
+    def test_order(self):
+        question_2 = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type="number", order=2)
+        question_1 = Question.objects.create(indicator=self.indicator, text="This is another question", answer_type="number", order=1)
+        questions = self.indicator.questions.order_by('order').all()
+        self.assertEqual(questions[0], question_1)
+        self.assertEqual(questions[1], question_2)
+
+class QuestionOptionTest(TestCase):
+    def setUp(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        indicator = Indicator.objects.create(batch=batch)
+        self.question = Question.objects.create(indicator=indicator, text="This is a question", answer_type="multichoice")
+
+    def test_store(self):
+        option_2 = QuestionOption.objects.create(question=self.question, text="This is another option", order=2)
+        option_1 = QuestionOption.objects.create(question=self.question, text="This is an option", order=1)
+        options = self.question.options.order_by('order').all()
+        self.assertEqual(len(options), 2)
+        options_in_text = "1) %s\n2) %s" % (option_1.text, option_2.text)
+        self.assertEqual(self.question.options_in_text(), options_in_text)

@@ -25,6 +25,59 @@ class LocationAutoComplete(models.Model):
     class Meta:
         app_label = 'survey'
 
+class Survey(TimeStampedModel):
+    name = models.CharField(max_length=100, blank=False, null=False)
+    description = models.CharField(max_length=255, blank=False, null=False)
+
+    class Meta:
+        app_label = 'survey'
+
+class Batch(TimeStampedModel):
+    survey = models.ForeignKey(Survey, null=True, related_name="batches")
+
+    class Meta:
+        app_label = 'survey'
+
+class Indicator(TimeStampedModel):
+    batch = models.ForeignKey(Batch, null=True, related_name="indicators")
+    order = models.PositiveIntegerField(max_length=2, null=True)
+
+    class Meta:
+        app_label = 'survey'
+
+class Question(TimeStampedModel):
+    NUMBER = 'number'
+    TEXT = 'text'
+    MULTICHOICE = 'multichoice'
+    TYPE_OF_ANSWERS = (
+        (NUMBER, 'NumberAnswer'),
+        (TEXT, 'TextAnswer'),
+        (MULTICHOICE, 'MultichoiceAnswer')
+    )
+
+    indicator = models.ForeignKey(Indicator, null=True, related_name="questions")
+    text = models.CharField(max_length=100, blank=False, null=False)
+    answer_type = models.CharField(max_length=100, blank=False, null=False, choices=TYPE_OF_ANSWERS)
+    order = models.PositiveIntegerField(max_length=2, null=True)
+
+    class Meta:
+        app_label = 'survey'
+
+    def options_in_text(self):
+        options = [option.to_text() for option in self.options.order_by('order').all()]
+        return "\n".join(options)
+
+class QuestionOption(TimeStampedModel):
+    question = models.ForeignKey(Question, null=True, related_name="options")
+    text = models.CharField(max_length=100, blank=False, null=False)
+    order = models.PositiveIntegerField(max_length=2, null=True)
+
+    class Meta:
+        app_label = 'survey'
+
+    def to_text(self):
+        return "%d) %s" % (self.order, self.text)
+
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
     if not auto_complete:
