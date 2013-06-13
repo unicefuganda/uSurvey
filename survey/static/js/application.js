@@ -58,14 +58,30 @@ function clean_number(value){
   return value.replace(/\s+/g, '').replace(/-/g, '');
 };
 
+function strip_leading_zero(element){
+  var value = $(element).val();
+  $(element).val(value.replace(/^[0]/g,""));
+  return true;
+};
+
+
 $(function(){
   
-  jQuery.validator.addMethod("mobile_number_length", function(value, element) {
-      return (value.length==9)
-    }, "Please enter 9 numbers");
+  jQuery.validator.addMethod("leading_zero_if_number_is_10_digits", function(value, element) {
+      return ((value.length !=10) || (value[0]==0) )
+    }, "The first digit should be 0 if you enter 10 digits.");
 
-  jQuery.validator.addMethod("no_leading_zero", function(value, element) {
-      return !(value[0]==0)
+  jQuery.validator.addMethod("too_few_digits", function(value, element) {
+      return (value.length>=9) 
+    }, "Too few digits. Please enter 9 digits.");
+
+  jQuery.validator.addMethod("too_many_digits", function(value, element) {
+      return (value.length<=10)
+    }, "Too many digits. Please enter 9 digits.");
+
+
+  jQuery.validator.addMethod("no_leading_zero_if_number_is_9_digits", function(value, element) {
+      return ( (value.length !=9) || (value[0] !=0))
     }, "No leading zero. Please follow format: 791234567.");
   
   jQuery.validator.addMethod("validate_confirm_number", function(value, element) {
@@ -80,8 +96,10 @@ $(function(){
         "name": "required",
         "mobile_number": {
           required: true,
-          mobile_number_length: true,
-          no_leading_zero: true,
+          too_few_digits: true,
+          too_many_digits: true,
+          no_leading_zero_if_number_is_9_digits: true,
+          leading_zero_if_number_is_10_digits: true,
           remote: '/investigators/check_mobile_number'
         },
         "confirm-mobile_number":{validate_confirm_number: true, required: true},
@@ -107,6 +125,7 @@ $(function(){
       submitHandler: function(form, e){
         e.preventDefault()
         form = $(form);
+        strip_leading_zero("#investigator-mobile-number");
         var button = form.find('button'),
             value = button.val();
         button.attr('disabled', true);

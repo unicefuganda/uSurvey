@@ -45,12 +45,12 @@
   <div class="control-group">
     <label class="control-label" for="investigator-age">Age</label>
     <div class="controls">
-      <input type="number" min=18 max=70  id="investigator-age" placeholder="Age" name="age">
+      <input type="number" min=18 max=50  id="investigator-age" placeholder="Age" name="age">
     </div>
   </div>
 
   <div class="control-group">
-    <label class="control-label" for="investigator-level-of-education">Level of education</label>
+    <label class="control-label" for="investigator-level-of-education">Highest level of education completed</label>
     <div class="controls">
       <select name="level_of_education" id="investigator-level-of-education">
         {% for education in list_of_eductional_levels %}
@@ -61,7 +61,7 @@
   </div>
 
   <div class="control-group">
-    <label class="control-label" for="investigator-language">Written language</label>
+    <label class="control-label" for="investigator-language">Preferred language of communication</label>
     <div class="controls">
       <select name="language" id="investigator-language">
         {% for language in list_of_languages %}

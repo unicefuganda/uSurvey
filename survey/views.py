@@ -64,7 +64,6 @@ def update_location_type(selected_location, location_id):
   selected_location = assign_immediate_child_locations(selected_location, location)
   return selected_location  
 
-
 def list_investigators(request):
     selected_location = initialize_location_type()
     investigators = Investigator.objects.all()
