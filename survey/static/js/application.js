@@ -71,15 +71,6 @@ $(function(){
       return ((value.length !=10) || (value[0]==0) )
     }, "The first digit should be 0 if you enter 10 digits.");
 
-  jQuery.validator.addMethod("too_few_digits", function(value, element) {
-      return (value.length>=9) 
-    }, "Too few digits. Please enter 9 digits.");
-
-  jQuery.validator.addMethod("too_many_digits", function(value, element) {
-      return (value.length<=10)
-    }, "Too many digits. Please enter 9 digits.");
-
-
   jQuery.validator.addMethod("no_leading_zero_if_number_is_9_digits", function(value, element) {
       return ( (value.length !=9) || (value[0] !=0))
     }, "No leading zero. Please follow format: 791234567.");
@@ -96,8 +87,8 @@ $(function(){
         "name": "required",
         "mobile_number": {
           required: true,
-          too_few_digits: true,
-          too_many_digits: true,
+          minlength: 9,
+          maxlength:10,
           no_leading_zero_if_number_is_9_digits: true,
           leading_zero_if_number_is_10_digits: true,
           remote: '/investigators/check_mobile_number'
@@ -112,6 +103,8 @@ $(function(){
       },
       messages: {
         "mobile_number": {
+          minlength:jQuery.format("Too few digits. Please enter {0} digits."),
+          maxlength:jQuery.format("Too many digits. Please enter {0} digits."),
           remote: jQuery.format("{0} is already registered.")
         }
       },
