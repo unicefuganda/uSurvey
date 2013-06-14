@@ -102,11 +102,14 @@ $(function(){
         "village":"required"
       },
       messages: {
+        "age":{number: "Please enter a valid number. No space or special charcters."},
         "mobile_number": {
+          number: "Please enter a valid number. No space or special charcters.",
           minlength:jQuery.format("Too few digits. Please enter {0} digits."),
           maxlength:jQuery.format("Too many digits. Please enter {0} digits."),
           remote: jQuery.format("{0} is already registered.")
-        }
+        },
+        "confirm-mobile_number":{number: "Please enter a valid number. No space or special charcters"}
       },
       errorPlacement: function(error, element) {
         if ($(element).is(':hidden')) {
