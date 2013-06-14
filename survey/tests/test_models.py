@@ -124,3 +124,9 @@ class QuestionOptionTest(TestCase):
         self.assertEqual(len(options), 2)
         options_in_text = "1) %s\n2) %s" % (option_1.text, option_2.text)
         self.assertEqual(self.question.options_in_text(), options_in_text)
+
+class HouseHoldTest(TestCase):
+    def test_store(self):
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
+        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        self.failUnless(household.id)

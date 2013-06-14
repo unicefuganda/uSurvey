@@ -78,6 +78,10 @@ class QuestionOption(TimeStampedModel):
     def to_text(self):
         return "%d) %s" % (self.order, self.text)
 
+class HouseHold(TimeStampedModel):
+    name = models.CharField(max_length=100, blank=False, null=False)
+    investigator = models.ForeignKey(Investigator, null=True, related_name="households")
+
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
     if not auto_complete:
