@@ -130,3 +130,15 @@ class HouseHoldTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
         household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
         self.failUnless(household.id)
+
+class NumericalAnswerTest(TestCase):
+    def test_store(self):
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
+        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        indicator = Indicator.objects.create(batch=batch)
+        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type="number")
+
+        answer = NumericalAnswer.objects.create(investigator=investigator, household=household, question=question, answer=10)
+        self.failUnless(answer.id)

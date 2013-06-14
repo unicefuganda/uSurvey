@@ -82,6 +82,12 @@ class HouseHold(TimeStampedModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
 
+class NumericalAnswer(TimeStampedModel):
+    investigator = models.ForeignKey(Investigator, null=True)
+    household = models.ForeignKey(HouseHold, null=True)
+    question = models.ForeignKey(Question, null=True, related_name="answers")
+    answer = models.PositiveIntegerField(max_length=5, null=True)
+
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
     if not auto_complete:
