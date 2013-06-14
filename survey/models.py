@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import *
 from django_extensions.db.models import TimeStampedModel
 from rapidsms.contrib.locations.models import Location
 from django.db.models.signals import post_save
@@ -16,7 +16,7 @@ class BaseModel(TimeStampedModel):
 
 class Investigator(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
-    mobile_number = models.CharField(max_length=9, unique=True, null=False, blank=False)
+    mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=9, unique=True, null=False, blank=False)
     male = models.BooleanField(default=True)
     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION)

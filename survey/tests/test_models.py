@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.models import *
-from django.db import IntegrityError
+from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 
 class InvestigatorTest(TestCase):
@@ -13,14 +13,18 @@ class InvestigatorTest(TestCase):
             self.assertIn(field, fields)
 
     def test_store(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321")
         self.failUnless(investigator.id)
         self.failUnless(investigator.created)
         self.failUnless(investigator.modified)
 
-    def test_validations(self):
-        Investigator.objects.create(name="", mobile_number = "mobile_number")
-        self.failUnlessRaises(IntegrityError, Investigator.objects.create, mobile_number = "mobile_number")
+    def test_mobile_number_is_unique(self):
+        Investigator.objects.create(name="", mobile_number = "123456789")
+        self.failUnlessRaises(IntegrityError, Investigator.objects.create, mobile_number = "123456789")
+        
+    def test_mobile_number_length_must_be_9(self):
+        mobile_number_of_length_10="1234567890"
+        self.failUnlessRaises(DatabaseError, Investigator.objects.create, mobile_number = mobile_number_of_length_10)
 
     def test_next_answerable_question(self):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210")

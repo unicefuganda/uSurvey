@@ -14,7 +14,7 @@ class InvestigatorFormTest(TestCase):
     def test_valid(self):
         form_data = {
                         'name': 'Rajini',
-                        'mobile_number': '9876543210',
+                        'mobile_number': '987654321',
                         'male': 't',
                         'age': '20',
                         'level_of_education': 'Primary',

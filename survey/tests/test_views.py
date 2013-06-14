@@ -63,7 +63,7 @@ class InvestigatorsViewTest(TestCase):
         uganda = Location.objects.create(name="Uganda")
         form_data = {
                         'name': 'Rajini',
-                        'mobile_number': '9876543210',
+                        'mobile_number': '987654321',
                         'male': 'f',
                         'age': '20',
                         'level_of_education': 'Nursery',
@@ -115,7 +115,7 @@ class InvestigatorsViewTest(TestCase):
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location=uganda)
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda)
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
         templates = [ template.name for template in response.templates]
@@ -130,7 +130,7 @@ class InvestigatorsViewTest(TestCase):
     def test_filter_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location=uganda)
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda)
         response = self.client.get("/investigators/filter/"+ str(uganda.id)+"/")
         self.failUnlessEqual(response.status_code, 200)
         templates = [ template.name for template in response.templates]
@@ -143,7 +143,7 @@ class InvestigatorsViewTest(TestCase):
 
 
     def test_check_mobile_number(self):
-        investigator = Investigator.objects.create(name="investigator", mobile_number="1234567890")
+        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789")
         response = self.client.get("/investigators/check_mobile_number?mobile_number=0987654321")
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
