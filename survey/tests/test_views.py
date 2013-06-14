@@ -169,5 +169,9 @@ class InvestigatorsViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 404)
 
     def test_ussd_non_registered_user(self):
-        response = self.client.post('/ussd', data=self.ussd_params)
+        response = self.client.post('/ussd/', data=self.ussd_params)
         self.failUnlessEqual(response.status_code, 404)
+
+    def test_ussd_simulator(self):
+        response = self.client.get('/ussd/simulator')
+        self.failUnlessEqual(response.status_code, 200)
