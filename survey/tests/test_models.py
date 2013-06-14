@@ -138,7 +138,32 @@ class NumericalAnswerTest(TestCase):
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
-        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type="number")
+        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type=Question.NUMBER)
 
         answer = NumericalAnswer.objects.create(investigator=investigator, household=household, question=question, answer=10)
+        self.failUnless(answer.id)
+
+class TextAnswerTest(TestCase):
+    def test_store(self):
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
+        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        indicator = Indicator.objects.create(batch=batch)
+        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type=Question.TEXT)
+
+        answer = TextAnswer.objects.create(investigator=investigator, household=household, question=question, answer="This is an answer")
+        self.failUnless(answer.id)
+
+class MultiChoiceAnswerTest(TestCase):
+    def test_store(self):
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
+        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        indicator = Indicator.objects.create(batch=batch)
+        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type=Question.MULTICHOICE)
+        option = QuestionOption.objects.create(question=question, text="This is an option")
+
+        answer = MultiChoiceAnswer.objects.create(investigator=investigator, household=household, question=question, answer=option)
         self.failUnless(answer.id)

@@ -5,7 +5,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from investigator_configs import *
 
-class Investigator(TimeStampedModel):
+class BaseModel(TimeStampedModel):
+    class Meta:
+        app_label = 'survey'
+        abstract = True
+
+class Investigator(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     mobile_number = models.CharField(max_length=20, unique=True, null=False, blank=False)
     male = models.BooleanField(default=True)
@@ -14,10 +19,6 @@ class Investigator(TimeStampedModel):
     location = models.ForeignKey(Location, null=True)
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES)
 
-
-    class Meta:
-        app_label = 'survey'
-
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
@@ -25,34 +26,25 @@ class LocationAutoComplete(models.Model):
     class Meta:
         app_label = 'survey'
 
-class Survey(TimeStampedModel):
+class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     description = models.CharField(max_length=255, blank=False, null=False)
 
-    class Meta:
-        app_label = 'survey'
-
-class Batch(TimeStampedModel):
+class Batch(BaseModel):
     survey = models.ForeignKey(Survey, null=True, related_name="batches")
 
-    class Meta:
-        app_label = 'survey'
-
-class Indicator(TimeStampedModel):
+class Indicator(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="indicators")
     order = models.PositiveIntegerField(max_length=2, null=True)
 
-    class Meta:
-        app_label = 'survey'
-
-class Question(TimeStampedModel):
+class Question(BaseModel):
     NUMBER = 'number'
     TEXT = 'text'
     MULTICHOICE = 'multichoice'
     TYPE_OF_ANSWERS = (
         (NUMBER, 'NumberAnswer'),
         (TEXT, 'TextAnswer'),
-        (MULTICHOICE, 'MultichoiceAnswer')
+        (MULTICHOICE, 'MultiChoiceAnswer')
     )
 
     indicator = models.ForeignKey(Indicator, null=True, related_name="questions")
@@ -60,33 +52,38 @@ class Question(TimeStampedModel):
     answer_type = models.CharField(max_length=100, blank=False, null=False, choices=TYPE_OF_ANSWERS)
     order = models.PositiveIntegerField(max_length=2, null=True)
 
-    class Meta:
-        app_label = 'survey'
-
     def options_in_text(self):
         options = [option.to_text() for option in self.options.order_by('order').all()]
         return "\n".join(options)
 
-class QuestionOption(TimeStampedModel):
+class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
     text = models.CharField(max_length=100, blank=False, null=False)
     order = models.PositiveIntegerField(max_length=2, null=True)
 
-    class Meta:
-        app_label = 'survey'
-
     def to_text(self):
         return "%d) %s" % (self.order, self.text)
 
-class HouseHold(TimeStampedModel):
+class HouseHold(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
 
-class NumericalAnswer(TimeStampedModel):
+class Answer(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True)
     household = models.ForeignKey(HouseHold, null=True)
-    question = models.ForeignKey(Question, null=True, related_name="answers")
+    question = models.ForeignKey(Question, null=True)
+
+    class Meta:
+        abstract = True
+
+class NumericalAnswer(Answer):
     answer = models.PositiveIntegerField(max_length=5, null=True)
+
+class TextAnswer(Answer):
+    answer = models.CharField(max_length=100, blank=False, null=False)
+
+class MultiChoiceAnswer(Answer):
+    answer = models.ForeignKey(QuestionOption, null=True)
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
