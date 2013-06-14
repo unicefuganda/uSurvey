@@ -40,3 +40,5 @@ testsettings.py
 *.log
 investigator_configs.py
 *.csv
+.DS_STORE
+*/**/.DS_STORE
