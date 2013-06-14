@@ -37,6 +37,11 @@ class Investigator(BaseModel):
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
+    def answered(self, question, household, answer):
+        answer_class = eval(Question.TYPE_OF_ANSWERS_CLASS[question.answer_type])
+        answer_class.objects.create(investigator=self, question=question, household=household, answer=answer)
+        return question.next_question()
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
@@ -66,11 +71,16 @@ class Question(BaseModel):
     NUMBER = 'number'
     TEXT = 'text'
     MULTICHOICE = 'multichoice'
-    TYPE_OF_ANSWERS = (
-        (NUMBER, 'NumericalAnswer'),
-        (TEXT, 'TextAnswer'),
-        (MULTICHOICE, 'MultiChoiceAnswer')
-    )
+    TYPE_OF_ANSWERS = {
+        (NUMBER, 'Number'),
+        (TEXT, 'Text'),
+        (MULTICHOICE, 'Multichoice')
+    }
+    TYPE_OF_ANSWERS_CLASS = {
+        NUMBER: 'NumericalAnswer',
+        TEXT: 'TextAnswer',
+        MULTICHOICE: 'MultiChoiceAnswer'
+    }
 
     indicator = models.ForeignKey(Indicator, null=True, related_name="questions")
     text = models.CharField(max_length=100, blank=False, null=False)
@@ -85,6 +95,9 @@ class Question(BaseModel):
         question = self.indicator.questions.filter(order__gt=self.order)
         if question:
             return question[0]
+
+    def to_ussd(self):
+        return self.text
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
@@ -110,6 +123,10 @@ class Answer(BaseModel):
 
 class NumericalAnswer(Answer):
     answer = models.PositiveIntegerField(max_length=5, null=True)
+
+    def save(self, *args, **kwargs):
+        self.answer = int(self.answer)
+        super(NumericalAnswer, self).save(*args, **kwargs)
 
 class TextAnswer(Answer):
     answer = models.CharField(max_length=100, blank=False, null=False)

@@ -9,10 +9,11 @@ class USSD(object):
         self.responseString = ""
 
     def response(self):
+        household = self.investigator.households.latest('created')
         question = self.investigator.next_answerable_question()
         if not self.is_new_request():
-            answer = self.get_answer()
-            question = self.investigator.answered(question, answer)
+            answer = self.request['ussdRequestString']
+            question = self.investigator.answered(question, household, answer)
         if not question:
             self.action = "end"
             self.responseString = USSD.SUCCESS_MESSAGE

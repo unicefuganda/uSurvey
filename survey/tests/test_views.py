@@ -171,10 +171,3 @@ class InvestigatorsViewTest(TestCase):
     def test_ussd_non_registered_user(self):
         response = self.client.post('/ussd', data=self.ussd_params)
         self.failUnlessEqual(response.status_code, 404)
-
-    # def test_ussd_registered_user(self):
-    #     investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''))
-    #     response = self.client.post('/ussd', data=self.ussd_params)
-    #     self.failUnlessEqual(response.status_code, 200)
-    #     templates = [ template.name for template in response.templates]
-    #     self.assertIn('ussd/' + USSD_PROVIDER + '.txt', templates)
