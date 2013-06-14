@@ -19,6 +19,24 @@ class Investigator(BaseModel):
     location = models.ForeignKey(Location, null=True)
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES)
 
+    def next_answerable_question(self):
+        last_answered_question = self.last_answered_question()
+        if not last_answered_question:
+            return Survey.currently_open().first_question()
+        else:
+            return last_answered_question.next_question()
+
+    def last_answered_question(self):
+        answered = []
+        for klass in [NumericalAnswer, TextAnswer, MultiChoiceAnswer]:
+            try:
+                answer = klass.objects.filter(investigator=self).latest()
+                if answer: answered.append(answer)
+            except klass.DoesNotExist, e:
+                pass
+        if answered:
+            return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
@@ -29,6 +47,13 @@ class LocationAutoComplete(models.Model):
 class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     description = models.CharField(max_length=255, blank=False, null=False)
+
+    def first_question(self):
+        return self.batches.reverse().latest('created').indicators.reverse().latest('order').questions.reverse().latest('order')
+
+    @classmethod
+    def currently_open(self):
+        return Survey.objects.latest('created')
 
 class Batch(BaseModel):
     survey = models.ForeignKey(Survey, null=True, related_name="batches")
@@ -42,7 +67,7 @@ class Question(BaseModel):
     TEXT = 'text'
     MULTICHOICE = 'multichoice'
     TYPE_OF_ANSWERS = (
-        (NUMBER, 'NumberAnswer'),
+        (NUMBER, 'NumericalAnswer'),
         (TEXT, 'TextAnswer'),
         (MULTICHOICE, 'MultiChoiceAnswer')
     )
@@ -55,6 +80,11 @@ class Question(BaseModel):
     def options_in_text(self):
         options = [option.to_text() for option in self.options.order_by('order').all()]
         return "\n".join(options)
+
+    def next_question(self):
+        question = self.indicator.questions.filter(order__gt=self.order)
+        if question:
+            return question[0]
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
@@ -74,7 +104,9 @@ class Answer(BaseModel):
     question = models.ForeignKey(Question, null=True)
 
     class Meta:
+        app_label = 'survey'
         abstract = True
+        get_latest_by = 'created'
 
 class NumericalAnswer(Answer):
     answer = models.PositiveIntegerField(max_length=5, null=True)

@@ -6,13 +6,14 @@ from survey.forms import *
 from survey.models import Investigator
 import json
 from django.views.decorators.csrf import csrf_exempt
+from survey.ussd import USSD
 
 def new_investigator(request):
     list_of_eductional_levels = [education[0] for education in LEVEL_OF_EDUCATION]
     list_of_languages = [language[0] for language in LANGUAGES]
     investigator = InvestigatorForm()
-      
-    return render(request, 'investigators/new.html', {'list_of_eductional_levels': list_of_eductional_levels, 
+
+    return render(request, 'investigators/new.html', {'list_of_eductional_levels': list_of_eductional_levels,
                                                       'list_of_languages': list_of_languages,
                                                       'country_phone_code': COUNTRY_PHONE_CODE,
                                                       'form': investigator,
@@ -41,7 +42,7 @@ def initialize_location_type():
   selected_location = {}
   for location_type in LocationType.objects.all():
     selected_location[location_type.name]={ 'value': '', 'text':'All', 'siblings':[]}
-  return selected_location  
+  return selected_location
 
 def assign_ancestors_locations(selected_location, location):
   ancestors = location.get_ancestors(include_self=True)
@@ -49,41 +50,41 @@ def assign_ancestors_locations(selected_location, location):
     selected_location[loca.type.name]['value'] = loca.id
     selected_location[loca.type.name]['text'] = loca.name
     selected_location[loca.type.name]['siblings'] = loca.get_siblings()
-  return selected_location  
-  
+  return selected_location
+
 def assign_immediate_child_locations(selected_location, location):
   children = location.get_descendants()
   if children:
     immediate_child = children[0]
     selected_location[immediate_child.type.name]['siblings'] =  immediate_child.get_siblings(include_self=True)
-  return selected_location  
+  return selected_location
 
 def update_location_type(selected_location, location_id):
   location =  Location.objects.get(id=location_id)
   selected_location = assign_ancestors_locations(selected_location, location)
   selected_location = assign_immediate_child_locations(selected_location, location)
-  return selected_location  
+  return selected_location
 
 def list_investigators(request):
     selected_location = initialize_location_type()
     investigators = Investigator.objects.all()
 
-    return render(request, 'investigators/index.html', 
+    return render(request, 'investigators/index.html',
                           {'investigators': investigators,
                            'location_type': selected_location,
                            'request': request})
-                           
+
 def filter_list_investigators(request, location_id):
    selected_location = initialize_location_type()
    investigators = Investigator.objects.filter(location=location_id)
    selected_location = update_location_type(selected_location, location_id)
 
-   return render(request, 'investigators/index.html', 
+   return render(request, 'investigators/index.html',
                          {'investigators': investigators,
                           'location_type': selected_location,
                           'request': request})
-                           
-                           
+
+
 
 def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number = request.GET['mobile_number']).exists()
@@ -95,8 +96,8 @@ def ussd(request):
     mobile_number = params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
     try:
         investigator = Investigator.objects.get(mobile_number=mobile_number)
-        responseString = "Welcome %s. You can now start to collect responses on survey questions." % investigator.name
+        response = USSD(investigator, params).response()
         template = "ussd/%s.txt" % USSD_PROVIDER
-        return render(request, template, { 'action': 'end', 'responseString': responseString })
+        return render(request, template, response)
     except Investigator.DoesNotExist:
         return HttpResponse(status=404)

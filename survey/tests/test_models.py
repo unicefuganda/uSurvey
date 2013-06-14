@@ -3,7 +3,6 @@ from survey.models import *
 from django.db import IntegrityError
 from rapidsms.contrib.locations.models import Location, LocationType
 
-
 class InvestigatorTest(TestCase):
 
     def test_fields(self):
@@ -22,6 +21,25 @@ class InvestigatorTest(TestCase):
     def test_validations(self):
         Investigator.objects.create(name="", mobile_number = "mobile_number")
         self.failUnlessRaises(IntegrityError, Investigator.objects.create, mobile_number = "mobile_number")
+
+    def test_next_answerable_question(self):
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210")
+        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        indicator = Indicator.objects.create(batch=batch)
+        question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+
+        self.assertEqual(question_1, investigator.next_answerable_question())
+
+        NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_1, answer=10)
+
+        self.assertEqual(question_2, investigator.next_answerable_question())
+
+        NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_2, answer=10)
+
+        self.assertEqual(None, investigator.next_answerable_question())
 
 class LocationTest(TestCase):
 
