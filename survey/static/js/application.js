@@ -148,6 +148,10 @@ $(function(){
     e.preventDefault();
   });
   
+  // $("select[data-location=true]").each(function(){
+  //   update_location_list($(this));
+  // });
+  
   update_location_list(district);
   update_location_list(county);
   update_location_list(subcounty);

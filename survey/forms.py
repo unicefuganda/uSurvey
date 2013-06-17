@@ -3,10 +3,6 @@ from survey.models import *
 from django.forms import ModelForm
 from django.core.validators import *
 from django.utils.safestring import mark_safe
-
-class HorizontalRadioRenderer(forms.RadioSelect.renderer):
-  def render(self):
-    return mark_safe(u'\n'.join([u'%s\n' % w for w in self]))
     
 class InvestigatorForm(ModelForm):
   
@@ -20,7 +16,6 @@ class InvestigatorForm(ModelForm):
       if mobile_number != confirm_mobile_number:
         message = "Mobile numbers don't match."
         self._errors["confirm_mobile_number"] = self.error_class([message])
-        del cleaned_data["confirm_mobile_number"]
         raise forms.ValidationError(message)
 
       return cleaned_data
@@ -31,7 +26,7 @@ class InvestigatorForm(ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
             'mobile_number': forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'style':"width:172px;"}),
-            'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female')), renderer=HorizontalRadioRenderer),
+            'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
             'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':18, 'max':50 }),
             'location':forms.HiddenInput(),
         }

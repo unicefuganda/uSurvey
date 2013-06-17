@@ -22,9 +22,9 @@ class InvestigatorTest(TestCase):
         Investigator.objects.create(name="", mobile_number = "123456789")
         self.failUnlessRaises(IntegrityError, Investigator.objects.create, mobile_number = "123456789")
         
-    def test_mobile_number_length_must_be_9(self):
-        mobile_number_of_length_10="1234567890"
-        self.failUnlessRaises(DatabaseError, Investigator.objects.create, mobile_number = mobile_number_of_length_10)
+    def test_mobile_number_length_must_be_less_than_10(self):
+        mobile_number_of_length_11="01234567891"
+        self.failUnlessRaises(DatabaseError, Investigator.objects.create, mobile_number = mobile_number_of_length_11)
 
     def test_next_answerable_question(self):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210")
