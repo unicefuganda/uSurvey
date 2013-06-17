@@ -155,22 +155,23 @@ class InvestigatorsViewTest(TestCase):
         self.assertFalse(json_response)
 
     def test_ussd_url(self):
+        response_message = "responseString=%s&action=end" % USSD.MESSAGES['USER_NOT_REGISTERED']
         response = self.client.get('/ussd', data=self.ussd_params)
-        self.failUnlessEqual(response.status_code, 404)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(urllib2.unquote(response.content), response_message)
 
         response = self.client.get('/ussd/', data=self.ussd_params)
-        self.failUnlessEqual(response.status_code, 404)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(urllib2.unquote(response.content), response_message)
 
         client = Client(enforce_csrf_checks=True)
         response = self.client.post('/ussd', data=self.ussd_params)
-        self.failUnlessEqual(response.status_code, 404)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(urllib2.unquote(response.content), response_message)
 
         response = self.client.post('/ussd/', data=self.ussd_params)
-        self.failUnlessEqual(response.status_code, 404)
-
-    def test_ussd_non_registered_user(self):
-        response = self.client.post('/ussd/', data=self.ussd_params)
-        self.failUnlessEqual(response.status_code, 404)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(urllib2.unquote(response.content), response_message)
 
     def test_ussd_simulator(self):
         response = self.client.get('/ussd/simulator')

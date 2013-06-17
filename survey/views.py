@@ -97,7 +97,7 @@ def ussd(request):
     try:
         investigator = Investigator.objects.get(mobile_number=mobile_number)
         response = USSD(investigator, params).response()
-        template = "ussd/%s.txt" % USSD_PROVIDER
-        return render(request, template, response)
     except Investigator.DoesNotExist:
-        return HttpResponse(status=404)
+        response = USSD.investigator_not_registered_response()
+    template = "ussd/%s.txt" % USSD_PROVIDER
+    return render(request, template, response)

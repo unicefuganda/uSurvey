@@ -45,7 +45,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "2"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=end" % USSD.SUCCESS_MESSAGE
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.assertEquals(2, NumericalAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
@@ -71,7 +71,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "Reply Two"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=end" % USSD.SUCCESS_MESSAGE
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.assertEquals(self.ussd_params['ussdRequestString'], TextAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
@@ -102,7 +102,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = str(option_2_1.order)
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=end" % USSD.SUCCESS_MESSAGE
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.assertEquals(option_2_1, MultiChoiceAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
