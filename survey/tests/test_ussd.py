@@ -22,13 +22,14 @@ class USSDTest(TestCase):
         self.household = HouseHold.objects.create(name="HouseHold 1", investigator=self.investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
-        indicator = Indicator.objects.create(batch=batch)
-        self.question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        self.question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        self.indicator = Indicator.objects.create(batch=batch)
 
     def test_numerical_questions(self):
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % self.question_1.text
+        response_string = "responseString=%s&action=request" % question_1.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.ussd_params['response'] = "true"
@@ -36,9 +37,9 @@ class USSDTest(TestCase):
 
         response = self.client.post('/ussd', data=self.ussd_params)
 
-        self.assertEquals(4, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_1).answer)
+        self.assertEquals(4, NumericalAnswer.objects.get(investigator=self.investigator, question=question_1).answer)
 
-        response_string = "responseString=%s&action=request" % self.question_2.text
+        response_string = "responseString=%s&action=request" % question_2.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.ussd_params['ussdRequestString'] = "2"
@@ -47,4 +48,30 @@ class USSDTest(TestCase):
         response_string = "responseString=%s&action=end" % USSD.SUCCESS_MESSAGE
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(2, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_2).answer)
+        self.assertEquals(2, NumericalAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
+
+    def test_textual_questions(self):
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.TEXT, order=1)
+        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.TEXT, order=2)
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % question_1.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "Reply one"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+
+        self.assertEquals(self.ussd_params['ussdRequestString'], TextAnswer.objects.get(investigator=self.investigator, question=question_1).answer)
+
+        response_string = "responseString=%s&action=request" % question_2.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['ussdRequestString'] = "Reply Two"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.SUCCESS_MESSAGE
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.assertEquals(self.ussd_params['ussdRequestString'], TextAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
