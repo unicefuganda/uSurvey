@@ -99,7 +99,11 @@ class Question(BaseModel):
             return question[0]
 
     def to_ussd(self):
-        return self.text
+        if self.answer_type == self.MULTICHOICE:
+            text = "%s\n%s" % (self.text, self.options_in_text())
+            return text
+        else:
+            return self.text
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")

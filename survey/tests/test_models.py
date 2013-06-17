@@ -143,6 +143,12 @@ class QuestionOptionTest(TestCase):
         options_in_text = "1) %s\n2) %s" % (option_1.text, option_2.text)
         self.assertEqual(self.question.options_in_text(), options_in_text)
 
+    def test_question_text(self):
+        option_2 = QuestionOption.objects.create(question=self.question, text="This is another option", order=2)
+        option_1 = QuestionOption.objects.create(question=self.question, text="This is an option", order=1)
+        question_in_text = "%s\n%s" % (self.question.text, self.question.options_in_text())
+        self.assertEqual(self.question.to_ussd(), question_in_text)
+
 class HouseHoldTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
