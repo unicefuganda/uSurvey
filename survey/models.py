@@ -16,12 +16,14 @@ class BaseModel(TimeStampedModel):
 
 class Investigator(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
-    mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=9, unique=True, null=False, blank=False)
-    male = models.BooleanField(default=True)
+    mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=10, unique=True, null=False, blank=False)
+    male = models.BooleanField(default=True, verbose_name="Sex")
     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
-    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION)
+    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION, 
+                                          blank=False, default='Primary', verbose_name="Highest level of education completed")
     location = models.ForeignKey(Location, null=True)
-    language = models.CharField(max_length=100, null=True, choices=LANGUAGES)
+    language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
+                                blank=False, default='English', verbose_name="Preferred language of communication")
 
     def next_answerable_question(self):
         last_answered_question = self.last_answered_question()

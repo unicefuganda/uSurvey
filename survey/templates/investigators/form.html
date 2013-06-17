@@ -1,88 +1,48 @@
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal investigator-form">
-  <input type="hidden" name="next-page" value="{{ next_page }}" id="next-page">
   {% csrf_token %}
-  <div class="control-group">
-    <label class="control-label" for="investigator-name">Name</label>
-    <div class="controls">
-      <input type="text" id="investigator-name" placeholder="Name" name="name">
-    </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label" for="investigator-mobile-number">Mobile Number</label>
-    <div class="controls">
-      <div class="input-prepend">
-        <span class="add-on">{{ country_phone_code }}</span>
-        <input type="number" id="investigator-mobile-number" placeholder="Format: 791234567" style="width:172px;" name="mobile_number">
+  
+  {% for field in form.visible_fields %}
+    {% load is_mobile_number %}
+    <div class="control-group">
+      <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
+      <div class="controls">
+        {% if field.label_tag|is_mobile_number %}
+         <div class="input-prepend">
+             <span class="add-on">{{ country_phone_code }}</span>
+        {% endif %}  
+        {{field}} <label class="error">
+          {% if field.errors %}
+              {% for error in field.errors %}
+                  {{ error}}
+              {% endfor %}
+          {% endif %}
+           </label>
+        {% if field.label_tag|is_mobile_number %}
+          </div>
+        {% endif %}
       </div>
     </div>
-  </div>
+  {% endfor %}  
 
-  <div class="control-group">
-    <label class="control-label" for="investigator-mobile-number">Confirm Mobile Number</label>
-    <div class="controls">
-      <div class="input-prepend">
-        <span class="add-on">{{ country_phone_code }}</span>
-        <input type="number" id="confirm-investigator-number" placeholder="Format: 791234567" style="width:172px;" name="confirm-mobile_number">
-      </div>
-    </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label">Sex</label>
-    <div class="controls">
-      <label class="radio inline">
-        <input type="radio" name="male" value="t" checked>
-        Male
-      </label>
-      <label class="radio inline">
-        <input type="radio" name="male" value="">
-        Female
-      </label>
-    </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label" for="investigator-age">Age</label>
-    <div class="controls">
-      <input type="number" min=18 max=50  id="investigator-age" placeholder="Age" name="age">
-    </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label" for="investigator-level-of-education">Highest level of education completed</label>
-    <div class="controls">
-      <select name="level_of_education" id="investigator-level-of-education">
-        {% for education in list_of_eductional_levels %}
-          <option value="{{ education }}">{{ education }}</option>
-        {% endfor %}
-      </select>
-    </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label" for="investigator-language">Preferred language of communication</label>
-    <div class="controls">
-      <select name="language" id="investigator-language">
-        {% for language in list_of_languages %}
-          <option value="{{ language }}">{{ language }}</option>
-        {% endfor %}
-      </select>
-    </div>
-  </div>
-
-  {% for type in location_type %}
-      <div class="control-group">
-        <label class="control-label">{{type.name.capitalize}}</label>
-        <div class="controls">
-        <select name="{{type.name.lower}}" id="investigator-{{type.name.lower}}" data-placeholder="Select or Type {{type.name}} "  single  class="chzn-select">
-        <option value=""></option>
+  
+  {% for name, type in location_type.items %}
+    <div class="control-group">
+      <label class="control-label">{{name.capitalize}}</label>
+      <div class="controls">
+        <select name="{{name.lower}}" id="investigator-{{name.lower}}" data-placeholder="Select or Type {{name}} "  single  class="chzn-select">
+          <option value="{{type.value}}" selected>{{type.text}}</option>
+          {% for location in type.siblings %}
+            <option value="{{location.id}}">{{location.name}}</option>
+          {% endfor %}
         </select>
         </div>
       </div>
- {% endfor %}
+  {% endfor %}
+ 
+  {% for hidden in form.hidden_fields %}
+    {{ hidden }}
+  {% endfor %}
 
- <input type="hidden" name="location" id="location-value" value="">
   <div class="form-actions">
     <button type="submit" class="btn btn-primary" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
   </div>
