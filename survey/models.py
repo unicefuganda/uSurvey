@@ -39,6 +39,8 @@ class Investigator(BaseModel):
 
     def answered(self, question, household, answer):
         answer_class = eval(Question.TYPE_OF_ANSWERS_CLASS[question.answer_type])
+        if answer_class == MultiChoiceAnswer:
+            answer = question.options.get(order=int(answer))
         answer_class.objects.create(investigator=self, question=question, household=household, answer=answer)
         return question.next_question()
 
