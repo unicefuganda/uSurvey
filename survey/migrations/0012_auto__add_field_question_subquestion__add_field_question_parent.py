@@ -8,23 +8,23 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'NumericalAnswerRule'
-        db.create_table(u'survey_numericalanswerrule', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('question', self.gf('django.db.models.fields.related.OneToOneField')(related_name='rule', unique=True, null=True, to=orm['survey.Question'])),
-            ('action', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('condition', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('next_question', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['survey.Question'], unique=True, null=True)),
-            ('value', self.gf('django.db.models.fields.PositiveIntegerField')(max_length=2, null=True)),
-        ))
-        db.send_create_signal('survey', ['NumericalAnswerRule'])
+        # Adding field 'Question.subquestion'
+        db.add_column(u'survey_question', 'subquestion',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'Question.parent'
+        db.add_column(u'survey_question', 'parent',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='children', null=True, to=orm['survey.Question']),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'NumericalAnswerRule'
-        db.delete_table(u'survey_numericalanswerrule')
+        # Deleting field 'Question.subquestion'
+        db.delete_column(u'survey_question', 'subquestion')
+
+        # Deleting field 'Question.parent'
+        db.delete_column(u'survey_question', 'parent_id')
 
 
     models = {
@@ -59,6 +59,19 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'latitude': ('django.db.models.fields.DecimalField', [], {'max_digits': '13', 'decimal_places': '10'}),
             'longitude': ('django.db.models.fields.DecimalField', [], {'max_digits': '13', 'decimal_places': '10'})
+        },
+        'survey.answerrule': {
+            'Meta': {'object_name': 'AnswerRule'},
+            'action': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'condition': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'next_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parent_question_rules'", 'null': 'True', 'to': "orm['survey.Question']"}),
+            'question': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'rule'", 'unique': 'True', 'null': 'True', 'to': "orm['survey.Question']"}),
+            'validate_with_option': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.QuestionOption']", 'null': 'True'}),
+            'validate_with_question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'}),
+            'validate_with_value': ('django.db.models.fields.PositiveIntegerField', [], {'max_length': '2', 'null': 'True'})
         },
         'survey.batch': {
             'Meta': {'object_name': 'Batch'},
@@ -122,17 +135,6 @@ class Migration(SchemaMigration):
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'})
         },
-        'survey.numericalanswerrule': {
-            'Meta': {'object_name': 'NumericalAnswerRule'},
-            'action': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'condition': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'next_question': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['survey.Question']", 'unique': 'True', 'null': 'True'}),
-            'question': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'rule'", 'unique': 'True', 'null': 'True', 'to': "orm['survey.Question']"}),
-            'value': ('django.db.models.fields.PositiveIntegerField', [], {'max_length': '2', 'null': 'True'})
-        },
         'survey.question': {
             'Meta': {'object_name': 'Question'},
             'answer_type': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -141,6 +143,8 @@ class Migration(SchemaMigration):
             'indicator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'questions'", 'null': 'True', 'to': "orm['survey.Indicator']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'order': ('django.db.models.fields.PositiveIntegerField', [], {'max_length': '2', 'null': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['survey.Question']"}),
+            'subquestion': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'text': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'survey.questionoption': {

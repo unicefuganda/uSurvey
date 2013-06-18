@@ -45,9 +45,12 @@ class Investigator(BaseModel):
         answer_class.objects.create(investigator=self, question=question, household=household, answer=answer)
         return question.next_question_for_investigator(self)
 
-    def delete_last_answer_for(self, question):
+    def last_answer_for(self, question):
         answer_class = question.answer_class()
-        answer_class.objects.filter(investigator=self, question=question).latest().delete()
+        return answer_class.objects.filter(investigator=self, question=question).latest()
+
+    def delete_last_answer_for(self, question):
+        self.last_answer_for(question).delete()
 
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
@@ -93,6 +96,8 @@ class Question(BaseModel):
     text = models.CharField(max_length=100, blank=False, null=False)
     answer_type = models.CharField(max_length=100, blank=False, null=False, choices=TYPE_OF_ANSWERS)
     order = models.PositiveIntegerField(max_length=2, null=True)
+    subquestion = models.BooleanField(default=False)
+    parent = models.ForeignKey("Question", null=True, related_name="children")
 
     def answer_class(self):
         return eval(Question.TYPE_OF_ANSWERS_CLASS[self.answer_type])
@@ -110,12 +115,16 @@ class Question(BaseModel):
     def next_question_for_investigator(self, investigator):
         answer = self.answer_class().objects.get(investigator=investigator, question=self)
         try:
-            return self.get_next_question_by_rule(answer.answer, investigator)
+            return self.get_next_question_by_rule(answer, investigator)
         except ObjectDoesNotExist, e:
             return self.next_question()
 
     def next_question(self):
-        question = self.indicator.questions.filter(order=self.order + 1)
+        if self.subquestion:
+            order = self.parent.order
+        else:
+            order = self.order
+        question = self.indicator.questions.filter(order=order + 1)
         if question:
             return question[0]
 
@@ -166,40 +175,56 @@ class AnswerRule(BaseModel):
                 'END_INTERVIEW': 'END_INTERVIEW',
                 'SKIP_TO': 'SKIP_TO',
                 'REANSWER': 'REANSWER',
+                'ASK_SUBQUESTION': 'ASK_SUBQUESTION',
     }
     ACTION_METHODS = {
                 'END_INTERVIEW': 'end_interview',
                 'SKIP_TO': 'skip_to',
                 'REANSWER': 'reanswer',
+                'ASK_SUBQUESTION': 'ask_subquestion',
     }
     CONDITIONS = {
                 'EQUALS': 'EQUALS',
+                'EQUALS_OPTION': 'EQUALS_OPTION',
                 'GREATER_THAN_QUESTION': 'GREATER_THAN_QUESTION',
                 'GREATER_THAN_VALUE': 'GREATER_THAN_VALUE',
+                'LESS_THAN_QUESTION': 'LESS_THAN_QUESTION',
+                'LESS_THAN_VALUE': 'LESS_THAN_VALUE',
     }
     CONDITION_METHODS = {
                 'EQUALS': 'is_equal',
+                'EQUALS_OPTION': 'equals_option',
                 'GREATER_THAN_QUESTION': 'greater_than_question',
                 'GREATER_THAN_VALUE': 'greater_than_value',
+                'LESS_THAN_QUESTION': 'less_than_question',
+                'LESS_THAN_VALUE': 'less_than_value',
     }
 
     question = models.OneToOneField(Question, null=True, related_name="rule")
     action = models.CharField(max_length=100, blank=False, null=False, choices=ACTIONS.items())
     condition = models.CharField(max_length=100, blank=False, null=False, choices=CONDITIONS.items())
-    next_question = models.OneToOneField(Question, null=True)
-
-    class Meta:
-        app_label = 'survey'
-        abstract = True
+    next_question = models.ForeignKey(Question, null=True, related_name="parent_question_rules")
+    validate_with_value = models.PositiveIntegerField(max_length=2, null=True)
+    validate_with_question = models.ForeignKey(Question, null=True)
+    validate_with_option = models.ForeignKey(QuestionOption, null=True)
 
     def is_equal(self, answer):
-        return self.value == answer
+        return self.validate_with_value == answer.answer
+
+    def equals_option(self, answer):
+        return self.validate_with_option == answer.answer
 
     def greater_than_question(self, answer):
-        pass
+        return answer.answer > answer.investigator.last_answer_for(self.validate_with_question).answer
 
     def greater_than_value(self, answer):
-        return answer > self.value
+        return answer.answer > self.validate_with_value
+
+    def less_than_question(self, answer):
+        return answer.answer < answer.investigator.last_answer_for(self.validate_with_question).answer
+
+    def less_than_value(self, answer):
+        return answer.answer < self.validate_with_value
 
     def end_interview(self, investigator):
         return None
@@ -208,11 +233,15 @@ class AnswerRule(BaseModel):
         return self.next_question
 
     def reanswer(self, investigator):
-        if self.next_question:
-            pass
+        investigator.delete_last_answer_for(self.question)
+        if self.validate_with_question:
+            investigator.delete_last_answer_for(self.validate_with_question)
+            return self.validate_with_question
         else:
-            investigator.delete_last_answer_for(self.question)
             return self.question
+
+    def ask_subquestion(self, investigator):
+        return self.skip_to(investigator)
 
     def action_to_take(self, investigator):
         method = getattr(self, self.ACTION_METHODS[self.action])
@@ -221,9 +250,6 @@ class AnswerRule(BaseModel):
     def validate(self, answer):
         method = getattr(self, self.CONDITION_METHODS[self.condition])
         return method(answer)
-
-class NumericalAnswerRule(AnswerRule):
-    value = models.PositiveIntegerField(max_length=2, null=True)
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)

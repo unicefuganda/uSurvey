@@ -209,7 +209,7 @@ class AnswerRuleTest(TestCase):
         self.assertEqual(next_question, question_2)
 
         NumericalAnswer.objects.all().delete()
-        rule = NumericalAnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'], condition=AnswerRule.CONDITIONS['EQUALS'], value=0)
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'], condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
         next_question = self.investigator.answered(question_1, self.household, answer=0)
         self.assertEqual(next_question, None)
@@ -224,7 +224,7 @@ class AnswerRuleTest(TestCase):
         self.assertEqual(next_question, question_2)
 
         NumericalAnswer.objects.all().delete()
-        rule = NumericalAnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['SKIP_TO'], condition=AnswerRule.CONDITIONS['EQUALS'], value=0, next_question=question_3)
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['SKIP_TO'], condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0, next_question=question_3)
 
         next_question = self.investigator.answered(question_1, self.household, answer=0)
         self.assertEqual(next_question, question_3)
@@ -233,7 +233,7 @@ class AnswerRuleTest(TestCase):
         NumericalAnswer.objects.all().delete()
         question_0 = Question.objects.create(indicator=self.indicator, text="How are you?", answer_type=Question.NUMBER, order=0)
         question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        rule = NumericalAnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_VALUE'], value=4)
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_VALUE'], validate_with_value=4)
 
         next_question = self.investigator.answered(question_0, self.household, answer=5)
 
@@ -247,19 +247,76 @@ class AnswerRuleTest(TestCase):
         self.assertEqual(NumericalAnswer.objects.count(), 2)
 
 
-    # def test_numerical_greater_than_question_and_reanswer(self):
-    #     NumericalAnswer.objects.all().delete()
-    #     question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-    #     question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-    #     question_3 = Question.objects.create(indicator=self.indicator, text="How many of them are children?", answer_type=Question.NUMBER, order=3)
-    #
-    #     rule = NumericalAnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'], value_question=question_1, next_question=question_3)
-    #
-    #     self.assertEqual(NumericalAnswer.objects.count(), 0)
-    #     next_question = self.investigator.answered(question_1, self.household, answer=1)
-    #     self.assertEqual(next_question, question_2)
-    #     self.assertEqual(NumericalAnswer.objects.count(), 1)
-    #
-    #     next_question = self.investigator.answered(question_2, self.household, answer=10)
-    #     self.assertEqual(next_question, question_1)
-    #     self.assertEqual(NumericalAnswer.objects.count(), 0)
+    def test_numerical_greater_than_question_and_reanswer(self):
+        NumericalAnswer.objects.all().delete()
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_3 = Question.objects.create(indicator=self.indicator, text="How many of them are children?", answer_type=Question.NUMBER, order=3)
+
+        rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'], validate_with_question=question_1)
+
+        self.assertEqual(NumericalAnswer.objects.count(), 0)
+        next_question = self.investigator.answered(question_1, self.household, answer=1)
+        self.assertEqual(next_question, question_2)
+        self.assertEqual(NumericalAnswer.objects.count(), 1)
+
+        next_question = self.investigator.answered(question_2, self.household, answer=10)
+        self.assertEqual(next_question, question_1)
+        self.assertEqual(NumericalAnswer.objects.count(), 0)
+
+    def test_numerical_less_than_value_and_reanswer(self):
+        NumericalAnswer.objects.all().delete()
+        question_0 = Question.objects.create(indicator=self.indicator, text="How are you?", answer_type=Question.NUMBER, order=0)
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['LESS_THAN_VALUE'], validate_with_value=4)
+
+        next_question = self.investigator.answered(question_0, self.household, answer=5)
+
+        self.assertEqual(NumericalAnswer.objects.count(), 1)
+        next_question = self.investigator.answered(question_1, self.household, answer=3)
+        self.assertEqual(next_question, question_1)
+        self.assertEqual(NumericalAnswer.objects.count(), 1)
+
+        next_question = self.investigator.answered(question_1, self.household, answer=4)
+        self.assertEqual(next_question, None)
+        self.assertEqual(NumericalAnswer.objects.count(), 2)
+
+
+    def test_numerical_less_than_question_and_reanswer(self):
+        NumericalAnswer.objects.all().delete()
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_3 = Question.objects.create(indicator=self.indicator, text="How many of them are children?", answer_type=Question.NUMBER, order=3)
+
+        rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['LESS_THAN_QUESTION'], validate_with_question=question_1)
+
+        self.assertEqual(NumericalAnswer.objects.count(), 0)
+        next_question = self.investigator.answered(question_1, self.household, answer=10)
+        self.assertEqual(next_question, question_2)
+        self.assertEqual(NumericalAnswer.objects.count(), 1)
+
+        next_question = self.investigator.answered(question_2, self.household, answer=9)
+        self.assertEqual(next_question, question_1)
+        self.assertEqual(NumericalAnswer.objects.count(), 0)
+
+    def test_multichoice_equals_option_and_ask_sub_question(self):
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=1)
+        option_1_1 = QuestionOption.objects.create(question=question_1, text="This is an option", order=1)
+        option_1_2 = QuestionOption.objects.create(question=question_1, text="This is another option", order=2)
+
+        sub_question_1 = Question.objects.create(indicator=self.indicator, text="Specify others", answer_type=Question.TEXT, subquestion=True, parent=question_1)
+
+        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=option_1_2, next_question=sub_question_1)
+
+        next_question = self.investigator.answered(question_1, self.household, answer=1)
+        self.assertEqual(next_question, question_2)
+
+        MultiChoiceAnswer.objects.all().delete()
+
+        next_question = self.investigator.answered(question_1, self.household, answer=2)
+        self.assertEqual(next_question, sub_question_1)
+
+        next_question = self.investigator.answered(sub_question_1, self.household, answer="Some explanation")
+        self.assertEqual(next_question, question_2)
