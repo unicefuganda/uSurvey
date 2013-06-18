@@ -111,7 +111,7 @@ class Question(BaseModel):
             return self.next_question()
 
     def next_question(self):
-        question = self.indicator.questions.filter(order__gt=self.order)
+        question = self.indicator.questions.filter(order=self.order + 1)
         if question:
             return question[0]
 
@@ -160,9 +160,11 @@ class MultiChoiceAnswer(Answer):
 class AnswerRule(BaseModel):
     ACTIONS = {
                 'END_INTERVIEW': 'END_INTERVIEW',
+                'SKIP_TO': 'SKIP_TO',
     }
     ACTION_METHODS = {
                 'END_INTERVIEW': 'end_interview',
+                'SKIP_TO': 'skip_to',
     }
     CONDITIONS = {
                 'EQUALS': 'EQUALS',
@@ -183,9 +185,11 @@ class AnswerRule(BaseModel):
     def is_equal(self, answer):
         return self.value == answer
 
-
     def end_interview(self):
         return None
+
+    def skip_to(self):
+        return self.next_question
 
     def action_to_take(self):
         method = getattr(self, self.ACTION_METHODS[self.action])

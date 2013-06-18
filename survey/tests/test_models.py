@@ -200,7 +200,7 @@ class AnswerRuleTest(TestCase):
         batch = Batch.objects.create(survey=survey)
         self.indicator = Indicator.objects.create(batch=batch)
 
-    def test_numerical_equals_rule(self):
+    def test_numerical_equals_and_end_rule(self):
         NumericalAnswer.objects.all().delete()
         question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
@@ -213,3 +213,18 @@ class AnswerRuleTest(TestCase):
 
         next_question = self.investigator.answered(question_1, self.household, answer=0)
         self.assertEqual(next_question, None)
+
+    def test_numerical_equals_and_skip_to_rule(self):
+        NumericalAnswer.objects.all().delete()
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_3 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=3)
+
+        next_question = self.investigator.answered(question_1, self.household, answer=1)
+        self.assertEqual(next_question, question_2)
+
+        NumericalAnswer.objects.all().delete()
+        rule = NumericalAnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['SKIP_TO'], condition=AnswerRule.CONDITIONS['EQUALS'], value=0, next_question=question_3)
+
+        next_question = self.investigator.answered(question_1, self.household, answer=0)
+        self.assertEqual(next_question, question_3)
