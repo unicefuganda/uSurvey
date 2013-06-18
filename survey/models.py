@@ -120,10 +120,7 @@ class Question(BaseModel):
             return self.next_question()
 
     def next_question(self):
-        if self.subquestion:
-            order = self.parent.order
-        else:
-            order = self.order
+        order = self.parent.order if self.subquestion else self.order
         question = self.indicator.questions.filter(order=order + 1)
         if question:
             return question[0]
