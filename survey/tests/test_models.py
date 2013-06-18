@@ -140,7 +140,7 @@ class QuestionOptionTest(TestCase):
         option_1 = QuestionOption.objects.create(question=self.question, text="OPTION 2", order=1)
         options = self.question.options.order_by('order').all()
         self.assertEqual(len(options), 2)
-        options_in_text = "1) %s\n2) %s" % (option_1.text, option_2.text)
+        options_in_text = "1: %s\n2: %s" % (option_1.text, option_2.text)
         self.assertEqual(self.question.options_in_text(), options_in_text)
 
     def test_question_text(self):
@@ -191,6 +191,36 @@ class MultiChoiceAnswerTest(TestCase):
 
         answer = MultiChoiceAnswer.objects.create(investigator=investigator, household=household, question=question, answer=option)
         self.failUnless(answer.id)
+
+    def test_pagination(self):
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
+        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        indicator = Indicator.objects.create(batch=batch)
+        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type=Question.MULTICHOICE)
+        option_1 = QuestionOption.objects.create(question=question, text="OPTION 1", order=1)
+        option_2 = QuestionOption.objects.create(question=question, text="OPTION 2", order=2)
+        option_3 = QuestionOption.objects.create(question=question, text="OPTION 3", order=3)
+        option_4 = QuestionOption.objects.create(question=question, text="OPTION 4", order=4)
+        option_5 = QuestionOption.objects.create(question=question, text="OPTION 5", order=5)
+        option_6 = QuestionOption.objects.create(question=question, text="OPTION 6", order=6)
+        option_7 = QuestionOption.objects.create(question=question, text="OPTION 7", order=7)
+        back_text = Question.PREVIOUS_PAGE_TEXT
+        next_text = Question.NEXT_PAGE_TEXT
+
+        question_in_text = "%s\n1: %s\n2: %s\n3: %s\n%s" % (question.text, option_1.text, option_2.text, option_3.text, next_text)
+        self.assertEqual(question.to_ussd(), question_in_text)
+
+        question_in_text = "%s\n1: %s\n2: %s\n3: %s\n%s" % (question.text, option_1.text, option_2.text, option_3.text, next_text)
+        self.assertEqual(question.to_ussd(1), question_in_text)
+
+        question_in_text = "%s\n4: %s\n5: %s\n6: %s\n%s\n%s" % (question.text, option_4.text, option_5.text, option_6.text, back_text, next_text)
+        self.assertEqual(question.to_ussd(2), question_in_text)
+
+        question_in_text = "%s\n7: %s\n%s" % (question.text, option_7.text, back_text)
+        self.assertEqual(question.to_ussd(3), question_in_text)
+
 
 class AnswerRuleTest(TestCase):
     def setUp(self):

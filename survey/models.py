@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from investigator_configs import *
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -92,6 +93,10 @@ class Question(BaseModel):
         MULTICHOICE: 'MultiChoiceAnswer'
     }
 
+    OPTIONS_PER_PAGE = 3
+    PREVIOUS_PAGE_TEXT = "*: Back"
+    NEXT_PAGE_TEXT = "#: Next"
+
     indicator = models.ForeignKey(Indicator, null=True, related_name="questions")
     text = models.CharField(max_length=60, blank=False, null=False)
     answer_type = models.CharField(max_length=15, blank=False, null=False, choices=TYPE_OF_ANSWERS)
@@ -102,9 +107,15 @@ class Question(BaseModel):
     def answer_class(self):
         return eval(Question.TYPE_OF_ANSWERS_CLASS[self.answer_type])
 
-    def options_in_text(self):
-        options = [option.to_text() for option in self.options.order_by('order').all()]
-        return "\n".join(options)
+    def options_in_text(self, page=1):
+        paginator = Paginator(self.options.order_by('order').all(), self.OPTIONS_PER_PAGE)
+        options = paginator.page(page)
+        options_list = [option.to_text() for option in options]
+        if options.has_previous():
+            options_list.append(self.PREVIOUS_PAGE_TEXT)
+        if options.has_next():
+            options_list.append(self.NEXT_PAGE_TEXT)
+        return "\n".join(options_list)
 
     def get_next_question_by_rule(self, answer, investigator):
         if self.rule.validate(answer):
@@ -125,9 +136,9 @@ class Question(BaseModel):
         if question:
             return question[0]
 
-    def to_ussd(self):
+    def to_ussd(self, page=1):
         if self.answer_type == self.MULTICHOICE:
-            text = "%s\n%s" % (self.text, self.options_in_text())
+            text = "%s\n%s" % (self.text, self.options_in_text(page))
             return text
         else:
             return self.text
@@ -138,7 +149,7 @@ class QuestionOption(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
 
     def to_text(self):
-        return "%d) %s" % (self.order, self.text)
+        return "%d: %s" % (self.order, self.text)
 
 class HouseHold(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
