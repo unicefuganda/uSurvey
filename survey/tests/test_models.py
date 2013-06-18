@@ -228,3 +228,38 @@ class AnswerRuleTest(TestCase):
 
         next_question = self.investigator.answered(question_1, self.household, answer=0)
         self.assertEqual(next_question, question_3)
+
+    def test_numerical_greater_than_value_and_reanswer(self):
+        NumericalAnswer.objects.all().delete()
+        question_0 = Question.objects.create(indicator=self.indicator, text="How are you?", answer_type=Question.NUMBER, order=0)
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        rule = NumericalAnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_VALUE'], value=4)
+
+        next_question = self.investigator.answered(question_0, self.household, answer=5)
+
+        self.assertEqual(NumericalAnswer.objects.count(), 1)
+        next_question = self.investigator.answered(question_1, self.household, answer=5)
+        self.assertEqual(next_question, question_1)
+        self.assertEqual(NumericalAnswer.objects.count(), 1)
+
+        next_question = self.investigator.answered(question_1, self.household, answer=4)
+        self.assertEqual(next_question, None)
+        self.assertEqual(NumericalAnswer.objects.count(), 2)
+
+
+    # def test_numerical_greater_than_question_and_reanswer(self):
+    #     NumericalAnswer.objects.all().delete()
+    #     question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+    #     question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+    #     question_3 = Question.objects.create(indicator=self.indicator, text="How many of them are children?", answer_type=Question.NUMBER, order=3)
+    #
+    #     rule = NumericalAnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'], value_question=question_1, next_question=question_3)
+    #
+    #     self.assertEqual(NumericalAnswer.objects.count(), 0)
+    #     next_question = self.investigator.answered(question_1, self.household, answer=1)
+    #     self.assertEqual(next_question, question_2)
+    #     self.assertEqual(NumericalAnswer.objects.count(), 1)
+    #
+    #     next_question = self.investigator.answered(question_2, self.household, answer=10)
+    #     self.assertEqual(next_question, question_1)
+    #     self.assertEqual(NumericalAnswer.objects.count(), 0)

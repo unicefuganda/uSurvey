@@ -45,6 +45,10 @@ class Investigator(BaseModel):
         answer_class.objects.create(investigator=self, question=question, household=household, answer=answer)
         return question.next_question_for_investigator(self)
 
+    def delete_last_answer_for(self, question):
+        answer_class = question.answer_class()
+        answer_class.objects.filter(investigator=self, question=question).latest().delete()
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
@@ -97,16 +101,16 @@ class Question(BaseModel):
         options = [option.to_text() for option in self.options.order_by('order').all()]
         return "\n".join(options)
 
-    def get_next_question_by_rule(self, answer):
+    def get_next_question_by_rule(self, answer, investigator):
         if self.rule.validate(answer):
-            return self.rule.action_to_take()
+            return self.rule.action_to_take(investigator)
         else:
             raise ObjectDoesNotExist
 
     def next_question_for_investigator(self, investigator):
         answer = self.answer_class().objects.get(investigator=investigator, question=self)
         try:
-            return self.get_next_question_by_rule(answer.answer)
+            return self.get_next_question_by_rule(answer.answer, investigator)
         except ObjectDoesNotExist, e:
             return self.next_question()
 
@@ -161,16 +165,22 @@ class AnswerRule(BaseModel):
     ACTIONS = {
                 'END_INTERVIEW': 'END_INTERVIEW',
                 'SKIP_TO': 'SKIP_TO',
+                'REANSWER': 'REANSWER',
     }
     ACTION_METHODS = {
                 'END_INTERVIEW': 'end_interview',
                 'SKIP_TO': 'skip_to',
+                'REANSWER': 'reanswer',
     }
     CONDITIONS = {
                 'EQUALS': 'EQUALS',
+                'GREATER_THAN_QUESTION': 'GREATER_THAN_QUESTION',
+                'GREATER_THAN_VALUE': 'GREATER_THAN_VALUE',
     }
     CONDITION_METHODS = {
                 'EQUALS': 'is_equal',
+                'GREATER_THAN_QUESTION': 'greater_than_question',
+                'GREATER_THAN_VALUE': 'greater_than_value',
     }
 
     question = models.OneToOneField(Question, null=True, related_name="rule")
@@ -185,15 +195,28 @@ class AnswerRule(BaseModel):
     def is_equal(self, answer):
         return self.value == answer
 
-    def end_interview(self):
+    def greater_than_question(self, answer):
+        pass
+
+    def greater_than_value(self, answer):
+        return answer > self.value
+
+    def end_interview(self, investigator):
         return None
 
-    def skip_to(self):
+    def skip_to(self, investigator):
         return self.next_question
 
-    def action_to_take(self):
+    def reanswer(self, investigator):
+        if self.next_question:
+            pass
+        else:
+            investigator.delete_last_answer_for(self.question)
+            return self.question
+
+    def action_to_take(self, investigator):
         method = getattr(self, self.ACTION_METHODS[self.action])
-        return method()
+        return method(investigator)
 
     def validate(self, answer):
         method = getattr(self, self.CONDITION_METHODS[self.condition])
