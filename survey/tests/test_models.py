@@ -191,3 +191,25 @@ class MultiChoiceAnswerTest(TestCase):
 
         answer = MultiChoiceAnswer.objects.create(investigator=investigator, household=household, question=question, answer=option)
         self.failUnless(answer.id)
+
+class AnswerRuleTest(TestCase):
+    def setUp(self):
+        self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
+        self.household = HouseHold.objects.create(name="HouseHold 1", investigator=self.investigator)
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        self.indicator = Indicator.objects.create(batch=batch)
+
+    def test_numerical_equals_rule(self):
+        NumericalAnswer.objects.all().delete()
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+
+        next_question = self.investigator.answered(question_1, self.household, answer=1)
+        self.assertEqual(next_question, question_2)
+
+        NumericalAnswer.objects.all().delete()
+        rule = NumericalAnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'], condition=AnswerRule.CONDITIONS['EQUALS'], value=0)
+
+        next_question = self.investigator.answered(question_1, self.household, answer=0)
+        self.assertEqual(next_question, None)

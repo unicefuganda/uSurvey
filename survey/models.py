@@ -4,6 +4,7 @@ from rapidsms.contrib.locations.models import Location
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from investigator_configs import *
+from django.core.exceptions import ObjectDoesNotExist
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -24,7 +25,7 @@ class Investigator(BaseModel):
         if not last_answered_question:
             return Survey.currently_open().first_question()
         else:
-            return last_answered_question.next_question()
+            return last_answered_question.next_question_for_investigator(self)
 
     def last_answered_question(self):
         answered = []
@@ -32,17 +33,17 @@ class Investigator(BaseModel):
             try:
                 answer = klass.objects.filter(investigator=self).latest()
                 if answer: answered.append(answer)
-            except klass.DoesNotExist, e:
+            except ObjectDoesNotExist, e:
                 pass
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
     def answered(self, question, household, answer):
-        answer_class = eval(Question.TYPE_OF_ANSWERS_CLASS[question.answer_type])
+        answer_class = question.answer_class()
         if answer_class == MultiChoiceAnswer:
             answer = question.options.get(order=int(answer))
         answer_class.objects.create(investigator=self, question=question, household=household, answer=answer)
-        return question.next_question()
+        return question.next_question_for_investigator(self)
 
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
@@ -89,9 +90,25 @@ class Question(BaseModel):
     answer_type = models.CharField(max_length=100, blank=False, null=False, choices=TYPE_OF_ANSWERS)
     order = models.PositiveIntegerField(max_length=2, null=True)
 
+    def answer_class(self):
+        return eval(Question.TYPE_OF_ANSWERS_CLASS[self.answer_type])
+
     def options_in_text(self):
         options = [option.to_text() for option in self.options.order_by('order').all()]
         return "\n".join(options)
+
+    def get_next_question_by_rule(self, answer):
+        if self.rule.validate(answer):
+            return self.rule.action_to_take()
+        else:
+            raise ObjectDoesNotExist
+
+    def next_question_for_investigator(self, investigator):
+        answer = self.answer_class().objects.get(investigator=investigator, question=self)
+        try:
+            return self.get_next_question_by_rule(answer.answer)
+        except ObjectDoesNotExist, e:
+            return self.next_question()
 
     def next_question(self):
         question = self.indicator.questions.filter(order__gt=self.order)
@@ -139,6 +156,47 @@ class TextAnswer(Answer):
 
 class MultiChoiceAnswer(Answer):
     answer = models.ForeignKey(QuestionOption, null=True)
+
+class AnswerRule(BaseModel):
+    ACTIONS = {
+                'END_INTERVIEW': 'END_INTERVIEW',
+    }
+    ACTION_METHODS = {
+                'END_INTERVIEW': 'end_interview',
+    }
+    CONDITIONS = {
+                'EQUALS': 'EQUALS',
+    }
+    CONDITION_METHODS = {
+                'EQUALS': 'is_equal',
+    }
+
+    question = models.OneToOneField(Question, null=True, related_name="rule")
+    action = models.CharField(max_length=100, blank=False, null=False, choices=ACTIONS.items())
+    condition = models.CharField(max_length=100, blank=False, null=False, choices=CONDITIONS.items())
+    next_question = models.OneToOneField(Question, null=True)
+
+    class Meta:
+        app_label = 'survey'
+        abstract = True
+
+    def is_equal(self, answer):
+        return self.value == answer
+
+
+    def end_interview(self):
+        return None
+
+    def action_to_take(self):
+        method = getattr(self, self.ACTION_METHODS[self.action])
+        return method()
+
+    def validate(self, answer):
+        method = getattr(self, self.CONDITION_METHODS[self.condition])
+        return method(answer)
+
+class NumericalAnswerRule(AnswerRule):
+    value = models.PositiveIntegerField(max_length=2, null=True)
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
