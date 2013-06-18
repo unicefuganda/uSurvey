@@ -46,7 +46,7 @@ jQuery(function(){
     }).always(function(){
       response_false.removeAttr('checked');
       response_true.prop('checked', true);
-      user_response.val('');
+      user_response.blur().val('').focus();
       $('#form-control, #loader').toggleClass('hide');
     });
   }
