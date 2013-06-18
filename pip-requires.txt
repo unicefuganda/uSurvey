@@ -14,3 +14,4 @@ uWSGI==1.9.12
 gunicorn==0.17.4
 Fabric==1.6.1
 mock
+django-pylibmc==0.5.0
