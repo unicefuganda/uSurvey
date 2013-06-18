@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from investigator_configs import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
+from django.conf import settings
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -94,8 +95,8 @@ class Question(BaseModel):
     }
 
     OPTIONS_PER_PAGE = 3
-    PREVIOUS_PAGE_TEXT = "*: Back"
-    NEXT_PAGE_TEXT = "#: Next"
+    PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
+    NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
 
     indicator = models.ForeignKey(Indicator, null=True, related_name="questions")
     text = models.CharField(max_length=60, blank=False, null=False)
@@ -103,6 +104,9 @@ class Question(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
     subquestion = models.BooleanField(default=False)
     parent = models.ForeignKey("Question", null=True, related_name="children")
+
+    def is_multichoice(self):
+        return self.answer_type == self.MULTICHOICE
 
     def answer_class(self):
         return eval(Question.TYPE_OF_ANSWERS_CLASS[self.answer_type])

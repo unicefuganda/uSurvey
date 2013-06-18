@@ -179,6 +179,11 @@ LOGGING = {
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+USSD_PAGINATION = {
+    'PREVIOUS': "*",
+    'NEXT': "#"
+}
+
 try:
     from localsettings import *
 except ImportError:
