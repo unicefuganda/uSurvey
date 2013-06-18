@@ -38,10 +38,12 @@ class USSD(object):
         cache.set(self.session_string, session)
 
     def is_pagination(self, question, answer):
+        pagination = False
         if question.is_multichoice():
-            return answer in getattr(settings,'USSD_PAGINATION',None).values()
-        else:
-            return False
+            pagination = answer in getattr(settings,'USSD_PAGINATION',None).values()
+        if not pagination:
+            self.set_in_session('PAGE', self.DEFAULT_SESSION_VARIABLES['PAGE'])
+        return pagination
 
     def set_current_page(self, answer):
         current_page = self.get_from_session('PAGE')

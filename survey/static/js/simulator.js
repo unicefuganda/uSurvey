@@ -9,7 +9,7 @@ jQuery(function(){
       user_response = $("#ussdRequestString"),
       simulator = $("#simulator-form"),
       timer = $("#timer"),
-      delay = 5;
+      delay = 0;
 
   function form_reset () {
     transactionId.val(Math.floor((Math.random()*100000)));
