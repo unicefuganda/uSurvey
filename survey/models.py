@@ -93,8 +93,8 @@ class Question(BaseModel):
     }
 
     indicator = models.ForeignKey(Indicator, null=True, related_name="questions")
-    text = models.CharField(max_length=100, blank=False, null=False)
-    answer_type = models.CharField(max_length=100, blank=False, null=False, choices=TYPE_OF_ANSWERS)
+    text = models.CharField(max_length=60, blank=False, null=False)
+    answer_type = models.CharField(max_length=15, blank=False, null=False, choices=TYPE_OF_ANSWERS)
     order = models.PositiveIntegerField(max_length=2, null=True)
     subquestion = models.BooleanField(default=False)
     parent = models.ForeignKey("Question", null=True, related_name="children")
@@ -134,7 +134,7 @@ class Question(BaseModel):
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
-    text = models.CharField(max_length=100, blank=False, null=False)
+    text = models.CharField(max_length=20, blank=False, null=False)
     order = models.PositiveIntegerField(max_length=2, null=True)
 
     def to_text(self):

@@ -136,16 +136,16 @@ class QuestionOptionTest(TestCase):
         self.question = Question.objects.create(indicator=indicator, text="This is a question", answer_type="multichoice")
 
     def test_store(self):
-        option_2 = QuestionOption.objects.create(question=self.question, text="This is another option", order=2)
-        option_1 = QuestionOption.objects.create(question=self.question, text="This is an option", order=1)
+        option_2 = QuestionOption.objects.create(question=self.question, text="OPTION 1", order=2)
+        option_1 = QuestionOption.objects.create(question=self.question, text="OPTION 2", order=1)
         options = self.question.options.order_by('order').all()
         self.assertEqual(len(options), 2)
         options_in_text = "1) %s\n2) %s" % (option_1.text, option_2.text)
         self.assertEqual(self.question.options_in_text(), options_in_text)
 
     def test_question_text(self):
-        option_2 = QuestionOption.objects.create(question=self.question, text="This is another option", order=2)
-        option_1 = QuestionOption.objects.create(question=self.question, text="This is an option", order=1)
+        option_2 = QuestionOption.objects.create(question=self.question, text="OPTION 1", order=2)
+        option_1 = QuestionOption.objects.create(question=self.question, text="OPTION 2", order=1)
         question_in_text = "%s\n%s" % (self.question.text, self.question.options_in_text())
         self.assertEqual(self.question.to_ussd(), question_in_text)
 
@@ -301,8 +301,8 @@ class AnswerRuleTest(TestCase):
 
     def test_multichoice_equals_option_and_ask_sub_question(self):
         question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=1)
-        option_1_1 = QuestionOption.objects.create(question=question_1, text="This is an option", order=1)
-        option_1_2 = QuestionOption.objects.create(question=question_1, text="This is another option", order=2)
+        option_1_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
+        option_1_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
         sub_question_1 = Question.objects.create(indicator=self.indicator, text="Specify others", answer_type=Question.TEXT, subquestion=True, parent=question_1)
 

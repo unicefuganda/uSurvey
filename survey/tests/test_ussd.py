@@ -78,12 +78,12 @@ class USSDTest(TestCase):
 
     def test_multichoice_questions(self):
         question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=1)
-        option_1_1 = QuestionOption.objects.create(question=question_1, text="This is an option", order=1)
-        option_1_2 = QuestionOption.objects.create(question=question_1, text="This is another option", order=2)
+        option_1_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
+        option_1_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
         question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.MULTICHOICE, order=2)
-        option_2_1 = QuestionOption.objects.create(question=question_2, text="This is an option", order=1)
-        option_2_2 = QuestionOption.objects.create(question=question_2, text="This is another option", order=2)
+        option_2_1 = QuestionOption.objects.create(question=question_2, text="OPTION 1", order=1)
+        option_2_2 = QuestionOption.objects.create(question=question_2, text="OPTION 2", order=2)
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % question_1.to_ussd()
