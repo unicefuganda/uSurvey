@@ -33,9 +33,6 @@ class NewInvestigatorPage(PageObject):
         assert self.browser.find_by_css("span.add-on")[0].text == COUNTRY_PHONE_CODE
 
     def get_investigator_values(self):
-        print '*'*100
-        print self.values
-        print '*'*100
         return self.values
 
     def fill_valid_values(self):
@@ -57,7 +54,7 @@ class NewInvestigatorPage(PageObject):
         sleep(5)
         script = '$("#investigator-county").val(%s);$("#investigator-county").trigger("liszt:updated").chosen().change()' % kampala_county.id
         self.browser.execute_script(script)
-    
+
     def submit(self):
         sleep(2)
         self.browser.find_by_css("form button").first.click()
