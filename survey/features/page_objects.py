@@ -4,6 +4,7 @@ from random import randint
 from time import sleep
 from rapidsms.contrib.locations.models import Location
 from investigator_configs import *
+from rapidsms.contrib.locations.models import *
 
 class PageObject(object):
     def __init__(self, browser):
@@ -25,8 +26,8 @@ class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
     def valid_page(self):
-        fields = ['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age',
-                  'level_of_education', 'language', 'district', 'county', 'subcounty', 'parish', 'village']
+        fields = ['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age']
+        fields += [location_type.name.lower() for location_type in LocationType.objects.all()]
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
         assert self.browser.find_by_css("span.add-on")[0].text == COUNTRY_PHONE_CODE
