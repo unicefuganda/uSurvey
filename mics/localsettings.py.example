@@ -20,3 +20,16 @@ CACHES = {
         }
     }
 }
+if ('test' in sys.argv) or ('harvest' in sys.argv):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
+            'LOCATION': 'localhost:11211',
+            'TIMEOUT': 1,
+            'BINARY': False,
+            'OPTIONS': {  # Maps to pylibmc "behaviors"
+                'tcp_nodelay': True,
+                'ketama': True
+            }
+        }
+    }
