@@ -53,13 +53,13 @@ class NewInvestigatorPage(PageObject):
         kampala_county = Location.objects.get(name="Kampala County")
         script = '$("#investigator-district").val(%s);$("#investigator-district").trigger("liszt:updated").chosen().change()' % kampala.id
         self.browser.execute_script(script)
-        
+        sleep(5)
         script = '$("#investigator-county").val(%s);$("#investigator-county").trigger("liszt:updated").chosen().change()' % kampala_county.id
         self.browser.execute_script(script)
     
     def submit(self):
+        sleep(2)
         self.browser.find_by_css("form button").first.click()
-        sleep(10)
 
 class InvestigatorsListPage(PageObject):
     url = '/investigators/'
