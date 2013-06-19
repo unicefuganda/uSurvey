@@ -3,7 +3,7 @@ from django.conf import settings
 
 class USSD(object):
     MESSAGES = {
-        'SUCCESS_MESSAGE': "Thanks for the survey",
+        'SUCCESS_MESSAGE': "This survey has come to an end. Your responses have been received. Thank you.",
         'USER_NOT_REGISTERED': "Sorry, your mobile number is not registered for this survey"
     }
 
