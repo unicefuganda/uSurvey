@@ -13,23 +13,22 @@ class USSD(object):
     }
 
     DEFAULT_SESSION_VARIABLES = {
-        'PAGE': 1
-    }
-
-    DEFAULT_INVESTIGATOR_VARIABLES = {
-        'REANSWER': []
+        'PAGE': 1,
+        'INVESTIGATOR_VARIABLES': {
+            'REANSWER': []
+        }
     }
 
     def __init__(self, investigator, request):
         super(USSD, self).__init__()
         self.investigator = investigator
-        self.investigator.ussd_variables = self.DEFAULT_INVESTIGATOR_VARIABLES
         self.request = request
         self.action = self.ACTIONS['REQUEST']
         self.responseString = ""
         self.set_session()
         self.household = self.investigator.households.latest('created')
         self.question = self.investigator.next_answerable_question()
+        self.investigator.ussd_variables = self.get_from_session('INVESTIGATOR_VARIABLES')
 
     def set_session(self):
         self.session_string = "SESSION-%s" % self.request['msisdn']
@@ -61,13 +60,10 @@ class USSD(object):
         self.set_in_session('PAGE', current_page)
 
     def reanswerable_question(self, question):
-        return question in self.get_from_session('REANSWER')
+        return question in self.get_from_session('INVESTIGATOR_VARIABLES')['REANSWER']
 
     def merge_ussd_session_variables(self):
-        cached = cache.get(self.session_string)
-        investigator_variables = self.investigator.ussd_variables
-        merged = dict(cached.items() + investigator_variables.items())
-        cache.set(self.session_string, merged)
+        self.set_in_session('INVESTIGATOR_VARIABLES', self.investigator.ussd_variables)
 
     def process_investigator_response(self):
         answer = self.request['ussdRequestString'].strip()
