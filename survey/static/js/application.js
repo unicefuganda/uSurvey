@@ -1,37 +1,39 @@
 ;
 
-$(".chzn-select").chosen();
+$("[data-location=true]").chosen();
 
 function populate_location_chosen(location_type, parent_id){
   $.getJSON('/investigators/locations', {parent: parent_id}, function(data) {     
       $.each(data, function(key, value) {   
-           $(location_type.id_name)
+           location_type
                 .append($('<option>')
                 .val(value)
                 .text(key)); 
       });
       
-  $(location_type.id_name).trigger("liszt:updated");
+  location_type.trigger("liszt:updated");
   });
 };
 
 function notify(location_type){
-  var reset_option_text = '';
-  if($(location_type.id_name).attr('data-placeholder')=='All'){
+ var reset_option_text = '';
+  if(location_type.attr('data-placeholder')=='All'){
     reset_option_text = 'All';
   }
-  $(location_type.id_name)
+  location_type
       .find('option')
       .remove()
       .end()
       .append('<option value="">'+ reset_option_text +'</option>');
       
-  $(location_type.id_name).trigger("liszt:updated");
+  location_type.trigger("liszt:updated");
+};
 
-  if (location_type.child){
-    notify(location_type.child);    
-  };
-  
+function notify_all(location_array){
+    var i;
+    for (i = 0; i < location_array.length; ++i) {
+        notify($(location_array[i]));
+    }
 };
 
 function update_get_investigator_list_link(id){
@@ -42,35 +44,23 @@ function update_get_investigator_list_link(id){
   $("#a-investigator-list").attr("href", "/investigators/"+ filter_id);
 };  
 
-function update_location_list(location_type){
-  $(location_type.id_name).chosen().change( function(){
-       var location_value = $(location_type.id_name).val();
-       if (location_value && location_type.child){
-         populate_location_chosen(location_type.child, location_value);
-         update_get_investigator_list_link($(location_type.id_name).val())
+function update_location_list(location_type, location_children, location_parent){
+  $(location_type).chosen().change( function(){
+       var location_value = $(location_type).val();
+       if (location_value && location_children){
+         populate_location_chosen($(location_children[0]), location_value);
+         update_get_investigator_list_link(location_value)
         } else{
-          var parent = location_type.location_parent;
-          update_get_investigator_list_link($(parent.id_name).val())
+          update_get_investigator_list_link($(location_parent).val())
         }
-       
-       if (location_type.child){
-         notify(location_type.child);    
-       };
-       
+        notify_all(location_children); 
+        if (location_children.length==0){
+            $("#investigator-location").val(location_value);
+            update_get_investigator_list_link(location_value);
+        }
+        
      });
 };
-
-var village = {'id_name': '#investigator-village'};
-var parish = {'id_name': '#investigator-parish', 'child': village};
-var subcounty = {'id_name': '#investigator-subcounty', 'child': parish};
-var county = {'id_name': '#investigator-county', 'child': subcounty};
-var district = {'id_name': '#investigator-district', 'child': county};
-village.location_parent=parish;
-parish.location_parent=subcounty;
-subcounty.location_parent=county;
-county.location_parent=district;
-district.location_parent=district;
-
 
 function clean_number(value){
   return value.replace(/\s+/g, '').replace(/-/g, '');
@@ -111,15 +101,10 @@ $(function(){
           remote: '/investigators/check_mobile_number'
         },
         "confirm_mobile_number":{validate_confirm_number: true, required: true},
-        "age": "required",
-        "district":"required",
-        "county":"required",
-        "subcounty":"required",
-        "parish":"required",                        
-        "village":"required"
+        "age": "required"
       },
       messages: {
-        "age":{number: "Please enter a valid number. No space or special charcters."},
+        "age":{ number: "Please enter a valid number. No space or special charcters."},
         "mobile_number": {
           number: "Please enter a valid number. No space or special charcters.",
           minlength:jQuery.format("Too few digits. Please enter {0} digits."),
@@ -148,18 +133,8 @@ $(function(){
     e.preventDefault();
   });
   
-  // $("select[data-location=true]").each(function(){
-  //   update_location_list($(this));
-  // });
-  
-  update_location_list(district);
-  update_location_list(county);
-  update_location_list(subcounty);
-  update_location_list(parish);
-  
-  $('#investigator-village').chosen().change( function(){
-       var location_value = $("#investigator-village").val()
-       $("#investigator-location").val(location_value);
-       update_get_investigator_list_link(location_value)
-   });     
+  var data_location = $("select[data-location=true]");
+  data_location.each(function(index){
+      update_location_list(this, data_location.slice(index+1), data_location.get(Math.min(index-1)));
+  });
 });

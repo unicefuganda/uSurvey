@@ -25,12 +25,16 @@ class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
     def valid_page(self):
-        fields = ['name', 'mobile_number', 'confirm-mobile_number', 'male', 'age', 'level_of_education', 'language']
+        fields = ['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age',
+                  'level_of_education', 'language', 'district', 'county', 'subcounty', 'parish', 'village']
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
         assert self.browser.find_by_css("span.add-on")[0].text == COUNTRY_PHONE_CODE
 
     def get_investigator_values(self):
+        print '*'*100
+        print self.values
+        print '*'*100
         return self.values
 
     def fill_valid_values(self):
@@ -38,16 +42,24 @@ class NewInvestigatorPage(PageObject):
         self.values = {
             'name': self.random_text('Investigator Name'),
             'mobile_number': "987654321",
+            'confirm_mobile_number': "987654321",
             'male': 't',
             'age': '25',
             'level_of_education': 'Primary',
             'language': 'Luo',
       }
         self.browser.fill_form(self.values)
-        self.browser.find_by_css("ul.typeahead a").first.click()
-
+        kampala = Location.objects.get(name="Kampala")
+        kampala_county = Location.objects.get(name="Kampala County")
+        script = '$("#investigator-district").val(%s);$("#investigator-district").trigger("liszt:updated").chosen().change()' % kampala.id
+        self.browser.execute_script(script)
+        
+        script = '$("#investigator-county").val(%s);$("#investigator-county").trigger("liszt:updated").chosen().change()' % kampala_county.id
+        self.browser.execute_script(script)
+    
     def submit(self):
         self.browser.find_by_css("form button").first.click()
+        sleep(10)
 
 class InvestigatorsListPage(PageObject):
     url = '/investigators/'

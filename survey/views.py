@@ -57,7 +57,7 @@ def _get_posted_location(location_data):
       location_id=location_data[location_type.name.lower()]
   return location_id
 
-def _add_error_response_message(request):
+def _add_error_response_message(investigator, request):
   error_message = "Investigator not registered. "
   messages.error(request, error_message + "See errors below.")
 
@@ -75,7 +75,7 @@ def _process_form(investigator, request):
       messages.success(request, "Investigator successfully registered.")
       return HttpResponseRedirect("/investigators/")
 
-    _add_error_response_message(request)
+    _add_error_response_message(investigator, request)
     return None
 
 def _insert_confirm_field_right_after_mobile_number(keys):
@@ -95,7 +95,7 @@ def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
     location_type = initialize_location_type()
     response = None
-                      
+    
     if request.method == 'POST':
       investigator = InvestigatorForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
       location_id = _get_posted_location(request.POST)

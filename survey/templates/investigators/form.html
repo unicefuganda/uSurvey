@@ -29,7 +29,7 @@
     <div class="control-group">
       <label class="control-label">{{name.capitalize}}</label>
       <div class="controls">
-        <select name="{{name.lower}}" id="investigator-{{name.lower}}" data-placeholder="Select or Type {{name}} "  single  class="chzn-select">
+        <select name="{{name.lower}}" id="investigator-{{name.lower}}" data-location="true" data-placeholder="Select or Type {{name}} "  single  class="chzn-select" required>
           <option value="{{type.value}}" selected>{{type.text}}</option>
           {% for location in type.siblings %}
             <option value="{{location.id}}">{{location.name}}</option>

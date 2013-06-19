@@ -9,7 +9,7 @@ from survey.investigator_configs import *
 from mock import *
 from survey.views import *
 from django.template.defaultfilters import slugify
-from django.db.models.query import QuerySet
+
 
 class InvestigatorsViewTest(TestCase):
 
@@ -34,7 +34,7 @@ class InvestigatorsViewTest(TestCase):
 
     def test_new(self):
         LocationType.objects.create(name='some type', slug='some_name')
-        response = self.client.get('/investigators/new')
+        response = self.client.get('/investigators/new/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [ template.name for template in response.templates]
         self.assertIn('investigators/new.html', templates)
@@ -95,7 +95,7 @@ class InvestigatorsViewTest(TestCase):
                     }
         investigator = Investigator.objects.filter(name=form_data['name'])
         self.failIf(investigator)
-        response = self.client.post('/investigators/new', data=form_data)
+        response = self.client.post('/investigators/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 302) # ensure redirection to list investigator page
         investigator = Investigator.objects.get(name=form_data['name'])
         self.failUnless(investigator.id)

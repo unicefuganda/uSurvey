@@ -3,11 +3,21 @@ from lettuce import *
 from page_objects import *
 from random import randint
 from survey.models import *
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import *
+from django.template.defaultfilters import slugify
 
 @step(u'Given I am logged in as researcher')
 def given_i_am_logged_in_as_researcher(step):
     assert True
+
+@step(u'And I have locations')
+def and_i_have_locations(step):
+    district = LocationType.objects.create(name="district", slug=slugify("district"))
+    county = LocationType.objects.create(name="county", slug=slugify("county"))
+    
+    kampala = Location.objects.create(name="Kampala", type=district)
+    kampala_county = Location.objects.create(name="Kampala County", type=county, tree_parent=kampala)  
+
 
 @step(u'And I visit new investigator page')
 def and_i_visit_new_investigator_page(step):
