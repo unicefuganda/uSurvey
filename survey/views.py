@@ -19,9 +19,9 @@ def initialize_location_type(default_select=CREATE_INVESTIGATOR_DEFAULT_SELECT):
   all_type= LocationType.objects.all()
   for location_type in all_type:
     selected_location[location_type.name]={ 'value': '', 'text':default_select, 'siblings':[]}
-  district=all_type[0]  
+  district=all_type[0]
   selected_location[district.name]['siblings']= Location.objects.filter(tree_parent=None).order_by('name')
-  return selected_location  
+  return selected_location
 
 def assign_ancestors_locations(selected_location, location):
   ancestors = location.get_ancestors(include_self=True)
@@ -32,7 +32,7 @@ def assign_ancestors_locations(selected_location, location):
     siblings = list(loca.get_siblings().order_by('name'))
     siblings.insert(0, {'id':'', 'name':all_default_select})
     selected_location[loca.type.name]['siblings'] = siblings
-  return selected_location  
+  return selected_location
 
 def assign_immediate_child_locations(selected_location, location):
   children = location.get_descendants()
@@ -40,7 +40,7 @@ def assign_immediate_child_locations(selected_location, location):
     immediate_child = children[0]
     siblings = immediate_child.get_siblings(include_self=True).order_by('name')
     selected_location[immediate_child.type.name]['siblings'] =  siblings
-  return selected_location  
+  return selected_location
 
 def update_location_type(selected_location, location_id):
   if not location_id:
@@ -48,7 +48,7 @@ def update_location_type(selected_location, location_id):
   location =  Location.objects.get(id=location_id)
   selected_location = assign_ancestors_locations(selected_location, location)
   selected_location = assign_immediate_child_locations(selected_location, location)
-  return selected_location  
+  return selected_location
 
 def _get_posted_location(location_data):
   location_id=''
@@ -72,6 +72,7 @@ def _add_error_response_message(investigator, request):
 def _process_form(investigator, request):
     if investigator.is_valid():
       investigator.save()
+      HouseHold.objects.create(name="HouseHold", investigator=investigator.instance)
       messages.success(request, "Investigator successfully registered.")
       return HttpResponseRedirect("/investigators/")
 
@@ -89,19 +90,19 @@ def _put_confirm_mobile_number_exactly_after_mobile_number(fields):
   new_fields = SortedDict()
   for key in rearranged_keys:
     new_fields[key]=fields[key]
-  return new_fields  
+  return new_fields
 
 def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
     location_type = initialize_location_type()
     response = None
-    
+
     if request.method == 'POST':
       investigator = InvestigatorForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
       location_id = _get_posted_location(request.POST)
       location_type = update_location_type(location_type, location_id)
       response = _process_form(investigator, request)
-    
+
     investigator.fields = _put_confirm_mobile_number_exactly_after_mobile_number(investigator.fields)
 
     return response or render(request, 'investigators/new.html', {
@@ -116,7 +117,7 @@ def get_locations(request):
     for location in locations:
         location_hash[location.name] = location.id
     return HttpResponse(json.dumps(location_hash), content_type="application/json")
-    
+
 def list_investigators(request):
     selected_location = initialize_location_type(default_select=LIST_INVESTIGATOR_DEFAULT_SELECT)
     investigators = Investigator.objects.all()
@@ -129,7 +130,7 @@ def list_investigators(request):
 def filter_list_investigators(request, location_id):
    corresponding_locations = Location.objects.get(id=int(location_id)).get_descendants(include_self=True)
    investigators = Investigator.objects.filter(location__in=corresponding_locations)
-   
+
    return_selected_location = update_location_type(initialize_location_type(default_select=LIST_INVESTIGATOR_DEFAULT_SELECT), location_id)
 
    return render(request, 'investigators/index.html',
