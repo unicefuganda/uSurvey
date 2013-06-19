@@ -128,7 +128,8 @@ def list_investigators(request):
                            'request': request})
 
 def filter_list_investigators(request, location_id):
-   corresponding_locations = Location.objects.get(id=int(location_id)).get_descendants(include_self=True)
+   the_location = Location.objects.get(id=int(location_id));
+   corresponding_locations = the_location.get_descendants(include_self=True)
    investigators = Investigator.objects.filter(location__in=corresponding_locations)
 
    return_selected_location = update_location_type(initialize_location_type(default_select=LIST_INVESTIGATOR_DEFAULT_SELECT), location_id)
@@ -136,6 +137,7 @@ def filter_list_investigators(request, location_id):
    return render(request, 'investigators/index.html',
                          {'investigators': investigators,
                           'location_type': return_selected_location,
+                          'selected_location_type': the_location.type.name.lower(),
                           'request': request})
 
 def check_mobile_number(request):

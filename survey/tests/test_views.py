@@ -190,6 +190,9 @@ class InvestigatorsViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         templates = [ template.name for template in response.templates]
         self.assertIn('investigators/index.html', templates)
+        
+        self.assertEquals(response.context['selected_location_type'], 'country')
+        
         self.assertEqual(len(response.context['investigators']), 3)
         for investigator in [investigator1, investigator2, investigator3]:
           self.assertIn(investigator, response.context['investigators'])
