@@ -19,7 +19,7 @@ class Investigator(BaseModel):
     mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=10, unique=True, null=False, blank=False)
     male = models.BooleanField(default=True, verbose_name="Sex")
     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
-    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION, 
+    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary', verbose_name="Highest level of education completed")
     location = models.ForeignKey(Location, null=True)
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
@@ -54,7 +54,9 @@ class Investigator(BaseModel):
         answer_class = question.answer_class()
         return answer_class.objects.filter(investigator=self, question=question).latest()
 
-    def delete_last_answer_for(self, question):
+    def reanswer(self, question):
+        if getattr(self, 'ussd_variables', None):
+            self.ussd_variables['REANSWER'].append(question)
         self.last_answer_for(question).delete()
 
 class LocationAutoComplete(models.Model):
@@ -248,9 +250,9 @@ class AnswerRule(BaseModel):
         return self.next_question
 
     def reanswer(self, investigator):
-        investigator.delete_last_answer_for(self.question)
+        investigator.reanswer(self.question)
         if self.validate_with_question:
-            investigator.delete_last_answer_for(self.validate_with_question)
+            investigator.reanswer(self.validate_with_question)
             return self.validate_with_question
         else:
             return self.question
