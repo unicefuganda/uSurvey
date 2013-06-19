@@ -7,7 +7,7 @@ from django.utils.safestring import mark_safe
 class InvestigatorForm(ModelForm):
   
     confirm_mobile_number = forms.CharField( widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
-                                                                            'style':"width:172px;" , 'maxlength':'10', 'max':'10', 'type':'number'}))
+                                                                            'style':"width:172px;" , 'maxlength':'10', 'type':'number'}))
     
     def clean(self):
       cleaned_data = super(InvestigatorForm, self).clean()
@@ -26,7 +26,7 @@ class InvestigatorForm(ModelForm):
         fields = ['name', 'mobile_number', 'male', 'age', 'level_of_education', 'language', 'location']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
-            'mobile_number': forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'style':"width:172px;", 'maxlength':'10', 'max':'10', 'type':'number'}),
+            'mobile_number': forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'style':"width:172px;", 'maxlength':'10', 'type':'number'}),
             'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
             'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':18, 'max':50, 'type':'number' }),
             'location':forms.HiddenInput(),
