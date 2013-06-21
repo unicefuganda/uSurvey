@@ -74,6 +74,8 @@ class USSD(object):
 
     def process_investigator_response(self):
         answer = self.request['ussdRequestString'].strip()
+        if not answer:
+            return self.investigator.invalid_answer(self.question)
         if self.is_pagination(self.question, answer):
             self.set_current_page(answer)
         else:

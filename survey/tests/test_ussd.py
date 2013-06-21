@@ -211,6 +211,28 @@ class USSDTest(TestCase):
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+    def test_text_invalid_answer(self):
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.TEXT, order=1)
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % question_1.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = ""
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % ("Invalid answer: " + question_1.text)
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "something"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+
     def test_numerical_invalid_answer(self):
         question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
 
