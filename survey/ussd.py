@@ -32,7 +32,7 @@ class USSD(object):
         self.investigator.ussd_variables = self.get_from_session('INVESTIGATOR_VARIABLES')
 
     def set_session(self):
-        self.session_string = "SESSION-%s" % self.request['msisdn']
+        self.session_string = "SESSION-%s" % self.request['transactionId']
         if not cache.get(self.session_string):
             cache.set(self.session_string, self.DEFAULT_SESSION_VARIABLES)
 
