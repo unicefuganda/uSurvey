@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
-from survey.views import *
+from survey.views.investigator import *
+from survey.views.ussd import *
 
 urlpatterns = patterns('',
     url(r'^investigators/$', list_investigators, name="investigators_page"),

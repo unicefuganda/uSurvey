@@ -43,7 +43,10 @@ def given_i_have_100_investigators(step):
     uganda = Location.objects.create(name="Uganda")
     for _ in xrange(100):
         random_number = str(randint(1, 99999))
-        Investigator.objects.create(name="Investigator " + random_number, mobile_number = random_number, age = 12, level_of_education = "Nursery", language = "Luganda", location = uganda)
+        try:
+            Investigator.objects.create(name="Investigator " + random_number, mobile_number = random_number, age = 12, level_of_education = "Nursery", language = "Luganda", location = uganda)
+        except Exception:
+            pass   
 
 @step(u'And I visit investigators listing page')
 def and_i_visit_investigators_listing_page(step):
@@ -79,6 +82,18 @@ def given_i_have_no_investigators(step):
 
 @step(u'And I should see no investigators registered message')
 def and_i_should_see_no_investigators_registered_message(step):
-    sleep(3)
-    assert world.page.is_text_present("registered")
+    world.page.no_registered_invesitgators()
+    
+@step(u'And I request filter list of a County with no associated investigator')
+def and_i_request_filter_list_for_another_county_with_no_investigator(step):
+    county_type = LocationType.objects.get(name='county')
+    new_county = Location.objects.create(name="some county", type=county_type)
+    Investigator.objects.filter(location=new_county).delete()
+    world.page = FilteredInvestigatorsListPage(world.browser, new_county.id)
+    world.page.visit()
+    
+@step(u'Then I should see no investigator for this County')
+def then_i_should_see_no_investigator_for_this_county(step):
+    world.page.no_registered_invesitgators()
+    
         

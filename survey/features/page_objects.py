@@ -51,7 +51,7 @@ class NewInvestigatorPage(PageObject):
         kampala_county = Location.objects.get(name="Kampala County")
         script = '$("#investigator-district").val(%s);$("#investigator-district").trigger("liszt:updated").chosen().change()' % kampala.id
         self.browser.execute_script(script)
-        sleep(5)
+        sleep(3)
         script = '$("#investigator-county").val(%s);$("#investigator-county").trigger("liszt:updated").chosen().change()' % kampala_county.id
         self.browser.execute_script(script)
 
@@ -74,3 +74,14 @@ class InvestigatorsListPage(PageObject):
     def validate_presence_of_investigator(self, values):
         assert self.browser.is_text_present(values['name'])
         assert self.browser.is_text_present(values['mobile_number'])
+    
+    def no_registered_invesitgators(self):
+        assert self.browser.is_text_present("There are no investigators registered.")
+        
+class FilteredInvestigatorsListPage(InvestigatorsListPage):
+    def __init__(self, browser, location_id):
+        self.browser = browser
+        self.url = '/investigators/filter/' + str(location_id)
+
+    def no_registered_invesitgators(self):
+        assert self.browser.is_text_present("There are no investigators registered for this county.")        
