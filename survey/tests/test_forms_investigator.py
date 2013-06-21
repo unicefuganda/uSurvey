@@ -1,5 +1,5 @@
 from django.test import TestCase
-from survey.forms import *
+from survey.forms.investigator import *
 from rapidsms.contrib.locations.models import Location, LocationType
 
 class InvestigatorFormTest(TestCase):

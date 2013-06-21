@@ -7,7 +7,7 @@ from django.utils.datastructures import SortedDict
 
 from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import *
-from survey.forms import *
+from survey.forms.investigator import *
 from survey.models import Investigator
 
 
