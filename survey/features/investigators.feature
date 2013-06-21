@@ -1,5 +1,5 @@
 Feature: Investigators feature
-
+  
   Scenario: Investigator new page
     Given I am logged in as researcher
     And I have locations
@@ -7,7 +7,7 @@ Feature: Investigators feature
     And I see all the fields are present
     And I submit the form
     Then I should see the error messages
-
+  
   Scenario: Create an investigator
      Given I am logged in as researcher
      And I have locations
@@ -22,6 +22,13 @@ Feature: Investigators feature
     And I have locations
     And I visit investigators listing page
     And I should see the investigators list paginated
+
+  Scenario: No investigators list
+    Given I have no investigators
+    Given I am logged in as researcher
+    And I have locations
+    And I visit investigators listing page
+    And I should see no investigators registered message
   
   Scenario: Create an investigator - validation
     Given I am logged in as researcher

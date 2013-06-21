@@ -72,3 +72,13 @@ def and_i_see_all_the_fields_are_present(step):
 @step(u'Then I should see the error messages')
 def then_i_should_see_the_error_messages(step):
     world.page.is_text_present("This field is required.")
+    
+@step(u'Given I have no investigators')
+def given_i_have_no_investigators(step):
+    Investigator.objects.all().delete()
+
+@step(u'And I should see no investigators registered message')
+def and_i_should_see_no_investigators_registered_message(step):
+    sleep(3)
+    assert world.page.is_text_present("registered")
+        

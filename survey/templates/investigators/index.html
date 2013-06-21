@@ -75,7 +75,7 @@
       </tbody>
     </table>
   {% else %}
-    <h3> There are no investigators registered  for this {{selected_location_type}}. </h3>
+    <h4 style="color:red;"> There are no investigators registered{% if selected_location_type%} for this {{selected_location_type}}{% endif %}. </h4>
   {% endif %}
 {% paginate %}
 {% endblock %}
