@@ -15,7 +15,8 @@ class USSD(object):
     DEFAULT_SESSION_VARIABLES = {
         'PAGE': 1,
         'INVESTIGATOR_VARIABLES': {
-            'REANSWER': []
+            'REANSWER': [],
+            'INVALID_ANSWER': [],
         }
     }
 
@@ -59,8 +60,14 @@ class USSD(object):
             current_page += 1
         self.set_in_session('PAGE', current_page)
 
-    def reanswerable_question(self, question):
-        return question in self.get_from_session('INVESTIGATOR_VARIABLES')['REANSWER']
+    def question_present_in_cache(self, label):
+        return self.question in self.get_from_session('INVESTIGATOR_VARIABLES')[label]
+
+    def reanswerable_question(self):
+        return self.question_present_in_cache('REANSWER')
+
+    def invalid_answered_question(self):
+        return self.question_present_in_cache('INVALID_ANSWER')
 
     def merge_ussd_session_variables(self):
         self.set_in_session('INVESTIGATOR_VARIABLES', self.investigator.ussd_variables)
@@ -72,14 +79,19 @@ class USSD(object):
         else:
             self.question = self.investigator.answered(self.question, self.household, answer)
 
+    def add_question_prefix(self):
+        if self.reanswerable_question():
+            self.responseString += "Reconfirm: "
+        if self.invalid_answered_question():
+            self.responseString += "Invalid answer: "
+
     def render_response(self):
         if not self.question:
             self.action = self.ACTIONS['END']
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE']
         else:
             page = self.get_from_session('PAGE')
-            if self.reanswerable_question(self.question):
-                self.responseString += "Reconfirm: "
+            self.add_question_prefix()
             self.responseString += self.question.to_ussd(page)
         return { 'action': self.action, 'responseString': self.responseString }
 

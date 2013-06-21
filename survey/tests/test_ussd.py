@@ -14,7 +14,7 @@ class USSDTest(TestCase):
         self.ussd_params = {
                                 'transactionId': "123344" + str(randint(1, 99999)),
                                 'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
-                                'msisdn': '256776520831',
+                                'msisdn': '2567765' + str(randint(1, 99999)),
                                 'ussdServiceCode': '130',
                                 'ussdRequestString': '',
                                 'response': "false"
@@ -202,6 +202,27 @@ class USSDTest(TestCase):
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % ("Reconfirm: " + question_2.text)
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "2"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_numerical_invalid_answer(self):
+        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % question_1.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "a"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % ("Invalid answer: " + question_1.text)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.ussd_params['response'] = "true"

@@ -47,17 +47,25 @@ class Investigator(BaseModel):
         answer_class = question.answer_class()
         if answer_class == MultiChoiceAnswer:
             answer = question.options.get(order=int(answer))
-        answer_class.objects.create(investigator=self, question=question, household=household, answer=answer)
-        return question.next_question_for_investigator(self)
+        if answer_class.objects.create(investigator=self, question=question, household=household, answer=answer).pk:
+            return question.next_question_for_investigator(self)
+        else:
+            return question
 
     def last_answer_for(self, question):
         answer_class = question.answer_class()
         return answer_class.objects.filter(investigator=self, question=question).latest()
 
     def reanswer(self, question):
-        if getattr(self, 'ussd_variables', None):
-            self.ussd_variables['REANSWER'].append(question)
+        self.add_ussd_variable('REANSWER', question)
         self.last_answer_for(question).delete()
+
+    def invalid_answer(self, question):
+        self.add_ussd_variable('INVALID_ANSWER', question)
+
+    def add_ussd_variable(self, label, question):
+        if getattr(self, 'ussd_variables', None):
+            self.ussd_variables[label].append(question)
 
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
@@ -178,8 +186,11 @@ class NumericalAnswer(Answer):
     answer = models.PositiveIntegerField(max_length=5, null=True)
 
     def save(self, *args, **kwargs):
-        self.answer = int(self.answer)
-        super(NumericalAnswer, self).save(*args, **kwargs)
+        try:
+            self.answer = int(self.answer)
+            super(NumericalAnswer, self).save(*args, **kwargs)
+        except ValueError, e:
+            self.investigator.invalid_answer(self.question)
 
 class TextAnswer(Answer):
     answer = models.CharField(max_length=100, blank=False, null=False)
