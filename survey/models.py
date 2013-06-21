@@ -311,3 +311,13 @@ def auto_complete_text(self):
     return LocationAutoComplete.objects.get(location=self).text
 
 Location.auto_complete_text = auto_complete_text
+
+
+class HouseholdHead(BaseModel):
+    name = models.CharField(max_length=100, blank=False, null=False)
+    age = models.PositiveIntegerField(validators=[MinValueValidator(13)], null=True)
+    male = models.BooleanField(default=True, verbose_name="Sex")
+    occupation = models.CharField(max_length=100, blank=False, null=False)
+    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
+                                          blank=False, default='Primary', verbose_name="Highest level of education completed")
+    resident_since = models.PositiveIntegerField(null=False, default=0)
