@@ -231,3 +231,36 @@ class USSDTest(TestCase):
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_multichoice_invalid_answer(self):
+        question_1 = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type=Question.MULTICHOICE, order=1)
+        option_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
+        option_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
+
+        page_1 = "%s\n1: %s\n2: %s" % (question_1.text, option_1.text, option_2.text)
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % page_1
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "a"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % ("Invalid answer: " + page_1)
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "4"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % ("Invalid answer: " + page_1)
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "2"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)

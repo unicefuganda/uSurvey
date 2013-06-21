@@ -45,8 +45,10 @@ class Investigator(BaseModel):
 
     def answered(self, question, household, answer):
         answer_class = question.answer_class()
-        if answer_class == MultiChoiceAnswer:
-            answer = question.options.get(order=int(answer))
+        if question.is_multichoice():
+            answer = question.get_option(answer, self)
+            if not answer:
+                return question
         if answer_class.objects.create(investigator=self, question=question, household=household, answer=answer).pk:
             return question.next_question_for_investigator(self)
         else:
@@ -117,6 +119,13 @@ class Question(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
     subquestion = models.BooleanField(default=False)
     parent = models.ForeignKey("Question", null=True, related_name="children")
+
+    def get_option(self, answer, investigator):
+        try:
+            return self.options.get(order=int(answer))
+        except (QuestionOption.DoesNotExist, ValueError) as e:
+            investigator.invalid_answer(self)
+            return False
 
     def is_multichoice(self):
         return self.answer_type == self.MULTICHOICE
