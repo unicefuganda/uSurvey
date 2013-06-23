@@ -20,7 +20,7 @@ class USSDTest(TestCase):
                                 'response': "false"
                             }
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''))
-        self.household = HouseHold.objects.create(name="HouseHold 1", investigator=self.investigator)
+        self.household = HouseHold.objects.create( investigator=self.investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         self.indicator = Indicator.objects.create(batch=batch)

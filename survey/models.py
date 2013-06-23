@@ -76,6 +76,30 @@ class LocationAutoComplete(models.Model):
     class Meta:
         app_label = 'survey'
 
+
+class HouseholdHead(BaseModel):
+    name = models.CharField(max_length=100, blank=False, null=False, default="Household")
+    age = models.PositiveIntegerField(validators=[MinValueValidator(13)], null=True)
+    male = models.BooleanField(default=True, verbose_name="Gender")
+    occupation = models.CharField(max_length=100, blank=False, null=False, verbose_name="Occupation / Main Livelihood")
+    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
+                                          blank=False, default='Primary', verbose_name="Highest level of education completed")
+    resident_since = models.PositiveIntegerField(null=False, default=0)
+
+class HouseHold(BaseModel):
+    investigator = models.ForeignKey(Investigator, null=True, related_name="households")
+    head =  models.ForeignKey(HouseholdHead, null=True)
+    number_of_males = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many are male?")
+    number_of_females = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many are male?")
+    children_5_12_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many children are aged 5-12 years?")
+    children_13_17_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="13-17 years?")
+    children_0_5_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many of these children are aged 0-5 months?")
+    children_6_11_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="6-11 months?")
+    children_12_23_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="12-23 months?")
+    children_24_59_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="24-59 months?")
+    women_15_19_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many of these women are aged 15-19 years?")
+    women_20_49_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="20-49 years?")
+
 class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     description = models.CharField(max_length=255, blank=False, null=False)
@@ -176,10 +200,6 @@ class QuestionOption(BaseModel):
 
     def to_text(self):
         return "%d: %s" % (self.order, self.text)
-
-class HouseHold(BaseModel):
-    name = models.CharField(max_length=100, blank=False, null=False)
-    investigator = models.ForeignKey(Investigator, null=True, related_name="households")
 
 class Answer(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True)
@@ -311,13 +331,3 @@ def auto_complete_text(self):
     return LocationAutoComplete.objects.get(location=self).text
 
 Location.auto_complete_text = auto_complete_text
-
-
-class HouseholdHead(BaseModel):
-    name = models.CharField(max_length=100, blank=False, null=False)
-    age = models.PositiveIntegerField(validators=[MinValueValidator(13)], null=True)
-    male = models.BooleanField(default=True, verbose_name="Sex")
-    occupation = models.CharField(max_length=100, blank=False, null=False)
-    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
-                                          blank=False, default='Primary', verbose_name="Highest level of education completed")
-    resident_since = models.PositiveIntegerField(null=False, default=0)

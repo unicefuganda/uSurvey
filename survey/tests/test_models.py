@@ -21,14 +21,14 @@ class InvestigatorTest(TestCase):
     def test_mobile_number_is_unique(self):
         Investigator.objects.create(name="", mobile_number = "123456789")
         self.failUnlessRaises(IntegrityError, Investigator.objects.create, mobile_number = "123456789")
-        
+
     def test_mobile_number_length_must_be_less_than_10(self):
         mobile_number_of_length_11="01234567891"
         self.failUnlessRaises(DatabaseError, Investigator.objects.create, mobile_number = mobile_number_of_length_11)
 
     def test_next_answerable_question(self):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210")
-        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        household = HouseHold.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -156,13 +156,13 @@ class QuestionOptionTest(TestCase):
 class HouseHoldTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        household = HouseHold.objects.create(investigator=investigator)
         self.failUnless(household.id)
 
 class NumericalAnswerTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        household = HouseHold.objects.create( investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -174,7 +174,7 @@ class NumericalAnswerTest(TestCase):
 class TextAnswerTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        household = HouseHold.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -186,7 +186,7 @@ class TextAnswerTest(TestCase):
 class MultiChoiceAnswerTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        household = HouseHold.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -198,7 +198,7 @@ class MultiChoiceAnswerTest(TestCase):
 
     def test_pagination(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create(name="HouseHold 1", investigator=investigator)
+        household = HouseHold.objects.create( investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -229,7 +229,7 @@ class MultiChoiceAnswerTest(TestCase):
 class AnswerRuleTest(TestCase):
     def setUp(self):
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        self.household = HouseHold.objects.create(name="HouseHold 1", investigator=self.investigator)
+        self.household = HouseHold.objects.create(investigator=self.investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         self.indicator = Indicator.objects.create(batch=batch)

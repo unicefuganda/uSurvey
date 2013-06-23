@@ -7,8 +7,8 @@ from django.utils.datastructures import SortedDict
 
 from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import *
-from survey.forms.investigator import *
-from survey.models import Investigator
+from survey.forms.householdHead import *
+from survey.models import *
 
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
@@ -81,81 +81,26 @@ def _process_form(investigator, request):
         investigator.save()
         HouseHold.objects.create(investigator=investigator.instance)
         messages.success(request, "Investigator successfully registered.")
-        return HttpResponseRedirect("/investigators/")
+        return HttpResponseRedirect("/households/new")
 
     _add_error_response_message(investigator, request)
     return None
 
-
-def _insert_confirm_field_right_after_mobile_number(keys):
-    keys.remove('confirm_mobile_number')
-    index_of_mobile_number = keys.index('mobile_number')
-    keys.insert(index_of_mobile_number + 1, 'confirm_mobile_number')
-    return keys
-
-
-def _put_confirm_mobile_number_exactly_after_mobile_number(fields):
-    rearranged_keys = _insert_confirm_field_right_after_mobile_number(fields.keys())
-    new_fields = SortedDict()
-    for key in rearranged_keys:
-        new_fields[key] = fields[key]
-    return new_fields
-
-def new_investigator(request):
-    investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
+def new(request):
+    householdHead = HouseholdHeadForm(auto_id='investigator-%s', label_suffix='')
     location_type = initialize_location_type()
     response = None
 
     if request.method == 'POST':
-        investigator = InvestigatorForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
+        householdHead = HouseholdHeadForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
         location_id = _get_posted_location(request.POST)
         location_type = update_location_type(location_type, location_id)
-        response = _process_form(investigator, request)
+        response = _process_form(householdHead, request)
 
-    investigator.fields = _put_confirm_mobile_number_exactly_after_mobile_number(investigator.fields)
-
-    return response or render(request, 'investigators/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
+    return response or render(request, 'households/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
                                                                   'location_type': location_type,
-                                                                  'form': investigator,
-                                                                  'action':"/investigators/new/",
+                                                                  'form': householdHead,
+                                                                  'action':"/households/new/",
                                                                   'id':"create-investigator-form",
-                                                                  'button_label':"Create Investigator",
+                                                                  'button_label':"Create Household",
                                                                   'loading_text':"Creating..."})
-
-def get_locations(request):
-    tree_parent = request.GET['parent'] if request.GET.has_key('parent') and request.GET['parent'] else None
-    locations = Location.objects.filter(tree_parent=tree_parent)
-    location_hash = {}
-    for location in locations:
-        location_hash[location.name] = location.id
-    return HttpResponse(json.dumps(location_hash), content_type="application/json")
-
-
-def list_investigators(request):
-    selected_location = initialize_location_type(default_select=LIST_INVESTIGATOR_DEFAULT_SELECT)
-    investigators = Investigator.objects.all()
-
-    return render(request, 'investigators/index.html',
-                  {'investigators': investigators,
-                   'location_type': selected_location,
-                   'request': request})
-
-
-def filter_list_investigators(request, location_id):
-    the_location = Location.objects.get(id=int(location_id));
-    corresponding_locations = the_location.get_descendants(include_self=True)
-    investigators = Investigator.objects.filter(location__in=corresponding_locations)
-
-    return_selected_location = update_location_type(
-        initialize_location_type(default_select=LIST_INVESTIGATOR_DEFAULT_SELECT), location_id)
-
-    return render(request, 'investigators/index.html',
-                  {'investigators': investigators,
-                   'location_type': return_selected_location,
-                   'selected_location_type': the_location.type.name.lower(),
-                   'request': request})
-
-
-def check_mobile_number(request):
-    response = Investigator.objects.filter(mobile_number=request.GET['mobile_number']).exists()
-    return HttpResponse(json.dumps(not response), content_type="application/json")

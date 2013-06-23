@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
 from survey.views.investigator import *
 from survey.views.ussd import *
+from survey.views.household import *
 
 urlpatterns = patterns('',
     url(r'^investigators/$', list_investigators, name="investigators_page"),
@@ -12,4 +13,5 @@ urlpatterns = patterns('',
     url(r'^investigators/check_mobile_number', check_mobile_number, name="check_mobile_number"),
     url(r'^ussd/simulator', TemplateView.as_view(template_name="ussd/simulator.html")),
     url(r'^ussd', ussd, name="ussd"),
+    url(r'^households/new/$', new, name="new_household_page"),
 )
