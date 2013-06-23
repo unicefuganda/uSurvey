@@ -101,7 +101,6 @@ def _put_confirm_mobile_number_exactly_after_mobile_number(fields):
         new_fields[key] = fields[key]
     return new_fields
 
-
 def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
     location_type = initialize_location_type()
@@ -115,11 +114,13 @@ def new_investigator(request):
 
     investigator.fields = _put_confirm_mobile_number_exactly_after_mobile_number(investigator.fields)
 
-    return response or render(request, 'investigators/new.html', {
-        'country_phone_code': COUNTRY_PHONE_CODE,
-        'form': investigator,
-        'location_type': location_type})
-
+    return response or render(request, 'investigators/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
+                                                                  'location_type': location_type,
+                                                                  'form': investigator,         
+                                                                  'action':"/investigators/new/",
+                                                                  'id':"create-investigator-form",
+                                                                  'button_label':"Create Investigator",
+                                                                  'loading_text':"Creating..."})
 
 def get_locations(request):
     tree_parent = request.GET['parent'] if request.GET.has_key('parent') and request.GET['parent'] else None

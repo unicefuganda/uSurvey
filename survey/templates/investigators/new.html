@@ -1,10 +1,10 @@
-{% extends "layout.html" %}
+{% extends "form.html"%}
+
 {% block title %}
   New Investigator
 {% endblock %}
-{% block content %}
-<h3>
-  New Investigator
-</h3>
-{% include "investigators/form.html" with action="/investigators/new/" id="create-investigator-form" button_label="Create Investigator" loading_text="Creating..." next_page="/investigators/"  %}
+
+{% block extra-post-form-fields %}
+{% include "location_filter.html"%}
 {% endblock %}
+

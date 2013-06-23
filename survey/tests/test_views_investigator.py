@@ -29,6 +29,11 @@ class InvestigatorsViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('investigators/new.html', templates)
+        self.assertEquals(response.context['action'], '/investigators/new/')
+        self.assertEquals(response.context['id'], 'create-investigator-form')
+        self.assertEquals(response.context['button_label'], 'Create Investigator')
+        self.assertEquals(response.context['loading_text'], 'Creating...')
+
 
     def test_get_district_location_returns_all_locations_if_parent_not_specified(self):
         uganda = Location.objects.create(name="Uganda")

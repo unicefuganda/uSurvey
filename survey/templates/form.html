@@ -1,6 +1,15 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h3>
+	{% block title %} {% endblock %}
+</h3>
+
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal investigator-form">
   {% csrf_token %}
-  
+
+  {% block extra-pre-form-fields %}{% endblock %}
+
   {% for field in form.visible_fields %}
     {% load is_mobile_number %}
     <div class="control-group">
@@ -9,7 +18,7 @@
         {% if field.label_tag|is_mobile_number %}
          <div class="input-prepend">
              <span class="add-on">{{ country_phone_code }}</span>
-        {% endif %}  
+        {% endif %}
         {{field}} <label class="error">
           {% if field.errors %}
               {% for error in field.errors %}
@@ -22,23 +31,10 @@
         {% endif %}
       </div>
     </div>
-  {% endfor %}  
-
-  
-  {% for name, type in location_type.items %}
-    <div class="control-group">
-      <label class="control-label">{{name.capitalize}}</label>
-      <div class="controls">
-        <select name="{{name.lower}}" id="investigator-{{name.lower}}" data-location="true" data-placeholder="Select or Type {{name}} "  single  class="chzn-select" required>
-          <option value="{{type.value}}" selected>{{type.text}}</option>
-          {% for location in type.siblings %}
-            <option value="{{location.id}}">{{location.name}}</option>
-          {% endfor %}
-        </select>
-        </div>
-      </div>
   {% endfor %}
- 
+
+  {% block extra-post-form-fields %}{% endblock %}
+
   {% for hidden in form.hidden_fields %}
     {{ hidden }}
   {% endfor %}
@@ -47,3 +43,5 @@
     <button type="submit" class="btn btn-primary" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
   </div>
 </form>
+
+{% endblock %}
