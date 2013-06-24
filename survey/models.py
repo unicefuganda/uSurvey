@@ -109,7 +109,7 @@ class Children(BaseModel):
     aged_between_24_59_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="24-59 months?")
 
 class Women(BaseModel):
-   household = models.OneToOneField(HouseHold, null=True)
+   household = models.OneToOneField(HouseHold, null=True, related_name="women")
    aged_between_15_19_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many of these women are aged 15-19 years?")
    aged_between_15_49_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="15-49 years?")
 
