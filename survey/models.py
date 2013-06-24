@@ -69,6 +69,13 @@ class Investigator(BaseModel):
         if getattr(self, 'ussd_variables', None):
             self.ussd_variables[label].append(question)
 
+    def has_pending_survey(self):
+        last_answered_question = self.last_answered_question()
+        if not last_answered_question or not last_answered_question.next_question_for_investigator(self):
+            return False
+        else:
+            return True
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
