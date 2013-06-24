@@ -78,7 +78,8 @@ class LocationAutoComplete(models.Model):
 
 
 class HouseholdHead(BaseModel):
-    name = models.CharField(max_length=100, blank=False, null=False, default="Household")
+    surname = models.CharField(max_length=100, blank=False, null=False, default="Household")
+    first_name = models.CharField(max_length=100, blank=True, null=True)
     age = models.PositiveIntegerField(validators=[MinValueValidator(13)], null=True)
     male = models.BooleanField(default=True, verbose_name="Gender")
     occupation = models.CharField(max_length=100, blank=False, null=False, verbose_name="Occupation / Main Livelihood")
