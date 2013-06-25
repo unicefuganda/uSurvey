@@ -85,7 +85,7 @@ class USSD(object):
         if self.reanswerable_question():
             self.responseString += "Reconfirm: "
         if self.invalid_answered_question():
-            self.responseString += "Invalid answer: "
+            self.responseString += "INVALID ANSWER: "
 
     def render_response(self):
         if not self.question:
