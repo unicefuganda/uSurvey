@@ -47,7 +47,7 @@ class InvestigatorTest(TestCase):
 
     def test_has_pending_survey(self):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210")
-        household = HouseHold.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
