@@ -156,6 +156,12 @@ class Household(BaseModel):
         else:
             return True
 
+    def survey_completed(self):
+        return not self.next_question()
+
+    def retake_latest_batch(self):
+        for klass in [NumericalAnswer, TextAnswer, MultiChoiceAnswer]:
+            klass.objects.filter(household=self).delete()
 
 class HouseholdHead(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="head")

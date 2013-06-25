@@ -436,6 +436,8 @@ class USSDTestCompleteFlow(TestCase):
         self.household_head_8.household.delete()
         self.household_head_9.household.delete()
 
+        # Survey for the next household
+
         self.ussd_params['response'] = "false"
         self.ussd_params['ussdRequestString'] = ""
         self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
@@ -486,3 +488,52 @@ class USSDTestCompleteFlow(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.assertEquals(5, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_2, household=self.household_head_2.household).answer)
+
+        # Retaking survey for an household
+
+        self.ussd_params['response'] = "false"
+        self.ussd_params['ussdRequestString'] = ""
+        self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % homepage
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "00"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % households_list_1
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "2"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "2"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % households_list_1
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "2"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.assertEquals(2, NumericalAnswer.objects.filter(investigator=self.investigator, household=self.household_head_2.household).count())
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_1.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.assertEquals(0, NumericalAnswer.objects.filter(investigator=self.investigator, household=self.household_head_2.household).count())

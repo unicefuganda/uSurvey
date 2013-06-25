@@ -7,7 +7,8 @@ class USSD(object):
         'USER_NOT_REGISTERED': "Sorry, your mobile number is not registered for this survey",
         'WELCOME_TEXT': "Welcome %s to the survey. You will recieve refund only on the completion of the survey.",
         'HOUSEHOLD_LIST': "Please select an household from the list",
-        'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "BLAH BLAH",
+        'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
+        'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n 2: No",
     }
 
     ACTIONS = {
@@ -84,9 +85,6 @@ class USSD(object):
     def invalid_answered_question(self):
         return self.question_present_in_cache('INVALID_ANSWER')
 
-    def merge_ussd_session_variables(self):
-        pass
-
     def process_investigator_response(self):
         answer = self.request['ussdRequestString'].strip()
         if not answer:
@@ -102,21 +100,47 @@ class USSD(object):
         if self.invalid_answered_question():
             self.responseString += "INVALID ANSWER: "
 
+    def end_interview(self):
+        self.action = self.ACTIONS['END']
+        self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS'] if self.investigator.completed_open_surveys() else USSD.MESSAGES['SUCCESS_MESSAGE']
+
     def render_survey_response(self):
         if not self.question:
-            self.action = self.ACTIONS['END']
-            self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS'] if self.investigator.completed_open_surveys() else USSD.MESSAGES['SUCCESS_MESSAGE']
+            self.end_interview()
         else:
             page = self.get_from_session('PAGE')
             self.add_question_prefix()
             self.responseString += self.question.to_ussd(page)
 
     def render_survey(self):
-        self.question = self.household.next_question()
-        if not self.is_new_request():
-            self.process_investigator_response()
-        self.merge_ussd_session_variables()
-        self.render_survey_response()
+        if not self.household.survey_completed():
+            self.question = self.household.next_question()
+            if not self.is_new_request():
+                self.process_investigator_response()
+            self.render_survey_response()
+        else:
+            self.retake_survey()
+
+    def confirm_retake_survey(self, answer):
+        try:
+            answer = int(answer)
+            return answer == 1
+        except ValueError, e:
+            return False
+
+    def retake_survey(self):
+        answer = self.request['ussdRequestString'].strip()
+        if not answer:
+            self.responseString = self.MESSAGES['RETAKE_SURVEY']
+        else:
+            if self.confirm_retake_survey(answer):
+                self.household.retake_latest_batch()
+                self.behave_like_new_request()
+                self.render_survey()
+            else:
+                self.household = None
+                self.set_in_session('HOUSEHOLD', self.household)
+                self.render_households_list(self.HOUSEHOLD_LIST_OPTION)
 
     def render_welcome_text(self):
         welcome_message = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
