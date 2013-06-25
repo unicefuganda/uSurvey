@@ -20,7 +20,7 @@ class WomenForm(ModelForm):
         for field in [ 'aged_between_15_19_years', 'aged_between_15_49_years']:
             if int(cleaned_data.get(field)):
                 self._errors[field] = self.error_class([message])
-                raise forms.ValidationError(message)
+                del cleaned_data[field]
 
       return cleaned_data
 

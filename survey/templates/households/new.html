@@ -9,18 +9,18 @@
 <div class="control-group">
   <label class="control-label" for="investigator">Investigator</label>
   <div class="controls">
-    <select name="investigator" id="household-investigator"  data-placeholder="Select or Type Investigator "  single  class="chzn-select" required>
-      <option value="" selected></option>
-      {% for investigator in investigators %}
+   <select name="investigator" id="household-investigator"  data-placeholder="Select or Type Investigator "  single class="chzn-select" required>
+      <option value={{investigator_form.value}} selected>{{investigator_form.text}}</option>
+      {% for investigator in investigator_form.options %}
         <option value="{{investigator.id}}">{{investigator.name}}</option>
       {% endfor %}
-    </select>
+    </select><label class="error">{{ investigator_form.error }}</label>
   </div>
 </div>
 <h4>Head of Household's Information</h4>
 {% include "naked_form.html" with a_form=headform %}
 <h4>Household Information</h4>
-{% for form in householdform %}
+{% for name, form in householdform.items %}
   {% include "naked_form.html" with a_form=form %}
 {% endfor %}
 {% endblock %}
