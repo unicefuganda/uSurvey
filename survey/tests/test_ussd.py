@@ -222,7 +222,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = ""
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % ("Invalid answer: " + question_1.text)
+        response_string = "responseString=%s&action=request" % ("INVALID ANSWER: " + question_1.text)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.ussd_params['response'] = "true"
@@ -244,7 +244,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "a"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % ("Invalid answer: " + question_1.text)
+        response_string = "responseString=%s&action=request" % ("INVALID ANSWER: " + question_1.text)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.ussd_params['response'] = "true"
@@ -269,14 +269,14 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "a"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % ("Invalid answer: " + page_1)
+        response_string = "responseString=%s&action=request" % ("INVALID ANSWER: " + page_1)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "4"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % ("Invalid answer: " + page_1)
+        response_string = "responseString=%s&action=request" % ("INVALID ANSWER: " + page_1)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
 
