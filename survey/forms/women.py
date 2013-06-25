@@ -3,7 +3,7 @@ from survey.models import *
 from django.forms import ModelForm
 
 class WomenForm(ModelForm):
-    has_women = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))))
+    has_women = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))), initial=False)
 
     def __init__(self, *args, **kwargs):
         super(WomenForm, self).__init__(*args, **kwargs)
@@ -13,9 +13,9 @@ class WomenForm(ModelForm):
 
     def clean(self):
       cleaned_data = super(WomenForm, self).clean()
-      has_children = cleaned_data.get("has_children")
+      has_women = cleaned_data.get("has_women")
 
-      if not has_children:
+      if not has_women:
         message = "Should be zero. This household has no women aged 15+ years."
         for field in [ 'aged_between_15_19_years', 'aged_between_15_49_years']:
             if int(cleaned_data.get(field)):

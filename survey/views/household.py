@@ -53,22 +53,25 @@ def validate_investigator(request, householdform, posted_locations):
     return investigator, investigator_form
 
 def _process_form(householdform, investigator, request):
-    valid =[]
-    if householdform['household'].is_valid():
-        householdform['household'].investigator = investigator
-        valid.append(True)
+    valid ={}
+    is_valid_household = householdform['household'].is_valid()
+    if investigator and is_valid_household:
+        householdform['household'].instance.investigator = investigator
+        householdform['household'].save()
+        valid['household'] = True
     remaining_keys = ['householdHead', 'children', 'women']
     for key in remaining_keys:
-        if householdform[key].is_valid():
-            householdform[key].household= householdform['household']
-            valid.append(True)
-    if valid.count(True)==len(householdform.keys()):
-        householdform['household'].save()
-        for key in remaining_keys:
+        is_valid_form = householdform[key].is_valid()
+        if is_valid_household and is_valid_form:
+            householdform[key].instance.household= householdform['household'].instance
             householdform[key].save()
+            valid[key] = True
+    if valid.values().count(True)==len(householdform.keys()):
         messages.success(request, "Household successfully registered.")
         return HttpResponseRedirect("/households/new")
 
+    for key in valid.keys():
+        householdform[key].instance.delete()
     _add_error_response_message(householdform, request)
     return None
 
@@ -93,7 +96,6 @@ def new(request):
         posted_locations = Location.objects.get(id=int(location_id)).get_descendants(include_self=True)
         investigator, investigator_form = validate_investigator(request, householdform['household'],  posted_locations)
         response = _process_form(householdform, investigator, request)
-        print investigator_form
 
     householdHead = householdform['householdHead']
     del householdform['householdHead']

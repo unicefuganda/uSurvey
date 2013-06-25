@@ -4,7 +4,7 @@ from django.forms import ModelForm
 
 class HouseholdForm(ModelForm):
 
-    size = forms.CharField( widget=forms.TextInput(attrs={'type':'number'}))
+    size = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0}))
 
     def __init__(self, *args, **kwargs):
             super(HouseholdForm, self).__init__(*args, **kwargs)
@@ -20,7 +20,7 @@ class HouseholdForm(ModelForm):
       if int(size) != int(number_of_females) + int(number_of_males):
         message = "Total number of household members doesn't match female and male ones."
         self._errors["size"] = self.error_class([message])
-        raise forms.ValidationError(message)
+        del cleaned_data['size']
 
       return cleaned_data
 

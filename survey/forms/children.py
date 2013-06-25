@@ -3,9 +3,9 @@ from survey.models import *
 from django.forms import ModelForm
 
 class ChildrenForm(ModelForm):
-    has_children = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))))
-    has_children_below_5 = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))))
-    total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'type':'number'}))
+    has_children = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))), initial=False)
+    has_children_below_5 = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))), initial=False)
+    total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0}))
 
     def __init__(self, *args, **kwargs):
         super(ChildrenForm, self).__init__(*args, **kwargs)
@@ -27,12 +27,11 @@ class ChildrenForm(ModelForm):
 
     def check_total_below_5(self, cleaned_data, fields_for_below_5):
         total_below_5 = cleaned_data.get("total_below_5")
-        message = "Total does not match."
         total = 0
         for field in fields_for_below_5:
             total += int(cleaned_data.get(field))
-        if total != total_below_5:
-            self._errors[field] = self.error_class([message])
+        if total != int(total_below_5):
+            self._errors['total_below_5'] = self.error_class(["Total does not match."])
             del cleaned_data["total_below_5"]
         return cleaned_data
 
