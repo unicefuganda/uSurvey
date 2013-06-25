@@ -14,7 +14,7 @@ class Migration(SchemaMigration):
             ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
             ('modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
             ('investigator', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['survey.Investigator'], null=True)),
-            ('household', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['survey.HouseHold'], null=True)),
+            ('household', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['survey.Household'], null=True)),
             ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['survey.Question'], null=True)),
             ('answer', self.gf('django.db.models.fields.CharField')(max_length=100)),
         ))
@@ -67,7 +67,7 @@ class Migration(SchemaMigration):
             'survey': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'batches'", 'null': 'True', 'to': "orm['survey.Survey']"})
         },
         'survey.household': {
-            'Meta': {'object_name': 'HouseHold'},
+            'Meta': {'object_name': 'Household'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'households'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
@@ -105,7 +105,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'NumericalAnswer'},
             'answer': ('django.db.models.fields.PositiveIntegerField', [], {'max_length': '5', 'null': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'household': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.HouseHold']", 'null': 'True'}),
+            'household': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Household']", 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Investigator']", 'null': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -142,7 +142,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'TextAnswer'},
             'answer': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'household': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.HouseHold']", 'null': 'True'}),
+            'household': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Household']", 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Investigator']", 'null': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),

@@ -6,8 +6,13 @@ class HouseHoldForm(ModelForm):
 
     size = forms.CharField( widget=forms.TextInput(attrs={'type':'number'}))
 
+    def __init__(self, *args, **kwargs):
+            super(HouseHoldForm, self).__init__(*args, **kwargs)
+            self.fields['size'].label = 'How many persons reside in this household?'
+            self.fields.keyOrder=['size', 'number_of_males', 'number_of_females']
+
     def clean(self):
-      cleaned_data = super(InvestigatorForm, self).clean()
+      cleaned_data = super(HouseHoldForm, self).clean()
       number_of_males = cleaned_data.get("number_of_males")
       number_of_females = cleaned_data.get("number_of_females")
       size = cleaned_data.get("size")
@@ -20,5 +25,5 @@ class HouseHoldForm(ModelForm):
       return cleaned_data
 
     class Meta:
-        model = HouseHold
+        model = Household
         exclude = ['investigator']

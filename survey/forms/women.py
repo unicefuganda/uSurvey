@@ -5,8 +5,14 @@ from django.forms import ModelForm
 class WomenForm(ModelForm):
     has_women = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))))
 
+    def __init__(self, *args, **kwargs):
+        super(WomenForm, self).__init__(*args, **kwargs)
+        self.fields['has_women'].label = 'Does this household have any women aged 15+ years?'
+        self.fields.keyOrder= ['has_women', 'aged_between_15_19_years', 'aged_between_15_49_years']
+
+
     def clean(self):
-      cleaned_data = super(InvestigatorForm, self).clean()
+      cleaned_data = super(WomenForm, self).clean()
       has_children = cleaned_data.get("has_children")
 
       if not has_children:

@@ -3,56 +3,16 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
-from django.utils.datastructures import SortedDict
 
 from survey.investigator_configs import *
-from rapidsms.contrib.locations.models import *
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.investigator import *
 from survey.models import Investigator
+from survey.views.location_filter_helper import initialize_location_type, update_location_type
 
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
-
-
-def initialize_location_type(default_select=CREATE_INVESTIGATOR_DEFAULT_SELECT):
-    selected_location = SortedDict()
-    all_type = LocationType.objects.all()
-    for location_type in all_type:
-        selected_location[location_type.name] = {'value': '', 'text': default_select, 'siblings': []}
-    district = all_type[0]
-    selected_location[district.name]['siblings'] = Location.objects.filter(tree_parent=None).order_by('name')
-    return selected_location
-
-
-def assign_ancestors_locations(selected_location, location):
-    ancestors = location.get_ancestors(include_self=True)
-    for loca in ancestors:
-        selected_location[loca.type.name]['value'] = loca.id
-        all_default_select = selected_location[loca.type.name]['text']
-        selected_location[loca.type.name]['text'] = loca.name
-        siblings = list(loca.get_siblings().order_by('name'))
-        siblings.insert(0, {'id': '', 'name': all_default_select})
-        selected_location[loca.type.name]['siblings'] = siblings
-    return selected_location
-
-
-def assign_immediate_child_locations(selected_location, location):
-    children = location.get_descendants()
-    if children:
-        immediate_child = children[0]
-        siblings = immediate_child.get_siblings(include_self=True).order_by('name')
-        selected_location[immediate_child.type.name]['siblings'] = siblings
-    return selected_location
-
-
-def update_location_type(selected_location, location_id):
-    if not location_id:
-        return selected_location
-    location = Location.objects.get(id=location_id)
-    selected_location = assign_ancestors_locations(selected_location, location)
-    selected_location = assign_immediate_child_locations(selected_location, location)
-    return selected_location
 
 
 def _get_posted_location(location_data):
@@ -79,7 +39,7 @@ def _add_error_response_message(investigator, request):
 def _process_form(investigator, request):
     if investigator.is_valid():
         investigator.save()
-        HouseHold.objects.create(investigator=investigator.instance)
+        Household.objects.create(investigator=investigator.instance)
         messages.success(request, "Investigator successfully registered.")
         return HttpResponseRedirect("/investigators/")
 
@@ -87,23 +47,9 @@ def _process_form(investigator, request):
     return None
 
 
-def _insert_confirm_field_right_after_mobile_number(keys):
-    keys.remove('confirm_mobile_number')
-    index_of_mobile_number = keys.index('mobile_number')
-    keys.insert(index_of_mobile_number + 1, 'confirm_mobile_number')
-    return keys
-
-
-def _put_confirm_mobile_number_exactly_after_mobile_number(fields):
-    rearranged_keys = _insert_confirm_field_right_after_mobile_number(fields.keys())
-    new_fields = SortedDict()
-    for key in rearranged_keys:
-        new_fields[key] = fields[key]
-    return new_fields
-
 def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
-    location_type = initialize_location_type()
+    location_type = initialize_location_type(default_select=CREATE_INVESTIGATOR_DEFAULT_SELECT)
     response = None
 
     if request.method == 'POST':
@@ -112,15 +58,14 @@ def new_investigator(request):
         location_type = update_location_type(location_type, location_id)
         response = _process_form(investigator, request)
 
-    investigator.fields = _put_confirm_mobile_number_exactly_after_mobile_number(investigator.fields)
-
     return response or render(request, 'investigators/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
                                                                   'location_type': location_type,
                                                                   'form': investigator,
-                                                                  'action':"/investigators/new/",
-                                                                  'id':"create-investigator-form",
-                                                                  'button_label':"Create Investigator",
-                                                                  'loading_text':"Creating..."})
+                                                                  'action': "/investigators/new/",
+                                                                  'id': "create-investigator-form",
+                                                                  'button_label': "Create Investigator",
+                                                                  'loading_text': "Creating..."})
+
 
 def get_locations(request):
     tree_parent = request.GET['parent'] if request.GET.has_key('parent') and request.GET['parent'] else None

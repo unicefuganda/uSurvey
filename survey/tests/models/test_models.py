@@ -28,7 +28,7 @@ class InvestigatorTest(TestCase):
 
     def test_next_answerable_question(self):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210")
-        household = HouseHold.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -175,13 +175,13 @@ class QuestionOptionTest(TestCase):
 class HouseHoldTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator)
         self.failUnless(household.id)
 
 class NumericalAnswerTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create( investigator=investigator)
+        household = Household.objects.create( investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -193,7 +193,7 @@ class NumericalAnswerTest(TestCase):
 class TextAnswerTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -205,7 +205,7 @@ class TextAnswerTest(TestCase):
 class MultiChoiceAnswerTest(TestCase):
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -217,7 +217,7 @@ class MultiChoiceAnswerTest(TestCase):
 
     def test_pagination(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        household = HouseHold.objects.create( investigator=investigator)
+        household = Household.objects.create( investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         indicator = Indicator.objects.create(batch=batch)
@@ -248,7 +248,7 @@ class MultiChoiceAnswerTest(TestCase):
 class AnswerRuleTest(TestCase):
     def setUp(self):
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
-        self.household = HouseHold.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         self.indicator = Indicator.objects.create(batch=batch)

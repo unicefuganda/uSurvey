@@ -12,7 +12,7 @@ class ChildrenTest(TestCase):
             self.assertIn(field, fields)
 
     def test_store(self):
-        children = Children.objects.create(household=HouseHold())
+        children = Children.objects.create(household=Household())
         self.failUnless(children.id)
         self.failUnless(children.created)
         self.failUnless(children.modified)

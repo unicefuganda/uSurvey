@@ -1,59 +1,15 @@
-import json
-
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
-from django.utils.datastructures import SortedDict
 
-from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import *
 from survey.forms.householdHead import *
-from survey.models import *
+from survey.forms.children import *
+from survey.forms.women import *
+from survey.forms.household import *
+from survey.views.location_filter_helper import initialize_location_type, update_location_type
 
-
-CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
-LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
-
-
-def initialize_location_type(default_select=CREATE_INVESTIGATOR_DEFAULT_SELECT):
-    selected_location = SortedDict()
-    all_type = LocationType.objects.all()
-    for location_type in all_type:
-        selected_location[location_type.name] = {'value': '', 'text': default_select, 'siblings': []}
-    district = all_type[0]
-    selected_location[district.name]['siblings'] = Location.objects.filter(tree_parent=None).order_by('name')
-    return selected_location
-
-
-def assign_ancestors_locations(selected_location, location):
-    ancestors = location.get_ancestors(include_self=True)
-    for loca in ancestors:
-        selected_location[loca.type.name]['value'] = loca.id
-        all_default_select = selected_location[loca.type.name]['text']
-        selected_location[loca.type.name]['text'] = loca.name
-        siblings = list(loca.get_siblings().order_by('name'))
-        siblings.insert(0, {'id': '', 'name': all_default_select})
-        selected_location[loca.type.name]['siblings'] = siblings
-    return selected_location
-
-
-def assign_immediate_child_locations(selected_location, location):
-    children = location.get_descendants()
-    if children:
-        immediate_child = children[0]
-        siblings = immediate_child.get_siblings(include_self=True).order_by('name')
-        selected_location[immediate_child.type.name]['siblings'] = siblings
-    return selected_location
-
-
-def update_location_type(selected_location, location_id):
-    if not location_id:
-        return selected_location
-    location = Location.objects.get(id=location_id)
-    selected_location = assign_ancestors_locations(selected_location, location)
-    selected_location = assign_immediate_child_locations(selected_location, location)
-    return selected_location
-
+CREATE_HOUSEHOLD_DEFAULT_SELECT = ''
 
 def _get_posted_location(location_data):
     location_id = ''
@@ -63,44 +19,66 @@ def _get_posted_location(location_data):
     return location_id
 
 
-def _add_error_response_message(investigator, request):
-    error_message = "Investigator not registered. "
+def _add_error_response_message(form_list, request):
+    form_list = [item for sublist in form_list for item in sublist]
+    error_message = "Household not registered. "
     messages.error(request, error_message + "See errors below.")
-
-    for field in investigator.hidden_fields():
-        if field.errors:
-            messages.error(request, error_message + field.label + " information required.")
-
-    if investigator.non_field_errors():
-        for err in investigator.non_field_errors():
-            messages.error(request, error_message + str(err))
+    for form in form_list:
+        if form.non_field_errors():
+            for err in form.non_field_errors():
+                messages.error(request, error_message + str(err))
 
 
-def _process_form(investigator, request):
-    if investigator.is_valid():
-        investigator.save()
-        HouseHold.objects.create(investigator=investigator.instance)
-        messages.success(request, "Investigator successfully registered.")
+def _process_form(household, dependent_forms, request):
+    investigator = Investigator.objects.get(id=int(request.POST['investigator']))
+    valid =[]
+    if household.is_valid():
+        household.investigator = investigator
+        valid.append(True)
+    for form in dependent_forms:
+        if form.is_valid():
+            form.household= household
+            valid.append(True)
+    if valid.count(True)==len(dependent_forms)+1:
+        household.resident_since=3
+        household.save()
+        for form in dependent_forms:
+            form.save()
+        messages.success(request, "Household successfully registered.")
         return HttpResponseRedirect("/households/new")
 
-    _add_error_response_message(investigator, request)
+    _add_error_response_message([household, dependent_forms], request)
     return None
 
 def new(request):
-    householdHead = HouseholdHeadForm(auto_id='investigator-%s', label_suffix='')
-    location_type = initialize_location_type()
+    location_type = initialize_location_type(default_select=CREATE_HOUSEHOLD_DEFAULT_SELECT)
     response = None
 
+    householdHead = HouseholdHeadForm(auto_id='household-%s', label_suffix='')
+    children = ChildrenForm(auto_id='household-%s', label_suffix='')
+    women =  WomenForm(auto_id='household-%s', label_suffix='')
+    household= HouseHoldForm(auto_id='household-%s', label_suffix='')
+    investigators = Investigator.objects.all()
+
     if request.method == 'POST':
-        householdHead = HouseholdHeadForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
+        householdHead = HouseholdHeadForm(data=request.POST, auto_id='household-%s', label_suffix='')
+        children = ChildrenForm(data=request.POST,auto_id='household-%s', label_suffix='')
+        women =  WomenForm(data=request.POST,auto_id='household-%s', label_suffix='')
+        household= HouseHoldForm(data=request.POST, auto_id='household-%s', label_suffix='')
         location_id = _get_posted_location(request.POST)
         location_type = update_location_type(location_type, location_id)
-        response = _process_form(householdHead, request)
+        response = _process_form(household, [householdHead, children, women], request)
+        posted_locations = Location.objects.get(id=int(location_id)).get_descendants(include_self=True)
+        investigators = Investigator.objects.filter(location__in=posted_locations)
 
-    return response or render(request, 'households/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
-                                                                  'location_type': location_type,
-                                                                  'form': householdHead,
+
+    householdform =[household, children, women]
+
+    return response or render(request, 'households/new.html', {  'location_type': location_type,
+                                                                 'investigators': investigators,
+                                                                  'headform': householdHead,
+                                                                  'householdform': householdform,
                                                                   'action':"/households/new/",
-                                                                  'id':"create-investigator-form",
+                                                                  'id':"create-household-form",
                                                                   'button_label':"Create Household",
                                                                   'loading_text':"Creating..."})

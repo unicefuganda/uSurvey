@@ -4,7 +4,23 @@
   New Household
 {% endblock %}
 
-{% block extra-pre-form-fields %}
-{% include "location_filter.html"%}
+{% block display_form_fields %}
+{% include "location_filter.html" %}
+<div class="control-group">
+  <label class="control-label" for="investigator">Investigator</label>
+  <div class="controls">
+    <select name="investigator" id="household-investigator"  data-placeholder="Select or Type Investigator "  single  class="chzn-select" required>
+      <option value="" selected></option>
+      {% for investigator in investigators %}
+        <option value="{{investigator.id}}">{{investigator.name}}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
 <h4>Head of Household's Information</h4>
+{% include "naked_form.html" with a_form=headform %}
+<h4>Household Information</h4>
+{% for form in householdform %}
+  {% include "naked_form.html" with a_form=form %}
+{% endfor %}
 {% endblock %}

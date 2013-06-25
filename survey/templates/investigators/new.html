@@ -4,7 +4,8 @@
   New Investigator
 {% endblock %}
 
-{% block extra-post-form-fields %}
+{% block display_form_fields %}
+{% include "investigators/investigator_form.html"%}
 {% include "location_filter.html"%}
 {% endblock %}
 

@@ -2,42 +2,13 @@
 
 {% block content %}
 <h3>
-	{% block title %} {% endblock %}
+  {% block title %} {% endblock %}
 </h3>
 
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal investigator-form">
   {% csrf_token %}
 
-  {% block extra-pre-form-fields %}{% endblock %}
-
-  {% for field in form.visible_fields %}
-    {% load is_mobile_number %}
-    <div class="control-group">
-      <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
-      <div class="controls">
-        {% if field.label_tag|is_mobile_number %}
-         <div class="input-prepend">
-             <span class="add-on">{{ country_phone_code }}</span>
-        {% endif %}
-        {{field}} <label class="error">
-          {% if field.errors %}
-              {% for error in field.errors %}
-                  {{ error}}
-              {% endfor %}
-          {% endif %}
-           </label>
-        {% if field.label_tag|is_mobile_number %}
-          </div>
-        {% endif %}
-      </div>
-    </div>
-  {% endfor %}
-
-  {% block extra-post-form-fields %}{% endblock %}
-
-  {% for hidden in form.hidden_fields %}
-    {{ hidden }}
-  {% endfor %}
+  {% block display_form_fields %}{% endblock %}
 
   <div class="form-actions">
     <button type="submit" class="btn btn-primary" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>

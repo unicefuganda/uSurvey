@@ -8,7 +8,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'HouseHold'
+        # Adding model 'Household'
         db.create_table(u'survey_household', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
@@ -16,11 +16,11 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('investigator', self.gf('django.db.models.fields.related.ForeignKey')(related_name='households', null=True, to=orm['survey.Investigator'])),
         ))
-        db.send_create_signal(u'survey', ['HouseHold'])
+        db.send_create_signal(u'survey', ['Household'])
 
 
     def backwards(self, orm):
-        # Deleting model 'HouseHold'
+        # Deleting model 'Household'
         db.delete_table(u'survey_household')
 
 
@@ -65,7 +65,7 @@ class Migration(SchemaMigration):
             'survey': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'batches'", 'null': 'True', 'to': "orm['survey.Survey']"})
         },
         u'survey.household': {
-            'Meta': {'ordering': "('-modified', '-created')", 'object_name': 'HouseHold'},
+            'Meta': {'ordering': "('-modified', '-created')", 'object_name': 'Household'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'households'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
