@@ -341,6 +341,8 @@ class USSDTestCompleteFlow(TestCase):
     def test_flow(self):
         homepage = "Welcome %s to the survey. You will recieve refund only on the completion of the survey.\n00: Households list" % self.investigator.name
 
+        self.ussd_params['ussdRequestString'] = "adassd"
+
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -515,6 +517,20 @@ class USSDTestCompleteFlow(TestCase):
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "2"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % households_list_1
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "2"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "adads"
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % households_list_1

@@ -32,6 +32,7 @@ class USSD(object):
         self.household = None
         self.set_session()
         self.set_household()
+        self.clean_investigator_input()
 
     def set_household(self):
         household = self.get_from_session('HOUSEHOLD')
@@ -185,6 +186,10 @@ class USSD(object):
 
     def is_new_request(self):
         return self.request['response'] == 'false'
+
+    def clean_investigator_input(self):
+        if self.is_new_request():
+            self.request['ussdRequestString'] = ''
 
     def behave_like_new_request(self):
         self.request['ussdRequestString'] = ""
