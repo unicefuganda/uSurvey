@@ -101,7 +101,7 @@ class InvestigatorsViewTest(TestCase):
 
         self.assertTrue(investigator.male)
         self.assertEqual(investigator.location, uganda)
-        self.assertEqual(len(investigator.households.all()), 1)
+        self.assertEqual(len(investigator.households.all()), 0)
 
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))

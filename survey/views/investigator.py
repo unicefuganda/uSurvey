@@ -39,7 +39,7 @@ def _add_error_response_message(investigator, request):
 def _process_form(investigator, request):
     if investigator.is_valid():
         investigator.save()
-        Household.objects.create(investigator=investigator.instance)
+        # Household.objects.create(investigator=investigator.instance)
         messages.success(request, "Investigator successfully registered.")
         return HttpResponseRedirect("/investigators/")
 
