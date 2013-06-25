@@ -8,6 +8,7 @@ from investigator_configs import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.core.cache import cache
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -25,14 +26,36 @@ class Investigator(BaseModel):
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
                                 blank=False, default='English', verbose_name="Preferred language of communication")
 
-    def next_answerable_question(self):
-        last_answered_question = self.last_answered_question()
-        if not last_answered_question:
-            return Survey.currently_open().first_question()
-        else:
-            return last_answered_question.next_question_for_investigator(self)
+    HOUSEHOLDS_PER_PAGE = 4
+    PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
+    NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
 
-    def last_answered_question(self):
+    DEFAULT_CACHED_VALUES = {
+        'REANSWER': [],
+        'INVALID_ANSWER': [],
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(Investigator, self).__init__(*args, **kwargs)
+        self.cache_key = "Investigator-%s" % self.id
+        self.generate_cache()
+
+    def generate_cache(self):
+        if not cache.get(self.cache_key):
+            cache.set(self.cache_key, self.DEFAULT_CACHED_VALUES)
+
+    def set_in_cache(self, key, value):
+        cached = cache.get(self.cache_key)
+        cached[key] = value
+        cache.set(self.cache_key, cached)
+
+    def get_from_cache(self, key):
+        return cache.get(self.cache_key)[key]
+
+    def next_answerable_question(self, household):
+        return household.next_question()
+
+    def last_answered(self):
         answered = []
         for klass in [NumericalAnswer, TextAnswer, MultiChoiceAnswer]:
             try:
@@ -41,7 +64,10 @@ class Investigator(BaseModel):
             except ObjectDoesNotExist, e:
                 pass
         if answered:
-            return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
+            return sorted(answered, key=lambda x: x.created, reverse=True)[0]
+
+    def last_answered_question(self):
+        self.last_answered().question
 
     def answered(self, question, household, answer):
         answer_class = question.answer_class()
@@ -50,7 +76,7 @@ class Investigator(BaseModel):
             if not answer:
                 return question
         if answer_class.objects.create(investigator=self, question=question, household=household, answer=answer).pk:
-            return question.next_question_for_investigator(self)
+            return household.next_question()
         else:
             return question
 
@@ -66,15 +92,32 @@ class Investigator(BaseModel):
         self.add_ussd_variable('INVALID_ANSWER', question)
 
     def add_ussd_variable(self, label, question):
-        if getattr(self, 'ussd_variables', None):
-            self.ussd_variables[label].append(question)
+        questions = self.get_from_cache(label)
+        questions.append(question)
+        self.set_in_cache(label, questions)
 
-    def has_pending_survey(self):
-        last_answered_question = self.last_answered_question()
-        if not last_answered_question or not last_answered_question.next_question_for_investigator(self):
-            return False
-        else:
-            return True
+    def households_list(self, page = 1):
+        all_households = list(self.all_households())
+        paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
+        households = paginator.page(page)
+        households_list = []
+        for household in households:
+            text = "%s: %s" % (all_households.index(household) + 1, household.head.surname)
+            households_list.append(text)
+        if households.has_previous():
+            households_list.append(self.PREVIOUS_PAGE_TEXT)
+        if households.has_next():
+            households_list.append(self.NEXT_PAGE_TEXT)
+        return "\n".join(households_list)
+
+    def all_households(self):
+        return self.households.order_by('created').all()
+
+    def completed_open_surveys(self):
+        for household in self.all_households():
+            if household.next_question():
+                return False
+        return True
 
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
@@ -87,6 +130,32 @@ class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
     number_of_males = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many are male?")
     number_of_females = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many are female?")
+
+    def last_question_answered(self):
+        answered = []
+        for klass in [NumericalAnswer, TextAnswer, MultiChoiceAnswer]:
+            try:
+                answer = klass.objects.filter(household=self).latest()
+                if answer: answered.append(answer)
+            except ObjectDoesNotExist, e:
+                pass
+        if answered:
+            return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
+
+    def next_question(self):
+        last_question_answered = self.last_question_answered()
+        if not last_question_answered:
+            return Survey.currently_open().first_question()
+        else:
+            return last_question_answered.next_question_for_household(self)
+
+    def has_pending_survey(self):
+        last_answered_question = self.last_question_answered()
+        if not last_answered_question or not last_answered_question.next_question_for_household(self):
+            return False
+        else:
+            return True
+
 
 class HouseholdHead(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="head")
@@ -186,10 +255,10 @@ class Question(BaseModel):
         else:
             raise ObjectDoesNotExist
 
-    def next_question_for_investigator(self, investigator):
-        answer = self.answer_class().objects.get(investigator=investigator, question=self)
+    def next_question_for_household(self, household):
+        answer = self.answer_class().objects.get(household=household, question=self)
         try:
-            return self.get_next_question_by_rule(answer, investigator)
+            return self.get_next_question_by_rule(answer, household.investigator)
         except ObjectDoesNotExist, e:
             return self.next_question()
 

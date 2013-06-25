@@ -35,34 +35,15 @@ class InvestigatorTest(TestCase):
         question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
 
-        self.assertEqual(question_1, investigator.next_answerable_question())
+        self.assertEqual(question_1, investigator.next_answerable_question(household))
 
         NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_1, answer=10)
 
-        self.assertEqual(question_2, investigator.next_answerable_question())
+        self.assertEqual(question_2, investigator.next_answerable_question(household))
 
         NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_2, answer=10)
 
-        self.assertEqual(None, investigator.next_answerable_question())
-
-    def test_has_pending_survey(self):
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210")
-        household = Household.objects.create(investigator=investigator)
-        survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(survey=survey)
-        indicator = Indicator.objects.create(batch=batch)
-        question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-
-        self.assertFalse(investigator.has_pending_survey())
-
-        NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_1, answer=10)
-
-        self.assertTrue(investigator.has_pending_survey())
-
-        NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_2, answer=10)
-
-        self.assertFalse(investigator.has_pending_survey())
+        self.assertEqual(None, investigator.next_answerable_question(household))
 
 class LocationTest(TestCase):
 
@@ -177,6 +158,25 @@ class HouseHoldTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210")
         household = Household.objects.create(investigator=investigator)
         self.failUnless(household.id)
+
+    def test_has_pending_survey(self):
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210")
+        household = Household.objects.create(investigator=investigator)
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        indicator = Indicator.objects.create(batch=batch)
+        question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+
+        self.assertFalse(household.has_pending_survey())
+
+        NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_1, answer=10)
+
+        self.assertTrue(household.has_pending_survey())
+
+        NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_2, answer=10)
+
+        self.assertFalse(household.has_pending_survey())
 
 class NumericalAnswerTest(TestCase):
     def test_store(self):
