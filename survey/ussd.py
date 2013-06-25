@@ -26,7 +26,7 @@ class USSD(object):
     def __init__(self, investigator, request):
         super(USSD, self).__init__()
         self.investigator = investigator
-        self.request = request
+        self.request = request.dict()
         self.action = self.ACTIONS['REQUEST']
         self.responseString = ""
         self.household = None
