@@ -16,6 +16,9 @@ LANGUAGES = (   ("English", "English"),
                 ("Luo", "Luo"),
                 ("Lugbara", "Lugbara"),
             )
-
+TIME_MEASURE =( ("Days", "Days"),
+                ("Months", "Months"),
+                ("Years", "Years"),
+              )
 COUNTRY_PHONE_CODE = "256"
 USSD_PROVIDER = "YO"

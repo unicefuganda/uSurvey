@@ -179,7 +179,10 @@ class HouseholdHead(BaseModel):
     occupation = models.CharField(max_length=100, blank=False, null=False, verbose_name="Occupation / Main Livelihood")
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary', verbose_name="Highest level of education completed")
-    resident_since = models.PositiveIntegerField(null=False, default=0)
+    resident_since = models.PositiveIntegerField(null=False, default=0,
+     verbose_name = "How long has this householdbeen resident in this village?")
+    time_measure = models.CharField(max_length=7, null=False, choices=TIME_MEASURE, blank=False, default='Days')
+    
 
 class Children(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="children")
