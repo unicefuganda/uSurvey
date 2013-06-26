@@ -97,7 +97,7 @@ class USSD(object):
 
     def add_question_prefix(self):
         if self.reanswerable_question():
-            self.responseString += "Reconfirm: "
+            self.responseString += "RECONFIRM: "
         if self.invalid_answered_question():
             self.responseString += "INVALID ANSWER: "
 
