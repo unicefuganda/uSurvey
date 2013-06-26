@@ -19,4 +19,4 @@ class HouseholdHeadTest(TestCase):
         self.failUnless(hHead.created)
         self.failUnless(hHead.modified)
         self.assertEquals(0, hHead.resident_since)
-        self.assertEquals("Days", hHead.time_measure)
+        self.assertEquals("Years", hHead.time_measure)
