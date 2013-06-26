@@ -2,6 +2,19 @@
 
 $("[data-location=true]").chosen();
 $("#household-investigator").chosen();
+function populate_investigator_list(location_id){
+  $.getJSON('/households/investigators', {location: location_id}, function(data) {
+      $.each(data, function(key, value) {
+           $("#household-investigator")
+                .append($('<option>')
+                .val(value)
+                .text(key));
+      });
+
+  $("#household-investigator").trigger("liszt:updated");
+  });
+};
+
 function populate_location_chosen(location_type, parent_id){
   $.getJSON('/investigators/locations', {parent: parent_id}, function(data) {
       $.each(data, function(key, value) {
@@ -57,6 +70,8 @@ function update_location_list(location_type, location_children, location_parent)
         if (location_children.length==0){
             $("#investigator-location").val(location_value);
             update_get_investigator_list_link(location_value);
+            notify($("#household-investigator"));
+            populate_investigator_list(location_value);
         }
 
      });

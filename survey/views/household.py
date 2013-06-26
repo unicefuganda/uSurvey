@@ -1,4 +1,5 @@
-from django.http import HttpResponseRedirect
+import json
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib import messages
 from django import forms
@@ -107,3 +108,12 @@ def new(request):
                                                                   'id':"create-household-form",
                                                                   'button_label':"Create Household",
                                                                   'loading_text':"Creating..."})
+
+def get_investigators(request):
+  location = request.GET['location'] if request.GET.has_key('location') and request.GET['location'] else None
+  investigators = Investigator.objects.filter(location=location)
+  investigator_hash = {}
+  for investigator in investigators:
+      investigator_hash[investigator.name] = investigator.id
+  return HttpResponse(json.dumps(investigator_hash), content_type="application/json")
+

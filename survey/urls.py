@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     url(r'^ussd/simulator', TemplateView.as_view(template_name="ussd/simulator.html")),
     url(r'^ussd', ussd, name="ussd"),
     url(r'^households/new/$', new, name="new_household_page"),
+    url(r'^households/investigators', get_investigators, name='load_investigators'),
 )

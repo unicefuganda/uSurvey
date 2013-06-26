@@ -1,10 +1,13 @@
 from django import forms
 from survey.models import *
 from django.forms import ModelForm
+from widgets import InlineRadioSelect
 
 class ChildrenForm(ModelForm):
-    has_children = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))), initial=False)
-    has_children_below_5 = forms.BooleanField( widget=forms.RadioSelect(choices=((True, 'Yes'), (False, 'No'))), initial=False)
+    has_children = forms.TypedChoiceField( initial=False, coerce=lambda x: x == 'Yes',
+                                    widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
+    has_children_below_5 = forms.TypedChoiceField( initial=False, coerce=lambda x: x == 'True',
+                                                   widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
     total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0}))
 
     def __init__(self, *args, **kwargs):
