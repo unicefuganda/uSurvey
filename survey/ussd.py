@@ -6,7 +6,7 @@ class USSD(object):
         'SUCCESS_MESSAGE': "This survey has come to an end. Your responses have been received. Thank you.",
         'USER_NOT_REGISTERED': "Sorry, your mobile number is not registered for this survey",
         'WELCOME_TEXT': "Welcome %s to the survey. You will recieve refund only on the completion of the survey.",
-        'HOUSEHOLD_LIST': "Please select an household from the list",
+        'HOUSEHOLD_LIST': "Please select a household from the list",
         'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
         'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
     }

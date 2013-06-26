@@ -347,11 +347,11 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        households_list_1 = "Please select an household from the list\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
+        households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
 
-        households_list_2 = "Please select an household from the list\n5: %s\n6: %s\n7: %s\n8: %s\n*: Back\n#: Next" % (self.household_head_5.surname, self.household_head_6.surname, self.household_head_7.surname, self.household_head_8.surname)
+        households_list_2 = "%s\n5: %s\n6: %s\n7: %s\n8: %s\n*: Back\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_5.surname, self.household_head_6.surname, self.household_head_7.surname, self.household_head_8.surname)
 
-        households_list_3 = "Please select an household from the list\n9: %s\n*: Back" % (self.household_head_9.surname)
+        households_list_3 = "%s\n9: %s\n*: Back" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_9.surname)
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
@@ -448,7 +448,7 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        households_list_1 = "Please select an household from the list\n1: %s\n2: %s" % (self.household_head_1.surname, self.household_head_2.surname)
+        households_list_1 = "%s\n1: %s\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
