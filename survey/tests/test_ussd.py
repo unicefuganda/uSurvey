@@ -212,14 +212,14 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "10"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % ("Reconfirm: " + question_1.text)
+        response_string = "responseString=%s&action=request" % ("RECONFIRM: " + question_1.text)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "5"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % ("Reconfirm: " + question_2.text)
+        response_string = "responseString=%s&action=request" % ("RECONFIRM: " + question_2.text)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.ussd_params['response'] = "true"
@@ -322,7 +322,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "0"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % ("Reconfirm: " + question_1.text)
+        response_string = "responseString=%s&action=request" % ("RECONFIRM: " + question_1.text)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.assertEquals(0, NumericalAnswer.objects.count())
@@ -349,7 +349,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "0"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=request" % ("Reconfirm: " + question_1.text)
+        response_string = "responseString=%s&action=request" % ("RECONFIRM: " + question_1.text)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.assertEquals(0, NumericalAnswer.objects.count())
