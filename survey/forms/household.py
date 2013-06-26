@@ -26,3 +26,7 @@ class HouseholdForm(ModelForm):
     class Meta:
         model = Household
         exclude = ['investigator']
+        widgets = {
+        'number_of_males':forms.TextInput(attrs={'min':0, 'type':'number' }),
+        'number_of_females':forms.TextInput(attrs={'min':0, 'type':'number' }),
+        }

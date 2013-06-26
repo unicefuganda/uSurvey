@@ -104,6 +104,13 @@ $(function(){
         return (cleaned_original==cleaned_confirm)
       }, "Mobile number not matched.");
 
+  jQuery.validator.addMethod("validate_15_to_49", function(value, element) {
+        var value_19 = parseInt($("#household-women-aged_between_15_19_years").val());
+        var value_49 = parseInt(value);
+        return (value_19<= value_49)
+      }, "Should be higher than the number of women between 15 to 19 years age.");
+
+
   $('.investigator-form').validate({
       ignore: ":hidden:not(select)",
       rules: {
@@ -116,7 +123,9 @@ $(function(){
           remote: '/investigators/check_mobile_number'
         },
         "confirm_mobile_number":{validate_confirm_number: true, required: true},
-        "age": "required"
+        "age": "required",
+        "surname":"required",
+        "aged_between_15_49_years":"validate_15_to_49"
       },
       messages: {
         "age":{ number: "Please enter a valid number. No space or special charcters."},
@@ -152,4 +161,62 @@ $(function(){
   data_location.each(function(index){
       update_location_list(this, data_location.slice(index+1), data_location.get(Math.min(index-1)));
   });
+
+  $("#household-number_of_males").change(function(){update_total_family_size();});
+  $("#household-number_of_females").change(function(){update_total_family_size();});
+  $.each( $("[id*=_months]"), function(){
+      $(this).change(function(){update_total_below_5_children();});
+  });
+
+  $("#household-women-has_women_1").change(function(){
+          disable_selected("[id*=women]");
+  });
+
+  $("#household-children-has_children_1").change(function(){
+            disable_selected("[id*=children]");
+    });
+
+  $("#household-children-has_children_below_5_1").change(function(){
+            disable_selected("[id*=children][id*=months]");
+    });
+
+  $("#household-women-has_women_0").change(function(){
+      enable_selected("[id*=women]");
+  });
+
+  $("#household-children-has_children_0").change(function(){
+      enable_selected("[id*=children]");
+  });
+
+  $("#household-children-has_children_below_5_0").change(function(){
+      enable_selected("[id*=children][id*=months]");
+  });
+
+
+
 });
+
+function update_total_family_size(){
+    var males = parseInt($("#household-number_of_males").val());
+    var females = parseInt($("#household-number_of_females").val());
+    $("#household-size").val(males+females);
+};
+function update_total_below_5_children(){
+    var total =0;
+    $.each( $("[id*=_months]"), function(){
+        total = total + parseInt($(this).val());
+    });
+    $("#household-total_below_5").val(total);
+};
+
+function disable_selected(identifier){
+    $.each( $(identifier + "[type=number]"), function(){
+          $(this).val(0);
+          $(this).attr("disabled", true);
+      });
+}
+function enable_selected(identifier){
+    $.each( $(identifier+"[type=number]"), function(){
+          $(this).removeAttr('disabled');
+      });
+}

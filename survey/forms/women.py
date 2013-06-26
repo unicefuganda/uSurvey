@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from widgets import InlineRadioSelect
 
 class WomenForm(ModelForm):
-    has_women = forms.TypedChoiceField( initial=False, coerce=lambda x: x == 'True',
+    has_women = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'True',
     widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')) )
 
     def __init__(self, *args, **kwargs):
@@ -31,7 +31,7 @@ class WomenForm(ModelForm):
             return cleaned_data
 
         if int(aged_between_15_19_years) > int(aged_between_15_49_years):
-            self._errors["aged_between_15_49_years"] = self.error_class(["Should be higher than the number of children between 15 to 19 years age."])
+            self._errors["aged_between_15_49_years"] = self.error_class(["Should be higher than the number of women between 15 to 19 years age."])
             del cleaned_data['aged_between_15_49_years']
         return cleaned_data
 
@@ -44,3 +44,8 @@ class WomenForm(ModelForm):
     class Meta:
         model = Women
         exclude = ['household']
+        widgets ={
+        'aged_between_15_19_years':forms.TextInput(attrs={'min':0, 'type':'number' }),
+        'aged_between_15_49_years':forms.TextInput(attrs={'min':0, 'type':'number' }),
+        }
+

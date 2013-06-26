@@ -4,11 +4,12 @@ from django.forms import ModelForm
 from widgets import InlineRadioSelect
 
 class ChildrenForm(ModelForm):
-    has_children = forms.TypedChoiceField( initial=False, coerce=lambda x: x == 'Yes',
+    has_children = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'Yes',
                                     widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
-    has_children_below_5 = forms.TypedChoiceField( initial=False, coerce=lambda x: x == 'True',
+    has_children_below_5 = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'True',
                                                    widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
-    total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0}))
+    total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0,
+                                        'id':'household-children-total_months'}))
 
     def __init__(self, *args, **kwargs):
         super(ChildrenForm, self).__init__(*args, **kwargs)
@@ -55,3 +56,11 @@ class ChildrenForm(ModelForm):
     class Meta:
         model = Children
         exclude = ['household']
+        widgets={
+                'aged_between_5_12_years':forms.TextInput(attrs={'min':0, 'type':'number' }),
+                'aged_between_13_17_years':forms.TextInput(attrs={'min':0, 'type':'number' }),
+                'aged_between_0_5_months':forms.TextInput(attrs={'min':0, 'type':'number' }),
+                'aged_between_6_11_months':forms.TextInput(attrs={'min':0, 'type':'number' }),
+                'aged_between_12_23_months':forms.TextInput(attrs={'min':0, 'type':'number' }),
+                'aged_between_24_59_months':forms.TextInput(attrs={'min':0, 'type':'number' }),
+        }

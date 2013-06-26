@@ -79,8 +79,8 @@ def _process_form(householdform, investigator, request):
 def set_household_form(data):
     householdform={}
     householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
-    householdform['children'] = ChildrenForm(data=data,auto_id='household-%s', label_suffix='')
-    householdform['women'] =  WomenForm(data=data,auto_id='household-%s', label_suffix='')
+    householdform['children'] = ChildrenForm(data=data,auto_id='household-children-%s', label_suffix='')
+    householdform['women'] =  WomenForm(data=data,auto_id='household-women-%s', label_suffix='')
     householdform['household']= HouseholdForm(data=data, auto_id='household-%s', label_suffix='')
     return householdform
 

@@ -22,7 +22,7 @@ class USSDTest(TestCase):
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
-        HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Surname " + str(randint(1, 99999)))
+        HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         self.indicator = Indicator.objects.create(batch=batch)
@@ -365,7 +365,7 @@ class USSDTest(TestCase):
 class USSDTestCompleteFlow(TestCase):
 
     def create_household_head(self):
-        return HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Surname " + str(randint(1, 99999)))
+        return HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
 
     def setUp(self):
         self.client = Client()
