@@ -31,8 +31,12 @@ class ChildrenForm(ModelForm):
 
     def check_total_below_5(self, cleaned_data, fields_for_below_5):
         total_below_5 = cleaned_data.get("total_below_5")
+        if not total_below_5:
+            return cleaned_data
         total = 0
         for field in fields_for_below_5:
+            if not cleaned_data.get(field):
+                return cleaned_data
             total += int(cleaned_data.get(field))
         if total != int(total_below_5):
             self._errors['total_below_5'] = self.error_class(["Total does not match."])
