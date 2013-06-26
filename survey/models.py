@@ -33,6 +33,7 @@ class Investigator(BaseModel):
     DEFAULT_CACHED_VALUES = {
         'REANSWER': [],
         'INVALID_ANSWER': [],
+        'CONFIRM_END_INTERVIEW': [],
     }
 
     def __init__(self, *args, **kwargs):
@@ -90,6 +91,12 @@ class Investigator(BaseModel):
 
     def invalid_answer(self, question):
         self.add_ussd_variable('INVALID_ANSWER', question)
+
+    def can_end_the_interview(self, question):
+        return question in self.get_from_cache('CONFIRM_END_INTERVIEW')
+
+    def confirm_end_interview(self, question):
+        self.add_ussd_variable("CONFIRM_END_INTERVIEW", question)
 
     def add_ussd_variable(self, label, question):
         questions = self.get_from_cache(label)
@@ -372,6 +379,9 @@ class AnswerRule(BaseModel):
         return answer.answer < self.validate_with_value
 
     def end_interview(self, investigator):
+        if not investigator.can_end_the_interview(self.question):
+            investigator.confirm_end_interview(self.question)
+            return self.reanswer(investigator)
         return None
 
     def skip_to(self, investigator):

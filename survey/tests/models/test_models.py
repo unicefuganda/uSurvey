@@ -265,6 +265,9 @@ class AnswerRuleTest(TestCase):
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'], condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
         next_question = self.investigator.answered(question_1, self.household, answer=0)
+        self.assertEqual(next_question, question_1)
+
+        next_question = self.investigator.answered(question_1, self.household, answer=0)
         self.assertEqual(next_question, None)
 
     def test_numerical_equals_and_skip_to_rule(self):
