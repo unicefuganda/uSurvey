@@ -22,7 +22,7 @@ class USSDTest(TestCase):
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
-        HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
+        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
         self.indicator = Indicator.objects.create(batch=batch)
@@ -342,6 +342,33 @@ class USSDTest(TestCase):
 
         self.investigator = Investigator.objects.get(id=self.investigator.pk)
         self.assertEquals(len(self.investigator.get_from_cache('CONFIRM_END_INTERVIEW')), 0)
+        self.assertEquals(self.household.has_pending_survey(), False)
+
+        self.ussd_params['response'] = "false"
+        self.ussd_params['ussdRequestString'] = ""
+        self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
+
+        homepage = "Welcome %s to the survey. You will recieve refund only on the completion of the survey.\n00: Households list" % self.investigator.name
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % homepage
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "00"
+
+        households_list_1 = "%s\n1: %s\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % households_list_1
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "2"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % question_1.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_end_interview_confirmation_alternative(self):
         question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)

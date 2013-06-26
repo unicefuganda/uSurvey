@@ -273,7 +273,7 @@ class Question(BaseModel):
 
     def get_next_question_by_rule(self, answer, investigator):
         if self.rule.validate(answer):
-            return self.rule.action_to_take(investigator)
+            return self.rule.action_to_take(investigator, answer)
         else:
             raise ObjectDoesNotExist
 
@@ -309,6 +309,7 @@ class Answer(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True)
     household = models.ForeignKey(Household, null=True)
     question = models.ForeignKey(Question, null=True)
+    rule_applied = models.ForeignKey("AnswerRule", null=True)
 
     class Meta:
         app_label = 'survey'
@@ -387,16 +388,24 @@ class AnswerRule(BaseModel):
     def less_than_value(self, answer):
         return answer.answer < self.validate_with_value
 
-    def end_interview(self, investigator):
+    def end_interview(self, investigator, answer):
+        if answer.rule_applied:
+            return None
         if not investigator.can_end_the_interview(self.question):
             investigator.confirm_end_interview(self.question)
-            return self.reanswer(investigator)
-        return None
+            return self.reanswer(investigator, answer)
+        else:
+            self.rule_applied_to(answer)
+            return None
 
-    def skip_to(self, investigator):
+    def rule_applied_to(self, answer):
+        answer.rule_applied = self
+        answer.save()
+
+    def skip_to(self, investigator, answer):
         return self.next_question
 
-    def reanswer(self, investigator):
+    def reanswer(self, investigator, answer):
         investigator.reanswer(self.question)
         if self.validate_with_question:
             investigator.reanswer(self.validate_with_question)
@@ -404,12 +413,12 @@ class AnswerRule(BaseModel):
         else:
             return self.question
 
-    def ask_subquestion(self, investigator):
-        return self.skip_to(investigator)
+    def ask_subquestion(self, investigator, answer):
+        return self.skip_to(investigator, answer)
 
-    def action_to_take(self, investigator):
+    def action_to_take(self, investigator, answer):
         method = getattr(self, self.ACTION_METHODS[self.action])
-        return method(investigator)
+        return method(investigator, answer)
 
     def validate(self, answer):
         method = getattr(self, self.CONDITION_METHODS[self.condition])
