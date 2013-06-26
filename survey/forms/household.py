@@ -8,8 +8,7 @@ class HouseholdForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
             super(HouseholdForm, self).__init__(*args, **kwargs)
-            self.fields['size'].label = 'How many persons reside in this household?'
-            self.fields.keyOrder=['size', 'number_of_males', 'number_of_females']
+            self.fields['size'].label = 'Total number of persons in this household'
 
     def clean(self):
       cleaned_data = super(HouseholdForm, self).clean()

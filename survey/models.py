@@ -135,8 +135,10 @@ class LocationAutoComplete(models.Model):
 
 class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
-    number_of_males = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many are male?")
-    number_of_females = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many are female?")
+    number_of_males = models.PositiveIntegerField(blank=False, default=0, 
+                        verbose_name="How many males reside in this household?")
+    number_of_females = models.PositiveIntegerField(blank=False, default=0, 
+                        verbose_name="How many females reside in this household?")
 
     def last_question_answered(self):
         answered = []
