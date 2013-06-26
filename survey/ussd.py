@@ -104,6 +104,8 @@ class USSD(object):
     def end_interview(self):
         self.action = self.ACTIONS['END']
         self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS'] if self.investigator.completed_open_surveys() else USSD.MESSAGES['SUCCESS_MESSAGE']
+        self.investigator.clear_interview_caches()
+        print cache.get(self.investigator.cache_key)
 
     def render_survey_response(self):
         if not self.question:

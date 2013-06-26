@@ -318,12 +318,18 @@ class USSDTest(TestCase):
         response_string = "responseString=%s&action=request" % question_1.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+        self.investigator = Investigator.objects.get(id=self.investigator.pk)
+
+        self.assertEquals(len(self.investigator.get_from_cache('CONFIRM_END_INTERVIEW')), 0)
+
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "0"
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % ("RECONFIRM: " + question_1.text)
         self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.assertEquals(len(self.investigator.get_from_cache('CONFIRM_END_INTERVIEW')), 1)
 
         self.assertEquals(0, NumericalAnswer.objects.count())
 
@@ -333,6 +339,9 @@ class USSDTest(TestCase):
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.investigator = Investigator.objects.get(id=self.investigator.pk)
+        self.assertEquals(len(self.investigator.get_from_cache('CONFIRM_END_INTERVIEW')), 0)
 
     def test_end_interview_confirmation_alternative(self):
         question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)

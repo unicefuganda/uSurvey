@@ -38,7 +38,7 @@ class Investigator(BaseModel):
 
     def __init__(self, *args, **kwargs):
         super(Investigator, self).__init__(*args, **kwargs)
-        self.cache_key = "Investigator-%s" % self.id
+        self.cache_key = "Investigator-%s" % self.pk
         self.generate_cache()
 
     def generate_cache(self):
@@ -52,6 +52,9 @@ class Investigator(BaseModel):
 
     def get_from_cache(self, key):
         return cache.get(self.cache_key)[key]
+
+    def clear_interview_caches(self):
+        cache.delete(self.cache_key)
 
     def next_answerable_question(self, household):
         return household.next_question()
@@ -135,9 +138,9 @@ class LocationAutoComplete(models.Model):
 
 class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
-    number_of_males = models.PositiveIntegerField(blank=False, default=0, 
+    number_of_males = models.PositiveIntegerField(blank=False, default=0,
                         verbose_name="How many males reside in this household?")
-    number_of_females = models.PositiveIntegerField(blank=False, default=0, 
+    number_of_females = models.PositiveIntegerField(blank=False, default=0,
                         verbose_name="How many females reside in this household?")
 
     def last_question_answered(self):
@@ -178,14 +181,14 @@ class HouseholdHead(BaseModel):
     first_name = models.CharField(max_length=12, blank=True, null=True)
     age = models.PositiveIntegerField(validators=[MinValueValidator(10), MaxValueValidator(99)], null=True)
     male = models.BooleanField(default=True, verbose_name="Gender")
-    occupation = models.CharField(max_length=100, blank=False, null=False, choices= OCCUPATION, 
+    occupation = models.CharField(max_length=100, blank=False, null=False, choices= OCCUPATION,
                                    verbose_name="Occupation / Main Livelihood", default="16")
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary', verbose_name="Highest level of education completed")
     resident_since = models.PositiveIntegerField(null=False, default=0,
      verbose_name = "How long has this householdbeen resident in this village?")
     time_measure = models.CharField(max_length=7, null=False, choices=TIME_MEASURE, blank=False, default='Days')
-    
+
 
 class Children(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="children")
