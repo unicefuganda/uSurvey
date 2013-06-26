@@ -24,7 +24,7 @@ OCCUPATION = (
                 ("01", "Agricultural labor"),
                 ("02", "Livestock herding"),
                 ("03", "Own farm labor"),
-                ("04=Employed(salaried)"),
+                ("04", "Employed(salaried)"),
                 ("05", "Waged labor (Casual),"),
                 ("06", "Petty trade"),
                 ("07", "Unemployed"),
@@ -41,6 +41,6 @@ OCCUPATION = (
                 ("18", "Fishing"),
                 ("19", "Others (Specify),"),
                 )
-              
+
 COUNTRY_PHONE_CODE = "256"
 USSD_PROVIDER = "YO"
