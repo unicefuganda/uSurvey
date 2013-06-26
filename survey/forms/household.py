@@ -17,7 +17,7 @@ class HouseholdForm(ModelForm):
       size = cleaned_data.get("size")
 
       if int(size) != int(number_of_females) + int(number_of_males):
-        message = "Total number of household members doesn't match female and male ones."
+        message = "Total number of household members does not match female and male ones."
         self._errors["size"] = self.error_class([message])
         del cleaned_data['size']
 
