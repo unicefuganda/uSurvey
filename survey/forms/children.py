@@ -9,7 +9,7 @@ class ChildrenForm(ModelForm):
     has_children_below_5 = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'True',
                                                    widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
     total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0,
-                                        'id':'household-children-total_months'}))
+                                        'id':'household-children-total_months', 'readonly':'readonly'}))
 
     def __init__(self, *args, **kwargs):
         super(ChildrenForm, self).__init__(*args, **kwargs)
@@ -24,7 +24,7 @@ class ChildrenForm(ModelForm):
         if not has_children:
           message = "Should be zero. This household has no children" + message
           for field in against_attributes:
-              if int(cleaned_data.get(field)):
+              if cleaned_data.get(field) and int(cleaned_data.get(field)):
                   self._errors[field] = self.error_class([message])
                   del cleaned_data[field]
         return cleaned_data

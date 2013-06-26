@@ -4,7 +4,7 @@ from django.forms import ModelForm
 
 class HouseholdForm(ModelForm):
 
-    size = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0}))
+    size = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0, 'readonly':'readonly'}))
 
     def __init__(self, *args, **kwargs):
             super(HouseholdForm, self).__init__(*args, **kwargs)

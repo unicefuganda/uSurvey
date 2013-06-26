@@ -178,7 +178,7 @@ class Household(BaseModel):
 class HouseholdHead(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="head")
     surname = models.CharField(max_length=12, blank=False, null=True)
-    first_name = models.CharField(max_length=12, blank=True, null=True)
+    first_name = models.CharField(max_length=12, blank=False, null=True)
     age = models.PositiveIntegerField(validators=[MinValueValidator(10), MaxValueValidator(99)], null=True)
     male = models.BooleanField(default=True, verbose_name="Gender")
     occupation = models.CharField(max_length=100, blank=False, null=False, choices= OCCUPATION,
@@ -186,9 +186,8 @@ class HouseholdHead(BaseModel):
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary', verbose_name="Highest level of education completed")
     resident_since = models.PositiveIntegerField(null=False, default=0,
-     verbose_name = "How long has this householdbeen resident in this village?")
-    time_measure = models.CharField(max_length=7, null=False, choices=TIME_MEASURE, blank=False, default='Days')
-
+     verbose_name = "How long has this household been resident in this village?")
+    time_measure = models.CharField(max_length=7, null=False, choices=TIME_MEASURE, blank=False, default='Years')
 
 class Children(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="children")

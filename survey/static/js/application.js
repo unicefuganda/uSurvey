@@ -164,7 +164,7 @@ $(function(){
 
   $("#household-number_of_males").change(function(){update_total_family_size();});
   $("#household-number_of_females").change(function(){update_total_family_size();});
-  $.each( $("[id*=_months]"), function(){
+  $.each( $("[id*=months]"), function(){
       $(this).change(function(){update_total_below_5_children();});
   });
 
@@ -174,6 +174,7 @@ $(function(){
 
   $("#household-children-has_children_1").change(function(){
             disable_selected("[id*=children]");
+            $("#household-children-has_children_below_5_1").attr('checked', true);
     });
 
   $("#household-children-has_children_below_5_1").change(function(){
@@ -185,14 +186,14 @@ $(function(){
   });
 
   $("#household-children-has_children_0").change(function(){
-      enable_selected("[id*=children]");
+          enable_selected("[id*=children]");
   });
 
   $("#household-children-has_children_below_5_0").change(function(){
-      enable_selected("[id*=children][id*=months]");
+     if(!$("#household-children-has_children_1").is(':checked')){
+          enable_selected("[id*=children][id*=months]");
+     }
   });
-
-
 
 });
 
@@ -206,7 +207,7 @@ function update_total_below_5_children(){
     $.each( $("[id*=_months]"), function(){
         total = total + parseInt($(this).val());
     });
-    $("#household-total_below_5").val(total);
+    $("#household-children-total_months").val(total);
 };
 
 function disable_selected(identifier){
