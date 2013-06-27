@@ -3,6 +3,7 @@ from lettuce.django import django_url
 from random import randint
 from time import sleep
 from rapidsms.contrib.locations.models import Location
+from survey.models import Investigator
 from investigator_configs import *
 from rapidsms.contrib.locations.models import *
 
@@ -85,3 +86,49 @@ class FilteredInvestigatorsListPage(InvestigatorsListPage):
 
     def no_registered_invesitgators(self):
         assert self.browser.is_text_present("There are no investigators registered for this county.")        
+
+class NewHouseholdPage(PageObject):
+    url = "/households/new"
+
+    def valid_page(self):
+        fields = ['investigator', 'surname', 'first_name', 'male', 'age', 'occupation',
+                   'level_of_education', 'resident_since', 'time_measure']
+        fields += ['number_of_males', 'number_of_females', 'size']
+        fields += ['has_children', 'has_children_below_5','aged_between_5_12_years', 'aged_between_13_17_years', 'aged_between_0_5_months',
+                    'aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']
+        fields += ['has_women','aged_between_15_19_years', 'aged_between_15_49_years']            
+        fields += [location_type.name.lower() for location_type in LocationType.objects.all()]
+        for field in fields:
+            assert self.browser.is_element_present_by_name(field)
+   
+    def get_investigator_values(self):
+        return self.values
+
+    def fill_valid_values(self):
+        self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
+        self.values = {
+            'surname': self.random_text('house'),
+            'first_name': self.random_text('ayoyo'),
+            'age': '25',
+      }
+        self.browser.fill_form(self.values)
+        kampala = Location.objects.get(name="Kampala")
+        kampala_county = Location.objects.get(name="Kampala County")
+        investigator = Investigator.objects.get(name="Investigator name")
+        self.fill_in_with_js('$("#investigator-district")', kampala.id)
+        self.fill_in_with_js('$("#investigator-county")', kampala_county.id)
+        self.fill_in_with_js('$("#household-investigator")', investigator.id)
+
+    def fill_in_with_js(self, jquery_id, object_id):
+        script = '%s.val(%s); %s.trigger("liszt:updated").chosen().change()' % (jquery_id, object_id, jquery_id)
+        self.browser.execute_script(script)
+        sleep(2)
+
+    def submit(self):
+        sleep(2)
+        self.browser.find_by_css("form button").first.click()  
+
+    def validate_household_created(self):
+        assert self.browser.is_text_present("Household successfully registered.")
+
+      

@@ -3,7 +3,7 @@ from mock import *
 from django.template.defaultfilters import slugify
 
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.views.location_filter_helper import initialize_location_type, assign_immediate_child_locations, update_location_type
+from survey.views.location_filter_helper import initialize_location_type, assign_immediate_child_locations, update_location_type, get_posted_location
 
 
 class LocationViewFilterTest(TestCase):
@@ -71,3 +71,28 @@ class LocationViewFilterTest(TestCase):
         selected_location_orig = initialize_location_type(default_select='')
         selected_location = update_location_type(selected_location=selected_location_orig, location_id='')
         self.assertEquals(selected_location_orig, selected_location)
+
+    @patch('rapidsms.contrib.locations.models.LocationType.objects.all')
+    def test_get_posted_location(self, mock_location_type):
+        district = MagicMock()
+        district.name = 'District'
+        county = MagicMock()
+        county.name = 'County'
+        subcounty = MagicMock()
+        subcounty.name = 'Subcounty'
+        some_type =[district, county, subcounty]
+        mock_location_type.return_value = some_type
+        location_data ={'district':1,
+                        'county': '',
+                        'subcounty':''}
+
+        posted_location = get_posted_location(location_data)
+        self.assertEquals(posted_location, 1)
+
+        location_data['county']=2
+        posted_location = get_posted_location(location_data)
+        self.assertEquals(posted_location, 2)
+
+        location_data['subcounty']=99
+        posted_location = get_posted_location(location_data)
+        self.assertEquals(posted_location, 99)

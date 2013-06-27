@@ -40,3 +40,11 @@ def update_location_type(selected_location, location_id):
     selected_location = assign_ancestors_locations(selected_location, location)
     selected_location = assign_immediate_child_locations(selected_location, location)
     return selected_location
+
+
+def get_posted_location(location_data):
+    location_id = ''
+    for location_type in LocationType.objects.all():
+        if location_data[location_type.name.lower()]:
+            location_id = location_data[location_type.name.lower()]
+    return location_id

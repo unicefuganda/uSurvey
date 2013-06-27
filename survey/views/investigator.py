@@ -8,19 +8,11 @@ from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.investigator import *
 from survey.models import Investigator
-from survey.views.location_filter_helper import initialize_location_type, update_location_type
+from survey.views.location_filter_helper import initialize_location_type, update_location_type, get_posted_location
 
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
-
-
-def _get_posted_location(location_data):
-    location_id = ''
-    for location_type in LocationType.objects.all():
-        if location_data[location_type.name.lower()]:
-            location_id = location_data[location_type.name.lower()]
-    return location_id
 
 
 def _add_error_response_message(investigator, request):
@@ -54,7 +46,7 @@ def new_investigator(request):
 
     if request.method == 'POST':
         investigator = InvestigatorForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
-        location_id = _get_posted_location(request.POST)
+        location_id = get_posted_location(request.POST)
         location_type = update_location_type(location_type, location_id)
         response = _process_form(investigator, request)
 
