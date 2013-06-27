@@ -40,44 +40,63 @@ class ChildrenFormTest(TestCase):
             message = "Should be zero. This household has no children."
             self.assertEquals(children_form.errors[field], [message])
 
-    #     data['age']=100
-    #     children_form = ChildrenForm(data)
-    #     self.assertFalse(children_form.is_valid())
-    #     message = "Ensure this value is less than or equal to 99."
-    #     self.assertEquals(children_form.errors['age'], [message])
-    #
-    #
-    # def test_required_fields(self):
-    #     data = self.form_data
-    #     del data['age']
-    #     del data['surname']
-    #     del data['first_name']
-    #
-    #     children_form = ChildrenForm(data)
-    #     self.assertFalse(children_form.is_valid())
-    #     message = "This field is required."
-    #     self.assertEquals(children_form.errors['age'], [message])
-    #     self.assertEquals(children_form.errors['surname'], [message])
-    #     self.assertEquals(children_form.errors['first_name'], [message])
-    #
-    # def test_positive_resident_since(self):
-    #     data = self.form_data
-    #
-    #     data['resident_since'] = -6
-    #     children_form = ChildrenForm(data)
-    #     self.assertFalse(children_form.is_valid())
-    #     message = "Ensure this value is greater than or equal to 0."
-    #     self.assertEquals(children_form.errors['resident_since'], [message])
-    #
-    #     data['resident_since'] = 'not a number'
-    #     children_form = ChildrenForm(data)
-    #     self.assertFalse(children_form.is_valid())
-    #     message = 'Enter a whole number.'
-    #     self.assertEquals(children_form.errors['resident_since'], [message])
-    #
-    #     data['resident_since'] = None
-    #     children_form = ChildrenForm(data)
-    #     self.assertFalse(children_form.is_valid())
-    #     message = 'This field is required.'
-    #     self.assertEquals(children_form.errors['resident_since'], [message])
+    def test_has_children_below_5_false_but_one_of_the_field_positive(self):
+        data = self.form_data
+        data['has_children_below_5']= 'False'
+        for field in ['aged_between_0_5_months', 'aged_between_6_11_months',
+                        'aged_between_12_23_months', 'aged_between_24_59_months']:
+            data[field]= 1
+            children_form = ChildrenForm(data)
+            self.assertFalse(children_form.is_valid())
+            message = "Should be zero. This household has no children below 5 years."
+            self.assertEquals(children_form.errors[field], [message])
 
+    def test_has_both_children_and_below_5_false_with_two_separate_fields_positive(self):
+        data = self.form_data
+        data['has_children']= 'False'
+        data['has_children_below_5']= 'False'
+        data['aged_between_0_5_months']= 1
+        data['aged_between_5_12_years']= 1
+        children_form = ChildrenForm(data)
+        self.assertFalse(children_form.is_valid())
+        message = "Should be zero. This household has no children below 5 years."
+        self.assertEquals(children_form.errors['aged_between_0_5_months'], [message])
+        message = "Should be zero. This household has no children."
+        self.assertEquals(children_form.errors['aged_between_5_12_years'], [message])
+
+    def test_has_both_children_and_below_5_false_with_one_common_field_positive(self):
+        data = self.form_data
+        data['has_children']= 'False'
+        data['has_children_below_5']= 'False'
+        data['aged_between_0_5_months']= 1
+        children_form = ChildrenForm(data)
+        self.assertFalse(children_form.is_valid())
+        message = "Should be zero. This household has no children below 5 years."
+        self.assertEquals(children_form.errors['aged_between_0_5_months'], [message])
+
+    def test_check_total_below_5(self):
+        data = self.form_data
+        data['has_children']='True'
+        data['has_children_below_5']= 'True'
+        data['total_below_5']=5
+        for field in ['aged_between_0_5_months', 'aged_between_6_11_months',
+                        'aged_between_12_23_months', 'aged_between_24_59_months']:
+            data[field]= 100
+            children_form = ChildrenForm(data)
+            self.assertFalse(children_form.is_valid())
+            message = "Total does not match."
+            self.assertEquals(children_form.errors['total_below_5'], [message])
+
+    def test_check_total_below_5_when_one_of_the_below_5_field_is_not_clean(self):
+        data = self.form_data
+        data['has_children']='True'
+        data['has_children_below_5']= 'True'
+        data['total_below_5']=5
+        for field in ['aged_between_0_5_months', 'aged_between_6_11_months',
+                        'aged_between_12_23_months', 'aged_between_24_59_months']:
+            data[field]= 'not a number'
+            children_form = ChildrenForm(data)
+            self.assertFalse(children_form.is_valid())
+            message = "Enter a whole number."
+            self.assertEquals(children_form.errors[field], [message])
+            self.assertFalse(children_form.errors.has_key('total_below_5'))

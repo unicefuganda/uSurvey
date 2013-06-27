@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from widgets import InlineRadioSelect
 
 class ChildrenForm(ModelForm):
-    has_children = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'Yes',
+    has_children = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'True',
                                     widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
     has_children_below_5 = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'True',
                                                    widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
@@ -35,7 +35,7 @@ class ChildrenForm(ModelForm):
             return cleaned_data
         total = 0
         for field in fields_for_below_5:
-            if not cleaned_data.get(field):
+            if not cleaned_data.get(field) and cleaned_data.get(field)!=0 :
                 return cleaned_data
             total += int(cleaned_data.get(field))
         if total != int(total_below_5):
