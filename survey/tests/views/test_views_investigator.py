@@ -7,7 +7,7 @@ from django.template.defaultfilters import slugify
 
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import *
-from survey.views.location_filter_helper import initialize_location_type, assign_immediate_child_locations, update_location_type
+from survey.views.views_helper import initialize_location_type, assign_immediate_child_locations, update_location_type
 
 
 class InvestigatorsViewTest(TestCase):

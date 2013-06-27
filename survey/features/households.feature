@@ -1,12 +1,12 @@
 Feature: Households feature
 
-    # Scenario: Household new page
-    #   Given I am logged in as researcher
-    #   And I have locations
-    #   And I visit new household page
-    #   And I see all households fields are present
-    #   And I submit the form
-    #   Then I should see the error messages
+    Scenario: Household new page
+      Given I am logged in as researcher
+      And I have locations
+      And I visit new household page
+      And I see all households fields are present
+      And I submit the form
+      Then I should see the error messages
 
     Scenario: Create a household
        Given I am logged in as researcher

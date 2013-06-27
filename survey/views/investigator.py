@@ -8,7 +8,7 @@ from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.investigator import *
 from survey.models import Investigator
-from survey.views.location_filter_helper import initialize_location_type, update_location_type, get_posted_location
+from survey.views.views_helper import initialize_location_type, update_location_type, get_posted_location
 
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''

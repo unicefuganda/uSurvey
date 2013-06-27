@@ -11,7 +11,8 @@ from survey.forms.householdHead import *
 from survey.forms.children import *
 from survey.forms.women import *
 from survey.forms.household import *
-from survey.views.location_filter_helper import initialize_location_type, update_location_type, get_posted_location
+from survey.views.views_helper import initialize_location_type, update_location_type, get_posted_location
+from survey.models import *
 
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''
@@ -47,7 +48,6 @@ def validate_investigator(request, householdform, posted_locations):
         investigator_form['error'] = message
         householdform.errors['__all__'] = householdform.error_class([message])
     return investigator, investigator_form
-
 
 def _process_form(householdform, investigator, request):
     valid = {}
