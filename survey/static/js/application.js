@@ -125,6 +125,8 @@ $(function(){
         "confirm_mobile_number":{validate_confirm_number: true, required: true},
         "age": "required",
         "surname":"required",
+        "first_name":"required",
+        "occupation":"required",
         "aged_between_15_49_years":"validate_15_to_49"
       },
       messages: {
@@ -149,6 +151,7 @@ $(function(){
          var button = $(form).find('button'),
              value = button.val();
          button.attr('disabled', true);
+         set_householdHead_occupation_values();
          form.submit();
        }
   });
@@ -201,7 +204,7 @@ $(function(){
   });
 
   $('#household-occupation').change(function(){
-      if($(this).val()=="Others (Specify)"){
+      if($(this).val()=="Others: "){
           append_extra_input_field($(this));
       }
       else{
@@ -244,5 +247,14 @@ function append_time_measure(){
 };
 
 function append_extra_input_field(id){
-  id.after("&nbsp; &nbsp;<input name='occupation' id='extra-occupation-field' Placeholder='Specify' type='text'/>")
+  id.after("&nbsp; &nbsp;<input name='occupation' max_length=50 id='extra-occupation-field' Placeholder='Specify' type='text'/>")
+};
+
+function set_householdHead_occupation_values(){
+   if($('input[name=occupation]').val()){
+        var select_value = $('select[name=occupation]').val();
+        var input_value = $('input[name=occupation]').val();
+        $('#household-occupation').remove();
+        $('#extra-occupation-field').val(select_value + input_value);
+    };
 };

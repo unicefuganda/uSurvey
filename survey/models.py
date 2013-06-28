@@ -181,7 +181,7 @@ class HouseholdHead(BaseModel):
     first_name = models.CharField(max_length=12, blank=False, null=True)
     age = models.PositiveIntegerField(validators=[MinValueValidator(10), MaxValueValidator(99)], null=True)
     male = models.BooleanField(default=True, verbose_name="Gender")
-    occupation = models.CharField(max_length=100, blank=False, null=False, choices= OCCUPATION,
+    occupation = models.CharField(max_length=100, blank=False, null=False,
                                    verbose_name="Occupation / Main Livelihood", default="16")
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary', verbose_name="Highest level of education completed")

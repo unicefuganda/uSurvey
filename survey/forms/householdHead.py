@@ -2,7 +2,7 @@ from django import forms
 from survey.models import *
 from django.forms import ModelForm
 from django.core.validators import *
-from survey.investigator_configs import TIME_MEASURE
+from survey.investigator_configs import OCCUPATION
 from widgets import InlineRadioSelect
 
 class HouseholdHeadForm(ModelForm):
@@ -17,5 +17,6 @@ class HouseholdHeadForm(ModelForm):
             'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':10, 'max':99, 'type':'number' }),
             'resident_since':forms.TextInput(attrs={'min':0, 'type':'number' }),
             'time_measure': forms.HiddenInput(),
+            'occupation':forms.Select(choices= OCCUPATION)
         }
 

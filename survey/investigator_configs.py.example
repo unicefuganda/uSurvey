@@ -39,7 +39,7 @@ OCCUPATION = (
                 ("Brewing", "Brewing"),
                 ("Weaving/basketry", "Weaving/basketry"),
                 ("Fishing", "Fishing"),
-                ("Others (Specify)", "Others (Specify)"),
+                ("Others: ", "Others"),
                 )
 
 COUNTRY_PHONE_CODE = "256"
