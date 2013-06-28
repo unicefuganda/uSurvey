@@ -16,7 +16,10 @@ class WomenForm(ModelForm):
         has_women = cleaned_data.get("has_women")
         if not has_women:
             for field in [ 'aged_between_15_19_years', 'aged_between_15_49_years']:
-                if int(cleaned_data.get(field)):
+                field_value = cleaned_data.get(field)
+                if not field_value and field_value !=0:
+                    return cleaned_data
+                if int(field_value):
                     self._errors[field] = self.error_class(["Should be zero. This household has no women aged 15+ years."])
                     del cleaned_data[field]
         return cleaned_data
