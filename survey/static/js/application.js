@@ -224,7 +224,7 @@ function update_total_below_5_children(){
     $.each( $("[id*=_months]"), function(){
         total = total + parseInt($(this).val());
     });
-    $("#household-children-total_months").val(total);
+    $("#household-children-total_below_5").val(total);
 };
 
 function disable_selected(identifier){
