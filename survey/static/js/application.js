@@ -195,6 +195,20 @@ $(function(){
      }
   });
 
+  append_time_measure();
+  $(".js_time_measure").change(function(){
+     $("#household-time_measure").val($('input[name=js_time_measure]:checked', '#create-household-form').val());
+  });
+
+  $('#household-occupation').change(function(){
+      if($(this).val()=="Others (Specify)"){
+          append_extra_input_field($(this));
+      }
+      else{
+          $('#extra-occupation-field').remove();
+      };
+  });
+
 });
 
 function update_total_family_size(){
@@ -215,9 +229,20 @@ function disable_selected(identifier){
           $(this).val(0);
           $(this).attr("disabled", true);
       });
-}
+};
+
 function enable_selected(identifier){
     $.each( $(identifier+"[type=number]"), function(){
           $(this).removeAttr('disabled');
       });
-}
+};
+
+function append_time_measure(){
+    $('#household-resident_since').after("&nbsp; &nbsp;<input name='js_time_measure' class='js_time_measure' value='Days' type=radio> Days")
+    .after("&nbsp;&nbsp; <input name='js_time_measure' class='js_time_measure' value='Months' type=radio> Months")
+    .after("&nbsp;&nbsp; <input name='js_time_measure' class='js_time_measure' value='Years' type=radio checked> Years");
+};
+
+function append_extra_input_field(id){
+  id.after("&nbsp; &nbsp;<input name='occupation' id='extra-occupation-field' Placeholder='Specify' type='text'/>")
+};
