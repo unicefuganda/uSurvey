@@ -19,6 +19,25 @@
 </div>
 <h4>Head of Household's Information</h4>
 {% include "naked_form.html" with a_form=headform %}
+<div class="control-group">
+  <label class="control-label" for="resident_since">Since when have you lived here</label>
+  <div class="controls">
+   <select name="extra_resident_since_month" id="household-extra_resident_since_month"  data-placeholder="Month"  single class="chzn-select" required style="width:120px">
+      <option value=""></option>
+      {% for month in months_choices %}
+        <option value="{{month.value}}">{{month.text}}</option>
+      {% endfor %}
+    </select><label class="error">{{ headform.resident_since_month.error }}</label>
+
+    <select name="extra_resident_since_year" id="household-extra_resident_since_year"  data-placeholder="Year"  single class="chzn-select" required style="width:90px">
+       <option value=""></option>
+       {% for year in years_choices %}
+         <option value="{{year}}">{{year}}</option>
+       {% endfor %}
+     </select><label class="error">{{ headform.resident_since_year.error }}</label>
+
+  </div>
+</div>
 <h4>Household Information</h4>
 {% for name, form in householdform.items %}
   {% include "naked_form.html" with a_form=form %}

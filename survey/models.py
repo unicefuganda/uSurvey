@@ -188,8 +188,9 @@ class HouseholdHead(BaseModel):
                                    verbose_name="Occupation / Main Livelihood", default="16")
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary', verbose_name="Highest level of education completed")
-    resident_since_year = models.PositiveIntegerField(null=False, default=1984)
-    resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default='May')
+    resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
+                                                         null=False, default=1984)
+    resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
 
 class Children(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="children")

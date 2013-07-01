@@ -1,7 +1,6 @@
 ;
 
-$("[data-location=true]").chosen();
-$("#household-investigator").chosen();
+$(".chzn-select").chosen();
 function populate_investigator_list(location_id){
   $.getJSON('/households/investigators', {location: location_id}, function(data) {
       $.each(data, function(key, value) {
@@ -212,6 +211,8 @@ $(function(){
       };
   });
 
+  chosen_automatic_update("#household-extra_resident_since_year", "#household-resident_since_year");
+  chosen_automatic_update("#household-extra_resident_since_month", "#household-resident_since_month");
 });
 
 function update_total_family_size(){
@@ -257,4 +258,11 @@ function set_householdHead_occupation_values(){
         $('#household-occupation').remove();
         $('#extra-occupation-field').val(select_value + input_value);
     };
+};
+
+function chosen_automatic_update(given_id, hidden_id){
+    $(given_id).trigger("liszt:updated").chosen().change(function(){
+        $(hidden_id).val($(this).val());
+
+    });
 };

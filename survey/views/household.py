@@ -102,6 +102,8 @@ def new(request):
                                                                'investigator_form': investigator_form,
                                                                'headform': householdHead,
                                                                'householdform': householdform,
+                                                               'months_choices': householdHead.resident_since_month_choices(),
+                                                               'years_choices': householdHead.resident_since_year_choices(),
                                                                'action': "/households/new/",
                                                                'id': "create-household-form",
                                                                'button_label': "Create Household",

@@ -41,6 +41,8 @@ class HouseholdViewTest(TestCase):
         self.assertIsNotNone(response.context['householdform'])
         self.assertIsNotNone(response.context['headform'])
         self.assertIsNotNone(response.context['location_type'])
+        self.assertIsNotNone(response.context['months_choices'])
+        self.assertIsNotNone(response.context['years_choices'])
 
 
     def test_get_investigators(self):
@@ -167,7 +169,8 @@ class HouseholdViewTest(TestCase):
             'age': '20',
             'occupation':'Student',
             'level_of_education': 'Nursery',
-            'resident_since':'1',
+            'resident_since_year':'2013',
+            'resident_since_month':'5',
             'time_measure' : 'Years',
             'number_of_males': '2',
             'number_of_females': '3',
@@ -205,7 +208,7 @@ class HouseholdViewTest(TestCase):
         self.failUnless(children.id)
         self.failUnless(women.id)
         for key in ['surname', 'first_name', 'age', 'occupation',
-                    'level_of_education', 'resident_since', 'time_measure']:
+                    'level_of_education', 'resident_since_year', 'resident_since_month']:
             value = getattr(hHead, key)
             self.assertEqual(form_data[key], str(value))
 
