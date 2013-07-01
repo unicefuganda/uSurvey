@@ -348,7 +348,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = ""
         self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
 
-        homepage = "Welcome %s to the survey. You will recieve refund only on the completion of the survey.\n00: Households list" % self.investigator.name
+        homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % homepage
@@ -430,7 +430,7 @@ class USSDTestCompleteFlow(TestCase):
         self.question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
 
     def test_flow(self):
-        homepage = "Welcome %s to the survey. You will recieve refund only on the completion of the survey.\n00: Households list" % self.investigator.name
+        homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
 
         self.ussd_params['ussdRequestString'] = "adassd"
 
