@@ -24,8 +24,8 @@ class HouseholdHeadForm(ModelForm):
         model = HouseholdHead
         exclude = ['household']
         widgets = {
-            'surname': forms.TextInput(attrs={'placeholder': 'Name'}),
-            'first_name': forms.TextInput(attrs={'placeholder': 'First Name'}),
+            'surname': forms.TextInput(attrs={'placeholder': 'Family Name'}),
+            'first_name': forms.TextInput(attrs={'placeholder': 'Other Names'}),
             'male': InlineRadioSelect(choices=((True, 'Male'), (False, 'Female'))),
             'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':10, 'max':99, 'type':'number' }),
             'resident_since_year': forms.HiddenInput(),

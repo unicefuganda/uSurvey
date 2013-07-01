@@ -66,25 +66,3 @@ class WomenFormTest(TestCase):
             message = "Should be zero. This household has no women aged 15+ years."
             self.assertEquals(women_form.errors[field], [message])
             data[field] = self.form_data[field]
-
-    def test_check_aged_15_49(self):
-        data = self.form_data
-        data['aged_between_15_19_years']= 3
-        SOME_NUMBER_THAT_IS_LESS_THAN_3 = 0
-        data['aged_between_15_49_years']= SOME_NUMBER_THAT_IS_LESS_THAN_3
-
-        women_form = WomenForm(data)
-        self.assertFalse(women_form.is_valid())
-        message = "Should be higher than the number of women between 15 to 19 years age."
-        self.assertEquals(women_form.errors['aged_between_15_49_years'], [message])
-
-
-    def test_check_aged_15_49_when_one_of_the_field_is_not_clean(self):
-        data = self.form_data
-        for field in self.numeric_fields:
-            data[field]= 'not a number'
-            women_form = WomenForm(data)
-            self.assertFalse(women_form.is_valid())
-            message = "Enter a whole number."
-            self.assertEquals(women_form.errors[field], [message])
-            data[field] = self.form_data[field]
