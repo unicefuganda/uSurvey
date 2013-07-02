@@ -41,6 +41,9 @@ class Investigator(BaseModel):
         self.cache_key = "Investigator-%s" % self.pk
         self.generate_cache()
 
+    def has_households(self):
+        return self.households.count() > 0
+
     def generate_cache(self):
         if not cache.get(self.cache_key):
             cache.set(self.cache_key, self.DEFAULT_CACHED_VALUES)

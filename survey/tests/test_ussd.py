@@ -33,6 +33,13 @@ class USSDTest(TestCase):
         response = self.client.post('/ussd', data=self.ussd_params)
         self.ussd_params['ussdRequestString'] = "1"
 
+    def test_no_households(self):
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890")
+        self.ussd_params['msisdn'] = investigator.mobile_number
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_HOUSEHOLDS']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
     def test_numerical_questions(self):
         question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)

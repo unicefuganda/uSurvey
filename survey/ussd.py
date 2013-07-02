@@ -9,6 +9,7 @@ class USSD(object):
         'HOUSEHOLD_LIST': "Please select a household from the list",
         'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
         'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
+        'NO_HOUSEHOLDS': "Sorry, you have no households registered.",
     }
 
     ACTIONS = {
@@ -145,8 +146,12 @@ class USSD(object):
                 self.render_households_list(self.HOUSEHOLD_LIST_OPTION)
 
     def render_welcome_text(self):
-        welcome_message = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-        self.responseString = "%s\n%s: Households list" % (welcome_message, self.HOUSEHOLD_LIST_OPTION)
+        if self.investigator.has_households():
+            welcome_message = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+            self.responseString = "%s\n%s: Households list" % (welcome_message, self.HOUSEHOLD_LIST_OPTION)
+        else:
+            self.action = self.ACTIONS['END']
+            self.responseString = self.MESSAGES['NO_HOUSEHOLDS']
 
     def is_browsing_households_list(self, answer):
         if answer == self.HOUSEHOLD_LIST_OPTION or self.is_pagination_option(answer):
