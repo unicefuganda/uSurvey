@@ -204,7 +204,7 @@ class Children(BaseModel):
 class Women(BaseModel):
    household = models.OneToOneField(Household, null=True, related_name="women")
    aged_between_15_19_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many of these women are aged 15-19 years?")
-   aged_between_15_49_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="15-49 years?")
+   aged_between_20_49_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="20-49 years?")
 
 class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)

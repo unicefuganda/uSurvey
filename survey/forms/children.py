@@ -9,7 +9,7 @@ class ChildrenForm(ModelForm):
     has_children_below_5 = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'True',
                                                    widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
     total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0,
-                                        'id':'household-children-total_below_5', 'readonly':'readonly'}))
+                                        'id':'household-children-total_below_5', 'readonly':'readonly'}), required=False)
 
     def __init__(self, *args, **kwargs):
         super(ChildrenForm, self).__init__(*args, **kwargs)

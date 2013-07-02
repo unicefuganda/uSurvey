@@ -11,8 +11,6 @@ class WomenForm(ModelForm):
         super(WomenForm, self).__init__(*args, **kwargs)
         self.fields['has_women'].label = 'Does this household have any women aged 15+ years?'
         self.fields.keyOrder= ['has_women', 'aged_between_15_19_years', 'aged_between_20_49_years']
-        for key in ['has_women', 'aged_between_15_19_years', 'aged_between_20_49_years']:
-            self.fields[key].required = False
 
     def check_has_women(self, cleaned_data):
         has_women = cleaned_data.get("has_women")
@@ -35,7 +33,7 @@ class WomenForm(ModelForm):
         model = Women
         exclude = ['household']
         widgets ={
-        'aged_between_15_19_years':forms.TextInput(attrs={'class':"small-positive-number", 'max':10, 'type':'number' }),
+        'aged_between_15_19_years':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
         'aged_between_20_49_years':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
         }
 

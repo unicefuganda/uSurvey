@@ -9,16 +9,25 @@ from datetime import *
 class HouseholdHeadForm(ModelForm):
 
     @staticmethod
-    def resident_since_month_choices():
+    def resident_since_month_choices(choices):
         months = []
         for month in MONTHS:
             months.append({'value':month[0], 'text': month[1]})
-        return months
+        choices['choices']=months
+        return choices
 
     @staticmethod
-    def resident_since_year_choices():
+    def resident_since_year_choices(choices):
         year_now = datetime.now().year
-        return xrange(year_now-60, year_now+1, 1)
+        years = list(xrange(year_now-60, year_now+1, 1))
+        years.reverse()
+        choices['choices']= years
+        return choices
+
+    def add_default_cleaned_data(self):
+        return self.cleaned_data
+
+
 
     class Meta:
         model = HouseholdHead

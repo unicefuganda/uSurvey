@@ -118,6 +118,7 @@ class HouseholdHeadFormTest(TestCase):
 
 
     def test_resident_since_month_choices(self):
+        month_choices= {'selected_text':'', 'selected_value':''}
         months=[{'value':1, 'text':'January'},
                 {'value':2, 'text':'February'},
                 {'value':3, 'text':'March'},
@@ -130,10 +131,14 @@ class HouseholdHeadFormTest(TestCase):
                 {'value':10, 'text':'October'},
                 {'value':11, 'text':'November'},
                 {'value':12, 'text':'December'},]
+        month_choices = HouseholdHeadForm.resident_since_month_choices(month_choices)
 
-        self.assertEquals(months, HouseholdHeadForm.resident_since_month_choices())
+        self.assertEquals(months, month_choices['choices'] )
 
     def test_resident_since_year_choices(self):
+        year_choices= {'selected_text':'', 'selected_value':''}
         datetime = MockDate
-        years= xrange(2013-60, 2014, 1)
-        self.assertEquals(list(years), list(HouseholdHeadForm.resident_since_year_choices()))
+        years= list(xrange(2013-60, 2014, 1))
+        years.reverse()
+        year_choices = HouseholdHeadForm.resident_since_year_choices(year_choices)
+        self.assertEquals(years, year_choices['choices'])
