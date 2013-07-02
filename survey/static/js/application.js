@@ -1,6 +1,7 @@
 ;
 
 $(".chzn-select").chosen();
+
 function populate_investigator_list(location_id){
   $.getJSON('/households/investigators', {location: location_id}, function(data) {
       $.each(data, function(key, value) {
@@ -103,13 +104,6 @@ $(function(){
         return (cleaned_original==cleaned_confirm)
       }, "Mobile number not matched.");
 
-  jQuery.validator.addMethod("validate_15_to_49", function(value, element) {
-        var value_19 = parseInt($("#household-women-aged_between_15_19_years").val());
-        var value_49 = parseInt(value);
-        return (value_19<= value_49)
-      }, "Should be higher than the number of women between 15 to 19 years age.");
-
-
   $('.investigator-form').validate({
       ignore: ":hidden:not(select)",
       rules: {
@@ -126,7 +120,7 @@ $(function(){
         "surname":"required",
         "first_name":"required",
         "occupation":"required",
-        "aged_between_15_49_years":"validate_15_to_49"
+        // "haha":{ min:0, max:10},
       },
       messages: {
         "age":{ number: "Please enter a valid number. No space or special charcters."},
@@ -155,6 +149,10 @@ $(function(){
        }
   });
 
+  $("input.small-positive-number").each(function(){
+      $(this).rules('add', {min:0, max:10})
+  });
+
   $("#investigator-confirm_mobile_number").on('paste', function(e) {
     e.preventDefault();
   });
@@ -176,7 +174,7 @@ $(function(){
 
   $("#household-children-has_children_1").change(function(){
             disable_selected("[id*=children]");
-            $("#household-children-has_children_below_5_1").attr('checked', true);
+            $("#household-children-has_children_below_5_1").prop('checked', true);
     });
 
   $("#household-children-has_children_below_5_1").change(function(){
@@ -189,6 +187,7 @@ $(function(){
 
   $("#household-children-has_children_0").change(function(){
           enable_selected("[id*=children]");
+          $("#household-children-has_children_below_5_0").prop('checked', true);
   });
 
   $("#household-children-has_children_below_5_0").change(function(){

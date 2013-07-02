@@ -180,8 +180,8 @@ class Household(BaseModel):
 
 class HouseholdHead(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="head")
-    surname = models.CharField(max_length=12, blank=False, null=True)
-    first_name = models.CharField(max_length=12, blank=False, null=True)
+    surname = models.CharField(max_length=12, blank=False, null=True, verbose_name="Family Name")
+    first_name = models.CharField(max_length=12, blank=False, null=True, verbose_name="Other Names")
     age = models.PositiveIntegerField(validators=[MinValueValidator(10), MaxValueValidator(99)], null=True)
     male = models.BooleanField(default=True, verbose_name="Gender")
     occupation = models.CharField(max_length=100, blank=False, null=False,

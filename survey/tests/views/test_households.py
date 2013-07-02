@@ -186,7 +186,7 @@ class HouseholdViewTest(TestCase):
             'total_below_5':'0',
             'has_women':'True',
             'aged_between_15_19_years':'0',
-            'aged_between_15_49_years':'1'
+            'aged_between_20_49_years':'1'
         }
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(number_of_males=form_data['number_of_males'])
@@ -221,7 +221,7 @@ class HouseholdViewTest(TestCase):
             value = getattr(children, key)
             self.assertEqual(form_data[key], str(value))
 
-        for key in ['aged_between_15_19_years', 'aged_between_15_49_years']:
+        for key in ['aged_between_15_19_years', 'aged_between_20_49_years']:
             value = getattr(women, key)
             self.assertEqual(form_data[key], str(value))
 

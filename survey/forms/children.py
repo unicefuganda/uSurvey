@@ -61,10 +61,10 @@ class ChildrenForm(ModelForm):
         model = Children
         exclude = ['household']
         widgets={
-                'aged_between_5_12_years':forms.TextInput(attrs={'min':0, 'type':'number' }),
-                'aged_between_13_17_years':forms.TextInput(attrs={'min':0, 'type':'number' }),
-                'aged_between_0_5_months':forms.TextInput(attrs={'min':0, 'type':'number' }),
-                'aged_between_6_11_months':forms.TextInput(attrs={'min':0, 'type':'number' }),
-                'aged_between_12_23_months':forms.TextInput(attrs={'min':0, 'type':'number' }),
-                'aged_between_24_59_months':forms.TextInput(attrs={'min':0, 'type':'number' }),
+                'aged_between_5_12_years':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
+                'aged_between_13_17_years':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
+                'aged_between_0_5_months':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
+                'aged_between_6_11_months':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
+                'aged_between_12_23_months':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
+                'aged_between_24_59_months':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
         }

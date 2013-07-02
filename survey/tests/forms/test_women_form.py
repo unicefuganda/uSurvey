@@ -8,9 +8,9 @@ class WomenFormTest(TestCase):
         self.form_data = {
                             'has_women': 'True',
                             'aged_between_15_19_years':'0',
-                            'aged_between_15_49_years':'0',
+                            'aged_between_20_49_years':'0',
                             }
-        self.numeric_fields = ['aged_between_15_19_years', 'aged_between_15_49_years']
+        self.numeric_fields = ['aged_between_15_19_years', 'aged_between_20_49_years']
 
     def test_valid(self):
         women_form = WomenForm(self.form_data)
