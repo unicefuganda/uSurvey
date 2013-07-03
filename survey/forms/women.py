@@ -24,15 +24,6 @@ class WomenForm(ModelForm):
                     del cleaned_data[field]
         return cleaned_data
 
-    def check_has_women_with_number_of_females_in_household(self, cleaned_data):
-        has_women = cleaned_data.get("has_women")
-        household = self.instance.household
-        number_of_females = household.number_of_females if household else None
-        if has_women and number_of_females == 0:
-            self._errors['has_women'] = self.error_class(["Should be No. The number of females in this household is 0."])
-            del cleaned_data['has_women']
-        return cleaned_data
-
     def check_women_above_15_is_less_than_total_number_of_females_in_household(self, cleaned_data):
         aged_between_15_19_years = cleaned_data.get('aged_between_15_19_years') if cleaned_data.get('aged_between_15_19_years') else 0
         aged_between_20_49_years = cleaned_data.get('aged_between_20_49_years') if cleaned_data.get('aged_between_20_49_years') else 0
@@ -51,7 +42,6 @@ class WomenForm(ModelForm):
     def clean(self):
         cleaned_data = super(WomenForm, self).clean()
         cleaned_data = self.check_has_women(cleaned_data)
-        cleaned_data = self.check_has_women_with_number_of_females_in_household(cleaned_data)
         cleaned_data = self.check_women_above_15_is_less_than_total_number_of_females_in_household(cleaned_data)
         return cleaned_data
 
