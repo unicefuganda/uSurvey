@@ -24,9 +24,19 @@ class WomenForm(ModelForm):
                     del cleaned_data[field]
         return cleaned_data
 
+    def check_has_women_with_number_of_females_in_household(self, cleaned_data):
+        has_women = cleaned_data.get("has_women")
+        household = self.instance.household
+        number_of_females = household.number_of_females if household else None
+        if has_women and number_of_females == 0:
+            self._errors['has_women'] = self.error_class(["Should be No. The number of females in this household is 0."])
+            del cleaned_data['has_women']
+        return cleaned_data
+
     def clean(self):
         cleaned_data = super(WomenForm, self).clean()
         cleaned_data = self.check_has_women(cleaned_data)
+        cleaned_data = self.check_has_women_with_number_of_females_in_household(cleaned_data)
         return cleaned_data
 
     class Meta:

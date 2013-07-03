@@ -66,3 +66,15 @@ class WomenFormTest(TestCase):
             message = "Should be zero. This household has no women aged 15+ years."
             self.assertEquals(women_form.errors[field], [message])
             data[field] = self.form_data[field]
+
+    def test_has_women_true_but_total_number_of_females_is_0(self):
+        data = self.form_data
+        household = Household(number_of_females=0)
+        women = Women(household=household)
+        women_form = WomenForm(data, instance=women)
+        self.assertFalse(women_form.is_valid())
+        message = "Should be No. The number of females in this household is 0."
+        self.assertEquals(women_form.errors['has_women'], [message])
+
+
+

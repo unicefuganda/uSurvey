@@ -49,26 +49,39 @@ def validate_investigator(request, householdform, posted_locations):
         householdform.errors['__all__'] = householdform.error_class([message])
     return investigator, investigator_form
 
-def _process_form(householdform, investigator, request):
-    valid = {}
+def create_household(householdform, investigator, valid):
     is_valid_household = householdform['household'].is_valid()
     if investigator and is_valid_household:
         householdform['household'].instance.investigator = investigator
         householdform['household'].save()
         valid['household'] = True
-    remaining_keys = ['children','householdHead',  'women']
-    for key in remaining_keys:
-        is_valid_form = householdform[key].is_valid()
-        if is_valid_household and is_valid_form:
+    return valid
+
+def create_remaining_modelforms(householdform, valid):
+    if valid['household']:
+        remaining_keys = ['children','householdHead',  'women']
+        for key in remaining_keys:
             householdform[key].instance.household = householdform['household'].instance
-            householdform[key].save()
-            valid[key] = True
+            is_valid_form = householdform[key].is_valid()
+            if is_valid_form:
+                householdform[key].save()
+                valid[key] = True
+    return valid
+
+def delete_created_modelforms(householdform, valid):
+    for key in valid.keys():
+        householdform[key].instance.delete()
+
+def _process_form(householdform, investigator, request):
+    valid = {}
+    valid = create_household(householdform, investigator, valid)
+    valid = create_remaining_modelforms(householdform, valid)
+
     if valid.values().count(True) == len(householdform.keys()):
         messages.success(request, "Household successfully registered.")
         return HttpResponseRedirect("/households/new")
 
-    for key in valid.keys():
-        householdform[key].instance.delete()
+    delete_created_modelforms(householdform, valid)
     _add_error_response_message(householdform, request)
     return None
 

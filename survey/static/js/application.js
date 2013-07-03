@@ -83,10 +83,17 @@ function clean_number(value){
 
 function strip_leading_zero(element){
   var value = $(element).val();
-  $(element).val(value.replace(/^[0]/g,""));
-  return true;
+  if (value){
+    $(element).val(value.replace(/^[0]/g,""));
+    return true;
+  };
 };
 
+function set_householdHead_occupation_values(){
+    var select_value = $('select[name=occupation]').val();
+    var input_value = $('input[name=occupation]').val();
+    $('#extra-occupation-field').val(select_value + input_value);
+};
 
 $(function(){
 
@@ -150,7 +157,7 @@ $(function(){
   });
 
   $("input.small-positive-number").each(function(){
-      $(this).rules('add', {min:0, max:10})
+      $(this).rules('add', {required:true, min:0, max:10});
   });
 
   $("#investigator-confirm_mobile_number").on('paste', function(e) {
@@ -196,22 +203,19 @@ $(function(){
      }
   });
 
-  append_time_measure();
-  $(".js_time_measure").change(function(){
-     $("#household-time_measure").val($('input[name=js_time_measure]:checked', '#create-household-form').val());
-  });
-
+  append_extra_input_field($('#household-occupation'));
   $('#household-occupation').change(function(){
-      if($(this).val()=="Others: "){
-          append_extra_input_field($(this));
-      }
-      else{
+      if($(this).val() !="Others: "){
           $('#extra-occupation-field').remove();
+          return true;
       };
+
+      append_extra_input_field($(this));
   });
 
   chosen_automatic_update("#household-extra_resident_since_year", "#household-resident_since_year");
   chosen_automatic_update("#household-extra_resident_since_month", "#household-resident_since_month");
+
 });
 
 function update_total_family_size(){
@@ -219,6 +223,7 @@ function update_total_family_size(){
     var females = parseInt($("#household-number_of_females").val());
     $("#household-size").val(males+females);
 };
+
 function update_total_below_5_children(){
     var total =0;
     $.each( $("[id*=_months]"), function(){
@@ -240,23 +245,11 @@ function enable_selected(identifier){
       });
 };
 
-function append_time_measure(){
-    $('#household-resident_since').after("&nbsp; &nbsp;<input name='js_time_measure' class='js_time_measure' value='Days' type=radio> Days")
-    .after("&nbsp;&nbsp; <input name='js_time_measure' class='js_time_measure' value='Months' type=radio> Months")
-    .after("&nbsp;&nbsp; <input name='js_time_measure' class='js_time_measure' value='Years' type=radio checked> Years");
-};
-
 function append_extra_input_field(id){
-  id.after("&nbsp; &nbsp;<input name='occupation' max_length=50 id='extra-occupation-field' Placeholder='Specify' type='text'/>")
-};
-
-function set_householdHead_occupation_values(){
-   if($('input[name=occupation]').val()){
-        var select_value = $('select[name=occupation]').val();
-        var input_value = $('input[name=occupation]').val();
-        $('#household-occupation').remove();
-        $('#extra-occupation-field').val(select_value + input_value);
-    };
+  if(id.val()=="Others: "){
+      id.after("&nbsp; &nbsp;<input name='occupation' max_length=50 id='extra-occupation-field' Placeholder='Specify' type='text'/>");
+      $("#extra-occupation-field").rules('add', {required:true});
+  };
 };
 
 function chosen_automatic_update(given_id, hidden_id){
