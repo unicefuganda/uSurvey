@@ -111,6 +111,13 @@ $(function(){
         return (cleaned_original==cleaned_confirm)
       }, "Mobile number not matched.");
 
+  jQuery.validator.addMethod("validate_number_of_females", function(value, element) {
+        var aged_between_15_19_years = parseInt($("#household-women-aged_between_15_19_years").val());
+        var aged_between_20_49_years = parseInt($("#household-women-aged_between_20_49_years").val());
+        var number_of_females = value;
+        return (number_of_females >= aged_between_20_49_years + aged_between_15_19_years)
+      }, "Please enter a value that is greater or equal to the total number of women above 15 years age, at the bottom of the form.");
+
   $('.investigator-form').validate({
       ignore: ":hidden:not(select)",
       rules: {
@@ -127,7 +134,7 @@ $(function(){
         "surname":"required",
         "first_name":"required",
         "occupation":"required",
-        // "haha":{ min:0, max:10},
+        "number_of_females": "validate_number_of_females"
       },
       messages: {
         "age":{ number: "Please enter a valid number. No space or special charcters."},
