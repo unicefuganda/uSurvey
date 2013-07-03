@@ -33,10 +33,26 @@ class WomenForm(ModelForm):
             del cleaned_data['has_women']
         return cleaned_data
 
+    def check_women_above_15_is_less_than_total_number_of_females_in_household(self, cleaned_data):
+        aged_between_15_19_years = cleaned_data.get('aged_between_15_19_years') if cleaned_data.get('aged_between_15_19_years') else 0
+        aged_between_20_49_years = cleaned_data.get('aged_between_20_49_years') if cleaned_data.get('aged_between_20_49_years') else 0
+        total_women_above_15 = int(aged_between_15_19_years) + int(aged_between_20_49_years)
+
+        household = self.instance.household
+        number_of_females = household.number_of_females if household else None
+
+        if number_of_females and number_of_females < total_women_above_15:
+            for key in list(set(['aged_between_15_19_years', 'aged_between_20_49_years']) & set(cleaned_data.keys())):
+                self._errors[key] = self.error_class(["The total number of women above 15 cannot be greater than the number of females in this household."])
+                del cleaned_data[key]
+        return cleaned_data
+
+
     def clean(self):
         cleaned_data = super(WomenForm, self).clean()
         cleaned_data = self.check_has_women(cleaned_data)
         cleaned_data = self.check_has_women_with_number_of_females_in_household(cleaned_data)
+        cleaned_data = self.check_women_above_15_is_less_than_total_number_of_females_in_household(cleaned_data)
         return cleaned_data
 
     class Meta:

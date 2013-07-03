@@ -76,5 +76,47 @@ class WomenFormTest(TestCase):
         message = "Should be No. The number of females in this household is 0."
         self.assertEquals(women_form.errors['has_women'], [message])
 
+    def test_women_above15_must_be_less_than_total_number_of_females(self):
+        data = self.form_data
+        household = Household(number_of_females=5)
+        women = Women(household=household)
+        women_form = WomenForm(data, instance=women)
+        NUMBER_LARGER_THAN_NUMBER_OF_FEMALES = 6
+        data['aged_between_15_19_years'] = NUMBER_LARGER_THAN_NUMBER_OF_FEMALES
+        self.assert_women_above15_must_be_less_than_total_number_of_females(women_form)
 
+        NUMBER_LARGER_THAN_NUMBER_OF_FEMALES = 6
+        data['aged_between_20_49_years'] = NUMBER_LARGER_THAN_NUMBER_OF_FEMALES
+        women_form = WomenForm(data, instance=women)
+        self.assert_women_above15_must_be_less_than_total_number_of_females(women_form)
 
+        data['aged_between_15_19_years'] = 2
+        data['aged_between_20_49_years'] = 4
+        women_form = WomenForm(data, instance=women)
+        self.assert_women_above15_must_be_less_than_total_number_of_females(women_form)
+
+        data['aged_between_15_19_years'] = 5
+        data['aged_between_20_49_years'] = 1
+        women_form = WomenForm(data, instance=women)
+        self.assert_women_above15_must_be_less_than_total_number_of_females(women_form)
+
+        data['aged_between_15_19_years'] = 7
+        data['aged_between_20_49_years'] = ''
+        women_form = WomenForm(data, instance=women)
+        self.assertFalse(women_form.is_valid())
+        message = "The total number of women above 15 cannot be greater than the number of females in this household."
+        self.assertEquals(women_form.errors['aged_between_15_19_years'], [message])
+        self.assertEquals(women_form.errors['aged_between_20_49_years'], ["This field is required."])
+
+        data['aged_between_15_19_years'] = 7
+        data['aged_between_20_49_years'] = 'not-a-number'
+        self.assertFalse(women_form.is_valid())
+        message = "The total number of women above 15 cannot be greater than the number of females in this household."
+        self.assertEquals(women_form.errors['aged_between_15_19_years'], [message])
+        self.assertEquals(women_form.errors['aged_between_20_49_years'], ["This field is required."])
+
+    def assert_women_above15_must_be_less_than_total_number_of_females(self, women_form):
+        self.assertFalse(women_form.is_valid())
+        message = "The total number of women above 15 cannot be greater than the number of females in this household."
+        self.assertEquals(women_form.errors['aged_between_15_19_years'], [message])
+        self.assertEquals(women_form.errors['aged_between_20_49_years'], [message])
