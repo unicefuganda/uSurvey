@@ -8,7 +8,6 @@ class HouseholdFormTest(TestCase):
         form_data = {
                         'number_of_males': '6',
                         'number_of_females': '6',
-                        'size': '12',
                     }
         household_form = HouseholdForm(form_data)
         self.assertTrue(household_form.is_valid())
@@ -19,33 +18,10 @@ class HouseholdFormTest(TestCase):
         household_retrieved = Household.objects.get(investigator=investigator)
         self.assertEqual(household_retrieved, household)
 
-    def test_total_wrong(self):
-        form_data = {
-                        'number_of_males': 6,
-                        'number_of_females': 6,
-                        'size': 0,
-                    }
-        household_form = HouseholdForm(form_data)
-        self.assertFalse(household_form.is_valid())
-        message = "Total number of household members does not match female and male ones."
-        self.assertEquals(household_form.errors['size'], [message])
-
-    def test_clean_override_with_string_not_integer(self):
-        form_data = {
-                        'number_of_males': '6',
-                        'number_of_females': '6',
-                        'size': '0',
-                    }
-        household_form = HouseholdForm(form_data)
-        self.assertFalse(household_form.is_valid())
-        message = "Total number of household members does not match female and male ones."
-        self.assertEquals(household_form.errors['size'], [message])
-
     def test_positive_numbers(self):
         form_data = {
                         'number_of_males': -6,
                         'number_of_females': 6,
-                        'size': 0,
                     }
         household_form = HouseholdForm(form_data)
         self.assertFalse(household_form.is_valid())
@@ -57,8 +33,8 @@ class HouseholdFormTest(TestCase):
         self.assertFalse(household_form.is_valid())
         self.assertEquals(household_form.errors['number_of_females'], ['Enter a whole number.'])
 
-        form_data['size']= None
+        form_data['number_of_females']= None
         household_form = HouseholdForm(form_data)
         self.assertFalse(household_form.is_valid())
-        self.assertEquals(household_form.errors['size'], ['This field is required.'])
+        self.assertEquals(household_form.errors['number_of_females'], ['This field is required.'])
 

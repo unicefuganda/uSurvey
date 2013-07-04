@@ -116,7 +116,7 @@ $(function(){
         var aged_between_20_49_years = parseInt($("#household-women-aged_between_20_49_years").val());
         var number_of_females = value;
         return (number_of_females >= aged_between_20_49_years + aged_between_15_19_years)
-      }, "Please enter a value that is greater or equal to the total number of women above 15 years age, at the bottom of the form.");
+      }, "Please enter a value that is greater or equal to the total number of women above 15 years age.");
 
   $('.investigator-form').validate({
       ignore: ":hidden:not(select)",
