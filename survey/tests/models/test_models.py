@@ -386,7 +386,7 @@ class BatchLocationStatusTest(TestCase):
         batch_location_status = BatchLocationStatus.objects.create(batch=batch_1, location=kampala)
         self.failUnless(batch_location_status.id)
 
-    def test_open_for_location(self):
+    def test_open_and_close_for_location(self):
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch_1 = Batch.objects.create(survey=survey)
         batch_2 = Batch.objects.create(survey=survey)
@@ -409,3 +409,31 @@ class BatchLocationStatusTest(TestCase):
 
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
         self.assertEqual(len(investigator_2.get_open_batch()), 0)
+
+class HouseholdBatchCompletionTest(TestCase):
+    def test_store(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala)
+        household = Household.objects.create(investigator=investigator)
+
+        batch_completion = HouseholdBatchCompletion.objects.create(household=household, investigator=investigator, batch=batch)
+        self.failUnless(batch_completion.id)
+
+    def test_completed(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala)
+        household = Household.objects.create(investigator=investigator)
+
+        self.assertFalse(household.has_completed_batch(batch))
+
+        household.batch_completed(batch)
+
+        self.assertTrue(household.has_completed_batch(batch))
+
+        household.batch_reopen(batch)
+
+        self.assertFalse(household.has_completed_batch(batch))

@@ -183,6 +183,15 @@ class Household(BaseModel):
         for klass in [NumericalAnswer, TextAnswer, MultiChoiceAnswer]:
             klass.objects.filter(household=self).delete()
 
+    def has_completed_batch(self, batch):
+        return self.completed_batches.filter(batch=batch).count() > 0
+
+    def batch_completed(self, batch):
+        return self.completed_batches.get_or_create(household=self, investigator=self.investigator, batch=batch)
+
+    def batch_reopen(self, batch):
+        self.completed_batches.filter(household=self).delete()
+
 class HouseholdHead(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="head")
     surname = models.CharField(max_length=12, blank=False, null=True, verbose_name="Family Name")
@@ -234,6 +243,11 @@ class Batch(BaseModel):
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")
     location = models.ForeignKey(Location, null=True, related_name="open_batches")
+
+class HouseholdBatchCompletion(BaseModel):
+    household = models.ForeignKey(Household, null=True, related_name="completed_batches")
+    batch = models.ForeignKey(Batch, null=True, related_name="completed_households")
+    investigator = models.ForeignKey(Investigator, null=True, related_name="completed_batches")
 
 class Indicator(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="indicators")
