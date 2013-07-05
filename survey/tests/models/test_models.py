@@ -376,3 +376,36 @@ class AnswerRuleTest(TestCase):
 
         next_question = self.investigator.answered(sub_question_1, self.household, answer="Some explanation")
         self.assertEqual(next_question, question_2)
+
+class BatchLocationStatusTest(TestCase):
+
+    def test_store(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch_1 = Batch.objects.create(survey=survey)
+        kampala = Location.objects.create(name="Kampala")
+        batch_location_status = BatchLocationStatus.objects.create(batch=batch_1, location=kampala)
+        self.failUnless(batch_location_status.id)
+
+    def test_open_for_location(self):
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch_1 = Batch.objects.create(survey=survey)
+        batch_2 = Batch.objects.create(survey=survey)
+        kampala = Location.objects.create(name="Kampala")
+        abim = Location.objects.create(name="Abim")
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala)
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim)
+
+        self.assertEqual(len(investigator_1.get_open_batch()), 0)
+        self.assertEqual(len(investigator_2.get_open_batch()), 0)
+
+        batch_1.open_for_location(kampala)
+        batch_2.open_for_location(abim)
+
+        self.assertEqual(investigator_1.get_open_batch(), [batch_1])
+        self.assertEqual(investigator_2.get_open_batch(), [batch_2])
+
+        batch_1.close_for_location(kampala)
+        batch_2.close_for_location(abim)
+
+        self.assertEqual(len(investigator_1.get_open_batch()), 0)
+        self.assertEqual(len(investigator_2.get_open_batch()), 0)

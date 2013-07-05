@@ -132,6 +132,11 @@ class Investigator(BaseModel):
                 return False
         return True
 
+    def get_open_batch(self):
+        batch_locations = self.location.open_batches.all()
+        batches = [batch_location.batch for batch_location in batch_locations]
+        return batches
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
@@ -219,6 +224,16 @@ class Survey(BaseModel):
 
 class Batch(BaseModel):
     survey = models.ForeignKey(Survey, null=True, related_name="batches")
+
+    def open_for_location(self, location):
+        return self.open_locations.get_or_create(batch=self, location=location)
+
+    def close_for_location(self, location):
+        self.open_locations.filter(batch=self).delete()
+
+class BatchLocationStatus(BaseModel):
+    batch = models.ForeignKey(Batch, null=True, related_name="open_locations")
+    location = models.ForeignKey(Location, null=True, related_name="open_batches")
 
 class Indicator(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="indicators")
