@@ -10,6 +10,7 @@ class USSD(object):
         'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
         'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
         'NO_HOUSEHOLDS': "Sorry, you have no households registered.",
+        'NO_OPEN_BATCH': "Sorry, there are no open surveys currently.",
     }
 
     ACTIONS = {
@@ -183,11 +184,18 @@ class USSD(object):
         else:
             self.render_households_list(answer)
 
-    def response(self):
+    def process_open_batch(self):
         if self.household:
             self.render_survey()
         else:
             self.render_homepage()
+
+    def response(self):
+        if self.investigator.has_open_batch():
+            self.process_open_batch()
+        else:
+            self.action = self.ACTIONS['END']
+            self.responseString = self.MESSAGES['NO_OPEN_BATCH']
         return { 'action': self.action, 'responseString': self.responseString }
 
     def is_new_request(self):

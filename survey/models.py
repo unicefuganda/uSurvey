@@ -137,6 +137,9 @@ class Investigator(BaseModel):
         batches = [batch_location.batch for batch_location in batch_locations]
         return batches
 
+    def has_open_batch(self):
+        return self.location.open_batches.count() > 0
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)

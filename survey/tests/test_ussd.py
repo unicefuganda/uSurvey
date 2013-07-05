@@ -19,12 +19,13 @@ class USSDTest(TestCase):
                                 'ussdRequestString': '',
                                 'response': "false"
                             }
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''))
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
+        batch.open_for_location(self.investigator.location)
         self.indicator = Indicator.objects.create(batch=batch)
 
     def select_household(self):
@@ -34,7 +35,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "1"
 
     def test_no_households(self):
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890")
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890", location=self.investigator.location)
         self.ussd_params['msisdn'] = investigator.mobile_number
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_HOUSEHOLDS']
@@ -420,7 +421,7 @@ class USSDTestCompleteFlow(TestCase):
                                 'ussdRequestString': '',
                                 'response': "false"
                             }
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''))
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"))
         self.household_head_1 = self.create_household_head()
         self.household_head_2 = self.create_household_head()
         self.household_head_3 = self.create_household_head()
@@ -432,6 +433,7 @@ class USSDTestCompleteFlow(TestCase):
         self.household_head_9 = self.create_household_head()
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey)
+        batch.open_for_location(self.investigator.location)
         indicator = Indicator.objects.create(batch=batch)
         self.question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
@@ -651,3 +653,27 @@ class USSDTestCompleteFlow(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.assertEquals(0, NumericalAnswer.objects.filter(investigator=self.investigator, household=self.household_head_2.household).count())
+
+class USSDOpenBatch(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.ussd_params = {
+                                'transactionId': "123344" + str(randint(1, 99999)),
+                                'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
+                                'msisdn': '2567765' + str(randint(1, 99999)),
+                                'ussdServiceCode': '130',
+                                'ussdRequestString': '',
+                                'response': "false"
+                            }
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"))
+        self.household = Household.objects.create(investigator=self.investigator)
+        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
+        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        batch = Batch.objects.create(survey=survey)
+        self.indicator = Indicator.objects.create(batch=batch)
+
+    def test_closed_batch(self):
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
