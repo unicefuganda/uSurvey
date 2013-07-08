@@ -184,18 +184,24 @@ class USSD(object):
         else:
             self.render_households_list(answer)
 
+    def has_chosen_household(self):
+        return self.household != None
+
     def process_open_batch(self):
-        if self.household:
+        if self.has_chosen_household():
             self.render_survey()
         else:
             self.render_homepage()
+
+    def show_message_for_no_open_batch(self):
+        self.action = self.ACTIONS['END']
+        self.responseString = self.MESSAGES['NO_OPEN_BATCH']
 
     def response(self):
         if self.investigator.has_open_batch():
             self.process_open_batch()
         else:
-            self.action = self.ACTIONS['END']
-            self.responseString = self.MESSAGES['NO_OPEN_BATCH']
+            self.show_message_for_no_open_batch()
         return { 'action': self.action, 'responseString': self.responseString }
 
     def is_new_request(self):

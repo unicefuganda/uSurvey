@@ -168,7 +168,9 @@ class Household(BaseModel):
     def next_question(self):
         last_question_answered = self.last_question_answered()
         if not last_question_answered:
-            return Survey.currently_open().first_question()
+            open_batch = Batch.currently_open_for(location = self.investigator.location)
+            if open_batch:
+                return open_batch.first_question()
         else:
             return last_question_answered.next_question_for_household(self)
 
@@ -227,21 +229,41 @@ class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     description = models.CharField(max_length=255, blank=False, null=False)
 
-    def first_question(self):
-        return self.batches.reverse().latest('created').indicators.reverse().latest('order').questions.reverse().latest('order')
-
-    @classmethod
-    def currently_open(self):
-        return Survey.objects.latest('created')
+    def get_next_open_batch(self, order, location):
+        next_batch_in_order = self.batches.filter(order__gt = order).order_by('order')
+        next_open_batch = location.open_batches.filter(batch__in = next_batch_in_order)
+        if next_open_batch:
+            return next_open_batch[0].batch
 
 class Batch(BaseModel):
     survey = models.ForeignKey(Survey, null=True, related_name="batches")
+    order = models.PositiveIntegerField(max_length=2, null=True)
+
+    @classmethod
+    def currently_open_for(self, location):
+        if location.open_batches.count() > 0:
+            return location.open_batches.order_by('created').all()[:1].get().batch
+
+    def first_question(self):
+        return self.indicators.get(order=1).questions.get(order=1)
 
     def open_for_location(self, location):
         return self.open_locations.get_or_create(batch=self, location=location)
 
     def close_for_location(self, location):
         self.open_locations.filter(batch=self).delete()
+
+    def get_next_indicator(self, order, location):
+        indicator = self.indicators.filter(order = order + 1)
+        if indicator:
+            return indicator[0]
+        else:
+            return self.get_indicator_from_next_open_batch(location = location)
+
+    def get_indicator_from_next_open_batch(self, location):
+        next_open_batch = self.survey.get_next_open_batch(order = self.order, location = location)
+        if next_open_batch:
+            return next_open_batch.get_next_indicator(order = 0, location = location)
 
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")
@@ -255,6 +277,18 @@ class HouseholdBatchCompletion(BaseModel):
 class Indicator(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="indicators")
     order = models.PositiveIntegerField(max_length=2, null=True)
+
+    def get_next_question(self, order, location):
+        question = self.questions.filter(order=order + 1)
+        if question:
+            return question[0]
+        else:
+            return self.get_question_from_next_indicator(location = location)
+
+    def get_question_from_next_indicator(self, location):
+        next_indicator = self.batch.get_next_indicator(order = self.order, location = location)
+        if next_indicator:
+            return next_indicator.get_next_question(order = 0, location = location)
 
 class Question(BaseModel):
     NUMBER = 'number'
@@ -316,13 +350,11 @@ class Question(BaseModel):
         try:
             return self.get_next_question_by_rule(answer, household.investigator)
         except ObjectDoesNotExist, e:
-            return self.next_question()
+            return self.next_question(location = household.investigator.location)
 
-    def next_question(self):
+    def next_question(self, location):
         order = self.parent.order if self.subquestion else self.order
-        question = self.indicator.questions.filter(order=order + 1)
-        if question:
-            return question[0]
+        return self.indicator.get_next_question(order, location = location)
 
     def to_ussd(self, page=1):
         if self.answer_type == self.MULTICHOICE:

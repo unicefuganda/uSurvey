@@ -24,9 +24,9 @@ class USSDTest(TestCase):
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(survey=survey)
+        batch = Batch.objects.create(survey=survey, order = 1)
         batch.open_for_location(self.investigator.location)
-        self.indicator = Indicator.objects.create(batch=batch)
+        self.indicator = Indicator.objects.create(batch=batch, order=1)
 
     def select_household(self):
         self.ussd_params['response'] = "true"
@@ -432,9 +432,9 @@ class USSDTestCompleteFlow(TestCase):
         self.household_head_8 = self.create_household_head()
         self.household_head_9 = self.create_household_head()
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(survey=survey)
+        batch = Batch.objects.create(survey=survey, order = 1)
         batch.open_for_location(self.investigator.location)
-        indicator = Indicator.objects.create(batch=batch)
+        indicator = Indicator.objects.create(batch=batch, order=1)
         self.question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
 
@@ -670,10 +670,125 @@ class USSDOpenBatch(TestCase):
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(survey=survey)
-        self.indicator = Indicator.objects.create(batch=batch)
+        batch = Batch.objects.create(survey=survey, order = 1)
+        self.indicator = Indicator.objects.create(batch=batch, order=1)
 
     def test_closed_batch(self):
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+class USSDWithMultipleBatches(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.ussd_params = {
+                                'transactionId': "123344" + str(randint(1, 99999)),
+                                'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
+                                'msisdn': '2567765' + str(randint(1, 99999)),
+                                'ussdServiceCode': '130',
+                                'ussdRequestString': '',
+                                'response': "false"
+                            }
+        self.location = Location.objects.create(name="Kampala")
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=self.location)
+        self.household = Household.objects.create(investigator=self.investigator)
+        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
+        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        self.batch = Batch.objects.create(survey=survey, order=1)
+        self.question_1 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=1), text="Question 1?", answer_type=Question.NUMBER, order=1)
+        self.question_2 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=2), text="Question 2?", answer_type=Question.NUMBER, order=1)
+        self.batch_1 = Batch.objects.create(survey=survey, order=2)
+        self.question_3 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch_1, order=1), text="Question 3?", answer_type=Question.NUMBER, order=1)
+        self.question_4 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch_1, order=2), text="Question 4?", answer_type=Question.NUMBER, order=1)
+
+    def select_household(self, household = 1):
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "00"
+        response = self.client.post('/ussd', data=self.ussd_params)
+        self.ussd_params['ussdRequestString'] = str(household)
+
+
+    def test_with_one_batch_open(self):
+        self.batch.open_for_location(self.location)
+
+        self.select_household()
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_2.to_ussd()
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_with_two_batch_open(self):
+        self.batch.open_for_location(self.location)
+        self.batch_1.open_for_location(self.location)
+
+        self.select_household()
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_2.to_ussd()
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_4.to_ussd()
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_with_second_batch_open(self):
+        self.batch_1.open_for_location(self.location)
+
+        self.select_household()
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_4.to_ussd()
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
