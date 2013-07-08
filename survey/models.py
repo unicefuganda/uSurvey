@@ -138,7 +138,8 @@ class Investigator(BaseModel):
         return batches
 
     def has_open_batch(self):
-        return self.location.open_batches.count() > 0
+        locations = self.location.get_ancestors(include_self=True)
+        return BatchLocationStatus.objects.filter(location__in = locations).count() > 0
 
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
@@ -241,8 +242,10 @@ class Batch(BaseModel):
 
     @classmethod
     def currently_open_for(self, location):
-        if location.open_batches.count() > 0:
-            return location.open_batches.order_by('created').all()[:1].get().batch
+        locations = location.get_ancestors(include_self=True)
+        open_batches = BatchLocationStatus.objects.filter(location__in = locations)
+        if open_batches.count() > 0:
+            return open_batches.order_by('created').all()[:1].get().batch
 
     def first_question(self):
         return self.indicators.get(order=1).questions.get(order=1)
