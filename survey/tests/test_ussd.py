@@ -714,6 +714,8 @@ class USSDWithMultipleBatches(TestCase):
 
         self.select_household()
 
+        self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
+
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -732,11 +734,19 @@ class USSDWithMultipleBatches(TestCase):
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+        self.assertEquals(HouseholdBatchCompletion.objects.count(), 1)
+        household_completed = HouseholdBatchCompletion.objects.latest('id')
+        self.assertEquals(household_completed.household, self.household)
+        self.assertEquals(household_completed.investigator, self.investigator)
+        self.assertEquals(household_completed.batch, self.batch)
+
     def test_with_two_batch_open(self):
         self.batch.open_for_location(self.location)
         self.batch_1.open_for_location(self.location)
 
         self.select_household()
+
+        self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
@@ -756,6 +766,12 @@ class USSDWithMultipleBatches(TestCase):
         response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+        self.assertEquals(HouseholdBatchCompletion.objects.count(), 1)
+        household_completed = HouseholdBatchCompletion.objects.latest('id')
+        self.assertEquals(household_completed.household, self.household)
+        self.assertEquals(household_completed.investigator, self.investigator)
+        self.assertEquals(household_completed.batch, self.batch)
+
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "1"
 
@@ -769,6 +785,12 @@ class USSDWithMultipleBatches(TestCase):
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.assertEquals(HouseholdBatchCompletion.objects.count(), 2)
+        household_completed = HouseholdBatchCompletion.objects.latest('id')
+        self.assertEquals(household_completed.household, self.household)
+        self.assertEquals(household_completed.investigator, self.investigator)
+        self.assertEquals(household_completed.batch, self.batch_1)
 
     def test_with_second_batch_open(self):
         self.batch_1.open_for_location(self.location)

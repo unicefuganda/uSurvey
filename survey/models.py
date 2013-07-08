@@ -83,7 +83,10 @@ class Investigator(BaseModel):
             if not answer:
                 return question
         if answer_class.objects.create(investigator=self, question=question, household=household, answer=answer).pk:
-            return household.next_question()
+            next_question = household.next_question(last_question_answered = question)
+            if next_question == None or next_question.indicator.batch != question.indicator.batch:
+                household.batch_completed(question.indicator.batch)
+            return next_question
         else:
             return question
 
@@ -166,8 +169,9 @@ class Household(BaseModel):
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
-    def next_question(self):
-        last_question_answered = self.last_question_answered()
+    def next_question(self, last_question_answered = None):
+        if not last_question_answered:
+            last_question_answered = self.last_question_answered()
         if not last_question_answered:
             open_batch = Batch.currently_open_for(location = self.investigator.location)
             if open_batch:
