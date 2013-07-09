@@ -25,6 +25,8 @@ class USSD(object):
 
     HOUSEHOLD_LIST_OPTION = "00"
 
+    TIMEOUT_MINUTES = 5
+
     def __init__(self, investigator, request):
         super(USSD, self).__init__()
         self.investigator = investigator
@@ -40,7 +42,7 @@ class USSD(object):
         household = self.get_from_session('HOUSEHOLD')
         if household:
             self.household = household
-        else:
+        elif self.is_active():
             last_answered = self.investigator.last_answered()
             if last_answered:
                 household = last_answered.household
@@ -186,6 +188,9 @@ class USSD(object):
 
     def has_chosen_household(self):
         return self.household != None
+
+    def is_active(self):
+        return self.investigator.was_active_within(self.TIMEOUT_MINUTES)
 
     def process_open_batch(self):
         if self.has_chosen_household():

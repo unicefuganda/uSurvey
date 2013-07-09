@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.core.cache import cache
+import datetime
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -143,6 +144,14 @@ class Investigator(BaseModel):
     def has_open_batch(self):
         locations = self.location.get_ancestors(include_self=True)
         return BatchLocationStatus.objects.filter(location__in = locations).count() > 0
+
+    def was_active_within(self, minutes):
+        last_answered = self.last_answered()
+        if not last_answered:
+            return False
+        last_active = last_answered.created
+        timeout = datetime.datetime.utcnow().replace(tzinfo=last_active.tzinfo) - datetime.timedelta(minutes=minutes)
+        return last_active >= timeout
 
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
