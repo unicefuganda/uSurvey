@@ -23,3 +23,67 @@ def and_i_have_an_investigator_in_that_location(step):
 @step(u'Then I should see that the household is created')
 def then_i_should_see_that_the_household_is_created(step):
     world.page.validate_household_created()
+
+@step(u'And I click No to has children')
+def and_i_click_no_to_has_children(step):
+    world.page.has_children('False')
+
+@step(u'Then I should see children number fields disabled')
+def then_i_should_see_children_number_fields_disabled(step):
+    world.page.are_children_fields_disabled()
+
+@step(u'And No below 5 is also checked')
+def and_no_below_5_is_also_checked(step):
+    world.page.is_no_below_5_checked()
+
+@step(u'And checking below 5 to yes does not work')
+def and_checking_below_5_to_yes_does_not_work(step):
+    world.page.cannot_say_yes_to_below_5()
+
+@step(u'And Now If I click to Yes to has children')
+def and_now_if_i_click_to_yes_to_has_children(step):
+    world.page.has_children('True')
+
+@step(u'Then all children number fields are enabled back')
+def then_all_children_number_fields_are_enabled_back(step):
+    world.page.are_children_fields_disabled(is_disabled = False)
+
+@step(u'And I click No to has below 5')
+def and_i_click_no_to_has_below_5(step):
+    world.page.has_children_below_5('False')
+
+@step(u'Then I should see below 5 number fields disabled')
+def then_i_should_see_below_5_number_fields_disabled(step):
+    world.page.are_children_below_5_fields_disabled(is_disabled=True)
+
+@step(u'And Now If I click Yes to below 5')
+def and_now_if_i_click_yes_to_below_5(step):
+    world.page.has_children_below_5('True')
+
+@step(u'Then below 5 number fields are enabled back')
+def then_below_5_number_fields_are_enabled_back(step):
+    world.page.are_children_below_5_fields_disabled(is_disabled=False)
+
+@step(u'And I click No to has women')
+def and_i_click_no_to_has_women(step):
+    world.page.has_women('False')
+
+@step(u'Then I should see has women number fields disabled')
+def then_i_should_see_has_women_number_fields_disabled(step):
+    world.page.are_women_fields_disabled()
+
+@step(u'And Now If I click Yes to has women')
+def and_now_if_i_click_yes_to_has_women(step):
+    world.page.has_women('True')
+
+@step(u'Then has women number fields are enabled back')
+def then_has_women_number_fields_are_enabled_back(step):
+    world.page.are_women_fields_disabled(is_disabled=False)
+
+@step(u'And I fill in number_of_females lower than sum of 15_19 and 20_49')
+def and_i_fill_in_number_of_females_lower_than_sum_of_15_19_and_20_49(step):
+    world.page.fill_in_number_of_females_lower_than_sum_of_15_19_and_20_49()
+
+@step(u'Then I should see an error on number_of_females')
+def then_i_should_see_an_error_on_number_of_females(step):
+    world.page.see_an_error_on_number_of_females()

@@ -4,7 +4,7 @@ from random import randint
 from time import sleep
 from rapidsms.contrib.locations.models import Location
 from survey.models import Investigator
-from investigator_configs import *
+from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import *
 
 class PageObject(object):
@@ -22,6 +22,13 @@ class PageObject(object):
 
     def is_text_present(self, text):
         assert self.browser.is_text_present(text)
+
+    def is_disabled(self, element_id):
+        try:
+            self.browser.find_by_css('#%s[disabled=disabled]' % element_id).first
+            return True
+        except Exception, e:
+            return False
 
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
@@ -133,4 +140,42 @@ class NewHouseholdPage(PageObject):
     def validate_household_created(self):
         assert self.browser.is_text_present("Household successfully registered.")
 
+    def has_children(self, value):
+        self.browser.choose('has_children', value)
 
+    def are_children_fields_disabled(self, is_disabled = True):
+        for element_id in ['aged_between_5_12_years', 'aged_between_13_17_years']:
+            element_id = 'household-children-' + element_id
+            assert self.is_disabled(element_id) == is_disabled
+        self.are_children_below_5_fields_disabled(is_disabled=is_disabled)
+
+    def is_no_below_5_checked(self):
+        assert self.browser.find_by_id('household-children-has_children_below_5_1').selected == True
+
+    def cannot_say_yes_to_below_5(self):
+        self.browser.choose('has_children_below_5', 'True')
+        self.are_children_fields_disabled()
+
+    def has_children_below_5(self, value):
+        self.browser.choose('has_children_below_5', value)
+
+    def are_children_below_5_fields_disabled(self, is_disabled = True):
+        for element_id in ['aged_between_0_5_months','aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']:
+            element_id = 'household-children-' + element_id
+            assert self.is_disabled(element_id) == is_disabled
+
+    def has_women(self, value):
+        self.browser.choose('has_women', value)
+
+    def are_women_fields_disabled(self, is_disabled=True):
+        for element_id in ['aged_between_15_19_years', 'aged_between_20_49_years']:
+            element_id = 'household-women-' + element_id
+            assert self.is_disabled(element_id) == is_disabled
+
+    def fill_in_number_of_females_lower_than_sum_of_15_19_and_20_49(self):
+        self.browser.fill('number_of_females', '1')
+        self.browser.fill('aged_between_15_19_years', '2')
+        self.browser.fill('aged_between_20_49_years', '3')
+
+    def see_an_error_on_number_of_females(self):
+        self.is_text_present('Please enter a value that is greater or equal to the total number of women above 15 years age.')
