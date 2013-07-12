@@ -154,6 +154,10 @@ class Investigator(BaseModel):
         timeout = datetime.datetime.utcnow().replace(tzinfo=last_active.tzinfo) - datetime.timedelta(minutes=minutes)
         return last_active >= timeout
 
+    def pending_households_for(self, batch):
+        completed = batch.completed_households.filter(investigator=self).count()
+        return self.households.count() - completed
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
@@ -253,6 +257,7 @@ class Survey(BaseModel):
 class Batch(BaseModel):
     survey = models.ForeignKey(Survey, null=True, related_name="batches")
     order = models.PositiveIntegerField(max_length=2, null=True)
+    name = models.CharField(max_length=100, blank=False, null=True)
 
     @classmethod
     def currently_open_for(self, location):
@@ -266,6 +271,9 @@ class Batch(BaseModel):
 
     def open_for_location(self, location):
         return self.open_locations.get_or_create(batch=self, location=location)
+
+    def is_closed_for(self, location):
+        return self.open_locations.filter(location=location).count() == 0
 
     def close_for_location(self, location):
         self.open_locations.filter(batch=self).delete()

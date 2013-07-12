@@ -12,11 +12,6 @@ display: inline;
   list-style-type: none;
 }
 
-.table th, .table td {
-     border-top: none;
-     border-bottom: none;
- }
-
 #location-widget{
   margin: 0;
   & > li{
@@ -26,6 +21,23 @@ display: inline;
     label{
       display: block;
       font-weight: bold;
+    }
+  }
+}
+
+#aggregates-form{
+  div.batch-list-container{
+    clear: both;
+    padding-top: 10px;
+    margin-top: 10px;
+    label{
+      display: block;
+      font-weight: bold;
+    }
+    button{
+      position: relative;
+      top: -5px;
+      margin-left: 30px;
     }
   }
 }

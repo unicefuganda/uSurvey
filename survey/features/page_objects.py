@@ -35,6 +35,10 @@ class PageObject(object):
         self.browser.execute_script(script)
         sleep(2)
 
+    def submit(self):
+        self.browser.find_by_css("form button").first.click()
+
+
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
@@ -133,10 +137,6 @@ class NewHouseholdPage(PageObject):
         self.fill_in_with_js('$("#household-extra_resident_since_year")', 1984)
         self.fill_in_with_js('$("#household-extra_resident_since_month")', 1)
 
-    def submit(self):
-        sleep(2)
-        self.browser.find_by_css("form button").first.click()
-
     def validate_household_created(self):
         assert self.browser.is_text_present("Household successfully registered.")
 
@@ -185,6 +185,35 @@ class AggregateStatusPage(PageObject):
 
     def choose_location(self, locations):
         for key, value in locations.items():
-            jquery_id = '$("#investigator-%s")' % key
+            object_id = "location-%s" % key
+            assert self.browser.is_element_present_by_id(object_id)
+            jquery_id = '$("#%s")' % object_id
             location = Location.objects.get(name = value)
             self.fill_in_with_js(jquery_id, location.pk)
+
+    def check_if_batches_present(self, *batches):
+        all_options = self.browser.find_by_id('batch-list-select')[0].find_by_tag('option')
+        all_options = [ option.text for option in all_options ]
+        for batch in batches:
+            assert batch.name in all_options
+
+    def check_get_status_button_presence(self):
+        assert self.browser.find_by_css("#aggregates-form")[0].find_by_tag('button')[0].text == "Get status"
+
+    def choose_batch(self, batch):
+        self.browser.select('batch', batch.pk)
+
+    def assert_status_count(self, pending_households, completed_housesholds, pending_clusters, completed_clusters):
+        assert self.browser.find_by_id('pending-households-count')[0].text == str(pending_households)
+        assert self.browser.find_by_id('completed-households-count')[0].text == str(completed_housesholds)
+        assert self.browser.find_by_id('pending-clusters-count')[0].text == str(pending_clusters)
+        assert self.browser.find_by_id('completed-clusters-count')[0].text == str(completed_clusters)
+
+    def check_presence_of_investigators(self, *investigators):
+        for investigator in investigators:
+            self.is_text_present(investigator.name)
+            self.is_text_present(investigator.mobile_number)
+            self.is_text_present("10")
+
+    def assert_presence_of_batch_is_closed_message(self):
+        self.is_text_present("This batch is currently closed for this location.")

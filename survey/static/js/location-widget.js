@@ -14,14 +14,18 @@ jQuery(function($){
     element.trigger("liszt:updated");
   }
 
+  var location = $('input[name=location]');
+
   $("#location-widget select")
         .on('change', function(){
             var element = $(this),
-                url = "/location/" + element.val() + "/children";
-            if($.isEmptyObject(element.val())){
+                value = element.val(),
+                url = "/location/" + value + "/children";
+            if($.isEmptyObject(value)){
               next_element(element).trigger('clear-locations');
               return true;
             }
+            location.val(value);
             $.getJSON(url, function(data){
               populate_children(next_element(element), data);
             });

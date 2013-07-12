@@ -22,11 +22,14 @@ class AggregatesPageTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/status.html', templates)
+        self.assertEquals(len(response.context['batches']), 0)
         locations = response.context['locations'].get_widget_data()
-        self.assertEquals(len(locations.keys()), 1)
+        self.assertEquals(len(locations.keys()), 2)
         self.assertEquals(locations.keys()[0], 'country')
         self.assertEquals(len(locations['country']), 1)
         self.assertEquals(locations['country'][0], uganda)
+
+        self.assertEquals(len(locations['city']), 0)
 
     def test_get_aggregates_for_a_batch(self):
         country = LocationType.objects.create(name = 'Country', slug = 'country')
@@ -50,6 +53,9 @@ class AggregatesPageTest(TestCase):
 
         response = self.client.get('/aggregates/status', {'location': str(kampala.pk), 'batch': str(batch.pk)})
         self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(len(response.context['batches']), 2)
+        self.assertEquals(response.context['batches'][0], batch)
+        self.assertEquals(response.context['batches'][1], batch_2)
         self.assertEquals(response.context['selected_location'], kampala)
         self.assertEquals(response.context['selected_batch'], batch)
         self.assertEquals(response.context['households'], {'completed': 0, 'pending': 10})

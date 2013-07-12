@@ -89,7 +89,7 @@ class SurveyTest(TestCase):
 class BatchTest(TestCase):
     def test_store(self):
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(survey=survey, order=1)
+        batch = Batch.objects.create(survey=survey, order=1, name="Batch name")
         self.failUnless(batch.id)
 
 class IndicatorTest(TestCase):
