@@ -34,8 +34,8 @@ class AggregatesPageTest(TestCase):
         village = LocationType.objects.create(name = 'Village', slug = 'village')
 
         uganda = Location.objects.create(name='Uganda', type = country)
-        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = city)
         kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = city)
+        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = city)
         kampala_city = Location.objects.create(name='Kampala Village', tree_parent = kampala, type = village)
 
         batch = Batch.objects.create(order=1)

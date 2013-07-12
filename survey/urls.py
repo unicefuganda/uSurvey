@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     url(r'^households/new/$', 'survey.views.household.new', name="new_household_page"),
     url(r'^households/investigators', 'survey.views.household.get_investigators', name='load_investigators'),
     url(r'^aggregates/status', 'survey.views.aggregates.status', name='aggregates_status'),
+    url(r'^location/(?P<location_id>\d+)/children', 'survey.views.location.children', name='aggregates_status'),
 )
