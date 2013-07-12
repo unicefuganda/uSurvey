@@ -30,6 +30,11 @@ class PageObject(object):
         except Exception, e:
             return False
 
+    def fill_in_with_js(self, jquery_id, object_id):
+        script = '%s.val(%s); %s.trigger("liszt:updated").chosen().change()' % (jquery_id, object_id, jquery_id)
+        self.browser.execute_script(script)
+        sleep(2)
+
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
@@ -128,11 +133,6 @@ class NewHouseholdPage(PageObject):
         self.fill_in_with_js('$("#household-extra_resident_since_year")', 1984)
         self.fill_in_with_js('$("#household-extra_resident_since_month")', 1)
 
-    def fill_in_with_js(self, jquery_id, object_id):
-        script = '%s.val(%s); %s.trigger("liszt:updated").chosen().change()' % (jquery_id, object_id, jquery_id)
-        self.browser.execute_script(script)
-        sleep(2)
-
     def submit(self):
         sleep(2)
         self.browser.find_by_css("form button").first.click()
@@ -179,3 +179,12 @@ class NewHouseholdPage(PageObject):
 
     def see_an_error_on_number_of_females(self):
         self.is_text_present('Please enter a value that is greater or equal to the total number of women above 15 years age.')
+
+class AggregateStatusPage(PageObject):
+    url = "/aggregates/status"
+
+    def choose_location(self, locations):
+        for key, value in locations.items():
+            jquery_id = '$("#investigator-%s")' % key
+            location = Location.objects.get(name = value)
+            self.fill_in_with_js(jquery_id, location.pk)

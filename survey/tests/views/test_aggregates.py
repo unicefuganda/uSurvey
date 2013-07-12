@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import *
 from survey import investigator_configs
 
@@ -10,16 +10,34 @@ class AggregatesPageTest(TestCase):
         self.client = Client()
 
     def test_get_page(self):
+        country = LocationType.objects.create(name = 'Country', slug = 'country')
+        city = LocationType.objects.create(name = 'City', slug = 'city')
+
+        uganda = Location.objects.create(name='Uganda', type = country)
+        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = city)
+        kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = city)
+        kampala_city = Location.objects.create(name='Kampala City', tree_parent = kampala, type = city)
+
         response = self.client.get('/aggregates/status')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/status.html', templates)
+        locations = response.context['locations'].get_widget_data()
+        self.assertEquals(len(locations.keys()), 1)
+        self.assertEquals(locations.keys()[0], 'country')
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
 
     def test_get_aggregates_for_a_batch(self):
-        uganda = Location.objects.create(name='Uganda')
-        abim = Location.objects.create(name='Abim', tree_parent = uganda)
-        kampala = Location.objects.create(name='Kampala', tree_parent = uganda)
-        kampala_city = Location.objects.create(name='Kampala City', tree_parent = kampala)
+        country = LocationType.objects.create(name = 'Country', slug = 'country')
+        city = LocationType.objects.create(name = 'City', slug = 'city')
+        village = LocationType.objects.create(name = 'Village', slug = 'village')
+
+        uganda = Location.objects.create(name='Uganda', type = country)
+        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = city)
+        kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = city)
+        kampala_city = Location.objects.create(name='Kampala Village', tree_parent = kampala, type = village)
+
         batch = Batch.objects.create(order=1)
         batch_2 = Batch.objects.create(order=1)
 
@@ -38,6 +56,17 @@ class AggregatesPageTest(TestCase):
         self.assertEquals(response.context['clusters'], {'completed': 0, 'pending': 1})
         self.assertEquals(len(response.context['investigators']), 1)
         self.assertEquals(response.context['investigators'][0], investigator)
+
+        locations = response.context['locations'].get_widget_data()
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
+
+        self.assertEquals(len(locations['city']), 2)
+        self.assertEquals(locations['city'][0], abim)
+        self.assertEquals(locations['city'][1], kampala)
+
+        self.assertEquals(len(locations['village']), 1)
+        self.assertEquals(locations['village'][0], kampala_city)
 
         investigator_2 = Investigator.objects.create(name="investigator name", mobile_number="1234", location=kampala_city)
         count = 1

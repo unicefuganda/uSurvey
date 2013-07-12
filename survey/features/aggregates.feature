@@ -2,17 +2,17 @@ Feature: Aggregates feature
 
     Scenario: Aggregates status page
       Given I am logged in as researcher
-    #   And I have locations
-    #   And I have 2 batches with one open
-    #   And I visit aggregate status page
-    #   Then I should see an option to select location hierarchically
-    #   And I should see an option to select batch
-    #   And I should see a get status button
-    #
+      And I have locations
+      And I have 2 batches with one open
+      And I visit aggregate status page
+      Then I should see an option to select location hierarchically
+      And I should see an option to select batch
+      And I should see a get status button
+
     # Scenario: Aggregates status page for open batch
     #   Given I am logged in as researcher
     #   And I have locations
-    #   And I have 2 investigators with 3 households
+    #   And I have 2 investigators with households
     #   And I have 2 batches with one open
     #   And I visit aggregate status page
     #   And I choose a location and an open batch
@@ -23,7 +23,7 @@ Feature: Aggregates feature
     # Scenario: Aggregates status page for closed batch
     #   Given I am logged in as researcher
     #   And I have locations
-    #   And I have 2 investigators with 3 households
+    #   And I have 2 investigators with households
     #   And I have 2 batches with one open
     #   And I visit aggregate status page
     #   And I choose a location and a closed batch
