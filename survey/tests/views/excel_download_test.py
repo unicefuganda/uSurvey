@@ -24,7 +24,7 @@ class ExcelDownloadTest(TestCase):
 
     def test_downloaded_excel_file(self):
         file_name = "%s.csv" % self.batch.name
-        response = self.client.post('/aggregates/excel_report', data={'batch': self.batch.pk})
+        response = self.client.post('/aggregates/spreadsheet_report', data={'batch': self.batch.pk})
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
@@ -40,7 +40,7 @@ class ExcelDownloadViewTest(TestCase):
 
     def test_get(self):
         client = Client()
-        response = self.client.get('/aggregates/download_excel')
+        response = self.client.get('/aggregates/download_spreadsheet')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/download_excel.html', templates)

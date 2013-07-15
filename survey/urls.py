@@ -13,6 +13,6 @@ urlpatterns = patterns('',
     url(r'^households/investigators', 'survey.views.household.get_investigators', name='load_investigators'),
     url(r'^aggregates/status', 'survey.views.aggregates.status', name='aggregates_status'),
     url(r'^location/(?P<location_id>\d+)/children', 'survey.views.location.children', name='get_location_children'),
-    url(r'^aggregates/excel_report', 'survey.views.excel.download', name='excel_report'),
-    url(r'^aggregates/download_excel', 'survey.views.excel.list', name='download_excel'),
+    url(r'^aggregates/spreadsheet_report', 'survey.views.excel.download', name='excel_report'),
+    url(r'^aggregates/download_spreadsheet', 'survey.views.excel.list', name='download_excel'),
 )
