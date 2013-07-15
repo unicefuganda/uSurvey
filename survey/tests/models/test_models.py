@@ -98,12 +98,12 @@ class IndicatorTest(TestCase):
         self.batch = Batch.objects.create(survey=survey, order = 1)
 
     def test_store(self):
-        indicator = Indicator.objects.create(batch=self.batch, order=1)
+        indicator = Indicator.objects.create(batch=self.batch, order=1, identifier="IDENTIFIER")
         self.failUnless(indicator.id)
 
     def test_order(self):
-        indicator_2 = Indicator.objects.create(batch=self.batch, order=2)
-        indicator_1 = Indicator.objects.create(batch=self.batch, order=1)
+        indicator_2 = Indicator.objects.create(batch=self.batch, order=2, identifier="IDENTIFIER")
+        indicator_1 = Indicator.objects.create(batch=self.batch, order=1, identifier="IDENTIFIER_1")
         indicators = self.batch.indicators.order_by('order').all()
         self.assertEqual(indicators[0], indicator_1)
         self.assertEqual(indicators[1], indicator_2)

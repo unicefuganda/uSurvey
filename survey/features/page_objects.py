@@ -217,3 +217,10 @@ class AggregateStatusPage(PageObject):
 
     def assert_presence_of_batch_is_closed_message(self):
         self.is_text_present("This batch is currently closed for this location.")
+
+class DownloadExcelPage(PageObject):
+    url = "/aggregates/download_excel"
+
+    def export_to_csv(self, batch):
+        self.browser.select('batch', batch.pk)
+        self.submit()

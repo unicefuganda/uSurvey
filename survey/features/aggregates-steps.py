@@ -68,3 +68,17 @@ def and_i_choose_a_location_and_a_closed_batch(step):
 @step(u'And I should see a message that says that this batch is currently closed')
 def and_i_should_see_a_message_that_says_that_this_batch_is_currently_closed(step):
     world.page.assert_presence_of_batch_is_closed_message()
+
+@step(u'And I have few batches')
+def and_i_have_few_batches(step):
+    survey = Survey.objects.create(name = "some survey")
+    world.batch = Batch.objects.create(order = 1, survey = survey, name = "Batch A")
+
+@step(u'And I visit download excel page')
+def and_i_visit_download_excel_page(step):
+    world.page = DownloadExcelPage(world.browser)
+    world.page.visit()
+
+@step(u'And I select a batch and click export to csv')
+def and_i_select_a_batch_and_click_export_to_csv(step):
+    world.page.export_to_csv(world.batch)

@@ -158,6 +158,14 @@ class Investigator(BaseModel):
         completed = batch.completed_households.filter(investigator=self).count()
         return self.households.count() - completed
 
+    @classmethod
+    def get_summarised_answers_for(self, batch, questions, data):
+        for investigator in self.objects.all():
+            for household in investigator.households.all():
+                answers = [investigator.location.name, household.head.surname]
+                answers = answers + household.answers_for(questions)
+                data.append(answers)
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
@@ -215,6 +223,24 @@ class Household(BaseModel):
 
     def batch_reopen(self, batch):
         self.completed_batches.filter(household=self).delete()
+
+    def answers_for(self, questions):
+        answers = []
+        for question in questions:
+            answer_class = question.answer_class()
+            answer = answer_class.objects.filter(question=question, household=self)
+            if answer:
+                answer = answer[0]
+                if question.is_multichoice():
+                    option = answer.answer
+                    answers.append(option.order)
+                    answers.append(option.text)
+                else:
+                    answers.append(answer.answer)
+            else:
+                answers.append('')
+        return answers
+
 
 class HouseholdHead(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="head")
@@ -290,6 +316,21 @@ class Batch(BaseModel):
         if next_open_batch:
             return next_open_batch.get_next_indicator(order = 0, location = location)
 
+    def generate_report(self):
+        data = []
+        header = ['Location', 'Household Head Name']
+        questions = []
+        for indicator in self.indicators.order_by('order'):
+            for question in indicator.questions.order_by('order'):
+                questions.append(question)
+                title = "%s_%s" % (indicator.identifier, question.order)
+                header.append(title)
+                if question.is_multichoice():
+                    header.append('')
+        data = [header]
+        Investigator.get_summarised_answers_for(self, questions, data)
+        return data
+
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")
     location = models.ForeignKey(Location, null=True, related_name="open_batches")
@@ -328,6 +369,7 @@ class HouseholdBatchCompletion(BaseModel):
 class Indicator(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="indicators")
     order = models.PositiveIntegerField(max_length=2, null=True)
+    identifier = models.CharField(max_length=100, blank=False, null=True)
 
     def get_next_question(self, order, location):
         question = self.questions.filter(order=order + 1)

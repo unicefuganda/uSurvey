@@ -35,3 +35,9 @@ Feature: Aggregates feature
       Then I should see number of households and clusters completed and pending
       And I should see a list of investigators with corresponding phone numbers and pending households
       And I should see a message that says that this batch is currently closed
+
+    Scenario: Download Excel
+      Given I am logged in as researcher
+      And I have few batches
+      And I visit download excel page
+      And I select a batch and click export to csv
