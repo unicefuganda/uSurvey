@@ -14,7 +14,6 @@ from survey.views.location_widget import LocationWidget
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
 
-
 def _add_error_response_message(investigator, request):
     error_message = "Investigator not registered. "
     messages.error(request, error_message + "See errors below.")
@@ -26,7 +25,6 @@ def _add_error_response_message(investigator, request):
     if investigator.non_field_errors():
         for err in investigator.non_field_errors():
             messages.error(request, error_message + str(err))
-
 
 def _process_form(investigator, request):
     if investigator.is_valid():

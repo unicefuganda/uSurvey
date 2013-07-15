@@ -43,4 +43,5 @@ jQuery(function($){
             next_element(element).trigger('clear-locations');
         });
 
+  location.val($("#location-widget option[selected]").val());
 });
