@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.test.client import Client
-from xlrd import open_workbook
 from survey.models import *
 
 class ExcelDownloadTest(TestCase):
