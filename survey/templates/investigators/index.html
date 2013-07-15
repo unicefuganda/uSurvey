@@ -8,34 +8,12 @@
   <h3>
     Investigators List
   </h3>
-  
-  <table class="table" >
-    <thead>
-      <tr>
-          {% for name, type in location_type.items %}
-              <th>{{name.capitalize}}</th>
-          {% endfor%}
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        {% for name, type in location_type.items %}
-        <td>
-          <select name="{{name}}" id="investigator-{{name.lower}}" data-location=true data-placeholder="All" style="width:160px;" single  class="chzn-select">
-          <option value="{{type.value}}" selected>{{type.text}}</option>
-          {% for location in type.siblings %}
-            <option value="{{location.id}}">{{location.name}}</option>
-          {% endfor %}
-          </select>
-        </td>
-        {% endfor %}
-        <td>
-          <a class="btn btn-primary" id="a-investigator-list"> Get List</a>
-        </td>
-      </tr>
-    </tbody>
-    </table>
-      
+  <form id="aggregates-form" action="{% url 'investigators_page' %}" method="get">
+    <div class="span10">
+      {% include "location_widget.html" with location_data=location_data default_text="All" %}
+    </div>
+    <button class="btn btn-primary" id="investigator-list"> Get List</button>
+  </form>
   {% if investigators %}
     <table class="table table-striped table-bordered table-hover">
       <thead>
@@ -74,8 +52,6 @@
         {% endfor %}
       </tbody>
     </table>
-  {% else %}
-    <h4 style="color:red;"> There are no investigators registered{% if selected_location_type%} for this {{selected_location_type}}{% endif %}. </h4>
   {% endif %}
 {% paginate %}
 {% endblock %}

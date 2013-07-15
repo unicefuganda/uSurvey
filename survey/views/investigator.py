@@ -9,7 +9,7 @@ from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.investigator import *
 from survey.models import Investigator
 from survey.views.views_helper import initialize_location_type, update_location_type, get_posted_location
-
+from survey.views.location_widget import LocationWidget
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
@@ -60,36 +60,30 @@ def new_investigator(request):
 
 
 def get_locations(request):
-    tree_parent = request.GET['parent'] if request.GET.has_key('parent') and request.GET['parent'] else None
+    tree_parent = request.GET['parent'] if request.GET.has_key('parent') and request.GET['parent'].isdigit() else None
     locations = Location.objects.filter(tree_parent=tree_parent)
     location_hash = {}
     for location in locations:
         location_hash[location.name] = location.id
     return HttpResponse(json.dumps(location_hash), content_type="application/json")
 
-
 def list_investigators(request):
-    selected_location = initialize_location_type(default_select=LIST_INVESTIGATOR_DEFAULT_SELECT)
+    params = request.GET
+    selected_location = None
     investigators = Investigator.objects.all()
 
-    return render(request, 'investigators/index.html',
-                  {'investigators': investigators,
-                   'location_type': selected_location,
-                   'request': request})
+    if params.has_key('location') and params['location'].isdigit():
+        selected_location = Location.objects.get(id=int(params['location']));
+        corresponding_locations = selected_location.get_descendants(include_self=True)
+        investigators = Investigator.objects.filter(location__in=corresponding_locations)
 
-
-def filter_list_investigators(request, location_id):
-    the_location = Location.objects.get(id=int(location_id));
-    corresponding_locations = the_location.get_descendants(include_self=True)
-    investigators = Investigator.objects.filter(location__in=corresponding_locations)
-
-    return_selected_location = update_location_type(
-        initialize_location_type(default_select=LIST_INVESTIGATOR_DEFAULT_SELECT), location_id)
+    if not investigators:
+        location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'
+        messages.error(request, "There are  no investigators currently registered  for this %s." % location_type)
 
     return render(request, 'investigators/index.html',
                   {'investigators': investigators,
-                   'location_type': return_selected_location,
-                   'selected_location_type': the_location.type.name.lower(),
+                   'location_data': LocationWidget(selected_location),
                    'request': request})
 
 

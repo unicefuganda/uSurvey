@@ -105,7 +105,7 @@ class InvestigatorsViewTest(TestCase):
 
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
-        uganda = Location.objects.create(name="Uganda")
+        uganda = Location.objects.create(name="Uganda", type=country)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda)
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
@@ -114,9 +114,30 @@ class InvestigatorsViewTest(TestCase):
 
         self.assertEqual(len(response.context['investigators']), 1)
         self.assertIn(investigator, response.context['investigators'])
-        self.assertEquals(len(response.context['location_type']), 1)
-        self.assert_dictionary_equal({'value': '', 'text': 'All', 'siblings': [uganda]},
-                                     response.context['location_type'][country.name])
+
+        locations = response.context['location_data'].get_widget_data()
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
+
+    @patch('django.contrib.messages.error')
+    def test_list_investigators_no_investigators(self, mock_error_message):
+        country = LocationType.objects.create(name="country", slug=slugify("country"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.filter(location=uganda).delete()
+        response = self.client.get("/investigators/")
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('investigators/index.html', templates)
+
+        self.assertEqual(len(response.context['investigators']), 0)
+
+        locations = response.context['location_data'].get_widget_data()
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
+
+        assert mock_error_message.called_once_with('There are  no investigators currently registered  for this location.')
+
+
 
     def test_filter_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
@@ -130,22 +151,21 @@ class InvestigatorsViewTest(TestCase):
         investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala)
         investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", location=bukoto)
 
-        response = self.client.get("/investigators/filter/" + str(uganda.id) + "/")
+        response = self.client.get("/investigators/?location=" + str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('investigators/index.html', templates)
-
-        self.assertEquals(response.context['selected_location_type'], 'country')
 
         self.assertEqual(len(response.context['investigators']), 3)
         for investigator in [investigator1, investigator2, investigator3]:
             self.assertIn(investigator, response.context['investigators'])
 
-        self.assertEqual(len(response.context['location_type']), 2)
-        self.assertEquals({'value': uganda.id, 'text': uganda.name, 'siblings': [{'id': '', 'name': 'All'}]},
-                          response.context['location_type'][country.name])
-        self.assert_dictionary_equal({'value': '', 'text': 'All', 'siblings': [kampala]},
-                                     response.context['location_type'][district.name])
+        locations = response.context['location_data'].get_widget_data()
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
+
+        self.assertEquals(len(locations['district']), 1)
+        self.assertEquals(locations['district'][0], kampala)
 
     def test_check_mobile_number(self):
         investigator = Investigator.objects.create(name="investigator", mobile_number="123456789")

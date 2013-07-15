@@ -4,6 +4,10 @@ jQuery(function($){
     return element.parent().next().find('select');
   }
 
+  function previous_element(element) {
+    return element.parent().prev().find('select');
+  }
+
   function populate_children(element, data) {
     element.trigger('clear-locations');
     var option;
@@ -22,6 +26,8 @@ jQuery(function($){
                 value = element.val(),
                 url = "/location/" + value + "/children";
             if($.isEmptyObject(value)){
+              value = previous_element(element).val();
+              location.val(value);
               next_element(element).trigger('clear-locations');
               return true;
             }

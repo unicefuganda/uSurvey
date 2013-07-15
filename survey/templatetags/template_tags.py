@@ -15,3 +15,5 @@ def is_batch_selected(batch, selected_batch):
 @register.filter
 def pending_households(investigator, batch):
     return investigator.pending_households_for(batch)
+
+# @register.simple_tag

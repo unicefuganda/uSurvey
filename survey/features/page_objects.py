@@ -93,15 +93,15 @@ class InvestigatorsListPage(PageObject):
         assert self.browser.is_text_present(values['mobile_number'])
 
     def no_registered_invesitgators(self):
-        assert self.browser.is_text_present("There are no investigators registered.")
+        assert self.browser.is_text_present("There are no investigators currently registered for this location.")
 
 class FilteredInvestigatorsListPage(InvestigatorsListPage):
     def __init__(self, browser, location_id):
         self.browser = browser
-        self.url = '/investigators/filter/' + str(location_id)
+        self.url = '/investigators/?location=' + str(location_id)
 
     def no_registered_invesitgators(self):
-        assert self.browser.is_text_present("There are no investigators registered for this county.")
+        assert self.browser.is_text_present("There are no investigators currently registered for this county.")
 
 class NewHouseholdPage(PageObject):
     url = "/households/new"
