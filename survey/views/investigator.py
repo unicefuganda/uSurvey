@@ -36,26 +36,23 @@ def _process_form(investigator, request):
     _add_error_response_message(investigator, request)
     return None
 
-
 def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
-    location_type = initialize_location_type(default_select=CREATE_INVESTIGATOR_DEFAULT_SELECT)
+    selected_location = None
     response = None
 
     if request.method == 'POST':
         investigator = InvestigatorForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
-        location_id = get_posted_location(request.POST)
-        location_type = update_location_type(location_type, location_id)
         response = _process_form(investigator, request)
+        selected_location = Location.objects.get(id=int(request.POST['location']))
 
     return response or render(request, 'investigators/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
-                                                                  'location_type': location_type,
+                                                                  'location_data': LocationWidget(selected_location),
                                                                   'form': investigator,
                                                                   'action': "/investigators/new/",
                                                                   'id': "create-investigator-form",
                                                                   'button_label': "Create Investigator",
                                                                   'loading_text': "Creating..."})
-
 
 def get_locations(request):
     tree_parent = request.GET['parent'] if request.GET.has_key('parent') and request.GET['parent'].isdigit() else None

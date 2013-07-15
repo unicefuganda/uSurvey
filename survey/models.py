@@ -362,7 +362,7 @@ class HouseholdBatchCompletion(BaseModel):
 
     @classmethod
     def status_of_batch(self, batch, location):
-        locations = location.get_descendants(include_self=True)
+        locations = location.get_descendants(include_self=True) if location else Location.objects.all()
         investigators = Investigator.objects.filter(location__in = locations)
         return self.households_status(investigators, batch), self.clusters_status(investigators, batch), self.pending_investigators(investigators, batch)
 

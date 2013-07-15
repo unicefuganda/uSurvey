@@ -6,6 +6,7 @@ from survey.models import *
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
 from survey import investigator_configs
+from django.utils.datastructures import SortedDict
 
 @step(u'And I have 2 batches with one open')
 def and_i_have_2_batches_with_one_open(step):
@@ -45,12 +46,23 @@ def and_i_have_2_investigators_with_households(step):
 
 @step(u'And I choose a location and an open batch')
 def and_i_choose_a_location_and_an_open_batch(step):
-    world.page.choose_location({'district': 'Kampala'})
+    locations = SortedDict()
+    locations['district'] = 'Kampala'
+    locations['county'] = 'Kampala County'
+    world.page.choose_location(locations)
     world.page.choose_batch(world.batch_1)
+
+@step(u'And I change my mind to select all districts')
+def and_i_change_my_mind_to_select_all_districts(step):
+    world.page.select_all_district()
 
 @step(u'And I click get status button')
 def and_i_click_get_status_button(step):
     world.page.submit()
+
+@step(u'And I should see all districts as location selected')
+def and_i_should_see_all_districts_location_selected(step):
+    world.page.see_all_districts_location_selected()
 
 @step(u'Then I should see number of households and clusters completed and pending')
 def then_i_should_see_number_of_households_and_clusters_completed_and_pending(step):

@@ -4,6 +4,7 @@ from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import *
 from survey import investigator_configs
+from survey.views.aggregates import *
 
 class AggregatesPageTest(TestCase):
     def setUp(self):
@@ -108,3 +109,22 @@ class AggregatesPageTest(TestCase):
         self.assertEquals(response.context['clusters'], {'completed': 1, 'pending': 1})
         self.assertEquals(len(response.context['investigators']), 1)
         self.assertEquals(response.context['investigators'][0], investigator)
+
+    def test_contains_key(self):
+        self.assertTrue(contains_key({'bla':'1'}, 'bla'))
+        self.assertFalse(contains_key({'haha':'1'}, 'bla'))
+        self.assertFalse(contains_key({'bla':'-1'}, 'bla'))
+        self.assertFalse(contains_key({'bla':''}, 'bla'))
+        self.assertFalse(contains_key({'bla':'NOT_A_DIGIT'}, 'bla'))
+
+    def test_is_valid_params(self):
+        self.assertTrue(is_valid({'location':'1', 'batch':'2'}))
+
+    def test_empty_location_is_also_valid(self):
+        self.assertTrue(is_valid({'location':'', 'batch':'2'}))
+
+    def test_invalid(self):
+        self.assertFalse(is_valid({'batch':'2'}))
+        self.assertFalse(is_valid({'location':'2', 'batch':'NOT_A_DIGIT'}))
+        self.assertFalse(is_valid({'location':'NOT_A_DIGIT', 'batch':'1'}))
+        self.assertFalse(is_valid({'location':'1'}))

@@ -31,7 +31,7 @@ class PageObject(object):
             return False
 
     def fill_in_with_js(self, jquery_id, object_id):
-        script = '%s.val(%s); %s.trigger("liszt:updated").chosen().change()' % (jquery_id, object_id, jquery_id)
+        script = '%s.val(%s).change(); %s.trigger("liszt:updated").chosen().change()' % (jquery_id, object_id, jquery_id)
         self.browser.execute_script(script)
         sleep(2)
 
@@ -217,6 +217,12 @@ class AggregateStatusPage(PageObject):
 
     def assert_presence_of_batch_is_closed_message(self):
         self.is_text_present("This batch is currently closed for this location.")
+
+    def select_all_district(self):
+        self.browser.execute_script("$('#location-district').val('').change().trigger('liszt:updated').chosen().change();")
+
+    def see_all_districts_location_selected(self):
+        assert self.browser.find_by_css('input[name=location]')[0].value == ''
 
 class DownloadExcelPage(PageObject):
     url = "/aggregates/download_spreadsheet"

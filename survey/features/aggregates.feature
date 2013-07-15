@@ -16,9 +16,11 @@ Feature: Aggregates feature
       And I have 2 investigators with households
       And I visit aggregate status page
       And I choose a location and an open batch
+      And I change my mind to select all districts
       And I click get status button
       Then I should see number of households and clusters completed and pending
       And I should see a list of investigators with corresponding phone numbers and pending households
+      And I should see all districts as location selected
 
     Scenario: Aggregates status page for closed batch
       Given I am logged in as researcher
@@ -30,11 +32,9 @@ Feature: Aggregates feature
       And I click get status button
       Then I should see number of households and clusters completed and pending
       And I should see a list of investigators with corresponding phone numbers and pending households
-      And I should see a message that says that this batch is currently closed
       And I click get status button
       Then I should see number of households and clusters completed and pending
       And I should see a list of investigators with corresponding phone numbers and pending households
-      And I should see a message that says that this batch is currently closed
 
     Scenario: Download Excel
       Given I am logged in as researcher
