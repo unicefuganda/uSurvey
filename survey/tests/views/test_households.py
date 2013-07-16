@@ -231,3 +231,59 @@ class HouseholdViewTest(TestCase):
         self.assertEqual(children.household, household)
         self.assertEqual(women.household, household)
 
+    def test_create_households_unsuccessful(self):
+
+        country = LocationType.objects.create(name='country', slug='country')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda)
+        form_data = {
+            'country': uganda.id,
+            'investigator':investigator.id,
+            'surname': 'Rajini',
+            'first_name':'Kant',
+            'male': 'False',
+            'age': '20',
+            'occupation':'Student',
+            'level_of_education': 'Nursery',
+            'resident_since_year':'2013',
+            'resident_since_month':'5',
+            'time_measure' : 'Years',
+            'number_of_males': '2',
+            'number_of_females': '3',
+            'size':'5',
+            'has_children':'True',
+            'has_children_below_5':'True',
+            'aged_between_5_12_years':'0',
+            'aged_between_13_17_years':'1',
+            'aged_between_0_5_months':'0',
+            'aged_between_6_11_months':'0',
+            'aged_between_12_23_months':'0',
+            'aged_between_24_59_months':'0',
+            'total_below_5':'0',
+            'has_women':'True',
+            'aged_between_15_19_years':'0',
+            'aged_between_20_49_years':'1'
+        }
+        hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
+        household = Household.objects.filter(number_of_males=form_data['number_of_males'])
+        children = Children.objects.filter(aged_between_13_17_years=form_data['aged_between_13_17_years'])
+        women = Women.objects.filter(aged_between_15_19_years=form_data['aged_between_15_19_years'])
+        self.failIf(hHead)
+        self.failIf(household)
+        self.failIf(children)
+        self.failIf(women)
+
+        form_with_invalid_data= form_data
+        form_with_invalid_data['has_children'] = False
+
+        response = self.client.post('/households/new/', data=form_with_invalid_data)
+        self.failUnlessEqual(response.status_code, 200) # ensure redirection to list investigator page
+
+        hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
+        household = Household.objects.filter(number_of_males=form_data['number_of_males'])
+        children = Children.objects.filter(aged_between_13_17_years=form_data['aged_between_13_17_years'])
+        women = Women.objects.filter(aged_between_15_19_years=form_data['aged_between_15_19_years'])
+        self.failIf(hHead)
+        self.failIf(household)
+        self.failIf(children)
+        self.failIf(women)
