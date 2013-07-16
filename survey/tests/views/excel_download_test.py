@@ -13,6 +13,9 @@ class ExcelDownloadTest(TestCase):
         self.question_2 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=2)
         self.option_1_1 = QuestionOption.objects.create(question=self.question_2, text="OPTION 1", order=1)
         self.option_1_2 = QuestionOption.objects.create(question=self.question_2, text="OPTION 2", order=2)
+        self.option_1_3 = QuestionOption.objects.create(question=self.question_2, text="Others", order=3)
+        sub_question_1 = Question.objects.create(indicator=indicator, text="Describe the source of drinking water", answer_type=Question.TEXT, subquestion=True, parent=self.question_2)
+
         self.question_3 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.TEXT, order=3)
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=Location.objects.create(name="Kampala"))
         self.household = Household.objects.create(investigator=self.investigator)

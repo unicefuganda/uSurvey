@@ -321,7 +321,7 @@ class Batch(BaseModel):
         header = ['Location', 'Household Head Name']
         questions = []
         for indicator in self.indicators.order_by('order'):
-            for question in indicator.questions.order_by('order'):
+            for question in indicator.questions.order_by('order').filter(subquestion=False):
                 questions.append(question)
                 title = "%s_%s" % (indicator.identifier, question.order)
                 header.append(title)
