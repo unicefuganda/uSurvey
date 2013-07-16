@@ -38,16 +38,17 @@ def _process_form(investigator, request):
 
 def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
-    selected_location = None
+    location_type = initialize_location_type(default_select=CREATE_INVESTIGATOR_DEFAULT_SELECT)
     response = None
 
     if request.method == 'POST':
         investigator = InvestigatorForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
+        location_id = get_posted_location(request.POST)
+        location_type = update_location_type(location_type, location_id)
         response = _process_form(investigator, request)
-        selected_location = Location.objects.get(id=int(request.POST['location']))
 
     return response or render(request, 'investigators/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
-                                                                  'location_data': LocationWidget(selected_location),
+                                                                  'location_type': location_type,
                                                                   'form': investigator,
                                                                   'action': "/investigators/new/",
                                                                   'id': "create-investigator-form",
