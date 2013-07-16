@@ -9,9 +9,7 @@
     Investigators List
   </h3>
   <form id="aggregates-form" action="{% url 'investigators_page' %}" method="get">
-    <div class="span10">
-      {% include "location_widget.html" with location_data=location_data default_text="All" %}
-    </div>
+    {% include "location_widget.html" with location_data=location_data default_text="All" %}
     <button class="btn btn-primary" id="investigator-list"> Get List</button>
   </form>
   {% if investigators %}
