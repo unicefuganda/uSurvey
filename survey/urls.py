@@ -15,4 +15,14 @@ urlpatterns = patterns('',
     url(r'^location/(?P<location_id>\d+)/children', 'survey.views.location.children', name='get_location_children'),
     url(r'^aggregates/spreadsheet_report', 'survey.views.excel.download', name='excel_report'),
     url(r'^aggregates/download_spreadsheet', 'survey.views.excel.list', name='download_excel'),
+    url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'accounts/login.html'}),
 )
+
+
+
+
+
+
+
+
+

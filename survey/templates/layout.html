@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>
-      {% block title %}{% endblock %} | MICS
+      {% block title %}{% endblock %} | mMICS
     </title>
     <link rel="stylesheet" href="{{STATIC_URL}}/bootstrap/css/bootstrap.css" type="text/css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="{{STATIC_URL}}/bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen" charset="utf-8">
@@ -42,10 +42,13 @@
             </li>
 
           </ul>
+          <a style="float:right;" class="brand" href='#'>logout</a>
         </div>
+
       </div>
+      </header>
       <!-- Navigation bar end here -->
-    </header>
+
     <div id="content" class="container">
       <div class="container">
         {% if messages %}

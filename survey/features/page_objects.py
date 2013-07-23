@@ -230,3 +230,21 @@ class DownloadExcelPage(PageObject):
     def export_to_csv(self, batch):
         self.browser.select('batch', batch.pk)
         self.submit()
+
+class LoginPage(PageObject):
+    url = "/accounts/login"
+
+    def login(self, user):
+        user.set_password('secret')
+        user.save()
+        details={'username': user.username,
+                 'password': 'secret',
+        }
+
+        self.browser.fill_form(details)
+        self.submit()
+
+    def see_home_page_and_logout_link(self):
+        assert self.browser.find_by_css('title').first.text == 'Home | mMICS'
+        assert self.url not in self.browser.url
+        assert self.browser.find_link_by_text('logout')
