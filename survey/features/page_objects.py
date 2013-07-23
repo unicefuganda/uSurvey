@@ -38,6 +38,8 @@ class PageObject(object):
     def submit(self):
         self.browser.find_by_css("form button").first.click()
 
+    def see_logout_link(self):
+        assert self.browser.find_link_by_text('logout')
 
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
@@ -235,6 +237,8 @@ class LoginPage(PageObject):
     url = "/accounts/login"
 
     def login(self, user):
+        self.is_text_present('Type your username and password')
+
         user.set_password('secret')
         user.save()
         details={'username': user.username,
@@ -247,4 +251,10 @@ class LoginPage(PageObject):
     def see_home_page_and_logout_link(self):
         assert self.browser.find_by_css('title').first.text == 'Home | mMICS'
         assert self.url not in self.browser.url
-        assert self.browser.find_link_by_text('logout')
+        self.see_logout_link()
+
+class HomePage(PageObject):
+    url = "/"
+
+    def click_the_login_link(self):
+        self.browser.click_link_by_text('login')

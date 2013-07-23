@@ -8,15 +8,18 @@ from django.template.defaultfilters import slugify
 
 @step(u'Given I am logged in as researcher')
 def given_i_am_logged_in_as_researcher(step):
-    assert True
+    user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    world.page = LoginPage(world.browser)
+    world.page.visit()
+    world.page.login(user)
 
 @step(u'And I have locations')
 def and_i_have_locations(step):
     district = LocationType.objects.create(name="district", slug=slugify("district"))
     county = LocationType.objects.create(name="county", slug=slugify("county"))
-    
+
     kampala = Location.objects.create(name="Kampala", type=district)
-    kampala_county = Location.objects.create(name="Kampala County", type=county, tree_parent=kampala)  
+    kampala_county = Location.objects.create(name="Kampala County", type=county, tree_parent=kampala)
 
 
 @step(u'And I visit new investigator page')
@@ -46,7 +49,7 @@ def given_i_have_100_investigators(step):
         try:
             Investigator.objects.create(name="Investigator " + random_number, mobile_number = random_number, age = 12, level_of_education = "Nursery", language = "Luganda", location = uganda)
         except Exception:
-            pass   
+            pass
 
 @step(u'And I visit investigators listing page')
 def and_i_visit_investigators_listing_page(step):
@@ -75,7 +78,7 @@ def and_i_see_all_the_fields_are_present(step):
 @step(u'Then I should see the error messages')
 def then_i_should_see_the_error_messages(step):
     world.page.is_text_present("This field is required.")
-    
+
 @step(u'Given I have no investigators')
 def given_i_have_no_investigators(step):
     Investigator.objects.all().delete()
@@ -83,7 +86,7 @@ def given_i_have_no_investigators(step):
 @step(u'And I should see no investigators registered message')
 def and_i_should_see_no_investigators_registered_message(step):
     world.page.no_registered_invesitgators()
-    
+
 @step(u'And I request filter list of a County with no associated investigator')
 def and_i_request_filter_list_for_another_county_with_no_investigator(step):
     county_type = LocationType.objects.get(name='county')
@@ -91,9 +94,8 @@ def and_i_request_filter_list_for_another_county_with_no_investigator(step):
     Investigator.objects.filter(location=new_county).delete()
     world.page = FilteredInvestigatorsListPage(world.browser, new_county.id)
     world.page.visit()
-    
+
 @step(u'Then I should see no investigator for this County')
 def then_i_should_see_no_investigator_for_this_county(step):
     world.page.no_registered_invesitgators()
-    
-        
+

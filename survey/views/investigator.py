@@ -10,6 +10,7 @@ from survey.forms.investigator import *
 from survey.models import Investigator
 from survey.views.views_helper import initialize_location_type, update_location_type, get_posted_location
 from survey.views.location_widget import LocationWidget
+from django.contrib.auth.decorators import login_required
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
@@ -36,6 +37,7 @@ def _process_form(investigator, request):
     _add_error_response_message(investigator, request)
     return None
 
+@login_required
 def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
     location_type = initialize_location_type(default_select=CREATE_INVESTIGATOR_DEFAULT_SELECT)
@@ -54,7 +56,7 @@ def new_investigator(request):
                                                                   'id': "create-investigator-form",
                                                                   'button_label': "Create Investigator",
                                                                   'loading_text': "Creating..."})
-
+@login_required
 def get_locations(request):
     tree_parent = request.GET['parent'] if request.GET.has_key('parent') and request.GET['parent'].isdigit() else None
     locations = Location.objects.filter(tree_parent=tree_parent)
@@ -63,6 +65,7 @@ def get_locations(request):
         location_hash[location.name] = location.id
     return HttpResponse(json.dumps(location_hash), content_type="application/json")
 
+@login_required
 def list_investigators(request):
     params = request.GET
     selected_location = None
@@ -82,7 +85,7 @@ def list_investigators(request):
                    'location_data': LocationWidget(selected_location),
                    'request': request})
 
-
+@login_required
 def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number=request.GET['mobile_number']).exists()
     return HttpResponse(json.dumps(not response), content_type="application/json")

@@ -13,6 +13,7 @@ from survey.forms.women import *
 from survey.forms.household import *
 from survey.views.views_helper import initialize_location_type, update_location_type, get_posted_location
 from survey.models import *
+from django.contrib.auth.decorators import login_required
 
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''
@@ -27,7 +28,6 @@ def _add_error_response_message(householdform, request):
         if form.non_field_errors():
             for err in form.non_field_errors():
                 messages.error(request, error_message + str(err))
-
 
 def validate_investigator(request, householdform, posted_locations):
     investigator_form = {'value': '', 'text': '', 'error': '',
@@ -108,6 +108,7 @@ def create(request, location_type):
 
     return response, householdform, investigator, investigator_form
 
+@login_required
 def new(request):
     location_type = initialize_location_type(default_select=CREATE_HOUSEHOLD_DEFAULT_SELECT)
     response = None
@@ -137,7 +138,7 @@ def new(request):
                                                                'id': "create-household-form",
                                                                'button_label': "Create Household",
                                                                'loading_text': "Creating..."})
-
+@login_required
 def get_investigators(request):
     location = request.GET['location'] if request.GET.has_key('location') and request.GET['location'] else None
     investigators = Investigator.objects.filter(location=location)

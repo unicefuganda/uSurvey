@@ -5,6 +5,7 @@ from survey.models import *
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.views.location_widget import LocationWidget
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 def contains_key(params, key):
     return params.has_key(key) and params[key].isdigit()
@@ -16,6 +17,7 @@ def is_valid(params):
         return True
     return False
 
+@login_required
 def status(request):
     params = request.GET
     content = {'selected_batch': None}
