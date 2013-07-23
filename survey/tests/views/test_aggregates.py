@@ -5,10 +5,13 @@ from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import *
 from survey import investigator_configs
 from survey.views.aggregates import *
+from django.contrib.auth.models import User
 
 class AggregatesPageTest(TestCase):
     def setUp(self):
         self.client = Client()
+        User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        self.client.login(username='Rajni', password='I_Rock')
 
     def test_get_page(self):
         country = LocationType.objects.create(name = 'Country', slug = 'country')

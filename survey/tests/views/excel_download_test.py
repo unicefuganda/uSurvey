@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from survey.models import *
+from django.contrib.auth.models import User
 
 class ExcelDownloadTest(TestCase):
 
@@ -25,9 +26,14 @@ class ExcelDownloadTest(TestCase):
         self.investigator.answered(self.question_2, self.household, answer=1)
         self.investigator.answered(self.question_3, self.household, answer="ANSWER")
 
+        User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        self.client.login(username='Rajni', password='I_Rock')
+
+
     def test_downloaded_excel_file(self):
         file_name = "%s.csv" % self.batch.name
         response = self.client.post('/aggregates/spreadsheet_report', data={'batch': self.batch.pk})
+        print response
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
@@ -43,6 +49,9 @@ class ExcelDownloadViewTest(TestCase):
 
     def test_get(self):
         client = Client()
+        User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        self.client.login(username='Rajni', password='I_Rock')
+
         response = self.client.get('/aggregates/download_spreadsheet')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]

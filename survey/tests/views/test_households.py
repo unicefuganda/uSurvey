@@ -12,10 +12,13 @@ from survey.forms.household import *
 from survey.views.household import *
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 
 class HouseholdViewTest(TestCase):
     def setUp(self):
         self.client = Client()
+        User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        self.client.login(username='Rajni', password='I_Rock')
 
     def assert_dictionary_equal(self, dict1,
                                 dict2): # needed as QuerySet objects can't be equated -- just to not override .equals
