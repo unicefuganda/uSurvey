@@ -249,8 +249,7 @@ class LoginPage(PageObject):
         self.submit()
 
     def see_home_page_and_logout_link(self):
-        assert self.browser.find_by_css('title').first.text == 'Home | mMICS'
-        assert self.url not in self.browser.url
+        assert self.browser.url == django_url(HomePage.url)
         self.see_logout_link()
 
 class HomePage(PageObject):
