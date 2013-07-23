@@ -5,6 +5,7 @@ from random import randint
 from survey.models import *
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
+from django.contrib.auth.models import User
 
 @step(u'Given I am logged in as researcher')
 def given_i_am_logged_in_as_researcher(step):
