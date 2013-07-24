@@ -263,5 +263,8 @@ class HomePage(PageObject):
         self.is_text_present('Survey tools')
         self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
 
+    def see_under_construction(self):
+        self.is_text_present('Under Construction')
+
 class LogoutPage(PageObject):
     url = "/accounts/logout"

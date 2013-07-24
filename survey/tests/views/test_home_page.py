@@ -14,4 +14,4 @@ class HomepageViewTest(TestCase):
         response = self.client.get('/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('home/about.html', templates)
+        self.assertIn('home/index.html', templates)
