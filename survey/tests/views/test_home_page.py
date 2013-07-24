@@ -15,3 +15,9 @@ class HomepageViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('home/index.html', templates)
+
+    def test_about_page(self):
+        response = self.client.get('/about/')
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('home/about.html', templates)

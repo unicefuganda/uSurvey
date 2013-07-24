@@ -41,6 +41,12 @@ class PageObject(object):
     def see_logout_link(self):
         assert self.browser.find_link_by_text('logout')
 
+    def see_the_about_link(self):
+        assert self.browser.find_link_by_text('About')
+
+    def click_the_about_link(self):
+        self.browser.click_link_by_text('About')
+
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
@@ -258,13 +264,21 @@ class HomePage(PageObject):
     def click_the_login_link(self):
         self.browser.click_link_by_text('login')
 
-    def see_the_about_text_provided_by_panwar(self):
-        self.is_text_present('Multiple Indicator Cluster Survey (MICS)')
-        self.is_text_present('Survey tools')
-        self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
-
     def see_under_construction(self):
         self.is_text_present('Under Construction')
 
 class LogoutPage(PageObject):
     url = "/accounts/logout"
+
+    def check_browser_is_in_about_page(self):
+        assert self.browser.url == django_url(AboutPage.url)
+
+class AboutPage(PageObject):
+    url = "/about/"
+
+    def see_the_about_text_provided_by_panwar(self):
+        self.is_text_present('Multiple Indicator Cluster Survey (MICS)')
+        self.is_text_present('Survey tools')
+        self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
+
+

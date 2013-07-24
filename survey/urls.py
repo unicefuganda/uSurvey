@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = patterns('',
     url(r'^$', 'survey.views.home_page.home', name='home_page'),
+    url(r'^about/$', 'survey.views.home_page.about', name='about_page'),
     url(r'^investigators/$', 'survey.views.investigator.list_investigators', name="investigators_page"),
     url(r'^investigators/new/$', 'survey.views.investigator.new_investigator', name="new_investigator_page"),
     url(r'^investigators/locations', 'survey.views.investigator.get_locations', name="locations_autocomplete"),
