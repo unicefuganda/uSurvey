@@ -188,7 +188,7 @@ INSTALLED_BACKENDS = {}
 
 # Importing server specific settings
 from localsettings import *
-
+import sys
 if not ('harvest' in sys.argv):
     from survey.models import Backend
     for backend in INSTALLED_BACKENDS.keys():
