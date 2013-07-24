@@ -9,8 +9,8 @@ class InvestigatorForm(ModelForm):
                                                                             'style':"width:172px;" , 'maxlength':'10', 'type':'number'}))
     def __init__(self, *args, **kwargs):
         super(InvestigatorForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder=['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age', 'level_of_education', 'language', 'location']
-
+        self.fields.keyOrder=['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age', 'level_of_education', 'language', 'backend', 'location']
+        self.fields['backend'].empty_label = None
 
     def clean(self):
         cleaned_data = super(InvestigatorForm, self).clean()
@@ -26,7 +26,7 @@ class InvestigatorForm(ModelForm):
 
     class Meta:
         model = Investigator
-        fields = ['name', 'mobile_number', 'male', 'age', 'level_of_education', 'language', 'location']
+        fields = ['name', 'mobile_number', 'male', 'age', 'level_of_education', 'language', 'backend', 'location']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
             'mobile_number': forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'style':"width:172px;", 'maxlength':'10', 'type':'number'}),

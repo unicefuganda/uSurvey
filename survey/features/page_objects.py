@@ -45,7 +45,7 @@ class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
     def valid_page(self):
-        fields = ['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age']
+        fields = ['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age', 'backend']
         fields += [location_type.name.lower() for location_type in LocationType.objects.all()]
         for field in fields:
             assert self.browser.is_element_present_by_name(field)

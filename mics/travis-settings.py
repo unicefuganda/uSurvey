@@ -20,3 +20,9 @@ CACHES = {
         }
     }
 }
+
+INSTALLED_BACKENDS = {
+    "HTTP": {
+        "ENGINE": "rapidsms.contrib.httptester.backend.HttpTesterCacheBackend",
+    },
+}

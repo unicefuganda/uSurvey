@@ -81,6 +81,7 @@ class InvestigatorsViewTest(TestCase):
     def test_create_investigators(self):
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
+        backend = Backend.objects.create(name='something')
         form_data = {
             'name': 'Rajini',
             'mobile_number': '987654321',
@@ -90,9 +91,10 @@ class InvestigatorsViewTest(TestCase):
             'language': 'Luganda',
             'country': uganda.id,
             'location': uganda.id,
+            'backend': backend.id,
             'confirm_mobile_number': '987654321',
         }
-        investigator = Investigator.objects.filter(name=form_data['name'])
+        investigator = Investigator.objects.filter(name=form_data['name'], backend = Backend.objects.create(name='something1'))
         self.failIf(investigator)
         response = self.client.post('/investigators/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 302) # ensure redirection to list investigator page
@@ -109,7 +111,7 @@ class InvestigatorsViewTest(TestCase):
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda)
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda, backend = Backend.objects.create(name='something'))
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -150,9 +152,9 @@ class InvestigatorsViewTest(TestCase):
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
         bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
 
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda)
-        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala)
-        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", location=bukoto)
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda, backend = Backend.objects.create(name='something1'))
+        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala, backend = Backend.objects.create(name='something2'))
+        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", location=bukoto, backend = Backend.objects.create(name='something3'))
 
         response = self.client.get("/investigators/?location=" + str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
@@ -171,7 +173,7 @@ class InvestigatorsViewTest(TestCase):
         self.assertEquals(locations['district'][0], kampala)
 
     def test_check_mobile_number(self):
-        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789")
+        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'))
         response = self.client.get("/investigators/check_mobile_number?mobile_number=0987654321")
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)

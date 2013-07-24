@@ -18,7 +18,7 @@ class ExcelDownloadTest(TestCase):
         sub_question_1 = Question.objects.create(indicator=indicator, text="Describe the source of drinking water", answer_type=Question.TEXT, subquestion=True, parent=self.question_2)
 
         self.question_3 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.TEXT, order=3)
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=Location.objects.create(name="Kampala"))
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
 

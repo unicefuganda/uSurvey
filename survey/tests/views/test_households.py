@@ -50,8 +50,8 @@ class HouseholdViewTest(TestCase):
 
     def test_get_investigators(self):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv1", location=uganda)
-        investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number=123456789)
+        investigator = Investigator.objects.create(name="inv1", location=uganda, backend = Backend.objects.create(name='something'))
+        investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number=123456789, backend = Backend.objects.create(name='something1'))
         response = self.client.get('/households/investigators?location='+str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
@@ -61,8 +61,8 @@ class HouseholdViewTest(TestCase):
 
     def test_get_investigators_returns_investigators_with_no_location_if_location_empty(self):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv1", location=uganda)
-        investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number=123456789)
+        investigator = Investigator.objects.create(name="inv1", location=uganda, backend = Backend.objects.create(name='something'))
+        investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number=123456789, backend = Backend.objects.create(name='something2'))
         response = self.client.get('/households/investigators?locations=')
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
@@ -78,7 +78,7 @@ class HouseholdViewTest(TestCase):
 
     def test_validate_investigators(self):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
         posted_locations=[uganda]
         request = MagicMock()
@@ -97,7 +97,7 @@ class HouseholdViewTest(TestCase):
     @patch('survey.models.Investigator.objects.get')
     def test_validate_investigators_no_investigator_posted(self, mock_investigator_get, mock_error_class):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
         posted_locations=[uganda]
         request = MagicMock()
@@ -119,7 +119,7 @@ class HouseholdViewTest(TestCase):
     @patch('survey.models.Investigator.objects.get')
     def test_validate_investigators_non_existing_investigator_id_posted(self, mock_investigator_get, mock_error_class):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
         posted_locations=[uganda]
         request = MagicMock()
@@ -141,7 +141,7 @@ class HouseholdViewTest(TestCase):
     @patch('survey.models.Investigator.objects.get')
     def test_validate_investigators_NAN_investigator_id_posted(self, mock_investigator_get, mock_error_class):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
         posted_locations=[uganda]
         request = MagicMock()
@@ -162,7 +162,7 @@ class HouseholdViewTest(TestCase):
     def test_create_households(self):
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         form_data = {
             'country': uganda.id,
             'investigator':investigator.id,
@@ -238,7 +238,7 @@ class HouseholdViewTest(TestCase):
 
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         form_data = {
             'country': uganda.id,
             'investigator':investigator.id,

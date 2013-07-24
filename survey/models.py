@@ -11,11 +11,21 @@ from django.conf import settings
 from django.core.cache import cache
 import datetime
 from django.db.models import Count
+from django.conf import settings
 
 class BaseModel(TimeStampedModel):
     class Meta:
         app_label = 'survey'
         abstract = True
+
+class Backend(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        app_label = 'survey'
+
+    def __unicode__(self):
+        return self.name
 
 class Investigator(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
@@ -27,6 +37,7 @@ class Investigator(BaseModel):
     location = models.ForeignKey(Location, null=True)
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
                                 blank=False, default='English', verbose_name="Preferred language of communication")
+    backend = models.ForeignKey(Backend, null=True, verbose_name="Connection")
 
     HOUSEHOLDS_PER_PAGE = 4
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
@@ -40,6 +51,7 @@ class Investigator(BaseModel):
 
     def __init__(self, *args, **kwargs):
         super(Investigator, self).__init__(*args, **kwargs)
+        self.identity = self.mobile_number
         self.cache_key = "Investigator-%s" % self.pk
         self.generate_cache()
 

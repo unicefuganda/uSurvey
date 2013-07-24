@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.forms.household import *
-from survey.models import Investigator
+from survey.models import Investigator, Backend
 
 class HouseholdFormTest(TestCase):
 
@@ -11,7 +11,7 @@ class HouseholdFormTest(TestCase):
                     }
         household_form = HouseholdForm(form_data)
         self.assertTrue(household_form.is_valid())
-        investigator = Investigator.objects.create(name="test")
+        investigator = Investigator.objects.create(name="test", backend = Backend.objects.create(name='something'))
         household_form.instance.investigator = investigator
         household = household_form.save()
         self.failUnless(household.id)

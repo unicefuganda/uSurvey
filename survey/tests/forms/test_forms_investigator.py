@@ -1,6 +1,7 @@
 from django.test import TestCase
 from survey.forms.investigator import *
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models import Backend
 
 class InvestigatorFormTest(TestCase):
 
@@ -10,6 +11,7 @@ class InvestigatorFormTest(TestCase):
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
         self.location = kampala
+        self.backend = Backend.objects.create(name='something')
 
     def test_valid(self):
         form_data = {
@@ -22,6 +24,7 @@ class InvestigatorFormTest(TestCase):
                         'language': 'Luganda',
                         'id': 200,
                         'confirm_mobile_number': '987654321',
+                        'backend': self.backend.pk,
                     }
         investigator_form = InvestigatorForm(form_data)
         self.assertTrue(investigator_form.is_valid())
@@ -39,15 +42,16 @@ class InvestigatorFormTest(TestCase):
                         'language': 'Luganda',
                         'location': self.location.id,
                         'confirm_mobile_number': '987654321',
+                        'backend': self.backend.pk,
                     }
         keys = form_data.keys()
-        keys.remove('male')   # there's a default value for Male so it is valid even if it is not provided.         
+        keys.remove('male')   # there's a default value for Male so it is valid even if it is not provided.
         for key in keys:
             modified_form_data = dict(form_data.copy())
             modified_form_data[key] = None
             investigator_form = InvestigatorForm(modified_form_data)
             self.assertFalse(investigator_form.is_valid())
-            
+
     def test_confirm_mobile_number(self):
         form_data = {
                       'name': 'Rajini',
@@ -58,6 +62,7 @@ class InvestigatorFormTest(TestCase):
                       'language': 'Luganda',
                       'location': self.location.id,
                       'confirm_mobile_number': '123456789',
+                      'backend': self.backend.pk,
                   }
         form_data = dict(form_data.copy())
         investigator_form = InvestigatorForm(data=form_data)
@@ -66,7 +71,7 @@ class InvestigatorFormTest(TestCase):
         form_data['confirm_mobile_number'] = form_data['mobile_number']
         investigator_form = InvestigatorForm(form_data)
         self.assertTrue(investigator_form.is_valid())
-        
+
     def test_mobile_number_is_of_length_9(self):
         number_of_length_10='0123456789'
         form_data = {
@@ -78,6 +83,7 @@ class InvestigatorFormTest(TestCase):
                       'language': 'Luganda',
                       'location': self.location.id,
                       'confirm_mobile_number': number_of_length_10,
+                      'backend': self.backend.pk,
                   }
         form_data = dict(form_data.copy())
         investigator_form = InvestigatorForm(data=form_data)
@@ -95,24 +101,25 @@ class InvestigatorFormTest(TestCase):
                       'language': 'Luganda',
                       'location': self.location.id,
                       'confirm_mobile_number': '123456789',
+                      'backend': self.backend.pk,
                   }
         form_data = dict(form_data.copy())
         investigator_form = InvestigatorForm(data=form_data)
         self.assertTrue(investigator_form.is_valid())
-        
+
         form_data['age'] = 17
         investigator_form = InvestigatorForm(data=form_data)
         self.assertFalse(investigator_form.is_valid())
         self.assertEquals(len(investigator_form.errors),1)
-        self.assertTrue(investigator_form.errors.has_key('age'))        
-        
+        self.assertTrue(investigator_form.errors.has_key('age'))
+
 
         form_data['age'] = 51
         investigator_form = InvestigatorForm(data=form_data)
         self.assertFalse(investigator_form.is_valid())
         self.assertEquals(len(investigator_form.errors),1)
-        self.assertTrue(investigator_form.errors.has_key('age'))        
-        
+        self.assertTrue(investigator_form.errors.has_key('age'))
+
 
     def test_langugage_and_level_of_education_validity(self):
         for key in ['language', 'level_of_education']:

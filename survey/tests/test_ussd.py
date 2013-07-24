@@ -19,7 +19,7 @@ class USSDTest(TestCase):
                                 'ussdRequestString': '',
                                 'response': "false"
                             }
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"))
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
@@ -40,7 +40,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "1"
 
     def test_no_households(self):
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890", location=self.investigator.location)
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890", location=self.investigator.location, backend = Backend.objects.create(name='something1'))
         self.ussd_params['msisdn'] = investigator.mobile_number
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_HOUSEHOLDS']
@@ -496,7 +496,7 @@ class USSDTestCompleteFlow(TestCase):
                                 'ussdRequestString': '',
                                 'response': "false"
                             }
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"))
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.household_head_1 = self.create_household_head()
         self.household_head_2 = self.create_household_head()
         self.household_head_3 = self.create_household_head()
@@ -740,7 +740,7 @@ class USSDOpenBatch(TestCase):
                                 'ussdRequestString': '',
                                 'response': "false"
                             }
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"))
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
@@ -765,7 +765,7 @@ class USSDWithMultipleBatches(TestCase):
                                 'response': "false"
                             }
         self.location = Location.objects.create(name="Kampala")
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=self.location)
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=self.location, backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))

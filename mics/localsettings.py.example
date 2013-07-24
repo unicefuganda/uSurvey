@@ -21,6 +21,13 @@ CACHES = {
         }
     }
 }
+
+INSTALLED_BACKENDS = {
+    "HTTP": {
+        "ENGINE": "rapidsms.contrib.httptester.backend.HttpTesterCacheBackend",
+    },
+}
+
 if ('test' in sys.argv) or ('harvest' in sys.argv):
     CACHES = {
         'default': {

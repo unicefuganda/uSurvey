@@ -184,7 +184,12 @@ USSD_PAGINATION = {
     'NEXT': "#"
 }
 
-try:
-    from localsettings import *
-except ImportError:
-    pass
+INSTALLED_BACKENDS = {}
+
+# Importing server specific settings
+from localsettings import *
+
+if not ('harvest' in sys.argv):
+    from survey.models import Backend
+    for backend in INSTALLED_BACKENDS.keys():
+        Backend.objects.get_or_create(name=backend)

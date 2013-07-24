@@ -48,7 +48,7 @@ class AggregatesPageTest(TestCase):
         batch = Batch.objects.create(order=1)
         batch_2 = Batch.objects.create(order=1)
 
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=kampala_city)
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=kampala_city, backend = Backend.objects.create(name='something'))
         count = 1
         while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
             household = Household.objects.create(investigator = investigator)
@@ -78,7 +78,7 @@ class AggregatesPageTest(TestCase):
         self.assertEquals(len(locations['village']), 1)
         self.assertEquals(locations['village'][0], kampala_city)
 
-        investigator_2 = Investigator.objects.create(name="investigator name", mobile_number="1234", location=kampala_city)
+        investigator_2 = Investigator.objects.create(name="investigator name", mobile_number="1234", location=kampala_city, backend = Backend.objects.create(name='something1'))
         count = 1
         while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
             household = Household.objects.create(investigator = investigator_2)
@@ -94,14 +94,14 @@ class AggregatesPageTest(TestCase):
         self.assertEquals(len(response.context['investigators']), 1)
         self.assertEquals(response.context['investigators'][0], investigator)
 
-        investigator_3 = Investigator.objects.create(name="investigator name", mobile_number="12345", location=abim)
+        investigator_3 = Investigator.objects.create(name="investigator name", mobile_number="12345", location=abim, backend = Backend.objects.create(name='something2'))
         count = 1
         while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
             household = Household.objects.create(investigator = investigator_3)
             household.batch_completed(batch)
             count += 1
 
-        investigator_4 = Investigator.objects.create(name="investigator name", mobile_number="123456", location=abim)
+        investigator_4 = Investigator.objects.create(name="investigator name", mobile_number="123456", location=abim, backend = Backend.objects.create(name='something4'))
         Household.objects.create(investigator = investigator_4).batch_completed(batch)
 
         response = self.client.get('/aggregates/status', {'location': str(kampala.pk), 'batch': str(batch.pk)})

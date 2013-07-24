@@ -8,18 +8,19 @@ class InvestigatorTest(TestCase):
     def test_fields(self):
         investigator = Investigator()
         fields = [str(item.attname) for item in investigator._meta.fields]
-        self.assertEqual(len(fields), 10)
-        for field in ['id', 'name', 'mobile_number', 'created', 'modified', 'male', 'age', 'level_of_education', 'location_id', 'language']:
+        self.assertEqual(len(fields), 11)
+        for field in ['id', 'name', 'mobile_number', 'created', 'modified', 'male', 'age', 'level_of_education', 'location_id', 'language', 'backend_id']:
             self.assertIn(field, fields)
 
     def test_store(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location = Location.objects.create(name="Kampala"))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.failUnless(investigator.id)
         self.failUnless(investigator.created)
         self.failUnless(investigator.modified)
+        self.assertEqual(investigator.identity, investigator.mobile_number)
 
     def test_mobile_number_is_unique(self):
-        Investigator.objects.create(name="", mobile_number = "123456789", location = Location.objects.create(name="Kampala"))
+        Investigator.objects.create(name="", mobile_number = "123456789", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.failUnlessRaises(IntegrityError, Investigator.objects.create, mobile_number = "123456789")
 
     def test_mobile_number_length_must_be_less_than_10(self):
@@ -27,7 +28,7 @@ class InvestigatorTest(TestCase):
         self.failUnlessRaises(DatabaseError, Investigator.objects.create, mobile_number = mobile_number_of_length_11)
 
     def test_next_answerable_question(self):
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210", location = Location.objects.create(name="Kampala"))
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order = 1)
@@ -156,12 +157,12 @@ class QuestionOptionTest(TestCase):
 
 class HouseHoldTest(TestCase):
     def test_store(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
         self.failUnless(household.id)
 
     def test_has_pending_survey(self):
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210", location = Location.objects.create(name="Kampala"))
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order=1)
@@ -181,7 +182,7 @@ class HouseHoldTest(TestCase):
 
 class NumericalAnswerTest(TestCase):
     def test_store(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create( investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order=1)
@@ -193,7 +194,7 @@ class NumericalAnswerTest(TestCase):
 
 class TextAnswerTest(TestCase):
     def test_store(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order=1)
@@ -205,7 +206,7 @@ class TextAnswerTest(TestCase):
 
 class MultiChoiceAnswerTest(TestCase):
     def test_store(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order=1)
@@ -217,7 +218,7 @@ class MultiChoiceAnswerTest(TestCase):
         self.failUnless(answer.id)
 
     def test_pagination(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create( investigator=investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order=1)
@@ -248,7 +249,7 @@ class MultiChoiceAnswerTest(TestCase):
 
 class AnswerRuleTest(TestCase):
     def setUp(self):
-        self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"))
+        self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator)
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order=1)
@@ -393,8 +394,8 @@ class BatchLocationStatusTest(TestCase):
         batch_2 = Batch.objects.create(survey=survey, order=2)
         kampala = Location.objects.create(name="Kampala")
         abim = Location.objects.create(name="Abim")
-        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala)
-        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim)
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala, backend = Backend.objects.create(name='something'))
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim, backend = Backend.objects.create(name='something1'))
 
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
         self.assertEqual(len(investigator_2.get_open_batch()), 0)
@@ -416,7 +417,7 @@ class HouseholdBatchCompletionTest(TestCase):
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order=1)
         kampala = Location.objects.create(name="Kampala")
-        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala)
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala, backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
 
         batch_completion = HouseholdBatchCompletion.objects.create(household=household, investigator=investigator, batch=batch)
@@ -426,7 +427,7 @@ class HouseholdBatchCompletionTest(TestCase):
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
         batch = Batch.objects.create(survey=survey, order=1)
         kampala = Location.objects.create(name="Kampala")
-        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala)
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala, backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
 
         self.assertFalse(household.has_completed_batch(batch))
