@@ -18,13 +18,5 @@ urlpatterns = patterns('',
     url(r'^aggregates/download_spreadsheet', 'survey.views.excel.list', name='download_excel'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'accounts/login.html'}, name='login_page'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login', name='logout_page'),
+    url(r'^bulk_sms$', 'survey.views.bulk_sms.view', name='bulk_sms'),
 )
-
-
-
-
-
-
-
-
-
