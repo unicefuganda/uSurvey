@@ -257,3 +257,11 @@ class HomePage(PageObject):
 
     def click_the_login_link(self):
         self.browser.click_link_by_text('login')
+
+    def see_the_about_text_provided_by_panwar(self):
+        self.is_text_present('Multiple Indicator Cluster Survey (MICS)')
+        self.is_text_present('Survey tools')
+        self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
+
+class LogoutPage(PageObject):
+    url = "/accounts/logout"

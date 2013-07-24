@@ -7,4 +7,4 @@ from django.contrib import messages
 from survey.investigator_configs import *
 
 def home(request):
-    return render(request, 'home/index.html')
+    return render(request, 'home/about.html')
