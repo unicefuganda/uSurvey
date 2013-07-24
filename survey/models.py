@@ -12,6 +12,8 @@ from django.core.cache import cache
 import datetime
 from django.db.models import Count
 from django.conf import settings
+from rapidsms.router import send
+
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -177,6 +179,11 @@ class Investigator(BaseModel):
                 answers = [investigator.location.name, household.head.surname]
                 answers = answers + household.answers_for(questions)
                 data.append(answers)
+
+    @classmethod
+    def sms_investigators_in_locations(self, locations, text):
+        investigators = self.objects.filter(location__in=locations)
+        send(text, investigators)
 
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
