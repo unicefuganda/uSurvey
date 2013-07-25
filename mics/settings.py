@@ -188,8 +188,8 @@ INSTALLED_BACKENDS = {}
 
 # Importing server specific settings
 from localsettings import *
-import sys
-if not (('syncdb' in sys.argv) or ('migrate' in sys.argv) or ('harvest' in sys.argv)):
-    from survey.models import Backend
-    for backend in INSTALLED_BACKENDS.keys():
-        Backend.objects.get_or_create(name=backend)
+# import sys
+# if not (('syncdb' in sys.argv) or ('migrate' in sys.argv) or ('harvest' in sys.argv)):
+#     from survey.models import Backend
+#     for backend in INSTALLED_BACKENDS.keys():
+#         Backend.objects.get_or_create(name=backend)
