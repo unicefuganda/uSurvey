@@ -51,7 +51,7 @@ class HouseholdViewTest(TestCase):
     def test_get_investigators(self):
         uganda = Location.objects.create(name="Uganda")
         investigator = Investigator.objects.create(name="inv1", location=uganda, backend = Backend.objects.create(name='something'))
-        investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number=123456789, backend = Backend.objects.create(name='something1'))
+        investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number="123456789", backend = Backend.objects.create(name='something1'))
         response = self.client.get('/households/investigators?location='+str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
@@ -62,7 +62,7 @@ class HouseholdViewTest(TestCase):
     def test_get_investigators_returns_investigators_with_no_location_if_location_empty(self):
         uganda = Location.objects.create(name="Uganda")
         investigator = Investigator.objects.create(name="inv1", location=uganda, backend = Backend.objects.create(name='something'))
-        investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number=123456789, backend = Backend.objects.create(name='something2'))
+        investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number="123456789", backend = Backend.objects.create(name='something2'))
         response = self.client.get('/households/investigators?locations=')
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)

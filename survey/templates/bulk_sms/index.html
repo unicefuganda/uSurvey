@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}
+  Bulk Notifications
+{% endblock %}
+{% block content %}
+  <h3>
+    Bulk Notifications
+  </h3>
+  <form action="{% url 'send_bulk_sms' %}" method="POST" accept-charset="utf-8" id="bulk-sms-form" class="form-vertical">
+    {% csrf_token %}
+    <div class="control-group">
+      <label class="control-label" for="text">Compose</label>
+      <div class="controls">
+            <textarea rows="3" name="text"></textarea>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="bulk-sms-locations">Locations</label>
+      <div class="controls">
+        <select name="locations" id="bulk-sms-locations" multiple="multiple">
+          {% for location in locations %}
+            <option value="{{ location.id }}">{{ location.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-primary">Send</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

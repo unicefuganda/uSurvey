@@ -2,6 +2,7 @@ from django.test import TestCase
 from survey.models import *
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.investigator_configs import *
 
 class InvestigatorTest(TestCase):
 
@@ -17,7 +18,7 @@ class InvestigatorTest(TestCase):
         self.failUnless(investigator.id)
         self.failUnless(investigator.created)
         self.failUnless(investigator.modified)
-        self.assertEqual(investigator.identity, investigator.mobile_number)
+        self.assertEqual(investigator.identity, COUNTRY_PHONE_CODE + investigator.mobile_number)
 
     def test_mobile_number_is_unique(self):
         Investigator.objects.create(name="", mobile_number = "123456789", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))

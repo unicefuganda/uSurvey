@@ -1,6 +1,9 @@
 ;
 
-$(".chzn-select").chosen();
+jQuery(function($){
+  $(".chzn-select").chosen();
+  $("#bulk-sms-locations").multiSelect();
+});
 
 function populate_investigator_list(location_id){
   $.getJSON('/households/investigators', {location: location_id}, function(data) {

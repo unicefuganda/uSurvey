@@ -27,4 +27,4 @@ class BulkSMSTest(TestCase):
     def test_send(self):
         response = self.client.post('/bulk_sms/send', data={'locations': [self.kampala.pk, self.abim.pk], 'text': 'text'})
         self.failUnlessEqual(response.status_code, 302)
-        self.assertEquals(response['Location'], 'http://testserver/bulk_sms/')
+        self.assertEquals(response['Location'], 'http://testserver/bulk_sms')

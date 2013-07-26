@@ -53,7 +53,7 @@ class Investigator(BaseModel):
 
     def __init__(self, *args, **kwargs):
         super(Investigator, self).__init__(*args, **kwargs)
-        self.identity = self.mobile_number
+        self.identity = COUNTRY_PHONE_CODE + self.mobile_number
         self.cache_key = "Investigator-%s" % self.pk
         self.generate_cache()
 
@@ -182,7 +182,10 @@ class Investigator(BaseModel):
 
     @classmethod
     def sms_investigators_in_locations(self, locations, text):
-        investigators = self.objects.filter(location__in=locations)
+        locations_list = []
+        for location in locations:
+            locations_list += location.get_descendants(include_self=True).values_list('id', flat=True)
+        investigators = list(self.objects.filter(location__in=locations_list))
         send(text, investigators)
 
 class LocationAutoComplete(models.Model):

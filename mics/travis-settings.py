@@ -21,8 +21,28 @@ CACHES = {
     }
 }
 
+INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.admin',
+    'django_nose',
+    'south',
+    'lettuce.django',
+    'django_extensions',
+    'rapidsms.contrib.locations',
+    'rapidsms.contrib.locations.nested',
+    'bootstrap_pagination',
+    'survey',
+    'rapidsms.backends.database',
+    'rapidsms.contrib.httptester',
+)
+
 INSTALLED_BACKENDS = {
     "HTTP": {
-        "ENGINE": "rapidsms.contrib.httptester.backend.HttpTesterCacheBackend",
+        "ENGINE": "rapidsms.backends.database.DatabaseBackend",
     },
 }

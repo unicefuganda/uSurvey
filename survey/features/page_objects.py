@@ -6,6 +6,7 @@ from rapidsms.contrib.locations.models import Location
 from survey.models import Investigator
 from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import *
+from rapidsms.backends.database.models import BackendMessage
 
 class PageObject(object):
     def __init__(self, browser):
@@ -281,4 +282,22 @@ class AboutPage(PageObject):
         self.is_text_present('Survey tools')
         self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
 
+class LogoutPage(PageObject):
+    url = "/accounts/logout"
 
+class BulkSMSPage(PageObject):
+    url = "/bulk_sms"
+
+    def compose_message(self, message):
+        self.message = message
+        self.fill('text', message)
+
+    def select_locations(self, *locations):
+        for location in locations:
+            script = "$('#bulk-sms-locations').multiSelect('select', '%s')" % location.pk
+            self.browser.execute_script(script)
+
+    def is_message_sent(self):
+        self.is_text_present("Your message has been sent to investigators.")
+        for investgator in Investigator.objects.all():
+            assert BackendMessage.objects.filter(identity=investgator.identity, text=self.message).count() == 1
