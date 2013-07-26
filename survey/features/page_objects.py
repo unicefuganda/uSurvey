@@ -282,9 +282,6 @@ class AboutPage(PageObject):
         self.is_text_present('Survey tools')
         self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
 
-class LogoutPage(PageObject):
-    url = "/accounts/logout"
-
 class BulkSMSPage(PageObject):
     url = "/bulk_sms"
 
