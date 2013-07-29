@@ -298,3 +298,11 @@ class BulkSMSPage(PageObject):
         self.is_text_present("Your message has been sent to investigators.")
         for investgator in Investigator.objects.all():
             assert BackendMessage.objects.filter(identity=investgator.identity, text=self.message).count() == 1
+class NewUserPage(PageObject):
+    url = "/accounts/new/"
+
+    def valid_page(self):
+        self.is_text_present('New User')
+        fields = ['username', 'password', 'confirm_password', 'name', 'mobile_number', 'email', 'permissions']
+        for field in fields:
+            assert self.browser.is_element_present_by_name(field)

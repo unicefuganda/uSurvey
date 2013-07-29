@@ -20,4 +20,5 @@ urlpatterns = patterns('',
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login', name='logout_page'),
     url(r'^bulk_sms$', 'survey.views.bulk_sms.view', name='bulk_sms'),
     url(r'^bulk_sms/send$', 'survey.views.bulk_sms.send', name='send_bulk_sms'),
+    url(r'^accounts/new/$', 'survey.views.users.new', name='new_user_page'),
 )

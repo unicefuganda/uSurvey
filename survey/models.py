@@ -14,11 +14,17 @@ from django.db.models import Count
 from django.conf import settings
 from rapidsms.router import send
 
+from django.contrib.auth.models import User
 
 class BaseModel(TimeStampedModel):
     class Meta:
         app_label = 'survey'
         abstract = True
+
+class UserProfile(BaseModel):
+    user = models.OneToOneField(User)
+    mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=10, unique=True, null=False, blank=False)
+
 
 class Backend(models.Model):
     name = models.CharField(max_length=20, unique=True)
