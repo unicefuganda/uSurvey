@@ -1,6 +1,7 @@
 from django.test import TestCase
 from survey.forms.users import *
 from django.contrib.auth.models import User
+from survey.models import *
 
 class UserFormTest(TestCase):
 
@@ -21,6 +22,47 @@ class UserFormTest(TestCase):
         self.failUnless(user.id)
         user_retrieved = User.objects.get(last_name='Rajni')
         self.assertEqual(user_retrieved, user)
+
+        user_profile = UserProfile.objects.filter(user=user)
+        self.failUnless(user_profile)
+        self.assertEquals(user_profile[0].mobile_number, self.form_data['mobile_number'])
+
+    def test_NaN_mobile_number(self):
+        form_data = self.form_data
+        form_data['mobile_number']='not a number'
+        user_form = UserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "Enter a number."
+        self.assertEquals(user_form.errors['mobile_number'], [message])
+
+    def test_Negative_mobile_number(self):
+        form_data = self.form_data
+        form_data['mobile_number']=-123456789
+        user_form = UserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "Ensure this value is greater than or equal to 100000000."
+        self.assertEquals(user_form.errors['mobile_number'], [message])
+
+    def test_Negative_mobile_number(self):
+        form_data = self.form_data
+        number_of_length_greater_than_9 = 1234567890
+        form_data['mobile_number']=number_of_length_greater_than_9
+        user_form = UserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "Ensure that there are no more than 9 digits in total."
+        self.assertEquals(user_form.errors['mobile_number'], [message])
+
+    def test_clean_confirm_password(self):
+        form_data = self.form_data
+        form_data['confirm_password'] = 'tank'
+        user_form = UserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "Password  mismatch."
+        self.assertEquals(user_form.errors['confirm_password'], [message])
+
+        form_data['confirm_password'] = form_data['password']
+        user_form = UserForm(form_data)
+        self.assertTrue(user_form.is_valid())
 
 class UserProfileFormTest(TestCase):
 

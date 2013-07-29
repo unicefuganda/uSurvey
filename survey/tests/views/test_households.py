@@ -201,7 +201,7 @@ class HouseholdViewTest(TestCase):
         self.failIf(women)
         response = self.client.post('/households/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 302) # ensure redirection to list investigator page
-        print response
+
         hHead = HouseholdHead.objects.get(surname=form_data['surname'])
         household = Household.objects.get(number_of_males=form_data['number_of_males'])
         children = Children.objects.get(aged_between_13_17_years=form_data['aged_between_13_17_years'])
