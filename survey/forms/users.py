@@ -20,6 +20,9 @@ class UserForm(ModelForm):
     class Meta:
         model = User
         exclude = ['date_joined', 'last_login', 'is_superuser', 'is_staff', 'user_permissions', 'is_active' ]
+        widgets = {
+            'password':forms.PasswordInput(attrs={'placeholder':'Type Password'})
+        }
 
 class UserProfileForm(ModelForm):
 

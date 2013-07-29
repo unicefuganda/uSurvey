@@ -5,5 +5,5 @@ Feature: Users feature
       And I visit new user page
       Then I see all  new user fields
       And I click submit
-      Then I should see errors about required fields
+      Then I should see the error messages
 
