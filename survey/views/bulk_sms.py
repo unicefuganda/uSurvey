@@ -9,7 +9,7 @@ from django.contrib import messages
 
 @login_required
 def view(request):
-    location_type = LocationType.objects.get(name=SEND_BULK_SMS_TO_LOCATION_TYPE)
+    location_type = LocationType.objects.get(name=PRIME_LOCATION_TYPE)
     locations = Location.objects.filter(type=location_type).order_by('name')
     return render(request, 'bulk_sms/index.html', {'locations': locations})
 

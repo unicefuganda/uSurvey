@@ -11,7 +11,7 @@ class BulkSMSTest(TestCase):
         self.client = Client()
         User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         self.client.login(username='Rajni', password='I_Rock')
-        district = LocationType.objects.create(name=SEND_BULK_SMS_TO_LOCATION_TYPE, slug='district')
+        district = LocationType.objects.create(name=PRIME_LOCATION_TYPE, slug='district')
         country = LocationType.objects.create(name='Country', slug = 'country')
         self.kampala = Location.objects.create(name="Kampala", type=district)
         self.abim = Location.objects.create(name="Abim", type=district)

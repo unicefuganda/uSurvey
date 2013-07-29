@@ -5,7 +5,7 @@ from survey.models import *
 
 @step(u'And I have 2 districts with investigators')
 def and_i_have_2_districts_with_investigators(step):
-    district = LocationType.objects.create(name=SEND_BULK_SMS_TO_LOCATION_TYPE, slug='district')
+    district = LocationType.objects.create(name=PRIME_LOCATION_TYPE, slug='district')
     world.kampala = Location.objects.create(name="Kampala", type=district)
     world.abim = Location.objects.create(name="Abim", type=district)
     backend = Backend.objects.all()[0]
