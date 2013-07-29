@@ -25,6 +25,23 @@ class BulkSMSTest(TestCase):
         self.assertEquals(len(response.context['locations']), 2)
 
     def test_send(self):
-        response = self.client.post('/bulk_sms/send', data={'locations': [self.kampala.pk, self.abim.pk], 'text': 'text'})
-        self.failUnlessEqual(response.status_code, 302)
-        self.assertEquals(response['Location'], 'http://testserver/bulk_sms')
+        response = self.client.post('/bulk_sms/send', data={'locations': [self.kampala.pk, self.abim.pk], 'text': 'text'}, follow=True)
+        self.assertEquals(len(response.context['messages']), 1)
+        for message in response.context['messages']:
+            self.assertEquals(str(message), "Your message has been sent to investigators.")
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertRedirects(response, 'http://testserver/bulk_sms')
+
+    def test_send_failures(self):
+        response = self.client.post('/bulk_sms/send', data={'locations': [], 'text': 'text'}, follow=True)
+        self.assertEquals(len(response.context['messages']), 1)
+        for message in response.context['messages']:
+            self.assertEquals(str(message), "Please select a location.")
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertRedirects(response, 'http://testserver/bulk_sms')
+
+        response = self.client.post('/bulk_sms/send', data={'locations': [self.kampala.pk, self.abim.pk], 'text': ''}, follow=True)
+        for message in response.context['messages']:
+            self.assertEquals(str(message), "Please enter the message to send.")
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertRedirects(response, 'http://testserver/bulk_sms')

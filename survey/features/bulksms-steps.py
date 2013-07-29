@@ -32,3 +32,20 @@ def and_i_click_send(step):
 @step(u'Then I should see a message saying SMS has been sent')
 def then_i_should_see_a_message_saying_sms_has_been_sent(step):
     world.page.is_message_sent()
+
+@step(u'Then I should see error message for location')
+def then_i_should_see_error_message_for_location(step):
+    world.page.error_message_for('location')
+
+@step(u'Then I should see error message for text')
+def then_i_should_see_error_message_for_text(step):
+    world.page.error_message_for('text')
+
+@step(u'And I type message the message')
+def and_i_type_message_the_message(step):
+    world.text_length = 10
+    world.page.enter_text(length=world.text_length)
+
+@step(u'Then I should see the counter has changed')
+def then_i_should_see_the_counter_has_changed(step):
+    world.page.counter_updated(length=world.text_length)

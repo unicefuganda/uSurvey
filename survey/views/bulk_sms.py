@@ -16,7 +16,17 @@ def view(request):
 @login_required
 def send(request):
     params = dict(request.POST)
-    locations = Location.objects.filter(id__in=params['locations'])
-    Investigator.sms_investigators_in_locations(locations=locations, text=params['text'][0])
-    messages.success(request, "Your message has been sent to investigators.")
+    if valid_parameters(params, request):
+        locations = Location.objects.filter(id__in=params['locations'])
+        Investigator.sms_investigators_in_locations(locations=locations, text=params['text'][0])
+        messages.success(request, "Your message has been sent to investigators.")
     return HttpResponseRedirect(reverse('bulk_sms'))
+
+def valid_parameters(params, request):
+    if not params.has_key('locations'):
+        messages.error(request, "Please select a location.")
+        return False
+    if len(params['text'][0]) < 1:
+        messages.error(request, "Please enter the message to send.")
+        return False
+    return True

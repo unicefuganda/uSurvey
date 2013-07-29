@@ -284,6 +284,10 @@ class AboutPage(PageObject):
 
 class BulkSMSPage(PageObject):
     url = "/bulk_sms"
+    messages = {
+        "location": "Please select a location.",
+        "text": "Please enter the message to send.",
+    }
 
     def compose_message(self, message):
         self.message = message
@@ -298,6 +302,17 @@ class BulkSMSPage(PageObject):
         self.is_text_present("Your message has been sent to investigators.")
         for investgator in Investigator.objects.all():
             assert BackendMessage.objects.filter(identity=investgator.identity, text=self.message).count() == 1
+
+    def error_message_for(self, field):
+        self.is_text_present(self.messages[field])
+
+    def enter_text(self, length):
+        message = "*" * length
+        self.fill('text', message)
+
+    def counter_updated(self, length):
+        counter = str(length) + "/480"
+        self.is_text_present(counter)
 
 class NewUserPage(PageObject):
     url = "/users/new/"
