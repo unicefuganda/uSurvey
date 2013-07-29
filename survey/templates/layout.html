@@ -48,6 +48,10 @@
               </ul>
             </li>
 
+            <li>
+              <a href="{% url 'batch_index_page' %}">Batches</a>
+            </li>
+
           </ul>
           {% if user.is_authenticated %}
             <a class="right brand" href="{% url 'logout_page' %}">logout</a>
