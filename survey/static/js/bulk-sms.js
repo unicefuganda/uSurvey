@@ -1,5 +1,5 @@
 ;
-(function($){
+jQuery(function($){
   var textarea = $('#bulk-sms-form textarea'),
       counter = $('#sms-chars-left'),
       maxlength = parseInt(textarea.attr('maxlength')),
@@ -11,4 +11,4 @@
     if (current_length > maxlength) return false;
     counter.html(current_length + counter_text);
   });
-})(jQuery);
+});

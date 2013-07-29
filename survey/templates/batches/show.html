@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block title %}
+  {{ batch.name }}
+{% endblock %}
+{% block content %}
+  <h3>
+    {{ batch.name }}
+  </h3>
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>
+          Name
+        </th>
+        <th>
+          Status
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% load template_tags %}
+      {% for location in locations %}
+        <tr>
+          <td>
+            {{ location.name }}
+          </td>
+          <td>
+            <form action="{% url 'batch_open_page' batch.pk %}" method="POST" accept-charset="utf-8" class="hide open-for-location-form">
+              {% csrf_token %}
+              <input type="text" name="location_id" value="{{ location.pk }}">
+            </form>
+            <form action="{% url 'batch_close_page' batch.pk %}" method="POST" accept-charset="utf-8" class="hide close-for-location-form">
+              {% csrf_token %}
+              <input type="text" name="location_id" value="{{ location.pk }}">
+            </form>
+            <div class="switch" data-on="success" data-off="danger" data-on-label="Open" data-off-label="Close">
+              <input type="checkbox" {{ open_locations|is_batch_open_for_location:location }} />
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

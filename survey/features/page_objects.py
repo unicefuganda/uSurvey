@@ -324,3 +324,27 @@ class NewUserPage(PageObject):
                   'mobile_number', 'email', 'groups']
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
+
+class BatchListPage(PageObject):
+    url = "/batches/"
+
+    def visit_batch(self, batch):
+        self.browser.click_link_by_text("View")
+        return BatchShowPage(self.browser, batch)
+
+class BatchShowPage(object):
+    def __init__(self, browser, batch):
+        super(BatchShowPage, self).__init__()
+        self.browser = browser
+        self.url = "/batches/" + str(batch.pk)
+
+    def batch_closed_for_all_locations(self):
+        assert len(self.browser.find_by_css('input[checked=checked]')) == 0
+
+    def open_batch_for(self, location):
+        self.browser.execute_script('$($("input:checkbox")[0]).parent().bootstrapSwitch("toggleState")')
+        sleep(2)
+
+    def close_batch_for(self, location):
+        self.browser.execute_script('$($("input:checkbox")[0]).parent().bootstrapSwitch("toggleState")')
+        sleep(2)

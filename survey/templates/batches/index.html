@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}
+  Batches List
+{% endblock %}
+{% block content %}
+{% load pagination_tags %}
+{% autopaginate batches 50 %}
+  <h3>
+    Batches List
+  </h3>
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>
+          Name
+        </th>
+        <th>
+
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for batch in batches %}
+        <tr>
+          <td>
+            {{ batch.name }}
+          </td>
+          <td>
+            <a href="{% url 'batch_show_page' batch.pk %}">View</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% paginate %}
+{% endblock %}

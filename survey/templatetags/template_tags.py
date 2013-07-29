@@ -17,4 +17,7 @@ def is_batch_selected(batch, selected_batch):
 def pending_households(investigator, batch):
     return investigator.pending_households_for(batch)
 
-# @register.simple_tag
+@register.filter
+def is_batch_open_for_location(open_locations, location):
+    if location in open_locations:
+        return "checked='checked'"

@@ -21,4 +21,8 @@ urlpatterns = patterns('',
     url(r'^bulk_sms$', 'survey.views.bulk_sms.view', name='bulk_sms'),
     url(r'^bulk_sms/send$', 'survey.views.bulk_sms.send', name='send_bulk_sms'),
     url(r'^users/new/$', 'survey.views.users.new', name='new_user_page'),
+    url(r'^batches/$', 'survey.views.batch.index', name='batch_index_page'),
+    url(r'^batches/(?P<batch_id>\d+)/$', 'survey.views.batch.show', name='batch_show_page'),
+    url(r'^batches/(?P<batch_id>\d+)/open_to$', 'survey.views.batch.open', name='batch_open_page'),
+    url(r'^batches/(?P<batch_id>\d+)/close_to$', 'survey.views.batch.close', name='batch_close_page'),
 )
