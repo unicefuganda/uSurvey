@@ -9,6 +9,7 @@ Feature: Users feature
 
     Scenario: create user
       Given I am logged in as a superuser
+      And I have a group
       And I visit new user page
       Then I fill all necessary new user fields
       And I click submit

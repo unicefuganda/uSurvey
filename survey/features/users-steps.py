@@ -1,6 +1,6 @@
 from lettuce import *
 from page_objects import *
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 
 @step(u'Given I am logged in as a superuser')
@@ -23,6 +23,14 @@ def then_i_see_all_new_user_fields(step):
 def and_i_click_submit(step):
     world.page.submit()
 
-@step(u'Then I should see errors about required fields')
-def then_i_should_see_errors_about_required_fields(step):
-    pass
+@step(u'And I have a group')
+def and_i_have_a_group(step):
+    world.group = Group.objects.create()
+
+@step(u'Then I fill all necessary new user fields')
+def then_i_fill_all_necessary_new_user_fields(step):
+    world.page.fill_valid_values(world.group)
+
+@step(u'Then I should see user successfully registered')
+def then_i_should_see_user_successfully_registered(step):
+    world.page.see_user_successfully_registered()

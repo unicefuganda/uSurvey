@@ -325,6 +325,23 @@ class NewUserPage(PageObject):
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
 
+    def fill_valid_values(self, group):
+        data = {
+              'username':'baby_rajni',
+              'password':'baby_kant',
+              'confirm_password':'baby_kant',
+              'first_name':'Baby',
+              'last_name':'Kant',
+              'mobile_number':'123456789',
+              'email':'haha@haha.ha',
+              'groups':group.id,
+              }
+
+        self.browser.fill_form(data)
+
+    def see_user_successfully_registered(self):
+        self.is_text_present('User successfully registered.')
+
 class BatchListPage(PageObject):
     url = "/batches/"
 
