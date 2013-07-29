@@ -299,10 +299,12 @@ class BulkSMSPage(PageObject):
         for investgator in Investigator.objects.all():
             assert BackendMessage.objects.filter(identity=investgator.identity, text=self.message).count() == 1
 class NewUserPage(PageObject):
-    url = "/accounts/new/"
+    url = "/users/new/"
 
     def valid_page(self):
+        sleep(5)
         self.is_text_present('New User')
-        fields = ['username', 'password', 'confirm_password', 'name', 'mobile_number', 'email', 'permissions']
+        fields = ['username', 'password', 'confirm_password', 'first_name', 'last_name',
+                  'mobile_number', 'email', 'groups']
         for field in fields:
             assert self.browser.is_element_present_by_name(field)

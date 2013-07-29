@@ -17,13 +17,13 @@ class UsersViewTest(TestCase):
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_new(self):
-        response = self.client.get('/accounts/new/')
+        response = self.client.get('/users/new/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('accounts/new.html', templates)
-        self.assertEquals(response.context['action'], '/accounts/new/')
+        self.assertIn('users/new.html', templates)
+        self.assertEquals(response.context['action'], '/users/new/')
         self.assertEquals(response.context['id'], 'create-user-form')
         self.assertEquals(response.context['button_label'], 'Create User')
         self.assertEquals(response.context['loading_text'], 'Creating...')
-        self.assertIsNotNone(response.context['form'])
-
+        self.assertEquals(response.context['country_phone_code'], '256')
+        self.assertEquals(response.context['userform'].__class__.__name__, 'UserForm')

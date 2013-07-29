@@ -17,15 +17,6 @@ class InvestigatorsViewTest(TestCase):
         User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         self.client.login(username='Rajni', password='I_Rock')
 
-    def assert_dictionary_equal(self, dict1,
-                                dict2): # needed as QuerySet objects can't be equated -- just to not override .equals
-        self.assertEquals(len(dict1), len(dict2))
-        dict2_keys = dict2.keys()
-        for key in dict1.keys():
-            self.assertIn(key, dict2_keys)
-            for index in range(len(dict1[key])):
-                self.assertEquals(dict1[key][index], dict2[key][index])
-
     def test_new(self):
         LocationType.objects.create(name='some type', slug='some_name')
         response = self.client.get('/investigators/new/')

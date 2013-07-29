@@ -11,12 +11,11 @@ class UserFormTest(TestCase):
         'confirm_password':'kant',
         'last_name':'Rajni',
         'email':'raj@ni.kant',
+        'mobile_number':'791234567',
         }
 
     def test_valid(self):
         user_form = UserForm(self.form_data)
-        user_form.is_valid()
-        print user_form.errors
         self.assertTrue(user_form.is_valid())
         user = user_form.save()
         self.failUnless(user.id)
@@ -28,7 +27,6 @@ class UserProfileFormTest(TestCase):
     def setUp(self):
         self.form_data = {
         'mobile_number':'791234567',
-        'permissions':'create user',
         }
 
     def test_valid(self):

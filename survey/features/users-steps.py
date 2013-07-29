@@ -5,7 +5,10 @@ from django.contrib.auth.models import User
 
 @step(u'Given I am logged in as a superuser')
 def given_i_am_logged_in_as_a_superuser(step):
-    world.user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    world.page = LoginPage(world.browser)
+    world.page.visit()
+    world.page.login(user)
 
 @step(u'And I visit new user page')
 def and_i_visit_new_user_page(step):
@@ -18,7 +21,8 @@ def then_i_see_all_new_user_fields(step):
 
 @step(u'And I click submit')
 def and_i_click_submit(step):
-    assert False, 'This step must be implemented'
+    world.page.submit()
+
 @step(u'Then I should see errors about required fields')
 def then_i_should_see_errors_about_required_fields(step):
     assert False, 'This step must be implemented'
