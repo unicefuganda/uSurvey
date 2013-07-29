@@ -49,3 +49,9 @@ Feature: Login feature
     And I visit download excel page
     And I login a user
     Then I should see download excel page with logout link
+
+  Scenario: Login from users page
+     Given I have a user
+     And I visit new user page
+     And I login a user
+     Then I should see new user page with logout link

@@ -1,0 +1,325 @@
+[
+
+{"pk":  1, "model": "contenttypes.contenttype", "fields": {"model": "permission", "name": "permission", "app_label": "auth"}},
+
+{"pk":  2, "model": "contenttypes.contenttype", "fields": {"model": "group", "name": "group", "app_label": "auth"}},
+
+{"pk":  3, "model": "contenttypes.contenttype", "fields": {"model": "user", "name": "user", "app_label": "auth"}},
+
+{"pk":  4, "model": "contenttypes.contenttype", "fields": {"model": "contenttype", "name": "content type", "app_label": "contenttypes"}},
+
+{"pk":  5, "model": "contenttypes.contenttype", "fields": {"model": "session", "name": "session", "app_label": "sessions"}},
+
+{"pk":  6, "model": "contenttypes.contenttype", "fields": {"model": "site", "name": "site", "app_label": "sites"}},
+
+{"pk":  7, "model": "contenttypes.contenttype", "fields": {"model": "logentry", "name": "log entry", "app_label": "admin"}},
+
+{"pk":  8, "model": "contenttypes.contenttype", "fields": {"model": "migrationhistory", "name": "migration history", "app_label": "south"}},
+
+{"pk":  9, "model": "contenttypes.contenttype", "fields": {"model": "point", "name": "point", "app_label": "locations"}},
+
+{"pk":  10, "model": "contenttypes.contenttype", "fields": {"model": "locationtype", "name": "location type", "app_label": "locations"}},
+
+{"pk":  11, "model": "contenttypes.contenttype", "fields": {"model": "location", "name": "location", "app_label": "locations"}},
+
+{"pk":  12, "model": "contenttypes.contenttype", "fields": {"model": "userprofile", "name": "user profile", "app_label": "survey"}},
+
+{"pk":  13, "model": "contenttypes.contenttype", "fields": {"model": "backend", "name": "backend", "app_label": "survey"}},
+
+{"pk":  14, "model": "contenttypes.contenttype", "fields": {"model": "investigator", "name": "investigator", "app_label": "survey"}},
+
+{"pk":  15, "model": "contenttypes.contenttype", "fields": {"model": "locationautocomplete", "name": "location auto complete", "app_label": "survey"}},
+
+{"pk":  16, "model": "contenttypes.contenttype", "fields": {"model": "household", "name": "household", "app_label": "survey"}},
+
+{"pk":  17, "model": "contenttypes.contenttype", "fields": {"model": "householdhead", "name": "household head", "app_label": "survey"}},
+
+{"pk":  18, "model": "contenttypes.contenttype", "fields": {"model": "children", "name": "children", "app_label": "survey"}},
+
+{"pk":  19, "model": "contenttypes.contenttype", "fields": {"model": "women", "name": "women", "app_label": "survey"}},
+
+{"pk":  20, "model": "contenttypes.contenttype", "fields": {"model": "survey", "name": "survey", "app_label": "survey"}},
+
+{"pk":  21, "model": "contenttypes.contenttype", "fields": {"model": "batch", "name": "batch", "app_label": "survey"}},
+
+{"pk":  22, "model": "contenttypes.contenttype", "fields": {"model": "batchlocationstatus", "name": "batch location status", "app_label": "survey"}},
+
+{"pk":  23, "model": "contenttypes.contenttype", "fields": {"model": "householdbatchcompletion", "name": "household batch completion", "app_label": "survey"}},
+
+{"pk":  24, "model": "contenttypes.contenttype", "fields": {"model": "indicator", "name": "indicator", "app_label": "survey"}},
+
+{"pk":  25, "model": "contenttypes.contenttype", "fields": {"model": "question", "name": "question", "app_label": "survey"}},
+
+{"pk":  26, "model": "contenttypes.contenttype", "fields": {"model": "questionoption", "name": "question option", "app_label": "survey"}},
+
+{"pk":  27, "model": "contenttypes.contenttype", "fields": {"model": "numericalanswer", "name": "numerical answer", "app_label": "survey"}},
+
+{"pk":  28, "model": "contenttypes.contenttype", "fields": {"model": "textanswer", "name": "text answer", "app_label": "survey"}},
+
+{"pk":  29, "model": "contenttypes.contenttype", "fields": {"model": "multichoiceanswer", "name": "multi choice answer", "app_label": "survey"}},
+
+{"pk":  30, "model": "contenttypes.contenttype", "fields": {"model": "answerrule", "name": "answer rule", "app_label": "survey"}},
+
+{"pk":  "xdpx7mck9tijnsdrumih0tj6z4ks5xey", "model": "sessions.session", "fields": {"expire_date": "2013-08-12T13:04:16.232Z", "session_data": "OTc0NDFkYTI0ZWNlYjI5MGIzZjg3Mzk1YzhlMjcxOGM4M2IzOThiYTqAAn1xAShVEl9hdXRoX3VzZXJfYmFja2VuZHECVSlkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZHEDVQ1fYXV0aF91c2VyX2lkcQRLAXUu"}},
+
+{"pk":  1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}},
+
+{"pk":  1, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.203Z", "app_name": "django_extensions", "migration": "0001_empty"}},
+
+{"pk":  2, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.266Z", "app_name": "locations", "migration": "0001_initial"}},
+
+{"pk":  3, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.334Z", "app_name": "survey", "migration": "0001_initial"}},
+
+{"pk":  4, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.349Z", "app_name": "survey", "migration": "0002_AddTreeParentToLocations"}},
+
+{"pk":  5, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.370Z", "app_name": "survey", "migration": "0003_auto__add_field_investigator_male__add_field_investigator_age__add_fie"}},
+
+{"pk":  6, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.388Z", "app_name": "survey", "migration": "0004_auto__add_locationautocomplete"}},
+
+{"pk":  7, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.400Z", "app_name": "survey", "migration": "0005_auto__add_field_investigator_language"}},
+
+{"pk":  8, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.447Z", "app_name": "survey", "migration": "0006_auto__add_indicator__add_questionoption__add_batch__add_question__add_"}},
+
+{"pk":  9, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.475Z", "app_name": "survey", "migration": "0007_auto__add_household"}},
+
+{"pk":  10, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.507Z", "app_name": "survey", "migration": "0008_auto__add_numericalanswer"}},
+
+{"pk":  11, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.539Z", "app_name": "survey", "migration": "0009_auto__add_textanswer"}},
+
+{"pk":  12, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.586Z", "app_name": "survey", "migration": "0010_auto__add_multichoiceanswer"}},
+
+{"pk":  13, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.627Z", "app_name": "survey", "migration": "0011_auto__add_answerrule"}},
+
+{"pk":  14, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.668Z", "app_name": "survey", "migration": "0012_auto__add_field_question_subquestion__add_field_question_parent"}},
+
+{"pk":  15, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.776Z", "app_name": "survey", "migration": "0013_auto__chg_field_questionoption_text__chg_field_question_text__chg_fiel"}},
+
+{"pk":  16, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.851Z", "app_name": "survey", "migration": "0014_auto__chg_field_investigator_age__chg_field_investigator_mobile_number"}},
+
+{"pk":  17, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.892Z", "app_name": "survey", "migration": "0015_auto__add_householdhead"}},
+
+{"pk":  18, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:34.982Z", "app_name": "survey", "migration": "0016_auto__del_field_household_name__add_field_household_head__add_field_ho"}},
+
+{"pk":  19, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.029Z", "app_name": "survey", "migration": "0017_auto__del_field_household_children_20_49_years__add_field_household_wo"}},
+
+{"pk":  20, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.069Z", "app_name": "survey", "migration": "0018_auto__del_field_householdhead_name__add_field_householdhead_surname__a"}},
+
+{"pk":  21, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.170Z", "app_name": "survey", "migration": "0019_auto__add_children__add_women__del_field_household_children_24_59_mont"}},
+
+{"pk":  22, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.207Z", "app_name": "survey", "migration": "0020_auto__add_field_householdhead_time_measure"}},
+
+{"pk":  23, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.280Z", "app_name": "survey", "migration": "0021_auto__chg_field_householdhead_first_name__chg_field_householdhead_surn"}},
+
+{"pk":  24, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.329Z", "app_name": "survey", "migration": "0022_auto__add_field_textanswer_rule_applied__add_field_multichoiceanswer_r"}},
+
+{"pk":  25, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.373Z", "app_name": "survey", "migration": "0023_auto__del_field_householdhead_resident_since__del_field_householdhead_"}},
+
+{"pk":  26, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.412Z", "app_name": "survey", "migration": "0024_auto__del_field_women_aged_between_15_49_years__add_field_women_aged_b"}},
+
+{"pk":  27, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.459Z", "app_name": "survey", "migration": "0025_auto__add_batchlocationstatus"}},
+
+{"pk":  28, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.506Z", "app_name": "survey", "migration": "0026_auto__add_householdbatchcompletion"}},
+
+{"pk":  29, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.583Z", "app_name": "survey", "migration": "0027_auto__add_field_batch_order"}},
+
+{"pk":  30, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.621Z", "app_name": "survey", "migration": "0028_auto__add_field_batch_name"}},
+
+{"pk":  31, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.660Z", "app_name": "survey", "migration": "0029_auto__add_field_indicator_identifier"}},
+
+{"pk":  32, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.708Z", "app_name": "survey", "migration": "0030_auto__add_backend__add_field_investigator_backend"}},
+
+{"pk":  33, "model": "south.migrationhistory", "fields": {"applied": "2013-07-29T13:03:35.768Z", "app_name": "survey", "migration": "0031_auto__add_userprofile"}},
+
+{"pk":  1, "model": "auth.permission", "fields": {"codename": "add_permission", "name": "Can add permission", "content_type": 1}},
+
+{"pk":  2, "model": "auth.permission", "fields": {"codename": "change_permission", "name": "Can change permission", "content_type": 1}},
+
+{"pk":  3, "model": "auth.permission", "fields": {"codename": "delete_permission", "name": "Can delete permission", "content_type": 1}},
+
+{"pk":  4, "model": "auth.permission", "fields": {"codename": "add_group", "name": "Can add group", "content_type": 2}},
+
+{"pk":  5, "model": "auth.permission", "fields": {"codename": "change_group", "name": "Can change group", "content_type": 2}},
+
+{"pk":  6, "model": "auth.permission", "fields": {"codename": "delete_group", "name": "Can delete group", "content_type": 2}},
+
+{"pk":  7, "model": "auth.permission", "fields": {"codename": "add_user", "name": "Can add user", "content_type": 3}},
+
+{"pk":  8, "model": "auth.permission", "fields": {"codename": "change_user", "name": "Can change user", "content_type": 3}},
+
+{"pk":  9, "model": "auth.permission", "fields": {"codename": "delete_user", "name": "Can delete user", "content_type": 3}},
+
+{"pk":  10, "model": "auth.permission", "fields": {"codename": "add_contenttype", "name": "Can add content type", "content_type": 4}},
+
+{"pk":  11, "model": "auth.permission", "fields": {"codename": "change_contenttype", "name": "Can change content type", "content_type": 4}},
+
+{"pk":  12, "model": "auth.permission", "fields": {"codename": "delete_contenttype", "name": "Can delete content type", "content_type": 4}},
+
+{"pk":  13, "model": "auth.permission", "fields": {"codename": "add_session", "name": "Can add session", "content_type": 5}},
+
+{"pk":  14, "model": "auth.permission", "fields": {"codename": "change_session", "name": "Can change session", "content_type": 5}},
+
+{"pk":  15, "model": "auth.permission", "fields": {"codename": "delete_session", "name": "Can delete session", "content_type": 5}},
+
+{"pk":  16, "model": "auth.permission", "fields": {"codename": "add_site", "name": "Can add site", "content_type": 6}},
+
+{"pk":  17, "model": "auth.permission", "fields": {"codename": "change_site", "name": "Can change site", "content_type": 6}},
+
+{"pk":  18, "model": "auth.permission", "fields": {"codename": "delete_site", "name": "Can delete site", "content_type": 6}},
+
+{"pk":  19, "model": "auth.permission", "fields": {"codename": "add_logentry", "name": "Can add log entry", "content_type": 7}},
+
+{"pk":  20, "model": "auth.permission", "fields": {"codename": "change_logentry", "name": "Can change log entry", "content_type": 7}},
+
+{"pk":  21, "model": "auth.permission", "fields": {"codename": "delete_logentry", "name": "Can delete log entry", "content_type": 7}},
+
+{"pk":  22, "model": "auth.permission", "fields": {"codename": "add_migrationhistory", "name": "Can add migration history", "content_type": 8}},
+
+{"pk":  23, "model": "auth.permission", "fields": {"codename": "change_migrationhistory", "name": "Can change migration history", "content_type": 8}},
+
+{"pk":  24, "model": "auth.permission", "fields": {"codename": "delete_migrationhistory", "name": "Can delete migration history", "content_type": 8}},
+
+{"pk":  25, "model": "auth.permission", "fields": {"codename": "add_point", "name": "Can add point", "content_type": 9}},
+
+{"pk":  26, "model": "auth.permission", "fields": {"codename": "change_point", "name": "Can change point", "content_type": 9}},
+
+{"pk":  27, "model": "auth.permission", "fields": {"codename": "delete_point", "name": "Can delete point", "content_type": 9}},
+
+{"pk":  28, "model": "auth.permission", "fields": {"codename": "add_locationtype", "name": "Can add location type", "content_type": 10}},
+
+{"pk":  29, "model": "auth.permission", "fields": {"codename": "change_locationtype", "name": "Can change location type", "content_type": 10}},
+
+{"pk":  30, "model": "auth.permission", "fields": {"codename": "delete_locationtype", "name": "Can delete location type", "content_type": 10}},
+
+{"pk":  31, "model": "auth.permission", "fields": {"codename": "add_location", "name": "Can add location", "content_type": 11}},
+
+{"pk":  32, "model": "auth.permission", "fields": {"codename": "change_location", "name": "Can change location", "content_type": 11}},
+
+{"pk":  33, "model": "auth.permission", "fields": {"codename": "delete_location", "name": "Can delete location", "content_type": 11}},
+
+{"pk":  34, "model": "auth.permission", "fields": {"codename": "add_userprofile", "name": "Can add user profile", "content_type": 12}},
+
+{"pk":  35, "model": "auth.permission", "fields": {"codename": "change_userprofile", "name": "Can change user profile", "content_type": 12}},
+
+{"pk":  36, "model": "auth.permission", "fields": {"codename": "delete_userprofile", "name": "Can delete user profile", "content_type": 12}},
+
+{"pk":  37, "model": "auth.permission", "fields": {"codename": "add_backend", "name": "Can add backend", "content_type": 13}},
+
+{"pk":  38, "model": "auth.permission", "fields": {"codename": "change_backend", "name": "Can change backend", "content_type": 13}},
+
+{"pk":  39, "model": "auth.permission", "fields": {"codename": "delete_backend", "name": "Can delete backend", "content_type": 13}},
+
+{"pk":  40, "model": "auth.permission", "fields": {"codename": "add_investigator", "name": "Can add investigator", "content_type": 14}},
+
+{"pk":  41, "model": "auth.permission", "fields": {"codename": "change_investigator", "name": "Can change investigator", "content_type": 14}},
+
+{"pk":  42, "model": "auth.permission", "fields": {"codename": "delete_investigator", "name": "Can delete investigator", "content_type": 14}},
+
+{"pk":  43, "model": "auth.permission", "fields": {"codename": "add_locationautocomplete", "name": "Can add location auto complete", "content_type": 15}},
+
+{"pk":  44, "model": "auth.permission", "fields": {"codename": "change_locationautocomplete", "name": "Can change location auto complete", "content_type": 15}},
+
+{"pk":  45, "model": "auth.permission", "fields": {"codename": "delete_locationautocomplete", "name": "Can delete location auto complete", "content_type": 15}},
+
+{"pk":  46, "model": "auth.permission", "fields": {"codename": "add_household", "name": "Can add household", "content_type": 16}},
+
+{"pk":  47, "model": "auth.permission", "fields": {"codename": "change_household", "name": "Can change household", "content_type": 16}},
+
+{"pk":  48, "model": "auth.permission", "fields": {"codename": "delete_household", "name": "Can delete household", "content_type": 16}},
+
+{"pk":  49, "model": "auth.permission", "fields": {"codename": "add_householdhead", "name": "Can add household head", "content_type": 17}},
+
+{"pk":  50, "model": "auth.permission", "fields": {"codename": "change_householdhead", "name": "Can change household head", "content_type": 17}},
+
+{"pk":  51, "model": "auth.permission", "fields": {"codename": "delete_householdhead", "name": "Can delete household head", "content_type": 17}},
+
+{"pk":  52, "model": "auth.permission", "fields": {"codename": "add_children", "name": "Can add children", "content_type": 18}},
+
+{"pk":  53, "model": "auth.permission", "fields": {"codename": "change_children", "name": "Can change children", "content_type": 18}},
+
+{"pk":  54, "model": "auth.permission", "fields": {"codename": "delete_children", "name": "Can delete children", "content_type": 18}},
+
+{"pk":  55, "model": "auth.permission", "fields": {"codename": "add_women", "name": "Can add women", "content_type": 19}},
+
+{"pk":  56, "model": "auth.permission", "fields": {"codename": "change_women", "name": "Can change women", "content_type": 19}},
+
+{"pk":  57, "model": "auth.permission", "fields": {"codename": "delete_women", "name": "Can delete women", "content_type": 19}},
+
+{"pk":  58, "model": "auth.permission", "fields": {"codename": "add_survey", "name": "Can add survey", "content_type": 20}},
+
+{"pk":  59, "model": "auth.permission", "fields": {"codename": "change_survey", "name": "Can change survey", "content_type": 20}},
+
+{"pk":  60, "model": "auth.permission", "fields": {"codename": "delete_survey", "name": "Can delete survey", "content_type": 20}},
+
+{"pk":  61, "model": "auth.permission", "fields": {"codename": "add_batch", "name": "Can add batch", "content_type": 21}},
+
+{"pk":  62, "model": "auth.permission", "fields": {"codename": "change_batch", "name": "Can change batch", "content_type": 21}},
+
+{"pk":  63, "model": "auth.permission", "fields": {"codename": "delete_batch", "name": "Can delete batch", "content_type": 21}},
+
+{"pk":  64, "model": "auth.permission", "fields": {"codename": "add_batchlocationstatus", "name": "Can add batch location status", "content_type": 22}},
+
+{"pk":  65, "model": "auth.permission", "fields": {"codename": "change_batchlocationstatus", "name": "Can change batch location status", "content_type": 22}},
+
+{"pk":  66, "model": "auth.permission", "fields": {"codename": "delete_batchlocationstatus", "name": "Can delete batch location status", "content_type": 22}},
+
+{"pk":  67, "model": "auth.permission", "fields": {"codename": "add_householdbatchcompletion", "name": "Can add household batch completion", "content_type": 23}},
+
+{"pk":  68, "model": "auth.permission", "fields": {"codename": "change_householdbatchcompletion", "name": "Can change household batch completion", "content_type": 23}},
+
+{"pk":  69, "model": "auth.permission", "fields": {"codename": "delete_householdbatchcompletion", "name": "Can delete household batch completion", "content_type": 23}},
+
+{"pk":  70, "model": "auth.permission", "fields": {"codename": "add_indicator", "name": "Can add indicator", "content_type": 24}},
+
+{"pk":  71, "model": "auth.permission", "fields": {"codename": "change_indicator", "name": "Can change indicator", "content_type": 24}},
+
+{"pk":  72, "model": "auth.permission", "fields": {"codename": "delete_indicator", "name": "Can delete indicator", "content_type": 24}},
+
+{"pk":  73, "model": "auth.permission", "fields": {"codename": "add_question", "name": "Can add question", "content_type": 25}},
+
+{"pk":  74, "model": "auth.permission", "fields": {"codename": "change_question", "name": "Can change question", "content_type": 25}},
+
+{"pk":  75, "model": "auth.permission", "fields": {"codename": "delete_question", "name": "Can delete question", "content_type": 25}},
+
+{"pk":  76, "model": "auth.permission", "fields": {"codename": "add_questionoption", "name": "Can add question option", "content_type": 26}},
+
+{"pk":  77, "model": "auth.permission", "fields": {"codename": "change_questionoption", "name": "Can change question option", "content_type": 26}},
+
+{"pk":  78, "model": "auth.permission", "fields": {"codename": "delete_questionoption", "name": "Can delete question option", "content_type": 26}},
+
+{"pk":  79, "model": "auth.permission", "fields": {"codename": "add_numericalanswer", "name": "Can add numerical answer", "content_type": 27}},
+
+{"pk":  80, "model": "auth.permission", "fields": {"codename": "change_numericalanswer", "name": "Can change numerical answer", "content_type": 27}},
+
+{"pk":  81, "model": "auth.permission", "fields": {"codename": "delete_numericalanswer", "name": "Can delete numerical answer", "content_type": 27}},
+
+{"pk":  82, "model": "auth.permission", "fields": {"codename": "add_textanswer", "name": "Can add text answer", "content_type": 28}},
+
+{"pk":  83, "model": "auth.permission", "fields": {"codename": "change_textanswer", "name": "Can change text answer", "content_type": 28}},
+
+{"pk":  84, "model": "auth.permission", "fields": {"codename": "delete_textanswer", "name": "Can delete text answer", "content_type": 28}},
+
+{"pk":  85, "model": "auth.permission", "fields": {"codename": "add_multichoiceanswer", "name": "Can add multi choice answer", "content_type": 29}},
+
+{"pk":  86, "model": "auth.permission", "fields": {"codename": "change_multichoiceanswer", "name": "Can change multi choice answer", "content_type": 29}},
+
+{"pk":  87, "model": "auth.permission", "fields": {"codename": "delete_multichoiceanswer", "name": "Can delete multi choice answer", "content_type": 29}},
+
+{"pk":  88, "model": "auth.permission", "fields": {"codename": "add_answerrule", "name": "Can add answer rule", "content_type": 30}},
+
+{"pk":  89, "model": "auth.permission", "fields": {"codename": "change_answerrule", "name": "Can change answer rule", "content_type": 30}},
+
+{"pk":  90, "model": "auth.permission", "fields": {"codename": "delete_answerrule", "name": "Can delete answer rule", "content_type": 30}},
+
+{"pk":  1, "model": "auth.group", "fields": {"name": "admin", "permissions": [19, 20, 21, 4, 5, 6, 1, 2, 3, 7, 8, 9, 10, 11, 12, 31, 32, 33, 28, 29, 30, 25, 26, 27, 13, 14, 15, 16, 17, 18, 22, 23, 24, 88, 89, 90, 37, 38, 39, 61, 62, 63, 64, 65, 66, 52, 53, 54, 46, 47, 48, 67, 68, 69, 49, 50, 51, 70, 71, 72, 40, 41, 42, 43, 44, 45, 85, 86, 87, 79, 80, 81, 73, 74, 75, 76, 77, 78, 58, 59, 60, 82, 83, 84, 34, 35, 36, 55, 56, 57]}},
+
+{"pk":  2, "model": "auth.group", "fields": {"name": "researcher", "permissions": [31, 32, 33, 28, 29, 30, 25, 26, 27, 88, 89, 90, 37, 38, 39, 61, 62, 63, 64, 65, 66, 52, 53, 54, 46, 47, 48, 67, 68, 69, 49, 50, 51, 70, 71, 72, 40, 41, 42, 43, 44, 45, 85, 86, 87, 79, 80, 81, 73, 74, 75, 76, 77, 78, 58, 59, 60, 82, 83, 84, 34, 35, 36, 55, 56, 57]}},
+
+{"pk":  3, "model": "auth.group", "fields": {"name": "data entry", "permissions": [52, 53, 54, 46, 47, 48, 49, 50, 51, 40, 41, 42, 55, 56, 57]}},
+
+{"pk":  1, "model": "auth.user", "fields": {"username": "rajni", "first_name": "", "last_name": "", "is_active": true, "is_superuser": true, "is_staff": true, "last_login": "2013-07-29T13:04:16.230Z", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$jIr3ivCwWS50$o4V1KVBSCO0jJkkR5vOE4Miib5pEspKD0YLCsBnsgrg=", "email": "rr@rr.rr", "date_joined": "2013-07-29T13:03:13.515Z"}},
+
+{"pk":  1, "model": "admin.logentry", "fields": {"action_flag": 1, "action_time": "2013-07-29T13:04:34.258Z", "object_repr": "admin", "object_id": "1", "change_message": "", "user": 1, "content_type": 2}},
+
+{"pk":  2, "model": "admin.logentry", "fields": {"action_flag": 1, "action_time": "2013-07-29T13:05:04.667Z", "object_repr": "researcher", "object_id": "2", "change_message": "", "user": 1, "content_type": 2}},
+
+{"pk":  3, "model": "admin.logentry", "fields": {"action_flag": 1, "action_time": "2013-07-29T13:06:21.138Z", "object_repr": "data entry", "object_id": "3", "change_message": "", "user": 1, "content_type": 2}}]

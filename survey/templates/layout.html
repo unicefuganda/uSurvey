@@ -48,6 +48,14 @@
               </ul>
             </li>
 
+            <li class="dropdown">
+              <a data-toggle="dropdown" id="drop1" class="dropdown-toggle" role="button" href="#">Users<b class="caret"></b></a>
+              <ul aria-labelledby="drop1" role="menu" class="dropdown-menu">
+                <li role="presentation"><a href="{% url 'new_user_page' %}">List all users</a></li>
+                <li role="presentation"><a href="{% url 'new_user_page' %}">Add an user</a></li>
+              </ul>
+            </li>
+
             <li>
               <a href="{% url 'batch_index_page' %}">Batches</a>
             </li>

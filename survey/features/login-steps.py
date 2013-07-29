@@ -57,3 +57,8 @@ def then_i_should_see_aggregate_status_page_with_logout_link(step):
 def then_i_should_see_download_excel_page_with_logout_link(step):
     world.page = DownloadExcelPage(world.browser)
     world.page.see_logout_link()
+
+@step(u'Then I should see new user page with logout link')
+def then_i_should_see_new_user_page_with_logout_link(step):
+    world.page = NewUserPage(world.browser)
+    world.page.see_logout_link()
