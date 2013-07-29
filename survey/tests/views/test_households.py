@@ -280,7 +280,7 @@ class HouseholdViewTest(TestCase):
         form_with_invalid_data['has_children'] = False
 
         response = self.client.post('/households/new/', data=form_with_invalid_data)
-        self.failUnlessEqual(response.status_code, 200) # ensure redirection to list investigator page
+        self.failUnlessEqual(response.status_code, 200)
 
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(number_of_males=form_data['number_of_males'])

@@ -298,6 +298,7 @@ class BulkSMSPage(PageObject):
         self.is_text_present("Your message has been sent to investigators.")
         for investgator in Investigator.objects.all():
             assert BackendMessage.objects.filter(identity=investgator.identity, text=self.message).count() == 1
+
 class NewUserPage(PageObject):
     url = "/users/new/"
 

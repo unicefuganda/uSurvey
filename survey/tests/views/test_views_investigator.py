@@ -69,7 +69,7 @@ class InvestigatorsViewTest(TestCase):
         locations = json.loads(response.content)
         self.failUnlessEqual(locations, {})
 
-    def test_create_investigators(self):
+    def test_create_investigators_success(self):
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
         backend = Backend.objects.create(name='something')
@@ -98,6 +98,41 @@ class InvestigatorsViewTest(TestCase):
         self.assertTrue(investigator.male)
         self.assertEqual(investigator.location, uganda)
         self.assertEqual(len(investigator.households.all()), 0)
+
+    @patch('django.contrib.messages.error')
+    def test_create_investigators_failure(self, mock_messages_error):
+        country = LocationType.objects.create(name='country', slug='country')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        backend = Backend.objects.create(name='something')
+        form_data = {
+            'name': 'Rajini',
+            'mobile_number': '987654321',
+            'male': 'f',
+            'age': '20',
+            'level_of_education': 'Nursery',
+            'language': 'Luganda',
+            'country': uganda.id,
+            'location': uganda.id,
+            'backend': backend.id,
+            'confirm_mobile_number': '987654321',
+        }
+        investigator = Investigator.objects.filter(name=form_data['name'], backend = Backend.objects.create(name='something1'))
+        self.failIf(investigator)
+
+        form_data['location']='Not A Number'
+        response = self.client.post('/investigators/new/', data=form_data)
+        self.failUnlessEqual(response.status_code, 200) # ensure redirection to list investigator page
+        investigator = Investigator.objects.filter(name=form_data['name'])
+        self.failIf(investigator)
+        assert mock_messages_error.called
+
+        form_data['location']=uganda.id
+        form_data['confirm_mobile_number']='123456789' # not the same as mobile number, causing non-field error
+        response = self.client.post('/investigators/new/', data=form_data)
+        self.failUnlessEqual(response.status_code, 200) # ensure redirection to list investigator page
+        investigator = Investigator.objects.filter(name=form_data['name'])
+        self.failIf(investigator)
+        assert mock_messages_error.called
 
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
@@ -132,8 +167,6 @@ class InvestigatorsViewTest(TestCase):
         self.assertEquals(locations['country'][0], uganda)
 
         assert mock_error_message.called_once_with('There are  no investigators currently registered  for this location.')
-
-
 
     def test_filter_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
