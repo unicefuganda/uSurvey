@@ -14,3 +14,4 @@ Feature: Users feature
       Then I fill all necessary new user fields
       And I click submit
       Then I should see user successfully registered
+      And I can login that user successfully

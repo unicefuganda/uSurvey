@@ -320,23 +320,12 @@ class NewUserPage(PageObject):
     def valid_page(self):
         sleep(5)
         self.is_text_present('New User')
-        fields = ['username', 'password', 'confirm_password', 'first_name', 'last_name',
+        fields = ['username', 'password1', 'password2', 'first_name', 'last_name',
                   'mobile_number', 'email', 'groups']
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
 
-    def fill_valid_values(self, group):
-        data = {
-              'username':'baby_rajni',
-              'password':'baby_kant',
-              'confirm_password':'baby_kant',
-              'first_name':'Baby',
-              'last_name':'Kant',
-              'mobile_number':'123456789',
-              'email':'haha@haha.ha',
-              'groups':group.id,
-              }
-
+    def fill_valid_values(self, data):
         self.browser.fill_form(data)
 
     def see_user_successfully_registered(self):
