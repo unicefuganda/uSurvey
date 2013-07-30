@@ -33,8 +33,8 @@ class UsersViewTest(TestCase):
         some_group = Group.objects.create()
         form_data = {
                     'username':'knight',
-                    'password':'mk',
-                    'confirm_password':'mk',
+                    'password1':'mk',
+                    'password2':'mk',
                     'first_name':'michael',
                     'last_name':'knight',
                     'mobile_number':'123456789',
@@ -49,7 +49,7 @@ class UsersViewTest(TestCase):
 
         user = User.objects.get(username=form_data['username'])
         self.failUnless(user.id)
-        for key in ['username', 'password',  'first_name', 'last_name', 'email']:
+        for key in ['username', 'first_name', 'last_name', 'email']:
             value = getattr(user, key)
             self.assertEqual(form_data[key], str(value))
 
@@ -98,3 +98,15 @@ class UsersViewTest(TestCase):
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
         assert error_message.called
+
+        error_message.reset_mock()
+        form_data['groups']= some_group.id
+        user = User.objects.create(username='some_other_name')
+        userprofile = UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
+
+        response = self.client.post('/users/new/', data=form_data)
+        self.failUnlessEqual(response.status_code, 200)
+        user = User.objects.filter(username=form_data['username'])
+        self.failIf(user)
+        assert error_message.called
+

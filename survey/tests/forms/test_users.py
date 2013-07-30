@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.forms.users import *
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from survey.models import *
 
 class UserFormTest(TestCase):
@@ -8,8 +8,8 @@ class UserFormTest(TestCase):
     def setUp(self):
         self.form_data = {
         'username':'rajnii',
-        'password':'kant',
-        'confirm_password':'kant',
+        'password1':'kant',
+        'password2':'kant',
         'last_name':'Rajni',
         'email':'raj@ni.kant',
         'mobile_number':'791234567',
@@ -17,6 +17,8 @@ class UserFormTest(TestCase):
 
     def test_valid(self):
         user_form = UserForm(self.form_data)
+        user_form.is_valid()
+        print user_form.errors
         self.assertTrue(user_form.is_valid())
         user = user_form.save()
         self.failUnless(user.id)
@@ -52,15 +54,36 @@ class UserFormTest(TestCase):
         message = "Ensure that there are no more than 9 digits in total."
         self.assertEquals(user_form.errors['mobile_number'], [message])
 
-    def test_clean_confirm_password(self):
+    def test_mobile_number_already_used(self):
         form_data = self.form_data
-        form_data['confirm_password'] = 'tank'
+        user = User.objects.create(username='some_other_name')
+        userprofile = UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
+
         user_form = UserForm(form_data)
         self.assertFalse(user_form.is_valid())
-        message = "Password  mismatch."
-        self.assertEquals(user_form.errors['confirm_password'], [message])
+        message = "%s is already associated to a different user."% form_data['mobile_number']
+        self.assertEquals(user_form.errors['mobile_number'], [message])
 
-        form_data['confirm_password'] = form_data['password']
+    def test_email_already_used(self):
+        form_data = self.form_data
+        user = User.objects.create(email=form_data['email'])
+
+        user_form = UserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "%s is already associated to a different user."% form_data['email']
+        self.assertEquals(user_form.errors['email'], [message])
+
+
+
+    def test_clean_confirm_password(self):
+        form_data = self.form_data
+        form_data['password2'] = 'tank'
+        user_form = UserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "The two password fields didn't match."
+        self.assertEquals(user_form.errors['password2'], [message])
+
+        form_data['password2'] = form_data['password1']
         user_form = UserForm(form_data)
         self.assertTrue(user_form.is_valid())
 

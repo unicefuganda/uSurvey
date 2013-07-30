@@ -316,8 +316,6 @@
 
 {"pk":  3, "model": "auth.group", "fields": {"name": "data entry", "permissions": [52, 53, 54, 46, 47, 48, 49, 50, 51, 40, 41, 42, 55, 56, 57]}},
 
-{"pk":  1, "model": "auth.user", "fields": {"username": "rajni", "first_name": "", "last_name": "", "is_active": true, "is_superuser": true, "is_staff": true, "last_login": "2013-07-29T13:04:16.230Z", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$jIr3ivCwWS50$o4V1KVBSCO0jJkkR5vOE4Miib5pEspKD0YLCsBnsgrg=", "email": "rr@rr.rr", "date_joined": "2013-07-29T13:03:13.515Z"}},
-
 {"pk":  1, "model": "admin.logentry", "fields": {"action_flag": 1, "action_time": "2013-07-29T13:04:34.258Z", "object_repr": "admin", "object_id": "1", "change_message": "", "user": 1, "content_type": 2}},
 
 {"pk":  2, "model": "admin.logentry", "fields": {"action_flag": 1, "action_time": "2013-07-29T13:05:04.667Z", "object_repr": "researcher", "object_id": "2", "change_message": "", "user": 1, "content_type": 2}},
