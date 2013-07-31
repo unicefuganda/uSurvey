@@ -23,10 +23,11 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
+        'BACKEND': 'johnny.backends.memcached.MemcachedCache',
         'LOCATION': 'memcached:11211',
         'TIMEOUT': 500,
         'BINARY': False,
+        'JOHNNY_CACHE': True,
         'OPTIONS': {  # Maps to pylibmc "behaviors"
             'tcp_nodelay': True,
             'ketama': True
@@ -111,9 +112,13 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'bootstrap_pagination.middleware.PaginationMiddleware',
+    'johnny.middleware.LocalStoreClearMiddleware',
+    'johnny.middleware.QueryCacheMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+JOHNNY_MIDDLEWARE_KEY_PREFIX = "MICS_"
 
 ROOT_URLCONF = 'mics.urls'
 

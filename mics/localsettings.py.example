@@ -1,4 +1,4 @@
-import sys
+import sys, os
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -15,6 +15,7 @@ CACHES = {
         'LOCATION': 'localhost:11211',
         'TIMEOUT': 500,
         'BINARY': False,
+        'JOHNNY_CACHE': True,
         'OPTIONS': {  # Maps to pylibmc "behaviors"
             'tcp_nodelay': True,
             'ketama': True
@@ -25,13 +26,16 @@ CACHES = {
 if ('test' in sys.argv) or ('harvest' in sys.argv):
     CACHES = {
         'default': {
-            'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
+            'BACKEND': 'johnny.backends.memcached.MemcachedCache',
             'LOCATION': 'localhost:11211',
             'TIMEOUT': 1,
             'BINARY': False,
+            'JOHNNY_CACHE': True,
             'OPTIONS': {  # Maps to pylibmc "behaviors"
                 'tcp_nodelay': True,
                 'ketama': True
             }
         }
     }
+
+    os.system("echo 'flush_all' | nc localhost 11211")
