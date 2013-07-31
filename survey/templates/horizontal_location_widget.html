@@ -1,7 +1,7 @@
 {% load template_tags %}
 <ul id="location-widget">
   {% for type, locations  in location_data.get_widget_data.items %}
-    <li>
+    <li class="parent">
       <label> {{ type.capitalize }} </label>
       <select id="location-{{ type.lower }}"  class="chzn-select">
         <option value="">{{ default_text }}</option>

@@ -1,11 +1,11 @@
 ;
 jQuery(function($){
   function next_element(element) {
-    return element.parent().next().find('select');
+    return element.parents(".parent").next().find('select');
   }
 
   function previous_element(element) {
-    return element.parent().prev().find('select');
+    return element.parents(".parent").prev().find('select');
   }
 
   function populate_children(element, data) {

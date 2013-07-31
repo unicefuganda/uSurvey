@@ -37,20 +37,22 @@ def _process_form(investigator, request):
     _add_error_response_message(investigator, request)
     return None
 
+def contains_key(params, key):
+    return params.has_key(key) and params[key].isdigit()
+
 @login_required
 def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
-    location_type = initialize_location_type(default_select=CREATE_INVESTIGATOR_DEFAULT_SELECT)
+    selected_location = None
     response = None
 
     if request.method == 'POST':
         investigator = InvestigatorForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
-        location_id = get_posted_location(request.POST)
-        location_type = update_location_type(location_type, location_id)
+        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
         response = _process_form(investigator, request)
 
     return response or render(request, 'investigators/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
-                                                                  'location_type': location_type,
+                                                                  'locations': LocationWidget(selected_location),
                                                                   'form': investigator,
                                                                   'action': "/investigators/new/",
                                                                   'id': "create-investigator-form",

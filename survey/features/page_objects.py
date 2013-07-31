@@ -53,7 +53,6 @@ class NewInvestigatorPage(PageObject):
 
     def valid_page(self):
         fields = ['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age', 'backend']
-        fields += [location_type.name.lower() for location_type in LocationType.objects.all()]
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
         assert self.browser.find_by_css("span.add-on")[0].text == COUNTRY_PHONE_CODE
@@ -75,15 +74,16 @@ class NewInvestigatorPage(PageObject):
         self.browser.fill_form(self.values)
         kampala = Location.objects.get(name="Kampala")
         kampala_county = Location.objects.get(name="Kampala County")
-        script = '$("#investigator-district").val(%s);$("#investigator-district").trigger("liszt:updated").chosen().change()' % kampala.id
+        script = '$("#location-district").val(%s);$("#location-district").trigger("liszt:updated").chosen().change()' % kampala.id
         self.browser.execute_script(script)
         sleep(3)
-        script = '$("#investigator-county").val(%s);$("#investigator-county").trigger("liszt:updated").chosen().change()' % kampala_county.id
+        script = '$("#location-county").val(%s);$("#location-county").trigger("liszt:updated").chosen().change()' % kampala_county.id
         self.browser.execute_script(script)
 
     def submit(self):
         sleep(2)
         self.browser.find_by_css("form button").first.click()
+        sleep(5)
 
 class InvestigatorsListPage(PageObject):
     url = '/investigators/'
@@ -140,8 +140,8 @@ class NewHouseholdPage(PageObject):
         kampala = Location.objects.get(name="Kampala")
         kampala_county = Location.objects.get(name="Kampala County")
         investigator = Investigator.objects.get(name="Investigator name")
-        self.fill_in_with_js('$("#investigator-district")', kampala.id)
-        self.fill_in_with_js('$("#investigator-county")', kampala_county.id)
+        self.fill_in_with_js('$("#location-district")', kampala.id)
+        self.fill_in_with_js('$("#location-county")', kampala_county.id)
         self.fill_in_with_js('$("#household-investigator")', investigator.id)
         self.fill_in_with_js('$("#household-extra_resident_since_year")', 1984)
         self.fill_in_with_js('$("#household-extra_resident_since_month")', 1)

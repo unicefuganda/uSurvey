@@ -4,6 +4,10 @@ from django.contrib import messages
 register = template.Library()
 
 @register.filter
+def is_mobile_number(field):
+  return 'mobile number' in field.lower()
+
+@register.filter
 def is_location_selected(locations_data, location):
     if locations_data.has_location_selected(location):
         return "selected='selected'"

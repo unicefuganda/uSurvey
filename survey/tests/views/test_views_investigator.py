@@ -18,7 +18,14 @@ class InvestigatorsViewTest(TestCase):
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_new(self):
-        LocationType.objects.create(name='some type', slug='some_name')
+        country = LocationType.objects.create(name = 'Country', slug = 'country')
+        city = LocationType.objects.create(name = 'City', slug = 'city')
+
+        uganda = Location.objects.create(name='Uganda', type = country)
+        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = city)
+        kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = city)
+        kampala_city = Location.objects.create(name='Kampala City', tree_parent = kampala, type = city)
+
         response = self.client.get('/investigators/new/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -27,6 +34,15 @@ class InvestigatorsViewTest(TestCase):
         self.assertEquals(response.context['id'], 'create-investigator-form')
         self.assertEquals(response.context['button_label'], 'Create Investigator')
         self.assertEquals(response.context['loading_text'], 'Creating...')
+
+        locations = response.context['locations'].get_widget_data()
+        self.assertEquals(len(locations.keys()), 2)
+        self.assertEquals(locations.keys()[0], 'country')
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
+
+        self.assertEquals(len(locations['city']), 0)
+
 
 
     def test_get_district_location_returns_all_locations_if_parent_not_specified(self):

@@ -5,7 +5,7 @@
 {% block content %}
   <form id="aggregates-form" action="{% url 'aggregates_status' %}" method="get">
     <div>
-      {% include "location_widget.html" with location_data=locations default_text="All" %}
+      {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
     </div>
     <div class="batch-list-container">
       {% load template_tags %}
