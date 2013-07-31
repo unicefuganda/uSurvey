@@ -10,7 +10,7 @@
   </h3>
   <form id="aggregates-form" action="{% url 'investigators_page' %}" method="get">
     {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
-    <button class="btn btn-primary" id="investigator-list"> Get List</button>
+    <button class="btn btn-primary" id="a-investigator-list" href="{% url 'investigators_page' %}"> Get List</button>
   </form>
   {% if investigators %}
     <table class="table table-striped table-bordered table-hover">
@@ -52,4 +52,8 @@
     </table>
   {% endif %}
 {% paginate %}
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{{STATIC_URL}}/js/investigator.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

@@ -9,3 +9,6 @@
   {% include "vertical_location_widget.html" with location_data=locations default_text="" %}
 {% endblock %}
 
+{% block javascripts %}
+  <script src="{{STATIC_URL}}/js/investigator.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
