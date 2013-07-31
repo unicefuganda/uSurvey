@@ -142,6 +142,8 @@ INSTALLED_APPS = (
     'rapidsms.contrib.locations.nested',
     'bootstrap_pagination',
     'survey',
+    'rapidsms.backends.database',
+    'rapidsms.contrib.httptester',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -184,7 +186,11 @@ USSD_PAGINATION = {
     'NEXT': "#"
 }
 
-INSTALLED_BACKENDS = {}
+INSTALLED_BACKENDS = {
+    "HTTP": {
+        "ENGINE": "rapidsms.backends.database.DatabaseBackend",
+    },
+}
 
 # Importing server specific settings
 from localsettings import *
