@@ -192,6 +192,8 @@ INSTALLED_BACKENDS = {
     },
 }
 
+PRODUCTION = False
+
 # Importing server specific settings
 from localsettings import *
 # import sys

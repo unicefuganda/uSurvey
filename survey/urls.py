@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
+from django.conf import settings
 
 urlpatterns = patterns('',
     url(r'^$', 'survey.views.home_page.home', name='home_page'),
@@ -26,3 +27,9 @@ urlpatterns = patterns('',
     url(r'^batches/(?P<batch_id>\d+)/open_to$', 'survey.views.batch.open', name='batch_open_page'),
     url(r'^batches/(?P<batch_id>\d+)/close_to$', 'survey.views.batch.close', name='batch_close_page'),
 )
+
+if not settings.PRODUCTION:
+    urlpatterns += (
+        url(r'^api/create_investigator', 'survey.views.api.create_investigator', name='create_investigator'),
+        url(r'^api/delete_investigator', 'survey.views.api.delete_investigator', name='delete_investigator'),
+    )
