@@ -21,3 +21,13 @@ def pending_households(investigator, batch):
 def is_batch_open_for_location(open_locations, location):
     if location in open_locations:
         return "checked='checked'"
+
+@register.filter
+def is_mobile_number(field):
+    return 'mobile number' in field.lower()
+
+@register.filter
+def is_radio(field):
+    if "radio" in str(field):
+        return "radio_field"
+    return ""
