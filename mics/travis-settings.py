@@ -10,11 +10,10 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'johnny.backends.memcached.MemcachedCache',
+        'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
         'LOCATION': 'localhost:11211',
         'TIMEOUT': 500,
         'BINARY': False,
-        'JOHNNY_CACHE': True,
         'OPTIONS': {  # Maps to pylibmc "behaviors"
             'tcp_nodelay': True,
             'ketama': True
