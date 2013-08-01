@@ -5,7 +5,7 @@
   {% block title %} {% endblock %}
 </h3>
 
-<form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal investigator-form">
+<form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal">
   {% csrf_token %}
 
   {% block display_form_fields %}{% endblock %}

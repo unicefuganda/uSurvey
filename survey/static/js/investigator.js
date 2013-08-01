@@ -40,7 +40,7 @@ $(function(){
         return (cleaned_original==cleaned_confirm)
       }, "Mobile number not matched.");
 
-  $('.investigator-form').validate({
+  $('#create-investigator-form').validate({
       ignore: ":hidden:not(select)",
       rules: {
         "name": "required",

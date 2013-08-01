@@ -30,7 +30,8 @@ class HouseholdViewTest(TestCase):
                 self.assertEquals(dict1[key][index], dict2[key][index])
 
     def test_new_GET(self):
-        LocationType.objects.create(name='some type', slug='some_name')
+        some_type = LocationType.objects.create(name='some type', slug='some_name')
+        uganda = Location.objects.create(name="Uganda", type=some_type)
         response = self.client.get('/households/new/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -43,7 +44,8 @@ class HouseholdViewTest(TestCase):
         self.assert_dictionary_equal(response.context['investigator_form'], investigator_form)
         self.assertIsNotNone(response.context['householdform'])
         self.assertIsNotNone(response.context['headform'])
-        self.assertIsNotNone(response.context['location_type'])
+        self.assertIsNotNone(response.context['locations'])
+        self.assertIsNone(response.context['selected_location'])
         self.assertIsNotNone(response.context['months_choices'])
         self.assertIsNotNone(response.context['years_choices'])
 
@@ -164,7 +166,7 @@ class HouseholdViewTest(TestCase):
         uganda = Location.objects.create(name="Uganda", type=country)
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         form_data = {
-            'country': uganda.id,
+            'location': uganda.id,
             'investigator':investigator.id,
             'surname': 'Rajini',
             'first_name':'Kant',
@@ -240,7 +242,7 @@ class HouseholdViewTest(TestCase):
         uganda = Location.objects.create(name="Uganda", type=country)
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         form_data = {
-            'country': uganda.id,
+            'location': uganda.id,
             'investigator':investigator.id,
             'surname': 'Rajini',
             'first_name':'Kant',
@@ -281,6 +283,7 @@ class HouseholdViewTest(TestCase):
 
         response = self.client.post('/households/new/', data=form_with_invalid_data)
         self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(response.context['selected_location'], uganda)
 
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(number_of_males=form_data['number_of_males'])

@@ -54,3 +54,12 @@ Feature: Households feature
         And I fill in number_of_females lower than sum of 15_19 and 20_49
         And I submit the form
         Then I should see an error on number_of_females
+
+    Scenario: Create a household with other-specify occupation
+        Given I am logged in as researcher
+        And I have locations
+        And I visit new household page
+        And Now If I choose Other as occupation
+        Then I have to specify one
+        And If I choose a different occupation
+        Then Specify disappears

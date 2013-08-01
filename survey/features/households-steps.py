@@ -87,3 +87,19 @@ def and_i_fill_in_number_of_females_lower_than_sum_of_15_19_and_20_49(step):
 @step(u'Then I should see an error on number_of_females')
 def then_i_should_see_an_error_on_number_of_females(step):
     world.page.see_an_error_on_number_of_females()
+
+@step(u'And Now If I choose Other as occupation')
+def and_now_if_i_choose_other_as_occupation(step):
+    world.page.choose_occupation('Other: ')
+
+@step(u'Then I have to specify one')
+def then_i_have_to_specify_one(step):
+    world.page.is_specify_visible(True)
+
+@step(u'And If I choose a different occupation')
+def and_if_i_choose_a_different_occupation(step):
+    world.page.choose_occupation('Business person')
+
+@step(u'Then Specify disappears')
+def then_specify_disappears(step):
+    world.page.is_specify_visible(False)

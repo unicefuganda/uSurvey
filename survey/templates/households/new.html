@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block display_form_fields %}
-{% include "location_filter.html" %}
+{% include "vertical_location_widget.html" with location_data=locations default_text="" %}
+<input type="hidden" name="location" value="{% if selected_location %}{{selected_location.id}}{% endif %}">
 <div class="control-group">
   <label class="control-label" for="investigator">Investigator</label>
   <div class="controls">
@@ -50,4 +51,9 @@
 </div>
 
 {% include "naked_form.html" with a_form=householdform.children %}
+{% endblock %}
+
+{% block javascripts %}
+  <script src="{{STATIC_URL}}/js/household.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

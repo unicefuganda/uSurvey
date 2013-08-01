@@ -1,10 +1,10 @@
 ;
 jQuery(function($){
-  function next_element(element) {
+  function get_next_element(element) {
     return element.parents(".parent").next().find('select');
   }
 
-  function previous_element(element) {
+  function get_previous_element(element) {
     return element.parents(".parent").prev().find('select');
   }
 
@@ -24,24 +24,29 @@ jQuery(function($){
         .on('change', function(){
             var element = $(this),
                 value = element.val(),
-                url = "/location/" + value + "/children";
+                url = "/location/" + value + "/children",
+                next_element = get_next_element(element);
             if($.isEmptyObject(value)){
-              value = previous_element(element).val();
+              value = get_previous_element(element).val();
               location.val(value);
-              next_element(element).trigger('clear-locations');
+              next_element.trigger('clear-locations');
               return true;
             }
-            location.val(value);
-            $.getJSON(url, function(data){
-              populate_children(next_element(element), data);
-            });
+            if(next_element.length > 0){
+              location.val(value);
+              $.getJSON(url, function(data){
+                populate_children(next_element, data);
+              });
+            } else{
+              location.val(value).trigger('fetch-investigator');
+            };
         })
         .on('clear-locations', function(){
             var element = $(this);
             element.find('option[data-location=true]').remove();
             element.trigger("liszt:updated");
-            next_element(element).trigger('clear-locations');
+            get_next_element(element).trigger('clear-locations');
         });
 
-  location.val($("#location-widget option[selected]").last().val());
+  location.val($("#location-widget option[selected]").last().val()).trigger('change');
 });

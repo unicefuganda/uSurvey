@@ -8,3 +8,7 @@
 {% include "with_mobile_number_form.html" with form=userform %}
 <!-- {{user_profile_form}} -->
 {% endblock %}
+
+{% block javascripts %}
+  <script src="{{STATIC_URL}}/js/users.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

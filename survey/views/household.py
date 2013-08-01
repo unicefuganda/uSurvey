@@ -13,6 +13,7 @@ from survey.forms.women import *
 from survey.forms.household import *
 from survey.views.views_helper import initialize_location_type, update_location_type, get_posted_location
 from survey.models import *
+from survey.views.location_widget import LocationWidget
 from django.contrib.auth.decorators import login_required
 
 
@@ -93,42 +94,43 @@ def set_household_form(data):
     householdform['household'] = HouseholdForm(data=data, auto_id='household-%s', label_suffix='')
     return householdform
 
-def create(request, location_type):
+def create(request, selected_location):
     defaults = {"aged_between_0_5_months": 0, "aged_between_6_11_months": 0,
                 "aged_between_12_23_months": 0, "aged_between_24_59_months": 0,
                 'aged_between_5_12_years':0, 'aged_between_13_17_years':0,
                 'aged_between_15_19_years': 0, 'aged_between_20_49_years': 0}
     params = dict(defaults.items() + request.POST.items())
     householdform = set_household_form(data=params)
-    location_id = get_posted_location(request.POST)
-    location_type = update_location_type(location_type, location_id)
-    posted_locations = Location.objects.get(id=int(location_id)).get_descendants(include_self=True)
+    posted_locations = selected_location.get_descendants(include_self=True)
     investigator, investigator_form = validate_investigator(request, householdform['household'], posted_locations)
     response = _process_form(householdform, investigator, request)
 
     return response, householdform, investigator, investigator_form
 
+def contains_key(params, key):
+    return params.has_key(key) and params[key].isdigit()
+
 @login_required
 def new(request):
-    location_type = initialize_location_type(default_select=CREATE_HOUSEHOLD_DEFAULT_SELECT)
+    selected_location = None
     response = None
     householdform = set_household_form(data=None)
-    investigator_form = {'value': '', 'text': '', 'options': Investigator.objects.all(), 'error': ''}
+    investigator_form = {'value': '', 'text': '', 'options': '', 'error': ''}
     month_choices= {'selected_text':'', 'selected_value':''}
     year_choices= {'selected_text':'', 'selected_value':''}
 
-
     if request.method == 'POST':
-        response, householdform, investigator, investigator_form = create(request, location_type)
+        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
+        response, householdform, investigator, investigator_form = create(request, selected_location)
         month_choices={'selected_text':MONTHS[int(request.POST['resident_since_month'])][1],
                         'selected_value':request.POST['resident_since_month']    }
         year_choices={'selected_text':request.POST['resident_since_year'],
                         'selected_value':request.POST['resident_since_year']    }
 
-
     householdHead = householdform['householdHead']
     del householdform['householdHead']
-    return response or render(request, 'households/new.html', {'location_type': location_type,
+    return response or render(request, 'households/new.html', {'selected_location': selected_location,
+                                                               'locations': LocationWidget(selected_location),
                                                                'investigator_form': investigator_form,
                                                                'headform': householdHead,
                                                                'householdform': householdform,
