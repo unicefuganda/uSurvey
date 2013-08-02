@@ -81,9 +81,9 @@ class NewInvestigatorPage(PageObject):
         self.browser.execute_script(script)
 
     def submit(self):
-        sleep(2)
         self.browser.find_by_css("form button").first.click()
-        sleep(5)
+
+
 
 class InvestigatorsListPage(PageObject):
     url = '/investigators/'

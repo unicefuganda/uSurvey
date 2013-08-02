@@ -110,3 +110,46 @@ class UsersViewTest(TestCase):
         self.failIf(user)
         assert error_message.called
 
+    def test_index(self):
+        response = self.client.get('/users/')
+        self.failUnlessEqual(response.status_code, 200)
+
+    def test_check_mobile_number(self):
+        user = User.objects.create(username='some_other_name')
+        userprofile = UserProfile.objects.create(user=user, mobile_number='123456789')
+
+        response = self.client.get('/users/?mobile_number=987654321')
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)
+
+        response = self.client.get("/users/?mobile_number=" + userprofile.mobile_number)
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertFalse(json_response)
+
+    def test_check_username(self):
+        user = User.objects.create(username='some_other_name')
+
+        response = self.client.get('/users/?username=rajni')
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)
+
+        response = self.client.get("/users/?username=" + user.username)
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertFalse(json_response)
+
+    def test_check_email(self):
+        user = User.objects.create(email='haha@ha.ha')
+
+        response = self.client.get('/users/?email=bla@bla.bl')
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)
+
+        response = self.client.get("/users/?email=" + user.email)
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertFalse(json_response)

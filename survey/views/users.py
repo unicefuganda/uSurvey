@@ -36,3 +36,25 @@ def new(request):
                           'button_label': "Create User",
                           'loading_text': "Creating..."}
     return response or render(request, 'users/new.html', template_variables)
+
+
+def check_mobile_number(mobile_number):
+    response = UserProfile.objects.filter(mobile_number=mobile_number).exists()
+    return HttpResponse(json.dumps(not response), content_type="application/json")
+
+def check_user_attribute(**kwargs):
+    response = User.objects.filter(**kwargs).exists()
+    return HttpResponse(json.dumps(not response), content_type="application/json")
+
+@login_required
+def index(request):
+    if request.GET.has_key('mobile_number'):
+        return check_mobile_number(request.GET['mobile_number'])
+
+    if request.GET.has_key('username'):
+        return check_user_attribute(username=request.GET['username'])
+
+    if request.GET.has_key('email'):
+        return check_user_attribute(email=request.GET['email'])
+
+    return HttpResponse(status=200)
