@@ -12,6 +12,12 @@ $(function(){
         return ($("#id_password1").val()==value)
       }, "Mobile number not matched.");
 
+  jQuery.validator.addMethod( "regex", function(value, element, regexp) {
+                  var re = new RegExp(regexp);
+                  return re.test(value);
+              },"username may contain only letters characters."
+      );
+
   $('#create-user-form').validate({
       ignore: ":hidden:not(select)",
       rules: {
@@ -23,6 +29,7 @@ $(function(){
           remote: '/users/',
         },
         "username":{required:true,
+                    regex:'^[a-zA-Z]+$',
                     remote:'/users/'},
         "email":{required:true,
                     remote:'/users/'},

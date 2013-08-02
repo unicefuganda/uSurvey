@@ -106,3 +106,19 @@ def then_i_fill_an_existing_email(step):
 @step(u'Then I should see existing email error message')
 def then_i_should_see_existing_email_error_message(step):
     world.page.is_text_present('%s is already associated with a different user.'%world.user_data['email'])
+
+@step(u'Then I fill a not allowed username')
+def then_i_fill_a_not_allowed_username(step):
+    not_allowed_username = 'haha#%&&**!'
+    world.user_data = {
+          'username':not_allowed_username,
+          }
+    user = User.objects.create(username=world.user_data['username'])
+
+    world.page.fill_valid_values(world.user_data)
+    world.page.submit()
+
+
+@step(u'Then I should see not allowed username error message')
+def then_i_should_see_not_allowed_username_error_message(step):
+    world.page.is_text_present("username may contain only letters characters.")

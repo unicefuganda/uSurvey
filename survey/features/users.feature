@@ -40,3 +40,10 @@ Feature: Users feature
       And I click submit
       Then I should see existing email error message
 
+    Scenario: create user with prohibited username
+      Given I am logged in as a superuser
+      And I have a group
+      And I visit new user page
+      Then I fill a not allowed username
+      And I click submit
+      Then I should see not allowed username error message
