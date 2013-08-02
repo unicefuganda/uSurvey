@@ -64,52 +64,45 @@ def and_i_can_login_that_user_successfully(step):
 
 @step(u'Then I fill an existing mobile number')
 def then_i_fill_an_existing_mobile_number(step):
-    user_data = {
-          'username':'baby_rajni',
-          'password1':'baby_kant',
-          'password2':'baby_kant',
-          'first_name':'Baby',
-          'last_name':'Kant',
+    world.user_data = {
           'mobile_number':'123456789',
-          'email':'haha@haha.ha',
-          'groups':world.group.id,
           }
 
     user = User.objects.create(username='some_other_name')
-    userprofile = UserProfile.objects.create(user=user, mobile_number=user_data['mobile_number'])
+    userprofile = UserProfile.objects.create(user=user, mobile_number=world.user_data['mobile_number'])
 
-    world.page.fill_valid_values(user_data)
+    world.page.fill_valid_values(world.user_data)
     world.page.submit()
 
 @step(u'Then I should see existing mobile number error message')
 def then_i_should_see_existing_mobile_number_error_message(step):
-    world.page.is_text_present('is already associated with a different user.')
+    world.page.is_text_present('%s is already associated with a different user.'%world.user_data['mobile_number'])
 
 @step(u'Then I fill an existing username')
 def then_i_fill_an_existing_username(step):
-    user_data = {
+    world.user_data = {
           'username':'baby_rajni',
           }
-    user = User.objects.create(username=user_data['username'])
+    user = User.objects.create(username=world.user_data['username'])
 
-    world.page.fill_valid_values(user_data)
+    world.page.fill_valid_values(world.user_data)
     world.page.submit()
 
 @step(u'Then I should see existing username error message')
 def then_i_should_see_existing_username_error_message(step):
-    world.page.is_text_present('baby_rajni is no longer available.')
+    world.page.is_text_present('%s is no longer available.'%world.user_data['username'])
 
 
 @step(u'Then I fill an existing email')
 def then_i_fill_an_existing_email(step):
-    user_data = {
+    world.user_data = {
           'email':'haha@ha.ha',
           }
-    user = User.objects.create(email=user_data['email'])
+    user = User.objects.create(email=world.user_data['email'])
 
-    world.page.fill_valid_values(user_data)
+    world.page.fill_valid_values(world.user_data)
     world.page.submit()
 
 @step(u'Then I should see existing email error message')
 def then_i_should_see_existing_email_error_message(step):
-    world.page.is_text_present('haha@ha.ha is already associated with a different user.')
+    world.page.is_text_present('%s is already associated with a different user.'%world.user_data['email'])
