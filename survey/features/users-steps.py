@@ -30,7 +30,7 @@ def and_i_have_a_group(step):
 @step(u'Then I fill all necessary new user fields')
 def then_i_fill_all_necessary_new_user_fields(step):
     world.user_data = {
-          'username':'baby_rajni',
+          'username':'babyrajni',
           'password1':'baby_kant',
           'password2':'baby_kant',
           'first_name':'Baby',
@@ -81,7 +81,7 @@ def then_i_should_see_existing_mobile_number_error_message(step):
 @step(u'Then I fill an existing username')
 def then_i_fill_an_existing_username(step):
     world.user_data = {
-          'username':'baby_rajni',
+          'username':'babyrajni',
           }
     user = User.objects.create(username=world.user_data['username'])
 
