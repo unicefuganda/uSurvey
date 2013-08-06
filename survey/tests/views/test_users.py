@@ -5,7 +5,8 @@ from django.test.client import Client
 from mock import *
 
 from survey.models import *
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 
 
 class UsersViewTest(TestCase):
@@ -110,6 +111,24 @@ class UsersViewTest(TestCase):
         self.failIf(user)
         assert error_message.called
 
+    def test_create_users_restricted_permission(self):
+        self.client.logout()
+        useless = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+
+        self.client.login(username='useless', password='I_Suck')
+        response = self.client.get('/users/new/')
+
+        self.assertRedirects(response, expected_url='/accounts/login/?next=/users/new/', status_code=302, target_status_code=200, msg_prefix='')
+
+        some_group = Group.objects.create(name='admin')
+        auth_content = ContentType.objects.get_for_model(Permission)
+        permission, out = Permission.objects.get_or_create(codename='can_view_users', content_type=auth_content)
+        some_group.permissions.add(permission)
+        some_group.user_set.add(useless)
+
+        self.client.login(username='useless', password='I_Suck')
+        self.test_new()
+
     def test_index(self):
         response = self.client.get('/users/')
         self.failUnlessEqual(response.status_code, 200)
@@ -143,6 +162,7 @@ class UsersViewTest(TestCase):
 
     def test_check_email(self):
         user = User.objects.create(email='haha@ha.ha')
+        self.client.login(username='Rajni', password='I_suck')
 
         response = self.client.get('/users/?email=bla@bla.bl')
         self.failUnlessEqual(response.status_code, 200)

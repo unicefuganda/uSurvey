@@ -6,7 +6,7 @@ from django.contrib import messages
 
 from survey.investigator_configs import *
 from survey.forms.users import *
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 
 def _add_error_messages(userform, request):
     error_message = "User not registered. "
@@ -22,6 +22,7 @@ def _process_form(userform, request):
     return None
 
 @login_required
+@permission_required('auth.can_view_users')
 def new(request):
     userform = UserForm()
     response = None
