@@ -23,42 +23,52 @@
               <a  id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
             </li>
 
-            <li class="dropdown">
-              <a data-toggle="dropdown" id="drop1" class="dropdown-toggle" role="button" href="#">Investigators <b class="caret"></b></a>
-              <ul aria-labelledby="drop1" role="menu" class="dropdown-menu">
-                <li role="presentation"><a href="{% url 'investigators_page' %}">List all investigators</a></li>
-                <li role="presentation"><a href="{% url 'new_investigator_page' %}">Add an investigator</a></li>
-                <li role="presentation"><a href="{% url 'bulk_sms' %}">Notify Investigators</a></li>
-              </ul>
-            </li>
+            {% if perms.auth.can_view_investigators %}
+              <li class="dropdown">
+                <a data-toggle="dropdown" id="drop1" class="dropdown-toggle" role="button" href="#">Investigators<b class="caret"></b></a>
+                <ul aria-labelledby="drop1" role="menu" class="dropdown-menu">
+                  <li role="presentation"><a href="{% url 'investigators_page' %}">List all investigators</a></li>
+                  <li role="presentation"><a href="{% url 'new_investigator_page' %}">Add an investigator</a></li>
+                  <li role="presentation"><a href="{% url 'bulk_sms' %}">Notify Investigators</a></li>
+                </ul>
+              </li>
+            {% endif %}  
 
-            <li class="dropdown">
-              <a data-toggle="dropdown" id="drop2" class="dropdown-toggle" role="button" href="#">Households <b class="caret"></b></a>
-              <ul aria-labelledby="drop2" role="menu" class="dropdown-menu">
-                <li role="presentation"><a href="{% url 'new_household_page' %}">List all households</a></li>
-                <li role="presentation"><a href="{% url 'new_household_page' %}">Add a household</a></li>
-              </ul>
-            </li>
+            {% if perms.auth.can_view_households %}   
+              <li class="dropdown">
+                <a data-toggle="dropdown" id="drop2" class="dropdown-toggle" role="button" href="#">Households<b class="caret"></b></a>
+                <ul aria-labelledby="drop2" role="menu" class="dropdown-menu">
+                  <li role="presentation"><a href="{% url 'new_household_page' %}">List all households</a></li>
+                  <li role="presentation"><a href="{% url 'new_household_page' %}">Add a household</a></li>
+                </ul>
+              </li>
+            {% endif %}
 
-            <li class="dropdown">
-              <a data-toggle="dropdown" id="drop3" class="dropdown-toggle" role="button" href="#">Aggregates<b class="caret"></b></a>
-              <ul aria-labelledby="drop3" role="menu" class="dropdown-menu">
-                <li role="presentation"><a href="{% url 'aggregates_status' %}">Status</a></li>
-                <li role="presentation"><a href="{% url 'download_excel' %}">Download Spreadsheets</a></li>
-              </ul>
-            </li>
+            {% if perms.auth.can_view_aggregates %}  
+              <li class="dropdown">
+                <a data-toggle="dropdown" id="drop3" class="dropdown-toggle" role="button" href="#">Aggregates<b class="caret"></b></a>
+                <ul aria-labelledby="drop3" role="menu" class="dropdown-menu">
+                  <li role="presentation"><a href="{% url 'aggregates_status' %}">Status</a></li>
+                  <li role="presentation"><a href="{% url 'download_excel' %}">Download Spreadsheets</a></li>
+                </ul>
+              </li>
+            {% endif %}  
 
-            <li class="dropdown">
-              <a data-toggle="dropdown" id="drop4" class="dropdown-toggle" role="button" href="#">Users<b class="caret"></b></a>
-              <ul aria-labelledby="drop4" role="menu" class="dropdown-menu">
-                <li role="presentation"><a href="{% url 'new_user_page' %}">List all users</a></li>
-                <li role="presentation"><a href="{% url 'new_user_page' %}">Add a user</a></li>
-              </ul>
-            </li>
+            {% if perms.auth.can_view_users %}  
+              <li class="dropdown">
+                <a data-toggle="dropdown" id="drop4" class="dropdown-toggle" role="button" href="#">Users<b class="caret"></b></a>
+                <ul aria-labelledby="drop4" role="menu" class="dropdown-menu">
+                  <li role="presentation"><a href="{% url 'new_user_page' %}">List all users</a></li>
+                  <li role="presentation"><a href="{% url 'new_user_page' %}">Add a user</a></li>
+                </ul>
+              </li>
+            {% endif %}  
 
-            <li>
-              <a href="{% url 'batch_index_page' %}">Batches</a>
-            </li>
+            {% if perms.auth.can_view_batches %}              
+              <li>
+                <a href="{% url 'batch_index_page' %}">Batches</a>
+              </li>
+            {% endif %}
 
           </ul>
           {% if user.is_authenticated %}

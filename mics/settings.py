@@ -127,8 +127,8 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.auth',    
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
@@ -193,6 +193,8 @@ INSTALLED_BACKENDS = {
 }
 
 PRODUCTION = False
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Importing server specific settings
 from localsettings import *

@@ -48,6 +48,40 @@ class PageObject(object):
     def click_the_about_link(self):
         self.browser.click_link_by_text('About')
 
+    def check_anonymous_user_allowed_tabs(self):
+        assert self.browser.find_link_by_text('About')
+        assert self.browser.find_link_by_text('mMICS')
+        assert self.browser.find_link_by_text('login')
+
+    def check_data_entry_allowed_tabs(self):
+        assert self.browser.find_link_by_text('About')
+        assert self.browser.find_link_by_text('mMICS')
+
+        assert self.browser.find_link_by_text('Households')              
+        assert self.browser.find_link_by_text('Investigators')
+
+    def check_researcher_allowed_tabs(self):
+        self.check_data_entry_allowed_tabs()
+        assert self.browser.find_link_by_text('Batches') 
+        assert self.browser.find_link_by_text('Aggregates')            
+
+    def check_all_tabs(self):
+        self.check_researcher_allowed_tabs()
+        assert self.browser.find_link_by_text('Users')         
+
+    def check_researcher_not_allowed_tabs(self):
+        assert not self.browser.find_link_by_text('Users')               
+
+    def check_data_entry_not_allowed_tabs(self):
+        self.check_researcher_not_allowed_tabs()
+        assert not self.browser.find_link_by_text('Aggregates')            
+        assert not self.browser.find_link_by_text('Batches')                    
+
+    def check_anonymous_user_not_allowed_tabs(self):
+        self.check_data_entry_not_allowed_tabs()        
+        assert not self.browser.find_link_by_text('Investigators')    
+        assert not self.browser.find_link_by_text('Households')                    
+
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 

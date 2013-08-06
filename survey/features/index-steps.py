@@ -5,11 +5,13 @@ from lettuce.django import django_url
 from django.core.management import call_command
 from survey.models import Backend
 from django.conf import settings
+from django.contrib.auth.models import User, Group, Permission
 
 @before.each_scenario
 def flush_database(step):
-    call_command('flush', interactive=False)
-    create_backends()
+	Permission.objects.all().delete()
+	call_command('flush', interactive=False)
+	create_backends()
 
 @before.each_scenario
 def open_browser(step):
