@@ -440,3 +440,8 @@ class HouseholdBatchCompletionTest(TestCase):
         household.batch_reopen(batch)
 
         self.assertFalse(household.has_completed_batch(batch))
+
+class RandomHouseHoldSelectionTest(TestCase):
+    def test_store(self):
+        selection = RandomHouseHoldSelection.objects.create(mobile_number="123456789", no_of_households=50, selected_households="1,2,3,4,5,6,7,8,9,10")
+        self.failUnless(selection.id)

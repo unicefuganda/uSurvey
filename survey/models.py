@@ -13,6 +13,7 @@ import datetime
 from django.db.models import Count
 from django.conf import settings
 from rapidsms.router import send
+import random
 
 from django.contrib.auth.models import User
 
@@ -613,6 +614,27 @@ class AnswerRule(BaseModel):
     def validate(self, answer):
         method = getattr(self, self.CONDITION_METHODS[self.condition])
         return method(answer)
+
+class RandomHouseHoldSelection(BaseModel):
+    mobile_number = models.CharField(max_length=10, unique=True, null=False, blank=False)
+    no_of_households = models.PositiveIntegerField(null=True)
+    selected_households = models.CharField(max_length=100, blank=False, null=False)
+
+    def generate_new_list(self):
+        selected_households = random.sample(list(range(1, self.no_of_households + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
+        self.selected_households = ",".join(str(x) for x in selected_households)
+        self.save()
+
+    def text_message(self):
+        return "Dear investigator, these are the selected households: %s" % self.selected_households
+
+    def generate(self, no_of_households):
+        if self.no_of_households != no_of_households:
+            self.no_of_households = no_of_households
+            self.generate_new_list()
+        investigator = Investigator(mobile_number=self.mobile_number)
+        investigator.backend = Backend.objects.all()[0]
+        send(self.text_message(), [investigator])
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)

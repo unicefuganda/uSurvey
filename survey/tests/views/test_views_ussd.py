@@ -17,11 +17,11 @@ class InvestigatorsViewTest(TestCase):
             'msisdn': '256776520831',
             'ussdServiceCode': '130',
             'ussdRequestString': '',
-            'response': False
+            'response': 'false'
         }
 
     def test_ussd_url(self):
-        response_message = "responseString=%s&action=end" % USSD.MESSAGES['USER_NOT_REGISTERED']
+        response_message = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
         response = self.client.get('/ussd', data=self.ussd_params)
         self.failUnlessEqual(response.status_code, 200)
         self.assertEquals(urllib2.unquote(response.content), response_message)
