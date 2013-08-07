@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.conf import settings
 from survey.models import RandomHouseHoldSelection
+from survey.investigator_configs import *
 
 class USSDBase(object):
     MESSAGES = {
@@ -12,8 +13,9 @@ class USSDBase(object):
         'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
         'NO_HOUSEHOLDS': "Sorry, you have no households registered.",
         'NO_OPEN_BATCH': "Sorry, there are no open surveys currently.",
-        'HOUSEHOLDS_COUNT_QUESTION': "How many households are there?",
+        'HOUSEHOLDS_COUNT_QUESTION': "How many households are there in your village?",
         'HOUSEHOLD_SELECTION_SMS_MESSAGE': "Thanks. You will receive a SMS with households list shortly",
+        'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s.How many households are there in your village?" % NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR,
     }
 
     ACTIONS = {
@@ -237,11 +239,14 @@ class HouseHoldSelection(USSDBase):
 
     def randomly_select_households(self):
         no_of_households = int(self.request['ussdRequestString'].strip())
-        RandomHouseHoldSelection.objects.get_or_create(mobile_number=self.mobile_number)[0].generate(no_of_households=no_of_households)
+        if no_of_households >= NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR:
+            RandomHouseHoldSelection.objects.get_or_create(mobile_number=self.mobile_number)[0].generate(no_of_households=no_of_households)
+            return { 'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE'] }
+        else:
+            return { 'action': self.ACTIONS['REQUEST'], 'responseString': self.MESSAGES['HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE'] }
 
     def response(self):
         if self.is_new_request():
             return { 'action': self.ACTIONS['REQUEST'], 'responseString': self.MESSAGES['HOUSEHOLDS_COUNT_QUESTION'] }
         else:
-            self.randomly_select_households()
-            return { 'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE'] }
+            return self.randomly_select_households()

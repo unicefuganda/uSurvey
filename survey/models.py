@@ -4,7 +4,7 @@ from django_extensions.db.models import TimeStampedModel
 from rapidsms.contrib.locations.models import Location
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from investigator_configs import *
+from survey.investigator_configs import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.conf import settings
