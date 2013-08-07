@@ -5,11 +5,26 @@ from random import randint
 from survey.models import *
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
+
+def set_permissions(group, permissions_codename_list):
+    auth_content = ContentType.objects.get_for_model(Permission)
+    for codename in permissions_codename_list:
+        permission, out = Permission.objects.get_or_create(codename=codename, content_type=auth_content)
+        group.permissions.add(permission)
+
+def create_reacher():
+    researcher = Group.objects.create(name='researcher')
+    user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    researcher.user_set.add(user)
+    set_permissions(researcher, ['can_view_aggregates', 'can_view_households', 'can_view_batches', 'can_view_investigators'])
+
+    return user
 
 @step(u'Given I am logged in as researcher')
 def given_i_am_logged_in_as_researcher(step):
-    user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    user = create_reacher()
     world.page = LoginPage(world.browser)
     world.page.visit()
     world.page.login(user)

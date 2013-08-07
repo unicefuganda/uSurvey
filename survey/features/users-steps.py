@@ -6,6 +6,8 @@ from survey.models import *
 @step(u'Given I am logged in as a superuser')
 def given_i_am_logged_in_as_a_superuser(step):
     user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    user.is_superuser = True
+    user.save()
     world.page = LoginPage(world.browser)
     world.page.visit()
     world.page.login(user)
