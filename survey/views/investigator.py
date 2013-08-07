@@ -10,7 +10,7 @@ from survey.forms.investigator import *
 from survey.models import Investigator
 from survey.views.views_helper import initialize_location_type, update_location_type, get_posted_location
 from survey.views.location_widget import LocationWidget
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
@@ -41,6 +41,7 @@ def contains_key(params, key):
     return params.has_key(key) and params[key].isdigit()
 
 @login_required
+@permission_required('auth.can_view_investigators')
 def new_investigator(request):
     investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
     selected_location = None
@@ -68,6 +69,7 @@ def get_locations(request):
     return HttpResponse(json.dumps(location_hash), content_type="application/json")
 
 @login_required
+@permission_required('auth.can_view_investigators')
 def list_investigators(request):
     params = request.GET
     selected_location = None

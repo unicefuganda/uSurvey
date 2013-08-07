@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from survey.models import Batch
 import csv
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 
 @login_required
+@permission_required('auth.can_view_aggregates')
 def download(request):
     batch = Batch.objects.get(id = request.POST['batch'])
     response = HttpResponse(content_type='text/csv')
@@ -16,6 +17,7 @@ def download(request):
     return response
 
 @login_required
+@permission_required('auth.can_view_aggregates')
 def list(request):
     batches = Batch.objects.order_by('order').all()
     return render(request, 'aggregates/download_excel.html', {'batches': batches})

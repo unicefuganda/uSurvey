@@ -8,13 +8,22 @@ from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import *
 from survey.views.views_helper import initialize_location_type, assign_immediate_child_locations, update_location_type
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 
 
 class InvestigatorsViewTest(TestCase):
     def setUp(self):
         self.client = Client()
-        User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+
+        some_group = Group.objects.create(name='some group')
+        auth_content = ContentType.objects.get_for_model(Permission)
+        permission, out = Permission.objects.get_or_create(codename='can_view_investigators', content_type=auth_content)
+        some_group.permissions.add(permission)
+        some_group.user_set.add(raj)
+
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_new(self):
@@ -42,8 +51,6 @@ class InvestigatorsViewTest(TestCase):
         self.assertEquals(locations['country'][0], uganda)
 
         self.assertEquals(len(locations['city']), 0)
-
-
 
     def test_get_district_location_returns_all_locations_if_parent_not_specified(self):
         uganda = Location.objects.create(name="Uganda")
@@ -137,7 +144,7 @@ class InvestigatorsViewTest(TestCase):
 
         form_data['location']='Not A Number'
         response = self.client.post('/investigators/new/', data=form_data)
-        self.failUnlessEqual(response.status_code, 200) # ensure redirection to list investigator page
+        self.failUnlessEqual(response.status_code, 200)
         investigator = Investigator.objects.filter(name=form_data['name'])
         self.failIf(investigator)
         assert mock_messages_error.called
@@ -149,6 +156,14 @@ class InvestigatorsViewTest(TestCase):
         investigator = Investigator.objects.filter(name=form_data['name'])
         self.failIf(investigator)
         assert mock_messages_error.called
+
+    def assert_restricted_permission_for(self, url):
+        self.client.logout()
+
+        self.client.login(username='useless', password='I_Suck')
+        response = self.client.get(url)
+
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
@@ -223,3 +238,7 @@ class InvestigatorsViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
         self.assertFalse(json_response)
+
+    def test_restricted_permssion(self):
+        self.assert_restricted_permission_for('/investigators/new/')
+        self.assert_restricted_permission_for('/investigators/')

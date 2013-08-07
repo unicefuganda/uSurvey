@@ -14,7 +14,7 @@ from survey.forms.household import *
 from survey.views.views_helper import initialize_location_type, update_location_type, get_posted_location
 from survey.models import *
 from survey.views.location_widget import LocationWidget
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''
@@ -111,6 +111,7 @@ def contains_key(params, key):
     return params.has_key(key) and params[key].isdigit()
 
 @login_required
+@permission_required('auth.can_view_households')
 def new(request):
     selected_location = None
     response = None
