@@ -15,7 +15,7 @@ class USSDBase(object):
         'NO_OPEN_BATCH': "Sorry, there are no open surveys currently.",
         'HOUSEHOLDS_COUNT_QUESTION': "How many households are there in your village?",
         'HOUSEHOLD_SELECTION_SMS_MESSAGE': "Thanks. You will receive a SMS with households list shortly",
-        'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s.How many households are there in your village?" % NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR,
+        'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s. How many households are there in your village?" % NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR,
     }
 
     ACTIONS = {
