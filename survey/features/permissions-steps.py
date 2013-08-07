@@ -20,7 +20,7 @@ def then_i_should_see_anonymous_user_allowed_tabs(step):
 
 @step(u'And I should not be seeing above anonymous user level tabs')
 def and_i_should_not_be_seeing_above_anonymous_user_level_tabs(step):
-    world.page.check_anonymous_user_not_allowed_tabs()    
+    world.page.check_anonymous_user_not_allowed_tabs()
 
 def set_permissions(group, permissions_codename_list):
     auth_content = ContentType.objects.get_for_model(Permission)
@@ -47,7 +47,7 @@ def then_i_should_see_data_entry_allowed_tabs(step):
 
 @step(u'And I should not be seeing above data entry level tabs')
 def and_i_should_not_be_seeing_above_data_entry_level_tabs(step):
-    world.page.check_data_entry_not_allowed_tabs()    
+    world.page.check_data_entry_not_allowed_tabs()
 
 @step(u'Given I have a researcher user')
 def given_i_have_a_researcher_user(step):
@@ -58,7 +58,7 @@ def given_i_have_a_researcher_user(step):
 
 @step(u'And I should not be seeing above researcher level tabs')
 def and_i_should_not_be_seeing_above_researcher_level_tabs(step):
-    world.page.check_researcher_not_allowed_tabs() 
+    world.page.check_researcher_not_allowed_tabs()
 
 @step(u'Then I should see researcher allowed tabs')
 def then_i_should_see_researcher_allowed_tabs(step):
@@ -73,6 +73,8 @@ def given_i_have_a_admin_user(step):
 
 @step(u'Then I should all tabs')
 def then_i_should_all_tabs(step):
-    world.page.check_all_tabs()    
+    world.page.check_all_tabs()
 
-  
+@step(u'Then I should not see notify investigators drop-down')
+def then_i_should_not_see_notify_investigators_drop_down(step):
+    world.page.check_notify_investigators_drop_down_is_not_present()

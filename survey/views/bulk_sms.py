@@ -1,19 +1,21 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from rapidsms.contrib.locations.models import Location, LocationType
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from survey.investigator_configs import *
 from survey.models import Investigator
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 
 @login_required
+@permission_required('auth.can_view_batches')
 def view(request):
     location_type = LocationType.objects.get(name=PRIME_LOCATION_TYPE)
     locations = Location.objects.filter(type=location_type).order_by('name')
     return render(request, 'bulk_sms/index.html', {'locations': locations})
 
 @login_required
+@permission_required('auth.can_view_batches')
 def send(request):
     params = dict(request.POST)
     if valid_parameters(params, request):

@@ -25,3 +25,9 @@ Feature: Permissions feature
       And And I visit the login page
       And I login that user
       Then I should all tabs
+
+  Scenario: Notify investigators
+      Given I have a data entry user
+      And And I visit the login page
+      And I login that user
+      Then I should not see notify investigators drop-down
