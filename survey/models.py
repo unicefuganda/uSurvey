@@ -622,6 +622,7 @@ class RandomHouseHoldSelection(BaseModel):
 
     def generate_new_list(self):
         selected_households = random.sample(list(range(1, self.no_of_households + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
+        selected_households.sort()
         self.selected_households = ",".join(str(x) for x in selected_households)
         self.save()
 

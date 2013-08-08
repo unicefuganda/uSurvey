@@ -1013,3 +1013,33 @@ class RandomHouseHoldSelectionTest(TestCase):
 
         message = BackendMessage.objects.get(identity=self.ussd_params['msisdn'])
         self.assertEquals(message.text, household_selection.text_message())
+
+    def test_sort_household_selection_list(self):
+        mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+        self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
+
+        response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
+        response = self.client.get('/ussd', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(urllib2.unquote(response.content), response_message)
+        self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = " 100 "
+
+        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE']
+        response = self.client.get('/ussd', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(urllib2.unquote(response.content), response_message)
+        self.assertEquals(RandomHouseHoldSelection.objects.count(), 1)
+
+        household_selection = RandomHouseHoldSelection.objects.all()[0]
+        self.assertEquals(household_selection.mobile_number, mobile_number)
+        self.assertEquals(household_selection.no_of_households, 100)
+        selected_households = household_selection.selected_households.split(',')
+        selected_households = map(int,selected_households)
+        self.assertEquals(len(selected_households), 10)
+        self.assertEqual(sorted(selected_households), selected_households)
+
+        message = BackendMessage.objects.get(identity=self.ussd_params['msisdn'])
+        self.assertEquals(message.text, household_selection.text_message())
