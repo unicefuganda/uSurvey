@@ -3,17 +3,15 @@ import json
 from django.test import TestCase
 from django.test.client import Client
 from mock import *
-from django.template.defaultfilters import slugify
-
-from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import *
-from survey.views.views_helper import initialize_location_type, assign_immediate_child_locations, update_location_type
-from survey.forms.household import *
-from survey.views.household import *
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+
+from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models import *
+from survey.forms.household import *
+from survey.views.household import *
 
 class HouseholdViewTest(TestCase):
     def setUp(self):
