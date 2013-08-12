@@ -10,6 +10,7 @@ from survey.forms.investigator import *
 from survey.models import Investigator
 from survey.views.location_widget import LocationWidget
 from django.contrib.auth.decorators import login_required, permission_required
+from survey.views.views_helper import contains_key
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
@@ -35,9 +36,6 @@ def _process_form(investigator, request):
 
     _add_error_response_message(investigator, request)
     return None
-
-def contains_key(params, key):
-    return params.has_key(key) and params[key].isdigit()
 
 @login_required
 @permission_required('auth.can_view_investigators')

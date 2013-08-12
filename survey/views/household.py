@@ -13,6 +13,7 @@ from survey.forms.women import *
 from survey.forms.household import *
 from survey.views.location_widget import LocationWidget
 from django.contrib.auth.decorators import login_required, permission_required
+from survey.views.views_helper import contains_key
 
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''
@@ -104,9 +105,6 @@ def create(request, selected_location):
     response = _process_form(householdform, investigator, request)
 
     return response, householdform, investigator, investigator_form
-
-def contains_key(params, key):
-    return params.has_key(key) and params[key].isdigit()
 
 @login_required
 @permission_required('auth.can_view_households')

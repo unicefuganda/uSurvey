@@ -1,14 +1,12 @@
-from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from survey.models import *
-
-from rapidsms.contrib.locations.models import Location, LocationType
-from survey.views.location_widget import LocationWidget
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
-def contains_key(params, key):
-    return params.has_key(key) and params[key].isdigit()
+from survey.models import *
+from rapidsms.contrib.locations.models import Location, LocationType
+from survey.views.location_widget import LocationWidget
+from survey.views.views_helper import contains_key
+
 
 def is_valid(params):
     if contains_key(params, 'location') and contains_key(params, 'batch'):

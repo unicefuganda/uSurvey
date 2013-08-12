@@ -1,12 +1,14 @@
 from django.test import TestCase
 from django.test.client import Client
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import *
 from survey import investigator_configs
 from survey.views.aggregates import *
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from survey.views.views_helper import contains_key
+
 
 class AggregatesPageTest(TestCase):
     def setUp(self):
@@ -122,12 +124,6 @@ class AggregatesPageTest(TestCase):
         self.assertEquals(len(response.context['investigators']), 1)
         self.assertEquals(response.context['investigators'][0], investigator)
 
-    def test_contains_key(self):
-        self.assertTrue(contains_key({'bla':'1'}, 'bla'))
-        self.assertFalse(contains_key({'haha':'1'}, 'bla'))
-        self.assertFalse(contains_key({'bla':'-1'}, 'bla'))
-        self.assertFalse(contains_key({'bla':''}, 'bla'))
-        self.assertFalse(contains_key({'bla':'NOT_A_DIGIT'}, 'bla'))
 
     def test_is_valid_params(self):
         self.assertTrue(is_valid({'location':'1', 'batch':'2'}))
