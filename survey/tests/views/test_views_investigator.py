@@ -242,3 +242,19 @@ class InvestigatorsViewTest(TestCase):
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/investigators/new/')
         self.assert_restricted_permission_for('/investigators/')
+
+
+class ViewInvestigatorDetailsPage(TestCase):
+    def setUp(self):
+        self.client = Client()
+        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        self.client.login(username='Rajni', password='I_Rock')
+
+    def test_view_page(self):
+        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'))
+
+        response = self.client.get('/investigators/' + str(investigator.pk) + '/')
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('investigators/show.html', templates)
+        self.assertEquals(response.context['investigator'], investigator)

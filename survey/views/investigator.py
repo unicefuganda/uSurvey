@@ -93,3 +93,7 @@ def list_investigators(request):
 def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number=request.GET['mobile_number']).exists()
     return HttpResponse(json.dumps(not response), content_type="application/json")
+
+def show_investigator(request, investigator_id):
+    investigator = Investigator.objects.get(id=investigator_id)
+    return render(request, 'investigators/show.html', {'investigator': investigator})
