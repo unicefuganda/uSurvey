@@ -43,3 +43,10 @@ Feature: Investigators feature
       And I fill in already registered mobile number
       And I submit the form
       Then I should see that mobile number is already taken
+
+    Scenario: View investigator details
+      Given I am logged in as researcher
+      And I have an investigator
+      And I visit investigators listing page
+      When I visit an investigator's page
+      Then I should see his details displayed
