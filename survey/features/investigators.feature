@@ -46,6 +46,6 @@ Feature: Investigators feature
 
     Scenario: View investigator details
       Given I am logged in as researcher
-      And I have an investigator
+      And I have one investigator
       When I visit an investigator's page
       Then I should see his details displayed

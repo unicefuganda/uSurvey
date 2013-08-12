@@ -115,7 +115,7 @@ def and_i_request_filter_list_for_another_county_with_no_investigator(step):
 def then_i_should_see_no_investigator_for_this_county(step):
     world.page.no_registered_invesitgators()
 
-@step(u'And I have an investigator')
+@step(u'And I have one investigator')
 def and_i_have_an_investigator(step):
     country = LocationType.objects.create(name="Country", slug=slugify("country"))
     city = LocationType.objects.create(name="City", slug=slugify("city"))
