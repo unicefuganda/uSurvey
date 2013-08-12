@@ -31,7 +31,7 @@
         {% for investigator in investigators %}
           <tr>
             <td>
-              {{ investigator.name }}
+              <a href="{% url 'show_investigator_page' investigator.pk %}">{{ investigator.name }}</a>
             </td>
             <td>
               {{ investigator.mobile_number }}

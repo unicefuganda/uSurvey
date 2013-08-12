@@ -141,6 +141,9 @@ class InvestigatorsListPage(PageObject):
 
     def no_registered_invesitgators(self):
         assert self.browser.is_text_present("There are no investigators currently registered for this location.")
+    
+    def visit_investigator(self, investigator):
+        self.browser.click_link_by_text(investigator.name)
 
 class FilteredInvestigatorsListPage(InvestigatorsListPage):
     def __init__(self, browser, location_id):

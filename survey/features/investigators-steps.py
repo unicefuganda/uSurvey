@@ -122,13 +122,19 @@ def and_i_have_an_investigator(step):
     uganda = Location.objects.create(name="Uganda", type=country)
     kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
     world.investigator = Investigator.objects.create(name="Rajni", mobile_number = "123456789", age = 25, level_of_education = "Nursery", language = "Luganda", location = kampala)
-
-@step(u"When I visit an investigator's page")
-def when_i_visit_an_investigator_s_page(step):
-    world.page = InvestigatorDetailsPage(world.browser)
-    world.page.set_investigator(world.investigator)
+    
+@step(u'And I visit investigators page')
+def and_i_visit_investigators_page(step):
+    world.page = InvestigatorsListPage(world.browser)
     world.page.visit()
-
+    
+@step(u'And I click on the investigators name')
+def and_i_click_on_the_investigators_name(step):
+    world.page.visit_investigator(world.investigator)
+    
 @step(u'Then I should see his details displayed')
 def then_i_should_see_his_details_displayed(step):
+    world.page = InvestigatorDetailsPage(world.browser)
+    world.page.set_investigator(world.investigator)
     world.page.validate_page_content()
+    
