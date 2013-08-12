@@ -38,7 +38,7 @@ def then_i_fill_all_necessary_new_user_fields(step):
           'first_name':'Baby',
           'last_name':'Kant',
           'mobile_number':'123456789',
-          'email':'haha@haha.ha',
+          'email':'baby@ka.nt',
           'groups':world.group.id,
           }
 

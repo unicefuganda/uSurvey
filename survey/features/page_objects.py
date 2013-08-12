@@ -141,7 +141,7 @@ class InvestigatorsListPage(PageObject):
 
     def no_registered_invesitgators(self):
         assert self.browser.is_text_present("There are no investigators currently registered for this location.")
-    
+
     def visit_investigator(self, investigator):
         self.browser.click_link_by_text(investigator.name)
 
@@ -377,6 +377,7 @@ class NewUserPage(PageObject):
 
     def fill_valid_values(self, data):
         self.browser.fill_form(data)
+        sleep(2)
 
     def see_user_successfully_registered(self):
         self.is_text_present('User successfully registered.')
