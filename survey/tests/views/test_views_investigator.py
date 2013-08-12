@@ -251,8 +251,11 @@ class ViewInvestigatorDetailsPage(TestCase):
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_view_page(self):
-        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'))
-
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        city = LocationType.objects.create(name="City", slug=slugify("city"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
         response = self.client.get('/investigators/' + str(investigator.pk) + '/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]

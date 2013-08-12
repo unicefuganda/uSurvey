@@ -401,3 +401,22 @@ class BatchShowPage(object):
     def close_batch_for(self, location):
         self.browser.execute_script('$($("input:checkbox")[0]).parent().bootstrapSwitch("toggleState")')
         sleep(2)
+
+class InvestigatorDetailsPage(PageObject):
+
+    def set_investigator(self, investigator):
+        self.investigator = investigator
+        self.url = "/investigators/" + str(investigator.pk) + "/"
+
+    def validate_page_content(self):
+        details = {
+            'Name': self.investigator.name,
+            'Age': str(self.investigator.age),
+            'Level of Education': self.investigator.level_of_education,
+            'Language': self.investigator.language,
+            'Country': 'Uganda',
+            'City': 'Kampala',
+        }
+        for label, text in details.items():
+            self.is_text_present(label)
+            self.is_text_present(text)

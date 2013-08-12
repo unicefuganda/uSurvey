@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %}
+  {{ investigator.name }}'s details
+{% endblock %}
+{% block content %}
+<dl id="investigators-details">
+  <dt>
+    Name
+  </dt>
+  <dd>
+    {{ investigator.name }}
+  </dd>
+  <dt>
+    Age
+  </dt>
+  <dd>
+    {{ investigator.age }}
+  </dd>
+  <dt>
+    Level of Education
+  </dt>
+  <dd>
+    {{ investigator.level_of_education }}
+  </dd>
+  <dt>
+    Language
+  </dt>
+  <dd>
+    {{ investigator.language }}
+  </dd>
+  {% for location_type, location in investigator.location_hierarchy.items %}
+    <dt>
+      {{ location_type.capitalize }}
+    </dt>
+    <dd>
+      {{ location.name }}
+    </dd>
+  {% endfor %}
+</dl>
+{% endblock %}

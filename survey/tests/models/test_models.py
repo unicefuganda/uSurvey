@@ -3,6 +3,7 @@ from survey.models import *
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import *
+from django.template.defaultfilters import slugify
 
 class InvestigatorTest(TestCase):
 
@@ -47,6 +48,14 @@ class InvestigatorTest(TestCase):
         NumericalAnswer.objects.create(investigator=investigator, household=household, question=question_2, answer=10)
 
         self.assertEqual(None, investigator.next_answerable_question(household))
+
+    def test_location_hierarchy(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        city = LocationType.objects.create(name="City", slug=slugify("city"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210", location = kampala, backend = Backend.objects.create(name='something'))
+        self.assertEquals(investigator.location_hierarchy(), {'Country': uganda, 'City': kampala})
 
 class LocationTest(TestCase):
 

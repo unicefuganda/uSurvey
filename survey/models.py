@@ -14,7 +14,7 @@ from django.db.models import Count
 from django.conf import settings
 from rapidsms.router import send
 import random
-
+from django.utils.datastructures import SortedDict
 from django.contrib.auth.models import User
 
 class BaseModel(TimeStampedModel):
@@ -178,6 +178,16 @@ class Investigator(BaseModel):
     def pending_households_for(self, batch):
         completed = batch.completed_households.filter(investigator=self).count()
         return self.households.count() - completed
+
+    def location_hierarchy(self):
+        hierarchy = []
+        location = self.location
+        hierarchy.append([ location.type.name, location ])
+        while(location.tree_parent):
+            location = location.tree_parent
+            hierarchy.append([ location.type.name, location ])
+        hierarchy.reverse()
+        return SortedDict(hierarchy)
 
     @classmethod
     def get_summarised_answers_for(self, batch, questions, data):

@@ -117,12 +117,18 @@ def then_i_should_see_no_investigator_for_this_county(step):
 
 @step(u'And I have an investigator')
 def and_i_have_an_investigator(step):
-    assert False, 'This step must be implemented'
+    country = LocationType.objects.create(name="Country", slug=slugify("country"))
+    city = LocationType.objects.create(name="City", slug=slugify("city"))
+    uganda = Location.objects.create(name="Uganda", type=country)
+    kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+    world.investigator = Investigator.objects.create(name="Rajni", mobile_number = "123456789", age = 25, level_of_education = "Nursery", language = "Luganda", location = kampala)
 
 @step(u"When I visit an investigator's page")
 def when_i_visit_an_investigator_s_page(step):
-    assert False, 'This step must be implemented'
+    world.page = InvestigatorDetailsPage(world.browser)
+    world.page.set_investigator(world.investigator)
+    world.page.visit()
 
 @step(u'Then I should see his details displayed')
 def then_i_should_see_his_details_displayed(step):
-    assert False, 'This step must be implemented'
+    world.page.validate_page_content()
