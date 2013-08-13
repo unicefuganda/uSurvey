@@ -53,6 +53,7 @@ def new_investigator(request):
                                                                   'locations': LocationWidget(selected_location),
                                                                   'form': investigator,
                                                                   'action': "/investigators/new/",
+                                                                  'title': 'New Investigator',
                                                                   'id': "create-investigator-form",
                                                                   'button_label': "Create Investigator",
                                                                   'loading_text': "Creating..."})
@@ -97,8 +98,14 @@ def show_investigator(request, investigator_id):
     return render(request, 'investigators/show.html', {'investigator': investigator})
 
 def edit_investigator(request,investigator_id):
-    context = {'action': '/investigators/%s/edit/' % investigator_id,
+    investigator = Investigator.objects.get(id=investigator_id)
+    investigator_form = InvestigatorForm(instance=investigator, initial= {'confirm_mobile_number':investigator.mobile_number})
+    context = { 'action': '/investigators/%s/edit/' % investigator_id,
+                'country_phone_code': COUNTRY_PHONE_CODE,
+                'title': 'Edit Investigator',
                 'id': 'edit-investigator-form',
                 'button_label': 'Save',
-                'loading_text': 'Saving...'}
+                'loading_text': 'Saving...',
+                'form': investigator_form,
+                'locations': LocationWidget(investigator.location)}
     return render(request, 'investigators/new.html', context)

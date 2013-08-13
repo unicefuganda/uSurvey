@@ -6,6 +6,7 @@ from mock import *
 from django.template.defaultfilters import slugify
 
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.forms.investigator import InvestigatorForm
 from survey.models import *
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -48,6 +49,8 @@ class InvestigatorsViewTest(InvestigatorTest):
         templates = [template.name for template in response.templates]
         self.assertIn('investigators/new.html', templates)
         self.assertEquals(response.context['action'], '/investigators/new/')
+        self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)
+        self.assertEquals(response.context['title'], 'New Investigator')
         self.assertEquals(response.context['id'], 'create-investigator-form')
         self.assertEquals(response.context['button_label'], 'Create Investigator')
         self.assertEquals(response.context['loading_text'], 'Creating...')
@@ -260,6 +263,7 @@ class ViewInvestigatorDetailsPage(InvestigatorTest):
         self.assert_restricted_permission_for('/investigators/' + str(investigator.id) +'/')
         
 class EditInvestigatorPage(InvestigatorTest):
+
     def test_edit(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
         city = LocationType.objects.create(name="City", slug=slugify("city"))
@@ -271,6 +275,11 @@ class EditInvestigatorPage(InvestigatorTest):
         templates = [template.name for template in response.templates]
         self.assertIn('investigators/new.html', templates)
         self.assertEquals(response.context['action'], '/investigators/' + str(investigator.id) + '/edit/')
+        self.assertEquals(response.context['title'], 'Edit Investigator')
         self.assertEquals(response.context['id'], 'edit-investigator-form')
         self.assertEquals(response.context['button_label'], 'Save')
         self.assertEquals(response.context['loading_text'], 'Saving...')
+        self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)
+        self.assertIsInstance(response.context['form'], InvestigatorForm)
+        locations = response.context['locations'].get_widget_data()
+        self.assertEqual(len(locations),2)
