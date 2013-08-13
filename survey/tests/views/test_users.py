@@ -173,3 +173,13 @@ class UsersViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
         self.assertFalse(json_response)
+        
+    def test_list_users(self):
+        user = User.objects.create()
+        response = self.client.get('/users/')
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('users/index.html', templates)
+        self.assertEqual(len(response.context['users']), 2)
+        self.assertIn(user, response.context['users'])
+        self.assertNotEqual(None, response.context['request'])

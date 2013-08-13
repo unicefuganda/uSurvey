@@ -47,3 +47,9 @@ Feature: Users feature
       Then I fill a not allowed username
       And I click submit
       Then I should see not allowed username error message
+      
+    Scenario: List users
+      Given I am logged in as a superuser
+      And I have 100 users
+      And I visit the users list page
+      Then I should see a list of users

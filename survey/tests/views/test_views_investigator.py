@@ -197,6 +197,7 @@ class InvestigatorsViewTest(InvestigatorTest):
 
         self.assertEqual(len(response.context['investigators']), 1)
         self.assertIn(investigator, response.context['investigators'])
+        self.assertNotEqual(None, response.context['request'])
 
         locations = response.context['location_data'].get_widget_data()
         self.assertEquals(len(locations['country']), 1)

@@ -437,3 +437,15 @@ class InvestigatorDetailsPage(PageObject):
 
     def validate_back_link(self):
         self.browser.find_link_by_href(django_url(InvestigatorsListPage.url))
+
+class UsersListPage(PageObject):
+    url = "/users/"
+    def validate_users_listed(self):
+        self.is_text_present('Users List')
+    
+    def validate_displayed_headers(self):
+        self.is_text_present("Username")
+        self.is_text_present("Actions")
+        
+    def validate_users_paginated(self):
+        self.browser.click_link_by_text("2")

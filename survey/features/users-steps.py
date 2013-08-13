@@ -119,8 +119,32 @@ def then_i_fill_a_not_allowed_username(step):
 
     world.page.fill_valid_values(world.user_data)
     world.page.submit()
-
+    
 
 @step(u'Then I should see not allowed username error message')
 def then_i_should_see_not_allowed_username_error_message(step):
     world.page.is_text_present("username may contain only letters characters.")
+        
+@step(u'And I have 100 users')
+def and_i_have_users(step):
+    
+    for i in range(0,100):
+        random_suffix_number = str(randint(1, 1000))
+        try:
+            users  = User.objects.create_user('user'+ random_suffix_number, random_suffix_number +"@gmail.com", 'pass'+random_suffix_number )
+            print "&"*100
+            print users
+            print "&"*100
+        except:
+            pass
+    
+@step(u'And I visit the users list page')
+def and_i_visit_the_users_list_page(step):
+    world.page = UsersListPage(world.browser)
+    world.page.visit()
+    
+@step(u'Then I should see a list of users')
+def then_i_should_see_a_list_of_users(step):
+    world.page.validate_users_listed()
+    world.page.validate_displayed_headers()
+    world.page.validate_users_paginated()

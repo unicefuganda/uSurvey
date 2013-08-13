@@ -1,8 +1,9 @@
 import json
 
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 from survey.investigator_configs import *
 from survey.forms.users import *
@@ -57,5 +58,7 @@ def index(request):
 
     if request.GET.has_key('email'):
         return check_user_attribute(email=request.GET['email'])
-
-    return HttpResponse(status=200)
+    
+    print len(User.objects.all() )    
+    return render(request, 'users/index.html', { 'users' : User.objects.all(),
+                                                 'request': request})
