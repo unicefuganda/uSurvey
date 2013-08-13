@@ -149,6 +149,12 @@ class InvestigatorsListPage(PageObject):
     def visit_investigator(self, investigator):
         self.browser.click_link_by_text(investigator.name)
 
+    def click_actions_button(self):
+        self.browser.find_by_css('#action_caret').first.click()
+
+    def click_edit_button(self):
+        self.browser.click_link_by_text(' Edit')
+
 class FilteredInvestigatorsListPage(InvestigatorsListPage):
     def __init__(self, browser, location_id):
         self.browser = browser
@@ -468,3 +474,11 @@ class UsersDetailsPage(PageObject):
 
     def click_update_button(self):
         self.browser.find_by_name("save_button").first.click()
+class EditInvestigatorPage(PageObject):
+    def __init__(self, browser, investigator):
+        self.browser = browser
+        self.investigator = investigator
+        self.url = '/investigators/' + str(investigator.id) + '/edit'
+
+    def validate_edit_investigator_url(self):
+        assert self.browser.url == self.url

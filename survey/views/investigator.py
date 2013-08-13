@@ -95,3 +95,10 @@ def check_mobile_number(request):
 def show_investigator(request, investigator_id):
     investigator = Investigator.objects.get(id=investigator_id)
     return render(request, 'investigators/show.html', {'investigator': investigator})
+
+def edit_investigator(request,investigator_id):
+    context = {'action': '/investigators/%s/edit/' % investigator_id,
+                'id': 'edit-investigator-form',
+                'button_label': 'Save',
+                'loading_text': 'Saving...'}
+    return render(request, 'investigators/new.html', context)

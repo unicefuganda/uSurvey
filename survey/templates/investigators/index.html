@@ -37,14 +37,7 @@
               {{ investigator.mobile_number }}
             </td>
             <td>
-              <div class="btn-group">
-                <a class="btn btn-mini btn-primary" href="#"><i class="icon-user icon-white"></i> Actions</a>
-                <a class="btn btn-mini btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                  <li><a href="#"><i class="icon-pencil"></i> Edit</a></li>
-                  <li><a href="#"><i class="icon-trash"></i> Delete</a></li>
-                </ul>
-              </div>
+                {% include 'investigators/_action_button.html' with button_size="btn-mini" %}
             </td>
           </tr>
         {% endfor %}

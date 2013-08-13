@@ -52,3 +52,10 @@ Feature: Investigators feature
       Then I should see his details displayed
       And I should see navigation links
       Then back button should take back to Investigator Listing page
+
+    Scenario: Edit investigator details
+      Given I am logged in as researcher
+      And I have one investigator
+      And I visit investigators page
+      And I click on the edit button
+      Then it should be able to take me to edit form page

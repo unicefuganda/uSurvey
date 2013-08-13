@@ -34,19 +34,6 @@ class InvestigatorTest(TestCase):
 
 
 class InvestigatorsViewTest(InvestigatorTest):
-    # def setUp(self):
-    #     self.client = Client()
-    #     raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
-    #     user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-    #
-    #     some_group = Group.objects.create(name='some group')
-    #     auth_content = ContentType.objects.get_for_model(Permission)
-    #     permission, out = Permission.objects.get_or_create(codename='can_view_investigators', content_type=auth_content)
-    #     some_group.permissions.add(permission)
-    #     some_group.user_set.add(raj)
-    #
-    #     self.client.login(username='Rajni', password='I_Rock')
-
     def test_new(self):
         country = LocationType.objects.create(name = 'Country', slug = 'country')
         city = LocationType.objects.create(name = 'City', slug = 'city')
@@ -167,7 +154,6 @@ class InvestigatorsViewTest(InvestigatorTest):
         response = self.client.post('/investigators/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 200)
         investigator = Investigator.objects.filter(name=form_data['name'])
-        self.failIf(investigator)
         assert mock_messages_error.called
 
         form_data['location']=uganda.id
@@ -177,14 +163,7 @@ class InvestigatorsViewTest(InvestigatorTest):
         investigator = Investigator.objects.filter(name=form_data['name'])
         self.failIf(investigator)
         assert mock_messages_error.called
-
-    # def assert_restricted_permission_for(self, url):
-    #     self.client.logout()
-    #
-    #     self.client.login(username='useless', password='I_Suck')
-    #     response = self.client.get(url)
-    #
-    #     self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
+        self.failIf(investigator)
 
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
@@ -267,11 +246,6 @@ class InvestigatorsViewTest(InvestigatorTest):
 
 
 class ViewInvestigatorDetailsPage(InvestigatorTest):
-    # def setUp(self):
-    #     self.client = Client()
-    #     raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
-    #     self.client.login(username='Rajni', password='I_Rock')
-
     def test_view_page(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
         city = LocationType.objects.create(name="City", slug=slugify("city"))
@@ -284,3 +258,19 @@ class ViewInvestigatorDetailsPage(InvestigatorTest):
         self.assertIn('investigators/show.html', templates)
         self.assertEquals(response.context['investigator'], investigator)
         self.assert_restricted_permission_for('/investigators/' + str(investigator.id) +'/')
+        
+class EditInvestigatorPage(InvestigatorTest):
+    def test_edit(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        city = LocationType.objects.create(name="City", slug=slugify("city"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
+        response = self.client.get('/investigators/' + str(investigator.id) + '/edit')
+        self.assertEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('investigators/new.html', templates)
+        self.assertEquals(response.context['action'], '/investigators/' + str(investigator.id) + '/edit/')
+        self.assertEquals(response.context['id'], 'edit-investigator-form')
+        self.assertEquals(response.context['button_label'], 'Save')
+        self.assertEquals(response.context['loading_text'], 'Saving...')

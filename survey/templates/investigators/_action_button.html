@@ -1,0 +1,8 @@
+<div class="btn-group">
+    <a class="btn {{ button_size }} btn-primary" href="#"><i class="icon-user icon-white"></i> Actions</a>
+    <a class="btn {{ button_size }}  btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret" id="action_caret"></span></a>
+    <ul class="dropdown-menu">
+        <li><a href="{% url 'edit_investigator_page'  investigator.id %}"><i class="icon-pencil"></i> Edit</a></li>
+        <li><a href="#"><i class="icon-trash"></i> Delete</a></li>
+    </ul>
+</div>
