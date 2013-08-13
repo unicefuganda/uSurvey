@@ -50,3 +50,5 @@ Feature: Investigators feature
       And I visit investigators page
       And I click on the investigators name
       Then I should see his details displayed
+      And I should see navigation links
+      Then back button should take back to Investigator Listing page

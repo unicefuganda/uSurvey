@@ -418,11 +418,18 @@ class InvestigatorDetailsPage(PageObject):
             'Mobile Number': self.investigator.mobile_number,
             'Age': str(self.investigator.age),
             'Sex': 'Male' if self.investigator.male else 'Female',
-            'Level of Education': self.investigator.level_of_education,
-            'Language': self.investigator.language,
+            'Highest Level of Education': self.investigator.level_of_education,
+            'Preferred Language of Communication': self.investigator.language,
             'Country': 'Uganda',
             'City': 'Kampala',
         }
         for label, text in details.items():
             self.is_text_present(label)
             self.is_text_present(text)
+
+    def validate_navigation_links(self):
+        assert self.browser.find_link_by_text(' Back')
+        assert self.browser.find_link_by_text(' Actions')
+
+    def validate_back_link(self):
+        self.browser.find_link_by_href(django_url(InvestigatorsListPage.url))

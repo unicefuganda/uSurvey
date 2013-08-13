@@ -137,4 +137,11 @@ def then_i_should_see_his_details_displayed(step):
     world.page = InvestigatorDetailsPage(world.browser)
     world.page.set_investigator(world.investigator)
     world.page.validate_page_content()
-    
+
+@step(u'And I should see navigation links')
+def and_i_should_see_navigation_links(step):
+    world.page.validate_navigation_links()
+
+@step(u'Then back button should take back to Investigator Listing page')
+def then_back_button_should_take_back_to_investigator_listing_page(step):
+    world.page.validate_back_link()

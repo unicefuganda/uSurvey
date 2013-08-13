@@ -3,7 +3,7 @@
   {{ investigator.name }}'s details
 {% endblock %}
 {% block content %}
-<dl id="investigators-details">
+<dl id="investigators-details" class="offset1">
   <dt>
     Name
   </dt>
@@ -33,13 +33,13 @@
     {% endif %}
   </dd>
   <dt>
-    Level of Education
+    Highest Level of Education
   </dt>
   <dd>
     {{ investigator.level_of_education }}
   </dd>
   <dt>
-    Language
+    Preferred Language of Communication
   </dt>
   <dd>
     {{ investigator.language }}
@@ -53,4 +53,15 @@
     </dd>
   {% endfor %}
 </dl>
+<div class="offset3">
+    <a href="{% url 'investigators_page' %}" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
+    <div class="btn-group">
+        <a class="btn btn-primary" href="#"><i class="icon-user icon-white"></i> Actions</a>
+        <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="#"><i class="icon-pencil"></i> Edit</a></li>
+            <li><a href="#"><i class="icon-trash"></i> Delete</a></li>
+        </ul>
+    </div>
+</div>
 {% endblock %}
