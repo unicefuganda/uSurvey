@@ -128,13 +128,10 @@ def then_i_should_see_not_allowed_username_error_message(step):
 @step(u'And I have 100 users')
 def and_i_have_users(step):
     
-    for i in range(0,100):
-        random_suffix_number = str(randint(1, 1000))
+    for i in range(100):
+        random_suffix_number = str(randint(1, 99999))
         try:
             users  = User.objects.create_user('user'+ random_suffix_number, random_suffix_number +"@gmail.com", 'pass'+random_suffix_number )
-            print "&"*100
-            print users
-            print "&"*100
         except:
             pass
     
