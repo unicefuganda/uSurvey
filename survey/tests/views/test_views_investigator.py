@@ -10,8 +10,7 @@ from survey.models import *
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
-
-class InvestigatorsViewTest(TestCase):
+class InvestigatorTest(TestCase):
     def setUp(self):
         self.client = Client()
         raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
@@ -24,6 +23,29 @@ class InvestigatorsViewTest(TestCase):
         some_group.user_set.add(raj)
 
         self.client.login(username='Rajni', password='I_Rock')
+
+    def assert_restricted_permission_for(self, url):
+        self.client.logout()
+
+        self.client.login(username='useless', password='I_Suck')
+        response = self.client.get(url)
+
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
+
+
+class InvestigatorsViewTest(InvestigatorTest):
+    # def setUp(self):
+    #     self.client = Client()
+    #     raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    #     user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+    #
+    #     some_group = Group.objects.create(name='some group')
+    #     auth_content = ContentType.objects.get_for_model(Permission)
+    #     permission, out = Permission.objects.get_or_create(codename='can_view_investigators', content_type=auth_content)
+    #     some_group.permissions.add(permission)
+    #     some_group.user_set.add(raj)
+    #
+    #     self.client.login(username='Rajni', password='I_Rock')
 
     def test_new(self):
         country = LocationType.objects.create(name = 'Country', slug = 'country')
@@ -156,13 +178,13 @@ class InvestigatorsViewTest(TestCase):
         self.failIf(investigator)
         assert mock_messages_error.called
 
-    def assert_restricted_permission_for(self, url):
-        self.client.logout()
-
-        self.client.login(username='useless', password='I_Suck')
-        response = self.client.get(url)
-
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
+    # def assert_restricted_permission_for(self, url):
+    #     self.client.logout()
+    #
+    #     self.client.login(username='useless', password='I_Suck')
+    #     response = self.client.get(url)
+    #
+    #     self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
@@ -243,11 +265,11 @@ class InvestigatorsViewTest(TestCase):
         self.assert_restricted_permission_for('/investigators/')
 
 
-class ViewInvestigatorDetailsPage(TestCase):
-    def setUp(self):
-        self.client = Client()
-        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
-        self.client.login(username='Rajni', password='I_Rock')
+class ViewInvestigatorDetailsPage(InvestigatorTest):
+    # def setUp(self):
+    #     self.client = Client()
+    #     raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    #     self.client.login(username='Rajni', password='I_Rock')
 
     def test_view_page(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
@@ -260,3 +282,4 @@ class ViewInvestigatorDetailsPage(TestCase):
         templates = [template.name for template in response.templates]
         self.assertIn('investigators/show.html', templates)
         self.assertEquals(response.context['investigator'], investigator)
+        self.assert_restricted_permission_for('/investigators/' + str(investigator.id) +'/')
