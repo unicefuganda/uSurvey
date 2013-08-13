@@ -134,8 +134,7 @@ def and_i_click_on_the_investigators_name(step):
     
 @step(u'Then I should see his details displayed')
 def then_i_should_see_his_details_displayed(step):
-    world.page = InvestigatorDetailsPage(world.browser)
-    world.page.set_investigator(world.investigator)
+    world.page = InvestigatorDetailsPage(world.browser, world.investigator)
     world.page.validate_page_content()
 
 @step(u'And I should see navigation links')

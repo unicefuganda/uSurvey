@@ -407,10 +407,10 @@ class BatchShowPage(object):
         sleep(2)
 
 class InvestigatorDetailsPage(PageObject):
-
-    def set_investigator(self, investigator):
+    def __init__(self, browser, investigator):
+        self.browser = browser
         self.investigator = investigator
-        self.url = "/investigators/" + str(investigator.pk) + "/"
+        self.url = '/investigators/' + str(investigator.id) + '/'
 
     def validate_page_content(self):
         details = {
