@@ -640,7 +640,7 @@ class RandomHouseHoldSelection(BaseModel):
         return "Dear investigator, these are the selected households: %s" % self.selected_households
 
     def generate(self, no_of_households):
-        if self.no_of_households != no_of_households:
+        if not self.selected_households:
             self.no_of_households = no_of_households
             self.generate_new_list()
         investigator = Investigator(mobile_number=self.mobile_number)

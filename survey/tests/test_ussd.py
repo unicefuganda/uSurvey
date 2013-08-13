@@ -970,7 +970,7 @@ class RandomHouseHoldSelectionTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_message)
 
         self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = " 100 "
+        self.ussd_params['ussdRequestString'] = "999"
 
         response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE']
         response = self.client.get('/ussd', data=self.ussd_params)
