@@ -11,10 +11,26 @@
     {{ investigator.name }}
   </dd>
   <dt>
+    Mobile Number
+  </dt>
+  <dd>
+    {{ investigator.mobile_number }}
+  </dd>
+  <dt>
     Age
   </dt>
   <dd>
     {{ investigator.age }}
+  </dd>
+  <dt>
+    Sex
+  </dt>
+  <dd>
+    {% if investigator.male %}
+        Male
+    {% else %}
+        Female
+    {% endif %}
   </dd>
   <dt>
     Level of Education

@@ -415,7 +415,9 @@ class InvestigatorDetailsPage(PageObject):
     def validate_page_content(self):
         details = {
             'Name': self.investigator.name,
+            'Mobile Number': self.investigator.mobile_number,
             'Age': str(self.investigator.age),
+            'Sex': 'Male' if self.investigator.male else 'Female',
             'Level of Education': self.investigator.level_of_education,
             'Language': self.investigator.language,
             'Country': 'Uganda',
