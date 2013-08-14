@@ -53,11 +53,13 @@ Feature: Users feature
       And I have 100 users
       And I visit the users list page
       Then I should see a list of users
+      
     Scenario: Edit a user
       Given I am logged in as a superuser
       And I have two users
       And I visit the users list page
       And I select edit action
       Then I should see the users information in a form
-      When I click the update button
-      Then I should see user information saved successfully
+      When I modify the users information
+      And I click the update button
+      Then I should see user information updated successfully

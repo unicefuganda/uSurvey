@@ -36,7 +36,8 @@ def new(request):
                           'action': "/users/new/",
                           'id': "create-user-form",
                           'button_label': "Create User",
-                          'loading_text': "Creating..."}
+                          'loading_text': "Creating...", 
+                          'title' : 'New User'}
     return response or render(request, 'users/new.html', template_variables)
 
 
@@ -48,7 +49,7 @@ def check_user_attribute(**kwargs):
     response = User.objects.filter(**kwargs).exists()
     return HttpResponse(json.dumps(not response), content_type="application/json")
 
-@login_required
+@permission_required('auth.can_view_users')
 def index(request):
     if request.GET.has_key('mobile_number'):
         return check_mobile_number(request.GET['mobile_number'])
@@ -59,6 +60,15 @@ def index(request):
     if request.GET.has_key('email'):
         return check_user_attribute(email=request.GET['email'])
     
-    print len(User.objects.all() )    
     return render(request, 'users/index.html', { 'users' : User.objects.all(),
                                                  'request': request})
+                                                 
+def edit(request, user_id):
+    user = User.objects.get(pk=user_id)
+    context_variables = {'userform': UserForm(instance=user, initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number}), 
+                        'action' : '/users/'+str(user_id)+'/edit/',
+                        'id': 'edit-user-form', 'button_label' : 'Save Changes',
+                        'loading_text' : 'Saving...',
+                        'country_phone_code': COUNTRY_PHONE_CODE,
+                        'title': 'Edit User'}
+    return render(request, 'users/new.html', context_variables)

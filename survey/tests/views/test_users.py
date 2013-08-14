@@ -5,6 +5,7 @@ from django.test.client import Client
 from mock import *
 
 from survey.models import *
+from survey.forms.users import UserForm
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
@@ -13,8 +14,14 @@ class UsersViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         raj = User.objects.create_user(username='Rajni', email='rajni@kant.com', password='I_Rock')
-        raj.is_superuser=True
-        raj.save()
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+
+        some_group = Group.objects.create(name='some group')
+        auth_content = ContentType.objects.get_for_model(Permission)
+        permission, out = Permission.objects.get_or_create(codename='can_view_users', content_type=auth_content)
+        some_group.permissions.add(permission)
+        some_group.user_set.add(raj)
+
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_new(self):
@@ -27,7 +34,8 @@ class UsersViewTest(TestCase):
         self.assertEquals(response.context['button_label'], 'Create User')
         self.assertEquals(response.context['loading_text'], 'Creating...')
         self.assertEquals(response.context['country_phone_code'], '256')
-        self.assertEquals(response.context['userform'].__class__.__name__, 'UserForm')
+        self.assertIsInstance(response.context['userform'], UserForm)
+        self.assertEqual(response.context['title'], 'New User')
 
     @patch('django.contrib.messages.success')
     def test_create_users(self, success_message):
@@ -110,24 +118,19 @@ class UsersViewTest(TestCase):
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
         assert error_message.called
-
-    def test_create_users_restricted_permission(self):
+        
+    def assert_restricted_permission_for(self, url):
         self.client.logout()
-        useless = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
 
         self.client.login(username='useless', password='I_Suck')
-        response = self.client.get('/users/new/')
+        response = self.client.get(url)
 
-        self.assertRedirects(response, expected_url='/accounts/login/?next=/users/new/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')    
 
-        some_group = Group.objects.create(name='admin')
-        auth_content = ContentType.objects.get_for_model(Permission)
-        permission, out = Permission.objects.get_or_create(codename='can_view_users', content_type=auth_content)
-        some_group.permissions.add(permission)
-        some_group.user_set.add(useless)
+    def test_restricted_permission(self):
+        self.assert_restricted_permission_for('/users/new/')
+        self.assert_restricted_permission_for('/users/')
 
-        self.client.login(username='useless', password='I_Suck')
-        self.test_new()
 
     def test_index(self):
         response = self.client.get('/users/')
@@ -180,6 +183,24 @@ class UsersViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('users/index.html', templates)
-        self.assertEqual(len(response.context['users']), 2)
+        self.assertEqual(len(response.context['users']), 3)
         self.assertIn(user, response.context['users'])
         self.assertNotEqual(None, response.context['request'])
+        
+    def test_edit_user_view(self):
+        user = User.objects.create_user('andrew', 'a@m.vom', 'pass')
+        UserProfile.objects.create(user=user, mobile_number='200202020')
+        url = "/users/"+str(user.pk)+"/edit/"
+        response = self.client.get(url)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('users/new.html', templates)
+        self.assertEquals(response.context['action'], url)
+        self.assertEquals(response.context['id'], 'edit-user-form')
+        self.assertEquals(response.context['title'], 'Edit User')
+        self.assertEquals(response.context['button_label'], 'Save Changes')
+        self.assertEquals(response.context['loading_text'], 'Saving...')
+        self.assertEquals(response.context['country_phone_code'], '256')
+        self.assertIsInstance(response.context['userform'], UserForm)
+        
+        
