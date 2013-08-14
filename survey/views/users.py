@@ -54,7 +54,7 @@ def index(request):
     if request.GET.has_key('mobile_number'):
         return check_mobile_number(request.GET['mobile_number'])
 
-    if request.GET.has_key('username'):
+    if request.GET.has_key('username'): 
         return check_user_attribute(username=request.GET['username'])
 
     if request.GET.has_key('email'):
@@ -62,13 +62,19 @@ def index(request):
     
     return render(request, 'users/index.html', { 'users' : User.objects.all(),
                                                  'request': request})
-                                                 
+@permission_required('auth.can_view_users')                                                 
 def edit(request, user_id):
     user = User.objects.get(pk=user_id)
-    context_variables = {'userform': UserForm(instance=user, initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number}), 
+    userform = UserForm(instance=user, initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number})
+    response = None
+    if request.method == 'POST':
+        response = HttpResponseRedirect("/users/new/")
+        
+    context_variables = {'userform': userform,
                         'action' : '/users/'+str(user_id)+'/edit/',
                         'id': 'edit-user-form', 'button_label' : 'Save Changes',
                         'loading_text' : 'Saving...',
                         'country_phone_code': COUNTRY_PHONE_CODE,
                         'title': 'Edit User'}
-    return render(request, 'users/new.html', context_variables)
+      
+    return response or render(request, 'users/new.html', context_variables)
