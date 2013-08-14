@@ -478,7 +478,7 @@ class EditInvestigatorPage(PageObject):
     def __init__(self, browser, investigator):
         self.browser = browser
         self.investigator = investigator
-        self.url = '/investigators/' + str(investigator.id) + '/edit'
+        self.url = '/investigators/' + str(investigator.id) + '/edit/'
 
     def validate_edit_investigator_url(self):
-        assert self.browser.url == self.url
+        assert self.browser.url == django_url(self.url)
