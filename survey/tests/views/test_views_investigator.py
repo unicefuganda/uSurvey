@@ -276,7 +276,7 @@ class EditInvestigatorPage(InvestigatorTest):
         self.assertIn('investigators/new.html', templates)
         self.assertEquals(response.context['action'], '/investigators/' + str(investigator.id) + '/edit/')
         self.assertEquals(response.context['title'], 'Edit Investigator')
-        self.assertEquals(response.context['id'], 'edit-investigator-form')
+        self.assertEquals(response.context['id'], 'create-investigator-form')
         self.assertEquals(response.context['button_label'], 'Save')
         self.assertEquals(response.context['loading_text'], 'Saving...')
         self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)
@@ -300,15 +300,15 @@ class EditInvestigatorPage(InvestigatorTest):
             }
         investigator = Investigator.objects.create(**data)
         form_data={
-            'name': 'Rajni',
-            'mobile_number': '123456789',
+            'name': 'Rajnikant',
+            'mobile_number': investigator.mobile_number,
             'male': True,
             'age': '23',
             'level_of_education': 'Primary',
             'language': 'Luganda',
             'location': uganda.id,
             'backend': backend.id,
-            'confirm_mobile_number': '123456789'
+            'confirm_mobile_number': investigator.mobile_number
         }
         response = self.client.post('/investigators/%s/edit/' % investigator.id, data=form_data)
         self.failUnlessEqual(response.status_code, 302)
