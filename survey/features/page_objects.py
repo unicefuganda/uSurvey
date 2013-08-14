@@ -37,7 +37,6 @@ class PageObject(object):
         sleep(2)
 
     def submit(self):
-        sleep(1)
         self.browser.find_by_css("form button").first.click()
 
     def see_logout_link(self):
@@ -192,7 +191,6 @@ class NewHouseholdPage(PageObject):
 
     def has_children(self, value):
         self.browser.choose('has_children', value)
-        sleep(2)
 
     def are_children_fields_disabled(self, is_disabled = True):
         for element_id in ['aged_between_5_12_years', 'aged_between_13_17_years']:
@@ -209,7 +207,6 @@ class NewHouseholdPage(PageObject):
 
     def has_children_below_5(self, value):
         self.browser.choose('has_children_below_5', value)
-        sleep(2)
 
     def are_children_below_5_fields_disabled(self, is_disabled = True):
         for element_id in ['aged_between_0_5_months','aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']:
@@ -218,7 +215,6 @@ class NewHouseholdPage(PageObject):
 
     def has_women(self, value):
         self.browser.choose('has_women', value)
-        sleep(2)
 
     def are_women_fields_disabled(self, is_disabled=True):
         for element_id in ['aged_between_15_19_years', 'aged_between_20_49_years']:
@@ -310,7 +306,6 @@ class LoginPage(PageObject):
         self.submit()
 
     def see_home_page_and_logout_link(self):
-        sleep(1)
         assert self.browser.url == django_url(HomePage.url)
         self.see_logout_link()
 
@@ -385,7 +380,6 @@ class NewUserPage(PageObject):
         sleep(2)
 
     def see_user_successfully_registered(self):
-        sleep(1)
         self.is_text_present('User successfully registered.')
 
 class BatchListPage(PageObject):
