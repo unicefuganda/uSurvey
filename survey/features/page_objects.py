@@ -26,7 +26,7 @@ class PageObject(object):
 
     def is_disabled(self, element_id):
         try:
-            self.browser.find_by_css('#%s[disabled=disabled]' % element_id).first
+            self.browser.find_by_css('#%s[disabled]' % element_id).first
             return True
         except Exception, e:
             return False
