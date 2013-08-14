@@ -6,19 +6,22 @@ from django.core.management import call_command
 from survey.models import Backend
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission
+from django.template.defaultfilters import slugify
 
 @before.each_scenario
 def flush_database(step):
-	Permission.objects.all().delete()
-	call_command('flush', interactive=False)
-	create_backends()
+    Permission.objects.all().delete()
+    call_command('flush', interactive=False)
+    create_backends()
 
 @before.each_scenario
 def open_browser(step):
     world.browser = Browser()
 
 @after.each_scenario
-def close_browser(step):
+def close_browser(scenario):
+    if scenario.failed:
+        world.browser.driver.save_screenshot('screenshots/%s.png' % slugify(scenario.name))
     world.browser.quit()
 
 def create_backends():
