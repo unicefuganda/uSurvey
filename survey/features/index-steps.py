@@ -7,7 +7,7 @@ from survey.models import Backend
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission
 from django.template.defaultfilters import slugify
-import glob
+import glob, os
 
 @before.each_scenario
 def flush_database(step):
@@ -20,15 +20,22 @@ def clear_screenshots():
     screenshots = glob.glob('./screenshots/*.png')
     for screenshot in screenshots:
         os.remove(screenshot)
+    open_browser()
 
-@before.each_scenario
-def open_browser(step):
-    world.browser = Browser()
+def open_browser():
+    world.browser = Browser('phantomjs')
 
 @after.each_scenario
-def close_browser(scenario):
+def take_screenshot(scenario):
     if scenario.failed:
         world.browser.driver.save_screenshot('screenshots/%s.png' % slugify(scenario.name))
+
+@after.each_scenario
+def clear_cookies(scenario):
+    world.browser.cookies.delete()
+
+@after.all
+def close_browser(total):
     world.browser.quit()
 
 def create_backends():

@@ -288,7 +288,7 @@ class DownloadExcelPage(PageObject):
 
     def export_to_csv(self, batch):
         self.browser.select('batch', batch.pk)
-        self.submit()
+        # self.submit()
 
 class LoginPage(PageObject):
     url = "/accounts/login"
