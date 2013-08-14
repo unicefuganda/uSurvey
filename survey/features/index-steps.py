@@ -7,12 +7,19 @@ from survey.models import Backend
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission
 from django.template.defaultfilters import slugify
+import glob
 
 @before.each_scenario
 def flush_database(step):
     Permission.objects.all().delete()
     call_command('flush', interactive=False)
     create_backends()
+
+@before.all
+def clear_screenshots():
+    screenshots = glob.glob('./screenshots/*.png')
+    for screenshot in screenshots:
+        os.remove(screenshot)
 
 @before.each_scenario
 def open_browser(step):
