@@ -59,3 +59,8 @@ Feature: Investigators feature
       And I visit investigators page
       And I click on the edit button
       Then it should be able to take me to edit form page
+      And I change Name of investigator
+      And I click on save
+      Then I should go back to investigator details page
+      And I should see name of investigator updated
+

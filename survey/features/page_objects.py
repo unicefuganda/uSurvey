@@ -443,6 +443,14 @@ class InvestigatorDetailsPage(PageObject):
 
     def validate_back_link(self):
         self.browser.find_link_by_href(django_url(InvestigatorsListPage.url))
+    
+    def validate_detail_page_url(self):
+        print self.browser.url
+        print "*"*100
+        assert self.browser.url == django_url(self.url)
+
+    def validate_successful_edited_message(self):
+        self.is_text_present("Investigator successfully edited.")
 
 class UsersListPage(PageObject):
     url = "/users/"
@@ -474,6 +482,7 @@ class UsersDetailsPage(PageObject):
 
     def click_update_button(self):
         self.browser.find_by_name("save_button").first.click()
+        
 class EditInvestigatorPage(PageObject):
     def __init__(self, browser, investigator):
         self.browser = browser
@@ -482,3 +491,19 @@ class EditInvestigatorPage(PageObject):
 
     def validate_edit_investigator_url(self):
         assert self.browser.url == django_url(self.url)
+        
+    def change_name_of_investigator(self):
+        self.values = {
+            'name': 'Updated Name',
+            'mobile_number': self.investigator.mobile_number,
+            'confirm_mobile_number': self.investigator.mobile_number,
+            'male': self.investigator.male,
+            'age': self.investigator.age,
+            'level_of_education': self.investigator.level_of_education,
+            'language': self.investigator.language,
+            'location': self.investigator.location,
+            }
+        self.browser.fill_form(self.values)
+
+    def submit(self):
+        self.browser.find_by_css("form button").first.click()

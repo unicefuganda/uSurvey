@@ -154,3 +154,21 @@ def and_i_click_on_the_edit_button(step):
 def then_it_should_be_able_to_take_me_to_edit_form_page(step):
     world.page = EditInvestigatorPage(world.browser, world.investigator)
     world.page.validate_edit_investigator_url()
+    world.page.visit()
+
+@step(u'And I change Name of investigator')
+def and_i_change_name_of_investigator(step):
+    world.page.change_name_of_investigator()
+
+@step(u'And I click on save')
+def and_i_click_on_save(step):
+    world.page.submit()
+
+@step(u'Then I should go back to investigator details page')
+def then_i_should_go_back_to_investigator_details_page(step):
+    world.page = InvestigatorDetailsPage(world.browser, world.investigator)
+    world.page.validate_detail_page_url()
+
+@step(u'And I should see name of investigator updated')
+def and_i_should_see_name_of_investigator_updated(step):
+    world.page.validate_successful_edited_message()
