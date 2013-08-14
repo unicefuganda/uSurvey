@@ -270,7 +270,7 @@ class EditInvestigatorPage(InvestigatorTest):
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
         investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
-        response = self.client.get('/investigators/' + str(investigator.id) + '/edit')
+        response = self.client.get('/investigators/' + str(investigator.id) + '/edit/')
         self.assertEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('investigators/new.html', templates)
@@ -283,3 +283,40 @@ class EditInvestigatorPage(InvestigatorTest):
         self.assertIsInstance(response.context['form'], InvestigatorForm)
         locations = response.context['locations'].get_widget_data()
         self.assertEqual(len(locations),2)
+
+    def test_edit_post(self):
+        country = LocationType.objects.create(name='country', slug='country')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        backend = Backend.objects.create(name='something')
+        data = {
+            'name': 'Rajni',
+            'mobile_number': '123456789',
+            'male': False,
+            'age': '20',
+            'level_of_education': 'Nursery',
+            'language': 'Luganda',
+            'location': uganda,
+            'backend': backend,
+            }
+        investigator = Investigator.objects.create(**data)
+        form_data={
+            'name': 'Rajni',
+            'mobile_number': '123456789',
+            'male': True,
+            'age': '23',
+            'level_of_education': 'Primary',
+            'language': 'Luganda',
+            'location': uganda.id,
+            'backend': backend.id,
+            'confirm_mobile_number': '123456789'
+        }
+        response = self.client.post('/investigators/%s/edit/' % investigator.id, data=form_data)
+        self.failUnlessEqual(response.status_code, 302)
+        investigator = Investigator.objects.get(name=form_data['name'])
+        self.failUnless(investigator.id)
+        for key in ['name', 'mobile_number', 'age', 'level_of_education', 'language']:
+            value = getattr(investigator, key)
+            self.assertEqual(form_data[key], str(value))
+
+        self.assertTrue(investigator.male)
+        self.assertEqual(investigator.location, uganda)

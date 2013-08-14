@@ -15,8 +15,8 @@ from survey.views.views_helper import contains_key
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
 
-def _add_error_response_message(investigator, request):
-    error_message = "Investigator not registered. "
+def _add_error_response_message(investigator, request,action_text):
+    error_message = "Investigator not %s. " % action_text
     messages.error(request, error_message + "See errors below.")
 
     for field in investigator.hidden_fields():
@@ -27,14 +27,14 @@ def _add_error_response_message(investigator, request):
         for err in investigator.non_field_errors():
             messages.error(request, error_message + str(err))
 
-def _process_form(investigator, request):
+def _process_form(investigator, request, action_text,
+                  redirect_url):
     if investigator.is_valid():
         investigator.save()
         # Household.objects.create(investigator=investigator.instance)
-        messages.success(request, "Investigator successfully registered.")
-        return HttpResponseRedirect("/investigators/")
-
-    _add_error_response_message(investigator, request)
+        messages.success(request, "Investigator successfully %s " % action_text)
+        return HttpResponseRedirect(redirect_url)
+    _add_error_response_message(investigator, request,action_text)
     return None
 
 @login_required
@@ -47,7 +47,9 @@ def new_investigator(request):
     if request.method == 'POST':
         investigator = InvestigatorForm(data=request.POST, auto_id='investigator-%s', label_suffix='')
         selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
-        response = _process_form(investigator, request)
+        action_text = "registered."
+        redirect_url = "/investigators/"
+        response = _process_form(investigator, request, action_text, redirect_url)
 
     return response or render(request, 'investigators/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
                                                                   'locations': LocationWidget(selected_location),
@@ -97,10 +99,17 @@ def show_investigator(request, investigator_id):
     investigator = Investigator.objects.get(id=investigator_id)
     return render(request, 'investigators/show.html', {'investigator': investigator})
 
-def edit_investigator(request,investigator_id):
+def edit_investigator(request, investigator_id):
+    response = None
     investigator = Investigator.objects.get(id=investigator_id)
     investigator_form = InvestigatorForm(instance=investigator, initial= {'confirm_mobile_number':investigator.mobile_number})
-    context = { 'action': '/investigators/%s/edit/' % investigator_id,
+    if request.method == 'POST':
+        investigator_form = InvestigatorForm(data=request.POST, instance=investigator)
+        action_text = "edited."
+        redirect_url = "/investigators/%s" % investigator_id
+        response = _process_form(investigator_form, request, action_text, redirect_url)
+
+    context = { 'action': '/investigators/' + str(investigator_id) + '/edit/',
                 'country_phone_code': COUNTRY_PHONE_CODE,
                 'title': 'Edit Investigator',
                 'id': 'edit-investigator-form',
@@ -108,4 +117,4 @@ def edit_investigator(request,investigator_id):
                 'loading_text': 'Saving...',
                 'form': investigator_form,
                 'locations': LocationWidget(investigator.location)}
-    return render(request, 'investigators/new.html', context)
+    return response or render(request, 'investigators/new.html', context)
