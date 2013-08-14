@@ -9,8 +9,7 @@ class UserForm(UserCreationForm):
                                        max_digits=9,
                                        widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
                                                                    'style':"width:172px;" ,
-                                                                   'maxlength':'10',
-                                                                   'type':'number'}))
+                                                                   'maxlength':'10'}))
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
         self.fields['password2'].label = 'Confirm Password'

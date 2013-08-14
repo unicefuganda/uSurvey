@@ -38,7 +38,8 @@ jQuery(function($){
                 populate_children(next_element, data);
               });
             } else{
-              location.val(value).trigger('fetch-investigator');
+              location.val(value)
+              $(document).trigger('location-selected');
             };
         })
         .on('clear-locations', function(){

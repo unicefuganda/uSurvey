@@ -49,7 +49,7 @@ class WomenForm(ModelForm):
         model = Women
         exclude = ['household']
         widgets ={
-        'aged_between_15_19_years':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
-        'aged_between_20_49_years':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
+        'aged_between_15_19_years':forms.TextInput(attrs={'class':"small-positive-number women-field" }),
+        'aged_between_20_49_years':forms.TextInput(attrs={'class':"small-positive-number women-field" }),
         }
 

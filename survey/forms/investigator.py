@@ -5,8 +5,8 @@ from django.core.validators import *
 
 class InvestigatorForm(ModelForm):
 
-    confirm_mobile_number = forms.CharField( widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
-                                                                            'style':"width:172px;" , 'maxlength':'10', 'type':'number'}))
+    confirm_mobile_number = forms.CharField( widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'class':'no-paste',
+                                                                            'style':"width:172px;" , 'maxlength':'10'}))
     def __init__(self, *args, **kwargs):
         super(InvestigatorForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder=['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age', 'level_of_education', 'language', 'backend', 'location']
@@ -29,9 +29,9 @@ class InvestigatorForm(ModelForm):
         fields = ['name', 'mobile_number', 'male', 'age', 'level_of_education', 'language', 'backend', 'location']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
-            'mobile_number': forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'style':"width:172px;", 'maxlength':'10', 'type':'number'}),
+            'mobile_number': forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'style':"width:172px;", 'maxlength':'10'}),
             'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
-            'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':18, 'max':50, 'type':'number' }),
+            'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':18, 'max':50 }),
             'location':forms.HiddenInput(),
         }
 

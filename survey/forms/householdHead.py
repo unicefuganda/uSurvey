@@ -36,7 +36,7 @@ class HouseholdHeadForm(ModelForm):
             'surname': forms.TextInput(attrs={'placeholder': 'Family Name'}),
             'first_name': forms.TextInput(attrs={'placeholder': 'Other Names'}),
             'male': InlineRadioSelect(choices=((True, 'Male'), (False, 'Female'))),
-            'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':10, 'max':99, 'type':'number' }),
+            'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':10, 'max':99 }),
             'resident_since_year': forms.HiddenInput(),
             'resident_since_month': forms.HiddenInput(),
             'occupation': forms.Select(choices= OCCUPATION),

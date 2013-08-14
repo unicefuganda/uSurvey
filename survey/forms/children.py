@@ -7,8 +7,8 @@ class ChildrenForm(ModelForm):
     has_children = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'True',
                                     widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
     has_children_below_5 = forms.TypedChoiceField( initial=True, coerce=lambda x: x == 'True',
-                                                   widget=InlineRadioSelect, choices=((True, 'Yes'), (False, 'No')))
-    total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'type':'number', 'value':0,
+                                                   widget=InlineRadioSelect(attrs={'class': 'has_children_below_5 children-field'}), choices=((True, 'Yes'), (False, 'No')))
+    total_below_5 = forms.CharField( widget=forms.TextInput(attrs={'value':0,
                                         'id':'household-children-total_below_5', 'readonly':'readonly'}), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -61,10 +61,10 @@ class ChildrenForm(ModelForm):
         model = Children
         exclude = ['household']
         widgets={
-                'aged_between_5_12_years':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
-                'aged_between_13_17_years':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
-                'aged_between_0_5_months':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
-                'aged_between_6_11_months':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
-                'aged_between_12_23_months':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
-                'aged_between_24_59_months':forms.TextInput(attrs={'class':"small-positive-number", 'type':'number' }),
+                'aged_between_5_12_years':forms.TextInput(attrs={'class':"small-positive-number children-field" }),
+                'aged_between_13_17_years':forms.TextInput(attrs={'class':"small-positive-number children-field" }),
+                'aged_between_0_5_months':forms.TextInput(attrs={'class':"small-positive-number children-field children-below-5-field" }),
+                'aged_between_6_11_months':forms.TextInput(attrs={'class':"small-positive-number children-field children-below-5-field" }),
+                'aged_between_12_23_months':forms.TextInput(attrs={'class':"small-positive-number children-field children-below-5-field" }),
+                'aged_between_24_59_months':forms.TextInput(attrs={'class':"small-positive-number children-field children-below-5-field" }),
         }

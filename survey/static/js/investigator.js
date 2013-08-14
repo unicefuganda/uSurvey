@@ -1,30 +1,16 @@
 ;
-jQuery(function($){
-  $(".chzn-select").chosen();
-  $("#bulk-sms-locations").multiSelect();
-});
-
-function update_get_investigator_list_link(id){
-  filter_id = ""
-  if (id){
-    filter_id = "filter/"+ id +"/"
-  }
-  $("#a-investigator-list").attr("href", "/investigators/"+ filter_id);
-};
-
-function clean_number(value){
-  return value.replace(/\s+/g, '').replace(/-/g, '');
-};
-
-function strip_leading_zero(element){
-  var value = $(element).val();
-  if (value){
-    $(element).val(value.replace(/^[0]/g,""));
-    return true;
-  };
-};
-
 $(function(){
+  function clean_number(value){
+    return value.replace(/\s+/g, '').replace(/-/g, '');
+  };
+
+  function strip_leading_zero(element){
+    var value = $(element).val();
+    if (value){
+      $(element).val(value.replace(/^[0]/g,""));
+      return true;
+    };
+  };
 
   jQuery.validator.addMethod("leading_zero_if_number_is_10_digits", function(value, element) {
       return ((value.length !=10) || (value[0]==0) )
@@ -84,14 +70,6 @@ $(function(){
 
   $("input.small-positive-number").each(function(){
       $(this).rules('add', {required:true, min:0, max:10});
-  });
-
-  $("#investigator-confirm_mobile_number").on('paste', function(e) {
-    e.preventDefault();
-  });
-
-  $('input[name=location]').on('change', function(){
-      update_get_investigator_list_link($(this).val());
   });
 
 });
