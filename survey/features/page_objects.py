@@ -86,6 +86,10 @@ class PageObject(object):
         self.browser.click_link_by_text('Investigators')
         assert not self.browser.find_link_by_text('Notify Investigators')
 
+    def choose_radio(self, name, value):
+        js = "$('input:radio[name=%s][value=%s]').prop('checked', true).change()" % (name, value)
+        self.browser.execute_script(js)
+
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
@@ -190,7 +194,7 @@ class NewHouseholdPage(PageObject):
         assert self.browser.is_text_present("Household successfully registered.")
 
     def has_children(self, value):
-        self.browser.choose('has_children', value)
+        self.choose_radio('has_children', value)
 
     def are_children_fields_disabled(self, is_disabled = True):
         for element_id in ['aged_between_5_12_years', 'aged_between_13_17_years']:
@@ -202,11 +206,11 @@ class NewHouseholdPage(PageObject):
         assert self.browser.find_by_id('household-children-has_children_below_5_1').selected == True
 
     def cannot_say_yes_to_below_5(self):
-        self.browser.choose('has_children_below_5', 'True')
+        assert self.is_disabled("household-children-has_children_below_5_0") == True
         self.are_children_fields_disabled()
 
     def has_children_below_5(self, value):
-        self.browser.choose('has_children_below_5', value)
+        self.choose_radio('has_children_below_5', value)
 
     def are_children_below_5_fields_disabled(self, is_disabled = True):
         for element_id in ['aged_between_0_5_months','aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']:
@@ -214,7 +218,7 @@ class NewHouseholdPage(PageObject):
             assert self.is_disabled(element_id) == is_disabled
 
     def has_women(self, value):
-        self.browser.choose('has_women', value)
+        self.choose_radio('has_women', value)
 
     def are_women_fields_disabled(self, is_disabled=True):
         for element_id in ['aged_between_15_19_years', 'aged_between_20_49_years']:
