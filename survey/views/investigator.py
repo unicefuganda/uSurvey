@@ -102,9 +102,9 @@ def show_investigator(request, investigator_id):
 def edit_investigator(request, investigator_id):
     response = None
     investigator = Investigator.objects.get(id=investigator_id)
-    investigator_form = InvestigatorForm(instance=investigator, initial= {'confirm_mobile_number':investigator.mobile_number})
+    investigator_form = InvestigatorForm(instance=investigator, auto_id='investigator-%s', initial= {'confirm_mobile_number':investigator.mobile_number})
     if request.method == 'POST':
-        investigator_form = InvestigatorForm(data=request.POST, instance=investigator)
+        investigator_form = InvestigatorForm(data=request.POST, auto_id='investigator-%s', instance=investigator)
         action_text = "edited."
         redirect_url = "/investigators/%s" % investigator_id
         response = _process_form(investigator_form, request, action_text, redirect_url)
@@ -112,7 +112,7 @@ def edit_investigator(request, investigator_id):
     context = { 'action': '/investigators/' + str(investigator_id) + '/edit/',
                 'country_phone_code': COUNTRY_PHONE_CODE,
                 'title': 'Edit Investigator',
-                'id': 'edit-investigator-form',
+                'id': 'create-investigator-form',
                 'button_label': 'Save',
                 'loading_text': 'Saving...',
                 'form': investigator_form,
