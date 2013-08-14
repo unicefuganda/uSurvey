@@ -21,7 +21,7 @@ $(function(){
     }, "No leading zero. Please follow format: 771234567.");
 
   jQuery.validator.addMethod("validate_confirm_number", function(value, element) {
-        var cleaned_original = clean_number($("#investigator-mobile_number").val());
+        var cleaned_original = clean_number($("#id_mobile_number").val());
         var cleaned_confirm = clean_number(value);
         return (cleaned_original==cleaned_confirm)
       }, "Mobile number not matched.");
