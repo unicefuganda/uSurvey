@@ -23,7 +23,7 @@ class BaseModel(TimeStampedModel):
         abstract = True
 
 class UserProfile(BaseModel):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, related_name="userprofile")
     mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=10, unique=True, null=False, blank=False)
 
 

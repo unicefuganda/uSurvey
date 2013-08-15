@@ -5,14 +5,14 @@
 {% block content %}
 {% load pagination_tags %}
 {% autopaginate users 30 %}
-
+{% load template_tags %}
     {% if users %}
         <h3>Users List</h3>
         <table class="table table-striped table-bordered table-hover">
             <thead>
             <tr>
                 <th>Full name</th>
-                <th>Email</th>
+                <th>Role</th>
                 <th>Mobile number</th>
                 <th>Actions</th>
             </tr>
@@ -21,10 +21,14 @@
             {% for user in users %}
                 <tr>
                     <td>
-                        {{ user.username }}
+                        {{ user.get_full_name }}
                     </td>
                     <td>
-                        {{ user.email }}
+                      {% if user.groups.all %}
+                        {{ user.groups.all|display_list }}  
+                      {% else %}
+                        {{  "Unknown role" }}
+                      {% endif %}
                     </td>
                     <td>
                         {{ user.userprofile.mobile_number }}

@@ -197,4 +197,8 @@ def and_i_click_the_update_button(step):
 
 @step(u'Then I should see user information updated successfully')
 def then_i_should_see_user_information_saved_successfully(step):
-    pass
+    world.page.assert_user_saved_sucessfully()
+    
+@step(u'And I see that username is readonly')
+def and_i_see_that_username_is_readonly(step):
+    world.page.assert_username_is_readonly()    

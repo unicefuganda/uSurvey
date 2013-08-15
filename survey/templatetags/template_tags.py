@@ -35,3 +35,9 @@ def is_radio(field):
     if "radio" in str(field):
         return "radio_field"
     return ""
+    
+@register.filter
+def display_list(list):
+    new_list = [str(item) for item in list]
+    return ', '.join(new_list)
+            

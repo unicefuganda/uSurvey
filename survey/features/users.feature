@@ -60,6 +60,7 @@ Feature: Users feature
       And I visit the users list page
       And I select edit action
       Then I should see the users information in a form
+      And I see that username is readonly
       When I modify the users information
       And I click the update button
       Then I should see user information updated successfully

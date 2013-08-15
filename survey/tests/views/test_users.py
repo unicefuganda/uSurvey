@@ -5,7 +5,7 @@ from django.test.client import Client
 from mock import *
 
 from survey.models import *
-from survey.forms.users import UserForm
+from survey.forms.users import UserForm, EditUserForm
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
@@ -201,7 +201,7 @@ class UsersViewTest(TestCase):
         self.assertEquals(response.context['button_label'], 'Save Changes')
         self.assertEquals(response.context['loading_text'], 'Saving...')
         self.assertEquals(response.context['country_phone_code'], '256')
-        self.assertIsInstance(response.context['userform'], UserForm)
+        self.assertIsInstance(response.context['userform'], EditUserForm)
         
     def test_edit_user_when_one_has_valid_permissions(self):
         user_with_no_permission = User.objects.create_user(username='someguy', email='rajni@kant.com', password='pass')
@@ -225,7 +225,7 @@ class UsersViewTest(TestCase):
         user = User.objects.create(username=form_data['username'], email=form_data['email'], password=form_data['password1'])
         UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
         
-        form_data = {
+        data = {
                     'username':'knightngale',
                     'password1':'mk',
                     'password2':'mk',
@@ -235,11 +235,7 @@ class UsersViewTest(TestCase):
                     'email':'mm@mm.mm',
                 }
                 
-        response = self.client.post('/users/'+str(user.pk)+'/edit/', data=form_data)
+        response = self.client.post('/users/'+str(user.pk)+'/edit/', data=data)
         self.failUnlessEqual(response.status_code, 302)
-        
-        edited_user = User.objects.filter(username='knightngale')
-        # self.assertEqual(len(edited_user), 1)
-
-        
-        
+        edited_user = User.objects.filter(username='knightngale', last_name='knightngale')
+        self.assertEqual(len(edited_user), 1)

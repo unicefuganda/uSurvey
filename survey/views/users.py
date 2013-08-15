@@ -13,12 +13,11 @@ def _add_error_messages(userform, request):
     error_message = "User not registered. "
     messages.error(request, error_message + "See errors below.")
 
-def _process_form(userform, request):
+def _process_form(userform, request, action_success="registered"):
     if userform.is_valid():
         userform.save()
-        messages.success(request, "User successfully registered.")
+        messages.success(request, "User successfully %s." % action_success)
         return HttpResponseRedirect("/users/new/")
-
     _add_error_messages(userform, request)
     return None
 
@@ -36,7 +35,7 @@ def new(request):
                           'action': "/users/new/",
                           'id': "create-user-form",
                           'button_label': "Create User",
-                          'loading_text': "Creating...", 
+                          'loading_text': "Creating...",
                           'title' : 'New User'}
     return response or render(request, 'users/new.html', template_variables)
 
@@ -54,27 +53,26 @@ def index(request):
     if request.GET.has_key('mobile_number'):
         return check_mobile_number(request.GET['mobile_number'])
 
-    if request.GET.has_key('username'): 
+    if request.GET.has_key('username'):
         return check_user_attribute(username=request.GET['username'])
 
     if request.GET.has_key('email'):
         return check_user_attribute(email=request.GET['email'])
-    
     return render(request, 'users/index.html', { 'users' : User.objects.all(),
                                                  'request': request})
-@permission_required('auth.can_view_users')                                                 
+@permission_required('auth.can_view_users')
 def edit(request, user_id):
     user = User.objects.get(pk=user_id)
-    userform = UserForm(instance=user, initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number})
+    initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number }
+    userform = EditUserForm(instance=user, initial=initial)
     response = None
     if request.method == 'POST':
-        response = HttpResponseRedirect("/users/new/")
-        
+        userform = EditUserForm(data=request.POST, instance=user, initial=initial)
+        response = _process_form(userform, request, "edited")
     context_variables = {'userform': userform,
                         'action' : '/users/'+str(user_id)+'/edit/',
                         'id': 'edit-user-form', 'button_label' : 'Save Changes',
                         'loading_text' : 'Saving...',
                         'country_phone_code': COUNTRY_PHONE_CODE,
                         'title': 'Edit User'}
-      
     return response or render(request, 'users/new.html', context_variables)

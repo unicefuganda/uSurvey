@@ -54,6 +54,22 @@ class UserFormTest(TestCase):
         message = "Ensure that there are no more than 9 digits in total."
         self.assertEquals(user_form.errors['mobile_number'], [message])
 
+    def test_email_already_used(self):
+        form_data = self.form_data
+        user = User.objects.create(email=form_data['email'])
+
+        user_form = UserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "%s is already associated to a different user."% form_data['email']
+        self.assertEquals(user_form.errors['email'], [message])
+        
+    def test_clean_email_when_editing_a_user(self):
+        form_data = self.form_data
+        user = User.objects.create(username=form_data['username'], email=form_data['email'])
+
+        user_form = UserForm(form_data, instance=user)
+        self.assertTrue(user_form.is_valid())
+
     def test_mobile_number_already_used(self):
         form_data = self.form_data
         user = User.objects.create(username='some_other_name')
@@ -64,16 +80,28 @@ class UserFormTest(TestCase):
         message = "%s is already associated to a different user."% form_data['mobile_number']
         self.assertEquals(user_form.errors['mobile_number'], [message])
 
-    def test_email_already_used(self):
+    def test_clean_mobile_number_when_editing_a_user(self):
         form_data = self.form_data
-        user = User.objects.create(email=form_data['email'])
+        user = User.objects.create(username=form_data['username'])
+        userprofile = UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
 
+        user_form = UserForm(form_data, instance=user, initial={'mobile_number':form_data['mobile_number']})
+        self.assertTrue(user_form.is_valid())
+
+    def test_clean_username_no_duplicates_on_create(self):
+        form_data = self.form_data
+        user = User.objects.create(username=form_data['username'])
         user_form = UserForm(form_data)
         self.assertFalse(user_form.is_valid())
-        message = "%s is already associated to a different user."% form_data['email']
-        self.assertEquals(user_form.errors['email'], [message])
+        message = "%s is already associated to a different user."% form_data['username']
+        self.assertEquals(user_form.errors['username'], [message])
 
+    def test_clean_user_name_when_editing_a_user(self):
+        form_data = self.form_data
+        user = User.objects.create(username=form_data['username'])
 
+        user_form = UserForm(form_data, instance=user)
+        self.assertTrue(user_form.is_valid())
 
     def test_clean_confirm_password(self):
         form_data = self.form_data
@@ -85,6 +113,104 @@ class UserFormTest(TestCase):
 
         form_data['password2'] = form_data['password1']
         user_form = UserForm(form_data)
+        self.assertTrue(user_form.is_valid())
+
+class EditEditUserFormTest(TestCase):
+
+    def setUp(self):
+        self.form_data = {
+        'username':'rajnii',
+        'last_name':'Rajni',
+        'email':'raj@ni.kant',
+        'mobile_number':'791234567',
+        }
+
+    def test_valid(self):
+        user_form = EditUserForm(self.form_data)
+        user_form.is_valid()
+        print user_form.errors
+        self.assertTrue(user_form.is_valid())
+        user = user_form.save()
+        self.failUnless(user.id)
+        user_retrieved = User.objects.get(last_name='Rajni')
+        self.assertEqual(user_retrieved, user)
+
+        user_profile = UserProfile.objects.filter(user=user)
+        self.failUnless(user_profile)
+        self.assertEquals(user_profile[0].mobile_number, self.form_data['mobile_number'])
+
+    def test_NaN_mobile_number(self):
+        form_data = self.form_data
+        form_data['mobile_number']='not a number'
+        user_form = EditUserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "Enter a number."
+        self.assertEquals(user_form.errors['mobile_number'], [message])
+
+    def test_Negative_mobile_number(self):
+        form_data = self.form_data
+        form_data['mobile_number']=-123456789
+        user_form = EditUserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "Ensure this value is greater than or equal to 100000000."
+        self.assertEquals(user_form.errors['mobile_number'], [message])
+
+    def test_Negative_mobile_number(self):
+        form_data = self.form_data
+        number_of_length_greater_than_9 = 1234567890
+        form_data['mobile_number']=number_of_length_greater_than_9
+        user_form = EditUserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "Ensure that there are no more than 9 digits in total."
+        self.assertEquals(user_form.errors['mobile_number'], [message])
+
+    def test_email_already_used(self):
+        form_data = self.form_data
+        user = User.objects.create(email=form_data['email'])
+
+        user_form = EditUserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "%s is already associated to a different user."% form_data['email']
+        self.assertEquals(user_form.errors['email'], [message])
+
+    def test_clean_email_when_editing_a_user(self):
+        form_data = self.form_data
+        user = User.objects.create(username=form_data['username'], email=form_data['email'])
+
+        user_form = EditUserForm(form_data, instance=user)
+        self.assertTrue(user_form.is_valid())
+
+    def test_mobile_number_already_used(self):
+        form_data = self.form_data
+        user = User.objects.create(username='some_other_name')
+        userprofile = UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
+
+        user_form = EditUserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "%s is already associated to a different user."% form_data['mobile_number']
+        self.assertEquals(user_form.errors['mobile_number'], [message])
+
+    def test_clean_mobile_number_when_editing_a_user(self):
+        form_data = self.form_data
+        user = User.objects.create(username=form_data['username'])
+        userprofile = UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
+
+        user_form = EditUserForm(form_data, instance=user, initial={'mobile_number':form_data['mobile_number']})
+        self.assertTrue(user_form.is_valid())
+
+    def test_clean_username_no_duplicates_on_create(self):
+        form_data = self.form_data
+        user = User.objects.create(username=form_data['username'])
+        user_form = EditUserForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "%s is already associated to a different user."% form_data['username']
+        self.assertEquals(user_form.errors['username'], [message])
+
+    def test_clean_user_name_when_editing_a_user(self):
+        form_data = self.form_data
+        user = User.objects.create(username=form_data['username'])
+
+        user_form = EditUserForm(form_data, instance=user)
         self.assertTrue(user_form.is_valid())
 
 class UserProfileFormTest(TestCase):

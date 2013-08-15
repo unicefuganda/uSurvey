@@ -8,6 +8,7 @@ from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import *
 from rapidsms.backends.database.models import BackendMessage
 
+
 class PageObject(object):
     def __init__(self, browser):
         self.browser = browser
@@ -16,7 +17,7 @@ class PageObject(object):
         self.browser.visit(django_url(self.url))
 
     def random_text(self, text):
-        return text +  str(randint(1, 999))
+        return text + str(randint(1, 999))
 
     def fill(self, name, value):
         self.browser.fill(name, value)
@@ -32,7 +33,8 @@ class PageObject(object):
             return False
 
     def fill_in_with_js(self, jquery_id, object_id):
-        script = '%s.val(%s).change(); %s.trigger("liszt:updated").chosen().change()' % (jquery_id, object_id, jquery_id)
+        script = '%s.val(%s).change(); %s.trigger("liszt:updated").chosen().change()' % (
+        jquery_id, object_id, jquery_id)
         self.browser.execute_script(script)
         sleep(2)
 
@@ -90,6 +92,7 @@ class PageObject(object):
         js = "$('input:radio[name=%s][value=%s]').prop('checked', true).change()" % (name, value)
         self.browser.execute_script(js)
 
+
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
 
@@ -112,7 +115,7 @@ class NewInvestigatorPage(PageObject):
             'age': '25',
             'level_of_education': 'Primary',
             'language': 'Luo',
-      }
+        }
         self.browser.fill_form(self.values)
         kampala = Location.objects.get(name="Kampala")
         kampala_county = Location.objects.get(name="Kampala County")
@@ -124,7 +127,6 @@ class NewInvestigatorPage(PageObject):
 
     def submit(self):
         self.browser.find_by_css("form button").first.click()
-
 
 
 class InvestigatorsListPage(PageObject):
@@ -163,16 +165,18 @@ class FilteredInvestigatorsListPage(InvestigatorsListPage):
     def no_registered_invesitgators(self):
         assert self.browser.is_text_present("There are no investigators currently registered for this county.")
 
+
 class NewHouseholdPage(PageObject):
     url = "/households/new"
 
     def valid_page(self):
         fields = ['investigator', 'surname', 'first_name', 'male', 'age', 'occupation',
-                   'level_of_education', 'resident_since_month', 'resident_since_year']
+                  'level_of_education', 'resident_since_month', 'resident_since_year']
         fields += ['number_of_males', 'number_of_females', 'size']
-        fields += ['has_children', 'has_children_below_5','aged_between_5_12_years', 'aged_between_13_17_years', 'aged_between_0_5_months',
-                    'aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']
-        fields += ['has_women','aged_between_15_19_years', 'aged_between_20_49_years']
+        fields += ['has_children', 'has_children_below_5', 'aged_between_5_12_years', 'aged_between_13_17_years',
+                   'aged_between_0_5_months',
+                   'aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']
+        fields += ['has_women', 'aged_between_15_19_years', 'aged_between_20_49_years']
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
 
@@ -185,7 +189,7 @@ class NewHouseholdPage(PageObject):
             'surname': self.random_text('house'),
             'first_name': self.random_text('ayoyo'),
             'age': '25',
-      }
+        }
         self.browser.fill_form(self.values)
         kampala = Location.objects.get(name="Kampala")
         kampala_county = Location.objects.get(name="Kampala County")
@@ -202,7 +206,7 @@ class NewHouseholdPage(PageObject):
     def has_children(self, value):
         self.choose_radio('has_children', value)
 
-    def are_children_fields_disabled(self, is_disabled = True):
+    def are_children_fields_disabled(self, is_disabled=True):
         for element_id in ['aged_between_5_12_years', 'aged_between_13_17_years']:
             element_id = 'household-children-' + element_id
             assert self.is_disabled(element_id) == is_disabled
@@ -218,8 +222,9 @@ class NewHouseholdPage(PageObject):
     def has_children_below_5(self, value):
         self.choose_radio('has_children_below_5', value)
 
-    def are_children_below_5_fields_disabled(self, is_disabled = True):
-        for element_id in ['aged_between_0_5_months','aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']:
+    def are_children_below_5_fields_disabled(self, is_disabled=True):
+        for element_id in ['aged_between_0_5_months', 'aged_between_6_11_months', 'aged_between_12_23_months',
+                           'aged_between_24_59_months']:
             element_id = 'household-children-' + element_id
             assert self.is_disabled(element_id) == is_disabled
 
@@ -237,7 +242,8 @@ class NewHouseholdPage(PageObject):
         self.browser.fill('aged_between_20_49_years', '3')
 
     def see_an_error_on_number_of_females(self):
-        self.is_text_present('Please enter a value that is greater or equal to the total number of women above 15 years age.')
+        self.is_text_present(
+            'Please enter a value that is greater or equal to the total number of women above 15 years age.')
 
     def choose_occupation(self, occupation_value):
         self.browser.select('occupation', occupation_value)
@@ -249,6 +255,7 @@ class NewHouseholdPage(PageObject):
         else:
             assert len(extra) == 0
 
+
 class AggregateStatusPage(PageObject):
     url = "/aggregates/status"
 
@@ -257,12 +264,12 @@ class AggregateStatusPage(PageObject):
             object_id = "location-%s" % key
             assert self.browser.is_element_present_by_id(object_id)
             jquery_id = '$("#%s")' % object_id
-            location = Location.objects.get(name = value)
+            location = Location.objects.get(name=value)
             self.fill_in_with_js(jquery_id, location.pk)
 
     def check_if_batches_present(self, *batches):
         all_options = self.browser.find_by_id('batch-list-select')[0].find_by_tag('option')
-        all_options = [ option.text for option in all_options ]
+        all_options = [option.text for option in all_options]
         for batch in batches:
             assert batch.name in all_options
 
@@ -288,10 +295,12 @@ class AggregateStatusPage(PageObject):
         self.is_text_present("This batch is currently closed for this location.")
 
     def select_all_district(self):
-        self.browser.execute_script("$('#location-district').val('').change().trigger('liszt:updated').chosen().change();")
+        self.browser.execute_script(
+            "$('#location-district').val('').change().trigger('liszt:updated').chosen().change();")
 
     def see_all_districts_location_selected(self):
         assert self.browser.find_by_css('input[name=location]')[0].value == ''
+
 
 class DownloadExcelPage(PageObject):
     url = "/aggregates/download_spreadsheet"
@@ -299,6 +308,7 @@ class DownloadExcelPage(PageObject):
     def export_to_csv(self, batch):
         self.browser.select('batch', batch.pk)
         # self.submit()
+
 
 class LoginPage(PageObject):
     url = "/accounts/login"
@@ -308,8 +318,8 @@ class LoginPage(PageObject):
 
         user.set_password('secret')
         user.save()
-        details={'username': user.username,
-                 'password': 'secret',
+        details = {'username': user.username,
+                   'password': 'secret',
         }
 
         self.browser.fill_form(details)
@@ -318,6 +328,7 @@ class LoginPage(PageObject):
     def see_home_page_and_logout_link(self):
         assert self.browser.url == django_url(HomePage.url)
         self.see_logout_link()
+
 
 class HomePage(PageObject):
     url = "/"
@@ -328,11 +339,13 @@ class HomePage(PageObject):
     def see_under_construction(self):
         self.is_text_present('Under Construction')
 
+
 class LogoutPage(PageObject):
     url = "/accounts/logout"
 
     def check_browser_is_in_about_page(self):
         assert self.browser.url == django_url(AboutPage.url)
+
 
 class AboutPage(PageObject):
     url = "/about/"
@@ -341,6 +354,7 @@ class AboutPage(PageObject):
         self.is_text_present('Multiple Indicator Cluster Survey (MICS)')
         self.is_text_present('Survey tools')
         self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
+
 
 class BulkSMSPage(PageObject):
     url = "/bulk_sms"
@@ -374,6 +388,7 @@ class BulkSMSPage(PageObject):
         counter = str(length) + "/480"
         self.is_text_present(counter)
 
+
 class NewUserPage(PageObject):
     url = "/users/new/"
 
@@ -400,6 +415,7 @@ class BatchListPage(PageObject):
         self.browser.click_link_by_text("View")
         return BatchShowPage(self.browser, batch)
 
+
 class BatchShowPage(object):
     def __init__(self, browser, batch):
         super(BatchShowPage, self).__init__()
@@ -416,6 +432,7 @@ class BatchShowPage(object):
     def close_batch_for(self, location):
         self.browser.execute_script('$($("input:checkbox")[0]).parent().bootstrapSwitch("toggleState")')
         sleep(2)
+
 
 class InvestigatorDetailsPage(PageObject):
     def __init__(self, browser, investigator):
@@ -452,24 +469,27 @@ class InvestigatorDetailsPage(PageObject):
     def validate_successful_edited_message(self):
         self.is_text_present("Investigator successfully edited.")
 
+
 class UsersListPage(PageObject):
     url = "/users/"
+
     def validate_users_listed(self):
         self.is_text_present('Users List')
 
     def validate_displayed_headers(self):
         self.is_text_present("Full name")
-        self.is_text_present("Email")
+        self.is_text_present("Role")
         self.is_text_present("Mobile number")
         self.is_text_present("Actions")
 
     def validate_users_paginated(self):
         self.browser.click_link_by_text("2")
 
+
 class UsersDetailsPage(PageObject):
     def set_user(self, user):
         self.user = user
-        self.url = "/users/"+str(user.pk)+"/edit/"
+        self.url = "/users/" + str(user.pk) + "/edit/"
 
     def assert_form_has_infomation(self):
         assert self.browser.find_by_name("username").first.value == self.user.username
@@ -477,11 +497,21 @@ class UsersDetailsPage(PageObject):
         assert self.browser.find_by_name("email").first.value == self.user.email
 
     def modify_users_information(self):
-        self.fill('username', 'thrusday')
-        self.fill('mobile_number', '0994747474')
+        self.fill('mobile_number', '994747474')
 
     def click_update_button(self):
         self.browser.find_by_name("save_button").first.click()
+
+    def assert_user_saved_sucessfully(self):
+        self.is_text_present("User successfully edited.")
+
+    def assert_username_is_readonly(self):
+        try:
+            self.browser.find_by_css('#id_username[readonly]').first
+            return True
+        except Exception, e:
+            return False
+        
         
 class EditInvestigatorPage(PageObject):
     def __init__(self, browser, investigator):
@@ -507,3 +537,6 @@ class EditInvestigatorPage(PageObject):
 
     def submit(self):
         self.browser.find_by_css("form button").first.click()
+
+    def assert_user_saved_sucessfully(self):
+        self.is_text_present("User successfully edited.")
