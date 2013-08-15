@@ -47,7 +47,7 @@ class InvestigatorsViewTest(InvestigatorTest):
         response = self.client.get('/investigators/new/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('investigators/new.html', templates)
+        self.assertIn('investigators/investigator_form.html', templates)
         self.assertEquals(response.context['action'], '/investigators/new/')
         self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)
         self.assertEquals(response.context['title'], 'New Investigator')
@@ -273,10 +273,10 @@ class EditInvestigatorPage(InvestigatorTest):
         response = self.client.get('/investigators/' + str(investigator.id) + '/edit/')
         self.assertEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('investigators/new.html', templates)
+        self.assertIn('investigators/investigator_form.html', templates)
         self.assertEquals(response.context['action'], '/investigators/' + str(investigator.id) + '/edit/')
         self.assertEquals(response.context['title'], 'Edit Investigator')
-        self.assertEquals(response.context['id'], 'create-investigator-form')
+        self.assertEquals(response.context['id'], 'edit-investigator-form')
         self.assertEquals(response.context['button_label'], 'Save')
         self.assertEquals(response.context['loading_text'], 'Saving...')
         self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)

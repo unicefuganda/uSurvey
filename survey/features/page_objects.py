@@ -446,7 +446,6 @@ class InvestigatorDetailsPage(PageObject):
     
     def validate_detail_page_url(self):
         print self.browser.url
-        print "*"*100
         assert self.browser.url == django_url(self.url)
 
     def validate_successful_edited_message(self):

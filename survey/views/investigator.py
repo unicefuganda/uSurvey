@@ -40,7 +40,7 @@ def _process_form(investigator, request, action_text,
 @login_required
 @permission_required('auth.can_view_investigators')
 def new_investigator(request):
-    investigator = InvestigatorForm(auto_id='investigator-%s', label_suffix='')
+    investigator = InvestigatorForm(label_suffix='')
     selected_location = None
     response = None
 
@@ -51,12 +51,13 @@ def new_investigator(request):
         redirect_url = "/investigators/"
         response = _process_form(investigator, request, action_text, redirect_url)
 
-    return response or render(request, 'investigators/new.html', {'country_phone_code': COUNTRY_PHONE_CODE,
+    return response or render(request, 'investigators/investigator_form.html', {'country_phone_code': COUNTRY_PHONE_CODE,
                                                                   'locations': LocationWidget(selected_location),
                                                                   'form': investigator,
                                                                   'action': "/investigators/new/",
                                                                   'title': 'New Investigator',
                                                                   'id': "create-investigator-form",
+                                                                  'class': 'investigator-form',
                                                                   'button_label': "Create Investigator",
                                                                   'loading_text': "Creating..."})
 @login_required
@@ -112,9 +113,10 @@ def edit_investigator(request, investigator_id):
     context = { 'action': '/investigators/' + str(investigator_id) + '/edit/',
                 'country_phone_code': COUNTRY_PHONE_CODE,
                 'title': 'Edit Investigator',
-                'id': 'create-investigator-form',
+                'id': 'edit-investigator-form',
+                'class': 'investigator-form',
                 'button_label': 'Save',
                 'loading_text': 'Saving...',
                 'form': investigator_form,
                 'locations': LocationWidget(investigator.location)}
-    return response or render(request, 'investigators/new.html', context)
+    return response or render(request, 'investigators/investigator_form.html', context)

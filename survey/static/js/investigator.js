@@ -26,47 +26,53 @@ $(function(){
         return (cleaned_original==cleaned_confirm)
       }, "Mobile number not matched.");
 
-  $('#create-investigator-form').validate({
+  var validations = {
       ignore: ":hidden:not(select)",
       rules: {
-        "name": "required",
-        "mobile_number": {
-          required: true,
-          minlength: 9,
-          no_leading_zero_if_number_is_9_digits: true,
-          leading_zero_if_number_is_10_digits: true,
-          remote: '/investigators/check_mobile_number'
-        },
-        "confirm_mobile_number":{validate_confirm_number: true, required: true},
-        "age": "required",
-        "surname":"required",
-        "first_name":"required",
+          "name": "required",
+          "mobile_number": {
+              required: true,
+              minlength: 9,
+              no_leading_zero_if_number_is_9_digits: true,
+              leading_zero_if_number_is_10_digits: true
+          },
+          "confirm_mobile_number":{validate_confirm_number: true, required: true},
+          "age": "required",
+          "surname":"required",
+          "first_name":"required"
       },
       messages: {
-        "age":{ number: "Please enter a valid number. No space or special charcters."},
-        "mobile_number": {
-          number: "Please enter a valid number. No space or special charcters.",
-          minlength:jQuery.format("Too few digits. Please enter {0} digits."),
-          remote: jQuery.format("{0} is already registered.")
-        },
-        "confirm_mobile_number":{number: "Please enter a valid number. No space or special charcters"}
+          "age":{ number: "Please enter a valid number. No space or special charcters."},
+          "mobile_number": {
+              number: "Please enter a valid number. No space or special charcters.",
+              minlength:jQuery.format("Too few digits. Please enter {0} digits.")
+          },
+          "confirm_mobile_number":{number: "Please enter a valid number. No space or special charcters"}
       },
       errorPlacement: function(error, element) {
-        if ($(element).is(':hidden')) {
-          error.insertAfter(element.next());
-        } else {
-          error.insertAfter(element);
-        };
-       },
+          if ($(element).is(':hidden')) {
+              error.insertAfter(element.next());
+          } else {
+              error.insertAfter(element);
+          };
+      },
       submitHandler: function(form){
-         strip_leading_zero("#investigator-mobile_number");
-         strip_leading_zero("#investigator-confirm_mobile_number");
-         var button = $(form).find('button'),
-             value = button.val();
-         button.attr('disabled', true);
-         form.submit();
-       }
-  });
+          strip_leading_zero("#investigator-mobile_number");
+          strip_leading_zero("#investigator-confirm_mobile_number");
+          var button = $(form).find('button'),
+              value = button.val();
+          button.attr('disabled', true);
+          form.submit();
+      }
+  };
+
+  if($("#create-investigator-form").is(':visible')){
+      validations.rules.mobile_number.remote = '/investigators/check_mobile_number';
+      validations.messages.mobile_number.remote = jQuery.format("{0} is already registered.");
+  }
+
+  $('.investigator-form').validate(validations);
+
 
   $("input.small-positive-number").each(function(){
       $(this).rules('add', {required:true, min:0, max:10});
