@@ -283,6 +283,7 @@ class EditInvestigatorPage(InvestigatorTest):
         self.assertIsInstance(response.context['form'], InvestigatorForm)
         locations = response.context['locations'].get_widget_data()
         self.assertEqual(len(locations),2)
+        self.assert_restricted_permission_for('/investigators/' + str(investigator.id) +'/edit/')
 
     def test_edit_post(self):
         country = LocationType.objects.create(name='country', slug='country')

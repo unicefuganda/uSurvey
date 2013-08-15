@@ -100,6 +100,7 @@ def show_investigator(request, investigator_id):
     investigator = Investigator.objects.get(id=investigator_id)
     return render(request, 'investigators/show.html', {'investigator': investigator})
 
+@permission_required('auth.can_view_investigators')
 def edit_investigator(request, investigator_id):
     response = None
     investigator = Investigator.objects.get(id=investigator_id)
