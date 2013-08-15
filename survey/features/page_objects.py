@@ -390,7 +390,8 @@ class NewUserPage(PageObject):
         sleep(2)
 
     def see_user_successfully_registered(self):
-        self.is_text_present('User successfully registered')
+        sleep(0.5)
+        self.is_text_present('User successfully registered.')
 
 class BatchListPage(PageObject):
     url = "/batches/"
