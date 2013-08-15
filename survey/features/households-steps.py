@@ -103,3 +103,23 @@ def and_if_i_choose_a_different_occupation(step):
 @step(u'Then Specify disappears')
 def then_specify_disappears(step):
     world.page.is_specify_visible(False)
+
+@step(u'Given I have an investigator')
+def given_i_have_an_investigator(step):
+    assert False, 'This step must be implemented'
+    
+@step(u'Given I have 100 households')
+def given_i_have_100_households(step):
+    assert False, 'This step must be implemented'
+
+@step(u'And I visit households listing page')
+def and_i_visit_households_listing_page(step):
+    assert False, 'This step must be implemented'
+
+@step(u'And I should see the households list paginated')
+def and_i_should_see_the_households_list_paginated(step):
+    assert False, 'This step must be implemented'
+
+@step(u'And I should see respective investigator against the household')
+def and_i_should_see_respective_investigator_against_the_household(step):
+    assert False, 'This step must be implemented'

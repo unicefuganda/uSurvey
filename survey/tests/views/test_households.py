@@ -1,4 +1,5 @@
 import json
+from django.template.defaultfilters import slugify
 
 from django.test import TestCase
 from django.test.client import Client
@@ -311,4 +312,20 @@ class HouseholdViewTest(TestCase):
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/households/new/')
-        # self.assert_restricted_permission_for('/households/')
+
+    def test_listing_households(self):
+        country = LocationType.objects.create(name="country", slug=slugify("country"))
+        uganda = Location.objects.create(name="Uganda",type=country)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator)
+        response = self.client.get('/households/')
+        self.assertEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('households/index.html', templates)
+        self.assertEqual(len(response.context['households']), 1)
+        self.assertIn(household, response.context['households'])
+
+        locations = response.context['location_data'].get_widget_data()
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
+

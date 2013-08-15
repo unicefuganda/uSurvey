@@ -146,3 +146,11 @@ def get_investigators(request):
         investigator_hash[investigator.name] = investigator.id
     return HttpResponse(json.dumps(investigator_hash), content_type="application/json")
 
+def list_households(request):
+    selected_location = None
+    households = Household.objects.all()
+    params = request.GET
+    if params.has_key('location') and params['location'].isdigit():
+        selected_location = Location.objects.get(id=int(params['location']))
+
+    return render(request, 'households/index.html', {'households': households, 'location_data': LocationWidget(selected_location)})

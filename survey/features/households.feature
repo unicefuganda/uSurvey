@@ -63,3 +63,13 @@ Feature: Households feature
         Then I have to specify one
         And If I choose a different occupation
         Then Specify disappears
+
+    Scenario: List all households
+      Given I have 100 households
+      Given I have an investigator
+      Given I am logged in as researcher
+      And I have locations
+      And I visit households listing page
+      And I should see the households list paginated
+      And I should see respective investigator against the household
+
