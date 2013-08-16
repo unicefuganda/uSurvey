@@ -749,6 +749,32 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+    def test_retake_survey_time_limit(self):
+        self.household_head_1.household.batch_completed(self.batch)
+        self.investigator.answered(self.question_1, self.household_head_1.household, 1)
+        self.investigator.answered(self.question_2, self.household_head_1.household, 1)
+
+        completion = HouseholdBatchCompletion.objects.all()[0]
+        completion.created -= datetime.timedelta(minutes=USSD.TIMEOUT_MINUTES, seconds=1)
+        completion.save()
+
+        homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
+
+        households_list_1 = "%s\n1: %s*\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "00"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % households_list_1
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
 class USSDOpenBatch(TestCase):
     def setUp(self):
         self.client = Client()

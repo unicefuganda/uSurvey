@@ -134,8 +134,10 @@ class USSD(USSDBase):
             if not self.is_new_request():
                 self.process_investigator_response()
             self.render_survey_response()
-        else:
+        elif self.household.can_retake_survey(minutes=self.TIMEOUT_MINUTES):
             self.retake_survey()
+        else:
+            self.end_interview()
 
     def confirm_retake_survey(self, answer):
         try:

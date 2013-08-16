@@ -269,6 +269,11 @@ class Household(BaseModel):
     def batch_reopen(self, batch):
         self.completed_batches.filter(household=self).delete()
 
+    def can_retake_survey(self, minutes):
+        last_batch_completed_time = self.completed_batches.latest('created').created
+        timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(minutes=minutes)
+        return last_batch_completed_time >= timeout
+
     def answers_for(self, questions):
         answers = []
         for question in questions:
