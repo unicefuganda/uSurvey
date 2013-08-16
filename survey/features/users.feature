@@ -64,3 +64,29 @@ Feature: Users feature
       When I modify the users information
       And I click the update button
       Then I should see user information updated successfully
+    
+    Scenario: Edit a user when logged in with no permissions
+      Given I have a user
+      And I visit the login page
+      And I login a user
+      And I am in the home page
+      Then I see user settings link
+      And I click user settings link
+      And I select edit action
+      Then I should not see the groups field
+      When I modify the users information
+      And I click the update button
+      Then I should see user information updated successfully
+    
+    Scenario: Edit a user when logged as superuser
+      Given I am logged in as a superuser
+      And I visit the login page
+      And I login a user
+      And I am in the home page
+      Then I see user settings link
+      And I click user settings link
+      And I select edit action
+      Then I should see the groups field
+      When I modify the users information
+      And I click the update button
+      Then I should see user information updated successfully

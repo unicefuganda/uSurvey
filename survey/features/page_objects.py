@@ -513,6 +513,7 @@ class UsersDetailsPage(PageObject):
         assert self.browser.find_by_name("email").first.value == self.user.email
 
     def modify_users_information(self):
+        assert self.browser.find_by_name('mobile_number')
         self.fill('mobile_number', '994747474')
 
     def click_update_button(self):
@@ -527,8 +528,13 @@ class UsersDetailsPage(PageObject):
             return True
         except Exception, e:
             return False
-        
-        
+    
+    def is_group_input_field_visible(self, status=True):
+        if status:
+            assert self.browser.find_by_name("groups")
+        else:
+            assert not self.browser.find_by_name("groups")
+
 class EditInvestigatorPage(PageObject):
     def __init__(self, browser, investigator):
         self.browser = browser

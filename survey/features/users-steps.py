@@ -6,12 +6,13 @@ from survey.models import *
 
 @step(u'Given I am logged in as a superuser')
 def given_i_am_logged_in_as_a_superuser(step):
-    user = User.objects.create(username='Rajni', email='rajni@kant.com', password='I_Rock', first_name='some name', last_name='last_name')
-    user.is_superuser = True
-    user.save()
+    world.user = User.objects.create(username='Rajni', email='rajni@kant.com', password='I_Rock', first_name='some name', last_name='last_name')
+    world.user.is_superuser = True
+    world.user.save()
+    UserProfile.objects.create(user=world.user, mobile_number='123456666')
     world.page = LoginPage(world.browser)
     world.page.visit()
-    world.page.login(user)
+    world.page.login(world.user)
 
 
 @step(u'And I visit new user page')
@@ -201,4 +202,12 @@ def then_i_should_see_user_information_saved_successfully(step):
     
 @step(u'And I see that username is readonly')
 def and_i_see_that_username_is_readonly(step):
-    world.page.assert_username_is_readonly()    
+    world.page.assert_username_is_readonly() 
+    
+@step(u'Then I should not see the groups field')
+def then_i_should_not_see_the_groups_field(step):
+    world.page.is_group_input_field_visible(False)
+    
+@step(u'Then I should see the groups field')
+def then_i_should_see_the_groups_field(step):
+    world.page.is_group_input_field_visible(True)      

@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 @step(u'Given I have a user')
 def given_i_have_a_user(step):
     world.user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock', first_name='Rajin', last_name="Kant")
+    profile = UserProfile.objects.create(user=world.user, mobile_number='2222222223')
 
 @step(u'And I visit the login page')
 def and_i_visit_the_login_page(step):
