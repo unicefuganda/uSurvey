@@ -540,5 +540,21 @@ class EditInvestigatorPage(PageObject):
     def submit(self):
         self.browser.find_by_css("form button").first.click()
 
+
     def assert_user_saved_sucessfully(self):
         self.is_text_present("User successfully edited.")
+
+class HouseholdsListPage(PageObject):
+    url = '/households/'
+
+    def validate_fields(self):
+        assert self.browser.is_text_present('Households List')
+        assert self.browser.is_text_present('Name')
+        assert self.browser.is_text_present('Age')
+        assert self.browser.is_text_present('Gender')
+        assert self.browser.is_text_present('Location')
+        assert self.browser.is_text_present('Investigator')
+
+    def validate_pagination(self):
+        self.browser.click_link_by_text("2")
+

@@ -158,9 +158,6 @@ def list_households(request):
 
     if not households:
         location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'
-        messages.error(request, "There are  no investigators currently registered  for this %s." % location_type)
-    print "*"*100
-    print households
-    print "*"*100
+        messages.error(request, "There are  no households currently registered  for this %s." % location_type)
     return render(request, 'households/index.html',
                   {'households': households, 'location_data': LocationWidget(selected_location), 'request': request})
