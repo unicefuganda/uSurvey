@@ -377,3 +377,6 @@ class HouseholdViewTest(TestCase):
 
         self.assertEquals(len(locations['district']), 1)
         self.assertEquals(locations['district'][0], kampala)
+
+    def test_restricted_permissions(self):
+        self.assert_restricted_permission_for('/households/')

@@ -146,6 +146,7 @@ def get_investigators(request):
         investigator_hash[investigator.name] = investigator.id
     return HttpResponse(json.dumps(investigator_hash), content_type="application/json")
 
+@permission_required('auth.can_view_households')
 def list_households(request):
     selected_location = None
     households = Household.objects.all()
