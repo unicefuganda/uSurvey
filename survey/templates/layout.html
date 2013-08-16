@@ -71,13 +71,24 @@
                 <a href="{% url 'batch_index_page' %}">Batches</a>
               </li>
             {% endif %}
-
-          </ul>
+            </ul>
           {% if user.is_authenticated %}
-            <a class="right brand" href="{% url 'logout_page' %}">logout</a>
+            <ul role="navigation" class="nav pull-right">
+              <li class="dropdown">
+                <a data-toggle="dropdown" id="drop5" class="brand dropdown-toggle" role="button" href="#">{{ user.get_full_name }}<b class="caret"></b></a>
+                <ul aria-labelledby="drop5" role="menu" class="dropdown-menu">
+                  <li role="presentation"><a href="{% url 'users_edit' user.id %}">Edit Profile</a></li>
+                  <li role="presentation"><a href="{% url 'logout_page' %}">Logout</a></li>
+                </ul>
+              </li>
+            </ul>
+            <!-- <a data-toggle="dropdown" class="right brand dropdown-toggle" role="button" href="#">{{ user.username }}</a> -->
           {% else %}
-            <a class="right brand" href="{% url 'login_page' %}">login</a>
+            <ul role="navigation" class="nav pull-right">
+              <a class="right brand" href="{% url 'login_page' %}">login</a>
+            </ul>
           {% endif %}
+          
         </div>
 
       </div>

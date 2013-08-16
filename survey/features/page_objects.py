@@ -91,7 +91,17 @@ class PageObject(object):
     def choose_radio(self, name, value):
         js = "$('input:radio[name=%s][value=%s]').prop('checked', true).change()" % (name, value)
         self.browser.execute_script(js)
-
+        
+    def see_user_settings_link(self, user):
+        assert self.browser.find_link_by_partial_text("%s" % str(user.get_full_name()))
+    
+    def click_user_settings(self, user):
+        self.browser.click_link_by_text("%s" % user.get_full_name())
+        
+    def assert_user_can_see_profile_and_logout_link(self):
+        links = ["Edit Profile", "Logout"]
+        for link in links:
+            assert self.browser.find_link_by_text(link)
 
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
