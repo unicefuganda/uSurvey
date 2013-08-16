@@ -60,9 +60,12 @@ class EditUserForm(ModelForm):
                                                                    'style':"width:172px;" ,
                                                                    'maxlength':'10'}))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder= ['username','first_name', 'last_name','mobile_number', 'email', 'groups']
+        if user.has_perm("can_view_users"):
+            self.fields.keyOrder= ['username','first_name', 'last_name','mobile_number', 'email', 'groups']
+        else:    
+            self.fields.keyOrder= ['username','first_name', 'last_name','mobile_number', 'email']
 
     def _clean_attribute(self, Klass, **kwargs):
         attribute_name = kwargs.keys()[0]

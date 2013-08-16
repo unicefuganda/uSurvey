@@ -131,7 +131,7 @@ class EditUserFormTest(TestCase):
         user_data = self.user_data
         user_data['last_name'] = 'Rajniii'
         form_data = dict(user_data, **self.initial)
-        user_form = EditUserForm(form_data, instance=self.user_to_be_edited, initial=self.initial)
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
         self.assertTrue(user_form.is_valid())
         user = user_form.save()
         self.failUnless(user.id)
@@ -146,7 +146,7 @@ class EditUserFormTest(TestCase):
         user_data = self.user_data
         form_data = dict(user_data, **{'mobile_number':'not a number'})
 
-        user_form = EditUserForm(form_data, instance=self.user_to_be_edited, initial=self.initial)
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
         message = "Enter a number."
         self.assertEquals(user_form.errors['mobile_number'], [message])
@@ -155,7 +155,7 @@ class EditUserFormTest(TestCase):
         user_data = self.user_data
         form_data = dict(user_data, **{'mobile_number':-123456789})
 
-        user_form = EditUserForm(form_data, instance=self.user_to_be_edited, initial=self.initial)
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
         message = "Ensure this value is greater than or equal to 100000000."
         self.assertEquals(user_form.errors['mobile_number'], [message])
@@ -165,7 +165,7 @@ class EditUserFormTest(TestCase):
         user_data = self.user_data
         form_data = dict(user_data, **{'mobile_number':number_of_length_greater_than_9})
 
-        user_form = EditUserForm(form_data, instance=self.user_to_be_edited, initial=self.initial)
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
         message = "Ensure that there are no more than 9 digits in total."
         self.assertEquals(user_form.errors['mobile_number'], [message])
@@ -178,7 +178,7 @@ class EditUserFormTest(TestCase):
 
         other_user = User.objects.create(email=some_email)
 
-        user_form = EditUserForm(form_data, instance=self.user_to_be_edited, initial=self.initial)
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
         message = "%s is already associated to a different user."% form_data['email']
         self.assertEquals(user_form.errors['email'], [message])
@@ -192,7 +192,7 @@ class EditUserFormTest(TestCase):
         other_user = User.objects.create(username='some_other_name')
         userprofile = UserProfile.objects.create(user=other_user, mobile_number=form_data['mobile_number'])
 
-        user_form = EditUserForm(form_data, instance=self.user_to_be_edited, initial=self.initial)
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
         message = "%s is already associated to a different user."% form_data['mobile_number']
         self.assertEquals(user_form.errors['mobile_number'], [message])
@@ -204,7 +204,7 @@ class EditUserFormTest(TestCase):
 
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
-        user_form = EditUserForm(form_data, instance=self.user_to_be_edited, initial=self.initial)
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
         message = "username cannot be changed."
         self.assertEquals(user_form.errors['username'], [message])
@@ -216,7 +216,7 @@ class EditUserFormTest(TestCase):
         other_user,b = User.objects.get_or_create(username= existing_username)
         form_data['username']= existing_username
 
-        user_form = EditUserForm(form_data, instance=self.user_to_be_edited, initial=self.initial)
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
         self.assertFalse(user_form.is_valid())
         message = "username cannot be changed."
         self.assertEquals(user_form.errors['username'], [message])

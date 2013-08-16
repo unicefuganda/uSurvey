@@ -66,11 +66,11 @@ def index(request):
 def edit(request, user_id):
     user = User.objects.get(pk=user_id)
     initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number }
-    userform = EditUserForm(instance=user, initial=initial)
+    userform = EditUserForm(user= request.user, instance=user, initial=initial)
     response = None
     if request.method == 'POST':
-        userform = EditUserForm(data=request.POST, instance=user, initial=initial)
-        response = _process_form(userform, request, "edited", "/users/")
+        userform = EditUserForm(data=request.POST, user= request.user, instance=user, initial=initial)
+        response = _process_form(userform, request, 'edited', '/users/'+ str(user_id)+'/edit/')
     context_variables = {'userform': userform,
                         'action' : '/users/'+str(user_id)+'/edit/',
                         'id': 'edit-user-form', 'button_label' : 'Save Changes',
