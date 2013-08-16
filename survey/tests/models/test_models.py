@@ -80,17 +80,17 @@ class LocationAutoCompleteTest(TestCase):
         self.assertEqual(LocationAutoComplete.objects.all()[0].text, "Uganda")
 
         kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
-        self.assertEqual(kampala.auto_complete_text(), "Kampala, Uganda")
+        self.assertEqual(kampala.auto_complete_text(), "Uganda > Kampala")
 
         soroti = Location.objects.create(name="Soroti", tree_parent=kampala)
-        self.assertEqual(soroti.auto_complete_text(), "Soroti, Kampala, Uganda")
+        self.assertEqual(soroti.auto_complete_text(), "Uganda > Kampala > Soroti")
 
         kampala.name = "Kampala Changed"
         kampala.save()
-        self.assertEqual(kampala.auto_complete_text(), "Kampala Changed, Uganda")
+        self.assertEqual(kampala.auto_complete_text(), "Uganda > Kampala Changed")
 
         soroti = Location.objects.get(name="Soroti")
-        self.assertEqual(soroti.auto_complete_text(), "Soroti, Kampala Changed, Uganda")
+        self.assertEqual(soroti.auto_complete_text(), "Uganda > Kampala Changed > Soroti")
 
 class SurveyTest(TestCase):
     def test_store(self):

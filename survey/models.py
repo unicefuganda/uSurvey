@@ -674,7 +674,8 @@ def generate_auto_complete_text_for_location(location):
     while location.tree_parent:
         location = location.tree_parent
         parents.append(location.name)
-    auto_complete.text = ", ".join(parents)
+    parents.reverse()
+    auto_complete.text = " > ".join(parents)
     auto_complete.save()
 
 @receiver(post_save, sender=Location)
