@@ -118,14 +118,14 @@ class UsersViewTest(TestCase):
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
         assert error_message.called
-        
+
     def assert_restricted_permission_for(self, url):
         self.client.logout()
 
         self.client.login(username='useless', password='I_Suck')
         response = self.client.get(url)
 
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')    
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_restricted_permission(self):
         self.assert_restricted_permission_for('/users/new/')
@@ -176,7 +176,7 @@ class UsersViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
         self.assertFalse(json_response)
-        
+
     def test_list_users(self):
         user = User.objects.create()
         response = self.client.get('/users/')
@@ -186,7 +186,7 @@ class UsersViewTest(TestCase):
         self.assertEqual(len(response.context['users']), 3)
         self.assertIn(user, response.context['users'])
         self.assertNotEqual(None, response.context['request'])
-        
+
     def test_edit_user_view(self):
         user = User.objects.create_user('andrew', 'a@m.vom', 'pass')
         UserProfile.objects.create(user=user, mobile_number='200202020')
@@ -202,15 +202,15 @@ class UsersViewTest(TestCase):
         self.assertEquals(response.context['loading_text'], 'Saving...')
         self.assertEquals(response.context['country_phone_code'], '256')
         self.assertIsInstance(response.context['userform'], EditUserForm)
-        
+
     def test_edit_user_when_one_has_valid_permissions(self):
         user_with_no_permission = User.objects.create_user(username='someguy', email='rajni@kant.com', password='pass')
-        UserProfile.objects.create(user=user_with_no_permission, mobile_number='200202020')   
+        UserProfile.objects.create(user=user_with_no_permission, mobile_number='200202020')
         self.client.login(username='someguy', password='pass')
         url = "/users/"+str(user_with_no_permission.pk)+"/edit/"
         response = self.client.get(url)
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
-        
+
     def test_edit_user_updates_user_information(self):
         form_data = {
                     'username':'knight',
@@ -224,9 +224,9 @@ class UsersViewTest(TestCase):
         self.failIf(User.objects.filter(username=form_data['username']))
         user = User.objects.create(username=form_data['username'], email=form_data['email'], password=form_data['password1'])
         UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
-        
+
         data = {
-                    'username':'knightngale',
+                    'username':'knight',
                     'password1':'mk',
                     'password2':'mk',
                     'first_name':'michael',
@@ -234,8 +234,33 @@ class UsersViewTest(TestCase):
                     'mobile_number':'123456789',
                     'email':'mm@mm.mm',
                 }
-                
+
         response = self.client.post('/users/'+str(user.pk)+'/edit/', data=data)
         self.failUnlessEqual(response.status_code, 302)
-        edited_user = User.objects.filter(username='knightngale', last_name='knightngale')
+        edited_user = User.objects.filter(last_name='knightngale')
         self.assertEqual(len(edited_user), 1)
+
+    @patch('survey.views.users._add_error_messages')
+    def test_edit_username_not_allowed(self, mock_add_error_messages):
+        form_data = {
+                    'username':'knight',
+                    'password1':'mk',
+                    'password2':'mk',
+                    'first_name':'michael',
+                    'last_name':'knight',
+                    'mobile_number':'123456789',
+                    'email':'mm@mm.mm',
+                }
+        self.failIf(User.objects.filter(username=form_data['username']))
+        user = User.objects.create(username=form_data['username'], email=form_data['email'], password=form_data['password1'])
+        UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
+
+        data = form_data.copy()
+        data['username'] = 'changed'
+        response = self.client.post('/users/'+str(user.pk)+'/edit/', data=data)
+        self.failUnlessEqual(response.status_code, 200)
+        edited_user = User.objects.filter(username=data['username'])
+        self.failIf(edited_user)
+        original_user = User.objects.filter(username=form_data['username'], email=form_data['email'])
+        self.failUnless(original_user)
+        assert mock_add_error_messages.is_called

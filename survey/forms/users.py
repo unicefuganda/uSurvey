@@ -16,7 +16,7 @@ class UserForm(UserCreationForm):
         self.fields['password2'].label = 'Confirm Password'
         self.fields.keyOrder= ['username', 'password1', 'password2', 'first_name', 'last_name',
                                 'mobile_number', 'email', 'groups']
-                                
+
     def _clean_attribute(self, Klass, **kwargs):
         attribute_name = kwargs.keys()[0]
         data_attr = kwargs[attribute_name]
@@ -26,11 +26,11 @@ class UserForm(UserCreationForm):
             self._errors[attribute_name] = self.error_class([message])
             del self.cleaned_data[attribute_name]
         return data_attr
-        
+
     def clean_username(self):
         username = self.cleaned_data['username']
         return self._clean_attribute(User, username=username)
-                                
+
     def clean_mobile_number(self):
         mobile_number = self.cleaned_data['mobile_number']
         return self._clean_attribute(UserProfile, mobile_number=mobile_number)
@@ -52,7 +52,7 @@ class UserForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("username", "first_name", "last_name", "email", "groups")
-        
+
 class EditUserForm(ModelForm):
     mobile_number = forms.DecimalField(min_value=100000000,
                                        max_digits=9,
@@ -63,7 +63,7 @@ class EditUserForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder= ['username','first_name', 'last_name','mobile_number', 'email', 'groups']
-        
+
     def _clean_attribute(self, Klass, **kwargs):
         attribute_name = kwargs.keys()[0]
         data_attr = kwargs[attribute_name]
@@ -76,7 +76,13 @@ class EditUserForm(ModelForm):
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        return self._clean_attribute(User, username=username)
+        users_with_same_username = User.objects.filter(username=username)
+        if self.initial.get('username', None) != str(username) or not users_with_same_username:
+            message = "username cannot be changed."
+            self._errors['username'] = self.error_class([message])
+            del self.cleaned_data['username']
+
+        return username
 
     def clean_mobile_number(self):
         mobile_number = self.cleaned_data['mobile_number']
@@ -101,7 +107,7 @@ class EditUserForm(ModelForm):
         widgets={
                 'username':forms.TextInput(attrs={'readonly':'readonly'}),
         }
-        
+
 
 class UserProfileForm(ModelForm):
 
