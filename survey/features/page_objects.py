@@ -558,3 +558,6 @@ class HouseholdsListPage(PageObject):
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
+    def no_registered_huseholds(self):
+        self.browser.is_text_present('There are  no households currently registered  for this country.')
+

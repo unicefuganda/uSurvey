@@ -72,4 +72,11 @@ Feature: Households feature
       And I visit households listing page
       And I should see the households list paginated
 
+    Scenario: No households list
+      Given I have no households
+      Given I am logged in as researcher
+      And I have locations
+      And I visit households listing page
+      And I should see no household message
+
 

@@ -128,3 +128,11 @@ def and_i_visit_households_listing_page(step):
 def and_i_should_see_the_households_list_paginated(step):
     world.page.validate_fields()
     world.page.validate_pagination()
+
+@step(u'Given I have no households')
+def given_i_have_no_households(step):
+    Household.objects.all().delete()
+
+@step(u'And I should see no household message')
+def and_i_should_see_no_household_message(step):
+    world.page.no_registered_huseholds()
