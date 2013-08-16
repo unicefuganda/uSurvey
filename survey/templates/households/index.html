@@ -3,6 +3,8 @@
     Households List
 {% endblock %}
 {% block content %}
+    {% load pagination_tags %}
+    {% autopaginate households 50 %}
     <h3>
         Households List
     </h3>
@@ -51,13 +53,14 @@
                         {{ household.investigator.location.auto_complete_text }}
                     </td>
                     <td>
-                        {{ household.investigator.name }}
+                        <a href="{% url 'show_investigator_page' household.investigator.pk %}">{{ household.investigator.name }}</a>
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     {% endif %}
+    {% paginate %}
 {% endblock %}
 
 {% block javascripts %}
