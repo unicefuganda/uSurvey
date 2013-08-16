@@ -254,8 +254,11 @@ class Household(BaseModel):
         return not self.next_question()
 
     def retake_latest_batch(self):
-        for klass in [NumericalAnswer, TextAnswer, MultiChoiceAnswer]:
-            klass.objects.filter(household=self).delete()
+        batches = self.investigator.get_open_batch()
+        for batch in batches:
+            questions = batch.all_questions()
+            for klass in [NumericalAnswer, TextAnswer, MultiChoiceAnswer]:
+                klass.objects.filter(question__in=questions, household=self).delete()
 
     def has_completed_batch(self, batch):
         return self.completed_batches.filter(batch=batch).count() > 0
@@ -344,6 +347,9 @@ class Batch(BaseModel):
 
     def first_question(self):
         return self.indicators.get(order=1).questions.get(order=1)
+
+    def all_questions(self):
+        return Question.objects.filter(indicator__in=self.indicators.all())
 
     def open_for_location(self, location):
         return self.open_locations.get_or_create(batch=self, location=location)
