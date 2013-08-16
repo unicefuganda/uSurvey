@@ -371,7 +371,7 @@ class USSDTest(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
 
-        households_list_1 = "%s\n1: %s\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list_1 = "%s\n1: %s*\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % households_list_1
@@ -508,9 +508,9 @@ class USSDTestCompleteFlow(TestCase):
         self.household_head_8 = self.create_household_head()
         self.household_head_9 = self.create_household_head()
         survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(survey=survey, order = 1)
-        batch.open_for_location(self.investigator.location)
-        indicator = Indicator.objects.create(batch=batch, order=1)
+        self.batch = Batch.objects.create(survey=survey, order = 1)
+        self.batch.open_for_location(self.investigator.location)
+        indicator = Indicator.objects.create(batch=self.batch, order=1)
         self.question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
 
@@ -624,7 +624,7 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        households_list_1 = "%s\n1: %s\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
+        households_list_1 = "%s\n1: %s*\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
@@ -680,6 +680,8 @@ class USSDTestCompleteFlow(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
 
+        households_list_1 = "%s\n1: %s*\n2: %s*" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
+
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -729,6 +731,23 @@ class USSDTestCompleteFlow(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.assertEquals(0, NumericalAnswer.objects.filter(investigator=self.investigator, household=self.household_head_2.household).count())
+
+    def test_show_completion_star_next_to_household_head_name(self):
+        self.household_head_1.household.batch_completed(self.batch)
+        self.household_head_3.household.batch_completed(self.batch)
+        homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % homepage
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        households_list_1 = "%s\n1: %s*\n2: %s\n3: %s*\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "00"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % households_list_1
+        self.assertEquals(urllib2.unquote(response.content), response_string)
 
 class USSDOpenBatch(TestCase):
     def setUp(self):

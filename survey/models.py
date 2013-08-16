@@ -140,8 +140,11 @@ class Investigator(BaseModel):
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
         households_list = []
+        open_batches = self.get_open_batch()
         for household in households:
             text = "%s: %s" % (all_households.index(household) + 1, household.head.surname)
+            if household.has_completed_batches(open_batches):
+                text += "*"
             households_list.append(text)
         if households.has_previous():
             households_list.append(self.PREVIOUS_PAGE_TEXT)
@@ -256,6 +259,9 @@ class Household(BaseModel):
 
     def has_completed_batch(self, batch):
         return self.completed_batches.filter(batch=batch).count() > 0
+
+    def has_completed_batches(self, batches):
+        return self.completed_batches.filter(batch__in=batches).count() == len(batches)
 
     def batch_completed(self, batch):
         return self.completed_batches.get_or_create(household=self, investigator=self.investigator, batch=batch)
