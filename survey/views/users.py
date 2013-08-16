@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from survey.investigator_configs import *
 from survey.forms.users import *
 from django.contrib.auth.decorators import login_required, permission_required
+from survey.views.custom_decorators import permission_required_for_perm_or_current_user
 
 def _add_error_messages(userform, request):
     error_message = "User not registered. "
@@ -60,7 +61,8 @@ def index(request):
         return check_user_attribute(email=request.GET['email'])
     return render(request, 'users/index.html', { 'users' : User.objects.all(),
                                                  'request': request})
-@permission_required('auth.can_view_users')
+                                                 
+@permission_required_for_perm_or_current_user('auth.can_view_users')
 def edit(request, user_id):
     user = User.objects.get(pk=user_id)
     initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number }

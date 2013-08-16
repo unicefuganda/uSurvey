@@ -203,14 +203,6 @@ class UsersViewTest(TestCase):
         self.assertEquals(response.context['country_phone_code'], '256')
         self.assertIsInstance(response.context['userform'], EditUserForm)
 
-    def test_edit_user_when_one_has_valid_permissions(self):
-        user_with_no_permission = User.objects.create_user(username='someguy', email='rajni@kant.com', password='pass')
-        UserProfile.objects.create(user=user_with_no_permission, mobile_number='200202020')
-        self.client.login(username='someguy', password='pass')
-        url = "/users/"+str(user_with_no_permission.pk)+"/edit/"
-        response = self.client.get(url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
-
     def test_edit_user_updates_user_information(self):
         form_data = {
                     'username':'knight',
@@ -264,3 +256,35 @@ class UsersViewTest(TestCase):
         original_user = User.objects.filter(username=form_data['username'], email=form_data['email'])
         self.failUnless(original_user)
         assert mock_add_error_messages.is_called
+    
+    def test_current_user_edits_his_own_profile(self):
+        form_data = {
+                    'username':'knight',
+                    'password1':'mk',
+                    'password2':'mk',
+                    'first_name':'michael',
+                    'last_name':'knight',
+                    'mobile_number':'123456789',
+                    'email':'mm@mm.mm',
+                }
+        self.failIf(User.objects.filter(username=form_data['username']))
+        user_without_permission = User.objects.create(username=form_data['username'], email=form_data['email'])
+        user_without_permission.set_password(form_data['password1'])
+        user_without_permission.save()
+        UserProfile.objects.create(user=user_without_permission, mobile_number=form_data['mobile_number'])
+
+        self.client.logout()
+        self.client.login(username=form_data['username'], password=form_data['password1'])
+
+        data = {
+                    'username':'knight',
+                    'first_name':'michael',
+                    'last_name':'knightngale',
+                    'mobile_number':'123456789',
+                    'email':'mm@mm.mm',
+                }
+
+        response = self.client.post('/users/'+str(user_without_permission.pk)+'/edit/', data=data)
+        self.failUnlessEqual(response.status_code, 302)
+        edited_user = User.objects.filter(last_name='knightngale')
+        self.assertEqual(len(edited_user), 1)

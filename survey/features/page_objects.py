@@ -41,8 +41,12 @@ class PageObject(object):
     def submit(self):
         self.browser.find_by_css("form button").first.click()
 
-    def see_logout_link(self):
-        assert self.browser.find_link_by_text('logout')
+    def see_username_link(self, username):
+        assert self.browser.find_link_by_text(username)
+        
+    def see_logout_link(self, username):
+        self.browser.find_link_by_text(username).first.click()
+        assert self.browser.find_link_by_text(" Logout")
 
     def see_the_about_link(self):
         assert self.browser.find_link_by_text('About')
@@ -101,7 +105,7 @@ class PageObject(object):
     def assert_user_can_see_profile_and_logout_link(self):
         links = ["Edit Profile", "Logout"]
         for link in links:
-            assert self.browser.find_link_by_text(link)
+            assert self.browser.find_link_by_partial_text(link)
 
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
@@ -335,9 +339,9 @@ class LoginPage(PageObject):
         self.browser.fill_form(details)
         self.submit()
 
-    def see_home_page_and_logout_link(self):
+    def see_home_page_and_logout_link(self, full_name):
         assert self.browser.url == django_url(HomePage.url)
-        self.see_logout_link()
+        self.see_logout_link(full_name)
 
 
 class HomePage(PageObject):

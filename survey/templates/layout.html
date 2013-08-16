@@ -77,12 +77,11 @@
               <li class="dropdown">
                 <a data-toggle="dropdown" id="drop5" class="brand dropdown-toggle" role="button" href="#">{{ user.get_full_name }}<b class="caret"></b></a>
                 <ul aria-labelledby="drop5" role="menu" class="dropdown-menu">
-                  <li role="presentation"><a href="{% url 'users_edit' user.id %}">Edit Profile</a></li>
-                  <li role="presentation"><a href="{% url 'logout_page' %}">Logout</a></li>
+                  <li role="presentation"><a href="{% url 'users_edit' user.id %}"><i class="icon-pencil"></i> Edit Profile</a></li>
+                  <li role="presentation"><a href="{% url 'logout_page' %}"><i class="icon-off"></i> Logout</a></li>
                 </ul>
               </li>
             </ul>
-            <!-- <a data-toggle="dropdown" class="right brand dropdown-toggle" role="button" href="#">{{ user.username }}</a> -->
           {% else %}
             <ul role="navigation" class="nav pull-right">
               <a class="right brand" href="{% url 'login_page' %}">login</a>

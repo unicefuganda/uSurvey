@@ -6,7 +6,7 @@ from survey.models import *
 
 @step(u'Given I am logged in as a superuser')
 def given_i_am_logged_in_as_a_superuser(step):
-    user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+    user = User.objects.create(username='Rajni', email='rajni@kant.com', password='I_Rock', first_name='some name', last_name='last_name')
     user.is_superuser = True
     user.save()
     world.page = LoginPage(world.browser)
@@ -72,7 +72,7 @@ def and_i_can_login_that_user_successfully(step):
     logout(world)
     user = User.objects.get(username=world.user_data['username'])
     login(user, world)
-    world.page.see_home_page_and_logout_link()
+    world.page.see_home_page_and_logout_link(user.get_full_name())
 
 
 @step(u'Then I fill an existing mobile number')
