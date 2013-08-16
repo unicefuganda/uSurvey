@@ -152,5 +152,15 @@ def list_households(request):
     params = request.GET
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))
+        corresponding_locations = selected_location.get_descendants(include_self=True)
+        investigators = Investigator.objects.filter(location__in=corresponding_locations)
+        households = Household.objects.filter(investigator__in=investigators)
 
-    return render(request, 'households/index.html', {'households': households, 'location_data': LocationWidget(selected_location)})
+    if not households:
+        location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'
+        messages.error(request, "There are  no investigators currently registered  for this %s." % location_type)
+    print "*"*100
+    print households
+    print "*"*100
+    return render(request, 'households/index.html',
+                  {'households': households, 'location_data': LocationWidget(selected_location), 'request': request})

@@ -329,3 +329,51 @@ class HouseholdViewTest(TestCase):
         self.assertEquals(len(locations['country']), 1)
         self.assertEquals(locations['country'][0], uganda)
 
+    @patch('django.contrib.messages.error')
+    def test_listing_no_households(self, mock_error_message):
+        country = LocationType.objects.create(name="country", slug=slugify("country"))
+        uganda = Location.objects.create(name="Uganda",type=country)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
+        Household.objects.filter(investigator=investigator).delete()
+        response = self.client.get('/households/')
+        self.assertEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('households/index.html', templates)
+
+        self.assertEqual(len(response.context['households']), 0)
+
+        locations = response.context['location_data'].get_widget_data()
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
+
+    def test_filter_list_investigators(self):
+        country = LocationType.objects.create(name="country", slug=slugify("country"))
+        district = LocationType.objects.create(name="district", slug=slugify("district"))
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
+
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda, backend = Backend.objects.create(name='something1'))
+        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala, backend = Backend.objects.create(name='something2'))
+        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", location=bukoto, backend = Backend.objects.create(name='something3'))
+
+        household1 = Household.objects.create(investigator=investigator1)
+        household2 = Household.objects.create(investigator=investigator2)
+        household3 = Household.objects.create(investigator=investigator3)
+
+        response = self.client.get("/households/?location=" + str(uganda.id))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('households/index.html', templates)
+
+        self.assertEqual(len(response.context['households']), 3)
+        for household in [household1, household2, household3]:
+            self.assertIn(household, response.context['households'])
+
+        locations = response.context['location_data'].get_widget_data()
+        self.assertEquals(len(locations['country']), 1)
+        self.assertEquals(locations['country'][0], uganda)
+
+        self.assertEquals(len(locations['district']), 1)
+        self.assertEquals(locations['district'][0], kampala)
