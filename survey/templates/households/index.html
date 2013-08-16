@@ -1,1 +1,65 @@
-list all households WIP
+{% extends "layout.html" %}
+{% block title %}
+    Households List
+{% endblock %}
+{% block content %}
+    <h3>
+        Households List
+    </h3>
+    <form id="aggregates-form" action="{% url 'list_household_page' %}" method="get">
+        {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
+        <button class="btn btn-primary" id="a-investigator-list" href="{% url 'list_household_page' %}"> Get List</button>
+    </form>
+    {% if households %}
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Age
+                </th>
+                <th>
+                    Gender
+                </th>
+                <th>
+                    Location
+                </th>
+                <th>
+                    Investigator
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for household in households %}
+                <tr>
+                    <td>
+                        {{ household.head.firstname|capfirst }} {{ household.head.surname|capfirst }}
+                    </td>
+                    <td>
+                        {{ household.head.age }}
+                    </td>
+                    <td>
+                        {% if household.head.male %}
+                            Male
+                        {% else %}
+                            Female
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ household.investigator.location.auto_complete_text }}
+                    </td>
+                    <td>
+                        {{ household.investigator.name }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
