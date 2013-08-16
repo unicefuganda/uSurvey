@@ -57,7 +57,7 @@
   {% endfor %}
 </dl>
 <div class="offset3">
-    <a href="{% url 'investigators_page' %}" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
+    <a href="javascript:back()" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
     {% include 'investigators/_action_button.html' with button_size="" investigator=investigator %}
 </div>
 {% endblock %}
