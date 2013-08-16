@@ -484,7 +484,9 @@ class UsersListPage(PageObject):
 
     def validate_users_paginated(self):
         self.browser.click_link_by_text("2")
-
+        
+    def assert_user_saved_sucessfully(self):
+        self.is_text_present("User successfully edited.")
 
 class UsersDetailsPage(PageObject):
     def set_user(self, user):

@@ -13,11 +13,11 @@ def _add_error_messages(userform, request):
     error_message = "User not registered. "
     messages.error(request, error_message + "See errors below.")
 
-def _process_form(userform, request, action_success="registered"):
+def _process_form(userform, request, action_success="registered", redirect_url="/users/new/"):
     if userform.is_valid():
         userform.save()
         messages.success(request, "User successfully %s." % action_success)
-        return HttpResponseRedirect("/users/new/")
+        return HttpResponseRedirect(redirect_url)
     _add_error_messages(userform, request)
     return None
 
@@ -68,7 +68,7 @@ def edit(request, user_id):
     response = None
     if request.method == 'POST':
         userform = EditUserForm(data=request.POST, instance=user, initial=initial)
-        response = _process_form(userform, request, "edited")
+        response = _process_form(userform, request, "edited", "/users/")
     context_variables = {'userform': userform,
                         'action' : '/users/'+str(user_id)+'/edit/',
                         'id': 'edit-user-form', 'button_label' : 'Save Changes',
