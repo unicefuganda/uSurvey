@@ -78,6 +78,7 @@
                 <a data-toggle="dropdown" id="drop5" class="brand dropdown-toggle" role="button" href="#">{{ user.get_full_name }}<b class="caret"></b></a>
                 <ul aria-labelledby="drop5" role="menu" class="dropdown-menu">
                   <li role="presentation"><a href="{% url 'users_edit' user.id %}"><i class="icon-pencil"></i> Edit Profile</a></li>
+                  <li role="presentation"><a href="{% url 'password_change'%}"><i class="icon-pencil"></i> Change Password</a></li>
                   <li role="presentation"><a href="{% url 'logout_page' %}"><i class="icon-off"></i> Logout</a></li>
                 </ul>
               </li>

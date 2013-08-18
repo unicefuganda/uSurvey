@@ -9,18 +9,17 @@
         <label class="error">Your username and password didn't match. Please try again.</label>
       </div>
   {% endif %}
-
-  <form class="form-horizontal" method="post" action="{% url 'django.contrib.auth.views.login' %}">
-    {% csrf_token %}
-
-    {% if not form.errors %}
-      <div class="control-group">
-        <div class="controls">
-          <p>Type your username and password</p>
-        </div>
+  {% if not form.errors %}
+    <div class="control-group offset2">
+      <div class="controls">
+        <h3 class='heading'>Type your username and password to login</h3>
+        
       </div>
-    {% endif %}
-
+    </div>
+  {% endif %}
+  <hr class="soften">
+  <form class="form-horizontal offset2" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+    {% csrf_token %}
 
     <div class="control-group">
       <label class="control-label" for="username">{{ form.username.label_tag }}</label>

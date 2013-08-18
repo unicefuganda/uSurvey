@@ -111,7 +111,6 @@ class EditUserForm(ModelForm):
                 'username':forms.TextInput(attrs={'readonly':'readonly'}),
         }
 
-
 class UserProfileForm(ModelForm):
 
     class Meta:

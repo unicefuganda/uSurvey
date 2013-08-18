@@ -11,6 +11,32 @@ def then_i_see_user_settings_link(step):
 def and_i_click_user_settings_link(step):
     world.page.click_user_settings(world.user)
 
-@step(u'Then I see edit profile and logout link')
-def then_i_see_edit_profile_and_logout_link(step):
+@step(u'Then I see edit profile, change password and logout link')
+def then_i_see_edit_profile_change_password_and_logout_link(step):
     world.page.assert_user_can_see_profile_and_logout_link()
+    
+@step(u'Then I click change password link')
+def then_i_click_change_password_link(step):
+    world.page.click_reset_password_form()
+    
+@step(u'Then I should see a form asking me to add old password and new password')
+def then_i_should_see_a_form_asking_me_to_add_old_password_and_new_password(step):
+    world.page = ResetPasswordPage(world.browser)
+    world.page.visit()
+    world.page.is_change_password_form_visble()
+    
+@step(u'Then I fill in the old password and new password')
+def then_i_fill_in_the_old_password_and_new_password(step):
+    world.page.fill('old_password','kant')
+    world.page.fill('new_password1','pass')
+    world.page.fill('new_password2','pass')
+    
+@step(u'And I click the change my password button')
+def and_i_click_the_change_my_password_button(step):
+    world.page.click_change_password_button()
+    
+@step(u'Then I should see password reset successfully')
+def then_i_should_see_password_reset_successfully(step):
+    world.page.assert_password_successfully_reset()
+    
+    

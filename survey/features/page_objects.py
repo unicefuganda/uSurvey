@@ -103,9 +103,16 @@ class PageObject(object):
         self.browser.click_link_by_text("%s" % user.get_full_name())
         
     def assert_user_can_see_profile_and_logout_link(self):
-        links = ["Edit Profile", "Logout"]
+        links = ["Edit Profile","Change Password","Logout"]
         for link in links:
             assert self.browser.find_link_by_partial_text(link)
+    
+    def click_reset_password_form(self):
+        self.browser.find_link_by_partial_text("Change Password").click()
+    
+    def assert_password_successfully_reset(self):
+        self.browser.is_text_present("Type your username and password to login")
+        
 
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
@@ -580,4 +587,14 @@ class HouseholdsListPage(PageObject):
 
     def no_registered_huseholds(self):
         self.browser.is_text_present('There are  no households currently registered  for this country.')
-
+class ResetPasswordPage(PageObject):
+    url = '/accounts/reset_password/'
+    
+    def is_change_password_form_visble(self):
+        self.browser.is_text_present("Old password")
+        self.browser.is_text_present("New password")
+        self.browser.is_text_present("New password confirmation")
+    
+    def click_change_password_button(self):
+        self.browser.find_by_name("save_changes").first.click()
+        

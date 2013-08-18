@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, include, url
+from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic import TemplateView
 from django.conf import settings
 
@@ -22,6 +23,9 @@ urlpatterns = patterns('',
     url(r'^aggregates/download_spreadsheet', 'survey.views.excel.list', name='download_excel'),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'accounts/login.html'}, name='login_page'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login', name='logout_page'),
+    url(r'^accounts/reset_password/$', 'django.contrib.auth.views.password_change',
+        {'template_name': 'accounts/reset_password.html', 'post_change_redirect': '/accounts/login/',
+         'password_change_form': PasswordChangeForm}, name='password_change'),
     url(r'^bulk_sms$', 'survey.views.bulk_sms.view', name='bulk_sms'),
     url(r'^bulk_sms/send$', 'survey.views.bulk_sms.send', name='send_bulk_sms'),
     url(r'^users/$', 'survey.views.users.index', name='users_index'),
