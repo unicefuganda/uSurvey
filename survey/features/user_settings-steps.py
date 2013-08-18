@@ -38,5 +38,15 @@ def and_i_click_the_change_my_password_button(step):
 @step(u'Then I should see password reset successfully')
 def then_i_should_see_password_reset_successfully(step):
     world.page.assert_password_successfully_reset()
+
+@step(u'Then I fill in the wrong old password and correct new password')
+def then_i_fill_in_the_wrong_old_password_and_correct_new_password(step):
+    world.page.fill('old_password','kantus')
+    world.page.fill('new_password1','pass')
+    world.page.fill('new_password2','pasq')
     
+@step(u'Then I should error that my old password is incorrect')
+def then_i_should_error_that_my_old_password_is_incorrect(step):
+    world.page.is_incorrect_oldpassword_error_visible()
+    world.page.is_password_mismatch()
     
