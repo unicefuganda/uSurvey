@@ -523,7 +523,7 @@ class Question(BaseModel):
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
-    text = models.CharField(max_length=20, blank=False, null=False)
+    text = models.CharField(max_length=150, blank=False, null=False)
     order = models.PositiveIntegerField(max_length=2, null=True)
 
     def to_text(self):

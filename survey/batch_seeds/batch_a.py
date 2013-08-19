@@ -7,7 +7,7 @@ indicator = Indicator.objects.create(batch=batch, order=1, identifier="TN1")
 question_1 = Question.objects.create(indicator=indicator, text="How many people usually live in this household?", answer_type=Question.NUMBER, order=1)
 
 indicator = Indicator.objects.create(batch=batch, order=2, identifier="WS1")
-question_2 = Question.objects.create(indicator=indicator, text="What is the household’s main source of drinking water?", answer_type=Question.MULTICHOICE, order=1)
+question_2 = Question.objects.create(indicator=indicator, text="What is the household's main source of drinking water?", answer_type=Question.MULTICHOICE, order=1)
 QuestionOption.objects.create(question=question_2, text="Piped tap water", order=1)
 QuestionOption.objects.create(question=question_2, text="Borehole", order=2)
 QuestionOption.objects.create(question=question_2, text="Protected well/spring", order=3)
@@ -61,8 +61,6 @@ question_10 = Question.objects.create(indicator=indicator, text="How many of the
 AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=other_option_1, next_question=sub_question_1)
 
 AnswerRule.objects.create(question=question_3, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=other_option_2, next_question=sub_question_2)
-
-AnswerRule.objects.create(question=question_5, action=AnswerRule.ACTIONS['END_INTERVIEW'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=option_5_2)
 
 AnswerRule.objects.create(question=question_7, action=AnswerRule.ACTIONS['SKIP_TO'], condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0, next_question=question_9)
 
