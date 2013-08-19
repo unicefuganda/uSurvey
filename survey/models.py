@@ -16,6 +16,7 @@ from rapidsms.router import send
 import random
 from django.utils.datastructures import SortedDict
 from django.contrib.auth.models import User
+from django.db.models import Sum
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -203,11 +204,15 @@ class Investigator(BaseModel):
 
     @classmethod
     def sms_investigators_in_locations(self, locations, text):
-        locations_list = []
+        investigators = []
         for location in locations:
-            locations_list += location.get_descendants(include_self=True).values_list('id', flat=True)
-        investigators = list(self.objects.filter(location__in=locations_list))
+            investigators.extend(Investigator.lives_under_location(location))
         send(text, investigators)
+
+    @classmethod
+    def lives_under_location(self, location):
+        locations = location.get_descendants(include_self=True)
+        return Investigator.objects.filter(location__in=locations)
 
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
@@ -669,6 +674,21 @@ class Formula(BaseModel):
     name = models.CharField(max_length=50,unique=True, blank=False)
     numerator = models.ForeignKey(Question, blank=False, related_name="as_numerator")
     denominator = models.ForeignKey(Question, blank=False, related_name="as_denominator")
+
+    def compute_for_location(self, location):
+        investigators = Investigator.lives_under_location(location)
+        values = []
+        for investigator in investigators:
+            values.append(self.compute_for_investigator(investigator))
+        return sum(values)/len(values)
+
+    def answer_sum_for_investigator(self, question, investigator):
+        return question.answer_class().objects.filter(investigator=investigator, question=question).aggregate(Sum('answer'))['answer__sum']
+
+    def compute_for_investigator(self, investigator):
+        numerator = self.answer_sum_for_investigator(self.numerator, investigator)
+        denominator = self.answer_sum_for_investigator(self.denominator, investigator)
+        return ((numerator * investigator.weights) / denominator) * 100
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)

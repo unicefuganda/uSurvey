@@ -480,10 +480,39 @@ class RandomHouseHoldSelectionTest(TestCase):
 
 class FormulaTest(TestCase):
     def setUp(self):
-        self.batch = Batch.objects.create(order=1)
+        survey = Survey.objects.create(name='Survey Name', description='Survey description')
+        self.batch = Batch.objects.create(order=1, survey=survey)
         self.question_1 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=1), text="Question 1?", answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=2), text="Question 2?", answer_type=Question.NUMBER, order=1)
 
     def test_store(self):
         formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2)
         self.failUnless(formula.id)
+
+    def test_compute_numerical_answers(self):
+        uganda = Location.objects.create(name="Uganda")
+        kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
+        abim = Location.objects.create(name="Abim", tree_parent=uganda)
+        backend = Backend.objects.create(name='something')
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala, backend = backend, weights = 0.3)
+        household_1 = Household.objects.create(investigator=investigator)
+        household_2 = Household.objects.create(investigator=investigator)
+
+        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim, backend = backend, weights = 0.9)
+        household_3 = Household.objects.create(investigator=investigator_1)
+        household_4 = Household.objects.create(investigator=investigator_1)
+
+        formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2)
+        investigator.answered(self.question_1, household_1, 20)
+        investigator.answered(self.question_2, household_1, 200)
+        investigator.answered(self.question_1, household_2, 10)
+        investigator.answered(self.question_2, household_2, 100)
+
+        investigator_1.answered(self.question_1, household_3, 40)
+        investigator_1.answered(self.question_2, household_3, 400)
+        investigator_1.answered(self.question_1, household_4, 50)
+        investigator_1.answered(self.question_2, household_4, 500)
+
+        self.assertEquals(formula.compute_for_location(kampala), 3)
+        self.assertEquals(formula.compute_for_location(abim), 9)
+        self.assertEquals(formula.compute_for_location(uganda), 6)
