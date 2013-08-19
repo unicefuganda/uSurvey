@@ -36,4 +36,3 @@ Feature: User Settings feature
       Then I fill in the wrong old password and correct new password
       And I click the change my password button
       Then I should error that my old password is incorrect and password mismatch
-      

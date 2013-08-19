@@ -111,7 +111,7 @@ class PageObject(object):
         self.browser.find_link_by_partial_text("Change Password").click()
     
     def assert_password_successfully_reset(self):
-        self.browser.is_text_present("Type your username and password to login")
+        self.browser.is_text_present("Your password was reset successfully!!")
         
 
 class NewInvestigatorPage(PageObject):

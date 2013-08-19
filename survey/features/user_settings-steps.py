@@ -49,4 +49,3 @@ def then_i_fill_in_the_wrong_old_password_and_correct_new_password(step):
 def then_i_should_error_that_my_old_password_is_incorrect(step):
     world.page.is_incorrect_oldpassword_error_visible()
     world.page.is_password_mismatch()
-    
