@@ -15,11 +15,12 @@ class InvestigatorTest(TestCase):
             self.assertIn(field, fields)
 
     def test_store(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'), weights=30)
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'), weights=30.99)
         self.failUnless(investigator.id)
         self.failUnless(investigator.created)
         self.failUnless(investigator.modified)
         self.assertEqual(investigator.identity, COUNTRY_PHONE_CODE + investigator.mobile_number)
+        self.assertEqual(investigator.weights, 30.99)
 
     def test_mobile_number_is_unique(self):
         Investigator.objects.create(name="", mobile_number = "123456789", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
