@@ -677,18 +677,51 @@ class Formula(BaseModel):
 
     def compute_for_location(self, location):
         investigators = Investigator.lives_under_location(location)
+        if self.numerator.is_multichoice():
+            return self.compute_multichoice_question_for_investigators(investigators)
+        else:
+            return self.compute_numerical_question_for_investigators(investigators)
+
+    def compute_numerical_question_for_investigators(self, investigators):
         values = []
         for investigator in investigators:
-            values.append(self.compute_for_investigator(investigator))
+            values.append(self.compute_numerical_question_for_investigator(investigator))
         return sum(values)/len(values)
+
+    def compute_multichoice_question_for_investigators(self, investigators):
+        values = []
+        computed_dict = {}
+        for investigator in investigators:
+            values.append(self.compute_multichoice_question_for_investigator(investigator))
+
+        denominator = len(values)
+        for option in self.numerator.options.all():
+            numerator = sum([value[option.text] for value in values])
+            computed_dict[option.text] = numerator / denominator
+        return computed_dict
+
+    def process_formula(self, numerator, denominator, investigator):
+        return ((numerator * investigator.weights) / denominator) * 100
+
+    def compute_multichoice_question_for_investigator(self, investigator):
+        values = {}
+        denominator = self.answer_sum_for_investigator(self.denominator, investigator)
+        for option in self.numerator.options.all():
+            numerator = self.compute_numerator_for_option(option, investigator)
+            values[ option.text ] = self.process_formula(numerator, denominator, investigator)
+        return values
+
+    def compute_numerator_for_option(self, option, investigator):
+        households = self.numerator.answer_class().objects.filter(investigator=investigator, answer=option).values_list('household', flat=True)
+        return self.denominator.answer_class().objects.filter(household__in=households, question=self.denominator).aggregate(Sum('answer'))['answer__sum']
 
     def answer_sum_for_investigator(self, question, investigator):
         return question.answer_class().objects.filter(investigator=investigator, question=question).aggregate(Sum('answer'))['answer__sum']
 
-    def compute_for_investigator(self, investigator):
-        numerator = self.answer_sum_for_investigator(self.numerator, investigator)
+    def compute_numerical_question_for_investigator(self, investigator):
         denominator = self.answer_sum_for_investigator(self.denominator, investigator)
-        return ((numerator * investigator.weights) / denominator) * 100
+        numerator = self.answer_sum_for_investigator(self.numerator, investigator)
+        return self.process_formula(numerator, denominator, investigator)
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)

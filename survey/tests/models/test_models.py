@@ -516,3 +516,42 @@ class FormulaTest(TestCase):
         self.assertEquals(formula.compute_for_location(kampala), 3)
         self.assertEquals(formula.compute_for_location(abim), 9)
         self.assertEquals(formula.compute_for_location(uganda), 6)
+
+    def test_compute_multichoice_answer(self):
+        uganda = Location.objects.create(name="Uganda")
+        kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
+        abim = Location.objects.create(name="Abim", tree_parent=uganda)
+        backend = Backend.objects.create(name='something')
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala, backend = backend, weights = 0.3)
+        household_1 = Household.objects.create(investigator=investigator)
+        household_2 = Household.objects.create(investigator=investigator)
+        household_3 = Household.objects.create(investigator=investigator)
+
+        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim, backend = backend, weights = 0.9)
+        household_4 = Household.objects.create(investigator=investigator_1)
+        household_5 = Household.objects.create(investigator=investigator_1)
+        household_6 = Household.objects.create(investigator=investigator_1)
+
+        self.question_3 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=3), text="This is a question", answer_type=Question.MULTICHOICE, order=3)
+        option_1 = QuestionOption.objects.create(question=self.question_3, text="OPTION 2", order=1)
+        option_2 = QuestionOption.objects.create(question=self.question_3, text="OPTION 1", order=2)
+
+        formula = Formula.objects.create(name="Name", numerator=self.question_3, denominator=self.question_1)
+
+        investigator.answered(self.question_1, household_1, 20)
+        investigator.answered(self.question_3, household_1, 1)
+        investigator.answered(self.question_1, household_2, 10)
+        investigator.answered(self.question_3, household_2, 1)
+        investigator.answered(self.question_1, household_3, 30)
+        investigator.answered(self.question_3, household_3, 2)
+
+        investigator_1.answered(self.question_1, household_4, 30)
+        investigator_1.answered(self.question_3, household_4, 2)
+        investigator_1.answered(self.question_1, household_5, 20)
+        investigator_1.answered(self.question_3, household_5, 2)
+        investigator_1.answered(self.question_1, household_6, 40)
+        investigator_1.answered(self.question_3, household_6, 1)
+
+        self.assertEquals(formula.compute_for_location(kampala), { option_1.text: 15, option_2.text: 15})
+        self.assertEquals(formula.compute_for_location(abim), { option_1.text: 40, option_2.text: 50})
+        self.assertEquals(formula.compute_for_location(uganda), { option_1.text: 27.5, option_2.text: 32.5})
