@@ -47,6 +47,7 @@ class Investigator(BaseModel):
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
                                 blank=False, default='English', verbose_name="Preferred language of communication")
     backend = models.ForeignKey(Backend, null=True, verbose_name="Connection")
+    weights = models.PositiveIntegerField(default=0, blank=False)
 
     HOUSEHOLDS_PER_PAGE = 4
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')

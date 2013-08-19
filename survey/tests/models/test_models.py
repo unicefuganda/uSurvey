@@ -10,12 +10,12 @@ class InvestigatorTest(TestCase):
     def test_fields(self):
         investigator = Investigator()
         fields = [str(item.attname) for item in investigator._meta.fields]
-        self.assertEqual(len(fields), 11)
-        for field in ['id', 'name', 'mobile_number', 'created', 'modified', 'male', 'age', 'level_of_education', 'location_id', 'language', 'backend_id']:
+        self.assertEqual(len(fields), 12)
+        for field in ['id', 'name', 'mobile_number', 'created', 'modified', 'male', 'age', 'level_of_education', 'location_id', 'language', 'backend_id', 'weights']:
             self.assertIn(field, fields)
 
     def test_store(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'), weights=30)
         self.failUnless(investigator.id)
         self.failUnless(investigator.created)
         self.failUnless(investigator.modified)
