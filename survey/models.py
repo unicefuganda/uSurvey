@@ -664,6 +664,11 @@ class RandomHouseHoldSelection(BaseModel):
         investigator.backend = Backend.objects.all()[0]
         send(self.text_message(), [investigator])
 
+class Formula(BaseModel):
+    name = models.CharField(max_length=50,unique=True, blank=False)
+    numerator = models.ForeignKey(Question, blank=False, related_name="as_numerator")
+    denominator = models.ForeignKey(Question, blank=False, related_name="as_denominator")
+
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
     if not auto_complete:

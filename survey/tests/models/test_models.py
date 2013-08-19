@@ -476,3 +476,13 @@ class RandomHouseHoldSelectionTest(TestCase):
     def test_store(self):
         selection = RandomHouseHoldSelection.objects.create(mobile_number="123456789", no_of_households=50, selected_households="1,2,3,4,5,6,7,8,9,10")
         self.failUnless(selection.id)
+
+class FormulaTest(TestCase):
+    def setUp(self):
+        self.batch = Batch.objects.create(order=1)
+        self.question_1 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=1), text="Question 1?", answer_type=Question.NUMBER, order=1)
+        self.question_2 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=2), text="Question 2?", answer_type=Question.NUMBER, order=1)
+
+    def test_store(self):
+        formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2)
+        self.failUnless(formula.id)
