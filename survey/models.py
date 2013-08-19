@@ -468,7 +468,7 @@ class Question(BaseModel):
     NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
 
     indicator = models.ForeignKey(Indicator, null=True, related_name="questions")
-    text = models.CharField(max_length=60, blank=False, null=False)
+    text = models.CharField(max_length=150, blank=False, null=False)
     answer_type = models.CharField(max_length=15, blank=False, null=False, choices=TYPE_OF_ANSWERS)
     order = models.PositiveIntegerField(max_length=2, null=True)
     subquestion = models.BooleanField(default=False)
