@@ -4,7 +4,7 @@
   <div class="control-group parent">
     <label class="control-label"> {{ type.capitalize }} </label>
     <div class="controls">
-      <select id="location-{{ type.lower }}" data-placeholder="Select or Type {{type.capitalize}} " class="chzn-select" required>
+      <select id="location-{{ type.lower }}" data-placeholder="Select or Type {{type.capitalize}} " class="chzn-select" name="{{type.lower}}" required="required">
         <option value="">{{ default_text }}</option>
         {% for location in locations %}
           <option data-location=true value="{{ location.pk }}" {{ location_data|is_location_selected:location }}>{{ location.name }}</option>

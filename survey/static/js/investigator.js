@@ -27,7 +27,7 @@ $(function(){
       }, "Mobile number not matched.");
 
   var validations = {
-      ignore: ":hidden:not(select)",
+      ignore: ":hidden:not(.chzn-select)",
       rules: {
           "name": "required",
           "mobile_number": {
