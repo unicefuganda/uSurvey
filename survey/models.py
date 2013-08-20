@@ -676,6 +676,13 @@ class Formula(BaseModel):
         else:
             return self.compute_numerical_question_for_investigators(investigators)
 
+    def compute_for_next_location_type_in_the_hierarchy(self, current_location):
+        locations = current_location.get_children()
+        data = {}
+        for location in locations:
+            data[location] = self.compute_for_location(location)
+        return data
+
     def compute_numerical_question_for_investigators(self, investigators):
         values = []
         for investigator in investigators:
@@ -712,10 +719,29 @@ class Formula(BaseModel):
     def answer_sum_for_investigator(self, question, investigator):
         return question.answer_class().objects.filter(investigator=investigator, question=question).aggregate(Sum('answer'))['answer__sum']
 
+    def answer_for_household(self, question, household):
+        return question.answer_class().objects.get(household=household, question=question).answer
+
     def compute_numerical_question_for_investigator(self, investigator):
         denominator = self.answer_sum_for_investigator(self.denominator, investigator)
         numerator = self.answer_sum_for_investigator(self.numerator, investigator)
         return self.process_formula(numerator, denominator, investigator)
+
+    def weight_for_location(self, location):
+        investigator = Investigator.objects.filter(location=location)
+        if investigator:
+            return investigator[0].weights
+
+    def compute_for_households_in_location(self, location):
+        investigator = Investigator.objects.filter(location=location)
+        household_data = {}
+        if investigator:
+            for household in investigator[0].households.all():
+                household_data[household] = {
+                    'numerator': self.answer_for_household(self.numerator, household),
+                    'denominator': self.answer_for_household(self.denominator, household),
+                }
+        return household_data
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)

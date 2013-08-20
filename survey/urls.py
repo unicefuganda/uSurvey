@@ -36,6 +36,7 @@ urlpatterns = patterns('',
     url(r'^batches/(?P<batch_id>\d+)/$', 'survey.views.batch.show', name='batch_show_page'),
     url(r'^batches/(?P<batch_id>\d+)/open_to$', 'survey.views.batch.open', name='batch_open_page'),
     url(r'^batches/(?P<batch_id>\d+)/close_to$', 'survey.views.batch.close', name='batch_close_page'),
+    url(r'^batches/(?P<batch_id>\d+)/formulae/(?P<formula_id>\d+)/$', 'survey.views.formula.show', name='formula_show_page'),
 )
 
 if not settings.PRODUCTION:
