@@ -64,6 +64,9 @@ def and_i_have_investigators_completed_batches(step):
     investigator_1.answered(world.question_2, household_6, 40)
     investigator_1.answered(world.question_3, household_6, 1)
 
+    for household in Household.objects.all():
+        HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk)
+
 @step(u'Given I am on the numerical answer computation page')
 def given_i_am_on_the_numerical_answer_computation_page(step):
     world.page = FormulaShowPage(world.browser, world.formula_1)

@@ -49,6 +49,9 @@ class NumericalFormulaResults(TestCase):
         investigator_1.answered(self.question_2, self.household_3, 400)
         investigator_1.answered(self.question_1, self.household_4, 50)
         investigator_1.answered(self.question_2, self.household_4, 500)
+        for household in Household.objects.all():
+            HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk)
+
 
     def test_get(self):
         url = "/batches/%s/formulae/%s/" % (self.batch.pk, self.formula_1.pk)
@@ -80,10 +83,10 @@ class NumericalFormulaResults(TestCase):
         self.assertEquals(response.context['computed_value'], 3)
         self.assertEquals(response.context['weights'], 0.3)
         self.assertEquals(len(response.context['household_data']), 2)
-        self.assertEquals(response.context['household_data'][self.household_1]['numerator'], 20)
-        self.assertEquals(response.context['household_data'][self.household_1]['denominator'], 200)
-        self.assertEquals(response.context['household_data'][self.household_2]['numerator'], 10)
-        self.assertEquals(response.context['household_data'][self.household_2]['denominator'], 100)
+        self.assertEquals(response.context['household_data'][self.household_1][self.formula_1.numerator], 20)
+        self.assertEquals(response.context['household_data'][self.household_1][self.formula_1.denominator], 200)
+        self.assertEquals(response.context['household_data'][self.household_2][self.formula_1.numerator], 10)
+        self.assertEquals(response.context['household_data'][self.household_2][self.formula_1.denominator], 100)
 
 class MultichoiceResults(TestCase):
     def setUp(self):
@@ -140,6 +143,9 @@ class MultichoiceResults(TestCase):
         investigator_1.answered(self.question_3, household_5, 2)
         investigator_1.answered(self.question_1, household_6, 40)
         investigator_1.answered(self.question_3, household_6, 1)
+        for household in Household.objects.all():
+            HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk)
+
 
     def test_get_for_district(self):
         url = "/batches/%s/formulae/%s/?location=%s" % (self.batch.pk, self.formula.pk, self.kampala.pk)
@@ -163,9 +169,9 @@ class MultichoiceResults(TestCase):
         self.assertEquals(response.context['computed_value'], { self.option_1.text: 15, self.option_2.text: 15})
         self.assertEquals(response.context['weights'], 0.3)
         self.assertEquals(len(response.context['household_data']), 3)
-        self.assertEquals(response.context['household_data'][self.household_1]['numerator'], self.option_1)
-        self.assertEquals(response.context['household_data'][self.household_1]['denominator'], 20)
-        self.assertEquals(response.context['household_data'][self.household_2]['numerator'], self.option_1)
-        self.assertEquals(response.context['household_data'][self.household_2]['denominator'], 10)
-        self.assertEquals(response.context['household_data'][self.household_3]['numerator'], self.option_2)
-        self.assertEquals(response.context['household_data'][self.household_3]['denominator'], 30)
+        self.assertEquals(response.context['household_data'][self.household_1][self.formula.numerator], self.option_1)
+        self.assertEquals(response.context['household_data'][self.household_1][self.formula.denominator], 20)
+        self.assertEquals(response.context['household_data'][self.household_2][self.formula.numerator], self.option_1)
+        self.assertEquals(response.context['household_data'][self.household_2][self.formula.denominator], 10)
+        self.assertEquals(response.context['household_data'][self.household_3][self.formula.numerator], self.option_2)
+        self.assertEquals(response.context['household_data'][self.household_3][self.formula.denominator], 30)

@@ -17,7 +17,7 @@ if (window.bar_chart_data) {
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Percentage',
+                        text: window.bar_chart_data['yAxis-text'],
                         align: 'high'
                     },
                     labels: {
@@ -48,12 +48,9 @@ if (window.bar_chart_data) {
                 credits: {
                     enabled: false
                 },
-                series: [{
-                    name: window.bar_chart_data['series-name'],
-                    data: window.bar_chart_data['series-data']
-                }]
+                series: window.bar_chart_data['series']
             });
         });
 
-    $('#bar-chart').css('height', window.bar_chart_data['series-data'].length * 50)
+    $('#bar-chart').css('height', window.bar_chart_data['length'] * 50)
 };

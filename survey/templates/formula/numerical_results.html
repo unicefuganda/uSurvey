@@ -1,14 +1,39 @@
 {% load chart_template_tags %}
-<div class="well well-large">
-    {{ computed_value }}
+<div class="hero-unit">
+    {% if computed_value %}
+      <strong>Computed value:</strong> {{ computed_value }}
+      <br/>
+    {% endif %}
+    {% if weights %}
+      <strong>Weight for the location:</strong> {{ weights }}
+    {% endif %}
 </div>
 <div id="bar-chart" class="chart"></div>
+{% if locations|can_display_location_based_chart %}
 <script type="text/javascript" charset="utf-8">
     window.bar_chart_data = {
         'title-text': '{{ formula|title_for_barchart:locations }}',
         'xAxis-text': '{{ locations|title_for_location_type }}',
+        'yAxis-text': 'Percentage',
         'xAxis-categories': {{ hierarchial_data|location_names|safe }},
-        'series-name': '{{ formula.name }}',
-        'series-data': {{ hierarchial_data|get_values }}
+        'series': [{
+            name: '{{ formula.name }}',
+            data: {{ hierarchial_data|get_values }}
+        }]
     }
+</script>
+{% else %}
+<script type="text/javascript" charset="utf-8">
+    window.bar_chart_data = {
+        'title-text': '{{ formula.name }} for households',
+        'xAxis-text': 'Households',
+        'yAxis-text': 'Answered',
+        'xAxis-categories': {{ household_data|household_names|safe }},
+        'series': {{ household_data|get_numerator_denominator_values:formula|safe }}
+    }
+</script>
+{% endif %}
+
+<script type="text/javascript" charset="utf-8">
+  window.bar_chart_data['length'] = window.bar_chart_data['series'][0]['data'].length
 </script>

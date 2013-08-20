@@ -738,8 +738,8 @@ class Formula(BaseModel):
         if investigator:
             for household in investigator[0].households.all():
                 household_data[household] = {
-                    'numerator': self.answer_for_household(self.numerator, household),
-                    'denominator': self.answer_for_household(self.denominator, household),
+                    self.numerator: self.answer_for_household(self.numerator, household),
+                    self.denominator: self.answer_for_household(self.denominator, household),
                 }
         return household_data
 
