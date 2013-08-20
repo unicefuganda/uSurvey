@@ -26,8 +26,9 @@ def show(request, batch_id):
 @permission_required('auth.can_view_batches')
 def open(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
-    location = Location.objects.get(id=request.POST['location_id'])
-    batch.open_for_location(location)
+    locations = Location.objects.get(id=request.POST['location_id']).get_descendants(include_self=True)
+    for location in locations:
+        batch.open_for_location(location)
     return HttpResponse()
 
 @login_required

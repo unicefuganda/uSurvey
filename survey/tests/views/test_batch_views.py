@@ -1,10 +1,11 @@
 from django.test import TestCase
 from django.test.client import Client
-from survey.models import *
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import Location, LocationType
+
+from survey.models import *
+
 
 class BatchViews(TestCase):
 
@@ -24,6 +25,11 @@ class BatchViews(TestCase):
         self.batch = Batch.objects.create(order = 1, name = "Batch A")
         district = LocationType.objects.create(name=PRIME_LOCATION_TYPE, slug=PRIME_LOCATION_TYPE)
         self.kampala = Location.objects.create(name="Kampala", type=district)
+        city = LocationType.objects.create(name="City", slug="city")
+        village = LocationType.objects.create(name="Village", slug="village")
+        self.kampala_city = Location.objects.create(name="Kampala City", type=city, tree_parent=self.kampala)
+        self.bukoto = Location.objects.create(name="Bukoto", type=city, tree_parent=self.kampala)
+        self.kamoja = Location.objects.create(name="kamoja", type=village, tree_parent=self.bukoto)
         self.abim = Location.objects.create(name="Abim", type=district)
         self.batch.open_for_location(self.abim)
 
@@ -47,13 +53,17 @@ class BatchViews(TestCase):
         self.assertFalse(self.batch.is_open_for(self.kampala))
         response = self.client.post('/batches/' + str(self.batch.pk) + "/open_to", data={'location_id': self.kampala.pk})
         self.failUnlessEqual(response.status_code, 200)
-        self.assertTrue(self.batch.is_open_for(self.kampala))
+        for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
+            self.assertTrue(self.batch.is_open_for(loc))
 
     def test_close_batch_for_location(self):
-        self.assertTrue(self.batch.is_open_for(self.abim))
-        response = self.client.post('/batches/' + str(self.batch.pk) + "/close_to", data={'location_id': self.abim.pk})
+        for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
+            self.batch.open_for_location(loc)
+
+        response = self.client.post('/batches/' + str(self.batch.pk) + "/close_to", data={'location_id': self.kampala.pk})
         self.failUnlessEqual(response.status_code, 200)
-        self.assertFalse(self.batch.is_open_for(self.abim))
+        for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
+            self.assertFalse(self.batch.is_open_for(loc))
 
     def assert_restricted_permission_for(self, url):
         self.client.logout()
