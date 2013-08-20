@@ -7,8 +7,7 @@ class TestApi(TestCase):
     def setUp(self):
         self.client = Client()
         self.location = Location.objects.create(name="Kampala")
-        survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(name="Batch", survey=survey, order = 1)
+        batch = Batch.objects.create(name="Batch", order = 1)
         batch.open_for_location(self.location)
 
     def test_create_investigator(self):

@@ -329,18 +329,7 @@ class Women(BaseModel):
    aged_between_15_19_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many of these women are aged 15-19 years?")
    aged_between_20_49_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="20-49 years?")
 
-class Survey(BaseModel):
-    name = models.CharField(max_length=100, blank=False, null=False)
-    description = models.CharField(max_length=255, blank=False, null=False)
-
-    def get_next_open_batch(self, order, location):
-        next_batch_in_order = self.batches.filter(order__gt = order).order_by('order')
-        next_open_batch = location.open_batches.filter(batch__in = next_batch_in_order)
-        if next_open_batch:
-            return next_open_batch[0].batch
-
 class Batch(BaseModel):
-    survey = models.ForeignKey(Survey, null=True, related_name="batches")
     order = models.PositiveIntegerField(max_length=2, null=True)
     name = models.CharField(max_length=100, blank=False, null=True)
 
@@ -376,8 +365,14 @@ class Batch(BaseModel):
         else:
             return self.get_indicator_from_next_open_batch(location = location)
 
+    def get_next_open_batch(self, order, location):
+        next_batch_in_order = Batch.objects.filter(order__gt = order).order_by('order')
+        next_open_batch = location.open_batches.filter(batch__in = next_batch_in_order)
+        if next_open_batch:
+            return next_open_batch[0].batch
+
     def get_indicator_from_next_open_batch(self, location):
-        next_open_batch = self.survey.get_next_open_batch(order = self.order, location = location)
+        next_open_batch = self.get_next_open_batch(order = self.order, location = location)
         if next_open_batch:
             return next_open_batch.get_next_indicator(order = 0, location = location)
 

@@ -24,8 +24,7 @@ class USSDTest(TestCase):
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
-        survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(survey=survey, order = 1)
+        batch = Batch.objects.create(order = 1)
         batch.open_for_location(self.investigator.location)
         self.indicator = Indicator.objects.create(batch=batch, order=1)
 
@@ -507,8 +506,7 @@ class USSDTestCompleteFlow(TestCase):
         self.household_head_7 = self.create_household_head()
         self.household_head_8 = self.create_household_head()
         self.household_head_9 = self.create_household_head()
-        survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        self.batch = Batch.objects.create(survey=survey, order = 1)
+        self.batch = Batch.objects.create(order = 1)
         self.batch.open_for_location(self.investigator.location)
         indicator = Indicator.objects.create(batch=self.batch, order=1)
         self.question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
@@ -790,8 +788,7 @@ class USSDOpenBatch(TestCase):
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
-        survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        batch = Batch.objects.create(survey=survey, order = 1)
+        batch = Batch.objects.create(order = 1)
         self.indicator = Indicator.objects.create(batch=batch, order=1)
 
     def test_closed_batch(self):
@@ -815,11 +812,10 @@ class USSDWithMultipleBatches(TestCase):
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
         self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
-        survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        self.batch = Batch.objects.create(survey=survey, order=1)
+        self.batch = Batch.objects.create(order=1)
         self.question_1 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=1), text="Question 1?", answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=2), text="Question 2?", answer_type=Question.NUMBER, order=1)
-        self.batch_1 = Batch.objects.create(survey=survey, order=2)
+        self.batch_1 = Batch.objects.create(order=2)
         self.question_3 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch_1, order=1), text="Question 3?", answer_type=Question.NUMBER, order=1)
         self.question_4 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch_1, order=2), text="Question 4?", answer_type=Question.NUMBER, order=1)
 

@@ -21,8 +21,7 @@ class BatchViews(TestCase):
 
         self.client.login(username='Rajni', password='I_Rock')
 
-        survey = Survey.objects.create(name = "some survey")
-        self.batch = Batch.objects.create(order = 1, survey = survey, name = "Batch A")
+        self.batch = Batch.objects.create(order = 1, name = "Batch A")
         district = LocationType.objects.create(name=PRIME_LOCATION_TYPE, slug=PRIME_LOCATION_TYPE)
         self.kampala = Location.objects.create(name="Kampala", type=district)
         self.abim = Location.objects.create(name="Abim", type=district)

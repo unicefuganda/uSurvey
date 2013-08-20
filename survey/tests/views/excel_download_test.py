@@ -8,8 +8,7 @@ class ExcelDownloadTest(TestCase):
 
     def setUp(self):
         self.client = Client()
-        survey = Survey.objects.create(name='Survey Name', description='Survey description')
-        self.batch = Batch.objects.create(survey=survey, order = 1, name="BATCH A")
+        self.batch = Batch.objects.create(order = 1, name="BATCH A")
         indicator = Indicator.objects.create(batch=self.batch, order=1, identifier="IDENTIFIER")
         self.question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=2)
