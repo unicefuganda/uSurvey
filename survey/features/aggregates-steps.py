@@ -10,9 +10,8 @@ from django.utils.datastructures import SortedDict
 
 @step(u'And I have 2 batches with one open')
 def and_i_have_2_batches_with_one_open(step):
-    survey = Survey.objects.create(name = "some survey")
-    world.batch_1 = Batch.objects.create(order = 1, survey = survey, name = "Batch A")
-    world.batch_2 = Batch.objects.create(order = 2, survey = survey, name = "Batch B")
+    world.batch_1 = Batch.objects.create(order = 1, name = "Batch A")
+    world.batch_2 = Batch.objects.create(order = 2, name = "Batch B")
     world.kampala_county = Location.objects.get(name = "Kampala County")
     world.someother_county = Location.objects.create(name = "Some County", tree_parent = world.kampala_county.tree_parent)
     world.batch_1.open_for_location(world.kampala_county.tree_parent)
@@ -83,8 +82,7 @@ def and_i_should_see_a_message_that_says_that_this_batch_is_currently_closed(ste
 
 @step(u'And I have few batches')
 def and_i_have_few_batches(step):
-    survey = Survey.objects.create(name = "some survey")
-    world.batch = Batch.objects.create(order = 1, survey = survey, name = "Batch A")
+    world.batch = Batch.objects.create(order = 1, name = "Batch A")
 
 @step(u'And I visit download excel page')
 def and_i_visit_download_excel_page(step):

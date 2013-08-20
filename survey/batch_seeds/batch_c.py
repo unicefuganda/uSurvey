@@ -1,7 +1,6 @@
 from survey.models import *
 
-survey = Survey.objects.create(name='MICS Uganda 2013', description='MICS Uganda 2013')
-batch = Batch.objects.create(survey=survey, order=2, name="Batch C")
+batch = Batch.objects.create(order=2, name="Batch C")
 
 indicator = Indicator.objects.create(batch=batch, order=1, identifier="MN2")
 question_1 = Question.objects.create(indicator=indicator, text="How many times did you receive antenatal care during the last pregnancy?", answer_type=Question.NUMBER, order=1)

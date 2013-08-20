@@ -6,8 +6,7 @@ from rapidsms.contrib.locations.models import *
 
 @step(u'And I have a batch')
 def and_i_have_prime_locations(step):
-    survey = Survey.objects.create(name = "some survey")
-    world.batch = Batch.objects.create(order = 1, survey = survey, name = "Batch A")
+    world.batch = Batch.objects.create(order = 1, name = "Batch A")
 
 @step(u'And I have prime locations')
 def and_i_have_prime_locations(step):

@@ -1,7 +1,6 @@
 from survey.models import *
 
-survey = Survey.objects.create(name='MICS Uganda 2013', description='MICS Uganda 2013')
-batch = Batch.objects.create(survey=survey, order=2, name="Batch E")
+batch = Batch.objects.create(order=2, name="Batch E")
 
 indicator = Indicator.objects.create(batch=batch, order=1, identifier="HA1")
 question_1 = Question.objects.create(indicator=indicator, text="Can people reduce their chance of getting the AIDS virus by having just one uninfected sex partner who has no other sex partners?", answer_type=Question.MULTICHOICE, order=1)

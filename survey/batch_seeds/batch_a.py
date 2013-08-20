@@ -1,7 +1,6 @@
 from survey.models import *
 
-survey = Survey.objects.create(name='MICS Uganda 2013', description='MICS Uganda 2013')
-batch = Batch.objects.create(survey=survey, order=1, name="Batch A")
+batch = Batch.objects.create(order=1, name="Batch A")
 
 indicator = Indicator.objects.create(batch=batch, order=1, identifier="TN1")
 question_1 = Question.objects.create(indicator=indicator, text="How many people usually live in this household?", answer_type=Question.NUMBER, order=1)
