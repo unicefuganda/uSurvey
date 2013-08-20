@@ -2,16 +2,13 @@ from survey.models import *
 
 batch = Batch.objects.create(order=2, name="Batch B")
 
-indicator = Indicator.objects.create(batch=batch, order=1, identifier="MN17")
-question_1 = Question.objects.create(indicator=indicator, text="How many women aged between 15-49 years are in this household?", answer_type=Question.NUMBER, order=1)
-question_2 = Question.objects.create(indicator=indicator, text="How many of these women has had a live birth in the last 2 years?", answer_type=Question.NUMBER, order=2)
+question_1 = Question.objects.create(batch=batch, text="How many women aged between 15-49 years are in this household?", answer_type=Question.NUMBER, order=1)
+question_2 = Question.objects.create(batch=batch, text="How many of these women has had a live birth in the last 2 years?", answer_type=Question.NUMBER, order=2)
 
-indicator = Indicator.objects.create(batch=batch, order=2, identifier="MN18")
-question_3 = Question.objects.create(indicator=indicator, text="How many of these child births were delivered in a health facility?", answer_type=Question.NUMBER, order=1)
-question_4 = Question.objects.create(indicator=indicator, text="How many of these child births were assisted by a skilled health personnel?", answer_type=Question.NUMBER, order=2)
+question_3 = Question.objects.create(batch=batch, text="How many of these child births were delivered in a health facility?", answer_type=Question.NUMBER, order=1)
+question_4 = Question.objects.create(batch=batch, text="How many of these child births were assisted by a skilled health personnel?", answer_type=Question.NUMBER, order=2)
 
-indicator = Indicator.objects.create(batch=batch, order=3, identifier="MN25")
-question_5 = Question.objects.create(indicator=indicator, text="How many of these new borns were breast fed within 1 hour of birth?", answer_type=Question.NUMBER, order=1)
+question_5 = Question.objects.create(batch=batch, text="How many of these new borns were breast fed within 1 hour of birth?", answer_type=Question.NUMBER, order=1)
 
 
 # Rules

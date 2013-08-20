@@ -109,8 +109,8 @@ class Investigator(BaseModel):
                 return question
         if answer_class.objects.create(investigator=self, question=question, household=household, answer=answer).pk:
             next_question = household.next_question(last_question_answered = question)
-            if next_question == None or next_question.indicator.batch != question.indicator.batch:
-                household.batch_completed(question.indicator.batch)
+            if next_question == None or next_question.batch != question.batch:
+                household.batch_completed(question.batch)
             return next_question
         else:
             return question
@@ -341,10 +341,10 @@ class Batch(BaseModel):
             return open_batches.order_by('created').all()[:1].get().batch
 
     def first_question(self):
-        return self.indicators.get(order=1).questions.get(order=1)
+        return self.questions.get(order=1)
 
     def all_questions(self):
-        return Question.objects.filter(indicator__in=self.indicators.all())
+        return Question.objects.filter(batch=self)
 
     def open_for_location(self, location):
         return self.open_locations.get_or_create(batch=self, location=location)
@@ -371,25 +371,30 @@ class Batch(BaseModel):
         if next_open_batch:
             return next_open_batch[0].batch
 
-    def get_indicator_from_next_open_batch(self, location):
-        next_open_batch = self.get_next_open_batch(order = self.order, location = location)
-        if next_open_batch:
-            return next_open_batch.get_next_indicator(order = 0, location = location)
-
     def generate_report(self):
         data = []
         header = ['Location', 'Household Head Name']
         questions = []
-        for indicator in self.indicators.order_by('order'):
-            for question in indicator.questions.order_by('order').filter(subquestion=False):
-                questions.append(question)
-                title = "%s_%s" % (indicator.identifier, question.order)
-                header.append(title)
-                if question.is_multichoice():
-                    header.append('')
+        for question in self.questions.order_by('order').filter(subquestion=False):
+            questions.append(question)
+            header.append(question.identifier)
+            if question.is_multichoice():
+                header.append('')
         data = [header]
         Investigator.get_summarised_answers_for(self, questions, data)
         return data
+
+    def get_next_question(self, order, location):
+        question = self.questions.filter(order=order + 1)
+        if question:
+            return question[0]
+        else:
+            return self.get_question_from_next_batch(location = location)
+
+    def get_question_from_next_batch(self, location):
+        next_batch = self.get_next_open_batch(order=self.order, location=location)
+        if next_batch:
+            return next_batch.get_next_question(order = 0, location = location)
 
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")
@@ -426,23 +431,6 @@ class HouseholdBatchCompletion(BaseModel):
         investigators = Investigator.objects.filter(location__in = locations)
         return self.households_status(investigators, batch), self.clusters_status(investigators, batch), self.pending_investigators(investigators, batch)
 
-class Indicator(BaseModel):
-    batch = models.ForeignKey(Batch, null=True, related_name="indicators")
-    order = models.PositiveIntegerField(max_length=2, null=True)
-    identifier = models.CharField(max_length=100, blank=False, null=True)
-
-    def get_next_question(self, order, location):
-        question = self.questions.filter(order=order + 1)
-        if question:
-            return question[0]
-        else:
-            return self.get_question_from_next_indicator(location = location)
-
-    def get_question_from_next_indicator(self, location):
-        next_indicator = self.batch.get_next_indicator(order = self.order, location = location)
-        if next_indicator:
-            return next_indicator.get_next_question(order = 0, location = location)
-
 class Question(BaseModel):
     NUMBER = 'number'
     TEXT = 'text'
@@ -462,7 +450,8 @@ class Question(BaseModel):
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
     NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
 
-    indicator = models.ForeignKey(Indicator, null=True, related_name="questions")
+    identifier = models.CharField(max_length=100, blank=False, null=True)
+    batch = models.ForeignKey(Batch, null=True, related_name="questions")
     text = models.CharField(max_length=150, blank=False, null=False)
     answer_type = models.CharField(max_length=15, blank=False, null=False, choices=TYPE_OF_ANSWERS)
     order = models.PositiveIntegerField(max_length=2, null=True)
@@ -507,7 +496,7 @@ class Question(BaseModel):
 
     def next_question(self, location):
         order = self.parent.order if self.subquestion else self.order
-        return self.indicator.get_next_question(order, location = location)
+        return self.batch.get_next_question(order, location = location)
 
     def to_ussd(self, page=1):
         if self.answer_type == self.MULTICHOICE:

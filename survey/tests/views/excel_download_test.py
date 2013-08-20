@@ -9,15 +9,14 @@ class ExcelDownloadTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.batch = Batch.objects.create(order = 1, name="BATCH A")
-        indicator = Indicator.objects.create(batch=self.batch, order=1, identifier="IDENTIFIER")
-        self.question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        self.question_2 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=2)
+        self.question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1, identifier="QUESTION_1")
+        self.question_2 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=2, identifier="QUESTION_2")
         self.option_1_1 = QuestionOption.objects.create(question=self.question_2, text="OPTION 1", order=1)
         self.option_1_2 = QuestionOption.objects.create(question=self.question_2, text="OPTION 2", order=2)
         self.option_1_3 = QuestionOption.objects.create(question=self.question_2, text="Others", order=3)
-        sub_question_1 = Question.objects.create(indicator=indicator, text="Describe the source of drinking water", answer_type=Question.TEXT, subquestion=True, parent=self.question_2)
+        sub_question_1 = Question.objects.create(batch=self.batch, text="Describe the source of drinking water", answer_type=Question.TEXT, subquestion=True, parent=self.question_2)
 
-        self.question_3 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.TEXT, order=3)
+        self.question_3 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.TEXT, order=3, identifier="QUESTION_3")
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
@@ -46,7 +45,7 @@ class ExcelDownloadTest(TestCase):
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
 
-        row1 = ['Location', 'Household Head Name', 'IDENTIFIER_1', 'IDENTIFIER_2', '', 'IDENTIFIER_3']
+        row1 = ['Location', 'Household Head Name', 'QUESTION_1', 'QUESTION_2', '', 'QUESTION_3']
         row2 = ['Kampala',  'Surname',             '1',            '1',            'OPTION 1', 'ANSWER']
 
         contents = "%s\r\n%s\r\n" % (",".join(row1), ",".join(row2))

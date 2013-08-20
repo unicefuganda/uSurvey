@@ -35,9 +35,8 @@ class InvestigatorTest(TestCase):
         household = Household.objects.create(investigator=investigator)
         batch = Batch.objects.create(order = 1)
         batch.open_for_location(investigator.location)
-        indicator = Indicator.objects.create(batch=batch, order=1)
-        question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
 
         self.assertEqual(question_1, investigator.next_answerable_question(household))
 
@@ -97,50 +96,33 @@ class BatchTest(TestCase):
         batch = Batch.objects.create(order=1, name="Batch name")
         self.failUnless(batch.id)
 
-class IndicatorTest(TestCase):
-    def setUp(self):
-        self.batch = Batch.objects.create(order = 1)
-
-    def test_store(self):
-        indicator = Indicator.objects.create(batch=self.batch, order=1, identifier="IDENTIFIER")
-        self.failUnless(indicator.id)
-
-    def test_order(self):
-        indicator_2 = Indicator.objects.create(batch=self.batch, order=2, identifier="IDENTIFIER")
-        indicator_1 = Indicator.objects.create(batch=self.batch, order=1, identifier="IDENTIFIER_1")
-        indicators = self.batch.indicators.order_by('order').all()
-        self.assertEqual(indicators[0], indicator_1)
-        self.assertEqual(indicators[1], indicator_2)
-
 class QuestionTest(TestCase):
     def setUp(self):
-        batch = Batch.objects.create(order =1)
-        self.indicator = Indicator.objects.create(batch=batch, order=1)
+        self.batch = Batch.objects.create(order =1)
 
     def test_numerical_question(self):
-        question = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type=Question.NUMBER)
+        question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.NUMBER)
         self.failUnless(question.id)
 
     def test_text_question(self):
-        question = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type=Question.TEXT)
+        question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.TEXT)
         self.failUnless(question.id)
 
     def test_multichoice_question(self):
-        question = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type=Question.MULTICHOICE)
+        question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.MULTICHOICE)
         self.failUnless(question.id)
 
     def test_order(self):
-        question_2 = Question.objects.create(indicator=self.indicator, text="This is a question", answer_type="number", order=2)
-        question_1 = Question.objects.create(indicator=self.indicator, text="This is another question", answer_type="number", order=1)
-        questions = self.indicator.questions.order_by('order').all()
+        question_2 = Question.objects.create(batch=self.batch, text="This is a question", answer_type="number", order=2)
+        question_1 = Question.objects.create(batch=self.batch, text="This is another question", answer_type="number", order=1)
+        questions = self.batch.questions.order_by('order').all()
         self.assertEqual(questions[0], question_1)
         self.assertEqual(questions[1], question_2)
 
 class QuestionOptionTest(TestCase):
     def setUp(self):
         batch = Batch.objects.create(order = 1)
-        indicator = Indicator.objects.create(batch=batch, order=1)
-        self.question = Question.objects.create(indicator=indicator, text="This is a question", answer_type="multichoice")
+        self.question = Question.objects.create(batch=batch, text="This is a question", answer_type="multichoice")
 
     def test_store(self):
         option_2 = QuestionOption.objects.create(question=self.question, text="OPTION 1", order=2)
@@ -166,9 +148,8 @@ class HouseHoldTest(TestCase):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
         batch = Batch.objects.create(order=1)
-        indicator = Indicator.objects.create(batch=batch, order=1)
-        question_1 = Question.objects.create(indicator=indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(indicator=indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
 
         self.assertFalse(household.has_pending_survey())
 
@@ -185,14 +166,12 @@ class HouseHoldTest(TestCase):
         self.household = Household.objects.create(investigator=self.investigator)
 
         batch_1 = Batch.objects.create(order = 1)
-        indicator_1 = Indicator.objects.create(batch=batch_1, order=1)
-        question_1 = Question.objects.create(indicator=indicator_1, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_1 = Question.objects.create(batch=batch_1, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         self.investigator.answered(question_1, self.household, 1)
         batch_1.open_for_location(self.investigator.location)
 
         batch_2 = Batch.objects.create(order = 2)
-        indicator_2 = Indicator.objects.create(batch=batch_2, order=1)
-        question_2 = Question.objects.create(indicator=indicator_2, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=batch_2, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         self.investigator.answered(question_2, self.household, 1)
 
         self.assertEquals(NumericalAnswer.objects.count(), 2)
@@ -206,8 +185,7 @@ class NumericalAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create( investigator=investigator)
         batch = Batch.objects.create(order=1)
-        indicator = Indicator.objects.create(batch=batch, order=1)
-        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type=Question.NUMBER)
+        question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.NUMBER)
 
         answer = NumericalAnswer.objects.create(investigator=investigator, household=household, question=question, answer=10)
         self.failUnless(answer.id)
@@ -217,8 +195,7 @@ class TextAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
         batch = Batch.objects.create(order=1)
-        indicator = Indicator.objects.create(batch=batch, order=1)
-        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type=Question.TEXT)
+        question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.TEXT)
 
         answer = TextAnswer.objects.create(investigator=investigator, household=household, question=question, answer="This is an answer")
         self.failUnless(answer.id)
@@ -228,8 +205,7 @@ class MultiChoiceAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator)
         batch = Batch.objects.create(order=1)
-        indicator = Indicator.objects.create(batch=batch, order=1)
-        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type=Question.MULTICHOICE)
+        question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.MULTICHOICE)
         option = QuestionOption.objects.create(question=question, text="This is an option")
 
         answer = MultiChoiceAnswer.objects.create(investigator=investigator, household=household, question=question, answer=option)
@@ -239,8 +215,7 @@ class MultiChoiceAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         household = Household.objects.create( investigator=investigator)
         batch = Batch.objects.create(order=1)
-        indicator = Indicator.objects.create(batch=batch, order=1)
-        question = Question.objects.create(indicator=indicator, text="This is a question", answer_type=Question.MULTICHOICE)
+        question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.MULTICHOICE)
         option_1 = QuestionOption.objects.create(question=question, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(question=question, text="OPTION 2", order=2)
         option_3 = QuestionOption.objects.create(question=question, text="OPTION 3", order=3)
@@ -268,13 +243,12 @@ class AnswerRuleTest(TestCase):
     def setUp(self):
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210", location = Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator)
-        batch = Batch.objects.create(order=1)
-        self.indicator = Indicator.objects.create(batch=batch, order=1)
+        self.batch = Batch.objects.create(order=1)
 
     def test_numerical_equals_and_end_rule(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
 
         next_question = self.investigator.answered(question_1, self.household, answer=1)
         self.assertEqual(next_question, question_2)
@@ -290,9 +264,9 @@ class AnswerRuleTest(TestCase):
 
     def test_numerical_equals_and_skip_to_rule(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-        question_3 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=3)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_3 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=3)
 
         next_question = self.investigator.answered(question_1, self.household, answer=1)
         self.assertEqual(next_question, question_2)
@@ -305,8 +279,8 @@ class AnswerRuleTest(TestCase):
 
     def test_numerical_greater_than_value_and_reanswer(self):
         NumericalAnswer.objects.all().delete()
-        question_0 = Question.objects.create(indicator=self.indicator, text="How are you?", answer_type=Question.NUMBER, order=0)
-        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_0 = Question.objects.create(batch=self.batch, text="How are you?", answer_type=Question.NUMBER, order=0)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_VALUE'], validate_with_value=4)
 
         next_question = self.investigator.answered(question_0, self.household, answer=5)
@@ -323,9 +297,9 @@ class AnswerRuleTest(TestCase):
 
     def test_numerical_greater_than_question_and_reanswer(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-        question_3 = Question.objects.create(indicator=self.indicator, text="How many of them are children?", answer_type=Question.NUMBER, order=3)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_3 = Question.objects.create(batch=self.batch, text="How many of them are children?", answer_type=Question.NUMBER, order=3)
 
         rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'], validate_with_question=question_1)
 
@@ -340,8 +314,8 @@ class AnswerRuleTest(TestCase):
 
     def test_numerical_less_than_value_and_reanswer(self):
         NumericalAnswer.objects.all().delete()
-        question_0 = Question.objects.create(indicator=self.indicator, text="How are you?", answer_type=Question.NUMBER, order=0)
-        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_0 = Question.objects.create(batch=self.batch, text="How are you?", answer_type=Question.NUMBER, order=0)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['LESS_THAN_VALUE'], validate_with_value=4)
 
         next_question = self.investigator.answered(question_0, self.household, answer=5)
@@ -358,9 +332,9 @@ class AnswerRuleTest(TestCase):
 
     def test_numerical_less_than_question_and_reanswer(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-        question_3 = Question.objects.create(indicator=self.indicator, text="How many of them are children?", answer_type=Question.NUMBER, order=3)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_3 = Question.objects.create(batch=self.batch, text="How many of them are children?", answer_type=Question.NUMBER, order=3)
 
         rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['LESS_THAN_QUESTION'], validate_with_question=question_1)
 
@@ -374,13 +348,13 @@ class AnswerRuleTest(TestCase):
         self.assertEqual(NumericalAnswer.objects.count(), 0)
 
     def test_multichoice_equals_option_and_ask_sub_question(self):
-        question_1 = Question.objects.create(indicator=self.indicator, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=1)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=1)
         option_1_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_1_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
-        sub_question_1 = Question.objects.create(indicator=self.indicator, text="Specify others", answer_type=Question.TEXT, subquestion=True, parent=question_1)
+        sub_question_1 = Question.objects.create(batch=self.batch, text="Specify others", answer_type=Question.TEXT, subquestion=True, parent=question_1)
 
-        question_2 = Question.objects.create(indicator=self.indicator, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
 
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=option_1_2, next_question=sub_question_1)
 
@@ -460,8 +434,8 @@ class RandomHouseHoldSelectionTest(TestCase):
 class FormulaTest(TestCase):
     def setUp(self):
         self.batch = Batch.objects.create(order=1)
-        self.question_1 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=1), text="Question 1?", answer_type=Question.NUMBER, order=1)
-        self.question_2 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=2), text="Question 2?", answer_type=Question.NUMBER, order=1)
+        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1)
+        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2)
 
     def test_store(self):
         formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2)
@@ -510,7 +484,7 @@ class FormulaTest(TestCase):
         household_5 = Household.objects.create(investigator=investigator_1)
         household_6 = Household.objects.create(investigator=investigator_1)
 
-        self.question_3 = Question.objects.create(indicator=Indicator.objects.create(batch=self.batch, order=3), text="This is a question", answer_type=Question.MULTICHOICE, order=3)
+        self.question_3 = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=3)
         option_1 = QuestionOption.objects.create(question=self.question_3, text="OPTION 2", order=1)
         option_2 = QuestionOption.objects.create(question=self.question_3, text="OPTION 1", order=2)
 
