@@ -1,7 +1,8 @@
 from django.test import TestCase
 from survey.forms.users import *
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from survey.models import *
+from django.contrib.contenttypes.models import ContentType
 
 class UserFormTest(TestCase):
 
@@ -220,6 +221,21 @@ class EditUserFormTest(TestCase):
         self.assertFalse(user_form.is_valid())
         message = "username cannot be changed."
         self.assertEquals(user_form.errors['username'], [message])
+
+    def test_user_can_view_users_permission_can_edit_groups(self):
+        raj = User.objects.create_user(username='Rajni', email='rajni@kant.com', password='I_Rock')
+        some_group = Group.objects.create(name='some group')
+        auth_content = ContentType.objects.get_for_model(Permission)
+        permission, out = Permission.objects.get_or_create(codename='can_view_users', content_type=auth_content)
+        some_group.permissions.add(permission)
+        some_group.user_set.add(raj)
+        
+        form_data = dict(self.user_data, **self.initial)
+        form_data['groups']=[str(some_group.id)]
+        
+        user_form = EditUserForm(data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
+        self.assertTrue(user_form.is_valid())
+        self.assertIn('groups', user_form.fields.keys())
 
 class UserProfileFormTest(TestCase):
 

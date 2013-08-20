@@ -24,11 +24,6 @@ class HouseholdHeadForm(ModelForm):
         choices['choices']= years
         return choices
 
-    def add_default_cleaned_data(self):
-        return self.cleaned_data
-
-
-
     class Meta:
         model = HouseholdHead
         exclude = ['household']

@@ -62,7 +62,7 @@ class EditUserForm(ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
-        if user.has_perm("can_view_users"):
+        if user.has_perm("auth.can_view_users"):
             self.fields.keyOrder= ['username','first_name', 'last_name','mobile_number', 'email', 'groups']
         else:    
             self.fields.keyOrder= ['username','first_name', 'last_name','mobile_number', 'email']

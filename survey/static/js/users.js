@@ -10,7 +10,7 @@ $(function(){
 
   jQuery.validator.addMethod("validate_password", function(value, element) {
         return ($("#id_password1").val()==value)
-      }, "Mobile number not matched.");
+      }, "Password not matched.");
 
   jQuery.validator.addMethod( "regex", function(value, element, regexp) {
                   var re = new RegExp(regexp);
