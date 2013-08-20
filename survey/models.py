@@ -17,6 +17,7 @@ import random
 from django.utils.datastructures import SortedDict
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.core.exceptions import ValidationError
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -658,6 +659,15 @@ class Formula(BaseModel):
     name = models.CharField(max_length=50,unique=True, blank=False)
     numerator = models.ForeignKey(Question, blank=False, related_name="as_numerator")
     denominator = models.ForeignKey(Question, blank=False, related_name="as_denominator")
+    batch = models.ForeignKey(Batch, null=True, related_name="formula")
+
+    def clean(self, *args, **kwargs):
+        if self.numerator.batch != self.denominator.batch:
+            raise ValidationError('Numerator and Denominator must belong to the same batch')
+
+    def save(self, *args, **kwargs):
+        self.clean(*args, **kwargs)
+        super(Formula, self).save(*args, **kwargs)
 
     def compute_for_location(self, location):
         investigators = Investigator.lives_under_location(location)

@@ -4,6 +4,7 @@ from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import *
 from django.template.defaultfilters import slugify
+from django.core.exceptions import ValidationError
 
 class InvestigatorTest(TestCase):
 
@@ -438,8 +439,14 @@ class FormulaTest(TestCase):
         self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2)
 
     def test_store(self):
-        formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2)
+        formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2, batch=self.batch)
         self.failUnless(formula.id)
+
+    def test_validation(self):
+        batch_2 = Batch.objects.create(order=2)
+        question_3 = Question.objects.create(batch=batch_2, text="Question 1?", answer_type=Question.NUMBER, order=1)
+        formula = Formula(name="Name", numerator=self.question_1, denominator=question_3, batch=self.batch)
+        self.assertRaises(ValidationError, formula.save)
 
     def test_compute_numerical_answers(self):
         uganda = Location.objects.create(name="Uganda")
@@ -454,7 +461,7 @@ class FormulaTest(TestCase):
         household_3 = Household.objects.create(investigator=investigator_1)
         household_4 = Household.objects.create(investigator=investigator_1)
 
-        formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2)
+        formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2, batch=self.batch)
         investigator.answered(self.question_1, household_1, 20)
         investigator.answered(self.question_2, household_1, 200)
         investigator.answered(self.question_1, household_2, 10)
