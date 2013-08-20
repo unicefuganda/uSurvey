@@ -1,0 +1,14 @@
+{% load chart_template_tags %}
+<div class="well well-large">
+    {{ computed_value }}
+</div>
+<div id="bar-chart" class="chart"></div>
+<script type="text/javascript" charset="utf-8">
+    window.bar_chart_data = {
+        'title-text': '{{ formula|title_for_barchart:locations }}',
+        'xAxis-text': '{{ locations|title_for_location_type }}',
+        'xAxis-categories': {{ hierarchial_data|location_names|safe }},
+        'series-name': '{{ formula.name }}',
+        'series-data': {{ hierarchial_data|get_values }}
+    }
+</script>

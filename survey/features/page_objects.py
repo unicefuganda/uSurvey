@@ -43,7 +43,7 @@ class PageObject(object):
 
     def see_username_link(self, username):
         assert self.browser.find_link_by_text(username)
-        
+
     def see_logout_link(self, username):
         self.browser.find_link_by_text(username).first.click()
         assert self.browser.find_link_by_text(" Logout")
@@ -95,24 +95,24 @@ class PageObject(object):
     def choose_radio(self, name, value):
         js = "$('input:radio[name=%s][value=%s]').prop('checked', true).change()" % (name, value)
         self.browser.execute_script(js)
-        
+
     def see_user_settings_link(self, user):
         assert self.browser.find_link_by_partial_text("%s" % str(user.get_full_name()))
-    
+
     def click_user_settings(self, user):
         self.browser.click_link_by_text("%s" % user.get_full_name())
-        
+
     def assert_user_can_see_profile_and_logout_link(self):
         links = ["Edit Profile","Change Password","Logout"]
         for link in links:
             assert self.browser.find_link_by_partial_text(link)
-    
+
     def click_reset_password_form(self):
         self.browser.find_link_by_partial_text("Change Password").click()
-    
+
     def assert_password_successfully_reset(self):
         self.browser.is_text_present("Your password was reset successfully!!")
-        
+
 
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
@@ -482,9 +482,8 @@ class InvestigatorDetailsPage(PageObject):
 
     def validate_back_link(self):
         self.browser.find_link_by_href(django_url(InvestigatorsListPage.url))
-    
+
     def validate_detail_page_url(self):
-        print self.browser.url
         assert self.browser.url == django_url(self.url)
 
     def validate_successful_edited_message(self):
@@ -505,7 +504,7 @@ class UsersListPage(PageObject):
 
     def validate_users_paginated(self):
         self.browser.click_link_by_text("2")
-        
+
     def assert_user_saved_sucessfully(self):
         self.is_text_present("User successfully edited.")
 
@@ -535,7 +534,7 @@ class UsersDetailsPage(PageObject):
             return True
         except Exception, e:
             return False
-    
+
     def is_group_input_field_visible(self, status=True):
         if status:
             assert self.browser.find_by_name("groups")
@@ -550,7 +549,7 @@ class EditInvestigatorPage(PageObject):
 
     def validate_edit_investigator_url(self):
         assert self.browser.url == django_url(self.url)
-        
+
     def change_name_of_investigator(self):
         self.values = {
             'name': 'Updated Name',
@@ -589,17 +588,34 @@ class HouseholdsListPage(PageObject):
         self.browser.is_text_present('There are  no households currently registered  for this country.')
 class ResetPasswordPage(PageObject):
     url = '/accounts/reset_password/'
-    
+
     def is_change_password_form_visble(self):
         self.browser.is_text_present("Old password")
         self.browser.is_text_present("New password")
         self.browser.is_text_present("New password confirmation")
-    
+
     def click_change_password_button(self):
         self.browser.find_by_name("save_changes").first.click()
-        
+
     def is_incorrect_oldpassword_error_visible(self):
         self.is_text_present("Your old password was entered incorrectly. Please enter it again.")
-        
+
     def is_password_mismatch(self):
         self.is_text_present("The two password fields didn't match.")
+
+class FormulaShowPage(PageObject):
+    def __init__(self, browser, formula):
+        self.browser = browser
+        self.formula = formula
+        self.url = "/batches/%s/formulae/%s/" % (self.formula.batch.pk, self.formula.pk)
+
+    def choose_location(self, location):
+        self.fill_in_with_js('$("#location-%s")' % location.type.slug, location.id)
+
+    def presence_of_computed_value(self, computed_value):
+        self.is_text_present(str(computed_value))
+
+    def presence_of_bar_graph_for_villages(self, data):
+        for village, value in data.items():
+            self.is_text_present(village.name)
+            self.is_text_present(str(int(value)))

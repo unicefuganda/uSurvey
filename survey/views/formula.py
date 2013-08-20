@@ -18,8 +18,8 @@ def show(request, batch_id, formula_id):
     household_data = None
     weights = None
     selected_location = Location.objects.get(id=params['location']) if contains_key(params, 'location') else None
+    formula = Formula.objects.get(batch_id=batch_id, id=formula_id)
     if selected_location:
-        formula = Formula.objects.get(batch_id=batch_id, id=formula_id)
         computed_value = formula.compute_for_location(selected_location)
         hierarchial_data = formula.compute_for_next_location_type_in_the_hierarchy(current_location=selected_location)
         weights = formula.weight_for_location(selected_location)
@@ -30,4 +30,5 @@ def show(request, batch_id, formula_id):
                                                     'hierarchial_data': hierarchial_data,
                                                     'household_data': household_data,
                                                     'weights': weights,
+                                                    'formula': formula,
                                                 })
