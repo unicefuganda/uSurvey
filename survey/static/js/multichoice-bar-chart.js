@@ -15,6 +15,9 @@ if (window.multi_choice_bar_chart_data) {
                   min: 0,
                   title: {
                       text: 'Percentage'
+                  },
+                  labels: {
+                      overflow: 'justify'
                   }
               },
               tooltip: {
@@ -29,6 +32,11 @@ if (window.multi_choice_bar_chart_data) {
                   column: {
                       pointPadding: 0.2,
                       borderWidth: 0
+                  },
+                  column: {
+                      dataLabels: {
+                          enabled: true
+                      }
                   }
               },
               series: window.multi_choice_bar_chart_data['series']

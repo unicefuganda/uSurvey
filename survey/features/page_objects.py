@@ -619,3 +619,30 @@ class FormulaShowPage(PageObject):
         for village, value in data.items():
             self.is_text_present(village.name)
             self.is_text_present(str(int(value)))
+
+    def presence_of_bar_graph_for_households(self,data):
+        for key, value in data.items():
+            for household, val in value.items():
+                self.is_text_present(household.text)
+                self.is_text_present(str(val))
+
+    def presence_of_bar_chart_for_all_the_options(self,data):
+        for option, value in data.items():
+            self.is_text_present(str(option))
+            self.is_text_present(str(int(value)))
+
+    def presence_of_stacked_bar_graph_for_villages(self,data):
+        for village, value in data.items():
+            self.is_text_present(village.name)
+            for option, val in value.items():
+                self.is_text_present(str(option))
+
+    def presence_of_tabulated_results_for_households(self,data):
+        for household, value in data.items():
+            self.is_text_present(household.head.surname)
+            for question, val in value.items():
+                self.is_text_present(question.text)
+                if type(val) == int:
+                    self.is_text_present(str(val))
+                else:
+                    self.is_text_present(val.text)

@@ -70,16 +70,18 @@ def and_i_have_investigators_completed_batches(step):
 @step(u'Given I am on the numerical answer computation page')
 def given_i_am_on_the_numerical_answer_computation_page(step):
     world.page = FormulaShowPage(world.browser, world.formula_1)
+    world.formula = world.formula_1
     world.page.visit()
 
 @step(u'And I select a district to see results')
 def and_i_select_a_district_to_see_results(step):
     world.page.choose_location(world.kampala)
+    world.current_location = world.kampala
     world.page.submit()
 
 @step(u'Then I should see the computed value')
 def then_i_should_see_the_computed_value(step):
-    world.page.presence_of_computed_value(world.formula_1.compute_for_location(world.kampala))
+    world.page.presence_of_computed_value(world.formula.compute_for_location(world.current_location))
 
 @step(u'And I should see the bar graph for all the villages')
 def and_i_should_see_the_bar_graph_for_all_the_villages(step):
@@ -87,7 +89,9 @@ def and_i_should_see_the_bar_graph_for_all_the_villages(step):
 
 @step(u'And I select a village to see results')
 def and_i_select_a_village_to_see_results(step):
+    world.page.choose_location(world.kampala)
     world.page.choose_location(world.village_1)
+    world.current_location = world.village_1
     world.page.submit()
 
 @step(u'And I should see the bar graph for all the households')
@@ -97,11 +101,12 @@ def and_i_should_see_the_bar_graph_for_all_the_households(step):
 @step(u'Given I am on the multi choice answer computation page')
 def given_i_am_on_the_multi_choice_answer_computation_page(step):
     world.page = FormulaShowPage(world.browser, world.formula_2)
+    world.formula = world.formula_2
     world.page.visit()
 
-@step(u'Then I should see the computed pie chart')
-def then_i_should_see_the_computed_pie_chart(step):
-    world.page.presence_of_pie_chart(world.formula_2.compute_for_location(world.kampala))
+@step(u'Then I should see the computed bar chart for all the options')
+def then_i_should_see_the_computed_bar_chart_for_all_the_options(step):
+    world.page.presence_of_bar_chart_for_all_the_options(world.formula.compute_for_location(world.current_location))
 
 @step(u'And I should see the stacked bar graph for all the villages')
 def and_i_should_see_the_stacked_bar_graph_for_all_the_villages(step):
@@ -110,3 +115,4 @@ def and_i_should_see_the_stacked_bar_graph_for_all_the_villages(step):
 @step(u'And I should see the tabulated results for all the households')
 def and_i_should_see_the_tabulated_results_for_all_the_households(step):
     world.page.presence_of_tabulated_results_for_households(world.formula_2.compute_for_households_in_location(world.village_1))
+
