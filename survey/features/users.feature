@@ -56,9 +56,8 @@ Feature: Users feature
       
     Scenario: Edit a user
       Given I am logged in as a superuser
-      And I have two users
       And I visit the users list page
-      And I select edit action
+      And I click on the edit button
       Then I should see the users information in a form
       And I see that username is readonly
       When I modify the users information

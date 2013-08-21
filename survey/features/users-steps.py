@@ -167,22 +167,10 @@ def then_i_should_see_a_list_of_users(step):
     world.page.validate_displayed_headers()
     world.page.validate_users_paginated()
 
-
-@step(u'And I have two users')
-def and_i_have_two_users(step):
-    world.user = User.objects.create_user('wednesday', 'w@t.cc', 'password')
-    UserProfile.objects.create(user=world.user, mobile_number='0779766453')
-
-
-@step(u'And I select edit action')
-def and_i_select_edit_action(step):
-    world.page = UsersDetailsPage(world.browser)
-    world.page.set_user(world.user)
-    world.page.visit()
-
-
 @step(u'Then I should see the users information in a form')
 def then_i_should_see_the_users_information_in_a_form(step):
+    world.page = UsersDetailsPage(world.browser)
+    world.page.set_user(world.user)
     world.page.assert_form_has_infomation()
 
 
@@ -210,4 +198,9 @@ def then_i_should_not_see_the_groups_field(step):
     
 @step(u'Then I should see the groups field')
 def then_i_should_see_the_groups_field(step):
-    world.page.is_group_input_field_visible(True)      
+    world.page.is_group_input_field_visible(True) 
+
+@step(u'And I select edit action')
+def and_i_select_edit_action(step):
+    world.page.click_edit_link_with(" Edit Profile")
+    world.page = UsersDetailsPage(world.browser)

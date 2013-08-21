@@ -112,6 +112,12 @@ class PageObject(object):
 
     def assert_password_successfully_reset(self):
         self.browser.is_text_present("Your password was reset successfully!!")
+        
+    def click_actions_button(self):
+        self.browser.find_by_css('#action_caret').first.click()
+
+    def click_edit_link_with(self, text):
+        self.browser.click_link_by_text(text)
 
 
 class NewInvestigatorPage(PageObject):
@@ -171,12 +177,6 @@ class InvestigatorsListPage(PageObject):
 
     def visit_investigator(self, investigator):
         self.browser.click_link_by_text(investigator.name)
-
-    def click_actions_button(self):
-        self.browser.find_by_css('#action_caret').first.click()
-
-    def click_edit_button(self):
-        self.browser.click_link_by_text(' Edit')
 
 class FilteredInvestigatorsListPage(InvestigatorsListPage):
     def __init__(self, browser, location_id):
