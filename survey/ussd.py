@@ -3,9 +3,11 @@ from django.conf import settings
 from survey.models import RandomHouseHoldSelection
 from survey.investigator_configs import *
 
+
 class USSDBase(object):
     MESSAGES = {
         'SUCCESS_MESSAGE': "This survey has come to an end. Your responses have been received. Thank you.",
+        'BATCH_5_MIN_TIMEDOUT_MESSAGE': "This batch is already completed and 5 minutes have passed. You may no longer retake it.",
         'USER_NOT_REGISTERED': "Sorry, your mobile number is not registered for this survey",
         'WELCOME_TEXT': "Welcome %s to the survey.",
         'HOUSEHOLD_LIST': "Please select a household from the list",
@@ -117,7 +119,13 @@ class USSD(USSDBase):
 
     def end_interview(self):
         self.action = self.ACTIONS['END']
-        self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS'] if self.investigator.completed_open_surveys() else USSD.MESSAGES['SUCCESS_MESSAGE']
+        if self.investigator.completed_open_surveys():
+            self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
+        elif not self.household.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
+            self.responseString = USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE']
+        else:
+            self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE']
+
         self.investigator.clear_interview_caches()
 
     def render_survey_response(self):
@@ -128,13 +136,20 @@ class USSD(USSDBase):
             self.add_question_prefix()
             self.responseString += self.question.to_ussd(page)
 
+    def get_current_batch(self):
+        if not self.household.survey_completed():
+            return self.question.batch
+        if self.household:
+            return self.household.last_question_answered().batch
+        return self.investigator.first_open_batch()
+
     def render_survey(self):
         if not self.household.survey_completed():
             self.question = self.household.next_question()
             if not self.is_new_request():
                 self.process_investigator_response()
             self.render_survey_response()
-        elif self.household.can_retake_survey(minutes=self.TIMEOUT_MINUTES):
+        elif self.household.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
             self.retake_survey()
         else:
             self.end_interview()
@@ -219,7 +234,7 @@ class USSD(USSDBase):
             self.process_open_batch()
         else:
             self.show_message_for_no_open_batch()
-        return { 'action': self.action, 'responseString': self.responseString }
+        return {'action': self.action, 'responseString': self.responseString }
 
     def clean_investigator_input(self):
         if self.is_new_request():
@@ -231,7 +246,8 @@ class USSD(USSDBase):
 
     @classmethod
     def investigator_not_registered_response(self):
-        return { 'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['USER_NOT_REGISTERED'] }
+        return {'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['USER_NOT_REGISTERED'] }
+
 
 class HouseHoldSelection(USSDBase):
     def __init__(self, mobile_number, request):

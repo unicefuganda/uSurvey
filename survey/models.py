@@ -170,9 +170,15 @@ class Investigator(BaseModel):
         batches = [batch_location.batch for batch_location in batch_locations]
         return batches
 
+    def first_open_batch(self):
+        open_batches = self.get_open_batch()
+        query_open_batches = Batch.objects.filter(id__in=[batch.id for batch in open_batches])
+        batch = query_open_batches.order_by('order')[0]
+        return batch
+
     def has_open_batch(self):
         locations = self.location.get_ancestors(include_self=True)
-        return BatchLocationStatus.objects.filter(location__in = locations).count() > 0
+        return BatchLocationStatus.objects.filter(location__in=locations).count() > 0
 
     def was_active_within(self, minutes):
         last_answered = self.last_answered()
@@ -280,8 +286,13 @@ class Household(BaseModel):
     def batch_reopen(self, batch):
         self.completed_batches.filter(household=self).delete()
 
-    def can_retake_survey(self, minutes):
-        last_batch_completed_time = self.completed_batches.latest('created').created
+    def can_retake_survey(self, batch, minutes):
+        completed_batches = self.completed_batches.filter(household=self)
+        batches = [completion.batch for completion in completed_batches]
+        if not batch in batches:
+            return False
+
+        last_batch_completed_time = self.completed_batches.filter(batch=batch, household=self)[0].created
         timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(minutes=minutes)
         return last_batch_completed_time >= timeout
 

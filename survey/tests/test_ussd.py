@@ -9,6 +9,7 @@ from survey.ussd import *
 from random import randint
 from rapidsms.backends.database.models import BackendMessage
 
+
 class USSDTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -505,10 +506,12 @@ class USSDTestCompleteFlow(TestCase):
         self.household_head_7 = self.create_household_head()
         self.household_head_8 = self.create_household_head()
         self.household_head_9 = self.create_household_head()
-        self.batch = Batch.objects.create(order = 1)
+        self.batch = Batch.objects.create(order=1)
+        self.batch_b = Batch.objects.create(order=2)
         self.batch.open_for_location(self.investigator.location)
         self.question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        self.question_1_b = Question.objects.create(batch=self.batch_b, text="How many members are there in this household? Batch B", answer_type=Question.NUMBER, order=1)
 
     def test_flow(self):
         homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
@@ -750,12 +753,6 @@ class USSDTestCompleteFlow(TestCase):
         self.investigator.answered(self.question_1, self.household_head_1.household, 1)
         self.investigator.answered(self.question_2, self.household_head_1.household, 1)
 
-        completion = HouseholdBatchCompletion.objects.all()[0]
-        completion.created -= datetime.timedelta(minutes=USSD.TIMEOUT_MINUTES, seconds=1)
-        completion.save()
-
-        homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
-
         households_list_1 = "%s\n1: %s*\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
@@ -768,10 +765,57 @@ class USSDTestCompleteFlow(TestCase):
         self.ussd_params['ussdRequestString'] = "1"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+        completion = HouseholdBatchCompletion.objects.filter(batch=self.batch)[0]
+        completion.created -= datetime.timedelta(minutes=USSD.TIMEOUT_MINUTES, seconds=1)
+        completion.save()
+
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def xtest_completed_batch_timeout_for_household_after_5_min_should_allow_other_batches(self):
+        self.household_head_1.household.batch_completed(self.batch)
+        self.investigator.answered(self.question_1, self.household_head_1.household, 1)
+        self.investigator.answered(self.question_2, self.household_head_1.household, 1)
+
+        completion = HouseholdBatchCompletion.objects.all()[0]
+        completion.created -= datetime.timedelta(minutes=USSD.TIMEOUT_MINUTES, seconds=1)
+        completion.save()
+
+        self.batch.close_for_location(self.investigator.location)
+        self.batch_b.open_for_location(self.investigator.location)
+
+        households_list_1 = "%s\n1: %s*\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
+        # self.ussd_params['response'] = "false"
+        # self.ussd_params['ussdRequestString'] = "00"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % households_list_1
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        # self.ussd_params['response'] = "true"
+        # self.ussd_params['ussdRequestString'] = "1"
+        #
+        # response = self.client.post('/ussd', data=self.ussd_params)
+        # response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
+        # self.assertEquals(urllib2.unquote(response.content), response_string)
+        #
+        # self.ussd_params['response'] = "true"
+        # self.ussd_params['ussdRequestString'] = "10"
+        #
+        # response = self.client.post('/ussd', data=self.ussd_params)
+        # response_string = "responseString=%s&action=request" % self.question_1_b.text
+        # self.assertEquals(urllib2.unquote(response.content), response_string)
+
+
 class USSDOpenBatch(TestCase):
+
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
@@ -793,7 +837,9 @@ class USSDOpenBatch(TestCase):
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+
 class USSDWithMultipleBatches(TestCase):
+
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
@@ -821,7 +867,6 @@ class USSDWithMultipleBatches(TestCase):
         self.ussd_params['ussdRequestString'] = "00"
         response = self.client.post('/ussd', data=self.ussd_params)
         self.ussd_params['ussdRequestString'] = str(household)
-
 
     def test_with_one_batch_open(self):
         self.batch.open_for_location(self.location)
@@ -955,6 +1000,7 @@ class USSDWithMultipleBatches(TestCase):
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
+
 
 class RandomHouseHoldSelectionTest(TestCase):
     def setUp(self):
