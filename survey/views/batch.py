@@ -6,6 +6,7 @@ from survey.investigator_configs import *
 from survey.models import Batch
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from survey.forms.batch import BatchForm
 
 @login_required
 @permission_required('auth.can_view_batches')
@@ -38,3 +39,8 @@ def close(request, batch_id):
     location = Location.objects.get(id=request.POST['location_id'])
     batch.close_for_location(location)
     return HttpResponse()
+
+@login_required
+@permission_required('auth.can_view_batches')
+def new(request):
+    return render(request, 'batches/new.html', {'batchform':BatchForm(),'button_label':'Save'})

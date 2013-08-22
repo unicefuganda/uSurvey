@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from rapidsms.contrib.locations.models import Location, LocationType
 
 from survey.models import *
+from survey.forms.batch import BatchForm
 
 
 class BatchViews(TestCase):
@@ -75,6 +76,20 @@ class BatchViews(TestCase):
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/batches/')
+        self.assert_restricted_permission_for('/batches/new/')
         self.assert_restricted_permission_for('/batches/1/')
         self.assert_restricted_permission_for('/batches/1/open_to')
         self.assert_restricted_permission_for('/batches/1/close_to')
+
+    def test_add_new_batch(self):
+        response = self.client.get('/batches/new/')
+        self.assertEqual(response.status_code,200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('batches/new.html', templates)
+
+    def test_batch_form_is_in_response_request_context(self):
+        response = self.client.get('/batches/new/')
+        self.assertIsInstance(response.context['batchform'], BatchForm)
+        self.assertEqual(response.context['button_label'], 'Save')
+
+
