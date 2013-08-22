@@ -333,6 +333,7 @@ class Women(BaseModel):
 class Batch(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
     name = models.CharField(max_length=100, blank=False, null=True)
+    description = models.CharField(max_length=300,blank=True,default='')
 
     @classmethod
     def currently_open_for(self, location):
