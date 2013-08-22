@@ -1,5 +1,6 @@
 from django.test import TestCase
 from survey.models import *
+from survey.models import Batch
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import *
@@ -96,6 +97,17 @@ class BatchTest(TestCase):
     def test_store(self):
         batch = Batch.objects.create(order=1, name="Batch name")
         self.failUnless(batch.id)
+
+    def test_should_assign_order_as_0_if_it_is_the_only_batch(self):
+        batch = Batch.objects.create(name="Batch name",description='description')
+        batch = Batch.objects.get(name='Batch name')
+        self.assertEqual(batch.order,1)
+
+    def test_should_assign_max_order_plus_one_if_not_the_only_batch(self):
+        batch = Batch.objects.create(name="Batch name",description='description')
+        batch_1 = Batch.objects.create(name="Batch name_1",description='description')
+        batch_1 = Batch.objects.get(name='Batch name_1')
+        self.assertEqual(batch_1.order,2)
 
 class QuestionTest(TestCase):
     def setUp(self):

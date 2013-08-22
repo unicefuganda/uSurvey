@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import *
 from django_extensions.db.models import TimeStampedModel
 from rapidsms.contrib.locations.models import Location
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from survey.investigator_configs import *
 from django.core.exceptions import ObjectDoesNotExist
@@ -18,6 +18,7 @@ from django.utils.datastructures import SortedDict
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.core.exceptions import ValidationError
+from django.db.models import Max
 
 class BaseModel(TimeStampedModel):
     class Meta:
@@ -334,6 +335,11 @@ class Batch(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
     name = models.CharField(max_length=100, blank=False,null=True)
     description = models.CharField(max_length=300,blank=True,null=True)
+
+    def save(self, *args, **kwargs):
+        last_order = Batch.objects.aggregate(Max('order'))['order__max']
+        self.order = last_order + 1 if last_order else 1
+        super(Batch, self).save(*args, **kwargs)
 
     @classmethod
     def currently_open_for(self, location):
@@ -768,3 +774,5 @@ def auto_complete_text(self):
     return LocationAutoComplete.objects.get(location=self).text
 
 Location.auto_complete_text = auto_complete_text
+
+
