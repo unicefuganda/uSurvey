@@ -3,6 +3,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from rapidsms.contrib.locations.models import Location, LocationType
+from django.contrib import messages
 
 from survey.models import *
 from survey.forms.batch import BatchForm
@@ -81,7 +82,7 @@ class BatchViews(TestCase):
         self.assert_restricted_permission_for('/batches/1/open_to')
         self.assert_restricted_permission_for('/batches/1/close_to')
 
-    def test_add_new_batch(self):
+    def test_add_new_batch_should_load_new_template(self):
         response = self.client.get('/batches/new/')
         self.assertEqual(response.status_code,200)
         templates = [template.name for template in response.templates]
@@ -91,5 +92,21 @@ class BatchViews(TestCase):
         response = self.client.get('/batches/new/')
         self.assertIsInstance(response.context['batchform'], BatchForm)
         self.assertEqual(response.context['button_label'], 'Save')
+
+    def test_post_add_new_batch_is_invalid_if_name_field_is_empty(self):
+        response = self.client.post('/batches/new/', data={'name':'', 'description':''})
+        self.assertTrue(len(response.context['batchform'].errors)>0)
+
+    def test_post_add_new_batch(self):
+        response = self.client.post('/batches/new/', data={'name':'Batch1', 'description':'description'})
+        self.assertEqual(len(Batch.objects.filter(name='Batch1')),1)
+
+    def test_post_add_new_batch_redirects_to_batches_table_if_valid(self):
+         response = self.client.post('/batches/new/', data={'name':'Batch1', 'description':'description'})
+         self.assertRedirects(response, expected_url='/batches/', status_code=302, target_status_code=200, msg_prefix='')
+
+    def test_post_should_not_add_batch_with_existing_name(self):
+        response = self.client.post('/batches/new/', data={'name':'Batch A', 'description':'description'})
+        self.assertTrue(len(response.context['batchform'].errors)>0)
 
 

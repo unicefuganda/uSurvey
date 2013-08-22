@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.decorators import login_required, permission_required
 from survey.investigator_configs import *
@@ -43,4 +43,10 @@ def close(request, batch_id):
 @login_required
 @permission_required('auth.can_view_batches')
 def new(request):
-    return render(request, 'batches/new.html', {'batchform':BatchForm(),'button_label':'Save'})
+    batchform = BatchForm()
+    if request.method =='POST':
+        batchform = BatchForm(data=request.POST)
+        if batchform.is_valid():
+            batchform.save()
+            return HttpResponseRedirect('/batches/')
+    return render(request, 'batches/new.html', {'batchform':batchform,'button_label':'Save'})
