@@ -92,6 +92,7 @@ class BatchViews(TestCase):
         response = self.client.get('/batches/new/')
         self.assertIsInstance(response.context['batchform'], BatchForm)
         self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['id'], 'add-batch-form')
 
     def test_post_add_new_batch_is_invalid_if_name_field_is_empty(self):
         response = self.client.post('/batches/new/', data={'name':'', 'description':''})

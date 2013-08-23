@@ -70,3 +70,12 @@ def then_i_should_go_back_to_batches_listing_page(step):
 @step(u'And I should see batch successfully added message')
 def and_i_should_see_batch_successfully_added_message(step):
     world.page.see_batch_successfully_added_message()
+
+@step(u'And I visit add batch page')
+def and_i_visit_add_batch_page(step):
+    world.page = AddBatchPage(world.browser)
+    world.page.visit()
+
+@step(u'Then I should see validation error messages')
+def then_i_should_see_validation_error_messages(step):
+    world.page.validate_error_message_on_fields()

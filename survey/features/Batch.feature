@@ -21,3 +21,10 @@ Feature: Batch related features
     And I submit the form
     Then I should go back to batches listing page
     And I should see batch successfully added message
+
+  Scenario: Add new batch- Js validations
+    Given I am logged in as researcher
+    And I visit add batch page
+    And I submit the form
+    Then I should see validation error messages
+

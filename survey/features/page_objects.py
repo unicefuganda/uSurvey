@@ -463,6 +463,9 @@ class BatchShowPage(PageObject):
 class AddBatchPage(PageObject):
     url = "/batches/new/"
 
+    def validate_error_message_on_fields(self):
+        self.is_text_present("This field is required.")
+
 class InvestigatorDetailsPage(PageObject):
     def __init__(self, browser, investigator):
         self.browser = browser

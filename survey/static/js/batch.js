@@ -11,4 +11,14 @@ jQuery(function($){
       // do nothing
     });
   });
-})
+
+  $('#add-batch-form').validate({
+      rules: {
+        'name': 'required',
+        'description':'required',
+      },
+   });
+
+});
+
+
