@@ -48,20 +48,25 @@ def then_i_should_see_it_is_closed_for_that_location_in_db(step):
 
 @step(u'And I click add batch button')
 def and_i_click_add_batch_button(step):
-    assert False, 'This step must be implemented'
+    world.page.click_add_batch_button()
 
 @step(u'Then I should see a add batch page')
 def then_i_should_see_a_add_batch_page(step):
-    assert False, 'This step must be implemented'
+    world.page = AddBatchPage(world.browser)
+    world.page.validate_url()
 
 @step(u'When I fill the details for add batch form')
 def when_i_fill_the_details_for_add_batch_form(step):
-    assert False, 'This step must be implemented'
+    data={'name':'hritik  batch',
+          'description': 'roshan'}
+
+    world.page.fill_valid_values(data)
 
 @step(u'Then I should go back to batches listing page')
 def then_i_should_go_back_to_batches_listing_page(step):
-    assert False, 'This step must be implemented'
+    world.page = BatchListPage(world.browser)
+    world.page.validate_url()
 
 @step(u'And I should see batch successfully added message')
 def and_i_should_see_batch_successfully_added_message(step):
-    assert False, 'This step must be implemented'
+    world.page.see_batch_successfully_added_message()

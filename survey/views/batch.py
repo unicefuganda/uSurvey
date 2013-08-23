@@ -48,5 +48,6 @@ def new(request):
         batchform = BatchForm(data=request.POST)
         if batchform.is_valid():
             batchform.save()
+            messages.success(request, 'Batch successfully added.')
             return HttpResponseRedirect('/batches/')
     return render(request, 'batches/new.html', {'batchform':batchform,'button_label':'Save'})

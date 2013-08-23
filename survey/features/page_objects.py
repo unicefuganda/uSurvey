@@ -16,6 +16,9 @@ class PageObject(object):
     def visit(self):
         self.browser.visit(django_url(self.url))
 
+    def validate_url(self):
+        assert self.browser.url == django_url(self.url)
+
     def random_text(self, text):
         return text + str(randint(1, 999))
 
@@ -112,13 +115,16 @@ class PageObject(object):
 
     def assert_password_successfully_reset(self):
         self.browser.is_text_present("Your password was reset successfully!!")
-        
+
     def click_actions_button(self):
         self.browser.find_by_css('#action_caret').first.click()
 
     def click_edit_link_with(self, text):
         self.browser.click_link_by_text(text)
 
+    def fill_valid_values(self, data):
+        self.browser.fill_form(data)
+        sleep(2)
 
 class NewInvestigatorPage(PageObject):
     url = "/investigators/new"
@@ -421,10 +427,6 @@ class NewUserPage(PageObject):
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
 
-    def fill_valid_values(self, data):
-        self.browser.fill_form(data)
-        sleep(2)
-
     def see_user_successfully_registered(self):
         sleep(0.5)
         self.is_text_present('User successfully registered.')
@@ -436,11 +438,15 @@ class BatchListPage(PageObject):
         self.browser.click_link_by_text("View")
         return BatchShowPage(self.browser, batch)
 
+    def click_add_batch_button(self):
+        self.browser.click_link_by_text("Add Batch")
 
-class BatchShowPage(object):
+    def see_batch_successfully_added_message(self):
+        self.is_text_present('Batch successfully added.')
+
+class BatchShowPage(PageObject):
     def __init__(self, browser, batch):
-        super(BatchShowPage, self).__init__()
-        self.browser = browser
+        super(BatchShowPage, self).__init__(browser)
         self.url = "/batches/" + str(batch.pk)
 
     def batch_closed_for_all_locations(self):
@@ -454,6 +460,8 @@ class BatchShowPage(object):
         self.browser.execute_script('$($("input:checkbox")[0]).parent().bootstrapSwitch("toggleState")')
         sleep(2)
 
+class AddBatchPage(PageObject):
+    url = "/batches/new/"
 
 class InvestigatorDetailsPage(PageObject):
     def __init__(self, browser, investigator):
