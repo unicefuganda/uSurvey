@@ -75,7 +75,7 @@ class USSD(USSDBase):
         cache.set(self.session_string, session)
 
     def is_pagination_option(self, answer):
-        return answer in getattr(settings,'USSD_PAGINATION',None).values()
+        return answer in getattr(settings, 'USSD_PAGINATION', None).values()
 
     def is_pagination(self, question, answer):
         pagination = False
@@ -87,9 +87,9 @@ class USSD(USSDBase):
 
     def set_current_page(self, answer):
         current_page = self.get_from_session('PAGE')
-        if answer == getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS'):
+        if answer == getattr(settings, 'USSD_PAGINATION', None).get('PREVIOUS'):
             current_page -= 1
-        elif answer == getattr(settings,'USSD_PAGINATION',None).get('NEXT'):
+        elif answer == getattr(settings, 'USSD_PAGINATION', None).get('NEXT'):
             current_page += 1
         self.set_in_session('PAGE', current_page)
 
@@ -146,6 +146,7 @@ class USSD(USSDBase):
     def render_survey(self):
         if not self.household.survey_completed():
             self.question = self.household.next_question()
+
             if not self.is_new_request():
                 self.process_investigator_response()
             self.render_survey_response()
@@ -207,6 +208,7 @@ class USSD(USSDBase):
             self.render_survey()
 
     def render_homepage(self):
+
         answer = self.request['ussdRequestString'].strip()
         if not answer:
             self.render_welcome_text()
@@ -214,7 +216,7 @@ class USSD(USSDBase):
             self.render_households_list(answer)
 
     def has_chosen_household(self):
-        return self.household != None
+        return self.household is not None
 
     def is_active(self):
         return self.investigator.was_active_within(self.TIMEOUT_MINUTES)
@@ -234,7 +236,7 @@ class USSD(USSDBase):
             self.process_open_batch()
         else:
             self.show_message_for_no_open_batch()
-        return {'action': self.action, 'responseString': self.responseString }
+        return {'action': self.action, 'responseString': self.responseString}
 
     def clean_investigator_input(self):
         if self.is_new_request():
@@ -246,7 +248,7 @@ class USSD(USSDBase):
 
     @classmethod
     def investigator_not_registered_response(self):
-        return {'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['USER_NOT_REGISTERED'] }
+        return {'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['USER_NOT_REGISTERED']}
 
 
 class HouseHoldSelection(USSDBase):
@@ -258,13 +260,15 @@ class HouseHoldSelection(USSDBase):
     def randomly_select_households(self):
         no_of_households = int(self.request['ussdRequestString'].strip())
         if no_of_households >= NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR:
-            RandomHouseHoldSelection.objects.get_or_create(mobile_number=self.mobile_number)[0].generate(no_of_households=no_of_households)
-            return { 'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE'] }
+            RandomHouseHoldSelection.objects.get_or_create(mobile_number=self.mobile_number)[0].generate(
+                no_of_households=no_of_households)
+            return {'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE']}
         else:
-            return { 'action': self.ACTIONS['REQUEST'], 'responseString': self.MESSAGES['HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE'] }
+            return {'action': self.ACTIONS['REQUEST'],
+                    'responseString': self.MESSAGES['HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE']}
 
     def response(self):
         if self.is_new_request():
-            return { 'action': self.ACTIONS['REQUEST'], 'responseString': self.MESSAGES['HOUSEHOLDS_COUNT_QUESTION'] }
+            return {'action': self.ACTIONS['REQUEST'], 'responseString': self.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']}
         else:
             return self.randomly_select_households()

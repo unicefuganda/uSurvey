@@ -1,6 +1,7 @@
 from django.test import TestCase
 from survey.models import *
 
+
 class HouseholdTest(TestCase):
 
     def test_fields(self):

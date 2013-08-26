@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.test.client import Client
+from rapidsms.contrib.locations.models import LocationType
 from survey.models import *
 import json
 import datetime
@@ -779,39 +780,44 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-    def xtest_completed_batch_timeout_for_household_after_5_min_should_allow_other_batches(self):
+    def test_completed_batch_timeout_for_household_after_5_min_should_allow_other_batches(self):
         self.household_head_1.household.batch_completed(self.batch)
         self.investigator.answered(self.question_1, self.household_head_1.household, 1)
         self.investigator.answered(self.question_2, self.household_head_1.household, 1)
 
-        completion = HouseholdBatchCompletion.objects.all()[0]
-        completion.created -= datetime.timedelta(minutes=USSD.TIMEOUT_MINUTES, seconds=1)
-        completion.save()
+        completion = HouseholdBatchCompletion.objects.filter(batch=self.batch)[0]
+
+        latest_answer = NumericalAnswer.objects.all().latest()
+        latest_answer.created -= datetime.timedelta(minutes=(USSD.TIMEOUT_MINUTES+1), seconds=1)
+        latest_answer.save()
+
+        answer_one = NumericalAnswer.objects.filter(question=self.question_1)[0]
+        answer_one.created -= datetime.timedelta(minutes=(USSD.TIMEOUT_MINUTES+2), seconds=1)
+        answer_one.save()
 
         self.batch.close_for_location(self.investigator.location)
         self.batch_b.open_for_location(self.investigator.location)
 
-        households_list_1 = "%s\n1: %s*\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
-        # self.ussd_params['response'] = "false"
-        # self.ussd_params['ussdRequestString'] = "00"
+        self.client.post('/ussd', data=self.ussd_params)
+
+        households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'],
+                                                                         self.household_head_1.surname,
+                                                                         self.household_head_2.surname,
+                                                                         self.household_head_3.surname,
+                                                                         self.household_head_4.surname)
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "00"
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        # self.ussd_params['response'] = "true"
-        # self.ussd_params['ussdRequestString'] = "1"
-        #
-        # response = self.client.post('/ussd', data=self.ussd_params)
-        # response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
-        # self.assertEquals(urllib2.unquote(response.content), response_string)
-        #
-        # self.ussd_params['response'] = "true"
-        # self.ussd_params['ussdRequestString'] = "10"
-        #
-        # response = self.client.post('/ussd', data=self.ussd_params)
-        # response_string = "responseString=%s&action=request" % self.question_1_b.text
-        # self.assertEquals(urllib2.unquote(response.content), response_string)
+        self.ussd_params['response'] = "true"
+        self.ussd_params['ussdRequestString'] = "1"
+
+        response = self.client.post('/ussd', data=self.ussd_params)
+        response_string = "responseString=%s&action=request" % self.question_1_b.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
 
 
 class USSDOpenBatch(TestCase):
@@ -850,7 +856,11 @@ class USSDWithMultipleBatches(TestCase):
                                 'ussdRequestString': '',
                                 'response': "false"
                             }
-        self.location = Location.objects.create(name="Kampala")
+
+        self.country = LocationType.objects.create(name='Country', slug='country')
+        self.uganda = Location.objects.create(name="Uganda", type=self.country)
+        self.district = LocationType.objects.create(name='District', slug='district')
+        self.location = Location.objects.create(name="Kampala", type=self.district, tree_parent=self.uganda)
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=self.location, backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
@@ -975,11 +985,7 @@ class USSDWithMultipleBatches(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_with_batch_open_for_parent_location(self):
-        uganda = Location.objects.create(name="Uganda")
-        self.location.tree_parent = uganda
-        self.location.save()
-
-        self.batch.open_for_location(uganda)
+        self.batch.open_for_location(self.uganda)
 
         self.select_household()
 

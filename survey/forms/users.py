@@ -53,6 +53,7 @@ class UserForm(UserCreationForm):
         model = User
         fields = ("username", "first_name", "last_name", "email", "groups")
 
+
 class EditUserForm(ModelForm):
     mobile_number = forms.DecimalField(min_value=100000000,
                                        max_digits=9,
@@ -110,6 +111,7 @@ class EditUserForm(ModelForm):
         widgets={
                 'username':forms.TextInput(attrs={'readonly':'readonly'}),
         }
+
 
 class UserProfileForm(ModelForm):
 

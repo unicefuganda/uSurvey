@@ -20,10 +20,12 @@ from django.db.models import Sum
 from django.core.exceptions import ValidationError
 from django.db.models import Max
 
+
 class BaseModel(TimeStampedModel):
     class Meta:
         app_label = 'survey'
         abstract = True
+
 
 class UserProfile(BaseModel):
     user = models.OneToOneField(User, related_name="userprofile")
@@ -38,6 +40,7 @@ class Backend(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 class Investigator(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
@@ -94,7 +97,7 @@ class Investigator(BaseModel):
         for klass in [NumericalAnswer, TextAnswer, MultiChoiceAnswer]:
             try:
                 answer = klass.objects.filter(investigator=self).latest()
-                if answer: answered.append(answer)
+                if answer:answered.append(answer)
             except ObjectDoesNotExist, e:
                 pass
         if answered:
@@ -139,7 +142,7 @@ class Investigator(BaseModel):
         questions.append(question)
         self.set_in_cache(label, questions)
 
-    def households_list(self, page = 1):
+    def households_list(self, page=1):
         all_households = list(self.all_households())
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
@@ -195,10 +198,10 @@ class Investigator(BaseModel):
     def location_hierarchy(self):
         hierarchy = []
         location = self.location
-        hierarchy.append([ location.type.name, location ])
+        hierarchy.append([location.type.name, location])
         while(location.tree_parent):
             location = location.tree_parent
-            hierarchy.append([ location.type.name, location ])
+            hierarchy.append([location.type.name, location])
         hierarchy.reverse()
         return SortedDict(hierarchy)
 
@@ -222,12 +225,14 @@ class Investigator(BaseModel):
         locations = location.get_descendants(include_self=True)
         return Investigator.objects.filter(location__in=locations)
 
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)
 
     class Meta:
         app_label = 'survey'
+
 
 class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
@@ -247,13 +252,17 @@ class Household(BaseModel):
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
-    def next_question(self, last_question_answered = None):
+    def next_question(self, last_question_answered=None):
         if not last_question_answered:
             last_question_answered = self.last_question_answered()
-        if not last_question_answered:
-            open_batch = Batch.currently_open_for(location = self.investigator.location)
+
+        investigator_location = self.investigator.location
+
+        if not last_question_answered or not last_question_answered.is_in_open_batch(investigator_location):
+            open_batch = Batch.currently_open_for(location=investigator_location)
             if open_batch:
-                return open_batch.first_question()
+                question = open_batch.first_question()
+                return question
         else:
             return last_question_answered.next_question_for_household(self)
 
@@ -287,11 +296,6 @@ class Household(BaseModel):
         self.completed_batches.filter(household=self).delete()
 
     def can_retake_survey(self, batch, minutes):
-        completed_batches = self.completed_batches.filter(household=self)
-        batches = [completion.batch for completion in completed_batches]
-        if not batch in batches:
-            return False
-
         last_batch_completed_time = self.completed_batches.filter(batch=batch, household=self)[0].created
         timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(minutes=minutes)
         return last_batch_completed_time >= timeout
@@ -328,6 +332,7 @@ class HouseholdHead(BaseModel):
                                                          null=False, default=1984)
     resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
 
+
 class Children(BaseModel):
     household = models.OneToOneField(Household, null=True, related_name="children")
     aged_between_5_12_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many children are aged 5-12 years?")
@@ -337,10 +342,12 @@ class Children(BaseModel):
     aged_between_12_23_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="12-23 months?")
     aged_between_24_59_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="24-59 months?")
 
+
 class Women(BaseModel):
    household = models.OneToOneField(Household, null=True, related_name="women")
    aged_between_15_19_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many of these women are aged 15-19 years?")
    aged_between_20_49_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="20-49 years?")
+
 
 class Batch(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
@@ -355,7 +362,7 @@ class Batch(BaseModel):
     @classmethod
     def currently_open_for(self, location):
         locations = location.get_ancestors(include_self=True)
-        open_batches = BatchLocationStatus.objects.filter(location__in = locations)
+        open_batches = BatchLocationStatus.objects.filter(location__in=locations)
         if open_batches.count() > 0:
             return open_batches.order_by('created').all()[:1].get().batch
 
@@ -366,6 +373,10 @@ class Batch(BaseModel):
         return Question.objects.filter(batch=self)
 
     def open_for_location(self, location):
+        all_related_locations = location.get_descendants(include_self=False).all()
+        for related_location in all_related_locations:
+            self.open_locations.get_or_create(batch=self, location=related_location)
+
         return self.open_locations.get_or_create(batch=self, location=location)
 
     def is_closed_for(self, location):
@@ -386,6 +397,7 @@ class Batch(BaseModel):
 
     def get_next_open_batch(self, order, location):
         next_batch_in_order = Batch.objects.filter(order__gt = order).order_by('order')
+
         next_open_batch = location.open_batches.filter(batch__in = next_batch_in_order)
         if next_open_batch:
             return next_open_batch[0].batch
@@ -404,20 +416,26 @@ class Batch(BaseModel):
         return data
 
     def get_next_question(self, order, location):
-        question = self.questions.filter(order=order + 1)
-        if question:
-            return question[0]
+        if self.is_open_for(location=location):
+            question = self.questions.filter(order=order + 1)
+
+            if question:
+                return question[0]
+            else:
+                return self.get_question_from_next_batch(location=location)
         else:
-            return self.get_question_from_next_batch(location = location)
+            return self.get_question_from_next_batch(location=location)
 
     def get_question_from_next_batch(self, location):
         next_batch = self.get_next_open_batch(order=self.order, location=location)
         if next_batch:
-            return next_batch.get_next_question(order = 0, location = location)
+            return next_batch.get_next_question(order=0, location=location)
+
 
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")
     location = models.ForeignKey(Location, null=True, related_name="open_batches")
+
 
 class HouseholdBatchCompletion(BaseModel):
     household = models.ForeignKey(Household, null=True, related_name="completed_batches")
@@ -449,6 +467,7 @@ class HouseholdBatchCompletion(BaseModel):
         locations = location.get_descendants(include_self=True) if location else Location.objects.all()
         investigators = Investigator.objects.filter(location__in = locations)
         return self.households_status(investigators, batch), self.clusters_status(investigators, batch), self.pending_investigators(investigators, batch)
+
 
 class Question(BaseModel):
     NUMBER = 'number'
@@ -511,11 +530,11 @@ class Question(BaseModel):
         try:
             return self.get_next_question_by_rule(answer, household.investigator)
         except ObjectDoesNotExist, e:
-            return self.next_question(location = household.investigator.location)
+            return self.next_question(location=household.investigator.location)
 
     def next_question(self, location):
         order = self.parent.order if self.subquestion else self.order
-        return self.batch.get_next_question(order, location = location)
+        return self.batch.get_next_question(order, location=location)
 
     def to_ussd(self, page=1):
         if self.answer_type == self.MULTICHOICE:
@@ -524,6 +543,10 @@ class Question(BaseModel):
         else:
             return self.text
 
+    def is_in_open_batch(self, location):
+        return self.batch.is_open_for(location)
+
+
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
     text = models.CharField(max_length=150, blank=False, null=False)
@@ -531,6 +554,7 @@ class QuestionOption(BaseModel):
 
     def to_text(self):
         return "%d: %s" % (self.order, self.text)
+
 
 class Answer(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True)
@@ -543,6 +567,7 @@ class Answer(BaseModel):
         abstract = True
         get_latest_by = 'created'
 
+
 class NumericalAnswer(Answer):
     answer = models.PositiveIntegerField(max_length=5, null=True)
 
@@ -553,11 +578,14 @@ class NumericalAnswer(Answer):
         except ValueError, e:
             self.investigator.invalid_answer(self.question)
 
+
 class TextAnswer(Answer):
     answer = models.CharField(max_length=100, blank=False, null=False)
 
+
 class MultiChoiceAnswer(Answer):
     answer = models.ForeignKey(QuestionOption, null=True)
+
 
 class AnswerRule(BaseModel):
     ACTIONS = {
@@ -651,6 +679,7 @@ class AnswerRule(BaseModel):
         method = getattr(self, self.CONDITION_METHODS[self.condition])
         return method(answer)
 
+
 class RandomHouseHoldSelection(BaseModel):
     mobile_number = models.CharField(max_length=10, unique=True, null=False, blank=False)
     no_of_households = models.PositiveIntegerField(null=True)
@@ -672,6 +701,7 @@ class RandomHouseHoldSelection(BaseModel):
         investigator = Investigator(mobile_number=self.mobile_number)
         investigator.backend = Backend.objects.all()[0]
         send(self.text_message(), [investigator])
+
 
 class Formula(BaseModel):
     name = models.CharField(max_length=50,unique=True, blank=False)
@@ -781,9 +811,8 @@ def create_location_auto_complete_text(sender, instance, **kwargs):
     for location in instance.get_descendants():
         generate_auto_complete_text_for_location(location)
 
+
 def auto_complete_text(self):
     return LocationAutoComplete.objects.get(location=self).text
 
 Location.auto_complete_text = auto_complete_text
-
-
