@@ -1,6 +1,9 @@
 from lettuce import *
+from random import randint
 from page_objects import *
 from django.contrib.auth.models import User, Group
+from survey.features.page_objects.accounts import LoginPage, LogoutPage
+from survey.features.page_objects.users import NewUserPage, UsersListPage, UsersDetailsPage
 from survey.models import *
 
 
@@ -83,7 +86,7 @@ def then_i_fill_an_existing_mobile_number(step):
     }
 
     user = User.objects.create(username='some_other_name')
-    userprofile = UserProfile.objects.create(user=user, mobile_number=world.user_data['mobile_number'])
+    UserProfile.objects.create(user=user, mobile_number=world.user_data['mobile_number'])
 
     world.page.fill_valid_values(world.user_data)
     world.page.submit()
@@ -99,7 +102,7 @@ def then_i_fill_an_existing_username(step):
     world.user_data = {
         'username': 'babyrajni',
     }
-    user = User.objects.create(username=world.user_data['username'])
+    User.objects.create(username=world.user_data['username'])
 
     world.page.fill_valid_values(world.user_data)
     world.page.submit()
@@ -115,7 +118,7 @@ def then_i_fill_an_existing_email(step):
     world.user_data = {
         'email': 'haha@ha.ha',
     }
-    user = User.objects.create(email=world.user_data['email'])
+    User.objects.create(email=world.user_data['email'])
 
     world.page.fill_valid_values(world.user_data)
     world.page.submit()
@@ -132,7 +135,7 @@ def then_i_fill_a_not_allowed_username(step):
     world.user_data = {
         'username': not_allowed_username,
     }
-    user = User.objects.create(username=world.user_data['username'])
+    User.objects.create(username=world.user_data['username'])
 
     world.page.fill_valid_values(world.user_data)
     world.page.submit()

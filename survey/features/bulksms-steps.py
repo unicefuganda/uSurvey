@@ -1,7 +1,8 @@
-from page_objects import *
 from lettuce import *
+from survey.features.page_objects.root import BulkSMSPage
 from survey.investigator_configs import *
 from survey.models import *
+from rapidsms.contrib.locations.models import *
 
 @step(u'And I have 2 districts with investigators')
 def and_i_have_2_districts_with_investigators(step):

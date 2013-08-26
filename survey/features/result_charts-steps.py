@@ -2,6 +2,7 @@
 from lettuce import *
 from page_objects import *
 from random import randint
+from survey.features.page_objects.batches import FormulaShowPage
 from survey.models import *
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify

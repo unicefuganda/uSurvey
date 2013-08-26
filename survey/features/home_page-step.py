@@ -1,10 +1,8 @@
-from page_objects import *
-from random import randint
-from survey.models import *
+from survey.features.page_objects.accounts import LogoutPage
+from survey.features.page_objects.root import AboutPage
 from rapidsms.contrib.locations.models import *
-from django.template.defaultfilters import slugify
 from lettuce import *
-from django.contrib.auth.models import User
+
 
 @step(u'Given I am not logged in')
 def given_i_am_not_logged_in(step):

@@ -1,6 +1,7 @@
 from lettuce import *
 from page_objects import *
 from django.contrib.auth.models import User, Group
+from survey.features.page_objects.accounts import ResetPasswordPage
 from survey.models import *
 
 @step(u'Then I see user settings link')
