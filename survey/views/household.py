@@ -149,7 +149,8 @@ def get_investigators(request):
 @permission_required('auth.can_view_households')
 def list_households(request):
     selected_location = None
-    households = Household.objects.all()
+    households = Household.objects.all().order_by('head__surname')
+
     params = request.GET
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))

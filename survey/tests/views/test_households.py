@@ -317,17 +317,28 @@ class HouseholdViewTest(TestCase):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda",type=country)
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household_a = Household.objects.create(number_of_males=1, number_of_females=2, investigator=investigator)
+        household_b = Household.objects.create(number_of_males=1, number_of_females=2, investigator=investigator)
+        household_c = Household.objects.create(number_of_males=1, number_of_females=2, investigator=investigator)
+
+        household_head_b = HouseholdHead.objects.create(surname='Bravo', household=household_b)
+        household_head_a = HouseholdHead.objects.create(surname='Alpha', household=household_a)
+        household_head_c = HouseholdHead.objects.create(surname='Charlie', household=household_c)
         response = self.client.get('/households/')
         self.assertEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('households/index.html', templates)
-        self.assertEqual(len(response.context['households']), 1)
-        self.assertIn(household, response.context['households'])
+        self.assertEqual(len(response.context['households']), 3)
+        self.assertIn(household_b, response.context['households'])
+        self.assertEqual(household_a, response.context['households'][0])
+        self.assertEqual(household_b, response.context['households'][1])
+        self.assertEqual(household_c, response.context['households'][2])
 
         locations = response.context['location_data'].get_widget_data()
         self.assertEquals(len(locations['country']), 1)
         self.assertEquals(locations['country'][0], uganda)
+
+
 
     @patch('django.contrib.messages.error')
     def test_listing_no_households(self, mock_error_message):
