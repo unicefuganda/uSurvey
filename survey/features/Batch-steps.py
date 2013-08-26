@@ -6,7 +6,7 @@ from rapidsms.contrib.locations.models import *
 
 @step(u'And I have a batch')
 def and_i_have_prime_locations(step):
-    world.batch = Batch.objects.create(order = 1, name = "Batch A",description='description')
+    world.batch = Batch.objects.create(order = 1, name = "Batch A", description='description')
 
 @step(u'And I have prime locations')
 def and_i_have_prime_locations(step):
@@ -69,7 +69,7 @@ def then_i_should_go_back_to_batches_listing_page(step):
 
 @step(u'And I should see batch successfully added message')
 def and_i_should_see_batch_successfully_added_message(step):
-    world.page.see_batch_successfully_added_message()
+    world.page.see_success_message('added')
 
 @step(u'And I visit add batch page')
 def and_i_visit_add_batch_page(step):
@@ -79,3 +79,38 @@ def and_i_visit_add_batch_page(step):
 @step(u'Then I should see validation error messages')
 def then_i_should_see_validation_error_messages(step):
     world.page.validate_error_message_on_fields()
+
+@step(u'And I have 100 batches')
+def and_i_have_100_batches(step):
+    for _ in xrange(100):
+        random_number = randint(1, 99999)
+        try:
+            Batch.objects.create(order = random_number, name = "Batch %d"%random_number, description ='description %d'%random_number)
+        except Exception:
+            pass
+
+@step(u'And I should see the batches list paginated')
+def and_i_should_see_the_batches_list_paginated(step):
+    world.page.validate_fields()
+    world.page.validate_pagination()
+    world.page.validate_fields()
+
+@step(u'And I click edit batch link')
+def and_i_click_edit_batch_link(step):
+    world.page.click_edit_link()
+
+@step(u'Then I should see edit batch page')
+def then_i_should_see_edit_batch_page(step):
+    world.page = EditBatchPage(world.browser, world.batch)
+    world.page.validate_url()
+
+@step(u'When I fill the details for the batch')
+def when_i_fill_the_details_for_the_batch(step):
+    data={'name':'hritik  batch',
+          'description': 'roshan'}
+
+    world.page.fill_valid_values(data)
+
+@step(u'And I should see the batch successfully edited')
+def and_i_should_see_the_batch_successfully_edited(step):
+    world.page.see_success_message('edited')

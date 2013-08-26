@@ -13,10 +13,13 @@
     <thead>
       <tr>
         <th>
-          Name
+          Batch
         </th>
         <th>
-
+          Description
+        </th>
+        <th>
+          Actions
         </th>
       </tr>
     </thead>
@@ -27,7 +30,11 @@
             {{ batch.name }}
           </td>
           <td>
+            {{ batch.description }}
+          </td>
+          <td>
             <a href="{% url 'batch_show_page' batch.pk %}">View</a>
+            <a href="{% url 'batch_edit_page' batch.pk %}">Edit</a>
           </td>
         </tr>
       {% endfor %}

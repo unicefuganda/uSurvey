@@ -44,13 +44,22 @@ def close(request, batch_id):
 @permission_required('auth.can_view_batches')
 def new(request):
     batchform = BatchForm()
+    return _process_form(request=request, batchform=batchform, action_str='added')
+
+def _process_form(request, batchform, action_str='added'):
     if request.method =='POST':
         batchform = BatchForm(data=request.POST)
         if batchform.is_valid():
             batchform.save()
-            messages.success(request, 'Batch successfully added.')
+            messages.success(request, 'Batch successfully %s.'%action_str)
             return HttpResponseRedirect('/batches/')
-    return render(request, 'batches/new.html', {'batchform':batchform,
-                                                'button_label':'Save',
-                                                'id':'add-batch-form'
-                                                })
+    return  render(request, 'batches/new.html', {'batchform':batchform,
+                                                        'button_label':'Save',
+                                                        'id':'add-batch-form'
+                                                        })
+
+@permission_required('auth.can_view_batches')
+def edit(request, batch_id):
+    batch= Batch.objects.get(id=batch_id)
+    batchform= BatchForm(instance=batch)
+    return _process_form(request=request, batchform=batchform, action_str='edited')

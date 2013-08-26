@@ -441,8 +441,26 @@ class BatchListPage(PageObject):
     def click_add_batch_button(self):
         self.browser.click_link_by_text("Add Batch")
 
-    def see_batch_successfully_added_message(self):
-        self.is_text_present('Batch successfully added.')
+    def see_success_message(self,action_str):
+        self.is_text_present('Batch successfully %s.' % action_str)
+
+    def validate_fields(self):
+        assert self.browser.is_text_present('Batches List')
+        assert self.browser.is_text_present('Batch')
+        assert self.browser.is_text_present('Description')
+        assert self.browser.is_text_present('Actions')
+
+    def validate_pagination(self):
+        self.browser.click_link_by_text("2")
+
+    def click_edit_link(self):
+        self.browser.click_link_by_text("Edit")
+
+class EditBatchPage(PageObject):
+    def __init__(self, browser, batch):
+        self.browser= browser
+        self.batch= batch
+        self.url = '/batches/' + str(self.batch.id) + '/edit/'
 
 class BatchShowPage(PageObject):
     def __init__(self, browser, batch):

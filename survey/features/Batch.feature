@@ -28,3 +28,20 @@ Feature: Batch related features
     And I submit the form
     Then I should see validation error messages
 
+  Scenario: List Batches
+    Given I am logged in as researcher
+    And I have 100 batches
+    And I visit batches listing page
+    And I should see the batches list paginated
+
+  Scenario: Edit Batch
+    Given I am logged in as researcher
+    And I have a batch
+    And I visit batches listing page
+    And I click edit batch link
+    Then I should see edit batch page
+    When I fill the details for the batch
+    And I submit the form
+    Then I should go back to batches listing page
+    And I should see the batch successfully edited
+

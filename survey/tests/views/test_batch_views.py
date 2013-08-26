@@ -81,6 +81,7 @@ class BatchViews(TestCase):
         self.assert_restricted_permission_for('/batches/1/')
         self.assert_restricted_permission_for('/batches/1/open_to')
         self.assert_restricted_permission_for('/batches/1/close_to')
+        self.assert_restricted_permission_for('/batches/1/edit/')
 
     def test_add_new_batch_should_load_new_template(self):
         response = self.client.get('/batches/new/')
@@ -110,4 +111,30 @@ class BatchViews(TestCase):
         response = self.client.post('/batches/new/', data={'name':'Batch A', 'description':'description'})
         self.assertTrue(len(response.context['batchform'].errors)>0)
 
+
+    def test_edit_batch_should_load_new_template(self):
+        batch = Batch.objects.create(name="batch a", description="batch a description")
+        response = self.client.get('/batches/%d/edit/'%batch.id)
+        self.assertEqual(response.status_code,200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('batches/new.html', templates)
+
+    def test_edit_batch_page_gets_batch_form_instance(self):
+        batch = Batch.objects.create(name="batch a", description="batch a description")
+        response = self.client.get('/batches/%d/edit/'%batch.id)
+        self.assertIsInstance(response.context['batchform'], BatchForm)
+        self.assertEqual(response.context['batchform'].initial['name'], batch.name)
+        self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['id'], 'add-batch-form')
+
+    def test_save_edited_batch(self):
+        batch = Batch.objects.create(name="batch a", description="batch a description")
+        form_data={
+                    'name': 'batch aaa',
+                    'description': batch.description
+        }
+        response = self.client.post('/batches/%d/edit/'%batch.id,data=form_data)
+        updated_batch = Batch.objects.get(name=form_data['name'])
+        self.failUnless(updated_batch)
+        self.assertRedirects(response, expected_url='/batches/', status_code=302, target_status_code=200, msg_prefix='')
 
