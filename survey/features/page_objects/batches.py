@@ -101,5 +101,8 @@ class BatchListPage(PageObject):
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
-    def click_edit_link(self):
-        self.browser.click_link_by_text("Edit")
+    def click_link_by_text(self,text):
+        self.browser.click_link_by_text(text)
+
+    def see_confirm_delete_message(self,batch_name):
+        self.browser.is_text_present("Confirm: Are you sure you want to delete %s?" % batch_name)

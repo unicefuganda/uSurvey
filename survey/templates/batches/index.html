@@ -34,6 +34,8 @@
           </td>
           <td>
             <a href="{% url 'batch_edit_page' batch.pk %}">Edit</a>
+            <a data-toggle="modal" href="#delete_batch_{{batch.id}}">Delete</a>
+            {% include "batches/delete.html" with batch=batch %}
           </td>
         </tr>
       {% endfor %}

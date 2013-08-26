@@ -99,7 +99,7 @@ def and_i_should_see_the_batches_list_paginated(step):
 
 @step(u'And I click edit batch link')
 def and_i_click_edit_batch_link(step):
-    world.page.click_edit_link()
+    world.page.click_link_by_text('Edit')
 
 @step(u'Then I should see edit batch page')
 def then_i_should_see_edit_batch_page(step):
@@ -116,3 +116,19 @@ def when_i_fill_the_details_for_the_batch(step):
 @step(u'And I should see the batch successfully edited')
 def and_i_should_see_the_batch_successfully_edited(step):
     world.page.see_success_message('edited')
+
+@step(u'And I click delete batch link')
+def and_i_click_delete_batch_link(step):
+    world.page.click_link_by_text('Delete')
+
+@step(u'Then I should see confirm delete')
+def then_i_should_see_confirm_delete(step):
+    world.page.see_confirm_delete_message(world.batch.name)
+
+@step(u'And if I click yes')
+def and_if_i_click_yes(step):
+    world.page.click_link_by_text('Yes')
+
+@step(u'And I should see the batch successfully deleted')
+def and_i_should_see_the_batch_successfully_deleted(step):
+    world.page.see_success_message('deleted')

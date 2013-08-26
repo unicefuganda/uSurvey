@@ -138,3 +138,8 @@ class BatchViews(TestCase):
         self.failUnless(updated_batch)
         self.assertRedirects(response, expected_url='/batches/', status_code=302, target_status_code=200, msg_prefix='')
 
+    def test_delete_batch(self):
+        response = self.client.get('/batches/%d/delete/'%self.batch.id)
+        recovered_batch = Batch.objects.filter(id=self.batch.id)
+        self.assertRedirects(response, expected_url='/batches/', status_code=302, target_status_code=200, msg_prefix='')
+        self.failIf(recovered_batch)
