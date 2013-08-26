@@ -83,7 +83,7 @@ class BatchListPage(PageObject):
     url = "/batches/"
 
     def visit_batch(self, batch):
-        self.browser.click_link_by_text("View")
+        self.browser.click_link_by_text(batch.name)
         return BatchShowPage(self.browser, batch)
 
     def click_add_batch_button(self):

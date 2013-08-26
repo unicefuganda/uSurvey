@@ -27,13 +27,12 @@
       {% for batch in batches %}
         <tr>
           <td>
-            {{ batch.name }}
+            <a href="{% url 'batch_show_page' batch.pk %}">{{ batch.name }}</a>
           </td>
           <td>
             {{ batch.description }}
           </td>
           <td>
-            <a href="{% url 'batch_show_page' batch.pk %}">View</a>
             <a href="{% url 'batch_edit_page' batch.pk %}">Edit</a>
           </td>
         </tr>
