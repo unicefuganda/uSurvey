@@ -136,6 +136,7 @@ class BatchViews(TestCase):
         response = self.client.post('/batches/%d/edit/'%batch.id,data=form_data)
         updated_batch = Batch.objects.get(name=form_data['name'])
         self.failUnless(updated_batch)
+        self.failIf(Batch.objects.filter(name=batch.name))
         self.assertRedirects(response, expected_url='/batches/', status_code=302, target_status_code=200, msg_prefix='')
 
     def test_delete_batch(self):

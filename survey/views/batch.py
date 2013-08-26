@@ -46,9 +46,9 @@ def new(request):
     batchform = BatchForm()
     return _process_form(request=request, batchform=batchform, action_str='added')
 
-def _process_form(request, batchform, action_str='added'):
+def _process_form(request, batchform, action_str='added',**batchform_kwargs):
     if request.method =='POST':
-        batchform = BatchForm(data=request.POST)
+        batchform = BatchForm(data=request.POST, **batchform_kwargs)
         if batchform.is_valid():
             batchform.save()
             _add_success_message(request, action_str)
@@ -62,7 +62,7 @@ def _process_form(request, batchform, action_str='added'):
 def edit(request, batch_id):
     batch= Batch.objects.get(id=batch_id)
     batchform= BatchForm(instance=batch)
-    return _process_form(request=request, batchform=batchform, action_str='edited')
+    return _process_form(request=request, batchform=batchform, action_str='edited',instance=batch)
 
 def _add_success_message(request, action_str):
     messages.success(request, 'Batch successfully %s.'%action_str)
