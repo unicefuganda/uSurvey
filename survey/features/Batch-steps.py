@@ -140,5 +140,5 @@ def and_i_click_on_batch_name(step):
 
 @step(u'Then I should be on the list of questions under the batch page')
 def then_i_should_be_on_the_list_of_questions_under_the_batch_page(step):
-    world.page = QuestionsListPage(world.browser, world.batch.id)
+    world.page = QuestionsListPage(world.browser, world.batch)
     world.page.validate_url()

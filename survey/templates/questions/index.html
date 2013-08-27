@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block title %}
+  Questions List
+{% endblock %}
+{% block content %}
+{% load pagination_tags %}
+{% autopaginate questions 50 %}
+  <h3>
+    {{batch.name.capitalize}} Questions
+  </h3>
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>
+          Question
+        </th>
+        <th>
+          Question Type
+        </th>
+        <th>
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for question in questions %}
+        <tr>
+          <td>
+            {{question.text}}
+          </td>
+          <td>
+            {{ question.answer_type }}
+          </td>
+          <td>
+            Edit
+            Delete
+            Rules
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% paginate %}
+{% endblock %}

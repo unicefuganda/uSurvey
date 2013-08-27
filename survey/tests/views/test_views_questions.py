@@ -37,5 +37,6 @@ class QuestionsViews(TestCase):
         self.assertIn('questions/index.html', templates)
         self.assertIn(self.question_1, response.context['questions'])
         self.assertIn(self.question_2, response.context['questions'])
+        self.assertEqual(self.question_2.batch, response.context['batch'])
         self.assertIsNotNone(response.context['request'])
 
