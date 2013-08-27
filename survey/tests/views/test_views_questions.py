@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib import messages
+from mock import patch
 
 from survey.models import *
 from survey.forms.batch import BatchForm
@@ -39,4 +40,17 @@ class QuestionsViews(TestCase):
         self.assertIn(self.question_2, response.context['questions'])
         self.assertEqual(self.question_2.batch, response.context['batch'])
         self.assertIsNotNone(response.context['request'])
+
+    @patch('django.contrib.messages.error')
+    def test_no_questions_in_batch(self, mock_error):
+        other_batch = Batch.objects.create(order=2, name="Other Batch")
+        response = self.client.get('/batches/%d/questions/'%other_batch.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('questions/index.html', templates)
+        self.assertEquals(0, len(response.context['questions']))
+        self.assertEqual(other_batch, response.context['batch'])
+        self.assertIsNotNone(response.context['request'])
+        mock_error.assert_called_once_with(response.context['request'], 'There are no questions associated with this batch yet.')
+
 
