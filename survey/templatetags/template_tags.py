@@ -1,5 +1,4 @@
 from django import template
-from django.contrib import messages
 
 register = template.Library()
 
@@ -40,4 +39,7 @@ def is_radio(field):
 def display_list(list):
     new_list = [str(item) for item in list]
     return ', '.join(new_list)
-            
+
+@register.filter
+def get_location(location_dict, key):
+    return location_dict.get(key, "")

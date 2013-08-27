@@ -5,6 +5,7 @@
 {% block content %}
     {% load pagination_tags %}
     {% autopaginate households 50 %}
+    {% load template_tags %}
     <h3>
         Households List
     </h3>
@@ -26,7 +27,7 @@
                     Gender
                 </th>
                 <th>
-                    Location
+                    District
                 </th>
                 <th>
                     Investigator
