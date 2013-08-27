@@ -25,9 +25,17 @@ class QuestionsViews(TestCase):
         self.client.login(username='Rajni', password='I_Rock')
 
         self.batch = Batch.objects.create(order = 1, name = "Batch A")
+        self.question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                            answer_type=Question.NUMBER, order=1)
+        self.question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                            answer_type=Question.NUMBER, order=2)
 
     def test_get_index(self):
         response = self.client.get('/batches/%d/questions/'%self.batch.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions/index.html', templates)
+        self.assertIn(self.question_1, response.context['questions'])
+        self.assertIn(self.question_2, response.context['questions'])
+        self.assertIsNotNone(response.context['request'])
+
