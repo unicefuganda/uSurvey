@@ -11,7 +11,7 @@
   <table class="table table-striped table-bordered table-hover">
     <thead>
       <tr>
-        <th>
+        <th class="span10">
           Question
         </th>
         <th>
@@ -25,11 +25,11 @@
     <tbody>
       {% for question in questions %}
         <tr>
-          <td>
+          <td class="span10">
             {{question.text}}
           </td>
           <td>
-            {{ question.answer_type }}
+            {{question.answer_type.upper}}
           </td>
           <td>
             Edit
