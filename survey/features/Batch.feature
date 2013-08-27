@@ -54,3 +54,11 @@ Feature: Batch related features
     And if I click yes
     Then I should go back to batches listing page
     And I should see the batch successfully deleted
+
+  Scenario: Batch Details- Listing questions under batch
+    Given I am logged in as researcher
+    And I have a batch
+    And I visit batches listing page
+    And I click on batch name
+    Then I should be on the list of questions under the batch page
+

@@ -27,7 +27,7 @@
       {% for batch in batches %}
         <tr>
           <td>
-            {{ batch.name }}
+            <a href="{% url 'batch_questions_page' batch.id %}">{{ batch.name }}</a>
           </td>
           <td>
             {{ batch.description }}

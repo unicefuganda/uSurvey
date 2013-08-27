@@ -2,6 +2,7 @@ from random import randint
 from page_objects import *
 from lettuce import *
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage
+from survey.features.page_objects.questions import QuestionsListPage
 from survey.investigator_configs import *
 from survey.models import *
 from rapidsms.contrib.locations.models import *
@@ -132,3 +133,12 @@ def and_if_i_click_yes(step):
 @step(u'And I should see the batch successfully deleted')
 def and_i_should_see_the_batch_successfully_deleted(step):
     world.page.see_success_message('deleted')
+
+@step(u'And I click on batch name')
+def and_i_click_on_batch_name(step):
+    world.page.click_link_by_text(world.batch.name)
+
+@step(u'Then I should be on the list of questions under the batch page')
+def then_i_should_be_on_the_list_of_questions_under_the_batch_page(step):
+    world.page = QuestionsListPage(world.browser, world.batch.id)
+    world.page.validate_url()
