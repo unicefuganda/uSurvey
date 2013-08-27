@@ -28,3 +28,11 @@ def then_i_should_see_the_questions_list_paginated(step):
     world.page.validate_pagination()
     world.page.validate_fields()
 
+@step(u'And I have no questions under the batch')
+def and_i_have_no_questions_under_the_batch(step):
+    Question.objects.filter(batch=world.batch).delete()
+
+@step(u'Then I should see error message on the page')
+def then_i_should_see_error_message_on_the_page(step):
+    world.page.is_text_present("There are no questions associated with this batch yet.")
+
