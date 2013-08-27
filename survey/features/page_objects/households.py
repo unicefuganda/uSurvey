@@ -99,7 +99,7 @@ class HouseholdsListPage(PageObject):
 
     def validate_fields(self):
         assert self.browser.is_text_present('Households List')
-        assert self.browser.is_text_present('Name')
+        assert self.browser.is_text_present('Household Head')
         assert self.browser.is_text_present('Age')
         assert self.browser.is_text_present('Gender')
         assert self.browser.is_text_present('Location')
