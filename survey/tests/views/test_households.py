@@ -321,12 +321,15 @@ class HouseholdViewTest(TestCase):
         household_b = Household.objects.create(number_of_males=1, number_of_females=2, investigator=investigator)
         household_c = Household.objects.create(number_of_males=1, number_of_females=2, investigator=investigator)
 
-        household_head_b = HouseholdHead.objects.create(surname='Bravo', household=household_b)
-        household_head_a = HouseholdHead.objects.create(surname='Alpha', household=household_a)
-        household_head_c = HouseholdHead.objects.create(surname='Charlie', household=household_c)
+        HouseholdHead.objects.create(surname='Bravo', household=household_b)
+        HouseholdHead.objects.create(surname='Alpha', household=household_a)
+        HouseholdHead.objects.create(surname='Charlie', household=household_c)
         response = self.client.get('/households/')
+
         self.assertEqual(response.status_code, 200)
+
         templates = [template.name for template in response.templates]
+
         self.assertIn('households/index.html', templates)
         self.assertEqual(len(response.context['households']), 3)
         self.assertIn(household_b, response.context['households'])
@@ -337,7 +340,6 @@ class HouseholdViewTest(TestCase):
         locations = response.context['location_data'].get_widget_data()
         self.assertEquals(len(locations['country']), 1)
         self.assertEquals(locations['country'][0], uganda)
-
 
 
     @patch('django.contrib.messages.error')
@@ -358,12 +360,13 @@ class HouseholdViewTest(TestCase):
         self.assertEquals(locations['country'][0], uganda)
 
     def test_filter_list_investigators(self):
-        country = LocationType.objects.create(name="country", slug=slugify("country"))
-        district = LocationType.objects.create(name="district", slug=slugify("district"))
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        district = LocationType.objects.create(name="District", slug=slugify("district"))
+        county = LocationType.objects.create(name="County", slug=slugify("county"))
 
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
-        bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
+        bukoto = Location.objects.create(name="Bukoto", type=county, tree_parent=kampala)
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda, backend = Backend.objects.create(name='something1'))
         investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala, backend = Backend.objects.create(name='something2'))
@@ -391,3 +394,30 @@ class HouseholdViewTest(TestCase):
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/households/')
+
+    def test_sets_location_to_household(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        district = LocationType.objects.create(name="District", slug=slugify("district"))
+        county = LocationType.objects.create(name="County", slug=slugify("county"))
+        sub_county = LocationType.objects.create(name="Subcounty", slug=slugify("sub-county"))
+        parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
+        village = LocationType.objects.create(name="Village", slug=slugify("village"))
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala_district = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        bukoto_county = Location.objects.create(name="Bukoto", type=county, tree_parent=kampala_district)
+        some_sub_county = Location.objects.create(name="Some sub county", type=sub_county, tree_parent=bukoto_county)
+        some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
+        some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
+
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
+
+        household1 = Household.objects.create(investigator=investigator1)
+        HouseholdHead.objects.create(surname='Bravo', household=household1)
+        household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
+
+        response = self.client.get('/households/')
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(household_location, response.context['households'][0].related_locations)
+

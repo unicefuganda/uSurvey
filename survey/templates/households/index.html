@@ -4,8 +4,8 @@
 {% endblock %}
 {% block content %}
     {% load pagination_tags %}
-    {% autopaginate households 50 %}
     {% load template_tags %}
+    {% autopaginate households 50 %}
     <h3>
         Households List
     </h3>
@@ -30,6 +30,18 @@
                     District
                 </th>
                 <th>
+                    County
+                </th>
+                <th>
+                    Sub County
+                </th>
+                <th>
+                    Parish
+                </th>
+                <th>
+                    Village
+                </th>
+                <th>
                     Investigator
                 </th>
             </tr>
@@ -51,7 +63,19 @@
                         {% endif %}
                     </td>
                     <td>
-                        {{ household.investigator.location.auto_complete_text }}
+                        {{ household.related_locations|get_location:"District" }}
+                    </td>
+                    <td>
+                        {{ household.related_locations|get_location:"County" }}
+                    </td>
+                    <td>
+                        {{ household.related_locations|get_location:"Subcounty" }}
+                    </td>
+                    <td>
+                        {{ household.related_locations|get_location:"Parish" }}
+                    </td>
+                    <td>
+                        {{ household.related_locations|get_location:"Village" }}
                     </td>
                     <td>
                         <a href="{% url 'show_investigator_page' household.investigator.pk %}">{{ household.investigator.name }}</a>

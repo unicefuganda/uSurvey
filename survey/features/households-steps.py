@@ -3,6 +3,7 @@ from lettuce import *
 from page_objects import *
 from random import randint
 from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage
+from survey.features.page_objects.root import HomePage
 from survey.models import *
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
@@ -107,7 +108,8 @@ def then_specify_disappears(step):
 
 @step(u'Given I have an investigator')
 def given_i_have_an_investigator(step):
-    uganda = Location.objects.create(name="Uganda")
+    country = LocationType.objects.create(name="Country", slug=slugify("country"))
+    uganda = Location.objects.create(name="Uganda", type=country)
     world.investigator = Investigator.objects.create(name="Investigator ", mobile_number='987654321', age=20,
                                                      level_of_education="Nursery", language="Luganda", location=uganda)
 
@@ -137,3 +139,13 @@ def given_i_have_no_households(step):
 @step(u'And I should see no household message')
 def and_i_should_see_no_household_message(step):
     world.page.no_registered_huseholds()
+
+@step(u'And I click households option')
+def and_i_click_households_option(step):
+    world.page = HomePage(world.browser)
+    world.page.click_edit_link_with("Households")
+
+@step(u'And I select list households')
+def and_i_select_list_households(step):
+    world.page.click_edit_link_with("List all households")
+    world.page=HouseholdsListPage(world.browser)

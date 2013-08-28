@@ -103,6 +103,10 @@ class HouseholdsListPage(PageObject):
         assert self.browser.is_text_present('Age')
         assert self.browser.is_text_present('Gender')
         assert self.browser.is_text_present('District')
+        assert self.browser.is_text_present('County')
+        assert self.browser.is_text_present('Sub County')
+        assert self.browser.is_text_present('Parish')
+        assert self.browser.is_text_present('Village')
         assert self.browser.is_text_present('Investigator')
 
     def validate_pagination(self):

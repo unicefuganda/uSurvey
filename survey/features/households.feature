@@ -69,7 +69,9 @@ Feature: Households feature
       Given I have 100 households
       Given I am logged in as researcher
       And I have locations
-      And I visit households listing page
+      And I am in the home page
+      And I click households option
+      And I select list households
       And I should see the households list paginated
 
     Scenario: No households list

@@ -199,7 +199,7 @@ class Investigator(BaseModel):
         hierarchy = []
         location = self.location
         hierarchy.append([location.type.name, location])
-        while(location.tree_parent):
+        while location.tree_parent:
             location = location.tree_parent
             hierarchy.append([location.type.name, location])
         hierarchy.reverse()
@@ -316,6 +316,32 @@ class Household(BaseModel):
             else:
                 answers.append('')
         return answers
+
+    def _get_related_location_name(self, key, location_hierarchy):
+        location_object = location_hierarchy.get(key, None)
+
+        location_name = ""
+
+        if location_object:
+            location_name = location_object.name
+
+        return location_name
+
+    def get_related_location(self):
+        location_hierarchy = self.investigator.location_hierarchy()
+
+        keys = ['District', 'County', 'Subcounty', 'Parish', 'Village']
+        related_location = {}
+        for key in keys:
+            related_location[key] = self._get_related_location_name(key, location_hierarchy)
+
+        return related_location
+
+    @classmethod
+    def set_related_locations(cls, households):
+        for household in households:
+            household.related_locations = household.get_related_location()
+        return households
 
 
 class HouseholdHead(BaseModel):

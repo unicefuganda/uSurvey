@@ -58,5 +58,3 @@ class BulkSMSPage(PageObject):
     def counter_updated(self, length):
         counter = str(length) + "/480"
         self.is_text_present(counter)
-
-
