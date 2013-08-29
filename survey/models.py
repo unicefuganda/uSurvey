@@ -863,3 +863,9 @@ def auto_complete_text(self):
     return LocationAutoComplete.objects.get(location=self).text
 
 Location.auto_complete_text = auto_complete_text
+
+
+class HouseholdMember(BaseModel):
+    name = models.CharField(max_length=255)
+    male = models.BooleanField(default=True)
+    date_of_birth = models.DateField(auto_now=False)
