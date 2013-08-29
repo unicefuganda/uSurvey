@@ -6,7 +6,7 @@ from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib import messages
 from mock import patch
 
-from survey.models import *
+from survey.models_file import *
 from survey.forms.question import QuestionForm
 
 

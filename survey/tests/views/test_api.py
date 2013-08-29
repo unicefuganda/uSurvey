@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.test.client import Client
-from survey.models import *
+from survey.models_file import *
 from rapidsms.contrib.locations.models import Location
 
 class TestApi(TestCase):

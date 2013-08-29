@@ -1,6 +1,6 @@
 from django.core.cache import cache
 from django.conf import settings
-from survey.models import RandomHouseHoldSelection
+from survey.models_file import RandomHouseHoldSelection
 from survey.investigator_configs import *
 
 

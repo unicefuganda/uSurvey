@@ -10,7 +10,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import *
+from survey.models_file import *
 from survey.forms.household import *
 from survey.views.household import *
 

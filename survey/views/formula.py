@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.decorators import login_required, permission_required
 from survey.investigator_configs import *
-from survey.models import Formula
+from survey.models_file import Formula
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from survey.views.location_widget import LocationWidget

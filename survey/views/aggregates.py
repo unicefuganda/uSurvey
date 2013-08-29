@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
-from survey.models import *
+from survey.models_file import *
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from survey.forms.investigator import *
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Backend
+from survey.models_file import Backend
 
 class InvestigatorFormTest(TestCase):
 

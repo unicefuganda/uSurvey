@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from survey.models import UserProfile
+from survey.models_file import UserProfile
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import *

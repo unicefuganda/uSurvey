@@ -11,7 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from lettuce import *
 from survey.features.page_objects.accounts import LoginPage
 from survey.features.page_objects.investigators import NewInvestigatorPage, InvestigatorsListPage, FilteredInvestigatorsListPage, EditInvestigatorPage, InvestigatorDetailsPage
-from survey.models import *
+from survey.models_file import *
 from rapidsms.contrib.locations.models import *
 
 

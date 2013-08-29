@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.decorators import login_required, permission_required
 from survey.investigator_configs import *
-from survey.models import Batch
+from survey.models_file import Batch
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from survey.forms.batch import BatchForm

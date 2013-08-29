@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from survey.models import Batch, Question
+from survey.models_file import Batch, Question
 from django.contrib import messages
 from survey.forms.question import QuestionForm
 from django.http import HttpResponseRedirect

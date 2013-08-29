@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from survey.models import Batch
+from survey.models_file import Batch
 import csv
 from django.contrib.auth.decorators import login_required, permission_required
 

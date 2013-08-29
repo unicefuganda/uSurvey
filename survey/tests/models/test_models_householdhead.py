@@ -1,5 +1,5 @@
 from django.test import TestCase
-from survey.models import *
+from survey.models_file import *
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 

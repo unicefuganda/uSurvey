@@ -4,7 +4,7 @@ from lettuce import *
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage
 from survey.features.page_objects.question import QuestionsListPage
 from survey.investigator_configs import *
-from survey.models import *
+from survey.models_file import *
 from rapidsms.contrib.locations.models import *
 
 @step(u'And I have a batch')

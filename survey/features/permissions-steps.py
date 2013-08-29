@@ -2,7 +2,7 @@ from lettuce import *
 from page_objects import *
 from random import randint
 from survey.features.page_objects.accounts import LogoutPage, LoginPage
-from survey.models import *
+from survey.models_file import *
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
 from survey import investigator_configs

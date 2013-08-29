@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.forms.householdHead import *
-from survey.models import Household
+from survey.models_file import Household
 from datetime import datetime
 
 class MockDate(datetime):

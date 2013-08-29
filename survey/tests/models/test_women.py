@@ -1,5 +1,5 @@
 from django.test import TestCase
-from survey.models import *
+from survey.models_file import *
 
 class ChildrenTest(TestCase):
 

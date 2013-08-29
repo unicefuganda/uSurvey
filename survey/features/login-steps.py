@@ -6,7 +6,7 @@ from survey.features.page_objects.households import NewHouseholdPage
 from survey.features.page_objects.investigators import NewInvestigatorPage, InvestigatorsListPage
 from survey.features.page_objects.root import HomePage
 from survey.features.page_objects.users import NewUserPage
-from survey.models import *
+from survey.models_file import *
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
 from lettuce import *

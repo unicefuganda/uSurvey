@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import *
+from survey.models_file import *
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from survey.views.location_widget import LocationWidget
