@@ -16,3 +16,9 @@ class QuestionsListPage(PageObject):
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
+class AddQuestionPage(PageObject):
+    def __init__(self, browser, batch):
+        self.browser = browser
+        self.batch = batch
+        self.url = '/batches/%d/questions/new/' % batch.id
+

@@ -190,20 +190,20 @@ def and_i_click_the_update_button(step):
 @step(u'Then I should see user information updated successfully')
 def then_i_should_see_user_information_saved_successfully(step):
     world.page.assert_user_saved_sucessfully()
-    
+
 @step(u'And I see that username is readonly')
 def and_i_see_that_username_is_readonly(step):
-    world.page.assert_username_is_readonly() 
-    
+    world.page.assert_username_is_readonly()
+
 @step(u'Then I should not see the groups field')
 def then_i_should_not_see_the_groups_field(step):
     world.page.is_group_input_field_visible(False)
-    
+
 @step(u'Then I should see the groups field')
 def then_i_should_see_the_groups_field(step):
-    world.page.is_group_input_field_visible(True) 
+    world.page.is_group_input_field_visible(True)
 
 @step(u'And I select edit action')
 def and_i_select_edit_action(step):
-    world.page.click_edit_link_with(" Edit Profile")
+    world.page.click_link_by_text(" Edit Profile")
     world.page = UsersDetailsPage(world.browser)

@@ -113,7 +113,7 @@ class PageObject(object):
     def click_actions_button(self):
         self.browser.find_by_css('#action_caret').first.click()
 
-    def click_edit_link_with(self, text):
+    def click_link_by_text(self, text):
         self.browser.click_link_by_text(text)
 
     def fill_valid_values(self, data):
