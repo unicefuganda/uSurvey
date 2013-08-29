@@ -817,6 +817,10 @@ class Formula(BaseModel):
                 }
         return household_data
 
+class HouseholdMemberGroup(BaseModel):
+    name = models.CharField(max_length=50)
+    order = models.IntegerField(max_length=5, null=False, blank=False, unique=True, default=0)
+    
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
     if not auto_complete:
