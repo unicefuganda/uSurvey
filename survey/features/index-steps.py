@@ -11,7 +11,6 @@ import glob, os
 
 @before.each_scenario
 def flush_database(step):
-    Permission.objects.all().delete()
     call_command('flush', interactive=False)
     create_backends()
 

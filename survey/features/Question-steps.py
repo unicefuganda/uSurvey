@@ -1,6 +1,6 @@
 from random import randint
 from lettuce import *
-from survey.features.page_objects.questions import QuestionsListPage, AddQuestionPage
+from survey.features.page_objects.question import QuestionsListPage, AddQuestionPage
 from survey.investigator_configs import *
 from survey.models import *
 

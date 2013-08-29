@@ -2,7 +2,7 @@ from random import randint
 from page_objects import *
 from lettuce import *
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage
-from survey.features.page_objects.questions import QuestionsListPage
+from survey.features.page_objects.question import QuestionsListPage
 from survey.investigator_configs import *
 from survey.models import *
 from rapidsms.contrib.locations.models import *
