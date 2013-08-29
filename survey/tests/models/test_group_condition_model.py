@@ -11,8 +11,19 @@ class GroupConditionTest(TestCase):
             self.assertIn(field, fields)
 
     def test_store(self):
-        hmg = GroupCondition.objects.create(value="5")
+        hmg = GroupCondition.objects.create(value="some string")
         self.failUnless(hmg.id)
         self.failUnless(hmg.created)
         self.failUnless(hmg.modified)
-        self.assertEquals("5", hmg.value)
+        self.assertEquals("some string", hmg.value)
+        self.assertEquals("EQUALS", hmg.condition)
+
+    def test_store_boolean_value(self):
+        hmg = GroupCondition.objects.create(value=True)
+        self.assertTrue(hmg.value)
+
+    def test_store_numeric_value(self):
+        hmg = GroupCondition.objects.create(value=5)
+        self.assertEquals(5, hmg.value)
+
+        

@@ -817,10 +817,24 @@ class Formula(BaseModel):
                 }
         return household_data
 
+
 class HouseholdMemberGroup(BaseModel):
     name = models.CharField(max_length=50)
     order = models.IntegerField(max_length=5, null=False, blank=False, unique=True, default=0)
     
+    
+class GroupCondition(BaseModel):
+    CONDITIONS = {
+                'EQUALS': 'EQUALS',
+                'GREATER_THAN': 'GREATER_THAN',
+                'LESS_THAN': 'LESS_THAN',
+    }
+    
+    value = models.CharField(max_length=50)
+    attribute = models.CharField(max_length=20, null=False)
+    condition = models.CharField(max_length=20, null=False, default='EQUALS', choices=CONDITIONS.items())
+    
+
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
     if not auto_complete:
