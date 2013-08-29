@@ -2,7 +2,7 @@ from random import randint
 from lettuce import *
 from survey.features.page_objects.question import QuestionsListPage, AddQuestionPage
 from survey.investigator_configs import *
-from survey.models_file import *
+from survey.models import *
 
 @step(u'And I have 100 questions under the batch')
 def and_i_have_100_questions_under_the_batch(step):

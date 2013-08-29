@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.forms.women import *
-from survey.models_file import Household
+from survey.models import Household
 
 class WomenFormTest(TestCase):
 

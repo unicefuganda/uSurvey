@@ -3,7 +3,7 @@
 from lettuce.django import django_url
 from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.base import PageObject
-from survey.models_file import Investigator
+from survey.models import Investigator
 from rapidsms.contrib.locations.models import *
 from rapidsms.backends.database.models import BackendMessage
 

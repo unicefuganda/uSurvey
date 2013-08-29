@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.forms.question import *
-from survey.models_file import *
+from survey.models import *
 
 class QuestionFormTest(TestCase):
     def setUp(self):

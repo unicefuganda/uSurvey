@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from rapidsms.contrib.locations.models import LocationType
-from survey.models_file import *
+from survey.models import *
 import json
 import datetime
 import urllib2

@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from survey.models_file import Investigator, BatchLocationStatus, Household, HouseholdHead
+from survey.models import Investigator, BatchLocationStatus, Household, HouseholdHead
 
 def create_investigator(request):
     location = BatchLocationStatus.objects.all()[0].location

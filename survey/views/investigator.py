@@ -7,7 +7,7 @@ from django.contrib import messages
 from survey.investigator_configs import *
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.investigator import *
-from survey.models_file import Investigator
+from survey.models import Investigator
 from survey.views.location_widget import LocationWidget
 from django.contrib.auth.decorators import login_required, permission_required
 from survey.views.views_helper import contains_key

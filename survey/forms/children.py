@@ -1,5 +1,5 @@
 from django import forms
-from survey.models_file import *
+from survey.models import *
 from django.forms import ModelForm
 from widgets import InlineRadioSelect
 

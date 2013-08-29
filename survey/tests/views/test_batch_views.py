@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib import messages
 
-from survey.models_file import *
+from survey.models import *
 from survey.forms.batch import BatchForm
 
 

@@ -1,5 +1,5 @@
 from django import forms
-from survey.models_file import *
+from survey.models import *
 from django.forms import ModelForm
 from django.core.validators import *
 from survey.investigator_configs import OCCUPATION, MONTHS

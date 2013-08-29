@@ -1,6 +1,6 @@
 from django.test import TestCase
-from survey.models_file import *
-from survey.models_file import Batch
+from survey.models import *
+from survey.models import Batch
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import *

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.forms.household import *
-from survey.models_file import Investigator, Backend
+from survey.models import Investigator, Backend
 
 class HouseholdFormTest(TestCase):
 

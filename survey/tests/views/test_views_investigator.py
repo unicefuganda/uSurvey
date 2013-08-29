@@ -7,7 +7,7 @@ from django.template.defaultfilters import slugify
 
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.investigator import InvestigatorForm
-from survey.models_file import *
+from survey.models import *
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
