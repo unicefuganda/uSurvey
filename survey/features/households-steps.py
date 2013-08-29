@@ -143,9 +143,9 @@ def and_i_should_see_no_household_message(step):
 @step(u'And I click households option')
 def and_i_click_households_option(step):
     world.page = HomePage(world.browser)
-    world.page.click_edit_link_with("Households")
+    world.page.click_link_by_text("Households")
 
 @step(u'And I select list households')
 def and_i_select_list_households(step):
-    world.page.click_edit_link_with("List all households")
+    world.page.click_link_by_text("List all households")
     world.page=HouseholdsListPage(world.browser)
