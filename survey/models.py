@@ -834,7 +834,10 @@ class GroupCondition(BaseModel):
     attribute = models.CharField(max_length=20, null=False)
     condition = models.CharField(max_length=20, null=False, default='EQUALS', choices=CONDITIONS.items())
     
-
+class GroupConditionMaping(BaseModel):
+    household_member_group = models.ForeignKey(HouseholdMemberGroup, related_name='conditions')
+    group_condition = models.ForeignKey(GroupCondition, related_name='household_member_groups')
+    
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
     if not auto_complete:
