@@ -5,15 +5,6 @@ from rapidsms.contrib.locations.models import LocationType, Location
 from survey.features.page_objects.household_member import NewHouseholdMemberPage
 from survey.models import Household, Investigator
 
-
-@step(u'And I have an investigator')
-def and_i_have_an_investigator(step):
-    country = LocationType.objects.create(name="Country", slug=slugify("country"))
-    uganda = Location.objects.create(name="Uganda", type=country)
-    world.investigator = Investigator.objects.create(name="Investigator ", mobile_number='987654321', age=20,
-                                                     level_of_education="Nursery", language="Luganda", location=uganda)
-
-
 @step(u'And I have a household')
 def and_i_have_a_household(step):
     world.household = Household.objects.create(investigator=world.investigator)
@@ -41,4 +32,4 @@ def and_i_fill_all_member_related_fields(step):
             'date_of_birth': '2013-08-30',
             'male': True
     }
-    world.page.fill_valid_values(data)
+    world.page.fill_valid_member_values(data)

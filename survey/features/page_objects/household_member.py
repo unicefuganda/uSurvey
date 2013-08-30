@@ -18,5 +18,5 @@ class NewHouseholdMemberPage(PageObject):
         self.is_text_present('Cancel')
 
 
-    def fill_valid_values(self,data):
+    def fill_valid_member_values(self,data):
         self.browser.fill_form(data)
