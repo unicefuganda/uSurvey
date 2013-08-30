@@ -867,6 +867,6 @@ Location.auto_complete_text = auto_complete_text
 
 class HouseholdMember(BaseModel):
     name = models.CharField(max_length=255)
-    male = models.BooleanField(default=True)
+    male = models.BooleanField(default=True, verbose_name="Sex")
     date_of_birth = models.DateField(auto_now=False)
     household = models.ForeignKey(Household,related_name='household_member')
