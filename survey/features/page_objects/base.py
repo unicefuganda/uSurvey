@@ -119,3 +119,8 @@ class PageObject(object):
     def fill_valid_values(self, data):
         self.browser.fill_form(data)
         sleep(2)
+
+    def validate_pagination(self):
+        self.browser.click_link_by_text("2")
+
+        

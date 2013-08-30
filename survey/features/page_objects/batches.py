@@ -98,9 +98,6 @@ class BatchListPage(PageObject):
         assert self.browser.is_text_present('Description')
         assert self.browser.is_text_present('Actions')
 
-    def validate_pagination(self):
-        self.browser.click_link_by_text("2")
-
     def click_link_by_text(self,text):
         self.browser.click_link_by_text(text)
 
