@@ -12,7 +12,6 @@ class HouseholdMemberGroupTests(TestCase):
             }
         
         household_member_group_form = HouseholdMemberGroupForm(form_data)
-        print household_member_group_form
         self.assertTrue(household_member_group_form.is_valid())
         
     def test_invalid_group_exists(self):
