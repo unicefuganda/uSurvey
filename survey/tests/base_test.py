@@ -17,7 +17,6 @@ class BaseTest(TestCase):
         some_group.user_set.add(user)
         return user
 
-
     def assert_restricted_permission_for(self, url):
         self.client.logout()
         self.client.login(username='useless', password='I_Suck')
