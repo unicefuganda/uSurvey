@@ -123,4 +123,8 @@ class PageObject(object):
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
+    def is_radio_selected(self,name,value):
+        js = "$('input[name=%s]:radio').prop('checked')" %name
+        return self.browser.execute_script(js) == value
+
         
