@@ -11,7 +11,7 @@ class GroupConditionListPage(PageObject):
         assert_equals(True, self.browser.is_text_present('Value'))
         
 class GroupsListingPage(PageObject):
-    url = 'groups/'
+    url = '/groups/'
     
     def validate_fields(self):
         assert_equals(True, self.browser.is_text_present('Groups List'))
@@ -21,4 +21,6 @@ class GroupsListingPage(PageObject):
         
 class AddConditionPage(PageObject):
     url = "/conditions/new/"
-    
+
+class AddGroupPage(PageObject):
+    url = '/groups/new/'

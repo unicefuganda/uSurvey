@@ -1,7 +1,7 @@
 from lettuce import *
 from random import randint
 from survey.models import GroupCondition, HouseholdMemberGroup
-from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage
+from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage
 
 
 @step(u'And I have 10 conditions')
@@ -72,3 +72,19 @@ def and_i_click_save_button(step):
 @step(u'Then I should see that the condition was saved successfully')
 def then_i_should_see_that_the_condition_was_saved_successfully(step):
     world.page.see_success_message('Condition', 'added')
+
+@step(u'And I visit the new group page')
+def and_i_visit_the_new_group_page(step):
+    world.page = AddGroupPage(world.browser)
+    world.page.visit()
+    
+@step(u'When I fill in the group details')
+def when_i_fill_in_the_group_details(step):
+    data = {'name':'aged between 15 and 49',
+            'order':1,
+            'condition': world.condition.id}
+    world.page.fill_valid_values(data)
+
+@step(u'Then I should see that the group was saved successfully')
+def then_i_should_see_that_the_group_was_saved_successfully(step):
+    world.page.see_success_message('Group', 'added')

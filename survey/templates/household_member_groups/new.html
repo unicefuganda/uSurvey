@@ -1,0 +1,26 @@
+{% extends "form.html" %}
+
+{% block display_form_fields %}
+{% include "naked_form.html" with a_form=groups_form %}
+
+<div class="control-group">
+  <label class="control-label" for="condition">Condition</label>
+  <div class="controls">
+    <select id="condition"  name="condition" required="required">
+      {% for condition in conditions %}
+        <option  value="{{ condition.pk }}">{{ condition.attribute }} >> {{ condition.condition }} >> {{ condition.value}}</option>
+      {% endfor %}
+    </select>
+
+     <label class="error">
+      {% if condition.errors %}
+          {% for error in condition.errors %}
+              {{ error}}
+          {% endfor %}
+      {% endif %}
+       </label>
+  </div>
+</div>
+
+
+{% endblock %}

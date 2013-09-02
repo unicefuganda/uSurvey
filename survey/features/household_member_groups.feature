@@ -21,3 +21,11 @@ Feature: Group features
     When I fill in the condition details
     And I click save button
     Then I should see that the condition was saved successfully
+
+  Scenario: Add a group
+    Given I am logged in as researcher
+    And I have a condition
+    And I visit the new group page
+    When I fill in the group details
+    And I click save button
+    Then I should see that the group was saved successfully
