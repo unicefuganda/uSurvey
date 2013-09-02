@@ -7,7 +7,9 @@ from survey.models import Household, Investigator, HouseholdMember
 
 @step(u'And I have a household')
 def and_i_have_a_household(step):
-    world.investigator = Investigator()
+    district = LocationType.objects.get(slug = 'district')
+    world.kampala = Location.objects.create(name='Kampala', type = district)
+    world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.kampala)
     world.household = Household.objects.create(investigator=world.investigator)
 
 
@@ -24,7 +26,7 @@ def and_i_see_all_household_member_fields_are_present(step):
 
 @step(u'Then I should see member successfully created message')
 def then_i_should_see_member_successfully_created_message(step):
-    world.page.see_success_message('Household member', 'created.')
+    world.page.see_success_message('Household member', 'created')
 
 @step(u'And I fill all member related fields')
 def and_i_fill_all_member_related_fields(step):
