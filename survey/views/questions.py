@@ -3,7 +3,9 @@ from survey.models import Batch, Question
 from django.contrib import messages
 from survey.forms.question import QuestionForm
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required, permission_required
 
+@permission_required('auth.can_view_batches')
 def index(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     questions = Question.objects.filter(batch=batch)
@@ -11,7 +13,8 @@ def index(request, batch_id):
         messages.error(request,'There are no questions associated with this batch yet.')
     context = {'questions':questions, 'request': request, 'batch':batch}
     return render(request, 'questions/index.html', context)
-
+    
+@permission_required('auth.can_view_batches')
 def new(request, batch_id):
     question_form = QuestionForm()
     if request.method == 'POST':
