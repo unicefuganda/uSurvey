@@ -8,21 +8,16 @@ from survey.models import *
 from survey import investigator_configs
 from survey.views.aggregates import *
 from survey.views.views_helper import contains_key
+from survey.tests.base_test import BaseTest
 
 
-class AggregatesPageTest(TestCase):
+class AggregatesPageTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-
-        some_group = Group.objects.create(name='some group')
-        auth_content = ContentType.objects.get_for_model(Permission)
-        permission, out = Permission.objects.get_or_create(codename='can_view_aggregates', content_type=auth_content)
-        some_group.permissions.add(permission)
-        some_group.user_set.add(raj)
-
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
+        
 
     def test_get_page(self):
         country = LocationType.objects.create(name = 'Country', slug = 'country')
@@ -136,14 +131,6 @@ class AggregatesPageTest(TestCase):
         self.assertFalse(is_valid({'location':'2', 'batch':'NOT_A_DIGIT'}))
         self.assertFalse(is_valid({'location':'NOT_A_DIGIT', 'batch':'1'}))
         self.assertFalse(is_valid({'location':'1'}))
-
-    def assert_restricted_permission_for(self, url):
-        self.client.logout()
-
-        self.client.login(username='useless', password='I_Suck')
-        response = self.client.get(url)
-
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/status')
