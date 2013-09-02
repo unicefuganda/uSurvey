@@ -1,15 +1,20 @@
 from datetime import date, datetime
 from django.test.client import Client
-from django.test.testcases import TestCase
 from lettuce.django import django_url
 from rapidsms.contrib.locations.models import Location
 from survey.forms.householdMember import HouseholdMemberForm
 from survey.models import Investigator, Backend, Household, HouseholdMember
+from django.contrib.auth.models import User
+from survey.tests.base_test import BaseTest
 
 
-class HouseholdMemberViewsTest(TestCase):
+class HouseholdMemberViewsTest(BaseTest):
     def setUp(self):
         self.client = Client()
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_households')
+        self.client.login(username='Rajni', password='I_Rock')
+        
         uganda = Location.objects.create(name="Uganda")
         investigator = Investigator.objects.create(name="inv1", location=uganda,
                                                    backend=Backend.objects.create(name='something'))
@@ -125,3 +130,7 @@ class HouseholdMemberViewsTest(TestCase):
         success_message = "Household member successfully edited."
 
         self.assertTrue(success_message in response.cookies['messages'].value)
+
+    def test_restricted_permissions(self):
+        self.assert_restricted_permission_for('/households/%d/member/new/' % int(self.household.id))
+        self.assert_restricted_permission_for('/households/%d/member/%d/edit/' % (int(self.household.id), int(self.household_member.id)))        

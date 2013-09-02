@@ -8,7 +8,6 @@ from survey.tests.base_test import BaseTest
 from survey.models import *
 from survey.forms.batch import BatchForm
 
-
 class BatchViews(BaseTest):
 
     def setUp(self):

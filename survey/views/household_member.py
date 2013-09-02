@@ -3,8 +3,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from survey.forms.householdMember import HouseholdMemberForm
 from survey.models import Household, HouseholdMember
+from django.contrib.auth.decorators import login_required, permission_required
 
-
+@permission_required('auth.can_view_households')
 def new(request, household_id):
     member_form = HouseholdMemberForm()
 
@@ -26,7 +27,7 @@ def new(request, household_id):
 
     return render(request, 'household_member/new.html', {'member_form': member_form, 'button_label': 'Create'})
 
-
+@permission_required('auth.can_view_households')
 def edit(request, household_id, member_id):
     household_member = HouseholdMember.objects.get(id=member_id, household__id=household_id)
     member_form = HouseholdMemberForm(instance=household_member)

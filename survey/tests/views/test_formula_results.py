@@ -5,17 +5,13 @@ from survey.models import *
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from survey.views.location_widget import LocationWidget
+from survey.tests.base_test import BaseTest
 
-class NumericalFormulaResults(TestCase):
+class NumericalFormulaResults(BaseTest):
     def setUp(self):
         self.client = Client()
-        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-        some_group = Group.objects.create(name='some group')
-        auth_content = ContentType.objects.get_for_model(Permission)
-        permission, out = Permission.objects.get_or_create(codename='can_view_aggregates', content_type=auth_content)
-        some_group.permissions.add(permission)
-        some_group.user_set.add(raj)
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
 
         self.batch = Batch.objects.create(order=1)
@@ -52,6 +48,8 @@ class NumericalFormulaResults(TestCase):
         for household in Household.objects.all():
             HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk)
 
+    def test_restricted_permissions(self):
+        self.assert_restricted_permission_for("/batches/%s/formulae/%s/" % (self.batch.pk, self.formula_1.pk))
 
     def test_get(self):
         url = "/batches/%s/formulae/%s/" % (self.batch.pk, self.formula_1.pk)
@@ -88,16 +86,11 @@ class NumericalFormulaResults(TestCase):
         self.assertEquals(response.context['household_data'][self.household_2][self.formula_1.numerator], 10)
         self.assertEquals(response.context['household_data'][self.household_2][self.formula_1.denominator], 100)
 
-class MultichoiceResults(TestCase):
+class MultichoiceResults(BaseTest):
     def setUp(self):
         self.client = Client()
-        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-        some_group = Group.objects.create(name='some group')
-        auth_content = ContentType.objects.get_for_model(Permission)
-        permission, out = Permission.objects.get_or_create(codename='can_view_aggregates', content_type=auth_content)
-        some_group.permissions.add(permission)
-        some_group.user_set.add(raj)
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
 
         self.batch = Batch.objects.create(order=1)
@@ -175,3 +168,7 @@ class MultichoiceResults(TestCase):
         self.assertEquals(response.context['household_data'][self.household_2][self.formula.denominator], 10)
         self.assertEquals(response.context['household_data'][self.household_3][self.formula.numerator], self.option_2)
         self.assertEquals(response.context['household_data'][self.household_3][self.formula.denominator], 30)
+        
+    def test_restricted_permissions(self):
+        self.assert_restricted_permission_for("/batches/%s/formulae/%s/?location=%s" % (self.batch.pk, self.formula.pk, self.kampala.pk))
+        
