@@ -5,6 +5,8 @@ Feature: Group features
     And I visit conditions listing page
     And I have 10 conditions
     And I should see the conditions list
+    When I click the add button
+    Then I should see the new condition form
     
   Scenario: List Groups Page
     Given I am logged in as researcher

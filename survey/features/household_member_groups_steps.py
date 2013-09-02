@@ -45,6 +45,14 @@ def then_i_should_see_the_groups_list_paginated(step):
     world.page.validate_fields()
     world.page.validate_pagination()
 
+@step(u'When I click the add button')
+def when_i_click_the_add_button(step):
+    world.page.click_link_by_text(" Add Condition")
+    
+@step(u'Then I should see the new condition form')
+def then_i_should_see_the_new_condition_form(step):
+    world.page.is_text_present("New condition")
+    
 @step(u'And I visit the new condition page')
 def and_i_visit_the_new_condition_page(step):
     world.page = AddConditionPage(world.browser)
