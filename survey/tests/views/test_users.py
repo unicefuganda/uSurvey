@@ -1,6 +1,6 @@
 import json
 
-from django.test import TestCase
+from survey.tests.base_test import BaseTest
 from django.test.client import Client
 from mock import *
 
@@ -10,18 +10,11 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
 
-class UsersViewTest(TestCase):
+class UsersViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        raj = User.objects.create_user(username='Rajni', email='rajni@kant.com', password='I_Rock')
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-
-        some_group = Group.objects.create(name='some group')
-        auth_content = ContentType.objects.get_for_model(Permission)
-        permission, out = Permission.objects.get_or_create(codename='can_view_users', content_type=auth_content)
-        some_group.permissions.add(permission)
-        some_group.user_set.add(raj)
-
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_users')
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_new(self):
@@ -119,18 +112,9 @@ class UsersViewTest(TestCase):
         self.failIf(user)
         assert error_message.called
 
-    def assert_restricted_permission_for(self, url):
-        self.client.logout()
-
-        self.client.login(username='useless', password='I_Suck')
-        response = self.client.get(url)
-
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
-
     def test_restricted_permission(self):
         self.assert_restricted_permission_for('/users/new/')
         self.assert_restricted_permission_for('/users/')
-
 
     def test_index(self):
         response = self.client.get('/users/')

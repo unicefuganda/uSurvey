@@ -1,7 +1,7 @@
 import json
 from django.template.defaultfilters import slugify
 
-from django.test import TestCase
+from survey.tests.base_test import BaseTest
 from django.test.client import Client
 from mock import *
 from django.utils.datastructures import MultiValueDictKeyError
@@ -14,28 +14,12 @@ from survey.models import *
 from survey.forms.household import *
 from survey.views.household import *
 
-class HouseholdViewTest(TestCase):
+class HouseholdViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-
-        some_group = Group.objects.create(name='some group')
-        auth_content = ContentType.objects.get_for_model(Permission)
-        permission, out = Permission.objects.get_or_create(codename='can_view_households', content_type=auth_content)
-        some_group.permissions.add(permission)
-        some_group.user_set.add(raj)
-
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_households')
         self.client.login(username='Rajni', password='I_Rock')
-
-    def assert_dictionary_equal(self, dict1,
-                                dict2): # needed as QuerySet objects can't be equated -- just to not override .equals
-        self.assertEquals(len(dict1), len(dict2))
-        dict2_keys = dict2.keys()
-        for key in dict1.keys():
-            self.assertIn(key, dict2_keys)
-            for index in range(len(dict1[key])):
-                self.assertEquals(dict1[key][index], dict2[key][index])
 
     def test_new_GET(self):
         some_type = LocationType.objects.create(name='some type', slug='some_name')
