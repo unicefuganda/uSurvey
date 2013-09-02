@@ -8,7 +8,7 @@ from rapidsms.contrib.locations.models import Location
 from survey.views.ussd import *
 
 
-class InvestigatorsViewTest(TestCase):
+class USSDTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
