@@ -5,10 +5,12 @@ from survey.forms.group_condition import GroupConditionForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
+@permission_required('auth.can_view_investigators')
 def conditions(request):
     conditions = GroupCondition.objects.all().order_by('condition')
     return render(request, 'household_member_groups/conditions/index.html', {'conditions': conditions, 'request': request})
 
+@permission_required('auth.can_view_investigators')
 def index(request):
     groups = HouseholdMemberGroup.objects.all().order_by('order')
     return render(request, 'household_member_groups/index.html', {'groups': groups, 'request': request})
