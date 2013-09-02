@@ -1,0 +1,10 @@
+{% extends 'form.html' %}
+
+{% block title %}
+  {{ title }}
+{% endblock %}
+
+
+{% block display_form_fields %}
+  {% include "household_member_groups/conditions/new_condition.html" %}
+{% endblock %}

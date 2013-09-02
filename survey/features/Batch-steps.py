@@ -72,7 +72,7 @@ def then_i_should_go_back_to_batches_listing_page(step):
 
 @step(u'And I should see batch successfully added message')
 def and_i_should_see_batch_successfully_added_message(step):
-    world.page.see_success_message('added')
+    world.page.see_success_message('Batch', 'added')
 
 @step(u'And I visit add batch page')
 def and_i_visit_add_batch_page(step):
@@ -116,7 +116,7 @@ def when_i_fill_the_details_for_the_batch(step):
 
 @step(u'And I should see the batch successfully edited')
 def and_i_should_see_the_batch_successfully_edited(step):
-    world.page.see_success_message('edited')
+    world.page.see_success_message('Batch', 'edited')
 
 @step(u'And I click delete batch link')
 def and_i_click_delete_batch_link(step):
@@ -132,7 +132,7 @@ def and_if_i_click_yes(step):
 
 @step(u'And I should see the batch successfully deleted')
 def and_i_should_see_the_batch_successfully_deleted(step):
-    world.page.see_success_message('deleted')
+    world.page.see_success_message('Batch', 'deleted')
 
 @step(u'And I click on batch name')
 def and_i_click_on_batch_name(step):

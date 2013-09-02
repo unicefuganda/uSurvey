@@ -127,4 +127,6 @@ class PageObject(object):
         js = "$('input[name=%s]:radio').prop('checked')" %name
         return self.browser.execute_script(js) == value
 
+    def see_success_message(self, object_name, action_str):
+        self.is_text_present('%s successfully %s.' % (object_name, action_str))
         

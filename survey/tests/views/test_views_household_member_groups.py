@@ -1,21 +1,48 @@
 from django.test import TestCase
 from django.test.client import Client
 from survey.models import GroupCondition, HouseholdMemberGroup
+from survey.forms.group_condition import GroupConditionForm
+from mock import patch
 
 
 class GroupConditionViewTest(TestCase):
-
+    
+    def setUp(self):
+        self.client = Client()
+        
     def test_view_conditions_list(self):
         hmg_1 = GroupCondition.objects.create(value="some string")
         hmg_2 = GroupCondition.objects.create(value="5")
-        client = Client()
-        response = client.get('/conditions/')
+        response = self.client.get('/conditions/')
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
-        self.assertIn('household_member_groups/conditions.html', templates)
+        self.assertIn('household_member_groups/conditions/index.html', templates)
         self.assertIn(hmg_1, response.context['conditions'])
         self.assertIn(hmg_2, response.context['conditions'])
         self.assertIsNotNone(response.context['request'])
+    
+    def test_add_condition(self):
+        response = self.client.get('/conditions/new/')
+        self.assertEqual(200, response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn('household_member_groups/conditions/new.html', templates)
+        self.assertIsInstance(response.context['condition_form'], GroupConditionForm)
+        self.assertIn('add-condition-form', response.context['id'])
+        self.assertIn('Save', response.context['button_label'])
+        self.assertIn('New condition', response.context['title'])
+        self.assertIn('/conditions/new/', response.context['action'])
+    
+    @patch('django.contrib.messages.success')
+    def test_post_condtion_form(self, mock_success):
+        data = {'attribute':'rajni',
+                'condition':'EQUALS',
+                'value':'kant'}
+                
+        self.failIf(GroupCondition.objects.filter(**data))
+        response = self.client.post('/conditions/new/', data=data)
+        self.assertRedirects(response, expected_url='/conditions/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertEquals(1, len(GroupCondition.objects.filter(**data)))
+        assert mock_success.called
 
 class HouseholdMemberGroupTest(TestCase):
 

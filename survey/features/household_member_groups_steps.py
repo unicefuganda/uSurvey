@@ -1,7 +1,7 @@
 from lettuce import *
 from random import randint
 from survey.models import GroupCondition, HouseholdMemberGroup
-from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage
+from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage
 
 
 @step(u'And I have 10 conditions')
@@ -44,3 +44,23 @@ def and_i_visit_groups_listing_page(step):
 def then_i_should_see_the_groups_list_paginated(step):
     world.page.validate_fields()
     world.page.validate_pagination()
+
+@step(u'And I visit the new condition page')
+def and_i_visit_the_new_condition_page(step):
+    world.page = AddConditionPage(world.browser)
+    world.page.visit()
+    
+@step(u'When I fill in the condition details')
+def when_i_fill_in_the_condition_details(step):
+    data = {'attribute':'rajni',
+            'condition':'EQUALS',
+            'value':'kant'}
+    world.page.fill_valid_values(data)
+    
+@step(u'And I click save button')
+def and_i_click_save_button(step):
+    world.page.submit()
+    
+@step(u'Then I should see that the condition was saved successfully')
+def then_i_should_see_that_the_condition_was_saved_successfully(step):
+    world.page.see_success_message('Condition', 'added')

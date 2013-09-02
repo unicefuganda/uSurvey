@@ -89,9 +89,6 @@ class BatchListPage(PageObject):
     def click_add_batch_button(self):
         self.browser.click_link_by_text("Add Batch")
 
-    def see_success_message(self,action_str):
-        self.is_text_present('Batch successfully %s.' % action_str)
-
     def validate_fields(self):
         assert self.browser.is_text_present('Batches List')
         assert self.browser.is_text_present('Batch')

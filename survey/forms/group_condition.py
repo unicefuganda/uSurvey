@@ -6,4 +6,4 @@ class GroupConditionForm(ModelForm):
 
     class Meta:
         model = GroupCondition
-        fields =['value','condition', 'attribute']
+        fields =['attribute', 'condition', 'value']

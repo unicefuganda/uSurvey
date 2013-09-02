@@ -18,6 +18,7 @@ class GroupsListingPage(PageObject):
         assert_equals(True, self.browser.is_text_present('Order'))
         assert_equals(True, self.browser.is_text_present('Group name'))
         assert_equals(True, self.browser.is_text_present('Actions'))
-    
-
         
+class AddConditionPage(PageObject):
+    url = "/conditions/new/"
+    

@@ -32,7 +32,15 @@
             <a href="">{{ group.name  }}</a>
           </td>
           <td>
-            <a href="">Edit</a>
+            <div class="btn-group">
+                <a class="btn btn-mini btn-primary" href="#"></i>Actions</a>
+                <a class="btn btn-mini btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+                  <span class="caret" id="action_caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#addConditionModal" data-toggle="modal"><i class="icon-plus"></i> Add condition</a></li>
+                <li><a href=""><i class="icon-pencil"></i> Edit</a></li>
+            </ul>
+          </div>
           </td>
         </tr>
       {% endfor %}

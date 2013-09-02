@@ -5,9 +5,9 @@ from rapidsms.contrib.locations.models import LocationType, Location
 from survey.features.page_objects.household_member import NewHouseholdMemberPage, EditHouseholdMemberPage
 from survey.models import Household, Investigator, HouseholdMember
 
-
 @step(u'And I have a household')
 def and_i_have_a_household(step):
+    world.investigator = Investigator()
     world.household = Household.objects.create(investigator=world.investigator)
 
 
@@ -24,8 +24,7 @@ def and_i_see_all_household_member_fields_are_present(step):
 
 @step(u'Then I should see member successfully created message')
 def then_i_should_see_member_successfully_created_message(step):
-    world.page.is_text_present('Household member successfully created.')
-
+    world.page.see_success_message('Household member', 'created.')
 
 @step(u'And I fill all member related fields')
 def and_i_fill_all_member_related_fields(step):

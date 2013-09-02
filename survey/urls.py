@@ -46,6 +46,7 @@ urlpatterns = patterns('',
     url(r'^batches/(?P<batch_id>\d+)/formulae/(?P<formula_id>\d+)/$', 'survey.views.formula.show', name='formula_show_page'),
     url(r'^groups/$', 'survey.views.household_member_group.index', name='household_member_groups_page'),
     url(r'^conditions/$', 'survey.views.household_member_group.conditions', name='show_group_condition'),
+    url(r'^conditions/new/$', 'survey.views.household_member_group.add_condition', name='new_group_condition'),
 )
 
 if not settings.PRODUCTION:
