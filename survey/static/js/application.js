@@ -6,3 +6,7 @@ $(function(){
     e.preventDefault();
   });
 });
+
+$(function(){
+    $('.datepicker').datepicker({dateFormat:'yy-mm-dd'});
+});
