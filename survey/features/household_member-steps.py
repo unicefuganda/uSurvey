@@ -1,6 +1,8 @@
 from lettuce import *
+from rapidsms.contrib.locations.models import LocationType, Location
 from survey.features.page_objects.household_member import NewHouseholdMemberPage, EditHouseholdMemberPage
-from survey.models import Household, HouseholdMember
+from survey.models import Household, HouseholdMember, Investigator
+
 
 @step(u'And I have a household')
 def and_i_have_a_household(step):
