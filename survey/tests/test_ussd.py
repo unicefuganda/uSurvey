@@ -23,9 +23,9 @@ class USSDTest(TestCase):
                                 'response': "false"
                             }
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
-        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
+        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=1), surname="Name " + str(randint(1, 9999)))
         self.batch = Batch.objects.create(order = 1)
         self.batch.open_for_location(self.investigator.location)
 
@@ -484,8 +484,8 @@ class USSDTest(TestCase):
 
 class USSDTestCompleteFlow(TestCase):
 
-    def create_household_head(self):
-        return HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
+    def create_household_head(self, uid):
+        return HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=uid), surname="Name " + str(randint(1, 9999)))
 
     def setUp(self):
         self.client = Client()
@@ -498,15 +498,15 @@ class USSDTestCompleteFlow(TestCase):
                                 'response': "false"
                             }
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
-        self.household_head_1 = self.create_household_head()
-        self.household_head_2 = self.create_household_head()
-        self.household_head_3 = self.create_household_head()
-        self.household_head_4 = self.create_household_head()
-        self.household_head_5 = self.create_household_head()
-        self.household_head_6 = self.create_household_head()
-        self.household_head_7 = self.create_household_head()
-        self.household_head_8 = self.create_household_head()
-        self.household_head_9 = self.create_household_head()
+        self.household_head_1 = self.create_household_head(0)
+        self.household_head_2 = self.create_household_head(1)
+        self.household_head_3 = self.create_household_head(2)
+        self.household_head_4 = self.create_household_head(3)
+        self.household_head_5 = self.create_household_head(4)
+        self.household_head_6 = self.create_household_head(5)
+        self.household_head_7 = self.create_household_head(6)
+        self.household_head_8 = self.create_household_head(7)
+        self.household_head_9 = self.create_household_head(8)
         self.batch = Batch.objects.create(order=1)
         self.batch_b = Batch.objects.create(order=2)
         self.batch.open_for_location(self.investigator.location)
@@ -833,9 +833,9 @@ class USSDOpenBatch(TestCase):
                                 'response': "false"
                             }
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
-        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
+        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=1), surname="Name " + str(randint(1, 9999)))
         batch = Batch.objects.create(order = 1)
 
     def test_closed_batch(self):
@@ -862,9 +862,9 @@ class USSDWithMultipleBatches(TestCase):
         self.district = LocationType.objects.create(name='District', slug='district')
         self.location = Location.objects.create(name="Kampala", type=self.district, tree_parent=self.uganda)
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=self.location, backend = Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
-        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator), surname="Name " + str(randint(1, 9999)))
+        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=1), surname="Name " + str(randint(1, 9999)))
         self.batch = Batch.objects.create(order=1)
         self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2)

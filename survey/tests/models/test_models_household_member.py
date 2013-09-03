@@ -18,7 +18,7 @@ class HouseholdMemberTest(TestCase):
         village = LocationType.objects.create(name="Village", slug=slugify("village"))
         some_village = Location.objects.create(name="Some village", type=village)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
         fields_data = dict(name='xyz', male=True, date_of_birth=date(1980, 05, 01), household=household)
         household_member = HouseholdMember.objects.create(**fields_data)
         self.failUnless(household_member)

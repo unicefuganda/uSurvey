@@ -29,12 +29,12 @@ class NumericalFormulaResults(BaseTest):
 
         backend = Backend.objects.create(name='something')
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.village_1, backend = backend, weights = 0.3)
-        self.household_1 = Household.objects.create(investigator=investigator)
-        self.household_2 = Household.objects.create(investigator=investigator)
+        self.household_1 = Household.objects.create(investigator=investigator, uid=0)
+        self.household_2 = Household.objects.create(investigator=investigator, uid=1)
 
         investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=self.village_2, backend = backend, weights = 0.9)
-        self.household_3 = Household.objects.create(investigator=investigator_1)
-        self.household_4 = Household.objects.create(investigator=investigator_1)
+        self.household_3 = Household.objects.create(investigator=investigator_1, uid=2)
+        self.household_4 = Household.objects.create(investigator=investigator_1, uid=3)
 
         investigator.answered(self.question_1, self.household_1, 20)
         investigator.answered(self.question_2, self.household_1, 200)
@@ -111,17 +111,17 @@ class MultichoiceResults(BaseTest):
 
         backend = Backend.objects.create(name='something')
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.village_1, backend = backend, weights = 0.3)
-        household_1 = Household.objects.create(investigator=investigator)
-        household_2 = Household.objects.create(investigator=investigator)
-        household_3 = Household.objects.create(investigator=investigator)
+        household_1 = Household.objects.create(investigator=investigator, uid=0)
+        household_2 = Household.objects.create(investigator=investigator, uid=1)
+        household_3 = Household.objects.create(investigator=investigator, uid=2)
         self.household_1 = household_1
         self.household_2 = household_2
         self.household_3 = household_3
 
         investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=self.village_2, backend = backend, weights = 0.9)
-        household_4 = Household.objects.create(investigator=investigator_1)
-        household_5 = Household.objects.create(investigator=investigator_1)
-        household_6 = Household.objects.create(investigator=investigator_1)
+        household_4 = Household.objects.create(investigator=investigator_1, uid=3)
+        household_5 = Household.objects.create(investigator=investigator_1, uid=4)
+        household_6 = Household.objects.create(investigator=investigator_1, uid=5)
 
         investigator.answered(self.question_1, household_1, 20)
         investigator.answered(self.question_3, household_1, 1)

@@ -38,9 +38,12 @@ def and_i_should_see_a_get_status_button(step):
 def and_i_have_2_investigators_with_households(step):
     investigator = Investigator.objects.create(name="Rajini", mobile_number="123", location=world.kampala_county)
     investigator_2 = Investigator.objects.create(name="Batman", mobile_number="1234", location=world.someother_county)
+    uid_counter = 0
     for index in range(investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
-        Household.objects.create(investigator = investigator)
-        Household.objects.create(investigator = investigator_2)
+        Household.objects.create(investigator = investigator, uid=uid_counter+index)
+        Household.objects.create(investigator = investigator_2, uid=uid_counter+1+index)
+        uid_counter = uid_counter + 2
+
     world.investigator = investigator
     world.investigator_2 = investigator_2
 

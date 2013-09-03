@@ -9,7 +9,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from rapidsms.contrib.locations.models import *
 from survey.forms.householdHead import *
 from survey.forms.children import *
-from survey.forms.women import *
 from survey.forms.household import *
 from survey.views.location_widget import LocationWidget
 from django.contrib.auth.decorators import login_required, permission_required
@@ -59,7 +58,7 @@ def create_household(householdform, investigator, valid):
 
 def create_remaining_modelforms(householdform, valid):
     if valid['household']:
-        remaining_keys = ['children','householdHead',  'women']
+        remaining_keys = ['children','householdHead']
         for key in remaining_keys:
             householdform[key].instance.household = householdform['household'].instance
             is_valid_form = householdform[key].is_valid()
@@ -89,7 +88,6 @@ def set_household_form(data):
     householdform = {}
     householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
     householdform['children'] = ChildrenForm(data=data, auto_id='household-children-%s', label_suffix='')
-    householdform['women'] = WomenForm(data=data, auto_id='household-women-%s', label_suffix='')
     householdform['household'] = HouseholdForm(data=data, auto_id='household-%s', label_suffix='')
     return householdform
 

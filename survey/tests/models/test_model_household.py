@@ -9,17 +9,16 @@ class HouseholdTest(TestCase):
     def test_fields(self):
         hHead = Household()
         fields = [str(item.attname) for item in hHead._meta.fields]
-        self.assertEqual(len(fields), 6)
-        for field in ['id', 'investigator_id', 'created', 'modified', 'number_of_males', 'number_of_females']:
+        self.assertEqual(len(fields), 5)
+        for field in ['id', 'investigator_id', 'created', 'modified', 'uid']:
             self.assertIn(field, fields)
 
     def test_store(self):
-        hhold = Household.objects.create(investigator=Investigator())
+        hhold = Household.objects.create(investigator=Investigator(), uid=0)
         self.failUnless(hhold.id)
         self.failUnless(hhold.created)
         self.failUnless(hhold.modified)
-        self.assertEquals(0, hhold.number_of_males)
-        self.assertEquals(0, hhold.number_of_females)
+        self.assertEquals(0, hhold.uid)
 
     def test_should_know_household_related_location_to_village_level(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
@@ -38,7 +37,7 @@ class HouseholdTest(TestCase):
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
 
-        household1 = Household.objects.create(investigator=investigator1)
+        household1 = Household.objects.create(investigator=investigator1 , uid=0)
         household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
 
         self.assertEqual(household_location, household1.get_related_location())
@@ -60,7 +59,7 @@ class HouseholdTest(TestCase):
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
 
-        household1 = Household.objects.create(investigator=investigator1)
+        household1 = Household.objects.create(investigator=investigator1, uid=0)
         household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
 
         households = Household.set_related_locations([household1])
@@ -72,7 +71,7 @@ class HouseholdTest(TestCase):
         kampala_district = Location.objects.create(name="Kampala", type=district)
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=kampala_district, backend=Backend.objects.create(name='something1'))
 
-        household1 = Household.objects.create(investigator=investigator1)
+        household1 = Household.objects.create(investigator=investigator1, uid=0)
 
         location_hierarchy = {'District': kampala_district}
 
@@ -83,7 +82,7 @@ class HouseholdTest(TestCase):
         kampala_district = Location.objects.create(name="Kampala", type=district)
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=kampala_district, backend=Backend.objects.create(name='something1'))
 
-        household1 = Household.objects.create(investigator=investigator1)
+        household1 = Household.objects.create(investigator=investigator1, uid=0)
 
         location_hierarchy = {'District': kampala_district}
 
@@ -106,7 +105,7 @@ class HouseholdTest(TestCase):
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
 
-        household1 = Household.objects.create(investigator=investigator1)
+        household1 = Household.objects.create(investigator=investigator1, uid=0)
         household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
 
         self.assertEqual(household_location, household1.get_related_location())

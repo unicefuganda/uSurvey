@@ -41,7 +41,7 @@ class InvestigatorTest(TestCase):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
                                                    location=Location.objects.create(name="Kampala"),
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
         batch.open_for_location(investigator.location)
         question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
@@ -202,8 +202,8 @@ class HouseHoldTest(TestCase):
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator)
-        self.household = Household.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, uid=1)
         self.failUnless(self.household.id)
 
     def test_has_pending_survey(self):
@@ -211,7 +211,7 @@ class HouseHoldTest(TestCase):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
                                                    location=location,
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
         batch.open_for_location(location)
 
@@ -234,7 +234,7 @@ class HouseHoldTest(TestCase):
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0)
 
         batch_1 = Batch.objects.create(order=1)
         question_1 = Question.objects.create(batch=batch_1, text="How many members are there in this household?",
@@ -257,7 +257,7 @@ class HouseHoldTest(TestCase):
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0)
 
         self.batch = Batch.objects.create(order=1)
         self.another_batch = Batch.objects.create(order=2)
@@ -270,7 +270,7 @@ class HouseHoldTest(TestCase):
                                                          text="Test question 1 in another batch",
                                                          answer_type=Question.NUMBER)
 
-        house_hold_1 = Household.objects.create(investigator=self.investigator)
+        house_hold_1 = Household.objects.create(investigator=self.investigator, uid=1)
 
         self.investigator.answered(batch_question_1, house_hold_1, 1)
 
@@ -282,7 +282,7 @@ class HouseHoldTest(TestCase):
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0)
         self.batch = Batch.objects.create(order=1, name="Batch Name")
         self.another_batch = Batch.objects.create(order=2, name="Batch Name 2")
 
@@ -302,7 +302,7 @@ class NumericalAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                    location=Location.objects.create(name="Kampala"),
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
         question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.NUMBER)
 
@@ -317,7 +317,7 @@ class TextAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                    location=Location.objects.create(name="Kampala"),
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
         question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.TEXT)
 
@@ -332,7 +332,7 @@ class MultiChoiceAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                    location=Location.objects.create(name="Kampala"),
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
         question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.MULTICHOICE)
         option = QuestionOption.objects.create(question=question, text="This is an option")
@@ -345,7 +345,7 @@ class MultiChoiceAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                    location=Location.objects.create(name="Kampala"),
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
         question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.MULTICHOICE)
         option_1 = QuestionOption.objects.create(question=question, text="OPTION 1", order=1)
@@ -381,7 +381,7 @@ class AnswerRuleTest(TestCase):
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                         location=self.location,
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0)
         self.batch = Batch.objects.create(order=1)
         self.batch.open_for_location(self.location)
 
@@ -578,7 +578,7 @@ class HouseholdBatchCompletionTest(TestCase):
         kampala = Location.objects.create(name="Kampala")
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
 
         batch_completion = HouseholdBatchCompletion.objects.create(household=household, investigator=investigator,
                                                                    batch=batch)
@@ -589,7 +589,7 @@ class HouseholdBatchCompletionTest(TestCase):
         kampala = Location.objects.create(name="Kampala")
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator)
+        household = Household.objects.create(investigator=investigator, uid=0)
 
         self.assertFalse(household.has_completed_batch(batch))
 
@@ -637,13 +637,13 @@ class FormulaTest(TestCase):
         backend = Backend.objects.create(name='something')
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
                                                    backend=backend, weights=0.3)
-        household_1 = Household.objects.create(investigator=investigator)
-        household_2 = Household.objects.create(investigator=investigator)
+        household_1 = Household.objects.create(investigator=investigator, uid=1)
+        household_2 = Household.objects.create(investigator=investigator, uid=2)
 
         investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
                                                      backend=backend, weights=0.9)
-        household_3 = Household.objects.create(investigator=investigator_1)
-        household_4 = Household.objects.create(investigator=investigator_1)
+        household_3 = Household.objects.create(investigator=investigator_1, uid=3)
+        household_4 = Household.objects.create(investigator=investigator_1, uid=4)
 
         formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2,
                                          batch=self.batch)
@@ -668,15 +668,15 @@ class FormulaTest(TestCase):
         backend = Backend.objects.create(name='something')
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
                                                    backend=backend, weights=0.3)
-        household_1 = Household.objects.create(investigator=investigator)
-        household_2 = Household.objects.create(investigator=investigator)
-        household_3 = Household.objects.create(investigator=investigator)
+        household_1 = Household.objects.create(investigator=investigator, uid=0)
+        household_2 = Household.objects.create(investigator=investigator, uid=1)
+        household_3 = Household.objects.create(investigator=investigator, uid=2)
 
         investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
                                                      backend=backend, weights=0.9)
-        household_4 = Household.objects.create(investigator=investigator_1)
-        household_5 = Household.objects.create(investigator=investigator_1)
-        household_6 = Household.objects.create(investigator=investigator_1)
+        household_4 = Household.objects.create(investigator=investigator_1, uid=3)
+        household_5 = Household.objects.create(investigator=investigator_1, uid=4)
+        household_6 = Household.objects.create(investigator=investigator_1, uid=5)
 
         self.question_3 = Question.objects.create(batch=self.batch, text="This is a question",
                                                   answer_type=Question.MULTICHOICE, order=3)

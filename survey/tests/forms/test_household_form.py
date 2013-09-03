@@ -5,10 +5,8 @@ from survey.models import Investigator, Backend
 class HouseholdFormTest(TestCase):
 
     def test_valid(self):
-        form_data = {
-                        'number_of_males': '6',
-                        'number_of_females': '6',
-                    }
+        form_data = {'uid': '6'}
+
         household_form = HouseholdForm(form_data)
         self.assertTrue(household_form.is_valid())
         investigator = Investigator.objects.create(name="test", backend = Backend.objects.create(name='something'))
@@ -20,21 +18,20 @@ class HouseholdFormTest(TestCase):
 
     def test_positive_numbers(self):
         form_data = {
-                        'number_of_males': -6,
-                        'number_of_females': 6,
+                        'uid': -6,
                     }
         household_form = HouseholdForm(form_data)
         self.assertFalse(household_form.is_valid())
         message = "Ensure this value is greater than or equal to 0."
-        self.assertEquals(household_form.errors['number_of_males'], [message])
+        self.assertEquals(household_form.errors['uid'], [message])
 
-        form_data['number_of_females']='not a number'
+        form_data['uid']='not a number'
         household_form = HouseholdForm(form_data)
         self.assertFalse(household_form.is_valid())
-        self.assertEquals(household_form.errors['number_of_females'], ['Enter a whole number.'])
+        self.assertEquals(household_form.errors['uid'], ['Enter a whole number.'])
 
-        form_data['number_of_females']= None
+        form_data['uid']= None
         household_form = HouseholdForm(form_data)
         self.assertFalse(household_form.is_valid())
-        self.assertEquals(household_form.errors['number_of_females'], ['This field is required.'])
+        self.assertEquals(household_form.errors['uid'], ['This field is required.'])
 

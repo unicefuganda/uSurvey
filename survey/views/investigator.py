@@ -31,7 +31,6 @@ def _process_form(investigator, request, action_text,
                   redirect_url):
     if investigator.is_valid():
         investigator.save()
-        # Household.objects.create(investigator=investigator.instance)
         messages.success(request, "Investigator successfully %s " % action_text)
         return HttpResponseRedirect(redirect_url)
     _add_error_response_message(investigator, request,action_text)

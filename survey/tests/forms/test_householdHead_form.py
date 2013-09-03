@@ -27,7 +27,7 @@ class HouseholdHeadFormTest(TestCase):
     def test_valid(self):
         hHead_form = HouseholdHeadForm(self.form_data)
         self.assertTrue(hHead_form.is_valid())
-        household = Household.objects.create()
+        household = Household.objects.create(uid=1)
         hHead_form.instance.household = household
         hHead = hHead_form.save()
         self.failUnless(hHead.id)

@@ -169,8 +169,7 @@ class HouseholdViewTest(BaseTest):
             'resident_since_year':'2013',
             'resident_since_month':'5',
             'time_measure' : 'Years',
-            'number_of_males': '2',
-            'number_of_females': '3',
+            'uid': '2',
             'size':'5',
             'has_children':'True',
             'has_children_below_5':'True',
@@ -186,31 +185,23 @@ class HouseholdViewTest(BaseTest):
             'aged_between_20_49_years':'1'
         }
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
-        household = Household.objects.filter(number_of_males=form_data['number_of_males'])
+        household = Household.objects.filter(uid=form_data['uid'])
         children = Children.objects.filter(aged_between_13_17_years=form_data['aged_between_13_17_years'])
-        women = Women.objects.filter(aged_between_15_19_years=form_data['aged_between_15_19_years'])
         self.failIf(hHead)
         self.failIf(household)
         self.failIf(children)
-        self.failIf(women)
         response = self.client.post('/households/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 302) # ensure redirection to list investigator page
 
         hHead = HouseholdHead.objects.get(surname=form_data['surname'])
-        household = Household.objects.get(number_of_males=form_data['number_of_males'])
+        household = Household.objects.get(uid=form_data['uid'])
         children = Children.objects.get(aged_between_13_17_years=form_data['aged_between_13_17_years'])
-        women = Women.objects.get(aged_between_15_19_years=form_data['aged_between_15_19_years'])
         self.failUnless(hHead.id)
         self.failUnless(household.id)
         self.failUnless(children.id)
-        self.failUnless(women.id)
         for key in ['surname', 'first_name', 'age', 'occupation',
                     'level_of_education', 'resident_since_year', 'resident_since_month']:
             value = getattr(hHead, key)
-            self.assertEqual(form_data[key], str(value))
-
-        for key in ['number_of_males', 'number_of_females']:
-            value = getattr(household, key)
             self.assertEqual(form_data[key], str(value))
 
         for key in ['aged_between_5_12_years', 'aged_between_13_17_years', 'aged_between_0_5_months',
@@ -218,15 +209,11 @@ class HouseholdViewTest(BaseTest):
             value = getattr(children, key)
             self.assertEqual(form_data[key], str(value))
 
-        for key in ['aged_between_15_19_years', 'aged_between_20_49_years']:
-            value = getattr(women, key)
-            self.assertEqual(form_data[key], str(value))
 
         self.assertEqual(hHead.male, False)
         self.assertEqual(household.investigator, investigator)
         self.assertEqual(hHead.household, household)
         self.assertEqual(children.household, household)
-        self.assertEqual(women.household, household)
 
     def test_create_households_unsuccessful(self):
 
@@ -245,8 +232,7 @@ class HouseholdViewTest(BaseTest):
             'resident_since_year':'2013',
             'resident_since_month':'5',
             'time_measure' : 'Years',
-            'number_of_males': '2',
-            'number_of_females': '3',
+            'uid': '2',
             'size':'5',
             'has_children':'True',
             'has_children_below_5':'True',
@@ -262,13 +248,11 @@ class HouseholdViewTest(BaseTest):
             'aged_between_20_49_years':'1'
         }
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
-        household = Household.objects.filter(number_of_males=form_data['number_of_males'])
+        household = Household.objects.filter(uid=form_data['uid'])
         children = Children.objects.filter(aged_between_13_17_years=form_data['aged_between_13_17_years'])
-        women = Women.objects.filter(aged_between_15_19_years=form_data['aged_between_15_19_years'])
         self.failIf(hHead)
         self.failIf(household)
         self.failIf(children)
-        self.failIf(women)
 
         form_with_invalid_data= form_data
         form_with_invalid_data['has_children'] = False
@@ -278,21 +262,11 @@ class HouseholdViewTest(BaseTest):
         self.assertEquals(response.context['selected_location'], uganda)
 
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
-        household = Household.objects.filter(number_of_males=form_data['number_of_males'])
+        household = Household.objects.filter(uid=form_data['uid'])
         children = Children.objects.filter(aged_between_13_17_years=form_data['aged_between_13_17_years'])
-        women = Women.objects.filter(aged_between_15_19_years=form_data['aged_between_15_19_years'])
         self.failIf(hHead)
         self.failIf(household)
         self.failIf(children)
-        self.failIf(women)
-
-    def assert_restricted_permission_for(self, url):
-        self.client.logout()
-
-        self.client.login(username='useless', password='I_Suck')
-        response = self.client.get(url)
-
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/households/new/')
@@ -301,9 +275,9 @@ class HouseholdViewTest(BaseTest):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda",type=country)
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
-        household_a = Household.objects.create(number_of_males=1, number_of_females=2, investigator=investigator)
-        household_b = Household.objects.create(number_of_males=1, number_of_females=2, investigator=investigator)
-        household_c = Household.objects.create(number_of_males=1, number_of_females=2, investigator=investigator)
+        household_a = Household.objects.create(investigator=investigator, uid=0)
+        household_b = Household.objects.create(investigator=investigator, uid=1)
+        household_c = Household.objects.create(investigator=investigator, uid=2)
 
         HouseholdHead.objects.create(surname='Bravo', household=household_b)
         HouseholdHead.objects.create(surname='Alpha', household=household_a)
@@ -356,9 +330,9 @@ class HouseholdViewTest(BaseTest):
         investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala, backend = Backend.objects.create(name='something2'))
         investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", location=bukoto, backend = Backend.objects.create(name='something3'))
 
-        household1 = Household.objects.create(investigator=investigator1)
-        household2 = Household.objects.create(investigator=investigator2)
-        household3 = Household.objects.create(investigator=investigator3)
+        household1 = Household.objects.create(investigator=investigator1, uid=0)
+        household2 = Household.objects.create(investigator=investigator2, uid=1)
+        household3 = Household.objects.create(investigator=investigator3, uid=2)
 
         response = self.client.get("/households/?location=" + str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
@@ -396,7 +370,7 @@ class HouseholdViewTest(BaseTest):
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
 
-        household1 = Household.objects.create(investigator=investigator1)
+        household1 = Household.objects.create(investigator=investigator1, uid=0)
         HouseholdHead.objects.create(surname='Bravo', household=household1)
         household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
 

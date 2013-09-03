@@ -115,10 +115,10 @@ def given_i_have_an_investigator(step):
 
 @step(u'Given I have 100 households')
 def given_i_have_100_households(step):
-    for _ in xrange(100):
+    for i in xrange(100):
         random_number = str(randint(1, 99999))
         try:
-            HouseholdHead.objects.create(surname="head" + random_number, age=30 , male = False, household = Household.objects.create(investigator=world.investigator))
+            HouseholdHead.objects.create(surname="head" + random_number, age=30 , male = False, household = Household.objects.create(investigator=world.investigator, uid=i))
         except Exception:
             pass
 

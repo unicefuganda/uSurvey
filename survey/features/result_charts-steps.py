@@ -22,14 +22,14 @@ def and_i_have_hierarchical_locations_with_district_and_village(step):
 def and_i_have_investigators_completed_batches(step):
     backend = Backend.objects.create(name='something')
     investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.village_1, backend = backend, weights = 0.3)
-    household_1 = Household.objects.create(investigator=investigator)
-    household_2 = Household.objects.create(investigator=investigator)
-    household_3 = Household.objects.create(investigator=investigator)
+    household_1 = Household.objects.create(investigator=investigator, uid=6)
+    household_2 = Household.objects.create(investigator=investigator, uid=7)
+    household_3 = Household.objects.create(investigator=investigator, uid=8)
 
     investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=world.village_2, backend = backend, weights = 0.9)
-    household_4 = Household.objects.create(investigator=investigator_1)
-    household_5 = Household.objects.create(investigator=investigator_1)
-    household_6 = Household.objects.create(investigator=investigator_1)
+    household_4 = Household.objects.create(investigator=investigator_1, uid=9)
+    household_5 = Household.objects.create(investigator=investigator_1, uid=10)
+    household_6 = Household.objects.create(investigator=investigator_1, uid=11)
 
     world.batch = Batch.objects.create(order=1)
     world.question_1 = Question.objects.create(batch=world.batch, text="Question 1?", answer_type=Question.NUMBER, order=1)

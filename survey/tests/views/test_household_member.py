@@ -28,7 +28,7 @@ class HouseholdMemberViewsTest(BaseTest):
         uganda = Location.objects.create(name="Uganda", type=country)
         investigator = Investigator.objects.create(name="inv1", location=uganda,
                                                    backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=investigator)
+        self.household = Household.objects.create(investigator=investigator, uid=0)
         self.household_member = HouseholdMember.objects.create(name='member1', date_of_birth=(date(2013, 8, 30)),
                                                                male=True,
                                                                household=self.household)

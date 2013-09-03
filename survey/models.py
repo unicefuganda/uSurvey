@@ -26,7 +26,6 @@ class BaseModel(TimeStampedModel):
         app_label = 'survey'
         abstract = True
 
-
 class UserProfile(BaseModel):
     user = models.OneToOneField(User, related_name="userprofile")
     mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=10, unique=True, null=False, blank=False)
@@ -236,10 +235,8 @@ class LocationAutoComplete(models.Model):
 
 class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
-    number_of_males = models.PositiveIntegerField(blank=False, default=0,
-                        verbose_name="How many males reside in this household?")
-    number_of_females = models.PositiveIntegerField(blank=False, default=0,
-                        verbose_name="How many females reside in this household?")
+    uid = models.PositiveIntegerField(blank=False, default=0, unique=True,
+                        verbose_name="Household Unique Identification")
 
     def last_question_answered(self):
         answered = []
@@ -367,12 +364,6 @@ class Children(BaseModel):
     aged_between_6_11_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="6-11 months?")
     aged_between_12_23_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="12-23 months?")
     aged_between_24_59_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="24-59 months?")
-
-
-class Women(BaseModel):
-   household = models.OneToOneField(Household, null=True, related_name="women")
-   aged_between_15_19_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many of these women are aged 15-19 years?")
-   aged_between_20_49_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="20-49 years?")
 
 
 class Batch(BaseModel):
@@ -821,23 +812,23 @@ class Formula(BaseModel):
 class HouseholdMemberGroup(BaseModel):
     name = models.CharField(max_length=50)
     order = models.IntegerField(max_length=5, null=False, blank=False, unique=True, default=0)
-    
-    
+
+
 class GroupCondition(BaseModel):
     CONDITIONS = {
                 'EQUALS': 'EQUALS',
                 'GREATER_THAN': 'GREATER_THAN',
                 'LESS_THAN': 'LESS_THAN',
     }
-    
+
     value = models.CharField(max_length=50)
     attribute = models.CharField(max_length=20, null=False)
     condition = models.CharField(max_length=20, null=False, default='EQUALS', choices=CONDITIONS.items())
-    
+
 class GroupConditionMaping(BaseModel):
     household_member_group = models.ForeignKey(HouseholdMemberGroup, related_name='conditions')
     group_condition = models.ForeignKey(GroupCondition, related_name='household_member_groups')
-    
+
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
     if not auto_complete:

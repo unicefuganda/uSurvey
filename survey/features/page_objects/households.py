@@ -10,11 +10,10 @@ class NewHouseholdPage(PageObject):
     def valid_page(self):
         fields = ['investigator', 'surname', 'first_name', 'male', 'age', 'occupation',
                   'level_of_education', 'resident_since_month', 'resident_since_year']
-        fields += ['number_of_males', 'number_of_females', 'size']
+        fields += ['uid']
         fields += ['has_children', 'has_children_below_5', 'aged_between_5_12_years', 'aged_between_13_17_years',
                    'aged_between_0_5_months',
                    'aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']
-        fields += ['has_women', 'aged_between_15_19_years', 'aged_between_20_49_years']
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
 

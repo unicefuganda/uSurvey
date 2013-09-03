@@ -57,9 +57,11 @@ class AggregatesPageTest(BaseTest):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=kampala_city, backend = Backend.objects.create(name='something'))
         count = 1
         while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
-            household = Household.objects.create(investigator = investigator)
+            household = Household.objects.create(investigator = investigator, uid=count)
             household.batch_completed(batch_2)
             count += 1
+
+        old_count = count
 
         response = self.client.get('/aggregates/status', {'location': str(kampala.pk), 'batch': str(batch.pk)})
         self.failUnlessEqual(response.status_code, 200)
@@ -87,9 +89,10 @@ class AggregatesPageTest(BaseTest):
         investigator_2 = Investigator.objects.create(name="investigator name", mobile_number="1234", location=kampala_city, backend = Backend.objects.create(name='something1'))
         count = 1
         while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
-            household = Household.objects.create(investigator = investigator_2)
+            household = Household.objects.create(investigator = investigator_2, uid = old_count + count)
             household.batch_completed(batch)
             count += 1
+        old_count = old_count + count
 
         response = self.client.get('/aggregates/status', {'location': str(kampala.pk), 'batch': str(batch.pk)})
         self.failUnlessEqual(response.status_code, 200)
@@ -103,12 +106,14 @@ class AggregatesPageTest(BaseTest):
         investigator_3 = Investigator.objects.create(name="investigator name", mobile_number="12345", location=abim, backend = Backend.objects.create(name='something2'))
         count = 1
         while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
-            household = Household.objects.create(investigator = investigator_3)
+            household = Household.objects.create(investigator = investigator_3,  uid = old_count + count)
             household.batch_completed(batch)
             count += 1
 
+        old_count = old_count + count
+
         investigator_4 = Investigator.objects.create(name="investigator name", mobile_number="123456", location=abim, backend = Backend.objects.create(name='something4'))
-        Household.objects.create(investigator = investigator_4).batch_completed(batch)
+        Household.objects.create(investigator = investigator_4, uid = old_count).batch_completed(batch)
 
         response = self.client.get('/aggregates/status', {'location': str(kampala.pk), 'batch': str(batch.pk)})
         self.failUnlessEqual(response.status_code, 200)

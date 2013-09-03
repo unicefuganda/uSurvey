@@ -4,7 +4,7 @@ from survey.models import Investigator, BatchLocationStatus, Household, Househol
 def create_investigator(request):
     location = BatchLocationStatus.objects.all()[0].location
     investigator = Investigator.objects.create(name="Tester", mobile_number=request.GET['mobile_number'], location=location)
-    household = Household.objects.create(investigator=investigator)
+    household = Household.objects.create(investigator=investigator, uid=0)
     HouseholdHead.objects.create(household=household, surname="Surname")
     return HttpResponse()
 

@@ -9,7 +9,7 @@ def and_i_have_a_household(step):
     district = LocationType.objects.get(slug = 'district')
     world.kampala = Location.objects.create(name='Kampala', type = district)
     world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.kampala)
-    world.household = Household.objects.create(investigator=world.investigator)
+    world.household = Household.objects.create(investigator=world.investigator, uid=4)
 
 
 @step(u'And I visit new household member page')

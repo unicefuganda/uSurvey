@@ -37,24 +37,6 @@ Feature: Households feature
         And Now If I click Yes to below 5
         Then below 5 number fields are enabled back
 
-    Scenario: Create a household - has women validation
-        Given I am logged in as researcher
-        And I have locations
-        And I visit new household page
-        And I click No to has women
-        Then I should see has women number fields disabled
-        And Now If I click Yes to has women
-        Then has women number fields are enabled back
-
-    Scenario: Create a household - 20_49 women validation
-        Given I am logged in as researcher
-        And I have locations
-        And I visit new household page
-        And Now If I click Yes to has women
-        And I fill in number_of_females lower than sum of 15_19 and 20_49
-        And I submit the form
-        Then I should see an error on number_of_females
-
     Scenario: Create a household with other-specify occupation
         Given I am logged in as researcher
         And I have locations

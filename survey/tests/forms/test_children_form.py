@@ -24,7 +24,7 @@ class ChildrenFormTest(TestCase):
     def test_valid(self):
         children_form = ChildrenForm(self.form_data)
         self.assertTrue(children_form.is_valid())
-        household = Household.objects.create()
+        household = Household.objects.create(uid=1)
         children_form.instance.household = household
         children = children_form.save()
         self.failUnless(children.id)
