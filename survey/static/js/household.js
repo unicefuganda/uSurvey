@@ -1,13 +1,6 @@
 ;
 
 jQuery(function($){
-  jQuery.validator.addMethod("validate_number_of_females", function(value, element) {
-    var aged_between_15_19_years = parseInt($("#household-women-aged_between_15_19_years").val()),
-        aged_between_20_49_years = parseInt($("#household-women-aged_between_20_49_years").val()),
-        number_of_females = value;
-    return (number_of_females >= aged_between_20_49_years + aged_between_15_19_years);
-  }, "Please enter a value that is greater or equal to the total number of women above 15 years age.");
-
   $('#create-household-form').validate({
       ignore: ':hidden:not(select)',
       rules: {
@@ -15,7 +8,6 @@ jQuery(function($){
         'surname':'required',
         'first_name':'required',
         'occupation':'required',
-        "number_of_females": "validate_number_of_females"
       },
       messages: {
         'age':{ number: 'Please enter a valid number. No space or special charcters.'},
@@ -37,24 +29,6 @@ jQuery(function($){
       });
       $('#household-investigator').trigger('liszt:updated');
     });
-  });
-
-  function toggle_related_fields(field, related_field) {
-    field.change(function(){
-      if ($(this).val() == 'True'){
-        related_field.removeAttr('disabled');
-      }else{
-        related_field.attr('disabled', 'disabled');
-      };
-    });
-  }
-
-  toggle_related_fields($('input[name=has_children_below_5]'), $('.children-below-5-field'));
-  toggle_related_fields($('input[name=has_women]'), $('.women-field'));
-  toggle_related_fields($('input[name=has_children]'), $('.children-field'));
-
-  $('input[name=has_children]').change(function(){
-    $('.has_children_below_5[value=' + $(this).val() + ']').prop('checked', true);
   });
 
   var occupation = $('#household-occupation'),

@@ -41,16 +41,6 @@
 </div>
 <h4>Household Information</h4>
 {% include "naked_form.html" with a_form=householdform.household %}
-{% include "naked_form.html" with a_form=householdform.women %}
-
-<div class="control-group">
-  <label class="control-label" for="household-size">Total number of persons in this household</label>
-  <div class="controls">
-   <input id="household-size" name="size" readonly="readonly" type="number" value="0" class="valid">
-  </div>
-</div>
-
-{% include "naked_form.html" with a_form=householdform.children %}
 {% endblock %}
 
 {% block javascripts %}
