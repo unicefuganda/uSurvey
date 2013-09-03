@@ -1,7 +1,7 @@
 from lettuce import *
 from random import randint
 from survey.models import GroupCondition, HouseholdMemberGroup
-from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage
+from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage
 
 
 @step(u'And I have 10 conditions')
@@ -61,7 +61,6 @@ def and_i_visit_the_new_condition_page(step):
 @step(u'When I fill in the condition details')
 def when_i_fill_in_the_condition_details(step):
     data = {'attribute':'rajni',
-            'condition':'EQUALS',
             'value':'kant'}
     world.page.fill_valid_values(data)
     
@@ -88,3 +87,25 @@ def when_i_fill_in_the_group_details(step):
 @step(u'Then I should see that the group was saved successfully')
 def then_i_should_see_that_the_group_was_saved_successfully(step):
     world.page.see_success_message('Group', 'added')
+
+@step(u'When I click the add new condition')
+def when_i_click_the_add_new_condition(step):
+    world.page.click_link_by_text("Add condition ")
+
+@step(u'Then I should see the modal open')
+def then_i_should_see_the_modal_open(step):
+    world.page = GroupConditionModalPage(world.browser)
+    world.page.validate_contents()
+
+@step(u'And I click the save button')
+def and_i_click_the_save_button(step):
+    world.page.click_button("save_condition_button")
+
+@step(u'Then I should see the condition was saved successfully')
+def then_i_should_see_the_condition_was_saved_successfully(step):
+    world.page.see_success_message("Condition", "added")
+
+@step(u'And I should see the new condition in the groups form')
+def and_i_should_see_the_new_condition_in_the_groups_form(step):
+    latest_condition = GroupCondition.objects.get(value='kant', attribute="rajni", condition="EQUALS")
+    world.page.validate_latest_condition(latest_condition)

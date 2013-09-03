@@ -29,3 +29,13 @@ Feature: Group features
     When I fill in the group details
     And I click save button
     Then I should see that the group was saved successfully
+    
+  Scenario: Create a condition on the group form
+    Given I am logged in as researcher
+    And I visit the new group page
+    When I click the add new condition
+    Then I should see the modal open
+    When I fill in the condition details
+    And I click the save button
+    Then I should see the condition was saved successfully
+    And I should see the new condition in the groups form

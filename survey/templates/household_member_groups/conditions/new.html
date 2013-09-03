@@ -1,10 +1,9 @@
-{% extends 'form.html' %}
+{% extends "layout.html" %}
 
 {% block title %}
   {{ title }}
 {% endblock %}
 
-
-{% block display_form_fields %}
+{% block content %}
   {% include "household_member_groups/conditions/new_condition.html" %}
 {% endblock %}

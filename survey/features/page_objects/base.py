@@ -129,4 +129,3 @@ class PageObject(object):
 
     def see_success_message(self, object_name, action_str):
         self.is_text_present('%s successfully %s.' % (object_name, action_str))
-        
