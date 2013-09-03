@@ -170,50 +170,26 @@ class HouseholdViewTest(BaseTest):
             'resident_since_month':'5',
             'time_measure' : 'Years',
             'uid': '2',
-            'size':'5',
-            'has_children':'True',
-            'has_children_below_5':'True',
-            'aged_between_5_12_years':'0',
-            'aged_between_13_17_years':'1',
-            'aged_between_0_5_months':'0',
-            'aged_between_6_11_months':'0',
-            'aged_between_12_23_months':'0',
-            'aged_between_24_59_months':'0',
-            'total_below_5':'0',
-            'has_women':'True',
-            'aged_between_15_19_years':'0',
-            'aged_between_20_49_years':'1'
         }
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(uid=form_data['uid'])
-        children = Children.objects.filter(aged_between_13_17_years=form_data['aged_between_13_17_years'])
         self.failIf(hHead)
         self.failIf(household)
-        self.failIf(children)
         response = self.client.post('/households/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 302) # ensure redirection to list investigator page
 
         hHead = HouseholdHead.objects.get(surname=form_data['surname'])
         household = Household.objects.get(uid=form_data['uid'])
-        children = Children.objects.get(aged_between_13_17_years=form_data['aged_between_13_17_years'])
         self.failUnless(hHead.id)
         self.failUnless(household.id)
-        self.failUnless(children.id)
         for key in ['surname', 'first_name', 'age', 'occupation',
                     'level_of_education', 'resident_since_year', 'resident_since_month']:
             value = getattr(hHead, key)
             self.assertEqual(form_data[key], str(value))
 
-        for key in ['aged_between_5_12_years', 'aged_between_13_17_years', 'aged_between_0_5_months',
-                    'aged_between_6_11_months', 'aged_between_12_23_months', 'aged_between_24_59_months']:
-            value = getattr(children, key)
-            self.assertEqual(form_data[key], str(value))
-
-
         self.assertEqual(hHead.male, False)
         self.assertEqual(household.investigator, investigator)
         self.assertEqual(hHead.household, household)
-        self.assertEqual(children.household, household)
 
     def test_create_households_unsuccessful(self):
 
@@ -233,29 +209,14 @@ class HouseholdViewTest(BaseTest):
             'resident_since_month':'5',
             'time_measure' : 'Years',
             'uid': '2',
-            'size':'5',
-            'has_children':'True',
-            'has_children_below_5':'True',
-            'aged_between_5_12_years':'0',
-            'aged_between_13_17_years':'1',
-            'aged_between_0_5_months':'0',
-            'aged_between_6_11_months':'0',
-            'aged_between_12_23_months':'0',
-            'aged_between_24_59_months':'0',
-            'total_below_5':'0',
-            'has_women':'True',
-            'aged_between_15_19_years':'0',
-            'aged_between_20_49_years':'1'
         }
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(uid=form_data['uid'])
-        children = Children.objects.filter(aged_between_13_17_years=form_data['aged_between_13_17_years'])
         self.failIf(hHead)
         self.failIf(household)
-        self.failIf(children)
 
         form_with_invalid_data= form_data
-        form_with_invalid_data['has_children'] = False
+        form_with_invalid_data['age'] = -20
 
         response = self.client.post('/households/new/', data=form_with_invalid_data)
         self.failUnlessEqual(response.status_code, 200)
@@ -263,10 +224,8 @@ class HouseholdViewTest(BaseTest):
 
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(uid=form_data['uid'])
-        children = Children.objects.filter(aged_between_13_17_years=form_data['aged_between_13_17_years'])
         self.failIf(hHead)
         self.failIf(household)
-        self.failIf(children)
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/households/new/')

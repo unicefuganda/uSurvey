@@ -5,13 +5,12 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.decorators import login_required, permission_required
 
 from rapidsms.contrib.locations.models import *
 from survey.forms.householdHead import *
-from survey.forms.children import *
 from survey.forms.household import *
 from survey.views.location_widget import LocationWidget
-from django.contrib.auth.decorators import login_required, permission_required
 from survey.views.views_helper import contains_key
 
 
@@ -58,13 +57,11 @@ def create_household(householdform, investigator, valid):
 
 def create_remaining_modelforms(householdform, valid):
     if valid['household']:
-        remaining_keys = ['children','householdHead']
-        for key in remaining_keys:
-            householdform[key].instance.household = householdform['household'].instance
-            is_valid_form = householdform[key].is_valid()
-            if is_valid_form:
-                householdform[key].save()
-                valid[key] = True
+        householdform['householdHead'].instance.household = householdform['household'].instance
+        is_valid_form = householdform['householdHead'].is_valid()
+        if is_valid_form:
+            householdform['householdHead'].save()
+            valid['householdHead'] = True
     return valid
 
 def delete_created_modelforms(householdform, valid):
@@ -87,17 +84,11 @@ def _process_form(householdform, investigator, request):
 def set_household_form(data):
     householdform = {}
     householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
-    householdform['children'] = ChildrenForm(data=data, auto_id='household-children-%s', label_suffix='')
     householdform['household'] = HouseholdForm(data=data, auto_id='household-%s', label_suffix='')
     return householdform
 
 def create(request, selected_location):
-    defaults = {"aged_between_0_5_months": 0, "aged_between_6_11_months": 0,
-                "aged_between_12_23_months": 0, "aged_between_24_59_months": 0,
-                'aged_between_5_12_years':0, 'aged_between_13_17_years':0,
-                'aged_between_15_19_years': 0, 'aged_between_20_49_years': 0}
-    params = dict(defaults.items() + request.POST.items())
-    householdform = set_household_form(data=params)
+    householdform = set_household_form(data=request.POST)
     posted_locations = selected_location.get_descendants(include_self=True)
     investigator, investigator_form = validate_investigator(request, householdform['household'], posted_locations)
     response = _process_form(householdform, investigator, request)

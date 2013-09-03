@@ -356,14 +356,6 @@ class HouseholdHead(BaseModel):
     resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
 
 
-class Children(BaseModel):
-    household = models.OneToOneField(Household, null=True, related_name="children")
-    aged_between_5_12_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many children are aged 5-12 years?")
-    aged_between_13_17_years = models.PositiveIntegerField(blank=False, default=0, verbose_name="13-17 years?")
-    aged_between_0_5_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="How many of these children are aged 0-5 months?")
-    aged_between_6_11_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="6-11 months?")
-    aged_between_12_23_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="12-23 months?")
-    aged_between_24_59_months = models.PositiveIntegerField(blank=False, default=0, verbose_name="24-59 months?")
 
 
 class Batch(BaseModel):
