@@ -36,3 +36,11 @@ class EditHouseholdMemberPage(PageObject):
     def fill_valid_member_values(self,data):
         self.browser.fill_form(data)
 
+class DeleteHouseholdMemberPage(PageObject):
+    def __init__(self, browser, household,member):
+        self.browser = browser
+        self.household = household
+        self.member = member
+        self.url = '/households/%d/member/%d/delete/' % (household.id,member.id)
+
+

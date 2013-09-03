@@ -1,7 +1,9 @@
 from datetime import date, datetime
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.test.client import Client
 from lettuce.django import django_url
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.householdMember import HouseholdMemberForm
 from survey.models import Investigator, Backend, Household, HouseholdMember
 from django.contrib.auth.models import User
@@ -10,12 +12,20 @@ from survey.tests.base_test import BaseTest
 
 class HouseholdMemberViewsTest(BaseTest):
     def setUp(self):
-        self.client = Client()
+        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        some_group = Group.objects.create(name='some group')
+        auth_content = ContentType.objects.get_for_model(Permission)
+        permission, out = Permission.objects.get_or_create(codename='can_view_households', content_type=auth_content)
+        some_group.permissions.add(permission)
+        some_group.user_set.add(raj)
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_households')
+
+        self.client = Client()
         self.client.login(username='Rajni', password='I_Rock')
-        
-        uganda = Location.objects.create(name="Uganda")
+
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
         investigator = Investigator.objects.create(name="inv1", location=uganda,
                                                    backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=investigator)
@@ -116,7 +126,7 @@ class HouseholdMemberViewsTest(BaseTest):
         self.assertEqual(updated_member.name,form_data['name'])
         self.assertEqual(updated_member.date_of_birth,form_data['date_of_birth'])
         self.assertFalse(updated_member.male)
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, expected_url='/households/', status_code=302, target_status_code=200, msg_prefix='')
 
     def test_should_show_successfully_edited_on_post_if_valid_information(self):
         form_data = {'name': 'new_name',
@@ -134,3 +144,18 @@ class HouseholdMemberViewsTest(BaseTest):
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/households/%d/member/new/' % int(self.household.id))
         self.assert_restricted_permission_for('/households/%d/member/%d/edit/' % (int(self.household.id), int(self.household_member.id)))        
+
+    def test_should_delete_member_from_houshold(self):
+        response = self.client.get(
+            '/households/%d/member/%d/delete/' % (int(self.household.id), int(self.household_member.id)))
+
+        self.assertRedirects(response, expected_url='/households/', status_code=302, target_status_code=200, msg_prefix='')
+
+
+        deleted_member = HouseholdMember.objects.filter(id=self.household_member.id)
+        self.failIf(deleted_member)
+
+        success_message = "Household member successfully deleted."
+
+        self.assertTrue(success_message in response.cookies['messages'].value)
+

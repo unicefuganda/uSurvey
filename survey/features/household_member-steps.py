@@ -1,9 +1,6 @@
-from django.template.defaultfilters import slugify
-from datetime import date
 from lettuce import *
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.features.page_objects.household_member import NewHouseholdMemberPage, EditHouseholdMemberPage
-from survey.models import Household, Investigator, HouseholdMember
+from survey.models import Household, HouseholdMember
 
 @step(u'And I have a household')
 def and_i_have_a_household(step):
@@ -61,8 +58,6 @@ def and_i_edit_member_related_fields(step):
             'male': False
     }
     world.page.fill_valid_member_values(data)
-
-
 
 @step(u'Then I should see member successfully edited message')
 def then_i_should_see_member_successfully_edited_message(step):

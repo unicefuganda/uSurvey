@@ -41,3 +41,11 @@ def edit(request, household_id, member_id):
 
     return render(request, 'household_member/new.html',
                   {'member_form': member_form, 'button_label': 'Save'})
+
+def delete(request, household_id, member_id):
+    member = HouseholdMember.objects.get(id=member_id, household__id=household_id)
+
+    member.delete()
+
+    messages.success(request, 'Household member successfully deleted.')
+    return HttpResponseRedirect('/households/')
