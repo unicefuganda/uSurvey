@@ -39,3 +39,12 @@ Feature: Group features
     And I click the save button
     Then I should see the condition was saved successfully
     And I should see the new condition in the groups form
+
+  Scenario: Create a group with multiple conditions
+    Given I am logged in as researcher
+    And I have 2 conditions
+    And I visit the new group page
+    When I fll name and order
+    And I select conditions
+    And I click save button
+    Then I should see that the group was saved successfully
