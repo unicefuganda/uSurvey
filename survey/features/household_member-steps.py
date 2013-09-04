@@ -1,7 +1,8 @@
 from lettuce import *
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.features.page_objects.household_member import NewHouseholdMemberPage, EditHouseholdMemberPage
-from survey.models import Household, HouseholdMember, Investigator
+from survey.features.page_objects.household_member import NewHouseholdMemberPage, EditHouseholdMemberPage, DeleteHouseholdMemberPage
+from survey.features.page_objects.households import HouseholdDetailsPage
+from survey.models import Household, HouseholdMember, Investigator, HouseholdHead
 
 
 @step(u'And I have a household')
@@ -10,6 +11,8 @@ def and_i_have_a_household(step):
     world.kampala = Location.objects.create(name='Kampala', type = district)
     world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.kampala)
     world.household = Household.objects.create(investigator=world.investigator, uid=4)
+    HouseholdHead.objects.create(household=world.household, surname="Test", first_name="User", age=30, male=True,
+                                 occupation='Agricultural labor', level_of_education='Primary', resident_since_year=2013, resident_since_month=2)
 
 
 @step(u'And I visit new household member page')
@@ -64,3 +67,22 @@ def and_i_edit_member_related_fields(step):
 @step(u'Then I should see member successfully edited message')
 def then_i_should_see_member_successfully_edited_message(step):
     world.page.is_text_present('Household member successfully edited.')
+
+
+@step(u'And I visit that household details page')
+def and_i_visit_that_household_details_page(step):
+    world.page = HouseholdDetailsPage(world.browser, world.household)
+    world.page.visit()
+
+@step(u'And I click delete member')
+def and_i_click_delete_member(step):
+    world.page.click_link_by_text('Delete')
+
+@step(u'Then I should see a confirmation modal')
+def then_i_should_see_a_confirmation_modal(step):
+    world.page = DeleteHouseholdMemberPage(world.browser, world.household, world.household_member)
+    world.page.see_delete_confirmation_modal()
+
+@step(u'Then that member is successfully deleted')
+def then_that_member_is_successfully_deleted(step):
+    world.page.see_success_message('Household member', 'deleted')

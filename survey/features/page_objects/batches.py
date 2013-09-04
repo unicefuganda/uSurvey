@@ -99,4 +99,4 @@ class BatchListPage(PageObject):
         self.browser.click_link_by_text(text)
 
     def see_confirm_delete_message(self,batch_name):
-        self.browser.is_text_present("Confirm: Are you sure you want to delete %s?" % batch_name)
+        self.is_text_present("Confirm: Are you sure you want to delete %s?" % batch_name)

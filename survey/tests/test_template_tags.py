@@ -1,3 +1,4 @@
+from datetime import date
 from django.test import TestCase
 from survey.templatetags.template_tags import *
 
@@ -24,3 +25,15 @@ class TemplateTagsTest(TestCase):
         self.assertEqual(get_location(location_dict, 'Country'), country_name)
         self.assertEqual(get_location(location_dict, 'District'), district_name)
         self.assertEqual(get_location(location_dict, 'County'), "")
+
+    def test_should_know_how_to_format_date(self):
+        date_entered = date(2008, 4, 5)
+        date_expected = "Apr 05, 2008"
+        self.assertEqual(format_date(date_entered), date_expected)
+
+    def test_shoud_return_months_given_month_number(self):
+        self.assertEqual('January', get_month(0))
+        self.assertEqual('March', get_month(2))
+        self.assertEqual('N/A', get_month(None))
+        self.assertEqual('N/A', get_month(''))
+

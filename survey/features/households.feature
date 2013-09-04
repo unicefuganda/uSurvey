@@ -16,6 +16,13 @@ Feature: Households feature
        And I fill all necessary fields
        And I submit the form
        Then I should see that the household is created
+       And I have a member for that household
+       And I visit households listing page
+       And then I click on that household ID
+       Then I should see household member title and add household member link
+       And I should see that household details, its head and members
+       And I should see actions edit and delete member
+
 
     Scenario: Create a household with other-specify occupation
         Given I am logged in as researcher

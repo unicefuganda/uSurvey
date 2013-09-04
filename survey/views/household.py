@@ -153,3 +153,7 @@ def list_households(request):
         messages.error(request, "There are  no households currently registered  for this %s." % location_type)
     return render(request, 'households/index.html',
                   {'households': households, 'location_data': LocationWidget(selected_location), 'request': request})
+
+def view_household(request, household_id):
+    household = Household.objects.get(id=household_id)
+    return render(request, 'households/show.html', {'household': household})

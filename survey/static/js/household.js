@@ -49,4 +49,13 @@ jQuery(function($){
     }
   });
 
+  $('#household-extra_resident_since_month').on('change', function(){
+    $('#household-resident_since_month').val($(this).val());
+  });
+
+  $('#household-extra_resident_since_year').on('change', function(){
+        $('#household-resident_since_year').val($(this).val());
+    });
+
+
 });

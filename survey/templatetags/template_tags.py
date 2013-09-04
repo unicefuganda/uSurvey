@@ -1,4 +1,5 @@
 from django import template
+from survey.investigator_configs import MONTHS
 
 register = template.Library()
 
@@ -43,3 +44,13 @@ def display_list(list):
 @register.filter
 def get_location(location_dict, key):
     return location_dict.get(key, "")
+
+@register.filter
+def get_month(index):
+    if not str(index).isdigit() and not index :
+        return "N/A"
+    return MONTHS[int(index)][1]
+
+@register.filter
+def format_date(date):
+    return date.strftime("%b %d, %Y")

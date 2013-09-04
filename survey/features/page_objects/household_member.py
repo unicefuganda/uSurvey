@@ -43,4 +43,7 @@ class DeleteHouseholdMemberPage(PageObject):
         self.member = member
         self.url = '/households/%d/member/%d/delete/' % (household.id,member.id)
 
+    def see_delete_confirmation_modal(self):
+        self.is_text_present("Confirm: Are you sure you want to delete %s?" % self.member.name)
+
 

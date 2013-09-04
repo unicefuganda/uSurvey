@@ -5,7 +5,7 @@ from django.test.client import Client
 from lettuce.django import django_url
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.householdMember import HouseholdMemberForm
-from survey.models import Investigator, Backend, Household, HouseholdMember
+from survey.models import Investigator, Backend, Household, HouseholdMember, HouseholdHead
 from django.contrib.auth.models import User
 from survey.tests.base_test import BaseTest
 
@@ -29,6 +29,8 @@ class HouseholdMemberViewsTest(BaseTest):
         investigator = Investigator.objects.create(name="inv1", location=uganda,
                                                    backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=investigator, uid=0)
+        HouseholdHead.objects.create(household=self.household, surname="Test", first_name="User", age=30, male=True,
+                                     occupation='Agricultural labor', level_of_education='Primary', resident_since_year=2013, resident_since_month=2)
         self.household_member = HouseholdMember.objects.create(name='member1', date_of_birth=(date(2013, 8, 30)),
                                                                male=True,
                                                                household=self.household)
@@ -52,6 +54,7 @@ class HouseholdMemberViewsTest(BaseTest):
         response = self.client.post('/households/%d/member/new/' % int(self.household.id), data=form_data)
 
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, expected_url='/households/%d/'%(self.household.id), status_code=302, target_status_code=200, msg_prefix='')
 
     def test_new_should_create_new_member_on_post_who_belongs_to_household_selected(self):
         form_data = {'name': 'xyz',
@@ -126,7 +129,7 @@ class HouseholdMemberViewsTest(BaseTest):
         self.assertEqual(updated_member.name,form_data['name'])
         self.assertEqual(updated_member.date_of_birth,form_data['date_of_birth'])
         self.assertFalse(updated_member.male)
-        self.assertRedirects(response, expected_url='/households/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, expected_url='/households/%d/'%(self.household.id), status_code=302, target_status_code=200, msg_prefix='')
 
     def test_should_show_successfully_edited_on_post_if_valid_information(self):
         form_data = {'name': 'new_name',
@@ -149,7 +152,7 @@ class HouseholdMemberViewsTest(BaseTest):
         response = self.client.get(
             '/households/%d/member/%d/delete/' % (int(self.household.id), int(self.household_member.id)))
 
-        self.assertRedirects(response, expected_url='/households/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, expected_url='/households/%d/'%(self.household.id), status_code=302, target_status_code=200, msg_prefix='')
 
 
         deleted_member = HouseholdMember.objects.filter(id=self.household_member.id)

@@ -18,13 +18,10 @@
             <thead>
             <tr>
                 <th>
+                    Household ID
+                </th>
+                <th>
                     Household Head
-                </th>
-                <th>
-                    Age
-                </th>
-                <th>
-                    Gender
                 </th>
                 <th>
                     District
@@ -50,17 +47,10 @@
             {% for household in households %}
                 <tr>
                     <td>
+                        <a href="{% url 'view_household_page' household.id %}">{{ household.uid }}</a>
+                    </td>
+                    <td>
                         {{ household.head.firstname|capfirst }} {{ household.head.surname|capfirst }}
-                    </td>
-                    <td>
-                        {{ household.head.age }}
-                    </td>
-                    <td>
-                        {% if household.head.male %}
-                            Male
-                        {% else %}
-                            Female
-                        {% endif %}
                     </td>
                     <td>
                         {{ household.related_locations|get_location:"District" }}

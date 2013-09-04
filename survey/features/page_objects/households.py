@@ -1,6 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.base import PageObject
+from survey.investigator_configs import MONTHS
 from survey.models import Investigator
 
 
@@ -14,7 +15,7 @@ class NewHouseholdPage(PageObject):
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
 
-    def get_investigator_values(self):
+    def get_household_values(self):
         return self.values
 
     def fill_valid_values(self):
@@ -23,6 +24,7 @@ class NewHouseholdPage(PageObject):
             'surname': self.random_text('house'),
             'first_name': self.random_text('ayoyo'),
             'age': '25',
+            'uid':'2'
         }
         self.browser.fill_form(self.values)
         kampala = Location.objects.get(name="Kampala")
@@ -90,14 +92,59 @@ class NewHouseholdPage(PageObject):
             assert len(extra) == 0
 
 
+class HouseholdDetailsPage(PageObject):
+    def __init__(self, browser, household):
+        self.browser = browser
+        self.household = household
+        self.url = '/households/' + str(household.id) + '/'
+
+
+    def validate_household_details(self):
+        details = {
+            'Family Name': self.household.head.surname,
+            'Other Names': self.household.head.first_name,
+            'Age': str(self.household.head.age),
+            'Gender': 'Male' if self.household.head.male else 'Female',
+            'Occupation / Main Livelihood': self.household.head.occupation,
+            'Highest level of education completed': self.household.head.level_of_education,
+            'Since when have you lived here': str(self.household.head.resident_since_year),
+            }
+        for label, text in details.items():
+            self.is_text_present(label)
+            self.is_text_present(text)
+        self.is_text_present(MONTHS[self.household.head.resident_since_month][1])
+
+    def validate_household_member_details_table_headings(self):
+        member_details_headings =['Name', 'Date of birth', 'Sex']
+        for heading in member_details_headings:
+            self.is_text_present(heading)
+
+    def validate_household_member_details_values(self):
+        for member in self.household.household_member.all():
+            for detail in [member.name, member.date_of_birth.strftime('%b %d, %Y'), 'Male' if member.male else 'Female']:
+                self.is_text_present(str(detail))
+
+    def validate_household_member_details(self):
+        self.validate_household_member_details_table_headings()
+        self.validate_household_member_details_values()
+
+    def validate_household_member_title_and_add_household_member_link(self):
+        self.is_text_present('Household Members:')
+        self.browser.find_link_by_text('Add Member')
+
+    def validate_actions_edit_and_delete_member(self):
+        self.is_text_present('Actions')
+        self.browser.find_link_by_text('Edit')
+        self.browser.find_link_by_text('Delete')
+
+
 class HouseholdsListPage(PageObject):
     url = '/households/'
 
     def validate_fields(self):
         assert self.browser.is_text_present('Households List')
+        assert self.browser.is_text_present('Household ID')
         assert self.browser.is_text_present('Household Head')
-        assert self.browser.is_text_present('Age')
-        assert self.browser.is_text_present('Gender')
         assert self.browser.is_text_present('District')
         assert self.browser.is_text_present('County')
         assert self.browser.is_text_present('Sub County')

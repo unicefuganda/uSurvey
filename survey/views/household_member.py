@@ -20,7 +20,7 @@ def new(request, household_id):
                 household_member.household = household
                 household_member.save()
                 messages.success(request, 'Household member successfully created.')
-                return HttpResponseRedirect('/households/')
+                return HttpResponseRedirect('/households/%s/'%(str(household_id)))
     except Household.DoesNotExist:
         messages.error(request, 'There are  no households currently registered  for this ID.')
         return HttpResponseRedirect('/households/')
@@ -37,7 +37,7 @@ def edit(request, household_id, member_id):
         if member_form.is_valid():
             member_form.save()
             messages.success(request, 'Household member successfully edited.')
-            return HttpResponseRedirect('/households/')
+            return HttpResponseRedirect('/households/%s/'%(str(household_id)))
 
     return render(request, 'household_member/new.html',
                   {'member_form': member_form, 'button_label': 'Save'})
@@ -48,4 +48,4 @@ def delete(request, household_id, member_id):
     member.delete()
 
     messages.success(request, 'Household member successfully deleted.')
-    return HttpResponseRedirect('/households/')
+    return HttpResponseRedirect('/households/%s/'%(str(household_id)))

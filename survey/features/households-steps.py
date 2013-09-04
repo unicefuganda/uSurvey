@@ -2,11 +2,13 @@
 from lettuce import *
 from page_objects import *
 from random import randint
-from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage
+from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage, HouseholdDetailsPage
 from survey.features.page_objects.root import HomePage
 from survey.models import *
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
+from datetime import date
+
 
 @step(u'And I visit new household page')
 def and_i_visit_new_household_page(step):
@@ -24,6 +26,7 @@ def and_i_have_an_investigator_in_that_location(step):
 
 @step(u'Then I should see that the household is created')
 def then_i_should_see_that_the_household_is_created(step):
+    world.household_uid = world.page.get_household_values()['uid']
     world.page.validate_household_created()
 
 @step(u'And I click No to has children')
@@ -149,3 +152,27 @@ def and_i_click_households_option(step):
 def and_i_select_list_households(step):
     world.page.click_link_by_text("List all households")
     world.page=HouseholdsListPage(world.browser)
+
+@step(u'And then I click on that household ID')
+def and_when_i_click_on_that_household_id(step):
+    world.page.click_link_by_text(world.household_uid)
+
+@step(u'And I should see that household details, its head and members')
+def and_i_should_see_that_household_details_its_head_and_members(step):
+    world.page.validate_household_details()
+    world.page.validate_household_member_details()
+
+@step(u'And I have a member for that household')
+def and_i_have_a_member_for_that_household(step):
+    world.household = Household.objects.get(uid=world.household_uid)
+    fields_data = dict(name='xyz', male=True, date_of_birth=date(1980, 05, 01), household=world.household)
+    HouseholdMember.objects.create(**fields_data)
+
+@step(u'Then I should see household member title and add household member link')
+def then_i_should_see_household_member_title_and_add_household_member_link(step):
+    world.page = HouseholdDetailsPage(world.browser, world.household)
+    world.page.validate_household_member_title_and_add_household_member_link()
+
+@step(u'And I should see actions edit and delete member')
+def and_i_should_see_actions_edit_and_delete_member(step):
+    world.page.validate_actions_edit_and_delete_member()

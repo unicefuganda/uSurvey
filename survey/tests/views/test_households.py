@@ -338,3 +338,26 @@ class HouseholdViewTest(BaseTest):
 
         self.assertEqual(household_location, response.context['households'][0].related_locations)
 
+
+class  ViewHouseholdDetailsTest(BaseTest):
+
+        def test_view_household_details(self):
+            client = Client()
+
+            country = LocationType.objects.create(name="Country", slug=slugify("country"))
+            city = LocationType.objects.create(name="City", slug=slugify("city"))
+            uganda = Location.objects.create(name="Uganda", type=country)
+            kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+            investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
+
+            household = Household.objects.create(investigator=investigator, uid=0)
+            HouseholdHead.objects.create(surname='Bravo', household=household, first_name='Test', age=30, male=True, occupation='Agricultural labor',
+                                         level_of_education='Primary', resident_since_year=2000, resident_since_month=7)
+
+            household_member = HouseholdMember.objects.create(household=household, name='Test Member', male=True, date_of_birth=date(2000, 8, 20))
+            response = client.get('/households/%d/'% int(household.id))
+
+            self.failUnlessEqual(response.status_code, 200)
+            templates = [template.name for template in response.templates]
+            self.assertIn('households/show.html', templates)
+            self.assertEquals(response.context['household'], household)
