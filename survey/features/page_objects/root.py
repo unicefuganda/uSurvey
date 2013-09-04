@@ -38,11 +38,6 @@ class BulkSMSPage(PageObject):
         self.message = message
         self.fill('text', message)
 
-    def select_locations(self, *locations):
-        for location in locations:
-            script = "$('#bulk-sms-locations').multiSelect('select', '%s')" % location.pk
-            self.browser.execute_script(script)
-
     def is_message_sent(self):
         self.is_text_present("Your message has been sent to investigators.")
         for investgator in Investigator.objects.all():

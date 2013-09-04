@@ -24,7 +24,7 @@ def and_i_compose_a_sms_to_send(step):
 
 @step(u'And I select the districts')
 def and_i_select_the_districts(step):
-    world.page.select_locations(world.kampala, world.abim)
+    world.page.select_multiple('#bulk-sms-locations',world.kampala, world.abim)
 
 @step(u'And I click send')
 def and_i_click_send(step):
