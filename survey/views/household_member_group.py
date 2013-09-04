@@ -69,9 +69,11 @@ def _process_condition_form(request):
 def _process_groupform(request, group_form):
     if group_form.is_valid() and has_valid_condition(request.POST):
         group = group_form.save()
-        group_mapping_form = GroupConditionMappingForm(
-            {'household_member_group': group.id, 'group_condition': request.POST['condition']})
-        group_mapping_form.save()
+        params = dict(request.POST)
+        for condition in params['condition']:
+            group_mapping_form = GroupConditionMappingForm(
+                {'household_member_group': group.id, 'group_condition':condition })
+            group_mapping_form.save()
         messages.success(request, 'Group successfully added.')
         return HttpResponseRedirect("/groups/")
 

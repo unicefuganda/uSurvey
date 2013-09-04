@@ -12,4 +12,4 @@ $(".modal-body button[name='save_condition_button']").on('click', function(e){
        });
 
        return false;
-});   
+});

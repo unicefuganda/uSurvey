@@ -181,3 +181,21 @@ class HouseholdMemberGroupTest(BaseTest):
         data = "%s > %s > %s" % (condition.attribute, condition.condition, condition.value)
         expected = '{"id": %s, "value": "%s"}' % (condition.id, data)
         self.assertEquals(str(expected),response.content)
+        
+    def test_save_multiple_conditions(self):
+        hmg_1 = GroupCondition.objects.create(value="some string")
+        hmg_2 = GroupCondition.objects.create(value="some string")
+        print hmg_1.id
+        print hmg_2.id
+        data = {'name': 'aged between 15 and 49',
+                'order': 1,
+                'condition': [hmg_1.id, hmg_2.id]}
+
+        self.failIf(HouseholdMemberGroup.objects.filter(name=data['name'], order=data['order']))
+        response = self.client.post('/groups/new/', data=data)
+        retrieved_group = HouseholdMemberGroup.objects.filter(name=data['name'], order=data['order'])
+        self.assertEquals(1, len(retrieved_group))
+        associated_conditions = retrieved_group[0].conditions.all()
+        self.assertEquals(2, len(associated_conditions))
+        
+        
