@@ -3,7 +3,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from survey.models import GroupCondition, HouseholdMemberGroup
 from survey.forms.group_condition import GroupConditionForm
-from survey.forms.group_condition_mapping import GroupConditionMappingForm
 from survey.forms.household_member_group import HouseholdMemberGroupForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
@@ -35,13 +34,14 @@ def add_condition(request):
     condition_form = GroupConditionForm()
 
     if request.is_ajax():
-        _process_condition_form(request)
+        condition_form = GroupConditionForm(data=request.POST)
+        _process_condition_form(request, condition_form)
         conditions = _get_conditions_hash()
         return HttpResponse(json.dumps(conditions), mimetype='application/json')
 
     elif request.method == 'POST':
-        _process_condition_form(request)
-        response = HttpResponseRedirect("/conditions/")
+        condition_form = GroupConditionForm(data=request.POST)
+        response = _process_condition_form(request, condition_form)
 
     context = {'button_label': 'Save',
                'title': 'New condition',
@@ -49,41 +49,41 @@ def add_condition(request):
                'action': '/conditions/new/',
                'request': request,
                'condition_form': condition_form}
+
     return response or render(request, 'household_member_groups/conditions/new.html', context)
 
 
 def has_valid_condition(data):
-    if contains_key(data, 'condition'):
-        corresponding_condition = GroupCondition.objects.filter(id=int(data['condition']))
+    if contains_key(data, 'conditions'):
+        corresponding_condition = GroupCondition.objects.filter(id=int(data['conditions']))
         return corresponding_condition
     return False
 
 
-def _process_condition_form(request):
-    condition_form = GroupConditionForm(data=request.POST)
+def _process_condition_form(request, condition_form):
     if condition_form.is_valid():
         condition_form.save()
         messages.success(request, 'Condition successfully added.')
+        return HttpResponseRedirect('/conditions/')
 
 
 def _process_groupform(request, group_form):
+
     if group_form.is_valid() and has_valid_condition(request.POST):
-        group = group_form.save()
-        params = dict(request.POST)
-        for condition in params['condition']:
-            group_mapping_form = GroupConditionMappingForm(
-                {'household_member_group': group.id, 'group_condition':condition })
-            group_mapping_form.save()
+        group_form.save()
         messages.success(request, 'Group successfully added.')
         return HttpResponseRedirect("/groups/")
 
 
 def add_group(request):
+    params = request.POST
     response = None
+    group_form = HouseholdMemberGroupForm()
+
     if request.method == 'POST':
-        group_form = HouseholdMemberGroupForm(data=request.POST)
+        group_form = HouseholdMemberGroupForm(params)
         response = _process_groupform(request, group_form)
-    context = {'groups_form': HouseholdMemberGroupForm(),
+    context = {'groups_form': group_form,
                'conditions': GroupCondition.objects.all(),
                'title': "New Group",
                'button_label': 'Save',

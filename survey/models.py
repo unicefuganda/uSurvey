@@ -803,7 +803,7 @@ class Formula(BaseModel):
 
 class HouseholdMemberGroup(BaseModel):
     name = models.CharField(max_length=50)
-    order = models.IntegerField(max_length=5, null=False, blank=False, unique=True, default=0)
+    order = models.PositiveIntegerField(max_length=5, null=False, blank=False, unique=True, default=0)
 
 
 class GroupCondition(BaseModel):
@@ -814,12 +814,10 @@ class GroupCondition(BaseModel):
     }
 
     value = models.CharField(max_length=50)
-    attribute = models.CharField(max_length=20, null=False)
-    condition = models.CharField(max_length=20, null=False, default='EQUALS', choices=CONDITIONS.items())
+    attribute = models.CharField(max_length=20)
+    condition = models.CharField(max_length=20, default='EQUALS', choices=CONDITIONS.items())
+    groups = models.ManyToManyField(HouseholdMemberGroup, related_name='conditions')
 
-class GroupConditionMaping(BaseModel):
-    household_member_group = models.ForeignKey(HouseholdMemberGroup, related_name='conditions')
-    group_condition = models.ForeignKey(GroupCondition, related_name='household_member_groups')
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)

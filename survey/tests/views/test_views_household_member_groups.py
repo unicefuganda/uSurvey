@@ -1,11 +1,9 @@
-from django.test import TestCase
 from django.test.client import Client
 from survey.models import GroupCondition, HouseholdMemberGroup
 from survey.forms.group_condition import GroupConditionForm
 from survey.forms.household_member_group import HouseholdMemberGroupForm
 from mock import patch
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User
 from survey.tests.base_test import BaseTest
 from survey.views.household_member_group import has_valid_condition
 
@@ -106,9 +104,10 @@ class HouseholdMemberGroupTest(BaseTest):
     @patch('django.contrib.messages.success')
     def test_add_group_post(self, mock_success):
         hmg_1 = GroupCondition.objects.create(value="some string")
+        hmg_2 = GroupCondition.objects.create(value="some string")
         data = {'name': 'aged between 15 and 49',
                 'order': 1,
-                'condition': hmg_1.id}
+                'conditions': hmg_1.id}
 
         self.failIf(HouseholdMemberGroup.objects.filter(name=data['name'], order=data['order']))
         response = self.client.post('/groups/new/', data=data)
@@ -116,7 +115,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertEquals(1, len(retrieved_group))
         associated_conditions = retrieved_group[0].conditions.all()
         self.assertEquals(1, len(associated_conditions))
-        self.assertEquals(hmg_1, associated_conditions[0].group_condition)
+        self.assertEquals(hmg_1, associated_conditions[0])
 
         self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')
         assert mock_success.called
@@ -126,7 +125,7 @@ class HouseholdMemberGroupTest(BaseTest):
         some_irrelevant_number = '1'
         data = {'name': 'aged between 15 and 49',
                 'order': 1,
-                'condition': some_irrelevant_number}
+                'conditions': some_irrelevant_number}
 
         response = self.client.post('/groups/new/', data=data)
         self.assertEqual(200, response.status_code)
@@ -138,7 +137,7 @@ class HouseholdMemberGroupTest(BaseTest):
         some_irrelevant_number = '1'
         data = {'name': 'aged between 15 and 49',
                 'order': 1,
-                'condition': hmg_1.id}
+                'conditions': [hmg_1.id]}
         group = HouseholdMemberGroup.objects.create(name=data['name'], order=data['order'])
         self.failUnless(group.id)
         response = self.client.post('/groups/new/', data=data)
@@ -148,7 +147,7 @@ class HouseholdMemberGroupTest(BaseTest):
 
     def test_has_valid_condition_successes(self):
         condition = GroupCondition.objects.create(condition="EQUALS")
-        self.assertTrue(has_valid_condition({'condition': str(condition.id)}))
+        self.assertTrue(has_valid_condition({'conditions': str(condition.id)}))
 
     def test_has_valid_condition_fails_when_there_is_no_corresponding_condition(self):
         some_invalid_condition_id = '1'
@@ -168,7 +167,7 @@ class HouseholdMemberGroupTest(BaseTest):
                 'value': 'kant'}
 
         self.failIf(GroupCondition.objects.filter(**data))
-        response = self.client.post('/conditions/new/', data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.client.post('/conditions/new/', data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.failUnless(GroupCondition.objects.filter(**data))
 
     def test_ajax_call_should_return_condition_list_in_context(self):
@@ -185,17 +184,15 @@ class HouseholdMemberGroupTest(BaseTest):
     def test_save_multiple_conditions(self):
         hmg_1 = GroupCondition.objects.create(value="some string")
         hmg_2 = GroupCondition.objects.create(value="some string")
-        print hmg_1.id
-        print hmg_2.id
         data = {'name': 'aged between 15 and 49',
-                'order': 1,
-                'condition': [hmg_1.id, hmg_2.id]}
+                'order': '2',
+                'conditions': [int(hmg_1.id), int(hmg_2.id)]}
 
         self.failIf(HouseholdMemberGroup.objects.filter(name=data['name'], order=data['order']))
-        response = self.client.post('/groups/new/', data=data)
+        self.client.post('/groups/new/', data=data)
         retrieved_group = HouseholdMemberGroup.objects.filter(name=data['name'], order=data['order'])
         self.assertEquals(1, len(retrieved_group))
         associated_conditions = retrieved_group[0].conditions.all()
         self.assertEquals(2, len(associated_conditions))
-        
-        
+        self.assertIn(hmg_1, associated_conditions)
+        self.assertIn(hmg_2, associated_conditions)

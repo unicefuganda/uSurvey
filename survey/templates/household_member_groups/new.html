@@ -2,24 +2,7 @@
 {% block title %} {{ title }} {% endblock %}
 {% block display_form_fields %}
   {% include "naked_form.html" with a_form=groups_form %}
-  <div class="control-group">
-  <label class="control-label" for="condition">Condition</label>
-  <div class="controls">
-    <select id="condition"  name="condition" required="required" class="multi-select" multiple="multiple">
-      {% for condition in conditions %}
-        <option  value="{{ condition.pk }}">{{ condition.attribute }} >> {{ condition.condition }} >> {{ condition.value}}</option>
-      {% endfor %}
-    </select>
-     <label class="error">
-      {% if condition.errors %}
-          {% for error in condition.errors %}
-              {{ error}}
-          {% endfor %}
-      {% endif %}
-       </label>
-       <a href="#new_condition" class="btn btn-primary pull-right" data-toggle="modal"><i class="icon-plus icon-white"></i>Add condition </a>
-  </div>
-  </div>
+       <a href="#new_condition" class="btn btn-primary pull-right" data-toggle="modal" onclick="clear_fields()"><i class="icon-plus icon-white"></i>Add condition </a>
 {% endblock %}
 
 {% block non_form_content %}

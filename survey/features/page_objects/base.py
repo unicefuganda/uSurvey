@@ -3,6 +3,7 @@ from random import randint
 from time import sleep
 from lettuce.django import django_url
 
+
 class PageObject(object):
     def __init__(self, browser):
         self.browser = browser
@@ -31,7 +32,7 @@ class PageObject(object):
 
     def fill_in_with_js(self, jquery_id, object_id):
         script = '%s.val(%s).change(); %s.trigger("liszt:updated").chosen().change()' % (
-        jquery_id, object_id, jquery_id)
+            jquery_id, object_id, jquery_id)
         self.browser.execute_script(script)
         sleep(2)
 
@@ -100,7 +101,7 @@ class PageObject(object):
         self.browser.click_link_by_text("%s" % user.get_full_name())
 
     def assert_user_can_see_profile_and_logout_link(self):
-        links = ["Edit Profile","Change Password","Logout"]
+        links = ["Edit Profile", "Change Password", "Logout"]
         for link in links:
             assert self.browser.find_link_by_partial_text(link)
 
@@ -123,14 +124,14 @@ class PageObject(object):
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
-    def is_radio_selected(self,name,value):
-        js = "$('input[name=%s]:radio').prop('checked')" %name
+    def is_radio_selected(self, name, value):
+        js = "$('input[name=%s]:radio').prop('checked')" % name
         return self.browser.execute_script(js) == value
 
     def see_success_message(self, object_name, action_str):
         self.is_text_present('%s successfully %s.' % (object_name, action_str))
 
-    def select_multiple(self,field_id,*data):
+    def select_multiple(self, field_id=None, *data):
         for item in data:
-            script = "$('%s').multiSelect('select', '%s')" % (field_id,item.pk)
+            script = "$('%s').multiSelect('select', '%s')" % (field_id, item.pk)
             self.browser.execute_script(script)

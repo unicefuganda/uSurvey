@@ -95,8 +95,9 @@ def and_i_visit_the_new_group_page(step):
 def when_i_fill_in_the_group_details(step):
     data = {'name': 'aged between 15 and 49',
             'order': 1,
-            'condition': world.condition.id}
+            }
     world.page.fill_valid_values(data)
+    world.page.select_multiple('#id_conditions', world.condition)
 
 
 @step(u'Then I should see that the group was saved successfully')
@@ -137,7 +138,7 @@ def and_i_have_2_conditions(step):
     world.condition_2 = GroupCondition.objects.create(value=35, attribute="age", condition="EQUALS")
 
 
-@step(u'When I fll name and order')
+@step(u'When I fill name and order')
 def when_i_fll_name_and_order(step):
     data = {'name': 'aged between 15 and 49',
             'order': 1}
@@ -146,4 +147,8 @@ def when_i_fll_name_and_order(step):
 
 @step(u'And I select conditions')
 def and_i_select_conditions(step):
-    world.page.select_multiple('#condition',world.condition_1, world.condition_2)
+    world.page.select_multiple('#id_conditions',world.condition_1, world.condition_2)
+
+@step(u'Then I should see the form errors of required fields')
+def then_i_should_see_the_form_errors_of_required_fields(step):
+    world.page.is_text_present("This field is required.")
