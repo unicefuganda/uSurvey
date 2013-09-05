@@ -24,7 +24,7 @@ jQuery(function($){
         .on('change', function(){
             var element = $(this),
                 value = element.val(),
-                url = "/location/" + value + "/children",
+                url = "/locations/" + value + "/children",
                 next_element = get_next_element(element);
             if($.isEmptyObject(value)){
               value = get_previous_element(element).val();
