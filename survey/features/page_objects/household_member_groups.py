@@ -6,21 +6,13 @@ class GroupConditionListPage(PageObject):
     url = '/conditions/'
 
     def validate_fields(self):
-        assert_equals(True, self.browser.is_text_present('Groups Condition List'))
-        assert_equals(True, self.browser.is_text_present('Condition'))
-        assert_equals(True, self.browser.is_text_present('Attribute'))
-        assert_equals(True, self.browser.is_text_present('Value'))
-
+        self.validate_fields_present(["Groups Condition List", "Condition", "Attribute", "Value"])
 
 class GroupsListingPage(PageObject):
     url = '/groups/'
 
     def validate_fields(self):
-        assert_equals(True, self.browser.is_text_present('Groups List'))
-        assert_equals(True, self.browser.is_text_present('Order'))
-        assert_equals(True, self.browser.is_text_present('Group name'))
-        assert_equals(True, self.browser.is_text_present('Actions'))
-
+        self.validate_fields_present(["Groups List", "Order", "Group name", "Actions"])
 
 class AddConditionPage(PageObject):
     url = "/conditions/new/"
@@ -34,10 +26,7 @@ class GroupConditionModalPage(PageObject):
     url = ''
 
     def validate_contents(self):
-        assert_equals(True, self.browser.is_text_present('New Condition'))
-        assert_equals(True, self.browser.is_text_present('Condition'))
-        assert_equals(True, self.browser.is_text_present('Attribute'))
-        assert_equals(True, self.browser.is_text_present('Value'))
+        self.validate_fields_present(["Value", "Attribute", "Condition", "New Condition"])
 
     def click_button(self,name):
         self.browser.find_by_name(name).click()
@@ -50,4 +39,3 @@ class GroupDetailsPage(PageObject):
     def __init__(self, browser, group_id):
         self.browser = browser
         self.url = '/groups/' + str(group_id)
-        

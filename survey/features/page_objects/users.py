@@ -10,10 +10,7 @@ class UsersListPage(PageObject):
         self.is_text_present('Users List')
 
     def validate_displayed_headers(self):
-        self.is_text_present("Full name")
-        self.is_text_present("Role")
-        self.is_text_present("Mobile number")
-        self.is_text_present("Actions")
+        self.validate_fields_present(["Full name", "Role", "Mobile number", "Actions"])
 
     def validate_users_paginated(self):
         self.browser.click_link_by_text("2")

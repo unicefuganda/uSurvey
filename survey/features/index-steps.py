@@ -25,7 +25,7 @@ def clear_screenshots():
 
 
 def open_browser():
-    world.browser = Browser("chrome")
+    world.browser = Browser("phantomjs")
 
 
 @after.each_scenario

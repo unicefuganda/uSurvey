@@ -47,11 +47,8 @@ class InvestigatorsListPage(PageObject):
     url = '/investigators/'
 
     def validate_fields(self):
-        assert self.browser.is_text_present('Investigators List')
-        assert self.browser.is_text_present('Name')
-        assert self.browser.is_text_present('Mobile Number')
-        assert self.browser.is_text_present('Action')
-
+        self.validate_fields_present(["Investigators List", "Name", "Mobile Number", "Action"])
+        
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 

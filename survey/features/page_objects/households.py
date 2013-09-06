@@ -142,16 +142,9 @@ class HouseholdsListPage(PageObject):
     url = '/households/'
 
     def validate_fields(self):
-        assert self.browser.is_text_present('Households List')
-        assert self.browser.is_text_present('Household ID')
-        assert self.browser.is_text_present('Household Head')
-        assert self.browser.is_text_present('District')
-        assert self.browser.is_text_present('County')
-        assert self.browser.is_text_present('Sub County')
-        assert self.browser.is_text_present('Parish')
-        assert self.browser.is_text_present('Village')
-        assert self.browser.is_text_present('Investigator')
-
+        self.validate_fields_present(["Households List", "Household ID", "Household Head", 
+        "District","County", "Sub County", "Parish", "Village", "Investigator"])
+        
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
