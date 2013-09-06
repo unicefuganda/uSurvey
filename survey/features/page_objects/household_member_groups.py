@@ -44,3 +44,10 @@ class GroupConditionModalPage(PageObject):
 
     def validate_latest_condition(self, condition):
         self.browser.find_by_value("%s > %s > %s" % (condition.attribute, condition.condition, condition.value))
+        
+class GroupDetailsPage(PageObject):
+    
+    def __init__(self, browser, group_id):
+        self.browser = browser
+        self.url = '/groups/' + str(group_id)
+        

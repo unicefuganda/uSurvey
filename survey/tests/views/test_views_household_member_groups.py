@@ -196,3 +196,37 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertEquals(2, len(associated_conditions))
         self.assertIn(hmg_1, associated_conditions)
         self.assertIn(hmg_2, associated_conditions)
+        
+    def test_view_conditions_assigned_to_agroup(self):
+        hmg_1 = GroupCondition.objects.create(value="condition1")
+        hmg_2 = GroupCondition.objects.create(value="condition2")
+        hmg_3 = GroupCondition.objects.create(value="condition3")
+        group = HouseholdMemberGroup.objects.create(name='some name', order=1)
+
+        self.failIf(group.conditions.all())
+        hmg_1.groups.add(group)
+        hmg_2.groups.add(group)
+        
+        response = self.client.get('/groups/'+str(group.pk)+'/')
+        self.assertEquals(200, response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn("household_member_groups/conditions/index.html", templates)
+        self.assertIn(hmg_1, response.context['conditions'])
+        self.assertIn(hmg_2, response.context['conditions'])
+        self.assertNotIn(hmg_3, response.context['conditions'])
+        
+    def test_view_returns_no_conditions_message_if_no_conditions_on_a_group(self):
+        group = HouseholdMemberGroup.objects.create(name='some name', order=1)
+
+        self.failIf(group.conditions.all())
+        
+        response = self.client.get('/groups/'+str(group.pk)+'/')
+        self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertTrue("No conditions in this group.", response.cookies['messages'].value)
+        
+    def test_restricted_permissions_for_group_details(self):
+        group = HouseholdMemberGroup.objects.create(name='some name', order=1)
+        self.assert_restricted_permission_for('/groups/'+str(group.pk)+'/')
+
+    def test_restricted_permissions_for_add_group(self):
+        self.assert_restricted_permission_for('/groups/new/')

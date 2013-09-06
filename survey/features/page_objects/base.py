@@ -135,3 +135,7 @@ class PageObject(object):
         for item in data:
             script = "$('%s').multiSelect('select', '%s')" % (field_id, item.pk)
             self.browser.execute_script(script)
+            
+    def validate_fields_present(self, fields):
+        for field in fields:
+            assert self.browser.is_text_present(field)

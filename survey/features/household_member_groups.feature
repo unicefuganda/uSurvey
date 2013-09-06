@@ -56,3 +56,12 @@ Feature: Group features
     And I select conditions
     And I click save button
     Then I should see that the group was saved successfully
+    
+  Scenario: List group details
+    Given I am logged in as researcher
+    And I have a groups
+    And I have 2 conditions
+    And I visit groups listing page
+    And I click the actions button
+    And I click view conditions link
+    Then I should see a list of conditions

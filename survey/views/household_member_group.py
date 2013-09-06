@@ -27,7 +27,6 @@ def _get_conditions_hash():
     return {'id': condition.id,
             'value': "%s > %s > %s" % (condition.attribute, condition.condition, condition.value)}
 
-
 @permission_required('auth.can_view_batches')
 def add_condition(request):
     response = None
@@ -73,8 +72,8 @@ def _process_groupform(request, group_form):
         group_form.save()
         messages.success(request, 'Group successfully added.')
         return HttpResponseRedirect("/groups/")
-
-
+        
+@permission_required('auth.can_view_batches')
 def add_group(request):
     params = request.POST
     response = None
@@ -93,3 +92,11 @@ def add_group(request):
                'condition_title': "New Condition"}
 
     return response or render(request, 'household_member_groups/new.html', context)
+    
+@permission_required('auth.can_view_batches')
+def details(request, group_id):
+    conditions = GroupCondition.objects.filter(groups__id=group_id)
+    if not conditions.exists():
+        messages.error(request, "No conditions in this group.")
+        return HttpResponseRedirect("/groups/")
+    return render(request, "household_member_groups/conditions/index.html", {'conditions': conditions })

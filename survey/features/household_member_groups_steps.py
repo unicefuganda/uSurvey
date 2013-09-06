@@ -1,7 +1,7 @@
 from lettuce import *
 from random import randint
 from survey.models import GroupCondition, HouseholdMemberGroup
-from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage
+from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage, GroupDetailsPage
 
 
 @step(u'And I have 10 conditions')
@@ -147,8 +147,29 @@ def when_i_fll_name_and_order(step):
 
 @step(u'And I select conditions')
 def and_i_select_conditions(step):
-    world.page.select_multiple('#id_conditions',world.condition_1, world.condition_2)
+    world.page.select_multiple('#id_conditions', world.condition_1, world.condition_2)
 
 @step(u'Then I should see the form errors of required fields')
 def then_i_should_see_the_form_errors_of_required_fields(step):
     world.page.is_text_present("This field is required.")
+    
+@step(u'And I click the actions button')
+def and_i_click_the_actions_button(step):
+    world.page.click_actions_button()
+    
+@step(u'And I have a groups')
+def and_i_have_a_groups(step):
+    condition_1 = GroupCondition.objects.create(value='True', attribute="male", condition="EQUALS")
+    condition_2 = GroupCondition.objects.create(value=35, attribute="age", condition="EQUALS")
+    world.group = HouseholdMemberGroup.objects.create(order=1, name="group 1")
+    condition_1.groups.add(world.group)
+    condition_2.groups.add(world.group)
+    
+@step(u'And I click view conditions link')
+def and_i_click_view_conditions_link(step):
+    world.page.click_link_by_text(" View Conditions")
+    
+@step(u'Then I should see a list of conditions')
+def then_i_should_see_a_list_of_conditions(step):
+    world.page = GroupDetailsPage(world.browser, world.group)
+    world.page.validate_fields_present(["Groups Condition List", "Condition", "Attribute", "Value"])
