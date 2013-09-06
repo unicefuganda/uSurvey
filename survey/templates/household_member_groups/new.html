@@ -2,7 +2,11 @@
 {% block title %} {{ title }} {% endblock %}
 {% block display_form_fields %}
   {% include "naked_form.html" with a_form=groups_form %}
-       <a href="#new_condition" class="btn btn-primary pull-right" data-toggle="modal" onclick="clear_fields()"><i class="icon-plus icon-white"></i>Add condition </a>
+  <div class="control-group">
+    <div class="controls">
+      <a href="#new_condition" class="btn btn-primary pull-right" data-toggle="modal" onclick="clear_fields()"><i class="icon-plus icon-white"></i>Add condition </a>
+    </div>
+  </div>
 {% endblock %}
 
 {% block non_form_content %}
