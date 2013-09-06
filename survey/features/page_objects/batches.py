@@ -90,10 +90,7 @@ class BatchListPage(PageObject):
         self.browser.click_link_by_text("Add Batch")
 
     def validate_fields(self):
-        assert self.browser.is_text_present('Batches List')
-        assert self.browser.is_text_present('Batch')
-        assert self.browser.is_text_present('Description')
-        assert self.browser.is_text_present('Actions')
+        self.self.validate_fields_present(["Batches List", "Batch", "Description", "Actions"])
 
     def click_link_by_text(self,text):
         self.browser.click_link_by_text(text)
