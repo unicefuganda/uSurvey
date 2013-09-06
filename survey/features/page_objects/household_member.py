@@ -11,12 +11,7 @@ class NewHouseholdMemberPage(PageObject):
         self.url = '/households/%d/member/new/' % household.id
 
     def validate_fields(self):
-        self.is_text_present('Name')
-        self.is_text_present('Sex')
-        self.is_text_present('Date of birth')
-        self.is_text_present('Create')
-        self.is_text_present('Cancel')
-
+        self.validate_fields_present(['Name', 'Sex', 'Date of birth', 'Create', 'Cancel'])
 
     def fill_valid_member_values(self,data):
         self.browser.fill_form(data)
