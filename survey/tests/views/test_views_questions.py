@@ -80,3 +80,26 @@ class QuestionsViews(BaseTest):
         self.assertEqual(question[0].batch,self.batch)
         self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
         assert mock_success.called
+
+    def test_should_retrieve_group_specific_questions_in_context_if_selected_group_key_is_in_request(self):
+        group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                            answer_type=Question.NUMBER, order=1,
+                                            group=self.household_member_group)
+
+        group_question_again = Question.objects.create(batch=self.batch, text="How many women are there in this household?",
+                                            answer_type=Question.NUMBER, order=2,
+                                            group=self.household_member_group)
+
+        another_group_question = Question.objects.create(batch=self.batch, text="What is your name?",
+                                            answer_type=Question.NUMBER, order=2,
+                                            group=HouseholdMemberGroup.objects.create(name='Age 6-10', order=2))
+
+        all_group_questions = [group_question, group_question_again]
+        another_group_questions = [another_group_question]
+
+        response = self.client.get('/batches/%d/questions/?group_id=%s'% (self.batch.id, self.household_member_group.id))
+
+        questions = response.context["questions"]
+
+        [self.assertIn(question, questions) for question in all_group_questions]
+        [self.assertNotIn(question, questions) for question in another_group_questions]

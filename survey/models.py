@@ -828,6 +828,8 @@ class HouseholdMemberGroup(BaseModel):
     name = models.CharField(max_length=50)
     order = models.PositiveIntegerField(max_length=5, null=False, blank=False, unique=True, default=0)
 
+    def all_questions(self):
+        return self.question_group.all()
 
 class GroupCondition(BaseModel):
     CONDITIONS = {

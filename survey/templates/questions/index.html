@@ -12,31 +12,37 @@
   <table class="table table-striped table-bordered table-hover">
     <thead>
       <tr>
-        <th class="span10">
+        <th class="span8">
           Question
         </th>
         <th>
           Question Type
         </th>
         <th>
-          Actions
+          Question Group
         </th>
+{#        <th>#}
+{#          Actions#}
+{#        </th>#}
       </tr>
     </thead>
     <tbody>
       {% for question in questions %}
         <tr>
-          <td class="span10">
+          <td class="span8">
             {{question.text}}
           </td>
           <td>
             {{question.answer_type.upper}}
           </td>
           <td>
-            Edit
-            Delete
-            Rules
+            {{question.group.name}}
           </td>
+{#          <td>#}
+{#            Edit#}
+{#            Delete#}
+{#            Rules#}
+{#          </td>#}
         </tr>
       {% endfor %}
     </tbody>

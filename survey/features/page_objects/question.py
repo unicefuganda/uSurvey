@@ -11,7 +11,8 @@ class QuestionsListPage(PageObject):
         self.is_text_present('%s Question'% self.batch.name.capitalize())
         self.is_text_present('Question')
         self.is_text_present('Question Type')
-        self.is_text_present('Actions')
+        self.is_text_present('Question Group')
+        # self.is_text_present('Actions')
 
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
