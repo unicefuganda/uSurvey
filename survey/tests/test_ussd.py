@@ -15,18 +15,24 @@ class USSDTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
-                                'transactionId': "123344" + str(randint(1, 99999)),
-                                'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
-                                'msisdn': '2567765' + str(randint(1, 99999)),
-                                'ussdServiceCode': '130',
-                                'ussdRequestString': '',
-                                'response': "false"
-                            }
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
+            'transactionId': "123344" + str(randint(1, 99999)),
+            'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
+            'msisdn': '2567765' + str(randint(1, 99999)),
+            'ussdServiceCode': '130',
+            'ussdRequestString': '',
+            'response': "false"
+        }
+        self.investigator = Investigator.objects.create(name="investigator name",
+                                                        mobile_number=self.ussd_params['msisdn'].replace(
+                                                            COUNTRY_PHONE_CODE, ''),
+                                                        location=Location.objects.create(name="Kampala"),
+                                                        backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
-        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=1), surname="Name " + str(randint(1, 9999)))
-        self.batch = Batch.objects.create(order = 1)
+        self.household_head_1 = HouseholdHead.objects.create(
+            household=Household.objects.create(investigator=self.investigator, uid=1),
+            surname="Name " + str(randint(1, 9999)))
+        self.batch = Batch.objects.create(order=1)
         self.batch.open_for_location(self.investigator.location)
 
     def reset_session(self):
@@ -41,15 +47,19 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "1"
 
     def test_no_households(self):
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890", location=self.investigator.location, backend = Backend.objects.create(name='something1'))
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890",
+                                                   location=self.investigator.location,
+                                                   backend=Backend.objects.create(name='something1'))
         self.ussd_params['msisdn'] = investigator.mobile_number
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_HOUSEHOLDS']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_numerical_questions(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                             answer_type=Question.NUMBER, order=2)
 
         self.select_household()
 
@@ -76,8 +86,10 @@ class USSDTest(TestCase):
         self.assertEquals(2, NumericalAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
 
     def test_textual_questions(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.TEXT, order=1)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.TEXT, order=2)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.TEXT, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                             answer_type=Question.TEXT, order=2)
 
         self.select_household()
 
@@ -90,7 +102,8 @@ class USSDTest(TestCase):
 
         response = self.client.post('/ussd', data=self.ussd_params)
 
-        self.assertEquals(self.ussd_params['ussdRequestString'], TextAnswer.objects.get(investigator=self.investigator, question=question_1).answer)
+        self.assertEquals(self.ussd_params['ussdRequestString'],
+                          TextAnswer.objects.get(investigator=self.investigator, question=question_1).answer)
 
         response_string = "responseString=%s&action=request" % question_2.to_ussd()
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -101,14 +114,17 @@ class USSDTest(TestCase):
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(self.ussd_params['ussdRequestString'], TextAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
+        self.assertEquals(self.ussd_params['ussdRequestString'],
+                          TextAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
 
     def test_multichoice_questions(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=1)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.MULTICHOICE, order=1)
         option_1_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_1_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.MULTICHOICE, order=2)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                             answer_type=Question.MULTICHOICE, order=2)
         option_2_1 = QuestionOption.objects.create(question=question_2, text="OPTION 1", order=1)
         option_2_2 = QuestionOption.objects.create(question=question_2, text="OPTION 2", order=2)
 
@@ -123,7 +139,8 @@ class USSDTest(TestCase):
 
         response = self.client.post('/ussd', data=self.ussd_params)
 
-        self.assertEquals(option_1_1, MultiChoiceAnswer.objects.get(investigator=self.investigator, question=question_1).answer)
+        self.assertEquals(option_1_1,
+                          MultiChoiceAnswer.objects.get(investigator=self.investigator, question=question_1).answer)
 
         response_string = "responseString=%s&action=request" % question_2.to_ussd()
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -134,10 +151,12 @@ class USSDTest(TestCase):
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(option_2_1, MultiChoiceAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
+        self.assertEquals(option_2_1,
+                          MultiChoiceAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
 
     def test_multichoice_questions_pagination(self):
-        question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=1)
+        question = Question.objects.create(batch=self.batch, text="This is a question",
+                                           answer_type=Question.MULTICHOICE, order=1)
         option_1 = QuestionOption.objects.create(question=question, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(question=question, text="OPTION 2", order=2)
         option_3 = QuestionOption.objects.create(question=question, text="OPTION 3", order=3)
@@ -148,14 +167,16 @@ class USSDTest(TestCase):
         back_text = Question.PREVIOUS_PAGE_TEXT
         next_text = Question.NEXT_PAGE_TEXT
 
-        question_2 = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=2)
+        question_2 = Question.objects.create(batch=self.batch, text="This is a question",
+                                             answer_type=Question.MULTICHOICE, order=2)
         option_8 = QuestionOption.objects.create(question=question_2, text="OPTION 1", order=1)
         option_9 = QuestionOption.objects.create(question=question_2, text="OPTION 2", order=2)
 
         self.select_household()
 
         page_1 = "%s\n1: %s\n2: %s\n3: %s\n%s" % (question.text, option_1.text, option_2.text, option_3.text, next_text)
-        page_2 = "%s\n4: %s\n5: %s\n6: %s\n%s\n%s" % (question.text, option_4.text, option_5.text, option_6.text, back_text, next_text)
+        page_2 = "%s\n4: %s\n5: %s\n6: %s\n%s\n%s" % (
+        question.text, option_4.text, option_5.text, option_6.text, back_text, next_text)
         page_3 = "%s\n7: %s\n%s" % (question.text, option_7.text, back_text)
 
         response = self.client.post('/ussd', data=self.ussd_params)
@@ -205,9 +226,13 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_reanswer_question(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-        rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'], condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'], validate_with_question=question_1)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                             answer_type=Question.NUMBER, order=2)
+        rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'],
+                                         condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'],
+                                         validate_with_question=question_1)
 
         self.select_household()
 
@@ -244,7 +269,8 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_text_invalid_answer(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.TEXT, order=1)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.TEXT, order=1)
 
         self.select_household()
 
@@ -268,7 +294,8 @@ class USSDTest(TestCase):
 
 
     def test_numerical_invalid_answer(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1)
         self.select_household()
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % question_1.text
@@ -289,7 +316,8 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_multichoice_invalid_answer(self):
-        question_1 = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=1)
+        question_1 = Question.objects.create(batch=self.batch, text="This is a question",
+                                             answer_type=Question.MULTICHOICE, order=1)
         option_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
         self.select_household()
@@ -313,7 +341,6 @@ class USSDTest(TestCase):
         response_string = "responseString=%s&action=request" % ("INVALID ANSWER: " + page_1)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "2"
 
@@ -322,9 +349,12 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_end_interview_confirmation(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'], condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                             answer_type=Question.NUMBER, order=2)
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                         condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
         self.select_household()
 
@@ -371,7 +401,8 @@ class USSDTest(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
 
-        households_list_1 = "%s\n1: %s*\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list_1 = "%s\n1: %s*\n2: %s" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % households_list_1
@@ -385,9 +416,12 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_end_interview_confirmation_alternative(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'], condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                             answer_type=Question.NUMBER, order=2)
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                         condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
         self.select_household()
 
@@ -412,8 +446,10 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_resume_functionality(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
+        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1)
+        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                             answer_type=Question.NUMBER, order=2)
 
         self.select_household()
 
@@ -448,7 +484,8 @@ class USSDTest(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
 
-        households_list_1 = "%s\n1: %s\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list_1 = "%s\n1: %s\n2: %s" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % households_list_1
@@ -483,21 +520,25 @@ class USSDTest(TestCase):
 
 
 class USSDTestCompleteFlow(TestCase):
-
     def create_household_head(self, uid):
-        return HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=uid), surname="Name " + str(randint(1, 9999)))
+        return HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=uid),
+                                            surname="Name " + str(randint(1, 9999)))
 
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
-                                'transactionId': "123344" + str(randint(1, 99999)),
-                                'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
-                                'msisdn': '2567765' + str(randint(1, 99999)),
-                                'ussdServiceCode': '130',
-                                'ussdRequestString': '',
-                                'response': "false"
-                            }
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
+            'transactionId': "123344" + str(randint(1, 99999)),
+            'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
+            'msisdn': '2567765' + str(randint(1, 99999)),
+            'ussdServiceCode': '130',
+            'ussdRequestString': '',
+            'response': "false"
+        }
+        self.investigator = Investigator.objects.create(name="investigator name",
+                                                        mobile_number=self.ussd_params['msisdn'].replace(
+                                                            COUNTRY_PHONE_CODE, ''),
+                                                        location=Location.objects.create(name="Kampala"),
+                                                        backend=Backend.objects.create(name='something'))
         self.household_head_1 = self.create_household_head(0)
         self.household_head_2 = self.create_household_head(1)
         self.household_head_3 = self.create_household_head(2)
@@ -510,9 +551,14 @@ class USSDTestCompleteFlow(TestCase):
         self.batch = Batch.objects.create(order=1)
         self.batch_b = Batch.objects.create(order=2)
         self.batch.open_for_location(self.investigator.location)
-        self.question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?", answer_type=Question.NUMBER, order=1)
-        self.question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.NUMBER, order=2)
-        self.question_1_b = Question.objects.create(batch=self.batch_b, text="How many members are there in this household? Batch B", answer_type=Question.NUMBER, order=1)
+        self.question_1 = Question.objects.create(batch=self.batch,
+                                                  text="How many members are there in this household?",
+                                                  answer_type=Question.NUMBER, order=1)
+        self.question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+                                                  answer_type=Question.NUMBER, order=2)
+        self.question_1_b = Question.objects.create(batch=self.batch_b,
+                                                    text="How many members are there in this household? Batch B",
+                                                    answer_type=Question.NUMBER, order=1)
 
     def test_flow(self):
         homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
@@ -523,9 +569,13 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
+        households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname,
+        self.household_head_3.surname, self.household_head_4.surname)
 
-        households_list_2 = "%s\n5: %s\n6: %s\n7: %s\n8: %s\n*: Back\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_5.surname, self.household_head_6.surname, self.household_head_7.surname, self.household_head_8.surname)
+        households_list_2 = "%s\n5: %s\n6: %s\n7: %s\n8: %s\n*: Back\n#: Next" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_5.surname, self.household_head_6.surname,
+        self.household_head_7.surname, self.household_head_8.surname)
 
         households_list_3 = "%s\n9: %s\n*: Back" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_9.surname)
 
@@ -571,7 +621,6 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % ("INVALID SELECTION: " + households_list_1)
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "adss"
 
@@ -593,7 +642,8 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % self.question_2.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(10, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_1, household=self.household_head_1.household).answer)
+        self.assertEquals(10, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_1,
+                                                          household=self.household_head_1.household).answer)
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "5"
@@ -602,7 +652,8 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(5, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_2, household=self.household_head_1.household).answer)
+        self.assertEquals(5, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_2,
+                                                         household=self.household_head_1.household).answer)
 
         # Deleting all the households except 1 and 2
 
@@ -624,7 +675,8 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        households_list_1 = "%s\n1: %s*\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
+        households_list_1 = "%s\n1: %s*\n2: %s" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
@@ -647,7 +699,8 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % self.question_2.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(10, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_1, household=self.household_head_2.household).answer)
+        self.assertEquals(10, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_1,
+                                                          household=self.household_head_2.household).answer)
 
         self.ussd_params['response'] = "false"
         self.ussd_params['ussdRequestString'] = ""
@@ -657,15 +710,16 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % self.question_2.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "5"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES[
+            'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(5, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_2, household=self.household_head_2.household).answer)
+        self.assertEquals(5, NumericalAnswer.objects.get(investigator=self.investigator, question=self.question_2,
+                                                         household=self.household_head_2.household).answer)
 
         # Retaking survey for an household
 
@@ -680,7 +734,8 @@ class USSDTestCompleteFlow(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
 
-        households_list_1 = "%s\n1: %s*\n2: %s*" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
+        households_list_1 = "%s\n1: %s*\n2: %s*" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
 
         response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % households_list_1
@@ -721,7 +776,8 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(2, NumericalAnswer.objects.filter(investigator=self.investigator, household=self.household_head_2.household).count())
+        self.assertEquals(2, NumericalAnswer.objects.filter(investigator=self.investigator,
+                                                            household=self.household_head_2.household).count())
 
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "1"
@@ -730,7 +786,8 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % self.question_1.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.assertEquals(0, NumericalAnswer.objects.filter(investigator=self.investigator, household=self.household_head_2.household).count())
+        self.assertEquals(0, NumericalAnswer.objects.filter(investigator=self.investigator,
+                                                            household=self.household_head_2.household).count())
 
     def test_show_completion_star_next_to_household_head_name(self):
         self.household_head_1.household.batch_completed(self.batch)
@@ -741,7 +798,9 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        households_list_1 = "%s\n1: %s*\n2: %s\n3: %s*\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
+        households_list_1 = "%s\n1: %s*\n2: %s\n3: %s*\n4: %s\n#: Next" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname,
+        self.household_head_3.surname, self.household_head_4.surname)
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
 
@@ -754,7 +813,9 @@ class USSDTestCompleteFlow(TestCase):
         self.investigator.answered(self.question_1, self.household_head_1.household, 1)
         self.investigator.answered(self.question_2, self.household_head_1.household, 1)
 
-        households_list_1 = "%s\n1: %s*\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname, self.household_head_3.surname, self.household_head_4.surname)
+        households_list_1 = "%s\n1: %s*\n2: %s\n3: %s\n4: %s\n#: Next" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname,
+        self.household_head_3.surname, self.household_head_4.surname)
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
 
@@ -788,11 +849,11 @@ class USSDTestCompleteFlow(TestCase):
         completion = HouseholdBatchCompletion.objects.filter(batch=self.batch)[0]
 
         latest_answer = NumericalAnswer.objects.all().latest()
-        latest_answer.created -= datetime.timedelta(minutes=(USSD.TIMEOUT_MINUTES+1), seconds=1)
+        latest_answer.created -= datetime.timedelta(minutes=(USSD.TIMEOUT_MINUTES + 1), seconds=1)
         latest_answer.save()
 
         answer_one = NumericalAnswer.objects.filter(question=self.question_1)[0]
-        answer_one.created -= datetime.timedelta(minutes=(USSD.TIMEOUT_MINUTES+2), seconds=1)
+        answer_one.created -= datetime.timedelta(minutes=(USSD.TIMEOUT_MINUTES + 2), seconds=1)
         answer_one.save()
 
         self.batch.close_for_location(self.investigator.location)
@@ -821,22 +882,27 @@ class USSDTestCompleteFlow(TestCase):
 
 
 class USSDOpenBatch(TestCase):
-
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
-                                'transactionId': "123344" + str(randint(1, 99999)),
-                                'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
-                                'msisdn': '2567765' + str(randint(1, 99999)),
-                                'ussdServiceCode': '130',
-                                'ussdRequestString': '',
-                                'response': "false"
-                            }
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
+            'transactionId': "123344" + str(randint(1, 99999)),
+            'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
+            'msisdn': '2567765' + str(randint(1, 99999)),
+            'ussdServiceCode': '130',
+            'ussdRequestString': '',
+            'response': "false"
+        }
+        self.investigator = Investigator.objects.create(name="investigator name",
+                                                        mobile_number=self.ussd_params['msisdn'].replace(
+                                                            COUNTRY_PHONE_CODE, ''),
+                                                        location=Location.objects.create(name="Kampala"),
+                                                        backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
-        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=1), surname="Name " + str(randint(1, 9999)))
-        batch = Batch.objects.create(order = 1)
+        self.household_head_1 = HouseholdHead.objects.create(
+            household=Household.objects.create(investigator=self.investigator, uid=1),
+            surname="Name " + str(randint(1, 9999)))
+        batch = Batch.objects.create(order=1)
 
     def test_closed_batch(self):
         response = self.client.post('/ussd', data=self.ussd_params)
@@ -845,34 +911,42 @@ class USSDOpenBatch(TestCase):
 
 
 class USSDWithMultipleBatches(TestCase):
-
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
-                                'transactionId': "123344" + str(randint(1, 99999)),
-                                'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
-                                'msisdn': '2567765' + str(randint(1, 99999)),
-                                'ussdServiceCode': '130',
-                                'ussdRequestString': '',
-                                'response': "false"
-                            }
+            'transactionId': "123344" + str(randint(1, 99999)),
+            'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
+            'msisdn': '2567765' + str(randint(1, 99999)),
+            'ussdServiceCode': '130',
+            'ussdRequestString': '',
+            'response': "false"
+        }
 
         self.country = LocationType.objects.create(name='Country', slug='country')
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         self.district = LocationType.objects.create(name='District', slug='district')
         self.location = Location.objects.create(name="Kampala", type=self.district, tree_parent=self.uganda)
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), location=self.location, backend = Backend.objects.create(name='something'))
+        self.investigator = Investigator.objects.create(name="investigator name",
+                                                        mobile_number=self.ussd_params['msisdn'].replace(
+                                                            COUNTRY_PHONE_CODE, ''), location=self.location,
+                                                        backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
-        self.household_head_1 = HouseholdHead.objects.create(household=Household.objects.create(investigator=self.investigator, uid=1), surname="Name " + str(randint(1, 9999)))
+        self.household_head_1 = HouseholdHead.objects.create(
+            household=Household.objects.create(investigator=self.investigator, uid=1),
+            surname="Name " + str(randint(1, 9999)))
         self.batch = Batch.objects.create(order=1)
-        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1)
-        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2)
+        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER,
+                                                  order=1)
+        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER,
+                                                  order=2)
         self.batch_1 = Batch.objects.create(order=2)
-        self.question_3 = Question.objects.create(batch=self.batch_1, text="Question 3?", answer_type=Question.NUMBER, order=1)
-        self.question_4 = Question.objects.create(batch=self.batch_1, text="Question 4?", answer_type=Question.NUMBER, order=2)
+        self.question_3 = Question.objects.create(batch=self.batch_1, text="Question 3?", answer_type=Question.NUMBER,
+                                                  order=1)
+        self.question_4 = Question.objects.create(batch=self.batch_1, text="Question 4?", answer_type=Question.NUMBER,
+                                                  order=2)
 
-    def select_household(self, household = 1):
+    def select_household(self, household=1):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "00"
         response = self.client.post('/ussd', data=self.ussd_params)
@@ -1034,7 +1108,8 @@ class RandomHouseHoldSelectionTest(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = " 100 "
 
-        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE']
+        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES[
+            'HOUSEHOLD_SELECTION_SMS_MESSAGE']
         response = self.client.get('/ussd', data=self.ussd_params)
         self.failUnlessEqual(response.status_code, 200)
         self.assertEquals(urllib2.unquote(response.content), response_message)
@@ -1052,7 +1127,8 @@ class RandomHouseHoldSelectionTest(TestCase):
     def test_selection_retry(self):
         mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
         selected_households = "hello"
-        household_selection = RandomHouseHoldSelection.objects.create(mobile_number=mobile_number, no_of_households=100, selected_households=selected_households)
+        household_selection = RandomHouseHoldSelection.objects.create(mobile_number=mobile_number, no_of_households=100,
+                                                                      selected_households=selected_households)
 
         response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
         response = self.client.get('/ussd', data=self.ussd_params)
@@ -1062,12 +1138,14 @@ class RandomHouseHoldSelectionTest(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "999"
 
-        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE']
+        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES[
+            'HOUSEHOLD_SELECTION_SMS_MESSAGE']
         response = self.client.get('/ussd', data=self.ussd_params)
         self.assertEquals(urllib2.unquote(response.content), response_message)
         self.failUnlessEqual(response.status_code, 200)
 
-        self.assertEquals(RandomHouseHoldSelection.objects.get(id=household_selection.pk).selected_households, selected_households)
+        self.assertEquals(RandomHouseHoldSelection.objects.get(id=household_selection.pk).selected_households,
+                          selected_households)
 
     def test_less_than_ten_households_failure(self):
         mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
@@ -1082,7 +1160,8 @@ class RandomHouseHoldSelectionTest(TestCase):
         self.ussd_params['ussdRequestString'] = "9"
 
         response = self.client.get('/ussd', data=self.ussd_params)
-        response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE']
+        response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES[
+            'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_message)
         self.failUnlessEqual(response.status_code, 200)
         self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
@@ -1090,7 +1169,8 @@ class RandomHouseHoldSelectionTest(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = "11"
 
-        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE']
+        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES[
+            'HOUSEHOLD_SELECTION_SMS_MESSAGE']
         response = self.client.get('/ussd', data=self.ussd_params)
         self.assertEquals(urllib2.unquote(response.content), response_message)
         self.failUnlessEqual(response.status_code, 200)
@@ -1117,7 +1197,8 @@ class RandomHouseHoldSelectionTest(TestCase):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = " 100 "
 
-        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE']
+        response_message = "responseString=%s&action=end" % HouseHoldSelection.MESSAGES[
+            'HOUSEHOLD_SELECTION_SMS_MESSAGE']
         response = self.client.get('/ussd', data=self.ussd_params)
         self.failUnlessEqual(response.status_code, 200)
         self.assertEquals(urllib2.unquote(response.content), response_message)
@@ -1127,7 +1208,7 @@ class RandomHouseHoldSelectionTest(TestCase):
         self.assertEquals(household_selection.mobile_number, mobile_number)
         self.assertEquals(household_selection.no_of_households, 100)
         selected_households = household_selection.selected_households.split(',')
-        selected_households = map(int,selected_households)
+        selected_households = map(int, selected_households)
         self.assertEquals(len(selected_households), 10)
         self.assertEqual(sorted(selected_households), selected_households)
 
