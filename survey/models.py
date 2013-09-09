@@ -521,6 +521,7 @@ class Question(BaseModel):
 
     identifier = models.CharField(max_length=100, blank=False, null=True)
     batch = models.ForeignKey(Batch, null=True, related_name="questions")
+    group = models.ForeignKey("HouseholdMemberGroup", null=True, related_name="question_group")
     text = models.CharField(max_length=150, blank=False, null=False)
     answer_type = models.CharField(max_length=15, blank=False, null=False, choices=TYPE_OF_ANSWERS)
     order = models.PositiveIntegerField(max_length=2, null=True)

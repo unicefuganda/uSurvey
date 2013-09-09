@@ -17,6 +17,7 @@ class QuestionsViews(BaseTest):
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_batches')
         self.client.login(username='Rajni', password='I_Rock')
+        self.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
 
         self.batch = Batch.objects.create(order = 1, name = "Batch A")
         self.question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
@@ -68,7 +69,8 @@ class QuestionsViews(BaseTest):
     def test_create_question_success(self, mock_success):
         form_data={
                     'text': 'This is a Question',
-                    'answer_type': Question.NUMBER
+                    'answer_type': Question.NUMBER,
+                    'group' : self.household_member_group.id
         }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)

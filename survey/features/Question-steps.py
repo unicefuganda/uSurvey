@@ -45,7 +45,8 @@ def then_i_should_see_a_add_question_page(step):
 @step(u'When I fill the details for add question form')
 def when_i_fill_the_details_for_add_question_form(step):
     data={'text':'hritik  question',
-          'answer_type': Question.NUMBER}
+          'answer_type': Question.NUMBER,
+          'group': world.household_member_group.id}
 
     world.page.fill_valid_values(data)
 
@@ -59,3 +60,6 @@ def then_i_should_go_back_to_questions_listing_page(step):
 def and_i_should_see_question_successfully_added_message(step):
     world.page.is_text_present("Question successfully added.")
 
+@step(u'And I have a member group')
+def and_i_have_a_member_group(step):
+    world.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
