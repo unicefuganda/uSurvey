@@ -26,4 +26,45 @@ class GroupConditionTest(TestCase):
         hmg = GroupCondition.objects.create(value=5)
         self.assertEquals(5, hmg.value)
 
-        
+    def test_knows_age_condition_equal_to_a_specific_value(self):
+        age_value = 20
+        attribute_type = "age"
+        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value)
+
+        self.assertTrue(age_condition.matches_condition(age_value))
+
+    def test_knows_age_condition_not_equal_to_a_specific_value(self):
+        age_value = 20
+        attribute_type = "age"
+        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value)
+
+        self.assertFalse(age_condition.matches_condition(age_value + 2))
+
+    def test_knows_to_match_greater_than_condition(self):
+        age_value = 20
+        attribute_type = "age"
+        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value, condition='GREATER_THAN')
+
+        self.assertTrue(age_condition.matches_condition(age_value+2))
+
+    def test_knows_to_match_greater_than_condition_if_condition_is_not_met(self):
+        age_value = 20
+        attribute_type = "age"
+        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value, condition='GREATER_THAN')
+
+        self.assertFalse(age_condition.matches_condition(age_value-2))
+
+    def test_knows_to_match_less_than_condition(self):
+        age_value = 20
+        attribute_type = "age"
+        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value, condition='LESS_THAN')
+
+        self.assertTrue(age_condition.matches_condition(age_value-2))
+
+    def test_knows_to_match_less_than_condition_if_condition_is_not_met(self):
+        age_value = 20
+        attribute_type = "age"
+        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value, condition='LESS_THAN')
+
+        self.assertFalse(age_condition.matches_condition(age_value+2))
+

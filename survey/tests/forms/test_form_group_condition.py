@@ -8,7 +8,7 @@ class GroupConditionFormTests(TestCase):
     def test_valid_form(self):
         form_data = {
             'value' : 3,
-            'attribute': "EQUALS",
+            'attribute': "AGE",
             'condition': 'GREATER_THAN'
         }
         
@@ -18,7 +18,7 @@ class GroupConditionFormTests(TestCase):
     def test_valid_form_due_to_invalid_condition(self):
         form_data = {
             'value' : 3,
-            'attribute': "EQUALS",
+            'attribute': "AGE",
             'condition': 'GREATER'
         }
 

@@ -43,7 +43,7 @@ class GroupConditionViewTest(BaseTest):
 
     @patch('django.contrib.messages.success')
     def test_post_condtion_form(self, mock_success):
-        data = {'attribute': 'rajni',
+        data = {'attribute': 'AGE',
                 'condition': 'EQUALS',
                 'value': 'kant'}
 
@@ -162,7 +162,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertFalse(has_valid_condition({'condition': ""}))
 
     def test_ajax_call_to_new_should_save_the_object(self):
-        data = {'attribute': 'rajni',
+        data = {'attribute': 'AGE',
                 'condition': 'EQUALS',
                 'value': 'kant'}
 
@@ -171,7 +171,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.failUnless(GroupCondition.objects.filter(**data))
 
     def test_ajax_call_should_return_condition_list_in_context(self):
-        data = {'attribute': 'rajni',
+        data = {'attribute': 'AGE',
                 'condition': 'EQUALS',
                 'value': 'kant'}
 

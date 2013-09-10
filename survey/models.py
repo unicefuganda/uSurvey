@@ -831,6 +831,28 @@ class HouseholdMemberGroup(BaseModel):
     def all_questions(self):
         return self.question_group.all()
 
+    def get_all_conditions(self):
+        return self.conditions.all()
+
+    def has_condition(self, household_member, condition):
+        age = household_member.get_age()
+        gender = household_member.male
+
+        if condition.attribute.lower() == GroupCondition.GROUP_TYPES["AGE"].lower():
+            condition_value = condition.matches_condition(age)
+        else:
+            condition_value = condition.matches_condition(gender)
+
+        return condition_value
+
+    def belongs_to_group(self, household_member):
+        condition_match = []
+
+        for condition in self.get_all_conditions():
+            condition_match.append(self.has_condition(household_member, condition))
+
+        return all(condition is True for condition in condition_match)
+
 class GroupCondition(BaseModel):
     CONDITIONS = {
                 'EQUALS': 'EQUALS',
@@ -838,11 +860,26 @@ class GroupCondition(BaseModel):
                 'LESS_THAN': 'LESS_THAN',
     }
 
+    GROUP_TYPES = {
+                'AGE': 'AGE',
+                'GENDER': 'GENDER'
+    }
+
     value = models.CharField(max_length=50)
-    attribute = models.CharField(max_length=20)
+    attribute = models.CharField(max_length=20, default='AGE', choices=GROUP_TYPES.items())
     condition = models.CharField(max_length=20, default='EQUALS', choices=CONDITIONS.items())
     groups = models.ManyToManyField(HouseholdMemberGroup, related_name='conditions')
 
+    def matches_condition(self, value):
+
+        if self.condition == GroupCondition.CONDITIONS['EQUALS']:
+            return str(self.value) == str(value)
+
+        elif self.condition == GroupCondition.CONDITIONS['GREATER_THAN']:
+            return value >= self.value
+
+        elif self.condition == GroupCondition.CONDITIONS['LESS_THAN']:
+            return value <= self.value
 
 def generate_auto_complete_text_for_location(location):
     auto_complete = LocationAutoComplete.objects.filter(location=location)
@@ -876,3 +913,15 @@ class HouseholdMember(BaseModel):
     male = models.BooleanField(default=True, verbose_name="Sex")
     date_of_birth = models.DateField(auto_now=False)
     household = models.ForeignKey(Household,related_name='household_member')
+
+    def get_member_groups(self):
+        member_groups = []
+
+        for group in HouseholdMemberGroup.objects.all():
+            if group.belongs_to_group(self):
+                member_groups.append(group)
+        return member_groups
+
+    def get_age(self):
+        days_in_year = 365.2425
+        return int((datetime.date.today() - self.date_of_birth).days/days_in_year)

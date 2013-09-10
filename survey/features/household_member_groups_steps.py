@@ -9,7 +9,7 @@ def and_i_have_10_conditions(step):
     for _ in xrange(10):
         random_number = str(randint(1, 99999))
         try:
-            GroupCondition.objects.create(value=random_number, attribute=str(random_number), condition="EQUALS")
+            GroupCondition.objects.create(value=random_number, attribute='AGE', condition="EQUALS")
         except Exception:
             pass
 
@@ -27,7 +27,7 @@ def and_i_should_see_the_conditions_list(step):
 
 @step(u'And I have a condition')
 def and_i_have_a_condition(step):
-    world.condition = GroupCondition.objects.create(value=5, attribute="male", condition="EQUALS")
+    world.condition = GroupCondition.objects.create(value=5, attribute='GENDER', condition="EQUALS")
 
 
 @step(u'And I have 100 groups with that condition')
@@ -70,7 +70,7 @@ def and_i_visit_the_new_condition_page(step):
 
 @step(u'When I fill in the condition details')
 def when_i_fill_in_the_condition_details(step):
-    data = {'attribute': 'rajni',
+    data = {'attribute': 'AGE',
             'value': 'kant'}
     world.page.fill_valid_values(data)
 
@@ -128,14 +128,14 @@ def then_i_should_see_the_condition_was_saved_successfully(step):
 
 @step(u'And I should see the new condition in the groups form')
 def and_i_should_see_the_new_condition_in_the_groups_form(step):
-    latest_condition = GroupCondition.objects.get(value='kant', attribute="rajni", condition="EQUALS")
+    latest_condition = GroupCondition.objects.get(value='kant', attribute="AGE", condition="EQUALS")
     world.page.validate_latest_condition(latest_condition)
 
 
 @step(u'And I have 2 conditions')
 def and_i_have_2_conditions(step):
-    world.condition_1 = GroupCondition.objects.create(value='True', attribute="male", condition="EQUALS")
-    world.condition_2 = GroupCondition.objects.create(value=35, attribute="age", condition="EQUALS")
+    world.condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
+    world.condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
 
 
 @step(u'When I fill name and order')
@@ -159,8 +159,8 @@ def and_i_click_the_actions_button(step):
     
 @step(u'And I have a groups')
 def and_i_have_a_groups(step):
-    condition_1 = GroupCondition.objects.create(value='True', attribute="male", condition="EQUALS")
-    condition_2 = GroupCondition.objects.create(value=35, attribute="age", condition="EQUALS")
+    condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
+    condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
     world.group = HouseholdMemberGroup.objects.create(order=1, name="group 1")
     condition_1.groups.add(world.group)
     condition_2.groups.add(world.group)
