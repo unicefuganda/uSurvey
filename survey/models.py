@@ -237,6 +237,9 @@ class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
     uid = models.PositiveIntegerField(blank=False, default=0, unique=True,
                         verbose_name="Household Unique Identification")
+    MEMBERS_PER_PAGE = 4
+    PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
+    NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
 
     def last_question_answered(self):
         answered = []
@@ -334,6 +337,26 @@ class Household(BaseModel):
 
         return related_location
 
+    def all_members(self):
+        household_members = list(self.household_member.order_by('name').all())
+        household_members.insert(0, self.head)
+        return household_members
+
+    def members_list(self, page=1):
+        all_members = self.all_members()
+        paginator = Paginator(all_members, self.MEMBERS_PER_PAGE)
+        members = paginator.page(page)
+        members_list = []
+        for member in members:
+            name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.name
+            text = "%s: %s" % (all_members.index(member) + 1, name)
+            members_list.append(text)
+        if members.has_previous():
+            members_list.append(self.PREVIOUS_PAGE_TEXT)
+        if members.has_next():
+            members_list.append(self.NEXT_PAGE_TEXT)
+        return "\n".join(members_list)
+
     @classmethod
     def set_related_locations(cls, households):
         for household in households:
@@ -354,7 +377,6 @@ class HouseholdHead(BaseModel):
     resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
                                                          null=False, default=1984)
     resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
-
 
 
 

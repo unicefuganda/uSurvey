@@ -11,6 +11,7 @@ class USSDBase(object):
         'USER_NOT_REGISTERED': "Sorry, your mobile number is not registered for this survey",
         'WELCOME_TEXT': "Welcome %s to the survey.",
         'HOUSEHOLD_LIST': "Please select a household from the list",
+        'MEMBERS_LIST': "Please select a member from the list",
         'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
         'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
         'NO_HOUSEHOLDS': "Sorry, you have no households registered.",
@@ -27,7 +28,8 @@ class USSDBase(object):
 
     DEFAULT_SESSION_VARIABLES = {
         'PAGE': 1,
-        'HOUSEHOLD': None
+        'HOUSEHOLD': None,
+        'HOUSEHOLD_MEMBER': None
     }
 
     HOUSEHOLD_LIST_OPTION = "00"
@@ -46,8 +48,10 @@ class USSD(USSDBase):
         self.action = self.ACTIONS['REQUEST']
         self.responseString = ""
         self.household = None
+        self.household_member = None
         self.set_session()
         self.set_household()
+        self.set_household_member()
         self.clean_investigator_input()
 
     def set_household(self):
@@ -60,6 +64,11 @@ class USSD(USSDBase):
                 household = last_answered.household
                 if household.next_question():
                     self.household = household
+
+    def set_household_member(self):
+        household_member = self.get_from_session('HOUSEHOLD_MEMBER')
+        if household_member:
+            self.household_member = household_member
 
     def set_session(self):
         self.session_string = "SESSION-%s" % self.request['transactionId']
@@ -146,35 +155,11 @@ class USSD(USSDBase):
     def render_survey(self):
         if not self.household.survey_completed():
             self.question = self.household.next_question()
-
             if not self.is_new_request():
                 self.process_investigator_response()
             self.render_survey_response()
-        elif self.household.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
-            self.retake_survey()
         else:
             self.end_interview()
-
-    def confirm_retake_survey(self, answer):
-        try:
-            answer = int(answer)
-            return answer == 1
-        except ValueError, e:
-            return False
-
-    def retake_survey(self):
-        answer = self.request['ussdRequestString'].strip()
-        if not answer:
-            self.responseString = self.MESSAGES['RETAKE_SURVEY']
-        else:
-            if self.confirm_retake_survey(answer):
-                self.household.retake_latest_batch()
-                self.behave_like_new_request()
-                self.render_survey()
-            else:
-                self.household = None
-                self.set_in_session('HOUSEHOLD', self.household)
-                self.render_households_list(self.HOUSEHOLD_LIST_OPTION)
 
     def render_welcome_text(self):
         if self.investigator.has_households():
@@ -184,8 +169,8 @@ class USSD(USSDBase):
             self.action = self.ACTIONS['END']
             self.responseString = self.MESSAGES['NO_HOUSEHOLDS']
 
-    def is_browsing_households_list(self, answer):
-        if answer == self.HOUSEHOLD_LIST_OPTION or self.is_pagination_option(answer):
+    def is_browsing_households_list(self, answer,list_option="00"):
+        if answer == list_option or self.is_pagination_option(answer):
             self.set_current_page(answer)
             return True
 
@@ -197,9 +182,46 @@ class USSD(USSDBase):
         except (ValueError, IndexError) as e:
             self.responseString += "INVALID SELECTION: "
 
-    def render_households_list(self, answer):
-        if not self.is_browsing_households_list(answer):
+    def select_household_member(self, answer):
+        try:
+            answer = int(answer)
+            self.household_member = self.household.all_members()[answer - 1]
+            self.set_in_session('HOUSEHOLD_MEMBER', self.household_member)
+        except (ValueError, IndexError) as e:
+            self.responseString += "INVALID SELECTION: "
+
+    def select_or_render_household(self, answer):
+        if self.is_browsing_households_list(answer):
+            self.render_households_list(answer)
+        else:
             self.select_household(answer)
+            if self.is_invalid_response():
+                self.render_households_list(answer)
+            else:
+                self.request['ussdRequestString'] = ""
+                self.render_household_or_household_member(answer)
+
+    def select_or_render_household_member(self, answer):
+        if self.is_browsing_households_list(answer):
+            self.render_household_members_list()
+        else:
+            if self.request['ussdRequestString'] == "":
+                self.render_household_members_list()
+            else:
+                self.select_household_member(answer)
+                self.behave_like_new_request()
+                self.render_household_or_household_member(answer)
+
+    def render_household_or_household_member(self, answer):
+        if self.has_chosen_household():
+            if self.has_chosen_household_member():
+                self.render_survey()
+            else:
+                self.select_or_render_household_member(answer)
+        else:
+            self.select_or_render_household(answer)
+
+    def render_households_list(self, answer):
         if not self.household:
             page = self.get_from_session('PAGE')
             self.responseString += "%s\n%s" % (self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page))
@@ -207,22 +229,31 @@ class USSD(USSDBase):
             self.behave_like_new_request()
             self.render_survey()
 
+    def render_household_members_list(self):
+        page = self.get_from_session('PAGE')
+        self.responseString += "%s\n%s" % (self.MESSAGES['MEMBERS_LIST'], self.household.members_list(page))
+
     def render_homepage(self):
 
         answer = self.request['ussdRequestString'].strip()
         if not answer:
             self.render_welcome_text()
         else:
-            self.render_households_list(answer)
+            self.render_household_or_household_member(answer)
 
     def has_chosen_household(self):
         return self.household is not None
+
+    def has_chosen_household_member(self):
+        if self.has_chosen_household():
+            return self.household_member is not None
+        return False
 
     def is_active(self):
         return self.investigator.was_active_within(self.TIMEOUT_MINUTES)
 
     def process_open_batch(self):
-        if self.has_chosen_household():
+        if self.has_chosen_household_member():
             self.render_survey()
         else:
             self.render_homepage()
@@ -245,6 +276,9 @@ class USSD(USSDBase):
     def behave_like_new_request(self):
         self.request['ussdRequestString'] = ""
         self.request['response'] = 'false'
+
+    def is_invalid_response(self):
+        return "INVALID SELECTION: " in self.responseString
 
     @classmethod
     def investigator_not_registered_response(self):

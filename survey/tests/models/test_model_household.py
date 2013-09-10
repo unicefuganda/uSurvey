@@ -109,3 +109,13 @@ class HouseholdTest(TestCase):
         household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
 
         self.assertEqual(household_location, household1.get_related_location())
+
+    def test_should_return_all_households_members(self):
+        hhold = Household.objects.create(investigator=Investigator(), uid=0)
+        household_head = HouseholdHead.objects.create(household=hhold,surname="Name")
+        household_member1 = HouseholdMember.objects.create(household=hhold, name="name", male=False, date_of_birth='1989-02-02')
+        household_member2 = HouseholdMember.objects.create(household=hhold, name="name1", male=False, date_of_birth='1989-02-02')
+        all_members = hhold.all_members()
+        self.assertTrue(household_head in all_members)
+        self.assertTrue(household_member1 in all_members)
+        self.assertTrue(household_member2 in all_members)
