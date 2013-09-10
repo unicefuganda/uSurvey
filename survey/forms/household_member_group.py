@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from survey.models import HouseholdMemberGroup, GroupCondition
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
 
 class HouseholdMemberGroupForm(ModelForm):

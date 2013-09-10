@@ -1,7 +1,5 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.base import PageObject
-from survey.models import Investigator
 
 
 class NewHouseholdMemberPage(PageObject):

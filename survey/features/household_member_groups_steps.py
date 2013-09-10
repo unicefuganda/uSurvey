@@ -1,6 +1,8 @@
-from lettuce import *
 from random import randint
-from survey.models import GroupCondition, HouseholdMemberGroup
+
+from lettuce import *
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
+
 from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage, GroupDetailsPage
 
 

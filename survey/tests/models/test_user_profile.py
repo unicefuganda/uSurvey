@@ -1,7 +1,9 @@
 from django.test import TestCase
-from survey.models import *
 from django.contrib.auth.models import User
 from django.db import IntegrityError, DatabaseError
+
+from survey.models.users import UserProfile
+
 
 class UserProfileTest(TestCase):
 

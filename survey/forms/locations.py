@@ -1,9 +1,12 @@
 from django import forms
-from survey.models import *
 from django.forms import ModelForm
-from django.core.validators import *
 from rapidsms.contrib.locations.models import *
+
 from django.template.defaultfilters import slugify
+from django.core.exceptions import ValidationError
+
+from survey.models.formula import *
+
 
 class LocationTypeForm(ModelForm):
 
@@ -28,5 +31,36 @@ class LocationTypeForm(ModelForm):
     class Meta:
         model = LocationType
         exclude = ['slug']
+
+class LocationForm(ModelForm):
+
+    def editing_instance(self, cleaned_data):
+        for field in cleaned_data.keys():
+            if self.initial.get(field, None) != cleaned_data[field]:
+                return False
+        return True
+
+    def clean_type(self):
+        a_type = self.cleaned_data['type']
+        if not a_type:
+            message = "This field is required."
+            self._errors['type'] = self.error_class([message])
+            del self.cleaned_data['type']
+        return a_type
+
+    def clean(self):
+        cleaned_data = super(LocationForm, self).clean()
+        locations_with_same_attributes = Location.objects.filter(**cleaned_data)
+        if locations_with_same_attributes and not self.editing_instance(cleaned_data):
+            raise ValidationError('This location already exists.')
+        return cleaned_data
+
+    class Meta:
+        model = Location
+        exclude = ['point', 'parent_type', 'parent_id']
+        widgets = {
+            'tree_parent': forms.Select(attrs={'class':'chzn-select', 'data-placeholder':'Select or Type District'}),
+            }
+
 
 

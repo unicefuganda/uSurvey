@@ -1,7 +1,6 @@
 from django.test import TestCase
-from survey.models import *
-from django.db import IntegrityError, DatabaseError
-from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models.households import HouseholdHead
+
 
 class HouseholdHeadTest(TestCase):
 

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from survey.models import HouseholdMemberGroup, GroupCondition
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.forms.household_member_group import HouseholdMemberGroupForm
 
 

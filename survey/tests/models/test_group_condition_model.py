@@ -1,5 +1,6 @@
 from django.test import TestCase
-from survey.models import GroupCondition
+from survey.models.householdgroups import GroupCondition
+
 
 class GroupConditionTest(TestCase):
 

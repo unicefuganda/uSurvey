@@ -1,6 +1,6 @@
-from django import forms
-from survey.models import *
 from django.forms import ModelForm
+from survey.models.households import Household
+
 
 class HouseholdForm(ModelForm):
 

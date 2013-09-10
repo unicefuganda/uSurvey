@@ -1,8 +1,13 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from survey.models import Batch
 import csv
+
+from django.shortcuts import render
+
+from django.http import HttpResponse
+
 from django.contrib.auth.decorators import login_required, permission_required
+from survey.models.batch import Batch
+from survey.models.investigator import Investigator
+
 
 @login_required
 @permission_required('auth.can_view_aggregates')
@@ -10,7 +15,7 @@ def download(request):
     batch = Batch.objects.get(id = request.POST['batch'])
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % batch.name
-    data = batch.generate_report()
+    data = batch.generate_report(Investigator)
     writer = csv.writer(response)
     for row in data:
         writer.writerow(row)

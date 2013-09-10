@@ -1,12 +1,12 @@
-from datetime import date, datetime
+from datetime import date
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test.client import Client
-from lettuce.django import django_url
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.householdMember import HouseholdMemberForm
-from survey.models import Investigator, Backend, Household, HouseholdMember, HouseholdHead
-from django.contrib.auth.models import User
+from survey.models.households import HouseholdMember, HouseholdHead, Household
+from survey.models.backend import Backend
+from survey.models.investigator import Investigator
 from survey.tests.base_test import BaseTest
 
 

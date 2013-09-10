@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from lettuce import *
-from page_objects import *
-from random import randint
-from survey.features.page_objects.batches import FormulaShowPage
-from survey.models import *
 from rapidsms.contrib.locations.models import *
-from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
+
+from survey.features.page_objects.batches import FormulaShowPage
+from survey.models.batch import Batch
+from survey.models.households import HouseholdHead, Household
+from survey.models.backend import Backend
+from survey.models.investigator import Investigator
+from survey.models.formula import *
+from survey.models.question import Question, QuestionOption
+
 
 @step(u'And I have hierarchical locations with district and village')
 def and_i_have_hierarchical_locations_with_district_and_village(step):

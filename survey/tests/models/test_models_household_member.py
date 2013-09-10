@@ -2,8 +2,10 @@ from datetime import date
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import HouseholdMember, Household, Investigator, Backend, HouseholdMemberGroup, GroupCondition
-
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
+from survey.models.households import HouseholdMember, Household
+from survey.models.backend import Backend
+from survey.models.investigator import Investigator
 
 class HouseholdMemberTest(TestCase):
     def test_should_have_fields_required(self):

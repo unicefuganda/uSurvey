@@ -1,9 +1,16 @@
 from django.shortcuts import render
-from survey.models import Batch, Question, HouseholdMemberGroup
 from django.contrib import messages
-from survey.forms.question import QuestionForm
+
 from django.http import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
+
+from survey.models.batch import Batch
+from survey.models.question import Question
+from survey.models.householdgroups import HouseholdMemberGroup
+
+from survey.forms.question import QuestionForm
+
+
 
 @permission_required('auth.can_view_batches')
 def index(request, batch_id):
@@ -18,7 +25,7 @@ def index(request, batch_id):
         messages.error(request,'There are no questions associated with this batch yet.')
     context = {'questions':questions, 'request': request, 'batch':batch}
     return render(request, 'questions/index.html', context)
-    
+
 @permission_required('auth.can_view_batches')
 def new(request, batch_id):
     question_form = QuestionForm()

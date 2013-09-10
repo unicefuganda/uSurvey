@@ -1,15 +1,19 @@
 import json
 
-from survey.tests.base_test import BaseTest
 from django.test.client import Client
 from mock import *
 from django.template.defaultfilters import slugify
-
 from rapidsms.contrib.locations.models import Location, LocationType
+from django.contrib.auth.models import User
+from survey.investigator_configs import COUNTRY_PHONE_CODE
+from survey.models import Backend
+from survey.models.investigator import Investigator
+
+from survey.tests.base_test import BaseTest
+
 from survey.forms.investigator import InvestigatorForm
-from survey.models import *
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from survey.models.formula import *
+
 
 class InvestigatorTest(BaseTest):
     def setUp(self):

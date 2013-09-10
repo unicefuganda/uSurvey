@@ -1,10 +1,11 @@
-from lettuce import *
 from random import randint
-from page_objects import *
+
+from lettuce import *
 from django.contrib.auth.models import User, Group
+
 from survey.features.page_objects.accounts import LoginPage, LogoutPage
 from survey.features.page_objects.users import NewUserPage, UsersListPage, UsersDetailsPage
-from survey.models import *
+from survey.models.users import UserProfile
 
 
 @step(u'Given I am logged in as a superuser')

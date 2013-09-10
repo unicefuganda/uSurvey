@@ -1,11 +1,16 @@
-from django.test import TestCase
 from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import *
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User
+from survey.models.batch import Batch
+from survey.models.households import HouseholdHead, Household
+from survey.models.backend import Backend
+from survey.models.investigator import Investigator
+
+from survey.models.formula import *
+from survey.models.question import Question, QuestionOption
 from survey.views.location_widget import LocationWidget
 from survey.tests.base_test import BaseTest
+
 
 class NumericalFormulaResults(BaseTest):
     def setUp(self):

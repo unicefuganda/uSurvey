@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+import glob
+import os
+
 from lettuce import *
 from splinter import Browser
-from lettuce.django import django_url
 from django.core.management import call_command
-from survey.models import Backend
 from django.conf import settings
-from django.contrib.auth.models import User, Group, Permission
+
 from django.template.defaultfilters import slugify
-import glob, os
+from survey.models.backend import Backend
 
 
 @before.each_scenario

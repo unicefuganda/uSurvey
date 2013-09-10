@@ -1,18 +1,21 @@
 import json
-from django.template.defaultfilters import slugify
 
-from survey.tests.base_test import BaseTest
+from django.template.defaultfilters import slugify
+from datetime import date
 from django.test.client import Client
 from mock import *
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
-
+from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import *
+from survey.models.households import HouseholdMember, HouseholdHead, Household
+from survey.models.backend import Backend
+from survey.models.investigator import Investigator
+
+from survey.tests.base_test import BaseTest
 from survey.forms.household import *
 from survey.views.household import *
+
 
 class HouseholdViewTest(BaseTest):
     def setUp(self):

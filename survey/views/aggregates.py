@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
-from survey.models import *
-from rapidsms.contrib.locations.models import Location, LocationType
+from rapidsms.contrib.locations.models import Location
+from survey.models import HouseholdBatchCompletion
+from survey.models.batch import Batch
+
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
 

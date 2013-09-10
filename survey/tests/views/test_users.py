@@ -1,13 +1,13 @@
 import json
 
-from survey.tests.base_test import BaseTest
 from django.test.client import Client
 from mock import *
+from django.contrib.auth.models import User, Group
+from survey.models.users import UserProfile
 
-from survey.models import *
+from survey.tests.base_test import BaseTest
+
 from survey.forms.users import UserForm, EditUserForm
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
 
 
 class UsersViewTest(BaseTest):

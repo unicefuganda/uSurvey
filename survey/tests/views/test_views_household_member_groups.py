@@ -1,9 +1,11 @@
 from django.test.client import Client
-from survey.models import GroupCondition, HouseholdMemberGroup
-from survey.forms.group_condition import GroupConditionForm
-from survey.forms.household_member_group import HouseholdMemberGroupForm
 from mock import patch
 from django.contrib.auth.models import User
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
+
+from survey.forms.group_condition import GroupConditionForm
+
+from survey.forms.household_member_group import HouseholdMemberGroupForm
 from survey.tests.base_test import BaseTest
 from survey.views.household_member_group import has_valid_condition
 

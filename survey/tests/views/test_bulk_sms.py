@@ -1,10 +1,8 @@
-from django.test import TestCase
 from django.test.client import Client
-from survey.models import *
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from survey.investigator_configs import *
+from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.investigator_configs import PRIME_LOCATION_TYPE
+
 from survey.tests.base_test import BaseTest
 
 

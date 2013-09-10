@@ -1,12 +1,10 @@
-from survey.tests.base_test import BaseTest
 from django.test.client import Client
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from rapidsms.contrib.locations.models import Location, LocationType
-from django.contrib import messages
+from django.contrib.auth.models import User
 from mock import patch
+from survey.models.batch import Batch
+from survey.models.question import Question
 
-from survey.models import *
+from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
 
 

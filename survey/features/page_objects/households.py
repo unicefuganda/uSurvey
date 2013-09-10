@@ -2,7 +2,7 @@
 from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.base import PageObject
 from survey.investigator_configs import MONTHS
-from survey.models import Investigator
+from survey.models.investigator import Investigator
 
 
 class NewHouseholdPage(PageObject):

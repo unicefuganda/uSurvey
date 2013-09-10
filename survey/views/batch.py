@@ -2,11 +2,13 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.decorators import login_required, permission_required
-from survey.investigator_configs import *
-from survey.models import Batch
-from django.core.urlresolvers import reverse
 from django.contrib import messages
+
+from survey.investigator_configs import *
+from survey.models.batch import Batch
+
 from survey.forms.batch import BatchForm
+
 
 @login_required
 @permission_required('auth.can_view_batches')

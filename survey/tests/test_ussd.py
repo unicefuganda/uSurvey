@@ -1,14 +1,22 @@
-from django.test import TestCase
-from django.test.client import Client
-from rapidsms.contrib.locations.models import LocationType
-from survey.models import *
-import json
 import datetime
 import urllib2
-from survey.views import *
-from survey.ussd import *
+
 from random import randint
+
+from django.test import TestCase
+from django.test.client import Client
+from rapidsms.contrib.locations.models import LocationType, Location
 from rapidsms.backends.database.models import BackendMessage
+from survey.models.backend import Backend
+from survey.models.household_batch_completion import HouseholdBatchCompletion
+from survey.models.answer_rule import AnswerRule
+from survey.models.batch import Batch
+from survey.models.households import HouseholdHead, Household
+from survey.models.investigator import Investigator
+
+from survey.models.question import Question, QuestionOption, NumericalAnswer, TextAnswer, MultiChoiceAnswer
+from survey.models.random_household_selection import RandomHouseHoldSelection
+from survey.ussd import *
 
 
 class USSDTest(TestCase):

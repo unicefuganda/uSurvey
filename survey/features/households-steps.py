@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-from lettuce import *
-from page_objects import *
 from random import randint
-from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage, HouseholdDetailsPage
-from survey.features.page_objects.root import HomePage
-from survey.models import *
+from datetime import date
+
+from lettuce import *
+
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
-from datetime import date
+
+from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage, HouseholdDetailsPage
+from survey.features.page_objects.root import HomePage
+from survey.models.households import HouseholdMember, HouseholdHead, Household
+from survey.models.investigator import Investigator
 
 
 @step(u'And I visit new household page')

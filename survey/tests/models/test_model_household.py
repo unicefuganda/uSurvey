@@ -1,7 +1,10 @@
 from django.template.defaultfilters import slugify
 from django.test import TestCase
-from rapidsms.contrib.locations.models import LocationType
-from survey.models import *
+from rapidsms.contrib.locations.models import LocationType, Location
+from survey.models.households import Household
+from survey.models.backend import Backend
+from survey.models.investigator import Investigator
+
 
 
 class HouseholdTest(TestCase):

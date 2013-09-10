@@ -1,13 +1,19 @@
 from django.test import TestCase
-from survey.models import *
-from survey.models import Batch
-from survey.models import Question
+from survey.models.batch import Batch
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.investigator_configs import *
 from django.template.defaultfilters import slugify
 from django.core.exceptions import ValidationError
-
+from survey.investigator_configs import COUNTRY_PHONE_CODE
+from survey.models.household_batch_completion import HouseholdBatchCompletion
+from survey.models.backend import Backend
+from survey.models.answer_rule import AnswerRule
+from survey.models.batch import Batch, BatchLocationStatus
+from survey.models.households import Household
+from survey.models.investigator import Investigator
+from survey.models.locations import LocationAutoComplete
+from survey.models.question import Question, QuestionOption, NumericalAnswer, TextAnswer, MultiChoiceAnswer
+from survey.models.random_household_selection import RandomHouseHoldSelection
 
 class InvestigatorTest(TestCase):
     def test_fields(self):

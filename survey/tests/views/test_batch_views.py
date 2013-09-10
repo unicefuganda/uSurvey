@@ -1,11 +1,9 @@
-from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
-from django.contrib import messages
+from survey.investigator_configs import PRIME_LOCATION_TYPE
+from survey.models.batch import Batch
 from survey.tests.base_test import BaseTest
-from survey.models import *
 from survey.forms.batch import BatchForm
 
 class BatchViews(BaseTest):

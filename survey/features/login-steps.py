@@ -1,16 +1,15 @@
-from page_objects import *
-from random import randint
+from lettuce import *
+from django.contrib.auth.models import User
+
 from survey.features.page_objects.accounts import LoginPage
+
 from survey.features.page_objects.aggregates import AggregateStatusPage, DownloadExcelPage
 from survey.features.page_objects.households import NewHouseholdPage
 from survey.features.page_objects.investigators import NewInvestigatorPage, InvestigatorsListPage
 from survey.features.page_objects.root import HomePage
 from survey.features.page_objects.users import NewUserPage
-from survey.models import *
-from rapidsms.contrib.locations.models import *
-from django.template.defaultfilters import slugify
-from lettuce import *
-from django.contrib.auth.models import User
+from survey.models.users import UserProfile
+
 
 @step(u'Given I have a user')
 def given_i_have_a_user(step):

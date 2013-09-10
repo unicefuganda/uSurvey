@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from lettuce.django import django_url
-from rapidsms.contrib.locations.models import Location
-from survey.features.page_objects.base import PageObject
-from survey.models import Investigator
-from rapidsms.contrib.locations.models import *
 from rapidsms.backends.database.models import BackendMessage
+
+from survey.features.page_objects.base import PageObject
+from survey.models.investigator import Investigator
 
 
 class HomePage(PageObject):

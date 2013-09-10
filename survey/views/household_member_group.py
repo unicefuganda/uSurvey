@@ -1,11 +1,13 @@
 import json
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from survey.models import GroupCondition, HouseholdMemberGroup
+from django.contrib import messages
+from django.contrib.auth.decorators import permission_required
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
+
 from survey.forms.group_condition import GroupConditionForm
 from survey.forms.household_member_group import HouseholdMemberGroupForm
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
 from survey.views.views_helper import contains_key
 
 

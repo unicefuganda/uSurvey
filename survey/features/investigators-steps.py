@@ -7,12 +7,13 @@ from random import randint
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-
 from lettuce import *
-from survey.features.page_objects.accounts import LoginPage
-from survey.features.page_objects.investigators import NewInvestigatorPage, InvestigatorsListPage, FilteredInvestigatorsListPage, EditInvestigatorPage, InvestigatorDetailsPage
-from survey.models import *
 from rapidsms.contrib.locations.models import *
+
+from survey.features.page_objects.accounts import LoginPage
+
+from survey.features.page_objects.investigators import NewInvestigatorPage, InvestigatorsListPage, FilteredInvestigatorsListPage, EditInvestigatorPage, InvestigatorDetailsPage
+from survey.models.investigator import Investigator
 
 
 def set_permissions(group, permissions_codename_list):
@@ -21,17 +22,17 @@ def set_permissions(group, permissions_codename_list):
         permission, out = Permission.objects.get_or_create(codename=codename, content_type=auth_content)
         group.permissions.add(permission)
 
-def create_reacher():
+def create_reseacher():
     researcher = Group.objects.create(name='researcher1')
     user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
     researcher.user_set.add(user)
-    set_permissions(researcher, ['can_view_aggregates', 'can_view_households', 'can_view_batches', 'can_view_investigators'])
+    set_permissions(researcher, ['can_view_aggregates', 'can_view_households', 'can_view_batches', 'can_view_investigators', 'can_view_locations'])
 
     return user
 
 @step(u'Given I am logged in as researcher')
 def given_i_am_logged_in_as_researcher(step):
-    user = create_reacher()
+    user = create_reseacher()
     world.page = LoginPage(world.browser)
     world.page.visit()
     world.page.login(user)

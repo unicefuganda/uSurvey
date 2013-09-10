@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.test.client import Client
-from survey.models import *
 from rapidsms.contrib.locations.models import Location
+from survey.models.batch import Batch
+from survey.models.investigator import Investigator
+
 
 class TestApi(TestCase):
     def setUp(self):

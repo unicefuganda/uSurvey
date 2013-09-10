@@ -1,5 +1,7 @@
 from django.test import TestCase
 from survey.forms.batch import *
+from survey.models.batch import Batch
+
 
 class BatchFormTest(TestCase):
     def test_valid(self):

@@ -3,8 +3,8 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from survey.investigator_configs import *
+from survey.models.investigator import Investigator
 
-from survey.models import Investigator
 from survey.ussd import *
 
 

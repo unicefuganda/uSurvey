@@ -1,10 +1,11 @@
+from datetime import datetime
 from django import forms
-from survey.models import *
 from django.forms import ModelForm
-from django.core.validators import *
+from survey.models.households import HouseholdHead
+
 from survey.investigator_configs import OCCUPATION, MONTHS
 from widgets import InlineRadioSelect
-from datetime import *
+
 
 class HouseholdHeadForm(ModelForm):
 

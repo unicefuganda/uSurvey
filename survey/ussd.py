@@ -1,7 +1,7 @@
 from django.core.cache import cache
 from django.conf import settings
-from survey.models import RandomHouseHoldSelection
 from survey.investigator_configs import *
+from survey.models.random_household_selection import RandomHouseHoldSelection
 
 
 class USSDBase(object):

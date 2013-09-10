@@ -1,8 +1,11 @@
 from lettuce import *
+from rapidsms.contrib.locations.models import *
+
 from survey.features.page_objects.root import BulkSMSPage
 from survey.investigator_configs import *
-from survey.models import *
-from rapidsms.contrib.locations.models import *
+from survey.models import Backend
+from survey.models.investigator import Investigator
+
 
 @step(u'And I have 2 districts with investigators')
 def and_i_have_2_districts_with_investigators(step):

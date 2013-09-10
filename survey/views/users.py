@@ -1,13 +1,14 @@
 import json
 
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, permission_required
 
 from survey.investigator_configs import *
 from survey.forms.users import *
-from django.contrib.auth.decorators import login_required, permission_required
+from survey.models.users import UserProfile
 from survey.views.custom_decorators import permission_required_for_perm_or_current_user
 
 def _add_error_messages(userform, request):

@@ -1,7 +1,6 @@
-import datetime
 from django.forms import ModelForm, DateInput
 from django import forms
-from survey.models import HouseholdMember
+from survey.models.households import HouseholdMember
 
 
 class HouseholdMemberForm(ModelForm):

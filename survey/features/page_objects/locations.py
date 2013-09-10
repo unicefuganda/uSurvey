@@ -6,3 +6,6 @@ class NewLocationTypePage(PageObject):
 
     def validate_location_type_fields(self):
         assert self.browser.is_element_present_by_name('name')
+
+class NewLocationPage(PageObject):
+    url = "/locations/new/"

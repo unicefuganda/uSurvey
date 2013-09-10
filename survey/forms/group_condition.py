@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from survey.models import GroupCondition
+from survey.models.householdgroups import GroupCondition
 
 
 class GroupConditionForm(ModelForm):

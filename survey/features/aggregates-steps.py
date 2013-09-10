@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from lettuce import *
-from page_objects import *
-from random import randint
-from survey.features.page_objects.aggregates import AggregateStatusPage, DownloadExcelPage
-from survey.models import *
-from rapidsms.contrib.locations.models import *
-from django.template.defaultfilters import slugify
-from survey import investigator_configs
 from django.utils.datastructures import SortedDict
+from rapidsms.contrib.locations.models import *
+
+from survey.features.page_objects.aggregates import AggregateStatusPage, DownloadExcelPage
+from survey.models.batch import Batch
+from survey.models.households import Household
+from survey.models.investigator import Investigator
+from survey.models.formula import *
+from survey import investigator_configs
 
 @step(u'And I have 2 batches with one open')
 def and_i_have_2_batches_with_one_open(step):

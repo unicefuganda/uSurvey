@@ -1,9 +1,11 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib.auth.decorators import permission_required
+
 from survey.forms.householdMember import HouseholdMemberForm
-from survey.models import Household, HouseholdMember
-from django.contrib.auth.decorators import login_required, permission_required
+from survey.models.households import HouseholdMember, Household
+
 
 @permission_required('auth.can_view_households')
 def new(request, household_id):

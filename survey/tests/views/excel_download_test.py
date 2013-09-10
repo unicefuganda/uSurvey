@@ -1,9 +1,17 @@
 from django.test import TestCase
 from django.test.client import Client
-from survey.models import *
 from django.contrib.auth.models import User, Group, Permission
+
 from django.contrib.contenttypes.models import ContentType
+from rapidsms.contrib.locations.models import Location
+from survey.models.batch import Batch
+from survey.models.households import HouseholdHead, Household
+from survey.models.backend import Backend
+from survey.models.investigator import Investigator
+
+from survey.models.question import Question, QuestionOption
 from survey.tests.base_test import BaseTest
+
 
 class ExcelDownloadTest(BaseTest):
 

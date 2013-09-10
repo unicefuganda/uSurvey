@@ -1,13 +1,9 @@
 from lettuce import *
-from page_objects import *
-from random import randint
-from survey.features.page_objects.accounts import LogoutPage, LoginPage
-from survey.models import *
-from rapidsms.contrib.locations.models import *
-from django.template.defaultfilters import slugify
-from survey import investigator_configs
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+
+from survey.features.page_objects.accounts import LogoutPage, LoginPage
+
 
 @step(u'Given I  am an anonymous user')
 def given_i_am_an_anonymous_user(step):

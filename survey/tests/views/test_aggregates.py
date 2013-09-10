@@ -1,13 +1,13 @@
-from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User
 
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import *
+from survey.models.batch import Batch
+from survey.models.households import Household
+from survey.models.backend import Backend
+from survey.models.investigator import Investigator
 from survey import investigator_configs
 from survey.views.aggregates import *
-from survey.views.views_helper import contains_key
 from survey.tests.base_test import BaseTest
 
 

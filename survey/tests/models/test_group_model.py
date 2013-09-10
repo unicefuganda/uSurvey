@@ -1,8 +1,11 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, Question, GroupCondition, Investigator, Backend, Household, HouseholdMember
-
+from survey.models.question import Question
+from survey.models.investigator import Investigator
+from survey.models.backend import Backend
+from survey.models.households import Household
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
 class HouseholdMemberGroupTest(TestCase):
 

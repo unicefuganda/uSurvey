@@ -1,11 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from rapidsms.contrib.locations.models import Location, LocationType
+from rapidsms.contrib.locations.models import Location
 from django.contrib.auth.decorators import login_required, permission_required
-from survey.investigator_configs import *
-from survey.models import Formula
-from django.core.urlresolvers import reverse
-from django.contrib import messages
+from survey.models.formula import Formula
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
 

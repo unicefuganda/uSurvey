@@ -1,9 +1,11 @@
 from django import forms
 from django.contrib.auth.models import User
-from survey.models import UserProfile
 from django.forms import ModelForm
+
 from django.contrib.auth.forms import UserCreationForm
-from django.core.validators import *
+
+from survey.models.users import UserProfile
+
 
 class UserForm(UserCreationForm):
     mobile_number = forms.DecimalField(min_value=100000000,

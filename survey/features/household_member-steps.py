@@ -2,7 +2,8 @@ from lettuce import *
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.features.page_objects.household_member import NewHouseholdMemberPage, EditHouseholdMemberPage, DeleteHouseholdMemberPage
 from survey.features.page_objects.households import HouseholdDetailsPage
-from survey.models import Household, HouseholdMember, Investigator, HouseholdHead
+from survey.models.households import HouseholdMember, HouseholdHead, Household
+from survey.models.investigator import Investigator
 
 
 @step(u'And I have a household')
