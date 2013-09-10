@@ -2,6 +2,7 @@ from django.test import TestCase
 from survey.forms.question import *
 from survey.models import Batch
 from survey.models.question import Question
+from survey.models.householdgroups import HouseholdMemberGroup
 
 
 class QuestionFormTest(TestCase):

@@ -14,6 +14,8 @@ from survey.models.investigator import Investigator
 from survey.models.locations import LocationAutoComplete
 from survey.models.question import Question, QuestionOption, NumericalAnswer, TextAnswer, MultiChoiceAnswer
 from survey.models.random_household_selection import RandomHouseHoldSelection
+from survey.models.formula import Formula
+from survey.models.householdgroups import HouseholdMemberGroup
 
 class InvestigatorTest(TestCase):
     def test_fields(self):

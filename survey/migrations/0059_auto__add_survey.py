@@ -27,9 +27,6 @@ class Migration(SchemaMigration):
         db.create_unique(u'survey_survey_questions', ['survey_id', 'question_id'])
 
 
-        # Changing field 'HouseholdMemberGroup.order'
-        db.alter_column(u'survey_householdmembergroup', 'order', self.gf('django.db.models.fields.PositiveIntegerField')(unique=True, max_length=5))
-
     def backwards(self, orm):
         # Deleting model 'Survey'
         db.delete_table(u'survey_survey')
@@ -37,9 +34,6 @@ class Migration(SchemaMigration):
         # Removing M2M table for field questions on 'Survey'
         db.delete_table('survey_survey_questions')
 
-
-        # Changing field 'HouseholdMemberGroup.order'
-        db.alter_column(u'survey_householdmembergroup', 'order', self.gf('django.db.models.fields.IntegerField')(max_length=5, unique=True))
 
     models = {
         u'auth.group': {
@@ -150,7 +144,7 @@ class Migration(SchemaMigration):
         },
         'survey.groupcondition': {
             'Meta': {'object_name': 'GroupCondition'},
-            'attribute': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'attribute': ('django.db.models.fields.CharField', [], {'default': "'AGE'", 'max_length': '20'}),
             'condition': ('django.db.models.fields.CharField', [], {'default': "'EQUALS'", 'max_length': '20'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'conditions'", 'symmetrical': 'False', 'to': "orm['survey.HouseholdMemberGroup']"}),
@@ -256,6 +250,7 @@ class Migration(SchemaMigration):
             'answer_type': ('django.db.models.fields.CharField', [], {'max_length': '15'}),
             'batch': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'questions'", 'null': 'True', 'to': "orm['survey.Batch']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'question_group'", 'null': 'True', 'to': "orm['survey.HouseholdMemberGroup']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'identifier': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),

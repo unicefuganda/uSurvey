@@ -11,7 +11,7 @@ from survey.models.backend import Backend
 from survey.models.household_batch_completion import HouseholdBatchCompletion
 from survey.models.answer_rule import AnswerRule
 from survey.models.batch import Batch
-from survey.models.households import HouseholdHead, Household
+from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.investigator import Investigator
 
 from survey.models.question import Question, QuestionOption, NumericalAnswer, TextAnswer, MultiChoiceAnswer

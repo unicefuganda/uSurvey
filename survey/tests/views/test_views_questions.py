@@ -6,6 +6,7 @@ from survey.models.question import Question
 
 from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
+from survey.models.householdgroups import HouseholdMemberGroup
 
 
 class QuestionsViews(BaseTest):
@@ -58,11 +59,11 @@ class QuestionsViews(BaseTest):
         self.assertIsInstance(response.context['questionform'], QuestionForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'add-question-form')
-        
+
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for("/batches/%d/questions/new/"%self.batch.id)
         self.assert_restricted_permission_for('/batches/%d/questions/'%self.batch.id)
-        
+
     @patch('django.contrib.messages.success')
     def test_create_question_success(self, mock_success):
         form_data={

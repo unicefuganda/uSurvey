@@ -2,7 +2,7 @@ from random import randint
 from lettuce import *
 from survey.features.page_objects.question import QuestionsListPage, AddQuestionPage
 from survey.models.question import Question
-
+from survey.models.householdgroups import HouseholdMemberGroup
 
 @step(u'And I have 100 questions under the batch')
 def and_i_have_100_questions_under_the_batch(step):
@@ -45,8 +45,7 @@ def then_i_should_see_a_add_question_page(step):
 @step(u'When I fill the details for add question form')
 def when_i_fill_the_details_for_add_question_form(step):
     data={'text':'hritik  question',
-          'answer_type': Question.NUMBER,
-          'group': world.household_member_group.id}
+          'answer_type': Question.NUMBER}
 
     world.page.fill_valid_values(data)
 

@@ -6,6 +6,7 @@ from survey.models.households import Household
 from survey.models.investigator import Investigator
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
+from django.conf import settings
 
 
 class Question(BaseModel):

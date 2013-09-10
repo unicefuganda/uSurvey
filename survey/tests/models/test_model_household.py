@@ -1,7 +1,7 @@
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models.households import Household
+from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 

@@ -4,7 +4,7 @@ from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.question import Question
 from survey.models.investigator import Investigator
 from survey.models.backend import Backend
-from survey.models.households import Household
+from survey.models.households import Household, HouseholdMember
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
 class HouseholdMemberGroupTest(TestCase):

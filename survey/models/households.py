@@ -5,6 +5,9 @@ from survey.investigator_configs import LEVEL_OF_EDUCATION, MONTHS
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
 from survey.models.investigator import Investigator
+from django.conf import settings
+from survey.models.householdgroups import HouseholdMemberGroup
+from django.core.paginator import Paginator
 
 
 class Household(BaseModel):
@@ -111,6 +114,27 @@ class Household(BaseModel):
             related_location[key] = self._get_related_location_name(key, location_hierarchy)
 
         return related_location
+
+    def all_members(self):
+        household_members = list(self.household_member.order_by('name').all())
+        household_members.insert(0, self.head)
+        return household_members
+
+    def members_list(self, page=1):
+        all_members = self.all_members()
+        paginator = Paginator(all_members, self.MEMBERS_PER_PAGE)
+        members = paginator.page(page)
+        members_list = []
+        for member in members:
+            name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.name
+            text = "%s: %s" % (all_members.index(member) + 1, name)
+            members_list.append(text)
+        if members.has_previous():
+            members_list.append(self.PREVIOUS_PAGE_TEXT)
+        if members.has_next():
+            members_list.append(self.NEXT_PAGE_TEXT)
+        return "\n".join(members_list)
+
 
     @classmethod
     def set_related_locations(cls, households):
