@@ -1,25 +1,26 @@
 {% extends "layout.html" %}
 {% block title %}
-  Group Condition List
+  Survey List
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
+{% autopaginate surveys 50 %}
   <h3>
-    Groups Condition List
+    Survey List
   </h3>
-    <a href="{% url 'new_group_condition' %}" class="btn btn-primary pull-right" id="add_condition">
-      <i class="icon-plus icon-white"></i> Add Condition</a>
+  <a href="{% url 'new_survey_page' %}" class="btn btn-primary pull-right" id="add_survey">
+    <i class="icon-plus icon-white"></i>Add Survey</a>
   <table class="table table-striped table-bordered table-hover">
     <thead>
       <tr>
         <th>
-          Condition
+          Name
         </th>
         <th>
-          Attribute
+          Description
         </th>
         <th>
-          Value
+          Rapid survey
         </th>
         <th>
           Actions
@@ -27,22 +28,25 @@
       </tr>
     </thead>
     <tbody>
-      {% for condition in conditions %}
+      {% for survey in surveys %}
         <tr>
           <td>
-            <a href="">{{ condition.condition }}</a>
+            {{ survey.name }}
           </td>
           <td>
-            {{ condition.attribute }}
+            {{ survey.description }}
           </td>
           <td>
-            {{ condition.value }}
+            {{ survey.description }}
           </td>
           <td>
-            <a href="">Edit</a>
+            <a href=''>Edit</a>
+            <a href=''>Delete</a>
+            <a href=''>Add questions</a>
           </td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
+  {% paginate %}
 {% endblock %}

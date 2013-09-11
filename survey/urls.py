@@ -53,6 +53,8 @@ urlpatterns = patterns('',
     url(r'^groups/new/$', 'survey.views.household_member_group.add_group', name='new_household_member_groups_page'),
     url(r'^conditions/$', 'survey.views.household_member_group.conditions', name='show_group_condition'),
     url(r'^conditions/new/$', 'survey.views.household_member_group.add_condition', name='new_group_condition'),
+    url(r'^surveys/$', 'survey.views.surveys.index', name='survey_list_page'),
+    url(r'^surveys/new/$', 'survey.views.surveys.new', name='new_survey_page'),
 )
 
 if not settings.PRODUCTION:
