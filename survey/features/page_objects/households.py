@@ -9,7 +9,7 @@ class NewHouseholdPage(PageObject):
     url = "/households/new"
 
     def valid_page(self):
-        fields = ['investigator', 'surname', 'first_name', 'male', 'age', 'occupation',
+        fields = ['investigator', 'surname', 'first_name', 'male', 'date_of_birth', 'occupation',
                   'level_of_education', 'resident_since_month', 'resident_since_year']
         fields += ['uid']
         for field in fields:
@@ -23,7 +23,7 @@ class NewHouseholdPage(PageObject):
         self.values = {
             'surname': self.random_text('house'),
             'first_name': self.random_text('ayoyo'),
-            'age': '25',
+            'date_of_birth': '1980-02-01',
             'uid':'2'
         }
         self.browser.fill_form(self.values)
@@ -98,30 +98,30 @@ class HouseholdDetailsPage(PageObject):
         self.household = household
         self.url = '/households/' + str(household.id) + '/'
 
-
     def validate_household_details(self):
+        household_head = self.household.get_head()
         details = {
-            'Family Name': self.household.head.surname,
-            'Other Names': self.household.head.first_name,
-            'Age': str(self.household.head.age),
-            'Gender': 'Male' if self.household.head.male else 'Female',
-            'Occupation / Main Livelihood': self.household.head.occupation,
-            'Highest level of education completed': self.household.head.level_of_education,
-            'Since when have you lived here': str(self.household.head.resident_since_year),
+            'Family Name': household_head.surname,
+            'Other Names': household_head.first_name,
+            'Age': str(household_head.get_age()),
+            'Gender': 'Male' if household_head.male else 'Female',
+            'Occupation / Main Livelihood': household_head.occupation,
+            'Highest level of education completed': household_head.level_of_education,
+            'Since when have you lived here': str(household_head.resident_since_year),
             }
         for label, text in details.items():
             self.is_text_present(label)
             self.is_text_present(text)
-        self.is_text_present(MONTHS[self.household.head.resident_since_month][1])
+        self.is_text_present(MONTHS[household_head.resident_since_month][1])
 
     def validate_household_member_details_table_headings(self):
-        member_details_headings =['Name', 'Date of birth', 'Sex']
+        member_details_headings =['Family Name', 'Date of birth', 'Sex']
         for heading in member_details_headings:
             self.is_text_present(heading)
 
     def validate_household_member_details_values(self):
         for member in self.household.household_member.all():
-            for detail in [member.name, member.date_of_birth.strftime('%b %d, %Y'), 'Male' if member.male else 'Female']:
+            for detail in [member.surname, member.date_of_birth.strftime('%b %d, %Y'), 'Male' if member.male else 'Female']:
                 self.is_text_present(str(detail))
 
     def validate_household_member_details(self):

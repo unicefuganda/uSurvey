@@ -1,3 +1,4 @@
+from time import sleep
 from lettuce import *
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.features.page_objects.household_member import NewHouseholdMemberPage, EditHouseholdMemberPage, DeleteHouseholdMemberPage
@@ -12,7 +13,7 @@ def and_i_have_a_household(step):
     world.kampala = Location.objects.create(name='Kampala', type = district)
     world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.kampala)
     world.household = Household.objects.create(investigator=world.investigator, uid=4)
-    HouseholdHead.objects.create(household=world.household, surname="Test", first_name="User", age=30, male=True,
+    HouseholdHead.objects.create(household=world.household, surname="Test", first_name="User", date_of_birth="1980-09-01", male=True,
                                  occupation='Agricultural labor', level_of_education='Primary', resident_since_year=2013, resident_since_month=2)
 
 
@@ -33,16 +34,17 @@ def then_i_should_see_member_successfully_created_message(step):
 
 @step(u'And I fill all member related fields')
 def and_i_fill_all_member_related_fields(step):
-    data = {'name': 'xyz',
-            'date_of_birth': '2013-08-30',
+    data = {'surname': 'xyz',
             'male': True
-    }
-    world.page.fill_valid_member_values(data)
+            }
 
+    world.page.fill_valid_member_values(data)
+    world.page.select_date("#id_date_of_birth")
+    sleep(3)
 
 @step(u'And also I have a household member')
 def and_also_i_have_a_household_member(step):
-    world.household_member = HouseholdMember.objects.create(name='member1', date_of_birth='2013-08-30', male=True,
+    world.household_member = HouseholdMember.objects.create(surname='member1', date_of_birth='2013-08-30', male=True,
                                                             household=world.household)
 
 
@@ -59,11 +61,16 @@ def and_i_see_all_details_of_household_member_are_present(step):
 
 @step(u'And I edit member related fields')
 def and_i_edit_member_related_fields(step):
-    data = {'name': 'member1edited',
-            'date_of_birth': '2013-08-31',
-            'male': False
-    }
+    data = {'male': False,
+            'surname': 'member1edited'
+            }
     world.page.fill_valid_member_values(data)
+    world.page.select_date("#id_date_of_birth")
+    sleep(3)
+
+@step(u'And I submit the form')
+def and_i_submit_the_form(step):
+    world.page.submit()
 
 @step(u'Then I should see member successfully edited message')
 def then_i_should_see_member_successfully_edited_message(step):

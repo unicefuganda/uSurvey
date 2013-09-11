@@ -9,12 +9,14 @@ class NewHouseholdMemberPage(PageObject):
         self.url = '/households/%d/member/new/' % household.id
 
     def validate_fields(self):
-        self.validate_fields_present(['Name', 'Sex', 'Date of birth', 'Create', 'Cancel'])
+        self.validate_fields_present(['Family Name', 'Sex', 'Date of birth', 'Create', 'Cancel'])
 
-    def fill_valid_member_values(self,data):
+    def fill_valid_member_values(self, data):
         self.browser.fill_form(data)
 
+
 class EditHouseholdMemberPage(PageObject):
+
     def __init__(self, browser, household,member):
         self.browser = browser
         self.household = household
@@ -22,12 +24,13 @@ class EditHouseholdMemberPage(PageObject):
         self.url = '/households/%d/member/%d/edit/' % (household.id,member.id)
 
     def validate_member_details(self, household_member):
-        self.browser.is_text_present(household_member.name)
+        self.browser.is_text_present(household_member.surname)
         self.browser.is_text_present(household_member.date_of_birth)
         self.is_radio_selected('male',True)
 
-    def fill_valid_member_values(self,data):
+    def fill_valid_member_values(self, data):
         self.browser.fill_form(data)
+
 
 class DeleteHouseholdMemberPage(PageObject):
     def __init__(self, browser, household,member):
@@ -37,6 +40,6 @@ class DeleteHouseholdMemberPage(PageObject):
         self.url = '/households/%d/member/%d/delete/' % (household.id,member.id)
 
     def see_delete_confirmation_modal(self):
-        self.is_text_present("Confirm: Are you sure you want to delete %s?" % self.member.name)
+        self.is_text_present("Confirm: Are you sure you want to delete %s?" % self.member.surname)
 
 

@@ -29,9 +29,9 @@ class HouseholdMemberViewsTest(BaseTest):
         investigator = Investigator.objects.create(name="inv1", location=uganda,
                                                    backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=investigator, uid=0)
-        HouseholdHead.objects.create(household=self.household, surname="Test", first_name="User", age=30, male=True,
+        HouseholdHead.objects.create(household=self.household, surname="Test", first_name="User", date_of_birth="1980-09-01", male=True,
                                      occupation='Agricultural labor', level_of_education='Primary', resident_since_year=2013, resident_since_month=2)
-        self.household_member = HouseholdMember.objects.create(name='member1', date_of_birth=(date(2013, 8, 30)),
+        self.household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                                male=True,
                                                                household=self.household)
 
@@ -46,7 +46,7 @@ class HouseholdMemberViewsTest(BaseTest):
         self.assertEqual(response.context['button_label'], 'Create')
 
     def test_new_should_redirect_on_post(self):
-        form_data = {'name': 'xyz',
+        form_data = {'surname': 'xyz',
                      'date_of_birth': date(1980, 05, 01),
                      'male': True
         }
@@ -57,15 +57,15 @@ class HouseholdMemberViewsTest(BaseTest):
         self.assertRedirects(response, expected_url='/households/%d/'%(self.household.id), status_code=302, target_status_code=200, msg_prefix='')
 
     def test_new_should_create_new_member_on_post_who_belongs_to_household_selected(self):
-        form_data = {'name': 'xyz',
+        form_data = {'surname': 'xyz',
                      'date_of_birth': date(1980, 05, 01),
                      'male': True
         }
 
         response = self.client.post('/households/%d/member/new/' % int(self.household.id), data=form_data)
-        self.assertEqual((HouseholdMember.objects.all()).count(), 2)
+        self.assertEqual((HouseholdMember.objects.filter(householdhead=None)).count(), 2)
         success_message = 'Household member successfully created.'
-        household_member = HouseholdMember.objects.get(name=form_data['name'])
+        household_member = HouseholdMember.objects.get(surname=form_data['surname'])
         self.failUnless(household_member)
         self.assertEqual(household_member.household, self.household)
         self.assertTrue(success_message in response.cookies['messages'].value)
@@ -81,7 +81,7 @@ class HouseholdMemberViewsTest(BaseTest):
 
     def test_should_show_error_if_being_created_for_household_that_does_not_exist_and_redirect_to_households_for_post(
             self):
-        form_data = {'name': 'xyz',
+        form_data = {'surname': 'xyz',
                      'date_of_birth': date(1980, 05, 01),
                      'male': True
         }
@@ -110,29 +110,29 @@ class HouseholdMemberViewsTest(BaseTest):
 
         member_form = response.context['member_form']
 
-        self.assertEqual(member_form.instance.name, self.household_member.name)
+        self.assertEqual(member_form.instance.surname, self.household_member.surname)
         self.assertEqual(member_form.instance.date_of_birth, self.household_member.date_of_birth)
         self.assertTrue(member_form.instance.male)
 
     def test_should_update_member_information_on_post(self):
-        form_data = {'name': 'new_name',
+        form_data = {'surname': 'new_name',
                      'date_of_birth': date(1981, 06, 01),
                      'male': False
         }
         response = self.client.post(
             '/households/%d/member/%d/edit/' % (int(self.household.id), int(self.household_member.id)), data=form_data)
 
-        member = HouseholdMember.objects.filter(name=self.household_member.name)
+        member = HouseholdMember.objects.filter(surname=self.household_member.surname)
         self.failIf(member)
 
         updated_member = HouseholdMember.objects.get(id=self.household_member.id)
-        self.assertEqual(updated_member.name,form_data['name'])
+        self.assertEqual(updated_member.surname,form_data['surname'])
         self.assertEqual(updated_member.date_of_birth,form_data['date_of_birth'])
         self.assertFalse(updated_member.male)
         self.assertRedirects(response, expected_url='/households/%d/'%(self.household.id), status_code=302, target_status_code=200, msg_prefix='')
 
     def test_should_show_successfully_edited_on_post_if_valid_information(self):
-        form_data = {'name': 'new_name',
+        form_data = {'surname': 'new_name',
                      'date_of_birth': date(1981, 06, 01),
                      'male': False
         }

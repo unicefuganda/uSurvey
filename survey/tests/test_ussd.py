@@ -36,12 +36,12 @@ class USSDTest(TestCase):
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, uid=0)
-        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
+        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname", date_of_birth='1980-09-01')
         self.household_1 = Household.objects.create(investigator=self.investigator, uid=1)
         self.household_head_1 = HouseholdHead.objects.create(
             household=self.household_1,
-            surname="Name " + str(randint(1, 9999)))
-        self.household_member = HouseholdMember.objects.create(name="Name 2", household=self.household_1, date_of_birth='2000-02-03')
+            surname="Name " + str(randint(1, 9999)), date_of_birth='1980-09-01')
+        self.household_member = HouseholdMember.objects.create(surname="Name 2", household=self.household_1, date_of_birth='2000-02-03')
         self.batch = Batch.objects.create(order=1)
         self.batch.open_for_location(self.investigator.location)
 
@@ -59,10 +59,10 @@ class USSDTest(TestCase):
         return self.client.post('/ussd', data=self.ussd_params)
 
     def test_list_household_members_after_selecting_household(self):
-        household_member1 = HouseholdMember.objects.create(household=self.household, name="abcd", male=False, date_of_birth='1989-02-02')
-        household_member2 = HouseholdMember.objects.create(household=self.household, name="xyz", male=False, date_of_birth='1989-02-02')
+        household_member1 = HouseholdMember.objects.create(household=self.household, surname="abcd", male=False, date_of_birth='1989-02-02')
+        household_member2 = HouseholdMember.objects.create(household=self.household, surname="xyz", male=False, date_of_birth='1989-02-02')
         response = self.select_household()
-        members_list = "%s\n1: %s - (HEAD)\n2: %s\n3: %s" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, household_member1.name, household_member2.name)
+        members_list = "%s\n1: %s - (HEAD)\n2: %s\n3: %s" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, household_member1.surname, household_member2.surname)
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -435,7 +435,7 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         response = self.select_housold_member(member_id="2")
-        members_list = "%s\n1: %s - (HEAD)\n2: %s" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, self.household_member.name)
+        members_list = "%s\n1: %s - (HEAD)\n2: %s" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, self.household_member.surname)
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -494,7 +494,7 @@ class USSDTestCompleteFlow(TestCase):
     def create_household_head(self, uid):
         self.household = Household.objects.create(investigator=self.investigator, uid=uid)
         return HouseholdHead.objects.create(household=self.household,
-                                            surname="Name " + str(randint(1, 9999)))
+                                            surname="Name " + str(randint(1, 9999)), date_of_birth='1980-09-01')
 
     def setUp(self):
         self.client = Client()
@@ -545,7 +545,7 @@ class USSDTestCompleteFlow(TestCase):
         return self.client.post('/ussd', data=self.ussd_params)
 
     def create_household_member(self, member, household):
-        return HouseholdMember.objects.create(name="member %s" % member, date_of_birth='2012-2-2', male=True,
+        return HouseholdMember.objects.create(surname="member %s" % member, date_of_birth='2012-2-2', male=True,
                                               household=household)
 
     def test_household_member_list_paginates(self):
@@ -559,12 +559,12 @@ class USSDTestCompleteFlow(TestCase):
         member_7 = self.create_household_member("7", household)
 
         member_list_1 = "%s\n1: %s - (HEAD)\n2: %s\n3: %s\n4: %s\n#: Next" % (
-            USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, member_1.name,
-            member_2.name, member_3.name)
+            USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, member_1.surname,
+            member_2.surname, member_3.surname)
 
         member_list_2 = "%s\n5: %s\n6: %s\n7: %s\n8: %s\n*: Back" % (
-            USSD.MESSAGES['MEMBERS_LIST'], member_4.name, member_5.name,
-            member_6.name, member_7.name)
+            USSD.MESSAGES['MEMBERS_LIST'], member_4.surname, member_5.surname,
+            member_6.surname, member_7.surname)
 
         response = self.select_household()
         response_string = "responseString=%s&action=request" % member_list_1
@@ -832,10 +832,10 @@ class USSDOpenBatch(TestCase):
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, uid=0)
-        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
+        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname", date_of_birth='1980-09-01')
         self.household_head_1 = HouseholdHead.objects.create(
             household=Household.objects.create(investigator=self.investigator, uid=1),
-            surname="Name " + str(randint(1, 9999)))
+            surname="Name " + str(randint(1, 9999)), date_of_birth='1980-09-01')
         batch = Batch.objects.create(order=1)
 
     def test_closed_batch(self):
@@ -865,10 +865,10 @@ class USSDWithMultipleBatches(TestCase):
                                                             COUNTRY_PHONE_CODE, ''), location=self.location,
                                                         backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, uid=0)
-        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
+        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname", date_of_birth='1929-02-02')
         self.household_head_1 = HouseholdHead.objects.create(
             household=Household.objects.create(investigator=self.investigator, uid=1),
-            surname="Name " + str(randint(1, 9999)))
+            surname="Name " + str(randint(1, 9999)), date_of_birth='1929-02-02')
         self.batch = Batch.objects.create(order=1)
         self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER,
                                                   order=1)

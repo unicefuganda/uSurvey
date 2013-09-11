@@ -60,7 +60,7 @@
     <tbody>
       {% for household, answer in household_data.items %}
       <tr>
-        <td>{{ household.head.surname }}</td>
+        <td>{{ household.get_head.surname }}</td>
         <td>{{ answer|get_numerator:formula }}</td>
         <td>{{ answer|get_denominator:formula }}</td>
       </tr>

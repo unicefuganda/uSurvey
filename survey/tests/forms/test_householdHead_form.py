@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from django.test import TestCase
 
@@ -19,7 +19,7 @@ class HouseholdHeadFormTest(TestCase):
                         'surname': 'household',
                         'first_name': 'bla',
                         'male': 't',
-                        'age':'23',
+                        'date_of_birth': date(2013, 05, 01),
                         'level_of_education':'Primary',
                         'occupation':'Brewing',
                         'resident_since_year':'2013',
@@ -29,6 +29,7 @@ class HouseholdHeadFormTest(TestCase):
 
     def test_valid(self):
         hHead_form = HouseholdHeadForm(self.form_data)
+        print hHead_form.errors
         self.assertTrue(hHead_form.is_valid())
         household = Household.objects.create(uid=1)
         hHead_form.instance.household = household
@@ -37,33 +38,16 @@ class HouseholdHeadFormTest(TestCase):
         hHead_retrieved = HouseholdHead.objects.get(household=household)
         self.assertEqual(hHead_retrieved, hHead)
 
-    def test_age(self):
-        data = self.form_data
-        data['age']=9
-        hHead_form = HouseholdHeadForm(data)
-        self.assertFalse(hHead_form.is_valid())
-        message = "Ensure this value is greater than or equal to 10."
-        self.assertEquals(hHead_form.errors['age'], [message])
-
-        data['age']=100
-        hHead_form = HouseholdHeadForm(data)
-        self.assertFalse(hHead_form.is_valid())
-        message = "Ensure this value is less than or equal to 99."
-        self.assertEquals(hHead_form.errors['age'], [message])
-
-
     def test_required_fields(self):
         data = self.form_data
-        del data['age']
+        del data['date_of_birth']
         del data['surname']
-        del data['first_name']
 
         hHead_form = HouseholdHeadForm(data)
         self.assertFalse(hHead_form.is_valid())
         message = "This field is required."
-        self.assertEquals(hHead_form.errors['age'], [message])
+        self.assertEquals(hHead_form.errors['date_of_birth'], [message])
         self.assertEquals(hHead_form.errors['surname'], [message])
-        self.assertEquals(hHead_form.errors['first_name'], [message])
 
     def test_resident_since_year(self):
         data = self.form_data

@@ -28,7 +28,7 @@ class ExcelDownloadTest(BaseTest):
         self.question_3 = Question.objects.create(batch=self.batch, text="How many of them are male?", answer_type=Question.TEXT, order=3, identifier="QUESTION_3")
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, uid=0)
-        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname")
+        self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname", date_of_birth='2000-09-01')
 
         self.investigator.answered(self.question_1, self.household, answer=1)
         self.investigator.answered(self.question_2, self.household, answer=1)

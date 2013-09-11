@@ -39,7 +39,7 @@ class FormulaShowPage(PageObject):
 
     def presence_of_tabulated_results_for_households(self,data):
         for household, value in data.items():
-            self.is_text_present(household.head.surname)
+            self.is_text_present(household.get_head().surname)
             for question, val in value.items():
                 self.is_text_present(question.text)
                 if type(val) == int:

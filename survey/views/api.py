@@ -8,7 +8,7 @@ def create_investigator(request):
     location = BatchLocationStatus.objects.all()[0].location
     investigator = Investigator.objects.create(name="Tester", mobile_number=request.GET['mobile_number'], location=location)
     household = Household.objects.create(investigator=investigator, uid=0)
-    HouseholdHead.objects.create(household=household, surname="Surname")
+    HouseholdHead.objects.create(household=household, surname="Surname", date_of_birth='1980-09-01')
     return HttpResponse()
 
 def delete_investigator(request):

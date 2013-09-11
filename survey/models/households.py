@@ -22,6 +22,9 @@ class Household(BaseModel):
     class Meta:
         app_label = 'survey'
 
+    def get_head(self):
+        return HouseholdHead.objects.get(household=self)
+
     def last_question_answered(self):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
@@ -116,8 +119,8 @@ class Household(BaseModel):
         return related_location
 
     def all_members(self):
-        household_members = list(self.household_member.order_by('name').all())
-        household_members.insert(0, self.head)
+        household_members = list(self.household_member.order_by('surname').filter(householdhead=None))
+        household_members.insert(0, self.get_head())
         return household_members
 
     def members_list(self, page=1):
@@ -126,7 +129,7 @@ class Household(BaseModel):
         members = paginator.page(page)
         members_list = []
         for member in members:
-            name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.name
+            name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.surname
             text = "%s: %s" % (all_members.index(member) + 1, name)
             members_list.append(text)
         if members.has_previous():
@@ -143,29 +146,15 @@ class Household(BaseModel):
         return households
 
 
-class HouseholdHead(BaseModel):
-    household = models.OneToOneField(Household, null=True, related_name="head")
-    surname = models.CharField(max_length=12, blank=False, null=True, verbose_name="Family Name")
-    first_name = models.CharField(max_length=12, blank=False, null=True, verbose_name="Other Names")
-    age = models.PositiveIntegerField(validators=[MinValueValidator(10), MaxValueValidator(99)], null=True)
-    male = models.BooleanField(default=True, verbose_name="Gender")
-    occupation = models.CharField(max_length=100, blank=False, null=False,
-                                   verbose_name="Occupation / Main Livelihood", default="16")
-    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
-                                          blank=False, default='Primary', verbose_name="Highest level of education completed")
-    resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
-                                                         null=False, default=1984)
-    resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
-
-    class Meta:
-        app_label = 'survey'
-
-
 class HouseholdMember(BaseModel):
-    name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=12, verbose_name="Family Name")
+    first_name = models.CharField(max_length=12, blank=True, null=True, verbose_name="Other Names")
     male = models.BooleanField(default=True, verbose_name="Sex")
     date_of_birth = models.DateField(auto_now=False)
     household = models.ForeignKey(Household,related_name='household_member')
+
+    def is_head(self):
+        return False
 
     def get_member_groups(self):
         member_groups = []
@@ -182,5 +171,20 @@ class HouseholdMember(BaseModel):
     class Meta:
         app_label = 'survey'
 
+
+class HouseholdHead(HouseholdMember):
+    occupation = models.CharField(max_length=100, blank=False, null=False,
+                                   verbose_name="Occupation / Main Livelihood", default="16")
+    level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
+                                          blank=False, default='Primary', verbose_name="Highest level of education completed")
+    resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
+                                                         null=False, default=1984)
+    resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
+
+    class Meta:
+        app_label = 'survey'
+
+    def is_head(self):
+        return True
 
 

@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.test.client import Client
 
 from rapidsms.contrib.locations.models import Location, LocationType
@@ -8,6 +7,7 @@ from survey.forms.locations import LocationTypeForm, LocationForm
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 from mock import patch
+
 
 class LocationTest(BaseTest):
     def setUp(self):
@@ -56,12 +56,12 @@ class LocationTest(BaseTest):
         uganda = Location.objects.create(name='Uganda')
         self.assert_login_required('/locations/%s/children' % uganda.pk)
 
+
 class LocationTypeViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_locations')
         self.client.login(username='Rajni', password='I_Rock')
-
 
     def test_new_should_have_location_type_form_in_response_context_for_get(self):
         response = self.client.get('/locations/type/new/')
@@ -96,6 +96,7 @@ class LocationTypeViewTest(BaseTest):
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/locations/type/new/')
 
+
 class LocationViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -111,8 +112,6 @@ class LocationViewTest(BaseTest):
                             'type':self.district.pk,
                             'tree_parent':self.uganda.id
                         }
-
-
 
     def test_new_should_have_location_form_in_response_context_for_get(self):
         response = self.client.get('/locations/new/')
@@ -144,7 +143,6 @@ class LocationViewTest(BaseTest):
         self.assertEquals(1, len(retrieved_locations))
         self.assertEquals(1, len(response.context['messages']._loaded_messages))
         self.assertEquals('Location successfully added.', response.context['messages']._loaded_messages[0].message)
-
 
     def test_new_should_not_re_create_an_already_existing_location_on_post(self):
         form_data = self.form_data

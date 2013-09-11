@@ -20,13 +20,11 @@ from survey.views.household import *
 class HouseholdViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_households')
+        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_households')
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_new_GET(self):
-        some_type = LocationType.objects.create(name='some type', slug='some_name')
-        uganda = Location.objects.create(name="Uganda", type=some_type)
         response = self.client.get('/households/new/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -43,7 +41,6 @@ class HouseholdViewTest(BaseTest):
         self.assertIsNone(response.context['selected_location'])
         self.assertIsNotNone(response.context['months_choices'])
         self.assertIsNotNone(response.context['years_choices'])
-
 
     def test_get_investigators(self):
         uganda = Location.objects.create(name="Uganda")
@@ -166,7 +163,7 @@ class HouseholdViewTest(BaseTest):
             'surname': 'Rajini',
             'first_name':'Kant',
             'male': 'False',
-            'age': '20',
+            'date_of_birth': date(1980, 9, 01),
             'occupation':'Student',
             'level_of_education': 'Nursery',
             'resident_since_year':'2013',
@@ -185,10 +182,10 @@ class HouseholdViewTest(BaseTest):
         household = Household.objects.get(uid=form_data['uid'])
         self.failUnless(hHead.id)
         self.failUnless(household.id)
-        for key in ['surname', 'first_name', 'age', 'occupation',
+        for key in ['surname', 'first_name', 'date_of_birth', 'occupation',
                     'level_of_education', 'resident_since_year', 'resident_since_month']:
             value = getattr(hHead, key)
-            self.assertEqual(form_data[key], str(value))
+            self.assertEqual(str(form_data[key]), str(value))
 
         self.assertEqual(hHead.male, False)
         self.assertEqual(household.investigator, investigator)
@@ -241,9 +238,9 @@ class HouseholdViewTest(BaseTest):
         household_b = Household.objects.create(investigator=investigator, uid=1)
         household_c = Household.objects.create(investigator=investigator, uid=2)
 
-        HouseholdHead.objects.create(surname='Bravo', household=household_b)
-        HouseholdHead.objects.create(surname='Alpha', household=household_a)
-        HouseholdHead.objects.create(surname='Charlie', household=household_c)
+        HouseholdHead.objects.create(surname='Bravo', household=household_b, date_of_birth='1980-09-01')
+        HouseholdHead.objects.create(surname='Alpha', household=household_a, date_of_birth='1980-09-01')
+        HouseholdHead.objects.create(surname='Charlie', household=household_c, date_of_birth='1980-09-01')
         response = self.client.get('/households/')
 
         self.assertEqual(response.status_code, 200)
@@ -333,7 +330,7 @@ class HouseholdViewTest(BaseTest):
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, uid=0)
-        HouseholdHead.objects.create(surname='Bravo', household=household1)
+        HouseholdHead.objects.create(surname='Bravo', household=household1, date_of_birth='1980-09-01')
         household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
 
         response = self.client.get('/households/')
@@ -354,10 +351,10 @@ class  ViewHouseholdDetailsTest(BaseTest):
             investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
 
             household = Household.objects.create(investigator=investigator, uid=0)
-            HouseholdHead.objects.create(surname='Bravo', household=household, first_name='Test', age=30, male=True, occupation='Agricultural labor',
+            HouseholdHead.objects.create(surname='Bravo', household=household, first_name='Test', date_of_birth='1980-09-01', male=True, occupation='Agricultural labor',
                                          level_of_education='Primary', resident_since_year=2000, resident_since_month=7)
 
-            household_member = HouseholdMember.objects.create(household=household, name='Test Member', male=True, date_of_birth=date(2000, 8, 20))
+            household_member = HouseholdMember.objects.create(household=household, surname='Test Member', male=True, date_of_birth=date(2000, 8, 20))
             response = client.get('/households/%d/'% int(household.id))
 
             self.failUnlessEqual(response.status_code, 200)

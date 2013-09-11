@@ -39,9 +39,6 @@ class NewInvestigatorPage(PageObject):
         script = '$("#location-county").val(%s);$("#location-county").trigger("liszt:updated").chosen().change()' % kampala_county.id
         self.browser.execute_script(script)
 
-    def submit(self):
-        self.browser.find_by_css("form button").first.click()
-
 
 class InvestigatorsListPage(PageObject):
     url = '/investigators/'
@@ -93,10 +90,6 @@ class EditInvestigatorPage(PageObject):
             'location': self.investigator.location,
             }
         self.browser.fill_form(self.values)
-
-    def submit(self):
-        self.browser.find_by_css("form button").first.click()
-
 
     def assert_user_saved_sucessfully(self):
         self.is_text_present("User successfully edited.")

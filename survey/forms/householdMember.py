@@ -10,9 +10,10 @@ class HouseholdMemberForm(ModelForm):
 
     class Meta:
         model = HouseholdMember
-        fields = ['name', 'date_of_birth', 'male']
+        fields = ['surname', 'first_name',  'date_of_birth', 'male']
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Name'}),
+            'surname': forms.TextInput(attrs={'placeholder': 'Family Name'}),
+            'first_name': forms.TextInput(attrs={'placeholder': 'Other Names'}),
             'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
             }
 

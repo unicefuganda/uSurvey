@@ -1,6 +1,6 @@
 from datetime import datetime
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, DateInput
 from survey.models.households import HouseholdHead
 
 from survey.investigator_configs import OCCUPATION, MONTHS
@@ -27,14 +27,17 @@ class HouseholdHeadForm(ModelForm):
 
     class Meta:
         model = HouseholdHead
-        exclude = ['household']
+        fields = ['surname', 'first_name',  'date_of_birth', 'male', 'resident_since_year',
+                  'level_of_education', 'resident_since_month', 'occupation']
+
         widgets = {
             'surname': forms.TextInput(attrs={'placeholder': 'Family Name'}),
             'first_name': forms.TextInput(attrs={'placeholder': 'Other Names'}),
             'male': InlineRadioSelect(choices=((True, 'Male'), (False, 'Female'))),
-            'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':10, 'max':99 }),
             'resident_since_year': forms.HiddenInput(),
             'resident_since_month': forms.HiddenInput(),
             'occupation': forms.Select(choices= OCCUPATION),
         }
+
+    date_of_birth = forms.DateField(label="Date of birth", widget=DateInput(attrs={'class':'datepicker'}), required=True, input_formats=["%Y-%m-%d"])
 

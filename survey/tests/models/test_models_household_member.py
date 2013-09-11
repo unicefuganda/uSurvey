@@ -3,7 +3,7 @@ from django.template.defaultfilters import slugify
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
-from survey.models.households import HouseholdMember, Household
+from survey.models.households import HouseholdMember, Household, HouseholdHead
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 
@@ -12,7 +12,7 @@ class HouseholdMemberTest(TestCase):
         household_member = HouseholdMember()
         fields = [str(item.attname) for item in household_member._meta.fields]
 
-        field_list_expected = ['name', 'male', 'date_of_birth', 'household_id']
+        field_list_expected = ['surname', 'first_name', 'male', 'date_of_birth', 'household_id']
 
         [self.assertIn(field_expected, fields) for field_expected in field_list_expected]
 
@@ -21,10 +21,10 @@ class HouseholdMemberTest(TestCase):
         some_village = Location.objects.create(name="Some village", type=village)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
         household = Household.objects.create(investigator=investigator, uid=0)
-        fields_data = dict(name='xyz', male=True, date_of_birth=date(1980, 05, 01), household=household)
+        fields_data = dict(surname='xyz', male=True, date_of_birth=date(1980, 05, 01), household=household)
         household_member = HouseholdMember.objects.create(**fields_data)
         self.failUnless(household_member)
-        self.assertEqual(household_member.name, fields_data['name'])
+        self.assertEqual(household_member.surname, fields_data['surname'])
         self.assertTrue(household_member.male)
         self.assertEqual(household_member.date_of_birth, fields_data['date_of_birth'])
         self.assertEqual(household_member.household, household)
@@ -34,7 +34,7 @@ class HouseholdMemberTest(TestCase):
         some_village = Location.objects.create(name="Some village", type=village)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
         household = Household.objects.create(investigator=investigator, uid=0)
-        fields_data = dict(name='xyz', male=True, date_of_birth=date(1980, 05, 01), household=household)
+        fields_data = dict(surname='xyz', male=True, date_of_birth=date(1980, 05, 01), household=household)
         household_member = HouseholdMember.objects.create(**fields_data)
 
         self.assertEqual(household_member.get_age(), 33)
@@ -48,7 +48,7 @@ class HouseholdMemberTest(TestCase):
         some_village = Location.objects.create(name="Some village", type=village)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
         household = Household.objects.create(investigator=investigator, uid=0)
-        fields_data = dict(name='xyz', male=True, date_of_birth=date(2013, 05, 01), household=household)
+        fields_data = dict(surname='xyz', male=True, date_of_birth=date(2013, 05, 01), household=household)
         household_member = HouseholdMember.objects.create(**fields_data)
 
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
@@ -66,3 +66,11 @@ class HouseholdMemberTest(TestCase):
         self.assertEqual(len(member_groups), 1)
         self.assertIn(member_group, member_groups)
         self.assertNotIn(another_member_group, member_groups)
+
+    def test_household_member_is_head(self):
+        hhold = Household.objects.create(investigator=Investigator(), uid=0)
+        household_head = HouseholdHead.objects.create(household=hhold, surname="Name", date_of_birth='1989-02-02')
+        household_member = HouseholdMember.objects.create(household=hhold, surname="name", male=False, date_of_birth='1989-02-02')
+
+        self.assertTrue(household_head.is_head())
+        self.assertFalse(household_member.is_head())

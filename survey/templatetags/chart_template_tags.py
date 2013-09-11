@@ -33,7 +33,7 @@ def can_display_location_based_chart(locations):
 
 @register.filter
 def household_names(households):
-    names = [str(household.head.surname) for household in households.keys()]
+    names = [str(household.get_head().surname) for household in households.keys()]
     return names
 
 @register.filter

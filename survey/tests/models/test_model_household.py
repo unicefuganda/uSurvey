@@ -1,4 +1,5 @@
 from django.template.defaultfilters import slugify
+from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.households import Household, HouseholdHead, HouseholdMember
@@ -113,11 +114,25 @@ class HouseholdTest(TestCase):
 
         self.assertEqual(household_location, household1.get_related_location())
 
+    def test_should_know_who_is_household_head(self):
+        village = LocationType.objects.create(name="Village", slug=slugify("village"))
+        some_village = Location.objects.create(name="Some village", type=village)
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        fields_data = dict(surname='xyz', male=True, date_of_birth=date(2013, 05, 01), household=household)
+
+        hHead = HouseholdHead.objects.create(surname="Daddy", date_of_birth=date(1980, 05, 01), household=household)
+        household_member = HouseholdMember.objects.create(**fields_data)
+
+        self.assertEqual(hHead, household.get_head())
+        self.assertNotEqual(household_member, household.get_head())
+
+
     def test_should_return_all_households_members(self):
         hhold = Household.objects.create(investigator=Investigator(), uid=0)
-        household_head = HouseholdHead.objects.create(household=hhold,surname="Name")
-        household_member1 = HouseholdMember.objects.create(household=hhold, name="name", male=False, date_of_birth='1989-02-02')
-        household_member2 = HouseholdMember.objects.create(household=hhold, name="name1", male=False, date_of_birth='1989-02-02')
+        household_head = HouseholdHead.objects.create(household=hhold,surname="Name", date_of_birth='1989-02-02')
+        household_member1 = HouseholdMember.objects.create(household=hhold, surname="name", male=False, date_of_birth='1989-02-02')
+        household_member2 = HouseholdMember.objects.create(household=hhold, surname="name1", male=False, date_of_birth='1989-02-02')
         all_members = hhold.all_members()
         self.assertTrue(household_head in all_members)
         self.assertTrue(household_member1 in all_members)

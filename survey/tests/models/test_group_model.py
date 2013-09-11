@@ -58,7 +58,7 @@ class HouseholdMemberGroupTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, uid=0)
-        household_member = HouseholdMember.objects.create(name='member1', date_of_birth=(date(2013, 8, 30)),
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                                male=True,
                                                                household=household)
 
@@ -105,7 +105,7 @@ class HouseholdMemberGroupTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, uid=0)
-        household_member = HouseholdMember.objects.create(name='member1', date_of_birth=(date(2000, 8, 30)),
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2000, 8, 30)),
                                                                male=False,
                                                                household=household)
 
@@ -131,7 +131,7 @@ class HouseholdMemberGroupTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, uid=0)
-        household_member = HouseholdMember.objects.create(name='member1', date_of_birth=(date(2013, 8, 30)),
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                                male=False,
                                                                household=household)
 
@@ -156,7 +156,7 @@ class HouseholdMemberGroupTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, uid=0)
-        household_member = HouseholdMember.objects.create(name='member1', date_of_birth=(date(2013, 8, 30)),
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                                male=True,
                                                                household=household)
 
@@ -179,7 +179,7 @@ class HouseholdMemberGroupTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, uid=0)
-        household_member = HouseholdMember.objects.create(name='member1', date_of_birth=(date(2013, 8, 30)),
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                                male=False,
                                                                household=household)
 

@@ -124,7 +124,7 @@ def given_i_have_100_households(step):
     for i in xrange(100):
         random_number = str(randint(1, 99999))
         try:
-            HouseholdHead.objects.create(surname="head" + random_number, age=30 , male = False, household = Household.objects.create(investigator=world.investigator, uid=i))
+            HouseholdHead.objects.create(surname="head" + random_number, date_of_birth='1980-06-01', male=False, household=Household.objects.create(investigator=world.investigator, uid=i))
         except Exception:
             pass
 
@@ -168,7 +168,7 @@ def and_i_should_see_that_household_details_its_head_and_members(step):
 @step(u'And I have a member for that household')
 def and_i_have_a_member_for_that_household(step):
     world.household = Household.objects.get(uid=world.household_uid)
-    fields_data = dict(name='xyz', male=True, date_of_birth=date(1980, 05, 01), household=world.household)
+    fields_data = dict(surname='xyz', male=True, date_of_birth=date(1980, 05, 01), household=world.household)
     HouseholdMember.objects.create(**fields_data)
 
 @step(u'Then I should see household member title and add household member link')

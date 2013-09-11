@@ -139,3 +139,9 @@ class PageObject(object):
     def validate_fields_present(self, fields):
         for field in fields:
             assert self.browser.is_text_present(field)
+
+    def select_date(self, field_id):
+        script = "$('%s').focus()" % field_id
+        self.browser.execute_script(script)
+        script = "$('.ui-state-default').first().click()"
+        self.browser.execute_script(script)

@@ -7,7 +7,7 @@ class HouseholdMemberFormTest(TestCase):
     def test_should_have_name_month_year_and_gender_fields(self):
         member_form = HouseholdMemberForm()
 
-        fields = ['name', 'date_of_birth', 'male']
+        fields = ['surname', 'first_name', 'date_of_birth', 'male']
 
         [self.assertIn(field, member_form.fields) for field in fields]
 
@@ -16,10 +16,11 @@ class HouseholdMemberFormTest(TestCase):
         self.assertFalse(member_form.is_valid())
 
     def test_should_be_valid_if_all_fields_are_given(self):
-        form_data = {'name': 'xyz',
+        form_data = {'surname': 'xyz',
                      'date_of_birth': date(1980, 05, 01),
                      'Sex': True
         }
 
         member_form = HouseholdMemberForm(data=form_data)
+        print member_form.errors
         self.assertTrue(member_form.is_valid())

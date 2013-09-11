@@ -50,8 +50,7 @@ class LocationWidget(object):
 
     def get_tree_parent(self):
         locations = Location.objects.filter(tree_parent=None).order_by('name')
-        type_slug = locations[0].type.slug
-        return self.sorted_by_hierarchy({ type_slug: locations })
+        return self.sorted_by_hierarchy({ locations[0].type.slug: locations }) if locations else {}
 
     def next_type_in_hierarchy(self):
         children = self.selected_location.get_children()

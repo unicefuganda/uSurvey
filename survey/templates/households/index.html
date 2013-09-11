@@ -50,7 +50,9 @@
                         <a href="{% url 'view_household_page' household.id %}">{{ household.uid }}</a>
                     </td>
                     <td>
-                        {{ household.head.firstname|capfirst }} {{ household.head.surname|capfirst }}
+                        {% with household.get_head as head %}
+                           {% if head.first_name %} {{ head.first_name|capfirst }} {% endif %} {{ head.surname|capfirst }}
+                        {% endwith %}
                     </td>
                     <td>
                         {{ household.related_locations|get_location:"District" }}

@@ -68,7 +68,7 @@ def and_i_have_investigators_completed_batches(step):
     investigator_1.answered(world.question_3, household_6, 1)
 
     for household in Household.objects.all():
-        HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk)
+        HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='2000-03-01')
 
 @step(u'Given I am on the numerical answer computation page')
 def given_i_am_on_the_numerical_answer_computation_page(step):
@@ -118,4 +118,5 @@ def and_i_should_see_the_stacked_bar_graph_for_all_the_villages(step):
 @step(u'And I should see the tabulated results for all the households')
 def and_i_should_see_the_tabulated_results_for_all_the_households(step):
     world.page.presence_of_tabulated_results_for_households(world.formula_2.compute_for_households_in_location(world.village_1))
+
 

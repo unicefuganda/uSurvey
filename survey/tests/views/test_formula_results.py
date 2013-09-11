@@ -51,7 +51,7 @@ class NumericalFormulaResults(BaseTest):
         investigator_1.answered(self.question_1, self.household_4, 50)
         investigator_1.answered(self.question_2, self.household_4, 500)
         for household in Household.objects.all():
-            HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk)
+            HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='1980-09-01')
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for("/batches/%s/formulae/%s/" % (self.batch.pk, self.formula_1.pk))
@@ -142,7 +142,7 @@ class MultichoiceResults(BaseTest):
         investigator_1.answered(self.question_1, household_6, 40)
         investigator_1.answered(self.question_3, household_6, 1)
         for household in Household.objects.all():
-            HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk)
+            HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='1980-09-01')
 
 
     def test_get_for_district(self):
