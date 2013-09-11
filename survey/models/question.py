@@ -40,6 +40,9 @@ class Question(BaseModel):
     class Meta:
         app_label = 'survey'
 
+    def __unicode__(self):
+        return self.text
+
 
     def get_option(self, answer, investigator):
         try:

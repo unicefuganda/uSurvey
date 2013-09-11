@@ -14,5 +14,6 @@ Feature: Survey features
     And I have a question
     And I visit the new survey page
     When I fill in the survey details
+    And I select the questions
     And I click save button
     Then I should see that the survey was saved successfully

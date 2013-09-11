@@ -54,7 +54,10 @@ def when_i_fill_in_the_survey_details(step):
             }
     world.page.fill_valid_values(data)
 
+@step(u'And I select the questions')
+def and_i_select_the_questions(step):
+    world.page.select_multiple('#id_questions', world.question)
+
 @step(u'Then I should see that the survey was saved successfully')
 def then_i_should_see_that_the_survey_was_saved_successfully(step):
     world.page.see_success_message('Survey', 'added')
-

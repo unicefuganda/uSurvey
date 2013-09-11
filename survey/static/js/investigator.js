@@ -75,7 +75,7 @@ $(function(){
 
 
   $("input.small-positive-number").each(function(){
-      $(this).rules('add', {required:true, min:0, max:10});
+      $(this).rules('add', {required:true, min:0, max:100});
   });
 
 });
