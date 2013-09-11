@@ -100,6 +100,7 @@ class HouseholdDetailsPage(PageObject):
 
     def validate_household_details(self):
         household_head = self.household.get_head()
+        print household_head
         details = {
             'Family Name': household_head.surname,
             'Other Names': household_head.first_name,

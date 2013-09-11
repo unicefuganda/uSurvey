@@ -86,7 +86,7 @@
               {% for household_member in household.household_member.all %}
                   <tr>
                       <td>
-                         {{ household_member.name }}
+                         {{ household_member.surname }}
                       </td>
                       <td>
                           {{ household_member.date_of_birth|format_date }}
