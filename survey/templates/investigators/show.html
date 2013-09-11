@@ -47,14 +47,20 @@
   <dd>
     {{ investigator.language }}
   </dd>
-  {% for location_type, location in investigator.location_hierarchy.items %}
+  {% for location in investigator.location.get_ancestors %}
     <dt>
-      {{ location_type.capitalize }}
+      {{ location.type}}
     </dt>
     <dd>
       {{ location.name }}
     </dd>
   {% endfor %}
+    <dt>
+      {{ investigator.location.type}}
+    </dt>
+    <dd>
+      {{ investigator.location.name }}
+    </dd>
 </dl>
 <div class="offset3">
     <a href="javascript:back()" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>

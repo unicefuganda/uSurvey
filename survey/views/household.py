@@ -141,7 +141,7 @@ def get_investigators(request):
 def list_households(request):
     selected_location = None
 
-    households = Household.objects.all().order_by('head__surname')
+    households = Household.objects.all().order_by('head__surname').exclude(investigator=None)
 
     params = request.GET
     if params.has_key('location') and params['location'].isdigit():
