@@ -49,11 +49,9 @@ function set_error_messages(form_fields) {
 }
 
 function get_form_fields() {
-    var attribute_field_value = $('.modal-body form #id_attribute')
     var value_field_value = $('.modal-body form #id_value')
 
     var form_fields = Array()
-    form_fields.push(attribute_field_value)
     form_fields.push(value_field_value)
 
     return form_fields
@@ -65,7 +63,7 @@ function validate_condition_form() {
 
     var form_fields = get_form_fields();
 
-    if (form_fields[0].val().trim().length != 0 && form_fields[1].val().trim().length != 0) {
+    if (form_fields[0].val().trim().length != 0) {
         $('.modal').modal('toggle');
         return true
     }

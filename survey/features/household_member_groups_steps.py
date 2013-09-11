@@ -29,7 +29,7 @@ def and_i_should_see_the_conditions_list(step):
 
 @step(u'And I have a condition')
 def and_i_have_a_condition(step):
-    world.condition = GroupCondition.objects.create(value=5, attribute='GENDER', condition="EQUALS")
+    world.condition = GroupCondition.objects.create(value=5, attribute='AGE', condition="EQUALS")
 
 
 @step(u'And I have 100 groups with that condition')
