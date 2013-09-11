@@ -13,10 +13,10 @@
     <thead>
       <tr>
         <th>
-          Condition
+           Attribute
         </th>
         <th>
-          Attribute
+          Condition
         </th>
         <th>
           Value
@@ -30,10 +30,10 @@
       {% for condition in conditions %}
         <tr>
           <td>
-            <a href="">{{ condition.condition }}</a>
+            <a href="">{{ condition.attribute }}</a>
           </td>
           <td>
-            {{ condition.attribute }}
+            {{ condition.condition }}
           </td>
           <td>
             {{ condition.value }}
