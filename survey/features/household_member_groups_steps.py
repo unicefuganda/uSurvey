@@ -99,7 +99,6 @@ def when_i_fill_in_the_group_details(step):
             'order': 1,
             }
     world.page.fill_valid_values(data)
-    world.page.select_multiple('#id_conditions', world.condition)
 
 
 @step(u'Then I should see that the group was saved successfully')
@@ -184,3 +183,7 @@ def when_i_click_groups_tab(step):
 def then_i_should_see_group_dropdown_list(step):
     reverse_url_links = ["household_member_groups_page", "new_household_member_groups_page", "show_group_condition", "new_group_condition"]
     world.page.see_dropdown(reverse_url_links)
+
+@step(u'And I select a condition')
+def and_i_select_a_condition(step):
+    world.page.select_multiple('#id_conditions', world.condition)

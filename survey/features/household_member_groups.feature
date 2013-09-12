@@ -27,6 +27,7 @@ Feature: Group features
     And I have a condition
     And I visit the new group page
     When I fill in the group details
+    And I select a condition
     And I click save button
     Then I should see that the group was saved successfully
     
