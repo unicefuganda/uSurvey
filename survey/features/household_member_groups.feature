@@ -66,3 +66,11 @@ Feature: Group features
     And I click the actions button
     And I click view conditions link
     Then I should see a list of conditions
+
+  Scenario: Add group from group listing page
+    Given I am logged in as researcher
+    And I visit groups listing page
+    When I click the add group button
+    Then I should go to add group page
+
+

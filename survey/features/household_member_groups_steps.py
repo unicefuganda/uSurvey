@@ -185,3 +185,12 @@ def then_i_should_see_group_dropdown_list(step):
 @step(u'And I select a condition')
 def and_i_select_a_condition(step):
     world.page.select("conditions",[world.condition.pk])
+
+@step(u'When I click the add group button')
+def when_i_click_the_add_group_button(step):
+    world.page.click_link_by_text("Add Group")
+
+@step(u'Then I should go to add group page')
+def then_i_should_go_to_add_group_page(step):
+    world.page = AddGroupPage(world.browser)
+    world.page.validate_url()
