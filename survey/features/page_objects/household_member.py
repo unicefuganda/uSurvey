@@ -33,13 +33,11 @@ class EditHouseholdMemberPage(PageObject):
 
 
 class DeleteHouseholdMemberPage(PageObject):
-    def __init__(self, browser, household,member):
+    def __init__(self, browser, household, member):
         self.browser = browser
         self.household = household
         self.member = member
-        self.url = '/households/%d/member/%d/delete/' % (household.id,member.id)
+        self.url = '/households/%d/member/%d/delete/' % (household.id, member.id)
 
     def see_delete_confirmation_modal(self):
-        self.is_text_present("Confirm: Are you sure you want to delete %s?" % self.member.surname)
-
-
+        self.is_text_present("Are you sure you want to delete %s" % self.member.surname)

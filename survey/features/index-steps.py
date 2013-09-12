@@ -33,7 +33,7 @@ def open_browser():
 @after.each_scenario
 def take_screenshot(scenario):
     if scenario.failed:
-        world.browser.driver.save_screenshot('screenshots/%s.png' % slugify(scenario.name))
+        # world.browser.driver.save_screenshot('screenshots/%s.png' % slugify(scenario.name))
 
 
 @after.each_scenario
