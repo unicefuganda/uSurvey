@@ -68,12 +68,17 @@
             {% endif %}
 
             {% if perms.auth.can_view_batches %}
-              <li>
-                <a href="{% url 'batch_index_page' %}">Batches</a>
-              </li>
+                <li class="dropdown">
+                    <a data-toggle="dropdown" id="drop7" class="dropdown-toggle" role="button" href="#">Survey<b class="caret"></b></a>
+                    <ul aria-labelledby="drop7" role="menu" class="dropdown-menu">
+                        <li role="presentation"><a href="{% url 'survey_list_page' %}">List all surveys</a></li>
+                        <li role="presentation"><a href="{% url 'new_survey_page' %}">Add a survey</a></li>
+                        <li role="presentation"><a href="{% url 'batch_index_page' %}">List all batches</a></li>
+                    </ul>
+                </li>
             {% endif %}
 
-            {% if perms.auth.can_view_batches %}
+            {% if perms.auth.can_view_household_groups %}
                 <li class="dropdown">
                     <a data-toggle="dropdown" id="drop6" class="dropdown-toggle" role="button" href="#">Groups<b class="caret"></b></a>
                     <ul aria-labelledby="drop6" role="menu" class="dropdown-menu">

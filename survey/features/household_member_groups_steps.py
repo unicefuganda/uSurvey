@@ -180,6 +180,7 @@ def then_i_should_see_a_list_of_conditions(step):
 def when_i_click_groups_tab(step):
     world.page.click_link_by_text("Groups")
 
-@step(u'Then I should see dropdown list')
-def then_i_should_see_dropdown_list(step):
-    world.page.see_group_dropdown_list()
+@step(u'Then I should see group dropdown list')
+def then_i_should_see_group_dropdown_list(step):
+    reverse_url_links = ["household_member_groups_page", "new_household_member_groups_page", "show_group_condition", "new_group_condition"]
+    world.page.see_dropdown(reverse_url_links)

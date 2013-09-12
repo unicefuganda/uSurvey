@@ -1,6 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from random import randint
 from time import sleep
+from django.core.urlresolvers import reverse
 from lettuce.django import django_url
 
 
@@ -145,3 +146,10 @@ class PageObject(object):
         self.browser.execute_script(script)
         script = "$('.ui-state-default').first().click()"
         self.browser.execute_script(script)
+
+    def click_tab(self, tab_name):
+        self.browser.click_link_by_text(tab_name)
+
+    def see_dropdown(self,links):
+        for url_name in links:
+            assert self.browser.find_link_by_partial_href(reverse(url_name))
