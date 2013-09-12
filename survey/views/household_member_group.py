@@ -11,7 +11,7 @@ from survey.forms.household_member_group import HouseholdMemberGroupForm
 from survey.views.views_helper import contains_key
 
 
-@permission_required('auth.can_view_investigators')
+@permission_required('auth.can_view_household_groups')
 def conditions(request):
     conditions = GroupCondition.objects.all().order_by('condition')
     return render(request, 'household_member_groups/conditions/index.html',
@@ -29,7 +29,7 @@ def _get_conditions_hash():
     return {'id': condition.id,
             'value': "%s > %s > %s" % (condition.attribute, condition.condition, condition.value)}
 
-@permission_required('auth.can_view_batches')
+@permission_required('auth.can_view_household_groups')
 def add_condition(request):
     response = None
     condition_form = GroupConditionForm()
@@ -75,7 +75,7 @@ def _process_groupform(request, group_form):
         messages.success(request, 'Group successfully added.')
         return HttpResponseRedirect("/groups/")
         
-@permission_required('auth.can_view_batches')
+@permission_required('auth.can_view_household_groups')
 def add_group(request):
     params = request.POST
     response = None
@@ -95,7 +95,7 @@ def add_group(request):
 
     return response or render(request, 'household_member_groups/new.html', context)
     
-@permission_required('auth.can_view_batches')
+@permission_required('auth.can_view_household_groups')
 def details(request, group_id):
     conditions = GroupCondition.objects.filter(groups__id=group_id)
     if not conditions.exists():

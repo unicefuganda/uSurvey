@@ -26,7 +26,8 @@ def create_reseacher():
     researcher = Group.objects.create(name='researcher1')
     user = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
     researcher.user_set.add(user)
-    set_permissions(researcher, ['can_view_aggregates', 'can_view_households', 'can_view_batches', 'can_view_investigators', 'can_view_locations'])
+    set_permissions(researcher, ['can_view_aggregates', 'can_view_households', 'can_view_batches',
+                                 'can_view_investigators', 'can_view_locations', 'can_view_household_groups'])
 
     return user
 
