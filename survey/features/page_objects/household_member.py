@@ -40,11 +40,5 @@ class DeleteHouseholdMemberPage(PageObject):
         self.url = '/households/%d/member/%d/delete/' % (household.id, member.id)
 
     def see_delete_confirmation_modal(self):
-<<<<<<< HEAD
-        self.is_text_present("Are you sure you want to delete %s" % self.member.surname)
-=======
         self.is_text_present("Delete Household Member")
         self.is_text_present("Confirm: Are you sure you want to delete %s?" % self.member.surname)
-
-
->>>>>>> changing delete householdmember link to use actual link not just word delete --fixing build
