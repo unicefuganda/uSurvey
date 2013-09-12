@@ -67,7 +67,7 @@ class PageObject(object):
 
     def check_researcher_allowed_tabs(self):
         self.check_data_entry_allowed_tabs()
-        assert self.browser.find_link_by_text('Batches')
+        assert self.browser.find_link_by_text('Survey')
         assert self.browser.find_link_by_text('Aggregates')
 
     def check_all_tabs(self):
