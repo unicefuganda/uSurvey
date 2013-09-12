@@ -136,7 +136,7 @@ class PageObject(object):
         for item in data:
             script = "$('%s').multiSelect('select', '%s')" % (field_id, item.pk)
             self.browser.execute_script(script)
-            
+
     def validate_fields_present(self, fields):
         for field in fields:
             assert self.browser.is_text_present(field)
@@ -153,3 +153,7 @@ class PageObject(object):
     def see_dropdown(self,links):
         for url_name in links:
             assert self.browser.find_link_by_partial_href(reverse(url_name))
+
+    def select(self,name,values):
+        for value in values:
+            self.browser.select(name,value)

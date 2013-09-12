@@ -11,7 +11,6 @@ class HouseholdHeadTest(TestCase):
     def test_fields(self):
         hHead = HouseholdHead()
         fields = [str(item.attname) for item in hHead._meta.fields]
-        print fields
         self.assertEqual(len(fields), 13)
         for field in ['id', 'surname', 'first_name', 'created', 'modified', 'male', 'occupation', 'date_of_birth',
                         'level_of_education', 'resident_since_year', 'resident_since_month', 'household_id']:

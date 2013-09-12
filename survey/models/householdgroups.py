@@ -65,3 +65,6 @@ class GroupCondition(BaseModel):
 
     class Meta:
         app_label = 'survey'
+
+    def __unicode__(self):
+        return "%s > %s > %s" % (self.attribute, self.condition, self.value)

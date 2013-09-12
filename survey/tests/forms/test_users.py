@@ -20,8 +20,6 @@ class UserFormTest(TestCase):
 
     def test_valid(self):
         user_form = UserForm(self.form_data)
-        user_form.is_valid()
-        print user_form.errors
         self.assertTrue(user_form.is_valid())
         user = user_form.save()
         self.failUnless(user.id)

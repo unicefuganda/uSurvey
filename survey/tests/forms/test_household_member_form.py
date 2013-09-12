@@ -22,5 +22,4 @@ class HouseholdMemberFormTest(TestCase):
         }
 
         member_form = HouseholdMemberForm(data=form_data)
-        print member_form.errors
         self.assertTrue(member_form.is_valid())

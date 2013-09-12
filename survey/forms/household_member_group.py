@@ -11,12 +11,6 @@ class HouseholdMemberGroupForm(ModelForm):
     class Meta:
         model = HouseholdMemberGroup
 
-    def __init__(self, *args, **kwargs):
-        super(HouseholdMemberGroupForm, self).__init__(*args, **kwargs)
-        condition_qs = self.fields['conditions']._queryset
-        self.fields['conditions'].choices = [(e.id, "%s > %s > %s" % (e.attribute, e.condition, e.value)) for e in
-                                             condition_qs]
-
     def add_conditions(self, group):
         for condition in self.cleaned_data['conditions']:
             condition.groups.add(group)

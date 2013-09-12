@@ -92,7 +92,6 @@ def and_i_visit_the_new_group_page(step):
     world.page = AddGroupPage(world.browser)
     world.page.visit()
 
-
 @step(u'When I fill in the group details')
 def when_i_fill_in_the_group_details(step):
     data = {'name': 'aged between 15 and 49',
@@ -138,7 +137,6 @@ def and_i_have_2_conditions(step):
     world.condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
     world.condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
 
-
 @step(u'When I fill name and order')
 def when_i_fll_name_and_order(step):
     data = {'name': 'aged between 15 and 49',
@@ -148,7 +146,7 @@ def when_i_fll_name_and_order(step):
 
 @step(u'And I select conditions')
 def and_i_select_conditions(step):
-    world.page.select_multiple('#id_conditions', world.condition_1, world.condition_2)
+    world.page.select('conditions', [world.condition_1.pk, world.condition_2.pk])
 
 @step(u'Then I should see the form errors of required fields')
 def then_i_should_see_the_form_errors_of_required_fields(step):
@@ -186,4 +184,4 @@ def then_i_should_see_group_dropdown_list(step):
 
 @step(u'And I select a condition')
 def and_i_select_a_condition(step):
-    world.page.select_multiple('#id_conditions', world.condition)
+    world.page.select("conditions",[world.condition.pk])

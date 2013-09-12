@@ -94,7 +94,6 @@ class Investigator(BaseModel):
 
     def last_answer_for(self, question):
         answer_class = question.answer_class()
-        print answer_class
         return answer_class.objects.filter(investigator=self, question=question).latest()
 
     def reanswer(self, question):

@@ -8,7 +8,6 @@ class LocationTypeFormTest(TestCase):
         form_data = {'name': 'some name say country'}
         type_form = LocationTypeForm(form_data)
         type_form.is_valid()
-        print type_form.errors
         self.assertTrue(type_form.is_valid())
 
     def test_name_is_required(self):
