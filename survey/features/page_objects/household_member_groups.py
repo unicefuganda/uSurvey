@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from survey.features.page_objects.base import PageObject
 
 
@@ -22,6 +23,9 @@ class AddConditionPage(PageObject):
 class AddGroupPage(PageObject):
     url = '/groups/new/'
 
+    def see_group_dropdown_list(self):
+        for url_name in ["household_member_groups_page", "new_household_member_groups_page", "show_group_condition", "new_group_condition"]:
+            assert self.browser.find_link_by_partial_href(reverse(url_name))
 
 class GroupConditionModalPage(PageObject):
     url = ''

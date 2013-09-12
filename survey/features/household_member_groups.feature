@@ -65,3 +65,9 @@ Feature: Group features
     And I click the actions button
     And I click view conditions link
     Then I should see a list of conditions
+
+  Scenario: Link for navigating
+    Given I am logged in as researcher
+    And I visit the new group page
+    When I click Groups tab
+    Then I should see dropdown list

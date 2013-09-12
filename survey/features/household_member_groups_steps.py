@@ -175,3 +175,11 @@ def and_i_click_view_conditions_link(step):
 def then_i_should_see_a_list_of_conditions(step):
     world.page = GroupDetailsPage(world.browser, world.group)
     world.page.validate_fields_present(["Groups Condition List", "Condition", "Attribute", "Value"])
+
+@step(u'When I click Groups tab')
+def when_i_click_groups_tab(step):
+    world.page.click_link_by_text("Groups")
+
+@step(u'Then I should see dropdown list')
+def then_i_should_see_dropdown_list(step):
+    world.page.see_group_dropdown_list()

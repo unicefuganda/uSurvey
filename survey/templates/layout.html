@@ -72,7 +72,19 @@
                 <a href="{% url 'batch_index_page' %}">Batches</a>
               </li>
             {% endif %}
-            </ul>
+
+            {% if perms.auth.can_view_batches %}
+                <li class="dropdown">
+                    <a data-toggle="dropdown" id="drop6" class="dropdown-toggle" role="button" href="#">Groups<b class="caret"></b></a>
+                    <ul aria-labelledby="drop6" role="menu" class="dropdown-menu">
+                        <li role="presentation"><a href="{% url 'household_member_groups_page' %}">List all groups</a></li>
+                        <li role="presentation"><a href="{% url 'new_household_member_groups_page' %}">Add a group</a></li>
+                        <li role="presentation"><a href="{% url 'show_group_condition' %}">List all conditions</a></li>
+                        <li role="presentation"><a href="{% url 'new_group_condition' %}">Add a condition</a></li>
+                    </ul>
+                </li>
+            {% endif %}
+          </ul>
           {% if user.is_authenticated %}
             <ul role="navigation" class="nav pull-right">
               <li class="dropdown">
