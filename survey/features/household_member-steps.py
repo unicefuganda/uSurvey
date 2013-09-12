@@ -84,7 +84,7 @@ def and_i_visit_that_household_details_page(step):
 
 @step(u'And I click delete member')
 def and_i_click_delete_member(step):
-    world.page.click_link_by_text('Delete')
+    world.page.click_delete_link(world.household_member.pk)
 
 @step(u'Then I should see a confirmation modal')
 def then_i_should_see_a_confirmation_modal(step):

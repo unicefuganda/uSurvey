@@ -3,7 +3,7 @@ from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.base import PageObject
 from survey.investigator_configs import MONTHS
 from survey.models.investigator import Investigator
-
+from lettuce.django import django_url
 
 class NewHouseholdPage(PageObject):
     url = "/households/new"
@@ -137,14 +137,17 @@ class HouseholdDetailsPage(PageObject):
         self.browser.find_link_by_text('Edit')
         self.browser.find_link_by_text('Delete')
 
+    def click_delete_link(self, member_id):
+        self.browser.click_link_by_partial_href("#delete_member_%d"%member_id)
+
 
 class HouseholdsListPage(PageObject):
     url = '/households/'
 
     def validate_fields(self):
-        self.validate_fields_present(["Households List", "Household ID", "Household Head", 
+        self.validate_fields_present(["Households List", "Household ID", "Household Head",
         "District","County", "Sub County", "Parish", "Village", "Investigator"])
-        
+
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
