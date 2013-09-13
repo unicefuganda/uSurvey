@@ -102,3 +102,7 @@ def then_i_should_see_only_one_option_field(step):
     world.page.see_one_option_field("Option 1")
     world.page.see_option_add_and_remove_buttons(1)
     world.page.option_not_present("Option 2")
+
+@step(u'And I fill an option question')
+def and_i_fill_an_option_question(step):
+    world.page.fill_valid_values({'options':'some option question text'})

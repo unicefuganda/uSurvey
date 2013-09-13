@@ -32,9 +32,7 @@ def new(request, batch_id):
     if request.method == 'POST':
         question_form = QuestionForm(data=request.POST)
         if question_form.is_valid():
-            question = question_form.save(commit=False)
-            question.batch=Batch.objects.get(id=batch_id)
-            question.save()
+            question_form.save(batch=Batch.objects.get(id=batch_id))
             messages.success(request, 'Question successfully added.')
             return HttpResponseRedirect('/batches/%s/questions/'% batch_id)
     context = { 'button_label':'Save',

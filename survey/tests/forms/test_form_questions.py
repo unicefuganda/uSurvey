@@ -49,5 +49,39 @@ class QuestionFormTest(TestCase):
         self.assertEqual(1, len(question_form.errors['answer_type']))
         self.assertEqual(expected_form_error, question_form.errors['answer_type'][0])
 
+    def test_should_save_options_and_batch_attached_to_questions_if_supplied(self):
+        form_data = self.form_data.copy()
+        form_data['answer_type'] = Question.MULTICHOICE
+        form_data['options']=['option 1', 'option 2']
+        question_form = QuestionForm(form_data)
+        self.assertTrue(question_form.is_valid())
+        batch = Batch.objects.create()
+        question = question_form.save(batch=batch)
+        self.assertEqual(batch, question.batch)
+        options = question.options.all()
+        self.assertEqual(2, options.count())
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), options)
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), options)
 
+    def test_should_save_questions_and_options_even_if_batch_is_not_supplied(self):
+        form_data = self.form_data.copy()
+        form_data['answer_type'] = Question.MULTICHOICE
+        form_data['options']=['option 1', 'option 2']
+        question_form = QuestionForm(form_data)
+        self.assertTrue(question_form.is_valid())
+        question = question_form.save()
+        self.assertIsNone(question.batch)
+        options = question.options.all()
+        self.assertEqual(2, options.count())
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), options)
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), options)
 
+    def test_should_not_save_options_if_not_multichoice_even_if_options_supplied(self):
+        form_data = self.form_data.copy()
+        form_data['answer_type'] = Question.TEXT
+        form_data['options']=['some option question']
+        question_form = QuestionForm(form_data)
+        self.assertTrue(question_form.is_valid())
+        question = question_form.save()
+        self.assertIsNone(question.batch)
+        self.assertEquals(0, question.options.all().count())

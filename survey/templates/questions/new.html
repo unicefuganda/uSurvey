@@ -1,5 +1,9 @@
 {% extends "form.html" %}
 
+{% block title %}
+New Question
+{% endblock %}
+
 {% block display_form_fields %}
 {% include "naked_form.html" with a_form=questionform %}
 

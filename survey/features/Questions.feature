@@ -38,4 +38,7 @@ Scenario: MultiChoice question
   Then I should see two options field
   When I click remove-option icon
   Then I should see only one option field
+  And I fill an option question
+  And I submit the form
+  And I should see question successfully added message
 

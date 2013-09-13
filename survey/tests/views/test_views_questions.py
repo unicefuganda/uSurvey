@@ -2,7 +2,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from mock import patch
 from survey.models.batch import Batch
-from survey.models.question import Question
+from survey.models.question import Question, QuestionOption
 
 from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
@@ -65,12 +65,13 @@ class QuestionsViews(BaseTest):
         self.assert_restricted_permission_for('/batches/%d/questions/'%self.batch.id)
 
     @patch('django.contrib.messages.success')
-    def test_create_question_success(self, mock_success):
+    def test_create_question_number_does_not_create_options(self, mock_success):
         form_data={
                     'text': 'This is a Question',
                     'answer_type': Question.NUMBER,
-                    'group' : self.household_member_group.id
-        }
+                    'group' : self.household_member_group.id,
+                    'options':'some option that should not be created',
+                    }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
         response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
@@ -78,6 +79,9 @@ class QuestionsViews(BaseTest):
         self.failUnless(question)
         self.assertEqual(question[0].batch,self.batch)
         self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
+        question_options = question[0].options.all()
+        self.assertEqual(0, question_options.count())
+
         assert mock_success.called
 
     def test_should_retrieve_group_specific_questions_in_context_if_selected_group_key_is_in_request(self):
@@ -102,3 +106,75 @@ class QuestionsViews(BaseTest):
 
         [self.assertIn(question, questions) for question in all_group_questions]
         [self.assertNotIn(question, questions) for question in another_group_questions]
+
+    def test_should_save_options_for_multichoice_questions(self):
+        form_data={
+            'text': 'This is a Question',
+            'answer_type': Question.MULTICHOICE,
+            'group' : self.household_member_group.id,
+            'options':['some question option 1', 'some question option 2'],
+            }
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        question = Question.objects.filter(text=form_data['text'])
+        self.failUnless(question)
+        self.assertEqual(1, len(question))
+        self.assertEqual(question[0].batch,self.batch)
+        self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
+        question_options = question[0].options.all()
+        self.assertEqual(2, question_options.count())
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options )
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][1]), question_options )
+
+    def test_should_not_save_empty_options_on_multichoice_questions(self):
+        form_data={
+            'text': 'This is a Question',
+            'answer_type': Question.MULTICHOICE,
+            'group' : self.household_member_group.id,
+            'options':['some question option 1', '', 'some question option 2', ''],
+            }
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        question = Question.objects.filter(text=form_data['text'])
+        self.failUnless(question)
+        self.assertEqual(1, len(question))
+        self.assertEqual(question[0].batch,self.batch)
+        self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
+        question_options = question[0].options.all()
+        self.assertEqual(2, question_options.count())
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options )
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][2]), question_options )
+
+    def test_should_not_save_multichoice_questions_if_no_option_supplied(self):
+        form_data={
+            'text': 'This is a Question',
+            'answer_type': Question.MULTICHOICE,
+            'group' : self.household_member_group.id,
+            'options':'',
+            }
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        self.failUnlessEqual(response.status_code, 200)
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+
+    def test_should_not_save_options_if_question_not_multichoice_even_if_options_supplied(self):
+        form_data={
+                'text': 'This is a Question',
+                'answer_type': Question.TEXT,
+                'group' : self.household_member_group.id,
+                'options':['some question option 1', 'some question option 2'],
+                }
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        question = Question.objects.filter(text=form_data['text'])
+        self.failUnless(question)
+        self.assertEqual(1, len(question))
+        self.assertEqual(question[0].batch, self.batch)
+        self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
+        question_options = question[0].options.all()
+        self.assertEqual(0, question_options.count())

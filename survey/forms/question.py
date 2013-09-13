@@ -1,12 +1,13 @@
 from django import forms
 from django.forms import ModelForm
 
-from survey.models.question import Question
+from survey.models.batch import Batch
+from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
 
 class QuestionForm(ModelForm):
 
-    options = forms.CharField(max_length=50, widget=forms.HiddenInput())
+    options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(QuestionForm, self).__init__(*args, **kwargs)
@@ -21,6 +22,12 @@ class QuestionForm(ModelForm):
             'text': forms.Textarea(attrs={"rows":4, "cols":50})
         }
 
+    def clean_options(self):
+        options = dict(self.data).get('options')
+        options = filter(lambda text: text.strip(), options)
+        self.cleaned_data['options'] = options
+        return options
+
     def clean(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         options = self.cleaned_data.get('options', None)
@@ -30,5 +37,33 @@ class QuestionForm(ModelForm):
             self._errors['answer_type'] = self.error_class([message])
             del self.cleaned_data['answer_type']
 
+        if answer_type != Question.MULTICHOICE and options:
+            del self.cleaned_data['options']
+
         return self.cleaned_data
 
+    def kwargs_has_batch(self, **kwargs):
+        return kwargs.has_key('batch') and isinstance(kwargs['batch'], Batch)
+
+    def options_supplied(self, commit):
+        return commit and self.cleaned_data.has_key('options')
+
+    def save_question_options(self, question):
+        order = 0
+        for text in self.cleaned_data['options']:
+            order += 1
+            QuestionOption.objects.create(question=question, text=text, order=order)
+
+    def save(self, commit=True, **kwargs):
+        question = super(QuestionForm, self).save(commit=False)
+
+        if self.kwargs_has_batch(**kwargs):
+            question.batch = kwargs['batch']
+
+        if commit:
+            question.save()
+
+        if self.options_supplied(commit):
+            self.save_question_options(question)
+
+        return question
