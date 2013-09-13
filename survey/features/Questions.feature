@@ -25,3 +25,17 @@ Scenario: Add new question to batch
   And I submit the form
   Then I should go back to questions listing page
   And I should see question successfully added message
+
+Scenario: MultiChoice question
+  Given I am logged in as researcher
+  And I have a batch
+  And I have a member group
+  And I visit add new question page of the batch
+  And I fill the details for question
+  When I select multichoice for answer type
+  Then I should see one option field
+  When I click add-option icon
+  Then I should see two options field
+  When I click remove-option icon
+  Then I should see only one option field
+

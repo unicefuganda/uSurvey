@@ -2,5 +2,21 @@
 
 {% block display_form_fields %}
 {% include "naked_form.html" with a_form=questionform %}
+
+<script type="text/template" id="question-option-template">
+    <div class="control-group options question-option">
+        <label class="control-label">Option <span class="number">i</span></label>
+        <div class="controls">
+            <input type="text" maxlength="100" name="options">
+            <a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>
+            <a href="javascript:;" class="add-on btn btn_primary remove-option"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+</script>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}/js/question_options.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
 

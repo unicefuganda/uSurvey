@@ -14,6 +14,7 @@ class QuestionFormTest(TestCase):
                         'batch': self.batch.id,
                         'text': 'whaat?',
                         'answer_type': Question.NUMBER,
+                        'options':"some option text",
                         'group' : self.household_member_group.id
         }
 
@@ -37,6 +38,16 @@ class QuestionFormTest(TestCase):
     def test_should_know_household_member_group_id_and_name_tuple_is_the_group_choice(self):
         question_form = QuestionForm(self.form_data)
         self.assertEqual(question_form.fields['group'].choices, [(self.household_member_group.id, self.household_member_group.name)])
+
+    def test_should_not_save_multichoice_question_if_no_options_given(self):
+        form_data = self.form_data.copy()
+        form_data['answer_type'] = Question.MULTICHOICE
+        form_data['options']=''
+        question_form = QuestionForm(form_data)
+        self.assertFalse(question_form.is_valid())
+        expected_form_error = 'Question Options missing.'
+        self.assertEqual(1, len(question_form.errors['answer_type']))
+        self.assertEqual(expected_form_error, question_form.errors['answer_type'][0])
 
 
 

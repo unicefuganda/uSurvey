@@ -62,3 +62,43 @@ def and_i_should_see_question_successfully_added_message(step):
 @step(u'And I have a member group')
 def and_i_have_a_member_group(step):
     world.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
+
+@step(u'And I visit add new question page of the batch')
+def and_i_visit_add_new_question_page_of_the_batch(step):
+    world.page = AddQuestionPage(world.browser,world.batch)
+    world.page.visit()
+
+@step(u'And I fill the details for question')
+def and_i_fill_the_details_for_question(step):
+    world.page.fill_valid_values({'text':'hritik  question'})
+    world.page.select('group', [world.household_member_group.pk])
+
+@step(u'When I select multichoice for answer type')
+def when_i_select_multichoice_for_answer_type(step):
+    world.page.select('answer_type', [Question.MULTICHOICE])
+
+@step(u'Then I should see one option field')
+def then_i_should_see_one_option_field(step):
+    world.page.see_one_option_field("Option 1")
+    world.page.see_option_add_and_remove_buttons(1)
+
+
+@step(u'When I click add-option icon')
+def when_i_click_add_option_icon(step):
+    world.page.click_by_css(".icon-plus")
+
+@step(u'Then I should see two options field')
+def then_i_should_see_two_options_field(step):
+    world.page.see_one_option_field("Option 1")
+    world.page.see_one_option_field("Option 2")
+    world.page.see_option_add_and_remove_buttons(2)
+
+@step(u'When I click remove-option icon')
+def when_i_click_remove_option_icon(step):
+    world.page.click_by_css(".icon-remove")
+
+@step(u'Then I should see only one option field')
+def then_i_should_see_only_one_option_field(step):
+    world.page.see_one_option_field("Option 1")
+    world.page.see_option_add_and_remove_buttons(1)
+    world.page.option_not_present("Option 2")
