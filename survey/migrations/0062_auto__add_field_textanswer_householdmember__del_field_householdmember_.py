@@ -54,7 +54,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'HouseholdHead.householdmember_ptr'
         db.add_column(u'survey_householdhead', u'householdmember_ptr',
-                      self.gf('django.db.models.fields.related.OneToOneField')(default=1, to=orm['survey.HouseholdMember'], unique=True, primary_key=True),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['survey.HouseholdMember']),
                       keep_default=False)
 
         # Adding field 'MultiChoiceAnswer.householdmember'
