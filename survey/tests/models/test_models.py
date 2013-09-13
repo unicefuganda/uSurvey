@@ -3,19 +3,21 @@ from survey.models.batch import Batch
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
+from datetime import date
 from django.core.exceptions import ValidationError
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models.household_batch_completion import HouseholdBatchCompletion
 from survey.models.backend import Backend
 from survey.models.answer_rule import AnswerRule
 from survey.models.batch import Batch, BatchLocationStatus
-from survey.models.households import Household
+from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.locations import LocationAutoComplete
 from survey.models.question import Question, QuestionOption, NumericalAnswer, TextAnswer, MultiChoiceAnswer
 from survey.models.random_household_selection import RandomHouseHoldSelection
 from survey.models.formula import Formula
-from survey.models.householdgroups import HouseholdMemberGroup
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
+
 
 class InvestigatorTest(TestCase):
     def test_fields(self):
@@ -77,6 +79,53 @@ class InvestigatorTest(TestCase):
                                                    location=kampala, backend=Backend.objects.create(name='something'))
         self.assertEquals(investigator.location_hierarchy(), {'Country': uganda, 'City': kampala})
 
+    def test_saves_household_member_answer_and_batch_is_complete(self):
+        self.batch = Batch.objects.create(name="Batch 1", order=1)
+        group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
+        group_condition = GroupCondition.objects.create(attribute="GENDER", condition="EQUALS", value=True)
+        group_condition.groups.add(group)
+
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
+                                                   location=Location.objects.create(name="Kampala"),
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member1 = HouseholdMember.objects.create(household=household, surname="abcd", male=True, date_of_birth=date(1989, 2, 2))
+        batch = Batch.objects.create(order=1)
+        batch.open_for_location(investigator.location)
+        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1, group=group)
+        investigator.member_answered(question_1, household_member1, answer=34)
+        completed_batches = HouseholdBatchCompletion.objects.filter()
+
+        self.assertEqual(investigator.last_answered_question(), question_1)
+        self.assertEqual(len(completed_batches), 1)
+        self.assertEqual(completed_batches[0].householdmember, household_member1)
+
+    def test_saves_household_member_answer_and_batch_is_not_complete_if_more_questions_exists(self):
+        self.batch = Batch.objects.create(name="Batch 1", order=1)
+        group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
+        group_condition = GroupCondition.objects.create(attribute="GENDER", condition="EQUALS", value=True)
+        group_condition.groups.add(group)
+
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
+                                                   location=Location.objects.create(name="Kampala"),
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member1 = HouseholdMember.objects.create(household=household, surname="abcd", male=True, date_of_birth=date(1989, 2, 2))
+        batch = Batch.objects.create(order=1)
+        batch.open_for_location(investigator.location)
+        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1, group=group)
+
+        question_2 = Question.objects.create(batch=batch, text="How many women are there in this household?",
+                                             answer_type=Question.NUMBER, order=2, group=group)
+
+        investigator.member_answered(question_1, household_member1, answer=34)
+        completed_batches = HouseholdBatchCompletion.objects.filter()
+
+        self.assertEqual(investigator.last_answered_question(), question_1)
+        self.assertEqual(len(completed_batches), 0)
+        self.assertEqual(household_member1.next_question(), question_2)
 
 class LocationTest(TestCase):
     def test_store(self):

@@ -1,6 +1,7 @@
 from django.db import models
 from survey.models.base import BaseModel
 
+
 class HouseholdMemberGroup(BaseModel):
     name = models.CharField(max_length=50)
     order = models.PositiveIntegerField(max_length=5, null=False, blank=False, unique=True, default=0)
@@ -22,6 +23,19 @@ class HouseholdMemberGroup(BaseModel):
 
         return condition_value
 
+    def all_questions_answered(self, member):
+        last_question = self.last_question()
+        answer_class = last_question.answer_class()
+
+        answered_question = answer_class.objects.filter(question=last_question, householdmember=member)
+        return len(answered_question) > 0
+
+    def first_question(self):
+        return self.all_questions().order_by('order')[0]
+
+    def last_question(self):
+        return self.all_questions().order_by('order').reverse()[0]
+
     def belongs_to_group(self, household_member):
         condition_match = []
 
@@ -30,21 +44,32 @@ class HouseholdMemberGroup(BaseModel):
 
         return all(condition is True for condition in condition_match)
 
+    def maximum_question_order(self):
+        all_questions = self.all_questions()
+        return all_questions.order_by('order').reverse()[0].order if all_questions else 0
+
+    def get_next_question_for(self, member):
+        last_question = member.last_question_answered()
+
+        if last_question and last_question.group == self:
+            return self.all_questions().get(order=last_question.order + 1)
+
+        return self.all_questions().order_by('order')[0]
+
     class Meta:
         app_label = 'survey'
 
 
-
 class GroupCondition(BaseModel):
     CONDITIONS = {
-                'EQUALS': 'EQUALS',
-                'GREATER_THAN': 'GREATER_THAN',
-                'LESS_THAN': 'LESS_THAN',
+        'EQUALS': 'EQUALS',
+        'GREATER_THAN': 'GREATER_THAN',
+        'LESS_THAN': 'LESS_THAN',
     }
 
     GROUP_TYPES = {
-                'AGE': 'AGE',
-                'GENDER': 'GENDER'
+        'AGE': 'AGE',
+        'GENDER': 'GENDER'
     }
 
     value = models.CharField(max_length=50)
@@ -58,10 +83,10 @@ class GroupCondition(BaseModel):
             return str(self.value) == str(value)
 
         elif self.condition == GroupCondition.CONDITIONS['GREATER_THAN']:
-            return value >= self.value
+            return int(value) >= int(self.value)
 
         elif self.condition == GroupCondition.CONDITIONS['LESS_THAN']:
-            return value <= self.value
+            return int(value) <= int(self.value)
 
     class Meta:
         app_label = 'survey'

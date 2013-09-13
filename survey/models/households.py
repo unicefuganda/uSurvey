@@ -13,11 +13,11 @@ from django.core.paginator import Paginator
 class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
     uid = models.PositiveIntegerField(blank=False, default=0, unique=True,
-                        verbose_name="Household Unique Identification")
+                                      verbose_name="Household Unique Identification")
 
     MEMBERS_PER_PAGE = 4
-    PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
-    NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
+    PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings, 'USSD_PAGINATION', None).get('PREVIOUS')
+    NEXT_PAGE_TEXT = "%s: Next" % getattr(settings, 'USSD_PAGINATION', None).get('NEXT')
 
     class Meta:
         app_label = 'survey'
@@ -29,7 +29,7 @@ class Household(BaseModel):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
             answer = getattr(self, related_name).all()
-            if answer:answered.append(answer.latest())
+            if answer: answered.append(answer.latest())
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
@@ -78,7 +78,8 @@ class Household(BaseModel):
 
     def can_retake_survey(self, batch, minutes):
         last_batch_completed_time = self.completed_batches.filter(batch=batch, household=self)[0].created
-        timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(minutes=minutes)
+        timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(
+            minutes=minutes)
         return last_batch_completed_time >= timeout
 
     def answers_for(self, questions):
@@ -147,11 +148,11 @@ class Household(BaseModel):
 
 
 class HouseholdMember(BaseModel):
-    surname = models.CharField(max_length=12, verbose_name="Family Name")
-    first_name = models.CharField(max_length=12, blank=True, null=True, verbose_name="Other Names")
+    surname = models.CharField(max_length=25, verbose_name="Family Name")
+    first_name = models.CharField(max_length=25, blank=True, null=True, verbose_name="Other Names")
     male = models.BooleanField(default=True, verbose_name="Sex")
     date_of_birth = models.DateField(auto_now=False)
-    household = models.ForeignKey(Household,related_name='household_member')
+    household = models.ForeignKey(Household, related_name='household_member')
 
     def is_head(self):
         return False
@@ -166,7 +167,42 @@ class HouseholdMember(BaseModel):
 
     def get_age(self):
         days_in_year = 365.2425
-        return int((datetime.date.today() - self.date_of_birth).days/days_in_year)
+        return int((datetime.date.today() - self.date_of_birth).days / days_in_year)
+
+    def get_next_group(self):
+        member_groups = self.get_member_groups()
+
+        for member_group in member_groups:
+            if not member_group.all_questions_answered(self):
+                return member_group
+
+    def last_question_answered(self):
+        answered = []
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+            answer = getattr(self, related_name).all()
+            if answer: answered.append(answer.latest())
+        if answered:
+            return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
+
+    def next_question(self, last_question_answered=None):
+
+        next_group = self.get_next_group()
+        question = None
+
+        if not last_question_answered:
+            last_question_answered = self.last_question_answered()
+
+        if not last_question_answered:
+            question = next_group.first_question()
+
+        if last_question_answered and next_group and not next_group.all_questions_answered(self):
+            question = next_group.get_next_question_for(self)
+
+        return question
+
+    def batch_completed(self, batch):
+        return self.completed_member_batches.get_or_create(householdmember=self,
+                                                           investigator=self.household.investigator, batch=batch)
 
     class Meta:
         app_label = 'survey'
@@ -174,11 +210,12 @@ class HouseholdMember(BaseModel):
 
 class HouseholdHead(HouseholdMember):
     occupation = models.CharField(max_length=100, blank=False, null=False,
-                                   verbose_name="Occupation / Main Livelihood", default="16")
+                                  verbose_name="Occupation / Main Livelihood", default="16")
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
-                                          blank=False, default='Primary', verbose_name="Highest level of education completed")
+                                          blank=False, default='Primary',
+                                          verbose_name="Highest level of education completed")
     resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
-                                                         null=False, default=1984)
+                                                      null=False, default=1984)
     resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
 
     class Meta:

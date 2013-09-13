@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import models
-from survey.models.households import Household
+from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
@@ -43,7 +43,6 @@ class Question(BaseModel):
     def __unicode__(self):
         return self.text
 
-
     def get_option(self, answer, investigator):
         try:
             return self.options.get(order=int(answer))
@@ -81,7 +80,14 @@ class Question(BaseModel):
         except ObjectDoesNotExist, e:
             return self.next_question(location=household.investigator.location)
 
-    def next_question(self, location):
+    def next_question_for_household_member(self, household_member):
+        answer = self.answer_class().objects.get(householdmember=household_member, question=self)
+        try:
+            return self.get_next_question_by_rule(answer, household_member.household.investigator)
+        except ObjectDoesNotExist, e:
+            return self.next_question(location=household_member.household.investigator.location, member=household_member)
+
+    def next_question(self, location, member=None):
         order = self.parent.order if self.subquestion else self.order
         return self.batch.get_next_question(order, location=location)
 
@@ -104,7 +110,6 @@ class QuestionOption(BaseModel):
     class Meta:
         app_label = 'survey'
 
-
     def to_text(self):
         return "%d: %s" % (self.order, self.text)
 
@@ -112,6 +117,7 @@ class QuestionOption(BaseModel):
 class Answer(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="%(class)s")
     household = models.ForeignKey(Household, null=True, related_name="%(class)s")
+    householdmember = models.ForeignKey(HouseholdMember, null=True, related_name="%(class)s")
     question = models.ForeignKey(Question, null=True)
     rule_applied = models.ForeignKey("AnswerRule", null=True)
 
@@ -134,6 +140,7 @@ class NumericalAnswer(Answer):
 
 class TextAnswer(Answer):
     answer = models.CharField(max_length=100, blank=False, null=False)
+
 
 class MultiChoiceAnswer(Answer):
     answer = models.ForeignKey(QuestionOption, null=True)

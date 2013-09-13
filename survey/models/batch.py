@@ -76,7 +76,7 @@ class Batch(BaseModel):
 
     def get_next_question(self, order, location):
         if self.is_open_for(location=location):
-            question = self.questions.filter(order=order + 1)
+            question = self.questions.filter(order=order+1)
 
             if question:
                 return question[0]

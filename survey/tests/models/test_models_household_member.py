@@ -2,10 +2,12 @@ from datetime import date
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models import Batch, Question
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import HouseholdMember, Household, HouseholdHead
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
+
 
 class HouseholdMemberTest(TestCase):
     def test_should_have_fields_required(self):
@@ -74,3 +76,148 @@ class HouseholdMemberTest(TestCase):
 
         self.assertTrue(household_head.is_head())
         self.assertFalse(household_member.is_head())
+
+    def test_member_gets_the_question_that_belongs_to_his_group(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        district = LocationType.objects.create(name="District", slug=slugify("district"))
+        county = LocationType.objects.create(name="County", slug=slugify("county"))
+        sub_county = LocationType.objects.create(name="Subcounty", slug=slugify("sub-county"))
+        parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
+        village = LocationType.objects.create(name="Village", slug=slugify("village"))
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala_district = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        bukoto_county = Location.objects.create(name="Bukoto", type=county, tree_parent=kampala_district)
+        some_sub_county = Location.objects.create(name="Some sub county", type=sub_county, tree_parent=bukoto_county)
+        some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
+        some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
+
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
+
+        self.batch = Batch.objects.create(name="Batch 1", order=1)
+        group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
+        group_condition = GroupCondition.objects.create(attribute="GENDER", condition="EQUALS", value=True)
+        group_condition.groups.add(group)
+
+        question_1 = Question.objects.create(batch=self.batch, group=group, text="This is another question", answer_type="number", order=1)
+        question_2 = Question.objects.create(batch=self.batch, group=group, text="This is a question", answer_type="number", order=2)
+
+        self.batch.open_for_location(uganda)
+
+        hhold = Household.objects.create(investigator=investigator1, uid=0)
+        household_member = HouseholdMember.objects.create(household=hhold, surname="name", male=True, date_of_birth=date(1998, 2, 2))
+
+        self.assertEqual(question_1, household_member.next_question())
+
+    def test_gets_next_group_with_un_answered_questions(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+
+        less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
+        greater_condition = GroupCondition.objects.create(attribute="age", condition="LESS_THAN", value=6)
+        member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
+        less_condition.groups.add(member_group)
+        greater_condition.groups.add(member_group)
+
+        female_group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        female_condition = GroupCondition.objects.create(attribute="gender", condition="EQUALS", value=False)
+        female_condition.groups.add(female_group)
+
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
+                                                          male=False,
+                                                          household=household)
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                             answer_type='number', order=2,
+                                             subquestion=False, group=member_group, batch=batch)
+
+        question_3 = Question.objects.create(identifier="identifier1", text="Question 3",
+                                             answer_type='number', order=1,
+                                             subquestion=False, group=female_group, batch=batch)
+        investigator.member_answered(question=question_1, household_member=household_member, answer=1)
+        investigator.member_answered(question=question_2, household_member=household_member, answer=1)
+        self.assertEqual(female_group, household_member.get_next_group())
+
+    def test_knows_how_to_get_the_next_questions_from_the_next_group(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+
+        less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
+        greater_condition = GroupCondition.objects.create(attribute="age", condition="LESS_THAN", value=6)
+        member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
+        less_condition.groups.add(member_group)
+        greater_condition.groups.add(member_group)
+
+        female_group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        female_condition = GroupCondition.objects.create(attribute="gender", condition="EQUALS", value=False)
+        female_condition.groups.add(female_group)
+
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
+                                                          male=False,
+                                                          household=household)
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                             answer_type='number', order=2,
+                                             subquestion=False, group=member_group, batch=batch)
+
+        question_3 = Question.objects.create(identifier="identifier1", text="Question 3",
+                                             answer_type='number', order=1,
+                                             subquestion=False, group=female_group, batch=batch)
+
+        self.assertEqual(question_1, household_member.next_question())
+        investigator.member_answered(question=question_1, household_member=household_member, answer=1)
+        self.assertEqual(question_2, household_member.next_question())
+        investigator.member_answered(question=question_2, household_member=household_member, answer=1)
+        self.assertEqual(question_3, household_member.next_question())
+
+    def test_knows_all_questions_are_answered(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+
+        less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
+        greater_condition = GroupCondition.objects.create(attribute="age", condition="LESS_THAN", value=6)
+        member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
+        less_condition.groups.add(member_group)
+        greater_condition.groups.add(member_group)
+
+        female_group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        female_condition = GroupCondition.objects.create(attribute="gender", condition="EQUALS", value=False)
+        female_condition.groups.add(female_group)
+
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
+                                                          male=False,
+                                                          household=household)
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                             answer_type='number', order=2,
+                                             subquestion=False, group=member_group, batch=batch)
+
+        question_3 = Question.objects.create(identifier="identifier1", text="Question 3",
+                                             answer_type='number', order=1,
+                                             subquestion=False, group=female_group, batch=batch)
+
+        investigator.member_answered(question=question_1, household_member=household_member, answer=1)
+        investigator.member_answered(question=question_2, household_member=household_member, answer=1)
+        investigator.member_answered(question=question_3, household_member=household_member, answer=1)
+        self.assertEqual(None, household_member.next_question())
