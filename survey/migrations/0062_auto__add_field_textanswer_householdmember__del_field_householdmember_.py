@@ -8,17 +8,27 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding field 'TextAnswer.householdmember'
+        db.add_column(u'survey_textanswer', 'householdmember',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='textanswer', null=True, to=orm['survey.HouseholdMember']),
+                      keep_default=False)
+
         # Deleting field 'HouseholdMember.name'
         db.delete_column(u'survey_householdmember', 'name')
 
         # Adding field 'HouseholdMember.surname'
         db.add_column(u'survey_householdmember', 'surname',
-                      self.gf('django.db.models.fields.CharField')(default='Test Surname', max_length=12),
+                      self.gf('django.db.models.fields.CharField')(default='Smith', max_length=25),
                       keep_default=False)
 
         # Adding field 'HouseholdMember.first_name'
         db.add_column(u'survey_householdmember', 'first_name',
-                      self.gf('django.db.models.fields.CharField')(max_length=12, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(max_length=25, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'HouseholdBatchCompletion.householdmember'
+        db.add_column(u'survey_householdbatchcompletion', 'householdmember',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='completed_member_batches', null=True, to=orm['survey.HouseholdMember']),
                       keep_default=False)
 
         # Deleting field 'HouseholdHead.surname'
@@ -26,9 +36,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'HouseholdHead.household'
         db.delete_column(u'survey_householdhead', 'household_id')
-
-        # Deleting field 'HouseholdHead.id'
-        db.delete_column(u'survey_householdhead', u'id')
 
         # Deleting field 'HouseholdHead.first_name'
         db.delete_column(u'survey_householdhead', 'first_name')
@@ -50,11 +57,24 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.OneToOneField')(default=1, to=orm['survey.HouseholdMember'], unique=True, primary_key=True),
                       keep_default=False)
 
+        # Adding field 'MultiChoiceAnswer.householdmember'
+        db.add_column(u'survey_multichoiceanswer', 'householdmember',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='multichoiceanswer', null=True, to=orm['survey.HouseholdMember']),
+                      keep_default=False)
+
+        # Adding field 'NumericalAnswer.householdmember'
+        db.add_column(u'survey_numericalanswer', 'householdmember',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='numericalanswer', null=True, to=orm['survey.HouseholdMember']),
+                      keep_default=False)
+
 
     def backwards(self, orm):
+        # Deleting field 'TextAnswer.householdmember'
+        db.delete_column(u'survey_textanswer', 'householdmember_id')
+
         # Adding field 'HouseholdMember.name'
         db.add_column(u'survey_householdmember', 'name',
-                      self.gf('django.db.models.fields.CharField')(default='Test Name', max_length=255),
+                      self.gf('django.db.models.fields.CharField')(default='Mary', max_length=255),
                       keep_default=False)
 
         # Deleting field 'HouseholdMember.surname'
@@ -62,6 +82,9 @@ class Migration(SchemaMigration):
 
         # Deleting field 'HouseholdMember.first_name'
         db.delete_column(u'survey_householdmember', 'first_name')
+
+        # Deleting field 'HouseholdBatchCompletion.householdmember'
+        db.delete_column(u'survey_householdbatchcompletion', 'householdmember_id')
 
         # Adding field 'HouseholdHead.surname'
         db.add_column(u'survey_householdhead', 'surname',
@@ -71,11 +94,6 @@ class Migration(SchemaMigration):
         # Adding field 'HouseholdHead.household'
         db.add_column(u'survey_householdhead', 'household',
                       self.gf('django.db.models.fields.related.OneToOneField')(related_name='head', unique=True, null=True, to=orm['survey.Household']),
-                      keep_default=False)
-
-        # Adding field 'HouseholdHead.id'
-        db.add_column(u'survey_householdhead', u'id',
-                      self.gf('django.db.models.fields.AutoField')(default=1, primary_key=True),
                       keep_default=False)
 
         # Adding field 'HouseholdHead.first_name'
@@ -105,6 +123,12 @@ class Migration(SchemaMigration):
 
         # Deleting field 'HouseholdHead.householdmember_ptr'
         db.delete_column(u'survey_householdhead', u'householdmember_ptr_id')
+
+        # Deleting field 'MultiChoiceAnswer.householdmember'
+        db.delete_column(u'survey_multichoiceanswer', 'householdmember_id')
+
+        # Deleting field 'NumericalAnswer.householdmember'
+        db.delete_column(u'survey_numericalanswer', 'householdmember_id')
 
 
     models = {
@@ -237,6 +261,7 @@ class Migration(SchemaMigration):
             'batch': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'completed_households'", 'null': 'True', 'to': "orm['survey.Batch']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'household': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'completed_batches'", 'null': 'True', 'to': "orm['survey.Household']"}),
+            'householdmember': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'completed_member_batches'", 'null': 'True', 'to': "orm['survey.HouseholdMember']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'completed_batches'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'})
@@ -253,12 +278,12 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'HouseholdMember'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'date_of_birth': ('django.db.models.fields.DateField', [], {}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '12', 'null': 'True', 'blank': 'True'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '25', 'null': 'True', 'blank': 'True'}),
             'household': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'household_member'", 'to': "orm['survey.Household']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'male': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'surname': ('django.db.models.fields.CharField', [], {'max_length': '12'})
+            'surname': ('django.db.models.fields.CharField', [], {'max_length': '25'})
         },
         'survey.householdmembergroup': {
             'Meta': {'object_name': 'HouseholdMemberGroup'},
@@ -294,6 +319,7 @@ class Migration(SchemaMigration):
             'answer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.QuestionOption']", 'null': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'household': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'multichoiceanswer'", 'null': 'True', 'to': "orm['survey.Household']"}),
+            'householdmember': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'multichoiceanswer'", 'null': 'True', 'to': "orm['survey.HouseholdMember']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'multichoiceanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -305,6 +331,7 @@ class Migration(SchemaMigration):
             'answer': ('django.db.models.fields.PositiveIntegerField', [], {'max_length': '5', 'null': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'household': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'numericalanswer'", 'null': 'True', 'to': "orm['survey.Household']"}),
+            'householdmember': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'numericalanswer'", 'null': 'True', 'to': "orm['survey.HouseholdMember']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'numericalanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -350,13 +377,16 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
-            'questions': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'survey'", 'symmetrical': 'False', 'to': "orm['survey.Question']"})
+            'number_of_household_per_investigator': ('django.db.models.fields.PositiveIntegerField', [], {'default': '10', 'max_length': '2'}),
+            'questions': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'survey'", 'symmetrical': 'False', 'to': "orm['survey.Question']"}),
+            'rapid_survey': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'survey.textanswer': {
             'Meta': {'object_name': 'TextAnswer'},
             'answer': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'household': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'textanswer'", 'null': 'True', 'to': "orm['survey.Household']"}),
+            'householdmember': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'textanswer'", 'null': 'True', 'to': "orm['survey.HouseholdMember']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'textanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
