@@ -15,7 +15,7 @@ def and_i_have_100_surveys(step):
     for _ in xrange(100):
         random_number = randint(1, 99999)
         try:
-            survey = Survey.objects.create(name='survey %d'%random_number, description= 'survey descrpition %d'%random_number, rapid_survey=(True if random_number%2 else False) )
+            survey = Survey.objects.create(name='survey %d'%random_number, description= 'survey descrpition %d'%random_number, type=(True if random_number%2 else False), sample_size=random_number)
         except Exception:
             pass
 
@@ -34,11 +34,6 @@ def then_i_should_see_the_new_survey_form(step):
     world.page = AddSurveyPage(world.browser)
     world.page.validate_url()
 
-@step(u'And I have a question')
-def and_i_have_a_question(step):
-    world.question = Question.objects.create(batch=world.batch, text="some questions",
-                                                    answer_type=Question.NUMBER, order=1)
-
 @step(u'And I visit the new survey page')
 def and_i_visit_the_new_survey_page(step):
     world.page = AddSurveyPage(world.browser)
@@ -48,9 +43,8 @@ def and_i_visit_the_new_survey_page(step):
 def when_i_fill_in_the_survey_details(step):
     data = {'name': 'survey rajni',
             'description': 'survey description rajni',
-            'number_of_household_per_investigator': 10,
-            'rapid_survey': True,
-            'questions': world.question.pk,
+            'sample_size': 10,
+            'type': True,
             }
     world.page.fill_valid_values(data)
 
