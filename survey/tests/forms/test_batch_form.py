@@ -38,8 +38,6 @@ class BatchQuestionsFormTest(TestCase):
                     'questions': [self.q1.id, self.q2.id],
                 }
 
-
-
     def test_valid(self):
         batch_questions_form = BatchQuestionsForm(self.form_data)
         self.assertTrue(batch_questions_form.is_valid())

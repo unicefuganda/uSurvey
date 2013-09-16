@@ -82,8 +82,16 @@ def delete(request, survey_id, batch_id):
     return HttpResponseRedirect('/surveys/%s/batches/'%survey_id)
 
 def assign(request, batch_id):
+    batch_questions_form = BatchQuestionsForm()
     batch = Batch.objects.get(id=batch_id)
-    context = {'questions': Question.objects.all(), 'batch_questions_form': BatchQuestionsForm(), 'batch': batch,
+    if request.method == 'POST':
+        batch_question_form = BatchQuestionsForm(data=request.POST, instance=batch)
+        if batch_question_form.is_valid():
+            batch_question_form.save()
+            success_message ="Questions successfully assigned to batch: %s."%batch.name.capitalize()
+            messages.success(request, success_message)
+            return HttpResponseRedirect("/batches/%s/questions/" %batch_id)
+    context = {'batch_questions_form': batch_questions_form, 'batch': batch,
                'button_label':'Save', 'id':'assign-question-to-batch-form'}
     return render(request, 'batches/assign.html',
                   context)

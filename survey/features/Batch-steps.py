@@ -6,6 +6,7 @@ from rapidsms.contrib.locations.models import *
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage
 from survey.features.page_objects.question import QuestionsListPage
 from survey.investigator_configs import *
+from survey.models.question import Question
 from survey.models.batch import Batch, BatchLocationStatus
 
 
@@ -155,4 +156,17 @@ def and_i_click_on_assign_question_link(step):
 def then_i_should_see_the_assign_question_page_of_that_batch(step):
     world.page = AssignQuestionToBatchPage(world.browser, world.batch)
     world.page.validate_url()
-    world.page.is_text_present("Assign Questions to %s - %s"%(world.batch.name.capitalize(), world.survey.name.capitalize()))
+    world.page.is_text_present("Assign Questions to %s - %s"%(world.survey.name.capitalize(), world.batch.name.capitalize()))
+
+@step(u'When I select some questions')
+def when_i_select_some_questions(step):
+    world.page.select('questions',[world.question_1.pk,world.question_2.pk])
+
+@step(u'Then I should see the questions successfully assigned to that batch')
+def then_i_should_see_the_questions_successfully_assigned_to_that_batch(step):
+    world.page.see_success_message("Questions", "assigned to batch: %s"%world.batch.name.capitalize())
+
+@step(u'And I have 2 questions')
+def and_i_have_2_questions(step):
+    world.question_1=Question.objects.create(text="question1", answer_type=Question.NUMBER)
+    world.question_2=Question.objects.create(text="question2", answer_type=Question.TEXT)

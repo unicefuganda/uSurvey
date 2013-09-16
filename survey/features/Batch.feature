@@ -73,9 +73,13 @@ Feature: Batch related features
     Given I am logged in as researcher
     And I have a survey
     And I have a batch
+    And I have 2 questions
     And I visit batches listing page
     And I click on assign question link
     Then I should see the assign question page of that batch
+    When I select some questions
+    And I submit the form
+    Then I should see the questions successfully assigned to that batch
 
 
 

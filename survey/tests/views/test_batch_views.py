@@ -159,9 +159,25 @@ class BatchViews(BaseTest):
         self.assertIn('batches/assign.html', templates)
 
         question = Question.objects.create()
-        self.assertEqual(1, len(response.context['questions']))
-        self.assertIn(question, response.context['questions'])
+        self.assertEqual(1, len(response.context['batch_questions_form'].fields['questions']._queryset))
+        self.assertIn(question, response.context['batch_questions_form'].fields['questions']._queryset)
         self.assertEqual(self.batch, response.context['batch'])
         self.assertIsInstance(response.context['batch_questions_form'],BatchQuestionsForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'assign-question-to-batch-form')
+
+    def test_post_assign_questions_to_batch_should_save_questions(self):
+        q1=Question.objects.create(text="question1", answer_type=Question.NUMBER)
+        q2=Question.objects.create(text="question2", answer_type=Question.TEXT)
+        form_data = {
+                    'questions': [q1.id, q2.id],
+                }
+        self.failIf(self.batch.all_questions())
+        response = self.client.post('/batches/%d/assign_questions/'%(self.batch.id),data=form_data)
+        self.assertRedirects(response, expected_url='batches/%d/questions/' %self.batch.id, status_code=302, target_status_code=200, msg_prefix='')
+        self.assertEqual(2, len(self.batch.all_questions()))
+        self.assertIn(q1, self.batch.all_questions())
+        self.assertIn(q2, self.batch.all_questions())
+        success_message ="Questions successfully assigned to batch: %s."%self.batch.name.capitalize()
+        self.assertTrue(success_message in response.cookies['messages'].value)
+

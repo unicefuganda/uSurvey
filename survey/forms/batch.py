@@ -27,3 +27,17 @@ class BatchQuestionsForm(ModelForm):
         model = Batch
         fields = ['questions' ]
 
+
+    def save_question_to_batch(self, batch):
+        for question in self.cleaned_data['questions']:
+            question.batch = batch
+            question.save()
+
+    def save(self, commit=True, *args, **kwargs):
+        batch = super(BatchQuestionsForm, self).save(commit=commit, *args, **kwargs)
+
+        if commit:
+            batch.save()
+            self.save_question_to_batch(batch)
+
+
