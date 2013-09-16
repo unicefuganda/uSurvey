@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 
 from survey.investigator_configs import *
+from survey.models import Survey
 from survey.models.batch import Batch
 
 from survey.forms.batch import BatchForm
@@ -15,7 +16,8 @@ from survey.forms.batch import BatchForm
 @permission_required('auth.can_view_batches')
 def index(request, survey_id):
     batches = Batch.objects.filter(survey__id= survey_id)
-    return render(request, 'batches/index.html', {'batches': batches, 'survey_id':survey_id, 'request': request})
+    return render(request, 'batches/index.html',
+                  {'batches': batches, 'survey': Survey.objects.get(id=survey_id), 'request': request})
 
 @login_required
 @permission_required('auth.can_view_batches')
@@ -53,10 +55,11 @@ def _process_form(request,survey_id, batchform, action_str='added', **batchform_
     if request.method =='POST':
         batchform = BatchForm(data=request.POST, **batchform_kwargs)
         if batchform.is_valid():
-            batchform.save()
+            batch = batchform.save(commit=False)
+            batch.survey= Survey.objects.get(id=survey_id)
+            batch.save()
             _add_success_message(request, action_str)
             batch_list_url = '/surveys/%s/batches/' % str(survey_id)
-            print batch_list_url
             return HttpResponseRedirect(batch_list_url)
     return  render(request, 'batches/new.html', {'batchform':batchform,
                                                         'button_label':'Save',

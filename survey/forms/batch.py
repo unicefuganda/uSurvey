@@ -1,3 +1,4 @@
+from django import forms
 from django.forms import ModelForm
 from survey.models.batch import Batch
 
@@ -8,6 +9,9 @@ class BatchForm(ModelForm):
     class Meta:
         model = Batch
         fields =['name','description']
+        widgets={
+            'description':forms.Textarea(attrs={"rows":4, "cols":50})
+        }
 
     def clean_name(self):
         if len(Batch.objects.filter(name=self.cleaned_data['name'])) > 0:

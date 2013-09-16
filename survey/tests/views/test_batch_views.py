@@ -1,4 +1,3 @@
-from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
@@ -35,7 +34,7 @@ class BatchViews(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('batches/index.html', templates)
         self.assertIn(self.batch, response.context['batches'])
-        self.assertEquals(str(self.survey.id), response.context['survey_id'])
+        self.assertEquals(self.survey, response.context['survey'])
 
     def test_get_index_should_not_show_batches_not_belonging_to_the_survey(self):
         another_batch = Batch.objects.create(order = 2, name = "Batch B")
@@ -45,7 +44,7 @@ class BatchViews(BaseTest):
         self.assertIn('batches/index.html', templates)
         self.assertIn(self.batch, response.context['batches'])
         self.assertFalse(another_batch in response.context['batches'])
-        self.assertEquals(str(self.survey.id), response.context['survey_id'])
+        self.assertEquals(self.survey, response.context['survey'])
 
     def test_get_batch_view(self):
         response = self.client.get('/surveys/%d/batches/%d/' %(self.survey.id, self.batch.pk))
@@ -109,6 +108,12 @@ class BatchViews(BaseTest):
         response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch A', 'description':'description'})
         self.assertTrue(len(response.context['batchform'].errors)>0)
 
+    def post_add_new_batch_should_add_batch_to_the_survey(self):
+        form_data = {'name': 'Some Batch', 'description': 'some description'}
+        self.failIf(Batch.objects.filter(**form_data))
+        response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data=form_data)
+        batch = Batch.objects.get(**form_data)
+        self.assertEqual(self.survey,batch.survey)
 
     def test_edit_batch_should_load_new_template(self):
         batch = Batch.objects.create(name="batch a", description="batch a description")

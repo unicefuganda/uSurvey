@@ -59,6 +59,7 @@ def and_i_click_add_batch_button(step):
 def then_i_should_see_a_add_batch_page(step):
     world.page = AddBatchPage(world.browser,world.survey)
     world.page.validate_url()
+    world.page.validate_fields_present(["New Batch", "Name", "Description"])
 
 @step(u'When I fill the details for add batch form')
 def when_i_fill_the_details_for_add_batch_form(step):

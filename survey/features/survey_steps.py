@@ -33,6 +33,7 @@ def and_if_i_click_the_add_survey_button(step):
 def then_i_should_see_the_new_survey_form(step):
     world.page = AddSurveyPage(world.browser)
     world.page.validate_url()
+    world.page.validate_fields_present(["New Survey", "Name", "Description", "Type", "Sample size"])
 
 @step(u'And I visit the new survey page')
 def and_i_visit_the_new_survey_page(step):

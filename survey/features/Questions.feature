@@ -2,6 +2,7 @@ Feature: Questions related features
 
 Scenario: List Questions
   Given I am logged in as researcher
+  And I have a survey
   And I have a batch
   And I have 100 questions under the batch
   And I visit questions listing page of the batch
@@ -9,6 +10,7 @@ Scenario: List Questions
 
 Scenario: Error Message on no question
   Given I am logged in as researcher
+  And I have a survey
   And I have a batch
   And I have no questions under the batch
   And I visit questions listing page of the batch
@@ -16,6 +18,7 @@ Scenario: Error Message on no question
 
 Scenario: Add new question to batch
   Given I am logged in as researcher
+  And I have a survey
   And I have a batch
   And I visit questions listing page of the batch
   And I have a member group
@@ -28,6 +31,7 @@ Scenario: Add new question to batch
 
 Scenario: MultiChoice question
   Given I am logged in as researcher
+  And I have a survey
   And I have a batch
   And I have a member group
   And I visit add new question page of the batch
