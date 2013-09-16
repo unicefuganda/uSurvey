@@ -1,5 +1,3 @@
-from random import randint
-
 from lettuce import *
 from rapidsms.contrib.locations.models import *
 
@@ -89,11 +87,10 @@ def then_i_should_see_validation_error_messages(step):
 
 @step(u'And I have 100 batches')
 def and_i_have_100_batches(step):
-    for _ in xrange(100):
-        random_number = randint(1, 99999)
+    for i in xrange(100):
         try:
-            Batch.objects.create(order=random_number, name="Batch %d" % random_number,
-                                 description='description %d' % random_number, survey=world.survey)
+            Batch.objects.create(order=i, name="Batch %d" % i,
+                                 description='description %d' % i, survey=world.survey)
         except Exception:
             pass
 

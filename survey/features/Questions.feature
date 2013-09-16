@@ -23,11 +23,7 @@ Scenario: Add new question to batch
   And I visit questions listing page of the batch
   And I have a member group
   And I click add question button
-  Then I should see a add question page
-  When I fill the details for add question form
-  And I submit the form
-  Then I should go back to questions listing page
-  And I should see question successfully added message
+  Then I should see the assign question page of that batch
 
 Scenario: MultiChoice question
   Given I am logged in as researcher
