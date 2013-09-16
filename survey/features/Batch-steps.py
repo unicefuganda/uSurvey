@@ -11,7 +11,7 @@ from survey.models.batch import Batch, BatchLocationStatus
 
 @step(u'And I have a batch')
 def and_i_have_prime_locations(step):
-    world.batch = Batch.objects.create(order = 1, name = "Batch A", description='description')
+    world.batch = Batch.objects.create(order = 1, name = "Batch A", description='description', survey=world.survey)
 
 @step(u'And I have prime locations')
 def and_i_have_prime_locations(step):
@@ -90,7 +90,8 @@ def and_i_have_100_batches(step):
     for _ in xrange(100):
         random_number = randint(1, 99999)
         try:
-            Batch.objects.create(order = random_number, name = "Batch %d"%random_number, description ='description %d'%random_number)
+            Batch.objects.create(order=random_number, name="Batch %d" % random_number,
+                                 description='description %d' % random_number, survey=world.survey)
         except Exception:
             pass
 

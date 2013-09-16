@@ -17,8 +17,8 @@ class BatchViews(BaseTest):
         raj = self.assign_permission_to(raj, 'can_view_investigators')
 
         self.client.login(username='Rajni', password='I_Rock')
-        
-        self.batch = Batch.objects.create(order = 1, name = "Batch A")
+        self.survey = Survey.objects.create(name='survey name', description= 'survey descrpition', type=False, sample_size=10)
+        self.batch = Batch.objects.create(order = 1, name = "Batch A",survey=self.survey)
         district = LocationType.objects.create(name=PRIME_LOCATION_TYPE, slug=PRIME_LOCATION_TYPE)
         self.kampala = Location.objects.create(name="Kampala", type=district)
         city = LocationType.objects.create(name="City", slug="city")
@@ -28,7 +28,6 @@ class BatchViews(BaseTest):
         self.kamoja = Location.objects.create(name="kamoja", type=village, tree_parent=self.bukoto)
         self.abim = Location.objects.create(name="Abim", type=district)
         self.batch.open_for_location(self.abim)
-        self.survey = Survey.objects.create(name='survey name', description= 'survey descrpition', type=False, sample_size=10)
 
     def test_get_index(self):
         response = self.client.get('/surveys/%d/batches/' %self.survey.id)
@@ -36,6 +35,16 @@ class BatchViews(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('batches/index.html', templates)
         self.assertIn(self.batch, response.context['batches'])
+        self.assertEquals(str(self.survey.id), response.context['survey_id'])
+
+    def test_get_index_should_not_show_batches_not_belonging_to_the_survey(self):
+        another_batch = Batch.objects.create(order = 2, name = "Batch B")
+        response = self.client.get('/surveys/%d/batches/' %self.survey.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('batches/index.html', templates)
+        self.assertIn(self.batch, response.context['batches'])
+        self.assertFalse(another_batch in response.context['batches'])
         self.assertEquals(str(self.survey.id), response.context['survey_id'])
 
     def test_get_batch_view(self):

@@ -14,7 +14,7 @@ from survey.forms.batch import BatchForm
 @login_required
 @permission_required('auth.can_view_batches')
 def index(request, survey_id):
-    batches = Batch.objects.all()
+    batches = Batch.objects.filter(survey__id= survey_id)
     return render(request, 'batches/index.html', {'batches': batches, 'survey_id':survey_id, 'request': request})
 
 @login_required
