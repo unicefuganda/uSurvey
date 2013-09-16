@@ -1,0 +1,7 @@
+{% extends 'form.html' %}
+{% block title %}
+    Assign Questions to {{ batch.survey.name.capitalize }} - {{ batch.name.capitalize }}
+{%  endblock %}
+{% block display_form_fields %}
+    {% include 'naked_form.html' with a_form=batch_questions_form %}
+{% endblock %}

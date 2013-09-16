@@ -104,3 +104,9 @@ class BatchListPage(PageObject):
 
     def see_confirm_delete_message(self,batch_name):
         self.is_text_present("Confirm: Are you sure you want to delete %s?" % batch_name)
+
+class AssignQuestionToBatchPage(PageObject):
+    def __init__(self, browser, batch):
+        self.browser= browser
+        self.batch= batch
+        self.url = '/batches/' + str(self.batch.id) + '/assign_questions/'

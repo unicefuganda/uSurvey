@@ -17,3 +17,13 @@ class BatchForm(ModelForm):
         if len(Batch.objects.filter(name=self.cleaned_data['name'])) > 0:
             raise ValidationError('Batch with the same name already exist')
         return self.cleaned_data['name']
+
+
+class BatchQuestionsForm(ModelForm):
+    questions = forms.ModelMultipleChoiceField(label=u'', queryset=Question.objects.all(),
+                                                widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
+
+    class Meta:
+        model = Batch
+        fields = ['questions' ]
+

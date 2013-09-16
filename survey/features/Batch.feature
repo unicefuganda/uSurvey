@@ -69,3 +69,13 @@ Feature: Batch related features
     And I click on batch name
     Then I should be on the list of questions under the batch page
 
+  Scenario: Assign questions to batch
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I visit batches listing page
+    And I click on assign question link
+    Then I should see the assign question page of that batch
+
+
+

@@ -6,10 +6,11 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 
 from survey.investigator_configs import *
-from survey.models import Survey
+from survey.models.surveys import Survey
+from survey.models.question import Question
 from survey.models.batch import Batch
 
-from survey.forms.batch import BatchForm
+from survey.forms.batch import BatchForm, BatchQuestionsForm
 
 
 @login_required
@@ -79,3 +80,10 @@ def delete(request, survey_id, batch_id):
     Batch.objects.get(id=batch_id).delete()
     _add_success_message(request, 'deleted')
     return HttpResponseRedirect('/surveys/%s/batches/'%survey_id)
+
+def assign(request, batch_id):
+    batch = Batch.objects.get(id=batch_id)
+    context = {'questions': Question.objects.all(), 'batch_questions_form': BatchQuestionsForm(), 'batch': batch,
+               'button_label':'Save', 'id':'assign-question-to-batch-form'}
+    return render(request, 'batches/assign.html',
+                  context)

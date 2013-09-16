@@ -3,7 +3,7 @@ from random import randint
 from lettuce import *
 from rapidsms.contrib.locations.models import *
 
-from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage
+from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage
 from survey.features.page_objects.question import QuestionsListPage
 from survey.investigator_configs import *
 from survey.models.batch import Batch, BatchLocationStatus
@@ -146,3 +146,13 @@ def and_i_click_on_batch_name(step):
 def then_i_should_be_on_the_list_of_questions_under_the_batch_page(step):
     world.page = QuestionsListPage(world.browser, world.batch)
     world.page.validate_url()
+
+@step(u'And I click on assign question link')
+def and_i_click_on_assign_question_link(step):
+    world.page.click_link_by_text("Assign Questions")
+
+@step(u'Then I should see the assign question page of that batch')
+def then_i_should_see_the_assign_question_page_of_that_batch(step):
+    world.page = AssignQuestionToBatchPage(world.browser, world.batch)
+    world.page.validate_url()
+    world.page.is_text_present("Assign Questions to %s - %s"%(world.batch.name.capitalize(), world.survey.name.capitalize()))
