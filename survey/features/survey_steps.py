@@ -27,7 +27,7 @@ def then_i_should_see_the_survey_list_paginated(step):
 
 @step(u'And if I click the add survey button')
 def and_if_i_click_the_add_survey_button(step):
-    world.page.click_link_by_text("Add Survey")
+    world.page.click_link_by_text("Create New Survey")
 
 @step(u'Then I should see the new survey form')
 def then_i_should_see_the_new_survey_form(step):

@@ -7,3 +7,7 @@ class SurveyForm(ModelForm):
 
     class Meta:
         model = Survey
+        fields=['name', 'description', 'type', 'sample_size']
+        widgets={
+            'type':forms.RadioSelect(choices=[(True, 'Aggregate'), ( False, 'Roster')]),
+        }
