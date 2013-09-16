@@ -49,7 +49,10 @@ class FormulaShowPage(PageObject):
 
 
 class AddBatchPage(PageObject):
-    url = "/batches/new/"
+    def __init__(self, browser,survey):
+        self.browser= browser
+        self.survey= survey
+        self.url = '/surveys/%s/batches/new/' %survey.pk
 
     def validate_error_message_on_fields(self):
         self.is_text_present("This field is required.")
@@ -73,14 +76,18 @@ class BatchShowPage(PageObject):
 
 
 class EditBatchPage(PageObject):
-    def __init__(self, browser, batch):
+    def __init__(self, browser, batch,survey):
         self.browser= browser
         self.batch= batch
-        self.url = '/batches/' + str(self.batch.id) + '/edit/'
+        self.survey= survey
+        self.url = '/surveys/%s/batches/%s/edit/' %(self.survey.id, self.batch.id)
 
 
 class BatchListPage(PageObject):
-    url = "/batches/"
+    def __init__(self, browser, survey):
+        self.browser= browser
+        self.survey= survey
+        self.url = '/surveys/' + str(self.survey.id) + '/batches/'
 
     def visit_batch(self, batch):
         self.browser.click_link_by_text("Open/Close")

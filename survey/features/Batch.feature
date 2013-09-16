@@ -3,6 +3,7 @@ Feature: Batch related features
   Scenario: Open-Close Batch
     Given I am logged in as researcher
     And I have prime locations
+    And I have a survey
     And I have a batch
     And I visit batches listing page
     And I visit the first batch listed
@@ -14,6 +15,7 @@ Feature: Batch related features
 
   Scenario: Add new Batch
     Given I am logged in as researcher
+    And I have a survey
     And I visit batches listing page
     And I click add batch button
     Then I should see a add batch page
@@ -24,18 +26,21 @@ Feature: Batch related features
 
   Scenario: Add new batch- Js validations
     Given I am logged in as researcher
+    And I have a survey
     And I visit add batch page
     And I submit the form
     Then I should see validation error messages
 
   Scenario: List Batches
     Given I am logged in as researcher
+    And I have a survey
     And I have 100 batches
     And I visit batches listing page
     And I should see the batches list paginated
 
   Scenario: Edit Batch
     Given I am logged in as researcher
+    And I have a survey
     And I have a batch
     And I visit batches listing page
     And I click edit batch link
@@ -47,6 +52,7 @@ Feature: Batch related features
 
   Scenario: Delete Batch
     Given I am logged in as researcher
+    And I have a survey
     And I have a batch
     And I visit batches listing page
     And I click delete batch link
@@ -57,6 +63,7 @@ Feature: Batch related features
 
   Scenario: Batch Details- Listing questions under batch
     Given I am logged in as researcher
+    And I have a survey
     And I have a batch
     And I visit batches listing page
     And I click on batch name

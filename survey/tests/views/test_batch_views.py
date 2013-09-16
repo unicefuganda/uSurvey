@@ -1,7 +1,9 @@
+from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import PRIME_LOCATION_TYPE
+from survey.models import Survey
 from survey.models.batch import Batch
 from survey.tests.base_test import BaseTest
 from survey.forms.batch import BatchForm
@@ -26,16 +28,18 @@ class BatchViews(BaseTest):
         self.kamoja = Location.objects.create(name="kamoja", type=village, tree_parent=self.bukoto)
         self.abim = Location.objects.create(name="Abim", type=district)
         self.batch.open_for_location(self.abim)
+        self.survey = Survey.objects.create(name='survey name', description= 'survey descrpition', type=False, sample_size=10)
 
     def test_get_index(self):
-        response = self.client.get('/batches/')
+        response = self.client.get('/surveys/%d/batches/' %self.survey.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('batches/index.html', templates)
         self.assertIn(self.batch, response.context['batches'])
+        self.assertEquals(str(self.survey.id), response.context['survey_id'])
 
     def test_get_batch_view(self):
-        response = self.client.get('/batches/' + str(self.batch.pk) + "/")
+        response = self.client.get('/surveys/%d/batches/%d/' %(self.survey.id, self.batch.pk))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('batches/show.html', templates)
@@ -61,52 +65,52 @@ class BatchViews(BaseTest):
 
 
     def test_restricted_permssion(self):
-        self.assert_restricted_permission_for('/batches/')
-        self.assert_restricted_permission_for('/batches/new/')
-        self.assert_restricted_permission_for('/batches/1/')
+        self.assert_restricted_permission_for('/surveys/%d/batches/' %self.survey.id)
+        self.assert_restricted_permission_for('/surveys/%d/batches/new/'%self.survey.id)
+        self.assert_restricted_permission_for('/surveys/%d/batches/1/'%self.survey.id)
         self.assert_restricted_permission_for('/batches/1/open_to')
         self.assert_restricted_permission_for('/batches/1/close_to')
-        self.assert_restricted_permission_for('/batches/1/edit/')
+        self.assert_restricted_permission_for('/surveys/%d/batches/%d/edit/'%(self.survey.id, self.batch.id))
 
     def test_add_new_batch_should_load_new_template(self):
-        response = self.client.get('/batches/new/')
+        response = self.client.get('/surveys/%d/batches/new/'%self.survey.id)
         self.assertEqual(response.status_code,200)
         templates = [template.name for template in response.templates]
         self.assertIn('batches/new.html', templates)
 
     def test_batch_form_is_in_response_request_context(self):
-        response = self.client.get('/batches/new/')
+        response = self.client.get('/surveys/%d/batches/new/'%self.survey.id)
         self.assertIsInstance(response.context['batchform'], BatchForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'add-batch-form')
 
     def test_post_add_new_batch_is_invalid_if_name_field_is_empty(self):
-        response = self.client.post('/batches/new/', data={'name':'', 'description':''})
+        response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'', 'description':''})
         self.assertTrue(len(response.context['batchform'].errors)>0)
 
     def test_post_add_new_batch(self):
-        response = self.client.post('/batches/new/', data={'name':'Batch1', 'description':'description'})
+        response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch1', 'description':'description'})
         self.assertEqual(len(Batch.objects.filter(name='Batch1')),1)
 
     def test_post_add_new_batch_redirects_to_batches_table_if_valid(self):
-         response = self.client.post('/batches/new/', data={'name':'Batch1', 'description':'description'})
-         self.assertRedirects(response, expected_url='/batches/', status_code=302, target_status_code=200, msg_prefix='')
+         response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch1', 'description':'description'})
+         self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_post_should_not_add_batch_with_existing_name(self):
-        response = self.client.post('/batches/new/', data={'name':'Batch A', 'description':'description'})
+        response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch A', 'description':'description'})
         self.assertTrue(len(response.context['batchform'].errors)>0)
 
 
     def test_edit_batch_should_load_new_template(self):
         batch = Batch.objects.create(name="batch a", description="batch a description")
-        response = self.client.get('/batches/%d/edit/'%batch.id)
+        response = self.client.get('/surveys/%d/batches/%d/edit/'%(self.survey.id, self.batch.id))
         self.assertEqual(response.status_code,200)
         templates = [template.name for template in response.templates]
         self.assertIn('batches/new.html', templates)
 
     def test_edit_batch_page_gets_batch_form_instance(self):
         batch = Batch.objects.create(name="batch a", description="batch a description")
-        response = self.client.get('/batches/%d/edit/'%batch.id)
+        response = self.client.get('/surveys/%d/batches/%d/edit/'%(self.survey.id, batch.id))
         self.assertIsInstance(response.context['batchform'], BatchForm)
         self.assertEqual(response.context['batchform'].initial['name'], batch.name)
         self.assertEqual(response.context['button_label'], 'Save')
@@ -118,14 +122,15 @@ class BatchViews(BaseTest):
                     'name': 'batch aaa',
                     'description': batch.description
         }
-        response = self.client.post('/batches/%d/edit/'%batch.id,data=form_data)
+        print '/surveys/%d/batches/%d/edit/'%(self.survey.id, batch.id)
+        response = self.client.post('/surveys/%d/batches/%d/edit/'%(self.survey.id, batch.id),data=form_data)
         updated_batch = Batch.objects.get(name=form_data['name'])
         self.failUnless(updated_batch)
         self.failIf(Batch.objects.filter(name=batch.name))
-        self.assertRedirects(response, expected_url='/batches/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_delete_batch(self):
-        response = self.client.get('/batches/%d/delete/'%self.batch.id)
+        response = self.client.get('/surveys/%d/batches/%d/delete/'%(self.survey.id, self.batch.id))
         recovered_batch = Batch.objects.filter(id=self.batch.id)
-        self.assertRedirects(response, expected_url='/batches/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
         self.failIf(recovered_batch)

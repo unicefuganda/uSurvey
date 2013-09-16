@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from rapidsms.contrib.locations.models import Location, LocationType
@@ -12,13 +13,13 @@ from survey.forms.batch import BatchForm
 
 @login_required
 @permission_required('auth.can_view_batches')
-def index(request):
+def index(request, survey_id):
     batches = Batch.objects.all()
-    return render(request, 'batches/index.html', {'batches': batches, 'request': request})
+    return render(request, 'batches/index.html', {'batches': batches, 'survey_id':survey_id, 'request': request})
 
 @login_required
 @permission_required('auth.can_view_batches')
-def show(request, batch_id):
+def show(request, survey_id, batch_id):
     batch = Batch.objects.get(id=batch_id)
     prime_location_type = LocationType.objects.get(name=PRIME_LOCATION_TYPE)
     locations = Location.objects.filter(type=prime_location_type).order_by('name')
@@ -44,32 +45,34 @@ def close(request, batch_id):
 
 @login_required
 @permission_required('auth.can_view_batches')
-def new(request):
+def new(request, survey_id):
     batchform = BatchForm()
-    return _process_form(request=request, batchform=batchform, action_str='added')
+    return _process_form(request=request, survey_id=survey_id, batchform=batchform, action_str='added')
 
-def _process_form(request, batchform, action_str='added',**batchform_kwargs):
+def _process_form(request,survey_id, batchform, action_str='added', **batchform_kwargs):
     if request.method =='POST':
         batchform = BatchForm(data=request.POST, **batchform_kwargs)
         if batchform.is_valid():
             batchform.save()
             _add_success_message(request, action_str)
-            return HttpResponseRedirect('/batches/')
+            batch_list_url = '/surveys/%s/batches/' % str(survey_id)
+            print batch_list_url
+            return HttpResponseRedirect(batch_list_url)
     return  render(request, 'batches/new.html', {'batchform':batchform,
                                                         'button_label':'Save',
                                                         'id':'add-batch-form'
                                                         })
 
 @permission_required('auth.can_view_batches')
-def edit(request, batch_id):
+def edit(request, survey_id, batch_id):
     batch= Batch.objects.get(id=batch_id)
     batchform= BatchForm(instance=batch)
-    return _process_form(request=request, batchform=batchform, action_str='edited',instance=batch)
+    return _process_form(request=request, survey_id=survey_id, batchform=batchform, action_str='edited',instance=batch)
 
 def _add_success_message(request, action_str):
     messages.success(request, 'Batch successfully %s.'%action_str)
 
-def delete(request,batch_id):
+def delete(request, survey_id, batch_id):
     Batch.objects.get(id=batch_id).delete()
     _add_success_message(request, 'deleted')
-    return HttpResponseRedirect('/batches/')
+    return HttpResponseRedirect('/surveys/%s/batches/'%survey_id)

@@ -8,6 +8,13 @@ Feature: Survey features
     And if I click the add survey button
     Then I should see the new survey form
 
+  Scenario: Link to batch list
+    Given I am logged in as researcher
+    And I have a survey
+    And I visit surveys listing page
+    And I click on a survey name
+    Then I should see a list of the batches under the survey
+
   Scenario: Add a survey
     Given I am logged in as researcher
     And I visit the new survey page

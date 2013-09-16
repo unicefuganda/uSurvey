@@ -1,15 +1,17 @@
+from datetime import date
+
 from django.test import TestCase
-from survey.models.batch import Batch
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
-from datetime import date
 from django.core.exceptions import ValidationError
+
+from survey.models.batch import Batch
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models.household_batch_completion import HouseholdBatchCompletion
 from survey.models.backend import Backend
 from survey.models.answer_rule import AnswerRule
-from survey.models.batch import Batch, BatchLocationStatus
+from survey.models.batch import BatchLocationStatus
 from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.locations import LocationAutoComplete
@@ -160,36 +162,6 @@ class LocationAutoCompleteTest(TestCase):
 
         soroti = Location.objects.get(name="Soroti")
         self.assertEqual(soroti.auto_complete_text(), "Uganda > Kampala Changed > Soroti")
-
-
-class BatchTest(TestCase):
-    def test_store(self):
-        batch = Batch.objects.create(order=1, name="Batch name")
-        self.failUnless(batch.id)
-
-    def test_should_assign_order_as_0_if_it_is_the_only_batch(self):
-        batch = Batch.objects.create(name="Batch name",description='description')
-        batch = Batch.objects.get(name='Batch name')
-        self.assertEqual(batch.order,1)
-
-    def test_should_assign_max_order_plus_one_if_not_the_only_batch(self):
-        batch = Batch.objects.create(name="Batch name",description='description')
-        batch_1 = Batch.objects.create(name="Batch name_1",description='description')
-        batch_1 = Batch.objects.get(name='Batch name_1')
-        self.assertEqual(batch_1.order,2)
-    def test_should_open_batch_for_parent_and_descendant_locations(self):
-        country = LocationType.objects.create(name='Country', slug='country')
-        district = LocationType.objects.create(name='District', slug='district')
-        uganda = Location.objects.create(name="Uganda", type=country)
-        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
-        masaka = Location.objects.create(name="masaka", type=district, tree_parent=uganda)
-
-        batch = Batch.objects.create(order=1)
-
-        batch.open_for_location(uganda)
-        self.assertTrue(batch.is_open_for(uganda))
-        self.assertTrue(batch.is_open_for(kampala))
-        self.assertTrue(batch.is_open_for(masaka))
 
 
 class QuestionTest(TestCase):

@@ -1,8 +1,8 @@
 from random import randint
 
 from lettuce import *
+from survey.features.page_objects.batches import BatchListPage
 from survey.models.surveys import Survey
-from survey.models.question import Question
 from survey.features.page_objects.surveys import SurveyListPage, AddSurveyPage
 
 @step(u'And I visit surveys listing page')
@@ -55,3 +55,16 @@ def and_i_select_the_questions(step):
 @step(u'Then I should see that the survey was saved successfully')
 def then_i_should_see_that_the_survey_was_saved_successfully(step):
     world.page.see_success_message('Survey', 'added')
+
+@step(u'And I have a survey')
+def and_i_have_a_survey(step):
+    world.survey = Survey.objects.create(name='survey name', description= 'survey descrpition', type=False, sample_size=10)
+
+@step(u'And I click on a survey name')
+def and_i_click_on_a_survey_name(step):
+    world.page.click_link_by_text(world.survey.name)
+
+@step(u'Then I should see a list of the batches under the survey')
+def then_i_should_see_a_list_of_the_batches_under_the_survey(step):
+    world.page = BatchListPage(world.browser, world.survey)
+    world.page.validate_url()

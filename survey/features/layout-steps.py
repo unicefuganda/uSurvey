@@ -8,5 +8,5 @@ def and_i_click_survey_tab(step):
 
 @step(u'Then I should see survey dropdown list')
 def then_i_should_see_survey_dropdown_list(step):
-    reverse_url_links = ["survey_list_page","new_survey_page", "batch_index_page"]
+    reverse_url_links = ["survey_list_page","new_survey_page"]
     world.page.see_dropdown(reverse_url_links)

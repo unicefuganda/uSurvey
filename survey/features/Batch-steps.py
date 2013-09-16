@@ -23,7 +23,7 @@ def and_i_have_prime_locations(step):
 
 @step(u'And I visit batches listing page')
 def and_i_visit_batches_listing_page(step):
-    world.page = BatchListPage(world.browser)
+    world.page = BatchListPage(world.browser,world.survey)
     world.page.visit()
 
 @step(u'And I visit the first batch listed')
@@ -57,7 +57,7 @@ def and_i_click_add_batch_button(step):
 
 @step(u'Then I should see a add batch page')
 def then_i_should_see_a_add_batch_page(step):
-    world.page = AddBatchPage(world.browser)
+    world.page = AddBatchPage(world.browser,world.survey)
     world.page.validate_url()
 
 @step(u'When I fill the details for add batch form')
@@ -69,7 +69,7 @@ def when_i_fill_the_details_for_add_batch_form(step):
 
 @step(u'Then I should go back to batches listing page')
 def then_i_should_go_back_to_batches_listing_page(step):
-    world.page = BatchListPage(world.browser)
+    world.page = BatchListPage(world.browser,world.survey)
     world.page.validate_url()
 
 @step(u'And I should see batch successfully added message')
@@ -78,7 +78,7 @@ def and_i_should_see_batch_successfully_added_message(step):
 
 @step(u'And I visit add batch page')
 def and_i_visit_add_batch_page(step):
-    world.page = AddBatchPage(world.browser)
+    world.page = AddBatchPage(world.browser,world.survey)
     world.page.visit()
 
 @step(u'Then I should see validation error messages')
@@ -106,7 +106,7 @@ def and_i_click_edit_batch_link(step):
 
 @step(u'Then I should see edit batch page')
 def then_i_should_see_edit_batch_page(step):
-    world.page = EditBatchPage(world.browser, world.batch)
+    world.page = EditBatchPage(world.browser, world.batch,world.survey)
     world.page.validate_url()
 
 @step(u'When I fill the details for the batch')

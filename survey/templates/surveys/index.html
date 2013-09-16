@@ -33,7 +33,7 @@
       {% for survey in surveys %}
         <tr>
           <td>
-            {{ survey.name }}
+            <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
           </td>
           <td>
             {{ survey.description }}
