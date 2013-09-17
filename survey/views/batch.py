@@ -77,11 +77,13 @@ def edit(request, survey_id, batch_id):
 def _add_success_message(request, action_str):
     messages.success(request, 'Batch successfully %s.'%action_str)
 
+@permission_required('auth.can_view_batches')
 def delete(request, survey_id, batch_id):
     Batch.objects.get(id=batch_id).delete()
     _add_success_message(request, 'deleted')
     return HttpResponseRedirect('/surveys/%s/batches/'%survey_id)
 
+@permission_required('auth.can_view_batches')
 def assign(request, batch_id):
     batch_questions_form = BatchQuestionsForm()
     groups = HouseholdMemberGroup.objects.all()

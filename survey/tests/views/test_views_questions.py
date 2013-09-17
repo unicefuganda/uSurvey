@@ -64,6 +64,7 @@ class QuestionsViews(BaseTest):
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for("/batches/%d/questions/new/"%self.batch.id)
         self.assert_restricted_permission_for('/batches/%d/questions/'%self.batch.id)
+        self.assert_restricted_permission_for('/questions/')
 
     @patch('django.contrib.messages.success')
     def test_create_question_number_does_not_create_options(self, mock_success):

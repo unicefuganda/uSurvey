@@ -43,6 +43,7 @@ def new(request, batch_id):
                 'questionform':question_form}
     return render(request, 'questions/new.html', context)
 
+@permission_required('auth.can_view_batches')
 def filter_by_group(request):
     group_id = request.GET['group'] if contains_key(request.GET, 'group') else None
     questions= Question.objects.filter(group__id=group_id).values('id', 'text').order_by('text')

@@ -79,9 +79,12 @@ class BatchViews(BaseTest):
         self.assert_restricted_permission_for('/surveys/%d/batches/' %self.survey.id)
         self.assert_restricted_permission_for('/surveys/%d/batches/new/'%self.survey.id)
         self.assert_restricted_permission_for('/surveys/%d/batches/1/'%self.survey.id)
+        self.assert_restricted_permission_for('/batches/%d/assign_questions/'%(self.batch.id))
         self.assert_restricted_permission_for('/batches/1/open_to')
         self.assert_restricted_permission_for('/batches/1/close_to')
         self.assert_restricted_permission_for('/surveys/%d/batches/%d/edit/'%(self.survey.id, self.batch.id))
+        self.assert_restricted_permission_for('/surveys/%d/batches/%d/delete/'%(self.survey.id, self.batch.id))
+
 
     def test_add_new_batch_should_load_new_template(self):
         response = self.client.get('/surveys/%d/batches/new/'%self.survey.id)
