@@ -10,3 +10,8 @@ Feature: Layout Page feature
     Given I am logged in as researcher
     And I click Survey tab
     Then I should see survey dropdown list
+
+  Scenario: Questions Tab
+    Given I am logged in as researcher
+    And I click Questions tab
+    Then I should see Questions dropdown list

@@ -76,6 +76,15 @@
                     </ul>
                 </li>
             {% endif %}
+            {% if perms.auth.can_view_batches %}
+                <li class="dropdown">
+                    <a data-toggle="dropdown" id="drop8" class="dropdown-toggle" role="button" href="#">Questions<b class="caret"></b></a>
+                    <ul aria-labelledby="drop7" role="menu" class="dropdown-menu">
+                        <li role="presentation"><a href="{% url 'list_all_questions' %}">List all questions</a></li>
+                        <li role="presentation"><a href="{% url 'new_question_page' %}">Add a question</a></li>
+                    </ul>
+                </li>
+            {% endif %}
 
             {% if perms.auth.can_view_household_groups %}
                 <li class="dropdown">

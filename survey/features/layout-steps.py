@@ -10,3 +10,12 @@ def and_i_click_survey_tab(step):
 def then_i_should_see_survey_dropdown_list(step):
     reverse_url_links = ["survey_list_page","new_survey_page"]
     world.page.see_dropdown(reverse_url_links)
+
+@step(u'And I click Questions tab')
+def and_i_click_questions_tab(step):
+    world.page.click_tab("Questions")
+
+@step(u'Then I should see Questions dropdown list')
+def then_i_should_see_questions_dropdown_list(step):
+    reverse_url_links = ["list_all_questions","new_question_page"]
+    world.page.see_dropdown(reverse_url_links)
