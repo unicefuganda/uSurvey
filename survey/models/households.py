@@ -33,29 +33,22 @@ class Household(BaseModel):
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
-    def next_question(self, last_question_answered=None):
-        if not last_question_answered:
-            last_question_answered = self.last_question_answered()
-
-        investigator_location = self.investigator.location
-
-        if not last_question_answered or not last_question_answered.is_in_open_batch(investigator_location):
-            open_batch = Batch.currently_open_for(location=investigator_location)
-            if open_batch:
-                question = open_batch.first_question()
-                return question
-        else:
-            return last_question_answered.next_question_for_household(self)
+    def has_next_question(self):
+        for household_member in self.household_member.all():
+            if household_member.next_question():
+                return True
+        return False
 
     def has_pending_survey(self):
-        last_answered_question = self.last_question_answered()
-        if not last_answered_question or not last_answered_question.next_question_for_household(self):
-            return False
-        else:
-            return True
+        for household_member in self.household_member.all():
+            if household_member.pending_surveys():
+                print 'Member'
+                return True
+        return False
+
 
     def survey_completed(self):
-        return not self.next_question()
+        return not self.has_next_question()
 
     def retake_latest_batch(self):
         batches = self.investigator.get_open_batch()
@@ -157,6 +150,10 @@ class HouseholdMember(BaseModel):
     def is_head(self):
         return False
 
+    def get_location(self):
+        investigator = self.household.investigator
+        return investigator.location if investigator else None
+
     def get_member_groups(self):
         member_groups = []
 
@@ -185,24 +182,41 @@ class HouseholdMember(BaseModel):
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
     def next_question(self, last_question_answered=None):
-
         next_group = self.get_next_group()
         question = None
+
+        if not next_group:
+            return question
 
         if not last_question_answered:
             last_question_answered = self.last_question_answered()
 
         if not last_question_answered:
-            question = next_group.first_question()
+            question = next_group.first_question(self)
 
         if last_question_answered and next_group and not next_group.all_questions_answered(self):
             question = next_group.get_next_question_for(self)
 
         return question
 
+    def can_retake_survey(self, batch, minutes):
+        last_batch_completed_time = self.completed_member_batches.filter(batch=batch, householdmember=self)[0].created
+        timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(
+            minutes=minutes)
+        return last_batch_completed_time >= timeout
+
     def batch_completed(self, batch):
-        return self.completed_member_batches.get_or_create(householdmember=self,
+        return self.completed_member_batches.get_or_create(householdmember=self, household=self.household,
                                                            investigator=self.household.investigator, batch=batch)
+
+    def survey_completed(self):
+        return (self.next_question() is None)
+
+    def has_started_the_survey(self):
+        return bool(self.last_question_answered())
+
+    def pending_surveys(self):
+        return not (bool(self.survey_completed()) and bool(self.has_started_the_survey()))
 
     class Meta:
         app_label = 'survey'
@@ -224,4 +238,6 @@ class HouseholdHead(HouseholdMember):
     def is_head(self):
         return True
 
+    def get_member(self):
+        return HouseholdMember.objects.get(householdhead=self)
 

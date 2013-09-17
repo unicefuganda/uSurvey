@@ -64,8 +64,8 @@ class Investigator(BaseModel):
     def clear_interview_caches(self):
         cache.delete(self.cache_key)
 
-    def next_answerable_question(self, household):
-        return household.next_question()
+    def next_answerable_question(self, household_member):
+        return household_member.next_question()
 
     def last_answered(self):
         answered = []
@@ -98,8 +98,11 @@ class Investigator(BaseModel):
             answer = question.get_option(answer, self)
             if not answer:
                 return question
-        if answer_class.objects.create(investigator=self, question=question, householdmember=household_member, answer=answer).pk:
-            next_question = household_member.next_question(last_question_answered = question)
+
+        answer = answer_class.objects.create(investigator=self, question=question, householdmember=household_member,
+                                             answer=answer, household=household_member.household)
+        if answer.pk:
+            next_question = question.next_question_for_household_member(household_member)
 
             if next_question == None or next_question.batch != question.batch:
                 household_member.batch_completed(question.batch)
@@ -151,7 +154,8 @@ class Investigator(BaseModel):
 
     def completed_open_surveys(self):
         for household in self.all_households():
-            if household.next_question():
+            if household.has_pending_survey():
+                print "here"
                 return False
         return True
 

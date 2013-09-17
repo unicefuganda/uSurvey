@@ -27,8 +27,13 @@ class Batch(BaseModel):
         if open_batches.count() > 0:
             return open_batches.order_by('created').all()[:1].get().batch
 
+    def get_groups(self):
+        questions = self.all_questions()
+        return list(set(map(lambda question: question.group, questions)))
+
     def first_question(self):
-        return self.questions.get(order=1)
+        first_group = self.get_groups()[0]
+        return self.questions.get(order=1, group=first_group)
 
     def all_questions(self):
         return self.questions.all()

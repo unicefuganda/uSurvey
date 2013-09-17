@@ -43,8 +43,8 @@ class HouseholdMemberTest(TestCase):
 
     def test_household_member_should_know_groups_they_belong_to(self):
         age_value = 6
-        age_attribute_type = "Age"
-        gender_attribute_type = "Male"
+        age_attribute_type = "AGE"
+        gender_attribute_type = "GENDER"
 
         village = LocationType.objects.create(name="Village", slug=slugify("village"))
         some_village = Location.objects.create(name="Some village", type=village)
@@ -76,6 +76,27 @@ class HouseholdMemberTest(TestCase):
 
         self.assertTrue(household_head.is_head())
         self.assertFalse(household_member.is_head())
+
+    def test_household_member_knows_location(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        district = LocationType.objects.create(name="District", slug=slugify("district"))
+        county = LocationType.objects.create(name="County", slug=slugify("county"))
+        sub_county = LocationType.objects.create(name="Subcounty", slug=slugify("sub-county"))
+        parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
+        village = LocationType.objects.create(name="Village", slug=slugify("village"))
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala_district = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        bukoto_county = Location.objects.create(name="Bukoto", type=county, tree_parent=kampala_district)
+        some_sub_county = Location.objects.create(name="Some sub county", type=sub_county, tree_parent=bukoto_county)
+        some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
+        some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
+
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
+        hhold = Household.objects.create(investigator=investigator1, uid=0)
+        household_member = HouseholdMember.objects.create(household=hhold, surname="name", male=True, date_of_birth=date(1998, 2, 2))
+
+        self.assertEqual(investigator1.location, household_member.get_location())
 
     def test_member_gets_the_question_that_belongs_to_his_group(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
@@ -163,6 +184,7 @@ class HouseholdMemberTest(TestCase):
         female_condition.groups.add(female_group)
 
         batch = Batch.objects.create(name="BATCH A", order=1)
+        batch.open_for_location(investigator.location)
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
                                                           male=False,
@@ -202,6 +224,8 @@ class HouseholdMemberTest(TestCase):
         female_condition.groups.add(female_group)
 
         batch = Batch.objects.create(name="BATCH A", order=1)
+        batch.open_for_location(investigator.location)
+
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
                                                           male=False,
@@ -221,3 +245,33 @@ class HouseholdMemberTest(TestCase):
         investigator.member_answered(question=question_2, household_member=household_member, answer=1)
         investigator.member_answered(question=question_3, household_member=household_member, answer=1)
         self.assertEqual(None, household_member.next_question())
+        self.assertTrue(household_member.survey_completed())
+
+    def test_should_know_if_survey_is_pending(self):
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        condition.groups.add(member_group)
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                  location=kampala,
+                                                  backend=backend)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                               date_of_birth=date(1980, 2, 2), male=False, household=household)
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        batch.open_for_location(investigator.location)
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                             answer_type='number', order=2,
+                                             subquestion=False, group=member_group, batch=batch)
+
+        self.assertTrue(household_member.pending_surveys())
+        investigator.member_answered(question_1,household_member,answer=1)
+        self.assertTrue(household_member.pending_surveys())
+        investigator.member_answered(question_2,household_member,answer=1)
+        self.assertTrue(household_member.survey_completed())

@@ -58,17 +58,22 @@ class USSD(USSDBase):
         household = self.get_from_session('HOUSEHOLD')
         if household:
             self.household = household
-        elif self.is_active():
-            last_answered = self.investigator.last_answered()
-            if last_answered:
-                household = last_answered.household
-                if household.next_question():
-                    self.household = household
+        # elif self.is_active():
+        #     last_answered = self.investigator.last_answered()
+        #     if last_answered:
+        #         household = last_answered.household
+        #         if household.has_next_question():
+        #             self.household = household
 
     def set_household_member(self):
         household_member = self.get_from_session('HOUSEHOLD_MEMBER')
         if household_member:
             self.household_member = household_member
+        # elif self.is_active():
+        #     last_answered = self.investigator.last_answered()
+        #     household_member = last_answered.householdmember
+        #     if household_member.next_question():
+        #         self.household_member = household_member
 
     def set_session(self):
         self.session_string = "SESSION-%s" % self.request['transactionId']
@@ -113,12 +118,13 @@ class USSD(USSDBase):
 
     def process_investigator_response(self):
         answer = self.request['ussdRequestString'].strip()
+
         if not answer:
             return self.investigator.invalid_answer(self.question)
         if self.is_pagination(self.question, answer):
             self.set_current_page(answer)
         else:
-            self.question = self.investigator.answered(self.question, self.household, answer)
+            self.question = self.investigator.member_answered(self.question, self.household_member, answer)
 
     def add_question_prefix(self):
         if self.reanswerable_question():
@@ -130,7 +136,7 @@ class USSD(USSDBase):
         self.action = self.ACTIONS['END']
         if self.investigator.completed_open_surveys():
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
-        elif not self.household.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
+        elif not self.household_member.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
             self.responseString = USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE']
         else:
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE']
@@ -147,14 +153,15 @@ class USSD(USSDBase):
 
     def get_current_batch(self):
         if not self.household.survey_completed():
-            return self.question.batch
-        if self.household:
-            return self.household.last_question_answered().batch
+            return self.household_member.next_question().batch
+        if self.household_member:
+            return self.household_member.last_question_answered().batch
         return self.investigator.first_open_batch()
 
     def render_survey(self):
-        if not self.household.survey_completed():
-            self.question = self.household.next_question()
+        if not self.household_member.survey_completed():
+            self.question = self.household_member.next_question()
+
             if not self.is_new_request():
                 self.process_investigator_response()
             self.render_survey_response()

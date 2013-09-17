@@ -1,8 +1,10 @@
+from datetime import date
 from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.models import User
+from survey.models import HouseholdMemberGroup, GroupCondition
 from survey.models.batch import Batch
-from survey.models.households import HouseholdHead, Household
+from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 
@@ -15,13 +17,17 @@ from survey.tests.base_test import BaseTest
 class NumericalFormulaResults(BaseTest):
     def setUp(self):
         self.client = Client()
+        self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        self.condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        self.condition.groups.add(self.member_group)
+
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
 
         self.batch = Batch.objects.create(order=1)
-        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1)
-        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2)
+        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1, group=self.member_group)
+        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2, group=self.member_group)
 
         self.formula_1 = Formula.objects.create(name="Formula 1", numerator=self.question_1, denominator=self.question_2, batch=self.batch)
 
@@ -41,17 +47,27 @@ class NumericalFormulaResults(BaseTest):
         self.household_3 = Household.objects.create(investigator=investigator_1, uid=2)
         self.household_4 = Household.objects.create(investigator=investigator_1, uid=3)
 
-        investigator.answered(self.question_1, self.household_1, 20)
-        investigator.answered(self.question_2, self.household_1, 200)
-        investigator.answered(self.question_1, self.household_2, 10)
-        investigator.answered(self.question_2, self.household_2, 100)
+        self.member1 = self.create_household_member(self.household_1)
+        self.member2 = self.create_household_member(self.household_2)
+        self.member3 = self.create_household_member(self.household_3)
+        self.member4 = self.create_household_member(self.household_4)
 
-        investigator_1.answered(self.question_1, self.household_3, 40)
-        investigator_1.answered(self.question_2, self.household_3, 400)
-        investigator_1.answered(self.question_1, self.household_4, 50)
-        investigator_1.answered(self.question_2, self.household_4, 500)
+        investigator.member_answered(self.question_1, self.member1, 20)
+        investigator.member_answered(self.question_2, self.member1, 200)
+        investigator.member_answered(self.question_1, self.member2, 10)
+        investigator.member_answered(self.question_2, self.member2, 100)
+
+        investigator_1.member_answered(self.question_1, self.member3, 40)
+        investigator_1.member_answered(self.question_2, self.member3, 400)
+        investigator_1.member_answered(self.question_1, self.member4, 50)
+        investigator_1.member_answered(self.question_2, self.member4, 500)
         for household in Household.objects.all():
             HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='1980-09-01')
+
+
+    def create_household_member(self,household):
+        return HouseholdMember.objects.create(surname="Member", date_of_birth=date(1980, 2, 2), male=False,
+                                              household=household)
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for("/batches/%s/formulae/%s/" % (self.batch.pk, self.formula_1.pk))
@@ -94,14 +110,18 @@ class NumericalFormulaResults(BaseTest):
 class MultichoiceResults(BaseTest):
     def setUp(self):
         self.client = Client()
+        self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        self.condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        self.condition.groups.add(self.member_group)
+
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
 
         self.batch = Batch.objects.create(order=1)
-        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1)
-        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2)
-        self.question_3 = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=3)
+        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1, group=self.member_group)
+        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2, group=self.member_group)
+        self.question_3 = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=3, group=self.member_group)
         self.option_1 = QuestionOption.objects.create(question=self.question_3, text="OPTION 2", order=1)
         self.option_2 = QuestionOption.objects.create(question=self.question_3, text="OPTION 1", order=2)
 
@@ -128,22 +148,33 @@ class MultichoiceResults(BaseTest):
         household_5 = Household.objects.create(investigator=investigator_1, uid=4)
         household_6 = Household.objects.create(investigator=investigator_1, uid=5)
 
-        investigator.answered(self.question_1, household_1, 20)
-        investigator.answered(self.question_3, household_1, 1)
-        investigator.answered(self.question_1, household_2, 10)
-        investigator.answered(self.question_3, household_2, 1)
-        investigator.answered(self.question_1, household_3, 30)
-        investigator.answered(self.question_3, household_3, 2)
+        self.member1 = self.create_household_member(self.household_1)
+        self.member2 = self.create_household_member(self.household_2)
+        self.member3 = self.create_household_member(self.household_3)
+        self.member4 = self.create_household_member(household_4)
+        self.member5 = self.create_household_member(household_5)
+        self.member6 = self.create_household_member(household_6)
 
-        investigator_1.answered(self.question_1, household_4, 30)
-        investigator_1.answered(self.question_3, household_4, 2)
-        investigator_1.answered(self.question_1, household_5, 20)
-        investigator_1.answered(self.question_3, household_5, 2)
-        investigator_1.answered(self.question_1, household_6, 40)
-        investigator_1.answered(self.question_3, household_6, 1)
+        investigator.member_answered(self.question_1, self.member1, 20)
+        investigator.member_answered(self.question_3, self.member1, 1)
+        investigator.member_answered(self.question_1, self.member2, 10)
+        investigator.member_answered(self.question_3, self.member2, 1)
+        investigator.member_answered(self.question_1, self.member3, 30)
+        investigator.member_answered(self.question_3, self.member3, 2)
+
+        investigator_1.member_answered(self.question_1, self.member4, 30)
+        investigator_1.member_answered(self.question_3, self.member4, 2)
+        investigator_1.member_answered(self.question_1, self.member5, 20)
+        investigator_1.member_answered(self.question_3, self.member5, 2)
+        investigator_1.member_answered(self.question_1, self.member6, 40)
+        investigator_1.member_answered(self.question_3, self.member6, 1)
         for household in Household.objects.all():
             HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='1980-09-01')
 
+
+    def create_household_member(self,household):
+        return HouseholdMember.objects.create(surname="Member", date_of_birth=date(1980, 2, 2), male=False,
+                                              household=household)
 
     def test_get_for_district(self):
         url = "/batches/%s/formulae/%s/?location=%s" % (self.batch.pk, self.formula.pk, self.kampala.pk)

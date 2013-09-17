@@ -15,26 +15,35 @@ class HouseholdMemberGroup(BaseModel):
     def has_condition(self, household_member, condition):
         age = household_member.get_age()
         gender = household_member.male
+        is_head = household_member.is_head()
 
         if condition.attribute.lower() == GroupCondition.GROUP_TYPES["AGE"].lower():
             condition_value = condition.matches_condition(age)
-        else:
+        elif condition.attribute.lower() == GroupCondition.GROUP_TYPES["GENDER"].lower():
             condition_value = condition.matches_condition(gender)
-
+        else:
+            condition_value = condition.matches_condition(is_head)
         return condition_value
 
     def all_questions_answered(self, member):
         last_question = self.last_question()
         answer_class = last_question.answer_class()
-
         answered_question = answer_class.objects.filter(question=last_question, householdmember=member)
         return len(answered_question) > 0
 
-    def first_question(self):
-        return self.all_questions().order_by('order')[0]
+    def first_question(self, member):
+        all_questions = self.all_questions().order_by('order')
+
+        open_questions = filter(lambda question: question.is_in_open_batch(member.get_location()), all_questions)
+
+        if open_questions:
+            return open_questions[0]
+        else:
+            return None
 
     def last_question(self):
-        return self.all_questions().order_by('order').reverse()[0]
+        all_questions = self.all_questions().exclude(order=None)
+        return all_questions.order_by('order').reverse()[0] if all_questions else None
 
     def belongs_to_group(self, household_member):
         condition_match = []
@@ -48,11 +57,17 @@ class HouseholdMemberGroup(BaseModel):
         all_questions = self.all_questions()
         return all_questions.order_by('order').reverse()[0].order if all_questions else 0
 
-    def get_next_question_for(self, member):
-        last_question = member.last_question_answered()
+    def get_next_question_for(self, member, last_question=None):
+        if not last_question:
+            last_question = member.last_question_answered()
 
         if last_question and last_question.group == self:
-            return self.all_questions().get(order=last_question.order + 1)
+            try:
+                order = last_question.parent.order if last_question.subquestion else last_question.order
+                last_question = self.all_questions().get(order=order + 1)
+            except:
+                return None
+            return last_question if last_question.is_in_open_batch(member.get_location()) else self.get_next_question_for(member, last_question)
 
         return self.all_questions().order_by('order')[0]
 
@@ -69,7 +84,8 @@ class GroupCondition(BaseModel):
 
     GROUP_TYPES = {
         'AGE': 'AGE',
-        'GENDER': 'GENDER'
+        'GENDER': 'GENDER',
+        'GENERAL': 'GENERAL'
     }
 
     value = models.CharField(max_length=50)
