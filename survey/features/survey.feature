@@ -21,3 +21,13 @@ Feature: Survey features
     When I fill in the survey details
     And I click save button
     Then I should see that the survey was saved successfully
+
+  Scenario: Add survey modal
+    Given I am logged in as researcher
+    And I visit surveys listing page
+    And I click on create new survey button
+    Then I should see the create new survey modal
+    When I fill in the survey details
+    And I click save button
+    Then I should see that the survey was saved successfully
+

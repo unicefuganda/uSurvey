@@ -69,3 +69,11 @@ def and_i_click_on_a_survey_name(step):
 def then_i_should_see_a_list_of_the_batches_under_the_survey(step):
     world.page = BatchListPage(world.browser, world.survey)
     world.page.validate_url()
+
+@step(u'And I click on create new survey button')
+def and_i_click_on_create_new_survey_button(step):
+    world.page.click_link_by_text("Create New Survey")
+
+@step(u'Then I should see the create new survey modal')
+def then_i_should_see_the_create_new_survey_modal(step):
+    world.page.validate_fields_present(["New Survey", "Name", "Description", "Type", "Sample size"])

@@ -10,4 +10,5 @@ class SurveyForm(ModelForm):
         fields=['name', 'description', 'type', 'sample_size']
         widgets={
             'type':forms.RadioSelect(choices=[(True, 'Aggregate'), ( False, 'Roster')]),
+            'description':forms.Textarea(attrs={"rows":4, "cols":50})
         }

@@ -32,6 +32,8 @@ class SurveyViewTest(BaseTest):
         self.assertIn(survey_1, response.context['surveys'])
         self.assertIn(survey_2, response.context['surveys'])
         self.assertIsNotNone(response.context['request'])
+        self.assertIsInstance(response.context['survey_form'], SurveyForm)
+
 
     def test_add_survey(self):
         response = self.client.get('/surveys/new/')
