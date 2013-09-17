@@ -160,3 +160,6 @@ class PageObject(object):
 
     def click_by_css(self, css_selector):
         self.browser.find_by_css(css_selector).first.click()
+
+    def click_modal_link(self, modal_id):
+        self.browser.click_link_by_partial_href(modal_id)

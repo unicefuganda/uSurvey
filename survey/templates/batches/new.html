@@ -1,8 +1,9 @@
-{% extends "form.html" %}
+{% extends "layout.html" %}
+
 {% block title %}
-   New Batch
-{% endblock %}
-{% block display_form_fields %}
-{% include "with_mobile_number_form.html" with form=batchform %}
+  New Batch
 {% endblock %}
 
+{% block content %}
+  {% include "batches/new_batch.html" %}
+{% endblock %}

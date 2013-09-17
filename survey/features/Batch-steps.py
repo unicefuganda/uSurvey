@@ -189,3 +189,11 @@ def and_i_have_one_question_belonging_to_that_group(step):
 @step(u'And another question which does not')
 def and_another_question_which_does_not(step):
     world.question_2=Question.objects.create(text="question2", answer_type=Question.TEXT)
+
+@step(u'And I click add batch modal button')
+def and_i_click_add_batch_modal_button(step):
+    world.page.click_modal_link("#new_batch")
+
+@step(u'Then I should see the add batch modal')
+def then_i_should_see_the_add_batch_modal(step):
+    world.page.validate_fields_present(["New Batch", "Name", "Description"])

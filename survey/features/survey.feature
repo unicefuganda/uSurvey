@@ -5,8 +5,6 @@ Feature: Survey features
     And I have 100 surveys
     And I visit surveys listing page
     Then I should see the survey list paginated
-    And if I click the add survey button
-    Then I should see the new survey form
 
   Scenario: Link to batch list
     Given I am logged in as researcher

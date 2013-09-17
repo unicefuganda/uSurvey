@@ -38,6 +38,9 @@ class BatchViews(BaseTest):
         self.assertIn('batches/index.html', templates)
         self.assertIn(self.batch, response.context['batches'])
         self.assertEquals(self.survey, response.context['survey'])
+        self.assertEquals('/surveys/%d/batches/new/' %self.survey.id, response.context['action'])
+        self.assertIsInstance(response.context['batchform'], BatchForm)
+
 
     def test_get_index_should_not_show_batches_not_belonging_to_the_survey(self):
         another_batch = Batch.objects.create(order = 2, name = "Batch B")

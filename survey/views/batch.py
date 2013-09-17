@@ -1,4 +1,3 @@
-from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from rapidsms.contrib.locations.models import Location, LocationType
@@ -8,7 +7,6 @@ from django.contrib import messages
 from survey.investigator_configs import *
 from survey.models import HouseholdMemberGroup
 from survey.models.surveys import Survey
-from survey.models.question import Question
 from survey.models.batch import Batch
 
 from survey.forms.batch import BatchForm, BatchQuestionsForm
@@ -18,8 +16,11 @@ from survey.forms.batch import BatchForm, BatchQuestionsForm
 @permission_required('auth.can_view_batches')
 def index(request, survey_id):
     batches = Batch.objects.filter(survey__id= survey_id)
+    context = {'batches': batches, 'survey': Survey.objects.get(id=survey_id),
+               'request': request, 'batchform':BatchForm(),
+               'action':'/surveys/%s/batches/new/' %survey_id, }
     return render(request, 'batches/index.html',
-                  {'batches': batches, 'survey': Survey.objects.get(id=survey_id), 'request': request})
+                  context)
 
 @login_required
 @permission_required('auth.can_view_batches')

@@ -16,9 +16,7 @@ Feature: Batch related features
   Scenario: Add new Batch
     Given I am logged in as researcher
     And I have a survey
-    And I visit batches listing page
-    And I click add batch button
-    Then I should see a add batch page
+    And I visit add batch page
     When I fill the details for add batch form
     And I submit the form
     Then I should go back to batches listing page
@@ -92,4 +90,13 @@ Feature: Batch related features
     When I select the group
     Then I should see the question which belong to that group
 
+  Scenario: Add new Batch modal
+    Given I am logged in as researcher
+    And I have a survey
+    And I visit batches listing page
+    And I click add batch modal button
+    Then I should see the add batch modal
+    When I fill the details for add batch form
+    And I submit the form
+    And I should see batch successfully added message
 
