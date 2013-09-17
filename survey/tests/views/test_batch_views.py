@@ -2,6 +2,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import PRIME_LOCATION_TYPE
+from survey.models import HouseholdMemberGroup
 from survey.models.surveys import Survey
 from survey.models.question import Question
 from survey.models.batch import Batch
@@ -151,20 +152,22 @@ class BatchViews(BaseTest):
         self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
         self.failIf(recovered_batch)
 
-
     def test_assign_question_to_the_batch_should_show_list_of_questions(self):
+        group = HouseholdMemberGroup.objects.create(name="Females", order=1)
         response = self.client.get('/batches/%d/assign_questions/'%(self.batch.id))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('batches/assign.html', templates)
 
-        question = Question.objects.create()
+        question = Question.objects.create(group=group, text="Haha?")
         self.assertEqual(1, len(response.context['batch_questions_form'].fields['questions']._queryset))
         self.assertIn(question, response.context['batch_questions_form'].fields['questions']._queryset)
         self.assertEqual(self.batch, response.context['batch'])
         self.assertIsInstance(response.context['batch_questions_form'],BatchQuestionsForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'assign-question-to-batch-form')
+        self.assertEqual(1, len(response.context['groups']))
+        self.assertIn(group, response.context['groups'])
 
     def test_post_assign_questions_to_batch_should_save_questions(self):
         q1=Question.objects.create(text="question1", answer_type=Question.NUMBER)

@@ -1,6 +1,4 @@
 from survey.features.page_objects.base import PageObject
-from nose.tools import assert_equals
-
 
 class SurveyListPage(PageObject):
     url = '/surveys/'

@@ -1,7 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from time import sleep
 from survey.features.page_objects.base import PageObject
-
+from nose.tools import assert_equals
 
 class FormulaShowPage(PageObject):
     def __init__(self, browser, formula):
@@ -110,3 +110,6 @@ class AssignQuestionToBatchPage(PageObject):
         self.browser= browser
         self.batch= batch
         self.url = '/batches/' + str(self.batch.id) + '/assign_questions/'
+
+    def see_the_question(self, status, question_text):
+        assert_equals( status, self.browser.is_text_present(question_text))

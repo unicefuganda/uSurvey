@@ -5,6 +5,9 @@
   {% block title %} {% endblock %}
 </h3>
 
+{% block pre_form_content %}
+{% endblock %}
+
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
   {% csrf_token %}
 

@@ -167,3 +167,25 @@ def then_i_should_see_the_questions_successfully_assigned_to_that_batch(step):
 def and_i_have_2_questions(step):
     world.question_1=Question.objects.create(text="question1", answer_type=Question.NUMBER)
     world.question_2=Question.objects.create(text="question2", answer_type=Question.TEXT)
+
+@step(u'And I visit the assign question to page batch')
+def and_i_visit_the_assign_question_to_page_batch(step):
+    world.page = AssignQuestionToBatchPage(world.browser, world.batch)
+    world.page.visit()
+
+@step(u'When I select the group')
+def when_i_select_the_group(step):
+    world.page.select('group', [world.household_member_group.id])
+
+@step(u'Then I should see the question which belong to that group')
+def then_i_should_see_the_question_which_belong_to_that_group(step):
+    world.page.see_the_question(True, world.question_1.text)
+    world.page.see_the_question(False, world.question_2.text)
+
+@step(u'And I have one question belonging to that group')
+def and_i_have_one_question_belonging_to_that_group(step):
+    world.question_1=Question.objects.create(text="question1", answer_type=Question.NUMBER, group=world.household_member_group)
+
+@step(u'And another question which does not')
+def and_another_question_which_does_not(step):
+    world.question_2=Question.objects.create(text="question2", answer_type=Question.TEXT)

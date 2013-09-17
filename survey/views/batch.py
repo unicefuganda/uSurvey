@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 
 from survey.investigator_configs import *
+from survey.models import HouseholdMemberGroup
 from survey.models.surveys import Survey
 from survey.models.question import Question
 from survey.models.batch import Batch
@@ -83,6 +84,7 @@ def delete(request, survey_id, batch_id):
 
 def assign(request, batch_id):
     batch_questions_form = BatchQuestionsForm()
+    groups = HouseholdMemberGroup.objects.all()
     batch = Batch.objects.get(id=batch_id)
     if request.method == 'POST':
         batch_question_form = BatchQuestionsForm(data=request.POST, instance=batch)
@@ -92,6 +94,6 @@ def assign(request, batch_id):
             messages.success(request, success_message)
             return HttpResponseRedirect("/batches/%s/questions/" %batch_id)
     context = {'batch_questions_form': batch_questions_form, 'batch': batch,
-               'button_label':'Save', 'id':'assign-question-to-batch-form'}
+               'button_label':'Save', 'id':'assign-question-to-batch-form', 'groups':groups}
     return render(request, 'batches/assign.html',
                   context)

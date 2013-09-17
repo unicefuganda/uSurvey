@@ -81,5 +81,15 @@ Feature: Batch related features
     And I submit the form
     Then I should see the questions successfully assigned to that batch
 
+  Scenario: Assign question filter
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I have a member group
+    And I have one question belonging to that group
+    And another question which does not
+    And I visit the assign question to page batch
+    When I select the group
+    Then I should see the question which belong to that group
 
 

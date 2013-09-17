@@ -3,5 +3,21 @@
     Assign Questions to {{ batch.survey.name.capitalize }} - {{ batch.name.capitalize }}
 {%  endblock %}
 {% block display_form_fields %}
+    <div class="control-group">
+        <div class="controls">
+            Group Filter
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <select name="group" id="assign_question_group">
+                <option value="">All</option>
+                {% for group in groups %}
+                    <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
     {% include 'naked_form.html' with a_form=batch_questions_form %}
 {% endblock %}

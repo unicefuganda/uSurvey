@@ -1,3 +1,4 @@
+import json
 from django.test.client import Client
 from django.contrib.auth.models import User
 from mock import patch
@@ -178,3 +179,16 @@ class QuestionsViews(BaseTest):
         self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
         question_options = question[0].options.all()
         self.assertEqual(0, question_options.count())
+
+    def test_should_render_json_questions_filtered_by_group(self):
+        member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        question_1 = Question.objects.create(text="question1", answer_type=Question.NUMBER, group=member_group)
+        question_2 = Question.objects.create(text="question2", answer_type=Question.NUMBER)
+        response = self.client.get('/questions/?group=%d'%member_group.id)
+        self.failUnlessEqual(response.status_code, 200)
+
+        content = json.loads(response.content)
+        self.assertEquals(len(content), 1)
+
+        self.assertEquals(content[0]['id'], question_1.pk)
+        self.assertEquals(content[0]['text'], question_1.text)

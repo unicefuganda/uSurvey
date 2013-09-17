@@ -1,7 +1,9 @@
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import messages
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 
 from survey.models.batch import Batch
@@ -9,7 +11,7 @@ from survey.models.question import Question
 from survey.models.householdgroups import HouseholdMemberGroup
 
 from survey.forms.question import QuestionForm
-
+from survey.views.views_helper import contains_key
 
 
 @permission_required('auth.can_view_batches')
@@ -40,3 +42,9 @@ def new(request, batch_id):
                 'request':request,
                 'questionform':question_form}
     return render(request, 'questions/new.html', context)
+
+def filter_by_group(request):
+    group_id = request.GET['group'] if contains_key(request.GET, 'group') else None
+    questions= Question.objects.filter(group__id=group_id).values('id', 'text').order_by('text')
+    json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
+    return HttpResponse(json_dump, mimetype='application/json')

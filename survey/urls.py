@@ -56,6 +56,7 @@ urlpatterns = patterns('',
     url(r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/$', 'survey.views.batch.show', name='batch_show_page'),
     url(r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/edit/$', 'survey.views.batch.edit', name='batch_edit_page'),
     url(r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/delete/$', 'survey.views.batch.delete', name='delete_batch'),
+    url(r'^questions/$', 'survey.views.questions.filter_by_group', name='questions_filtered_by_group_page'),
 
 )
 
