@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
+from datetime import date
 from lettuce import *
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.batches import FormulaShowPage
+from survey.models import GroupCondition, HouseholdMemberGroup
 from survey.models.batch import Batch
-from survey.models.households import HouseholdHead, Household
+from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 from survey.models.formula import *
 from survey.models.question import Question, QuestionOption
 
+def create_household_member(household):
+    return HouseholdMember.objects.create(surname="Member", date_of_birth=date(1980, 2, 2), male=False, household=household)
 
 @step(u'And I have hierarchical locations with district and village')
 def and_i_have_hierarchical_locations_with_district_and_village(step):
@@ -23,6 +27,10 @@ def and_i_have_hierarchical_locations_with_district_and_village(step):
 @step(u'And I have investigators completed batches')
 def and_i_have_investigators_completed_batches(step):
     backend = Backend.objects.create(name='something')
+    member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+    condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+    condition.groups.add(member_group)
+
     investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.village_1, backend = backend, weights = 0.3)
     household_1 = Household.objects.create(investigator=investigator, uid=6)
     household_2 = Household.objects.create(investigator=investigator, uid=7)
@@ -33,39 +41,46 @@ def and_i_have_investigators_completed_batches(step):
     household_5 = Household.objects.create(investigator=investigator_1, uid=10)
     household_6 = Household.objects.create(investigator=investigator_1, uid=11)
 
+    household_member_1 = create_household_member(household_1)
+    household_member_2 = create_household_member(household_2)
+    household_member_3 = create_household_member(household_3)
+    household_member_4 = create_household_member(household_4)
+    household_member_5 = create_household_member(household_5)
+    household_member_6 = create_household_member(household_6)
+
     world.batch = Batch.objects.create(order=1)
-    world.question_1 = Question.objects.create(batch=world.batch, text="Question 1?", answer_type=Question.NUMBER, order=1)
-    world.question_2 = Question.objects.create(batch=world.batch, text="Question 2?", answer_type=Question.NUMBER, order=2)
-    world.question_3 = Question.objects.create(batch=world.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=3)
+    world.question_1 = Question.objects.create(batch=world.batch, text="Question 1?", answer_type=Question.NUMBER, order=1, group=member_group)
+    world.question_2 = Question.objects.create(batch=world.batch, text="Question 2?", answer_type=Question.NUMBER, order=2, group=member_group)
+    world.question_3 = Question.objects.create(batch=world.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=3, group=member_group)
     option_1 = QuestionOption.objects.create(question=world.question_3, text="OPTION 2", order=1)
     option_2 = QuestionOption.objects.create(question=world.question_3, text="OPTION 1", order=2)
 
     world.formula_1 = Formula.objects.create(name="Name", numerator=world.question_1, denominator=world.question_2, batch=world.batch)
     world.formula_2 = Formula.objects.create(name="Name 1", numerator=world.question_3, denominator=world.question_1, batch=world.batch)
 
-    investigator.answered(world.question_1, household_1, 20)
-    investigator.answered(world.question_2, household_1, 20)
-    investigator.answered(world.question_3, household_1, 1)
+    investigator.member_answered(world.question_1, household_member_1, 20)
+    investigator.member_answered(world.question_2, household_member_1, 20)
+    investigator.member_answered(world.question_3, household_member_1, 1)
 
-    investigator.answered(world.question_1, household_2, 10)
-    investigator.answered(world.question_2, household_2, 20)
-    investigator.answered(world.question_3, household_2, 1)
+    investigator.member_answered(world.question_1, household_member_2, 10)
+    investigator.member_answered(world.question_2, household_member_2, 20)
+    investigator.member_answered(world.question_3, household_member_2, 1)
 
-    investigator.answered(world.question_1, household_3, 30)
-    investigator.answered(world.question_2, household_3, 30)
-    investigator.answered(world.question_3, household_3, 2)
+    investigator.member_answered(world.question_1, household_member_3, 30)
+    investigator.member_answered(world.question_2, household_member_3, 30)
+    investigator.member_answered(world.question_3, household_member_3, 2)
 
-    investigator_1.answered(world.question_1, household_4, 30)
-    investigator_1.answered(world.question_2, household_4, 30)
-    investigator_1.answered(world.question_3, household_4, 2)
+    investigator_1.member_answered(world.question_1, household_member_4, 30)
+    investigator_1.member_answered(world.question_2, household_member_4, 30)
+    investigator_1.member_answered(world.question_3, household_member_4, 2)
 
-    investigator_1.answered(world.question_1, household_5, 20)
-    investigator_1.answered(world.question_2, household_5, 20)
-    investigator_1.answered(world.question_3, household_5, 2)
+    investigator_1.member_answered(world.question_1, household_member_5, 20)
+    investigator_1.member_answered(world.question_2, household_member_5, 20)
+    investigator_1.member_answered(world.question_3, household_member_5, 2)
 
-    investigator_1.answered(world.question_1, household_6, 40)
-    investigator_1.answered(world.question_2, household_6, 40)
-    investigator_1.answered(world.question_3, household_6, 1)
+    investigator_1.member_answered(world.question_1, household_member_6, 40)
+    investigator_1.member_answered(world.question_2, household_member_6, 40)
+    investigator_1.member_answered(world.question_3, household_member_6, 1)
 
     for household in Household.objects.all():
         HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='2000-03-01')
