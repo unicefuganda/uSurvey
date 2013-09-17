@@ -139,7 +139,6 @@ class BatchViews(BaseTest):
                     'name': 'batch aaa',
                     'description': batch.description
         }
-        print '/surveys/%d/batches/%d/edit/'%(self.survey.id, batch.id)
         response = self.client.post('/surveys/%d/batches/%d/edit/'%(self.survey.id, batch.id),data=form_data)
         updated_batch = Batch.objects.get(name=form_data['name'])
         self.failUnless(updated_batch)

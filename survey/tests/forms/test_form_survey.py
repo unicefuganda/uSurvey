@@ -22,6 +22,4 @@ class SurveyFormTest(TestCase):
         }
 
         survey_form = SurveyForm(data=form_data)
-        survey_form.is_valid()
-        print survey_form.errors
         self.assertTrue(survey_form.is_valid())
