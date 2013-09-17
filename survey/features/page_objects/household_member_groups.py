@@ -30,15 +30,11 @@ class GroupConditionModalPage(PageObject):
     def validate_contents(self):
         self.validate_fields_present(["Value", "Attribute", "Condition", "New Condition"])
 
-    def click_button(self,name):
-        self.browser.find_by_name(name).click()
-
     def validate_latest_condition(self, condition):
         self.browser.find_by_value("%s > %s > %s" % (condition.attribute, condition.condition, condition.value))
 
-
 class GroupDetailsPage(PageObject):
-    
+
     def __init__(self, browser, group_id):
         self.browser = browser
         self.url = '/groups/' + str(group_id)

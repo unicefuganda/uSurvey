@@ -7,7 +7,7 @@ Feature: Group features
     And I should see the conditions list
     When I click the add button
     Then I should see the new condition form
-    
+
   Scenario: List Groups Page
     Given I am logged in as researcher
     And I have a condition
@@ -30,25 +30,25 @@ Feature: Group features
     And I select a condition
     And I click save button
     Then I should see that the group was saved successfully
-    
+
   Scenario: Create a condition on the group form
     Given I am logged in as researcher
     And I visit the new group page
     When I click the add new condition
     Then I should see the modal open
     When I fill in the condition details
-    And I click the save button
+    And I click the new condition form save button
     Then I should see the condition was saved successfully
     And I should see the new condition in the groups form
 
-  Scenario: Create a condition with invalid form on the group form 
+  Scenario: Create a condition with invalid form on the group form
     Given I am logged in as researcher
     And I visit the new group page
     When I click the add new condition
     Then I should see the modal open
-    And I click the save button
+    And I click the new condition form save button
     Then I should see the form errors of required fields
-    
+
   Scenario: Create a group with multiple conditions
     Given I am logged in as researcher
     And I have 2 conditions
@@ -57,7 +57,7 @@ Feature: Group features
     And I select conditions
     And I click save button
     Then I should see that the group was saved successfully
-    
+
   Scenario: List group details
     Given I am logged in as researcher
     And I have a groups

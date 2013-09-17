@@ -1,5 +1,5 @@
 ;
-$(".modal-body button[name='save_condition_button']").on('click', function (e) {
+$("#add_condition_from_group button[name='save_condition_button']").on('click', function (e) {
     if (validate_condition_form()) {
 
         $.ajax({

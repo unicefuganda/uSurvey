@@ -77,3 +77,7 @@ def and_i_click_on_create_new_survey_button(step):
 @step(u'Then I should see the create new survey modal')
 def then_i_should_see_the_create_new_survey_modal(step):
     world.page.validate_fields_present(["New Survey", "Name", "Description", "Type", "Sample size"])
+
+@step(u'And I click the modal save button')
+def and_i_click_the_modal_save_button(step):
+    world.page.click_button("save_button")

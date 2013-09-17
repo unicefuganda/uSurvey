@@ -97,6 +97,6 @@ Feature: Batch related features
     And I click add batch modal button
     Then I should see the add batch modal
     When I fill the details for add batch form
-    And I submit the form
+    And I click the modal save button
     And I should see batch successfully added message
 

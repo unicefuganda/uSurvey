@@ -26,6 +26,6 @@ Feature: Survey features
     And I click on create new survey button
     Then I should see the create new survey modal
     When I fill in the survey details
-    And I click save button
+    And I click the modal save button
     Then I should see that the survey was saved successfully
 

@@ -114,7 +114,7 @@ def then_i_should_see_the_modal_open(step):
     world.page.validate_contents()
 
 
-@step(u'And I click the save button')
+@step(u'And I click the new condition form save button')
 def and_i_click_the_save_button(step):
     world.page.click_button("save_condition_button")
 
@@ -149,11 +149,11 @@ def and_i_select_conditions(step):
 @step(u'Then I should see the form errors of required fields')
 def then_i_should_see_the_form_errors_of_required_fields(step):
     world.page.is_text_present("This field is required.")
-    
+
 @step(u'And I click the actions button')
 def and_i_click_the_actions_button(step):
     world.page.click_actions_button()
-    
+
 @step(u'And I have a groups')
 def and_i_have_a_groups(step):
     condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
@@ -161,11 +161,11 @@ def and_i_have_a_groups(step):
     world.group = HouseholdMemberGroup.objects.create(order=1, name="group 1")
     condition_1.groups.add(world.group)
     condition_2.groups.add(world.group)
-    
+
 @step(u'And I click view conditions link')
 def and_i_click_view_conditions_link(step):
     world.page.click_link_by_text(" View Conditions")
-    
+
 @step(u'Then I should see a list of conditions')
 def then_i_should_see_a_list_of_conditions(step):
     world.page = GroupDetailsPage(world.browser, world.group)
