@@ -2,7 +2,7 @@ from lettuce import *
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage
-from survey.features.page_objects.question import QuestionsListPage
+from survey.features.page_objects.question import BatchQuestionsListPage
 from survey.investigator_configs import *
 from survey.models.question import Question
 from survey.models.batch import Batch, BatchLocationStatus
@@ -142,7 +142,7 @@ def and_i_click_on_batch_name(step):
 
 @step(u'Then I should be on the list of questions under the batch page')
 def then_i_should_be_on_the_list_of_questions_under_the_batch_page(step):
-    world.page = QuestionsListPage(world.browser, world.batch)
+    world.page = BatchQuestionsListPage(world.browser, world.batch)
     world.page.validate_url()
 
 @step(u'And I click on assign question link')

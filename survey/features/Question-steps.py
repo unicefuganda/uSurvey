@@ -1,22 +1,18 @@
 from random import randint
 from lettuce import *
-from survey.features.page_objects.question import QuestionsListPage, AddQuestionPage
+from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage
 from survey.models.question import Question
 from survey.models.householdgroups import HouseholdMemberGroup
 
 @step(u'And I have 100 questions under the batch')
 def and_i_have_100_questions_under_the_batch(step):
-    for _ in xrange(100):
-        random_number = randint(1, 99999)
-        try:
-            Question.objects.create(batch=world.batch, text="some questions %d"%random_number,
-                                                answer_type=Question.NUMBER, order=random_number)
-        except Exception:
-            pass
+    for i in xrange(100):
+        q=Question.objects.create(batch=world.batch, text="some questions %d"%i,
+                                                answer_type=Question.NUMBER, order=i)
 
 @step(u'And I visit questions listing page of the batch')
 def and_i_visit_questions_listing_page_of_the_batch(step):
-    world.page = QuestionsListPage(world.browser, world.batch)
+    world.page = BatchQuestionsListPage(world.browser, world.batch)
     world.page.visit()
 
 @step(u'Then I should see the questions list paginated')
@@ -51,7 +47,7 @@ def when_i_fill_the_details_for_add_question_form(step):
 
 @step(u'Then I should go back to questions listing page')
 def then_i_should_go_back_to_questions_listing_page(step):
-    world.page = QuestionsListPage(world.browser, world.batch)
+    world.page = BatchQuestionsListPage(world.browser, world.batch)
     world.page.validate_url()
 
 
@@ -106,3 +102,27 @@ def then_i_should_see_only_one_option_field(step):
 @step(u'And I fill an option question')
 def and_i_fill_an_option_question(step):
     world.page.fill_valid_values({'options':'some option question text'})
+
+@step(u'And I have more than 50 questions')
+def and_i_have_100_questions(step):
+    for i in xrange(100):
+        Question.objects.create(text="some questions %d"%i, answer_type=Question.NUMBER, order=i)
+
+@step(u'And I visit questions list page')
+def and_i_visit_questions_list_page(step):
+    world.page = ListAllQuestionsPage(world.browser)
+    world.page.visit()
+
+@step(u'And If I click create new question link')
+def and_if_i_click_create_new_question_link(step):
+    world.page.click_link_by_text("Create New Question")
+
+@step(u'Then I should see create new question page')
+def then_i_should_see_create_new_question_page(step):
+    world.page = CreateNewQuestionPage(world.browser)
+    world.page.validate_url()
+
+@step(u'And I visit create new question page')
+def and_i_visit_create_new_question_page(step):
+    world.page = CreateNewQuestionPage(world.browser)
+    world.page.visit()

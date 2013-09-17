@@ -21,7 +21,7 @@ jQuery(function($){
 
   $('#assign_question_group').on('change', function(){
       var select_element = $(this),
-      url = '/questions/?group='+ select_element.val();
+      url = '/questions/groups/'+ select_element.val();
       $.getJSON(url, function(data){
           $('#id_questions').html("");
           $.each(data, function(){

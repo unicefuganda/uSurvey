@@ -29,14 +29,14 @@ def index(request, batch_id):
     return render(request, 'questions/index.html', context)
 
 @permission_required('auth.can_view_batches')
-def new(request, batch_id):
+def new(request):
     question_form = QuestionForm()
     if request.method == 'POST':
         question_form = QuestionForm(data=request.POST)
         if question_form.is_valid():
-            question_form.save(batch=Batch.objects.get(id=batch_id))
+            question_form.save()
             messages.success(request, 'Question successfully added.')
-            return HttpResponseRedirect('/batches/%s/questions/'% batch_id)
+            return HttpResponseRedirect('/questions/')
     context = { 'button_label':'Save',
                 'id':'add-question-form',
                 'request':request,
@@ -44,8 +44,13 @@ def new(request, batch_id):
     return render(request, 'questions/new.html', context)
 
 @permission_required('auth.can_view_batches')
-def filter_by_group(request):
-    group_id = request.GET['group'] if contains_key(request.GET, 'group') else None
+def filter_by_group(request, group_id):
     questions= Question.objects.filter(group__id=group_id).values('id', 'text').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')
+
+@permission_required('auth.can_view_batches')
+def list_all_questions(request):
+    questions = Question.objects.all()
+    context = {'questions':questions, 'request': request}
+    return render(request, 'questions/index.html', context)

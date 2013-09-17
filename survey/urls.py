@@ -40,7 +40,6 @@ urlpatterns = patterns('',
     url(r'^users/(?P<user_id>\d+)/edit/$', 'survey.views.users.edit', name='users_edit'),
     url(r'^batches/(?P<batch_id>\d+)/assign_questions/$', 'survey.views.batch.assign', name='assign_questions_page'),
     url(r'^batches/(?P<batch_id>\d+)/questions/$', 'survey.views.questions.index', name='batch_questions_page'),
-    url(r'^batches/(?P<batch_id>\d+)/questions/new/$', 'survey.views.questions.new', name='new_question_page'),
     url(r'^batches/(?P<batch_id>\d+)/open_to$', 'survey.views.batch.open', name='batch_open_page'),
     url(r'^batches/(?P<batch_id>\d+)/close_to$', 'survey.views.batch.close', name='batch_close_page'),
     url(r'^batches/(?P<batch_id>\d+)/formulae/(?P<formula_id>\d+)/$', 'survey.views.formula.show', name='formula_show_page'),
@@ -56,7 +55,9 @@ urlpatterns = patterns('',
     url(r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/$', 'survey.views.batch.show', name='batch_show_page'),
     url(r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/edit/$', 'survey.views.batch.edit', name='batch_edit_page'),
     url(r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/delete/$', 'survey.views.batch.delete', name='delete_batch'),
-    url(r'^questions/$', 'survey.views.questions.filter_by_group', name='questions_filtered_by_group_page'),
+    url(r'^questions/$', 'survey.views.questions.list_all_questions', name='list_all_questions'),
+    url(r'^questions/groups/(?P<group_id>\d+)/$', 'survey.views.questions.filter_by_group', name='list_questions_in_agroup'),
+    url(r'^questions/new/$', 'survey.views.questions.new', name='new_question_page'),
 
 )
 

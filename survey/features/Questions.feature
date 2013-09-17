@@ -1,6 +1,6 @@
 Feature: Questions related features
 
-Scenario: List Questions
+Scenario: List Questions Under a batch
   Given I am logged in as researcher
   And I have a survey
   And I have a batch
@@ -27,10 +27,8 @@ Scenario: Add new question to batch
 
 Scenario: MultiChoice question
   Given I am logged in as researcher
-  And I have a survey
-  And I have a batch
   And I have a member group
-  And I visit add new question page of the batch
+  And I visit create new question page
   And I fill the details for question
   When I select multichoice for answer type
   Then I should see one option field
@@ -42,3 +40,10 @@ Scenario: MultiChoice question
   And I submit the form
   And I should see question successfully added message
 
+Scenario: List All Questions
+  Given I am logged in as researcher
+  And I have more than 50 questions
+  And I visit questions list page
+  Then I should see the questions list paginated
+  And If I click create new question link
+  Then I should see create new question page

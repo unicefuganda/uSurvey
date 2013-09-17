@@ -1,7 +1,7 @@
 from survey.features.page_objects.base import PageObject
 from lettuce.django import django_url
 
-class QuestionsListPage(PageObject):
+class BatchQuestionsListPage(PageObject):
     def __init__(self, browser, batch):
         self.browser = browser
         self.batch = batch
@@ -17,11 +17,20 @@ class QuestionsListPage(PageObject):
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
+class ListAllQuestionsPage(PageObject):
+    url = "/questions/"
+
+    def validate_fields(self):
+        self.validate_fields_present(['Questions List', 'Question', 'Question Type', 'Question Group'])
+
 class AddQuestionPage(PageObject):
     def __init__(self, browser, batch):
         self.browser = browser
         self.batch = batch
         self.url = '/batches/%d/questions/new/' % batch.id
+
+class CreateNewQuestionPage(PageObject):
+    url = "/questions/new/"
 
     def see_one_option_field(self, option):
         self.is_text_present(option)

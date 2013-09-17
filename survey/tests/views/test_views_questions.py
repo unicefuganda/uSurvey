@@ -25,7 +25,7 @@ class QuestionsViews(BaseTest):
         self.question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
                                             answer_type=Question.NUMBER, order=2)
 
-    def test_get_index(self):
+    def test_get_index_per_batch(self):
         response = self.client.get('/batches/%d/questions/'%self.batch.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -49,22 +49,24 @@ class QuestionsViews(BaseTest):
 
 
     def test_add_new_question(self):
-        response = self.client.get('/batches/%d/questions/new/'%self.batch.id)
+        response = self.client.get('/questions/new/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions/new.html', templates)
         self.assertIsInstance(response.context['questionform'], QuestionForm)
 
     def test_question_form_is_in_response_request_context(self):
-        response = self.client.get('/batches/%d/questions/new/'%self.batch.id)
+        response = self.client.get('/questions/new/')
         self.assertIsInstance(response.context['questionform'], QuestionForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'add-question-form')
 
     def test_restricted_permissions(self):
-        self.assert_restricted_permission_for("/batches/%d/questions/new/"%self.batch.id)
+        member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        self.assert_restricted_permission_for("/questions/new/")
         self.assert_restricted_permission_for('/batches/%d/questions/'%self.batch.id)
         self.assert_restricted_permission_for('/questions/')
+        self.assert_restricted_permission_for('/questions/groups/%d/'%member_group.id)
 
     @patch('django.contrib.messages.success')
     def test_create_question_number_does_not_create_options(self, mock_success):
@@ -76,11 +78,10 @@ class QuestionsViews(BaseTest):
                     }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
-        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        response = self.client.post('/questions/new/', data=form_data)
         question = Question.objects.filter(text=form_data['text'])
         self.failUnless(question)
-        self.assertEqual(question[0].batch,self.batch)
-        self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
+        self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         question_options = question[0].options.all()
         self.assertEqual(0, question_options.count())
 
@@ -118,12 +119,11 @@ class QuestionsViews(BaseTest):
             }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
-        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        response = self.client.post('/questions/new/', data=form_data)
         question = Question.objects.filter(text=form_data['text'])
         self.failUnless(question)
         self.assertEqual(1, len(question))
-        self.assertEqual(question[0].batch,self.batch)
-        self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
+        self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         question_options = question[0].options.all()
         self.assertEqual(2, question_options.count())
         self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options )
@@ -138,12 +138,11 @@ class QuestionsViews(BaseTest):
             }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
-        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        response = self.client.post('/questions/new/', data=form_data)
         question = Question.objects.filter(text=form_data['text'])
         self.failUnless(question)
         self.assertEqual(1, len(question))
-        self.assertEqual(question[0].batch,self.batch)
-        self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
+        self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         question_options = question[0].options.all()
         self.assertEqual(2, question_options.count())
         self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options )
@@ -158,7 +157,7 @@ class QuestionsViews(BaseTest):
             }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
-        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        response = self.client.post('/questions/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 200)
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
@@ -172,12 +171,11 @@ class QuestionsViews(BaseTest):
                 }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
-        response = self.client.post('/batches/%d/questions/new/'%self.batch.id, data=form_data)
+        response = self.client.post('/questions/new/', data=form_data)
         question = Question.objects.filter(text=form_data['text'])
         self.failUnless(question)
         self.assertEqual(1, len(question))
-        self.assertEqual(question[0].batch, self.batch)
-        self.assertRedirects(response, expected_url='/batches/%d/questions/'%self.batch.id, status_code=302, target_status_code=200)
+        self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         question_options = question[0].options.all()
         self.assertEqual(0, question_options.count())
 
@@ -185,7 +183,7 @@ class QuestionsViews(BaseTest):
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         question_1 = Question.objects.create(text="question1", answer_type=Question.NUMBER, group=member_group)
         question_2 = Question.objects.create(text="question2", answer_type=Question.NUMBER)
-        response = self.client.get('/questions/?group=%d'%member_group.id)
+        response = self.client.get('/questions/groups/%d/'%member_group.id)
         self.failUnlessEqual(response.status_code, 200)
 
         content = json.loads(response.content)
@@ -193,3 +191,12 @@ class QuestionsViews(BaseTest):
 
         self.assertEquals(content[0]['id'], question_1.pk)
         self.assertEquals(content[0]['text'], question_1.text)
+
+    def test_get_index_all(self):
+        response = self.client.get('/questions/')
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('questions/index.html', templates)
+        self.assertIn(self.question_1, response.context['questions'])
+        self.assertIn(self.question_2, response.context['questions'])
+        self.assertIsNotNone(response.context['request'])
