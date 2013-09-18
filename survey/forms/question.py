@@ -56,11 +56,11 @@ class QuestionForm(ModelForm):
 
     def save(self, commit=True, **kwargs):
         question = super(QuestionForm, self).save(commit=False)
-
         if self.kwargs_has_batch(**kwargs):
             question.batch = kwargs['batch']
-
         if commit:
+            order = HouseholdMemberGroup.objects.get(id=kwargs['group'][0]).maximum_question_order() + 1
+            question.order = order
             question.save()
 
         if self.options_supplied(commit):

@@ -25,6 +25,23 @@ class HouseholdMemberGroupTest(TestCase):
         self.assertEquals("5 to 6 years", hmg.name)
         self.assertEquals(0, hmg.order)
 
+    def test_no_last_answered_question_returns_false_for_all_questions_answered(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        batch.open_for_location(investigator.location)
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
+                                                          male=False,
+                                                          household=household)
+
+        member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
+        self.assertTrue(member_group.all_questions_answered(household_member))
+
     def test_knows_all_the_questions_associated(self):
         member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
         another_member_group = HouseholdMemberGroup.objects.create(name="7 to 10 years", order=1)

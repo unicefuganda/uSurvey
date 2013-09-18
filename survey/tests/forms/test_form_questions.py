@@ -56,7 +56,7 @@ class QuestionFormTest(TestCase):
         question_form = QuestionForm(form_data)
         self.assertTrue(question_form.is_valid())
         batch = Batch.objects.create()
-        question = question_form.save(batch=batch)
+        question = question_form.save(batch=batch, group=[self.household_member_group.id])
         self.assertEqual(batch, question.batch)
         options = question.options.all()
         self.assertEqual(2, options.count())
@@ -69,7 +69,7 @@ class QuestionFormTest(TestCase):
         form_data['options']=['option 1', 'option 2']
         question_form = QuestionForm(form_data)
         self.assertTrue(question_form.is_valid())
-        question = question_form.save()
+        question = question_form.save(group=[self.household_member_group.id])
         self.assertIsNone(question.batch)
         options = question.options.all()
         self.assertEqual(2, options.count())
@@ -82,6 +82,6 @@ class QuestionFormTest(TestCase):
         form_data['options']=['some option question']
         question_form = QuestionForm(form_data)
         self.assertTrue(question_form.is_valid())
-        question = question_form.save()
+        question = question_form.save(group=[self.household_member_group.id])
         self.assertIsNone(question.batch)
         self.assertEquals(0, question.options.all().count())

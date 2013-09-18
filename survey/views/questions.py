@@ -34,7 +34,7 @@ def new(request):
     if request.method == 'POST':
         question_form = QuestionForm(data=request.POST)
         if question_form.is_valid():
-            question_form.save()
+            question_form.save(**request.POST)
             messages.success(request, 'Question successfully added.')
             return HttpResponseRedirect('/questions/')
     context = { 'button_label':'Save',

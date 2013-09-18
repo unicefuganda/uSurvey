@@ -27,9 +27,11 @@ class HouseholdMemberGroup(BaseModel):
 
     def all_questions_answered(self, member):
         last_question = self.last_question()
-        answer_class = last_question.answer_class()
-        answered_question = answer_class.objects.filter(question=last_question, householdmember=member)
-        return len(answered_question) > 0
+        if last_question:
+            answer_class = last_question.answer_class()
+            answered_question = answer_class.objects.filter(question=last_question, householdmember=member)
+            return len(answered_question) > 0
+        return True
 
     def first_question(self, member):
         all_questions = self.all_questions().order_by('order')

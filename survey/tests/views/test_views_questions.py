@@ -87,6 +87,39 @@ class QuestionsViews(BaseTest):
 
         assert mock_success.called
 
+    def test_create_question_saves_order_based_on_group_created_for(self):
+        form_data={
+                'text': "This is a question",
+                'answer_type': Question.NUMBER,
+                'group' : self.household_member_group.id,
+                'options': ''
+                }
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        response = self.client.post('/questions/new/', data=form_data)
+        question = Question.objects.filter(text=form_data['text'])
+        self.failUnless(question)
+        self.assertEqual(1, question[0].order)
+
+        form_data['text'] = 'This is another question'
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        response = self.client.post('/questions/new/', data=form_data)
+        question = Question.objects.filter(text=form_data['text'])
+        self.failUnless(question)
+        self.assertEqual(2, question[0].order)
+
+        new_household_member_group = HouseholdMemberGroup.objects.create(name='Age 15-20', order=2)
+        form_data['text'] = 'This is a question in new group'
+        form_data['group'] = new_household_member_group.id
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        response = self.client.post('/questions/new/', data=form_data)
+        question = Question.objects.filter(text=form_data['text'])
+        self.failUnless(question)
+        self.assertEqual(1, question[0].order)
+
+
     def test_should_retrieve_group_specific_questions_in_context_if_selected_group_key_is_in_request(self):
         group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
                                             answer_type=Question.NUMBER, order=1,
