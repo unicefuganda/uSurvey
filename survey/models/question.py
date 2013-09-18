@@ -99,7 +99,7 @@ class Question(BaseModel):
             return self.text
 
     def is_in_open_batch(self, location):
-        return self.batch.is_open_for(location)
+        return self.batch.is_open_for(location) if self.batch else False
 
 
 class QuestionOption(BaseModel):

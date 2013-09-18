@@ -36,7 +36,7 @@ class HouseholdMemberGroup(BaseModel):
     def first_question(self, member):
         all_questions = self.all_questions().order_by('order')
 
-        open_questions = filter(lambda question: question.is_in_open_batch(member.get_location()), all_questions)
+        open_questions = filter(lambda question: question.is_in_open_batch(member.get_location()), all_questions) if all_questions else None
 
         if open_questions:
             return open_questions[0]
