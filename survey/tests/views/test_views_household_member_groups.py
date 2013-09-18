@@ -47,7 +47,7 @@ class GroupConditionViewTest(BaseTest):
     def test_post_condtion_form(self, mock_success):
         data = {'attribute': 'AGE',
                 'condition': 'EQUALS',
-                'value': 'kant'}
+                'value': '8'}
 
         self.failIf(GroupCondition.objects.filter(**data))
         response = self.client.post('/conditions/new/', data=data)
@@ -166,7 +166,7 @@ class HouseholdMemberGroupTest(BaseTest):
     def test_ajax_call_to_new_should_save_the_object(self):
         data = {'attribute': 'AGE',
                 'condition': 'EQUALS',
-                'value': 'kant'}
+                'value': '9'}
 
         self.failIf(GroupCondition.objects.filter(**data))
         self.client.post('/conditions/new/', data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -175,7 +175,7 @@ class HouseholdMemberGroupTest(BaseTest):
     def test_ajax_call_should_return_condition_list_in_context(self):
         data = {'attribute': 'AGE',
                 'condition': 'EQUALS',
-                'value': 'kant'}
+                'value': '9'}
 
         response = self.client.post('/conditions/new/', data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         condition = GroupCondition.objects.get(**data)

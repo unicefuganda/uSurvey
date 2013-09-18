@@ -71,7 +71,7 @@ def and_i_visit_the_new_condition_page(step):
 @step(u'When I fill in the condition details')
 def when_i_fill_in_the_condition_details(step):
     data = {'attribute': 'AGE',
-            'value': 'kant'}
+            'value': '9'}
     world.page.fill_valid_values(data)
 
 
