@@ -42,7 +42,6 @@ class Household(BaseModel):
     def has_pending_survey(self):
         for household_member in self.household_member.all():
             if household_member.pending_surveys():
-                print 'Member'
                 return True
         return False
 
@@ -125,6 +124,8 @@ class Household(BaseModel):
         for member in members:
             name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.surname
             text = "%s: %s" % (all_members.index(member) + 1, name)
+            if not member.has_open_batches():
+                text += "*"
             members_list.append(text)
         if members.has_previous():
             members_list.append(self.PREVIOUS_PAGE_TEXT)
@@ -217,6 +218,13 @@ class HouseholdMember(BaseModel):
 
     def pending_surveys(self):
         return not (bool(self.survey_completed()) and bool(self.has_started_the_survey()))
+
+    def has_open_batches(self):
+        for batch in self.household.investigator.get_open_batch():
+            if not self.completed_member_batches.filter(householdmember=self, household=self.household,
+                                                    investigator=self.household.investigator, batch=batch):
+                return True
+        return False
 
     class Meta:
         app_label = 'survey'

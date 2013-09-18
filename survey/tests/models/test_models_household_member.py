@@ -275,3 +275,65 @@ class HouseholdMemberTest(TestCase):
         self.assertTrue(household_member.pending_surveys())
         investigator.member_answered(question_2,household_member,answer=1)
         self.assertTrue(household_member.survey_completed())
+
+    def test_knows_all_open_batches_are_completed(self):
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        condition.groups.add(member_group)
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        batch_2 = Batch.objects.create(name="BATCH A", order=1)
+        batch.open_for_location(investigator.location)
+        batch_2.open_for_location(investigator.location)
+
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                         answer_type='number', order=2,
+                                         subquestion=False, group=member_group, batch=batch_2)
+        investigator.member_answered(question_1,household_member,answer=1)
+        investigator.member_answered(question_2,household_member,answer=1)
+
+        self.assertFalse(household_member.has_open_batches())
+
+    def test_knows_all_open_batches_are_completed(self):
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        condition.groups.add(member_group)
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        batch_2 = Batch.objects.create(name="BATCH A", order=1)
+
+        batch.open_for_location(investigator.location)
+        batch_2.open_for_location(investigator.location)
+
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                         answer_type='number', order=2,
+                                         subquestion=False, group=member_group, batch=batch_2)
+        investigator.member_answered(question_1,household_member,answer=1)
+
+        self.assertTrue(household_member.has_open_batches())

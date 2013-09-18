@@ -155,7 +155,6 @@ class Investigator(BaseModel):
     def completed_open_surveys(self):
         for household in self.all_households():
             if household.has_pending_survey():
-                print "here"
                 return False
         return True
 
