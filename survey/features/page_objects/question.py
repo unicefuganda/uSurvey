@@ -10,8 +10,8 @@ class BatchQuestionsListPage(PageObject):
     def validate_fields(self):
         self.is_text_present('%s Question'% self.batch.name.capitalize())
         self.is_text_present('Question')
-        self.is_text_present('Question Type')
-        self.is_text_present('Question Group')
+        self.is_text_present('Type')
+        self.is_text_present('Group')
         # self.is_text_present('Actions')
 
     def validate_pagination(self):
@@ -21,7 +21,7 @@ class ListAllQuestionsPage(PageObject):
     url = "/questions/"
 
     def validate_fields(self):
-        self.validate_fields_present(['Questions List', 'Question', 'Question Type', 'Question Group'])
+        self.validate_fields_present(['Questions List', 'Question', 'Type', 'Group'])
 
 class AddQuestionPage(PageObject):
     def __init__(self, browser, batch):
