@@ -298,6 +298,28 @@ class QuestionTest(TestCase):
 
         self.assertEqual(household_member_group, question.group)
 
+    def test_knows_has_been_answered_by_member(self):
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+        household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+        household_member_1 = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=household_member_group, batch=self.batch)
+        self.assertFalse(question_1.has_been_answered(household_member))
+        investigator.member_answered(question_1, household_member, answer=1)
+        self.assertTrue(question_1.has_been_answered(household_member))
+        self.assertFalse(question_1.has_been_answered(household_member_1))
 
 class QuestionOptionTest(TestCase):
     def setUp(self):

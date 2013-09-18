@@ -171,7 +171,7 @@ class HouseholdMember(BaseModel):
         member_groups = self.get_member_groups()
 
         for member_group in member_groups:
-            if not member_group.all_questions_answered(self):
+            if not member_group.all_questions_answered(self) and member_group.all_open_batch_questions(self):
                 return member_group
 
     def last_question_answered(self):

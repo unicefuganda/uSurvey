@@ -26,6 +26,7 @@ class BatchTest(TestCase):
         batch_1 = Batch.objects.create(name="Batch name_1",description='description')
         batch_1 = Batch.objects.get(name='Batch name_1')
         self.assertEqual(batch_1.order,2)
+
     def test_should_open_batch_for_parent_and_descendant_locations(self):
         country = LocationType.objects.create(name='Country', slug='country')
         district = LocationType.objects.create(name='District', slug='district')

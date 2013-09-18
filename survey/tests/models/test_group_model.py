@@ -382,3 +382,39 @@ class HouseholdMemberGroupTest(TestCase):
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
 
         self.assertIsNone(member_group.last_question())
+
+    def test_knows_all_group_questions_in_an_open_batches_has_been_answered(self):
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        condition.groups.add(member_group)
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        batch_2 = Batch.objects.create(name="BATCH A", order=1)
+
+        batch.open_for_location(investigator.location)
+        batch_2.open_for_location(investigator.location)
+
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                             answer_type='number', order=2,
+                                             subquestion=False, group=member_group, batch=batch_2)
+
+        self.assertEqual(2, len(member_group.all_open_batch_questions(household_member)))
+
+        batch_2.close_for_location(investigator.location)
+        self.assertEqual(1, len(member_group.all_open_batch_questions(household_member)))
+
+        investigator.member_answered(question_1, household_member, answer=1)
+        self.assertEqual(0, len(member_group.all_open_batch_questions(household_member)))

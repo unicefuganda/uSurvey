@@ -154,7 +154,8 @@ class USSD(USSDBase):
 
     def get_current_batch(self):
         if not self.household.survey_completed():
-            return self.household_member.next_question().batch
+            next_question = self.household_member.next_question()
+            return next_question.batch if next_question else None
         if self.household_member:
             last_question_entered = self.household_member.last_question_answered()
             return last_question_entered.batch if last_question_entered else None

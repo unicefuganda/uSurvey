@@ -57,6 +57,10 @@ class Question(BaseModel):
 
         return eval(Question.TYPE_OF_ANSWERS_CLASS[self.answer_type])
 
+    def has_been_answered(self, member):
+        answer_class = self.answer_class()
+        return  len(answer_class.objects.filter(question=self, householdmember=member)) > 0
+
     def options_in_text(self, page=1):
         paginator = Paginator(self.options.order_by('order').all(), self.OPTIONS_PER_PAGE)
         options = paginator.page(page)
@@ -81,7 +85,7 @@ class Question(BaseModel):
             return self.next_question(location=household.investigator.location)
 
     def next_question_for_household_member(self, household_member):
-        answer = self.answer_class().objects.get(householdmember=household_member, question=self)
+        answer = self.answer_class().objects.get(householdmember=household_member if not household_member.is_head() else household_member.get_member(), question=self)
         try:
             return self.get_next_question_by_rule(answer, household_member.household.investigator)
         except ObjectDoesNotExist, e:

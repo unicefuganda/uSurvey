@@ -43,6 +43,14 @@ class HouseholdMemberGroup(BaseModel):
         else:
             return None
 
+    def all_open_batch_questions(self, member):
+        all_questions = self.all_questions()
+        open_batch_questions = []
+        for question in all_questions:
+            if question.batch and question.batch.is_open_for(member.get_location()) and not question.has_been_answered(member):
+                open_batch_questions.append(question)
+        return open_batch_questions
+
     def last_question(self):
         all_questions = self.all_questions().exclude(order=None)
         return all_questions.order_by('order').reverse()[0] if all_questions else None
@@ -95,11 +103,14 @@ class GroupCondition(BaseModel):
     condition = models.CharField(max_length=20, default='EQUALS', choices=CONDITIONS.items())
     groups = models.ManyToManyField(HouseholdMemberGroup, related_name='conditions')
 
-    def matches_condition(self, value):
+    def confirm_male(self, value):
+        if str(value) == str(True) or str(value) == str(False):
+            return value
+        return  str(value).lower() == "male"
 
+    def matches_condition(self, value):
         if self.condition == GroupCondition.CONDITIONS['EQUALS']:
-            check_for_male = True if str(self.value).lower() == "male" else False
-            return str(self.value) == str(value) or str(value) == str(check_for_male)
+            return str(self.value) == str(value) or str(value) == str(self.confirm_male(self.value))
 
         elif self.condition == GroupCondition.CONDITIONS['GREATER_THAN']:
             return int(value) >= int(self.value)

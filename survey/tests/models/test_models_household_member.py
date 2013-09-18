@@ -147,6 +147,7 @@ class HouseholdMemberTest(TestCase):
         female_condition.groups.add(female_group)
 
         batch = Batch.objects.create(name="BATCH A", order=1)
+        batch.open_for_location(investigator.location)
         household = Household.objects.create(investigator=investigator, uid=0)
 
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
