@@ -1,7 +1,7 @@
 from random import randint
 from lettuce import *
 from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage
-from survey.models.question import Question
+from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
 
 @step(u'And I have 100 questions under the batch')
@@ -126,3 +126,26 @@ def then_i_should_see_create_new_question_page(step):
 def and_i_visit_create_new_question_page(step):
     world.page = CreateNewQuestionPage(world.browser)
     world.page.visit()
+
+@step(u'And I have a multichoice question')
+def and_i_have_a_multichoice_question(step):
+    world.multi_choice_question = Question.objects.create(text="Are these insecticide?", answer_type=Question.MULTICHOICE, order=6)
+    QuestionOption.objects.create(question=world.multi_choice_question, text="Yes", order=1)
+    QuestionOption.objects.create(question=world.multi_choice_question, text="No", order=2)
+    QuestionOption.objects.create(question=world.multi_choice_question, text="Dont Know", order=3)
+
+@step(u'And I click on view options link')
+def and_i_click_on_view_options_link(step):
+    world.page.click_modal_link("#view_options_%d"%world.multi_choice_question.id)
+
+@step(u'Then I should see the question options in a modal')
+def then_i_should_see_the_question_options_in_a_modal(step):
+    world.page.validate_fields_present([world.multi_choice_question.text, "Text", "Order"])
+
+@step(u'And when I click the close button')
+def and_when_i_click_the_close_button(step):
+    world.page.click_by_css("#close_view_options_%d"%world.multi_choice_question.id)
+    
+@step(u'Then I should be back to questions list page')
+def then_i_should_see_questions_list_page(step):
+    world.page.validate_back_to_questions_list_page()

@@ -12,7 +12,7 @@ class BatchQuestionsListPage(PageObject):
         self.is_text_present('Question')
         self.is_text_present('Type')
         self.is_text_present('Group')
-        # self.is_text_present('Actions')
+        self.is_text_present('Actions')
 
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
@@ -21,7 +21,12 @@ class ListAllQuestionsPage(PageObject):
     url = "/questions/"
 
     def validate_fields(self):
-        self.validate_fields_present(['Questions List', 'Question', 'Type', 'Group'])
+        self.validate_fields_present(['Questions List', 'Question', 'Type', 'Group', 'Actions'])
+
+    def validate_back_to_questions_list_page(self):
+        assert not self.is_text_present("Text")
+        assert not self.is_text_present("Order")
+        assert not self.is_text_present("Close")
 
 class AddQuestionPage(PageObject):
     def __init__(self, browser, batch):
