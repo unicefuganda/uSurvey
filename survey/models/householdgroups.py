@@ -98,7 +98,8 @@ class GroupCondition(BaseModel):
     def matches_condition(self, value):
 
         if self.condition == GroupCondition.CONDITIONS['EQUALS']:
-            return str(self.value) == str(value)
+            check_for_male = True if str(self.value).lower() == "male" else False
+            return str(self.value) == str(value) or str(value) == str(check_for_male)
 
         elif self.condition == GroupCondition.CONDITIONS['GREATER_THAN']:
             return int(value) >= int(self.value)

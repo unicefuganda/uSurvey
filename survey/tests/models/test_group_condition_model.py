@@ -69,3 +69,31 @@ class GroupConditionTest(TestCase):
 
         self.assertFalse(age_condition.matches_condition(age_value+2))
 
+    def test_knows_to_match_equal_to_condition_for_gender_if_false(self):
+        gender_value = False
+        attribute_type = "gender"
+        gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
+
+        self.assertTrue(gender_condition.matches_condition(gender_value))
+        self.assertFalse(gender_condition.matches_condition(not gender_value))
+
+    def test_knows_to_match_equal_to_condition_for_gender_if_condition_value_is_female(self):
+        gender_value = "Female"
+        attribute_type = "gender"
+        is_male = True
+        is_female = False
+        gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
+
+        self.assertTrue(gender_condition.matches_condition(is_female))
+        self.assertFalse(gender_condition.matches_condition(is_male))
+
+    def test_knows_to_match_equal_to_condition_for_gender_if_condition_value_is_male(self):
+        gender_value = "Male"
+        attribute_type = "gender"
+        is_male = True
+        is_female = False
+        gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
+
+        self.assertTrue(gender_condition.matches_condition(is_male))
+        self.assertFalse(gender_condition.matches_condition(is_female))
+
