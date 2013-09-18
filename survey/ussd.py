@@ -136,7 +136,8 @@ class USSD(USSDBase):
         self.action = self.ACTIONS['END']
         if self.investigator.completed_open_surveys():
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
-        elif not self.household_member.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
+        elif self.household_member.last_question_answered() and \
+                not self.household_member.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
             self.responseString = USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE']
         else:
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE']
@@ -155,7 +156,8 @@ class USSD(USSDBase):
         if not self.household.survey_completed():
             return self.household_member.next_question().batch
         if self.household_member:
-            return self.household_member.last_question_answered().batch
+            last_question_entered = self.household_member.last_question_answered()
+            return last_question_entered.batch if last_question_entered else None
         return self.investigator.first_open_batch()
 
     def render_survey(self):
