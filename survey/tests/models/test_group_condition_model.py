@@ -97,3 +97,29 @@ class GroupConditionTest(TestCase):
         self.assertTrue(gender_condition.matches_condition(is_male))
         self.assertFalse(gender_condition.matches_condition(is_female))
 
+    def test_knows_to_match_equal_to_condition_for_general_if_condition_value_is_head(self):
+        value = "HEAD"
+        attribute_type = "GENERAL"
+        is_head = True
+        general_condition = GroupCondition.objects.create(attribute=attribute_type, value=value, condition='EQUALS')
+
+        self.assertTrue(general_condition.matches_condition(is_head))
+
+        value = "HEAD"
+        attribute_type = "gender"
+        is_head = True
+        general_condition = GroupCondition.objects.create(attribute=attribute_type, value=value, condition='EQUALS')
+
+        self.assertFalse(general_condition.matches_condition(is_head))
+
+    def test_should_not_match_general_condition_to_head_is_false(self):
+        value = "HEAD"
+        attribute_type = "GENERAL"
+        general_condition = GroupCondition.objects.create(attribute=attribute_type, value=value, condition='EQUALS')
+
+        is_head = False
+
+        self.assertFalse(general_condition.matches_condition(is_head))
+
+
+
