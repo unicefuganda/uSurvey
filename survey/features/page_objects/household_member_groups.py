@@ -19,7 +19,6 @@ class GroupsListingPage(PageObject):
 class AddConditionPage(PageObject):
     url = "/conditions/new/"
 
-
 class AddGroupPage(PageObject):
     url = '/groups/new/'
 

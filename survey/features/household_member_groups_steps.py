@@ -126,7 +126,7 @@ def then_i_should_see_the_condition_was_saved_successfully(step):
 
 @step(u'And I should see the new condition in the groups form')
 def and_i_should_see_the_new_condition_in_the_groups_form(step):
-    latest_condition = GroupCondition.objects.get(value='kant', attribute="AGE", condition="EQUALS")
+    latest_condition = GroupCondition.objects.get(value='9', attribute="AGE", condition="EQUALS")
     world.page.validate_latest_condition(latest_condition)
 
 
@@ -192,3 +192,35 @@ def when_i_click_the_add_group_button(step):
 def then_i_should_go_to_add_group_page(step):
     world.page = AddGroupPage(world.browser)
     world.page.validate_url()
+
+@step(u'When I select gender as attribute')
+def when_i_select_gender_as_attribute(step):
+    world.page.select('attribute', ['GENDER'])
+
+@step(u'Then I should see only Equals as available for condition')
+def then_i_should_see_only_equals_as_available_for_condition(step):
+    world.page.see_select_option(['EQUALS'], 'condition')
+
+@step(u'And male and female for values')
+def and_male_and_female_for_values(step):
+    world.page.see_select_option(['Male', 'Female'], 'value')
+
+@step(u'When I select general as attribute')
+def when_i_select_general_as_attribute(step):
+    world.page.select('attribute', ['GENERAL'])
+
+@step(u'And HEAD for values')
+def and_head_for_values(step):
+    world.page.find_by_css('input[name=value][readonly=readonly]', 'HEAD')
+
+@step(u'When I select age as attribute')
+def when_i_select_age_as_attribute(step):
+    world.page.select('attribute', ['AGE'])
+    
+@step(u'And If I add in a negative number')
+def and_if_i_add_in_a_negative_number(step):
+    world.page.fill('value', '-8')
+
+@step(u'Then I see error age cannot be negative')
+def then_i_should_see_error(step):
+    world.page.is_text_present('Age cannot be negative.')

@@ -9,4 +9,15 @@
     <a href="javascript:back()" class="btn btn-primary" name="cancel_button">Cancel</a>
   </div>
 </form>
-
+<script type="text/template" id="gender_value_select_template">
+  <select name="value" id="id_value">
+    <option value="Male">Male</option>
+      <option value="Female" selected="selected">Female</option>
+  </select>
+</script>
+<script type="text/template" id="age_value_select_template">
+  <input id="id_value" type="number" name="value" maxlength="50">
+</script>
+<script type="text/template" id="general_value_select_template">
+  <input id="id_value" type="text" name="value" value="HEAD" readonly="readonly">
+</script>

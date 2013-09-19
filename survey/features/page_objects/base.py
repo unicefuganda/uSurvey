@@ -166,3 +166,13 @@ class PageObject(object):
 
     def click_button(self,name):
         self.browser.find_by_name(name).click()
+
+    def find_by_css(self, css_selector, text):
+        assert self.browser.find_by_css(css_selector).first.value == text
+
+    def see_select_option(self, option_list, field_name):
+        for option in option_list:
+            assert option in self.browser.find_by_name(field_name).first.text
+
+    def fill(self, name, value):
+        self.browser.fill(name, value)

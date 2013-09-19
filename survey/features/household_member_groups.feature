@@ -73,4 +73,16 @@ Feature: Group features
     When I click the add group button
     Then I should go to add group page
 
-
+  Scenario: JS validation for add group condition
+    Given I am logged in as researcher
+    And I visit the new condition page
+    When I select gender as attribute
+    Then I should see only Equals as available for condition
+    And male and female for values
+    When I select general as attribute
+    Then I should see only Equals as available for condition
+    And HEAD for values
+    When I select age as attribute
+    And If I add in a negative number
+    And I click the new condition form save button
+    Then I see error age cannot be negative
