@@ -67,11 +67,8 @@ $(function(){
             .append(condition_option)
             .val('EQUALS');
     };
-
-    $('#id_attribute').on('change', function(){
-        var value = $('#id_value');
-        value.focus();
-        var attribute = $(this).val();        
+    
+    function adjust_field(attribute, value){
         if (attribute == 'GENDER'){
             switch_condition(equal_only_condition);
             value.replaceWith(gender_value_select_template.innerHTML);
@@ -80,7 +77,6 @@ $(function(){
         if (attribute == 'AGE'){
             switch_condition(original_conditions);
             value.replaceWith(age_value_select_template.innerHTML);
-                
             return true;
         };
         if (attribute == 'GENERAL'){
@@ -88,6 +84,11 @@ $(function(){
             value.replaceWith(general_value_select_template.innerHTML);
             return true;
         };
+    };
+
+    $('#id_attribute').on('change', function(){
+        adjust_field($(this).val(), $('#id_value'));
+        $('#id_value').click();
     });
 
     jQuery.validator.addMethod("positive_if_age", function(value, element) {

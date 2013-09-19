@@ -1,4 +1,5 @@
 from django.forms import ModelForm
+from django import forms
 from survey.models.householdgroups import GroupCondition
 
 
@@ -67,3 +68,6 @@ class GroupConditionForm(ModelForm):
     class Meta:
         model = GroupCondition
         fields =['attribute', 'condition', 'value']
+        widgets = {
+            'value': forms.TextInput(attrs={'type':'number', 'min':0, 'max':100}),
+        }

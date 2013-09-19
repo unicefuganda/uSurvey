@@ -73,6 +73,7 @@ def when_i_fill_in_the_condition_details(step):
     data = {'attribute': 'AGE',
             'value': '9'}
     world.page.fill_valid_values(data)
+    world.page.fill('value', '9')
 
 
 @step(u'And I click save button')
