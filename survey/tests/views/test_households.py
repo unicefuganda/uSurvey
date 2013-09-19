@@ -338,6 +338,35 @@ class HouseholdViewTest(BaseTest):
 
         self.assertEqual(household_location, response.context['households'][0].related_locations)
 
+    def test_should_send_only_number_of_households_sorted_by_head_surname(self):
+        country = LocationType.objects.create(name="country", slug=slugify("country"))
+        uganda = Location.objects.create(name="Uganda",type=country)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
+        household_a = Household.objects.create(investigator=investigator, uid=0)
+        household_b = Household.objects.create(investigator=investigator, uid=1)
+        household_c = Household.objects.create(investigator=investigator, uid=2)
+
+        HouseholdHead.objects.create(surname='Bravo', household=household_b, date_of_birth='1980-09-01')
+        HouseholdHead.objects.create(surname='Alpha', household=household_a, date_of_birth='1980-09-01')
+        HouseholdHead.objects.create(surname='Charlie', household=household_c, date_of_birth='1980-09-01')
+
+        HouseholdMember.objects.create(surname='Bravo', first_name='first_member', household=household_b, date_of_birth='1980-09-01')
+        HouseholdMember.objects.create(surname='Bravo', first_name='second_member', household=household_b, date_of_birth='1980-09-01')
+        HouseholdMember.objects.create(surname='Alpha', first_name='first_member', household=household_a, date_of_birth='1980-09-01')
+        HouseholdMember.objects.create(surname='Charlie', first_name='first_member', household=household_c, date_of_birth='1980-09-01')
+        response = self.client.get('/households/')
+
+        self.assertEqual(response.status_code, 200)
+
+        templates = [template.name for template in response.templates]
+
+        self.assertIn('households/index.html', templates)
+        self.assertEqual(len(response.context['households']), 3)
+        self.assertIn(household_b, response.context['households'])
+        self.assertEqual(household_a, response.context['households'][0])
+        self.assertEqual(household_b, response.context['households'][1])
+        self.assertEqual(household_c, response.context['households'][2])
+
 
 class  ViewHouseholdDetailsTest(BaseTest):
 
