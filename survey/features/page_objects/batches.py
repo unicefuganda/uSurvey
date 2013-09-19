@@ -111,5 +111,8 @@ class AssignQuestionToBatchPage(PageObject):
         self.batch= batch
         self.url = '/batches/' + str(self.batch.id) + '/assign_questions/'
 
-    def see_the_question(self, status, question_text):
-        assert_equals( status, self.browser.is_text_present(question_text))
+    def see_the_question(self, status, question_id):
+        assert_equals( status, self.browser.find_by_id("%s-selectable" %question_id).visible)
+
+    def see_the_selected_question(self, status, question_id):
+        assert_equals( status, self.browser.find_by_id("%s-selection" %question_id).visible)

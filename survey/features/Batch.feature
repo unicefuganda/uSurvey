@@ -100,3 +100,14 @@ Feature: Batch related features
     And I click the modal save button
     And I should see batch successfully added message
 
+  Scenario: Assign questions from multiple groups to batch
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I have 2 member groups
+    And I have questions belonging to those groups
+    And I visit the assign question to page batch
+    And I select a question from the list
+    When I select the group
+    Then I should see in selected list the question which belong to that group
+    And I should see the previously selected questions on the page

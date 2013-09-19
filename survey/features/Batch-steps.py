@@ -1,9 +1,11 @@
+from time import sleep
 from lettuce import *
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage
 from survey.features.page_objects.question import BatchQuestionsListPage
 from survey.investigator_configs import *
+from survey.models import HouseholdMemberGroup
 from survey.models.question import Question
 from survey.models.batch import Batch, BatchLocationStatus
 
@@ -179,12 +181,17 @@ def when_i_select_the_group(step):
 
 @step(u'Then I should see the question which belong to that group')
 def then_i_should_see_the_question_which_belong_to_that_group(step):
-    world.page.see_the_question(True, world.question_1.text)
-    world.page.see_the_question(False, world.question_2.text)
+    world.page.see_the_question(True, world.question_1.id)
+    world.page.see_the_question(False, world.question_2.id)
+
+
+def create_question_for_group(group):
+    return Question.objects.create(text="question-group%s" %group.name, answer_type=Question.NUMBER, group=group)
+
 
 @step(u'And I have one question belonging to that group')
 def and_i_have_one_question_belonging_to_that_group(step):
-    world.question_1=Question.objects.create(text="question1", answer_type=Question.NUMBER, group=world.household_member_group)
+    world.question_1= create_question_for_group(world.household_member_group)
 
 @step(u'And another question which does not')
 def and_another_question_which_does_not(step):
@@ -197,3 +204,29 @@ def and_i_click_add_batch_modal_button(step):
 @step(u'Then I should see the add batch modal')
 def then_i_should_see_the_add_batch_modal(step):
     world.page.validate_fields_present(["New Batch", "Name", "Description"])
+
+@step(u'And I have 2 member groups')
+def and_i_have_2_member_groups(step):
+    world.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
+    world.member_group_2 = HouseholdMemberGroup.objects.create(name='Age 15-49', order=2)
+
+@step(u'And I have questions belonging to those groups')
+def and_i_have_questions_belonging_to_those_groups(step):
+    world.question_1_with_group_1= create_question_for_group(world.household_member_group)
+    world.question_2_with_group_1= create_question_for_group(world.household_member_group)
+    world.question_1_with_group_2= create_question_for_group(world.member_group_2)
+    world.question_2_with_group_2= create_question_for_group(world.member_group_2)
+
+@step(u'And I select a question from the list')
+def and_i_select_a_question_from_the_list(step):
+    world.page.select_multiple("#id_questions",world.question_1_with_group_2)
+
+@step(u'Then I should see in selected list the question which belong to that group')
+def then_i_should_see_in_selected_list_the_question_which_belong_to_that_group(step):
+    world.page.see_the_question(True, world.question_1_with_group_1.id)
+    world.page.see_the_question(True, world.question_2_with_group_1.id)
+    world.page.see_the_question(False, world.question_2_with_group_2.id)
+
+@step(u'And I should see the previously selected questions on the page')
+def and_i_should_see_the_previously_selected_questions_on_the_page(step):
+    world.page.see_the_selected_question(True, world.question_1_with_group_2.id)

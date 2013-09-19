@@ -1,4 +1,23 @@
 ;
+
+function set_display(text, set){
+    var all_elements = $('.ms-selectable').children().children();
+
+    for(var counter=0; counter<all_elements.length; counter++)
+    {
+        element = all_elements[counter];
+
+        if(set){
+         if (text == element.childNodes[0].childNodes[0].nodeValue){
+             element.style.display = ''
+         }
+        }
+        else{
+            element.style.display = 'none'
+        }
+    }
+};
+
 jQuery(function($){
   $('.switch').on('switch-change', function(e, data){
     var $el = $(data.el), form;
@@ -23,12 +42,10 @@ jQuery(function($){
       var select_element = $(this),
       url = '/questions/groups/'+ select_element.val();
       $.getJSON(url, function(data){
-          $('#id_questions').html("");
+          set_display('', false);
           $.each(data, function(){
-                  option = $('<option/>').val(this.id).text(this.text);
-              $('#id_questions').append(option);
+              set_display(this.text, true);
           });
-          $('.multi-select').multiSelect('refresh');
     });
   });
 
