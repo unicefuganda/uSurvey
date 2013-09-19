@@ -17,3 +17,4 @@ mock
 django-pylibmc==0.5.0
 git+git://github.com/InviteBox/django-live-profiler.git
 newrelic==1.13.1.31
+selenium==2.35.0
