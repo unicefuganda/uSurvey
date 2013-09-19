@@ -14,7 +14,7 @@ class BatchForm(ModelForm):
         }
 
     def clean_name(self):
-        if len(Batch.objects.filter(name=self.cleaned_data['name'])) > 0:
+        if self.instance and self.instance.survey and Batch.objects.filter(name=self.cleaned_data['name'], survey=self.instance.survey).count() > 0:
             raise ValidationError('Batch with the same name already exist')
         return self.cleaned_data['name']
 

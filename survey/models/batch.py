@@ -18,6 +18,7 @@ class Batch(BaseModel):
 
     class Meta:
         app_label = 'survey'
+        unique_together = ('survey', 'name',)
 
 
     @classmethod

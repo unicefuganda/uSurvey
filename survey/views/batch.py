@@ -51,18 +51,17 @@ def close(request, batch_id):
 @login_required
 @permission_required('auth.can_view_batches')
 def new(request, survey_id):
-    batchform = BatchForm()
-    return _process_form(request=request, survey_id=survey_id, batchform=batchform, action_str='added')
+    batch = Batch(survey=Survey.objects.get(id=survey_id))
+    batchform = BatchForm(instance=batch)
+    return _process_form(request=request, batchform=batchform, action_str='added')
 
-def _process_form(request,survey_id, batchform, action_str='added', **batchform_kwargs):
+def _process_form(request, batchform, action_str='added'):
     if request.method =='POST':
-        batchform = BatchForm(data=request.POST, **batchform_kwargs)
+        batchform = BatchForm(data=request.POST, instance=batchform.instance)
         if batchform.is_valid():
-            batch = batchform.save(commit=False)
-            batch.survey= Survey.objects.get(id=survey_id)
-            batch.save()
+            batch = batchform.save()
             _add_success_message(request, action_str)
-            batch_list_url = '/surveys/%s/batches/' % str(survey_id)
+            batch_list_url = '/surveys/%s/batches/' % str(batch.survey.id)
             return HttpResponseRedirect(batch_list_url)
     return  render(request, 'batches/new.html', {'batchform':batchform,
                                                         'button_label':'Save',
@@ -71,9 +70,8 @@ def _process_form(request,survey_id, batchform, action_str='added', **batchform_
 
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id, batch_id):
-    batch= Batch.objects.get(id=batch_id)
-    batchform= BatchForm(instance=batch)
-    return _process_form(request=request, survey_id=survey_id, batchform=batchform, action_str='edited',instance=batch)
+    batchform= BatchForm(instance=Batch.objects.get(id=batch_id))
+    return _process_form(request=request, batchform=batchform, action_str='edited')
 
 def _add_success_message(request, action_str):
     messages.success(request, 'Batch successfully %s.'%action_str)

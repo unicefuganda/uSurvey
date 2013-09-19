@@ -2,7 +2,7 @@ from django.test import TestCase
 from survey.forms.batch import BatchForm, BatchQuestionsForm
 from survey.models.question import Question
 from survey.models.batch import Batch
-
+from survey.models.surveys import Survey
 
 class BatchFormTest(TestCase):
     def test_valid(self):
@@ -20,15 +20,28 @@ class BatchFormTest(TestCase):
         batch_form = BatchForm(form_data)
         self.assertFalse(batch_form.is_valid())
 
-    def test_form_should_be_invalid_if_name_already_exists(self):
-        Batch.objects.create(name='Batch A',description='description')
+    def test_form_should_be_invalid_if_name_already_exists_on_the_same_survey(self):
+        survey = Survey.objects.create(name="very fast")
+        Batch.objects.create(survey=survey, name='Batch A',description='description')
         form_data = {
                         'name': 'Batch A',
                         'description': 'description goes here',
                     }
-        batch_form = BatchForm(form_data)
+        batch_form = BatchForm(data=form_data, instance= Batch(survey=survey))
         self.assertFalse(batch_form.is_valid())
         self.assertIn('Batch with the same name already exist', batch_form.errors['name'])
+
+    def test_form_should_be_valid_if_name_already_exists_on_a_different_survey(self):
+        survey = Survey.objects.create(name="very fast")
+        form_data = {
+                        'name': 'Batch A',
+                        'description': 'description goes here',
+                    }
+
+        Batch.objects.create(survey=survey, name=form_data['name'], description='description')
+        different_survey = Survey.objects.create(name="different")
+        batch_form = BatchForm( data=form_data, instance= Batch(survey=different_survey))
+        self.assertTrue(batch_form.is_valid())
 
 class BatchQuestionsFormTest(TestCase):
     def setUp(self):

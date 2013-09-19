@@ -113,10 +113,6 @@ class BatchViews(BaseTest):
          response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch1', 'description':'description'})
          self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
 
-    def test_post_should_not_add_batch_with_existing_name(self):
-        response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch A', 'description':'description'})
-        self.assertTrue(len(response.context['batchform'].errors)>0)
-
     def post_add_new_batch_should_add_batch_to_the_survey(self):
         form_data = {'name': 'Some Batch', 'description': 'some description'}
         self.failIf(Batch.objects.filter(**form_data))
@@ -125,14 +121,14 @@ class BatchViews(BaseTest):
         self.assertEqual(self.survey,batch.survey)
 
     def test_edit_batch_should_load_new_template(self):
-        batch = Batch.objects.create(name="batch a", description="batch a description")
+        batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
         response = self.client.get('/surveys/%d/batches/%d/edit/'%(self.survey.id, self.batch.id))
         self.assertEqual(response.status_code,200)
         templates = [template.name for template in response.templates]
         self.assertIn('batches/new.html', templates)
 
     def test_edit_batch_page_gets_batch_form_instance(self):
-        batch = Batch.objects.create(name="batch a", description="batch a description")
+        batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
         response = self.client.get('/surveys/%d/batches/%d/edit/'%(self.survey.id, batch.id))
         self.assertIsInstance(response.context['batchform'], BatchForm)
         self.assertEqual(response.context['batchform'].initial['name'], batch.name)
@@ -140,7 +136,7 @@ class BatchViews(BaseTest):
         self.assertEqual(response.context['id'], 'add-batch-form')
 
     def test_save_edited_batch(self):
-        batch = Batch.objects.create(name="batch a", description="batch a description")
+        batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
         form_data={
                     'name': 'batch aaa',
                     'description': batch.description

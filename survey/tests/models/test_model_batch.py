@@ -1,6 +1,8 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Batch
+from survey.models.batch import Batch
+from survey.models.surveys import Survey
+from django.db import IntegrityError
 
 class BatchTest(TestCase):
 
@@ -40,3 +42,9 @@ class BatchTest(TestCase):
         self.assertTrue(batch.is_open_for(uganda))
         self.assertTrue(batch.is_open_for(kampala))
         self.assertTrue(batch.is_open_for(masaka))
+
+    def test_should_be_unique_together_batch_name_and_survey_id(self):
+        survey = Survey.objects.create(name="very fast")
+        batch_a = Batch.objects.create(survey=survey, name='Batch A',description='description')
+        batch = Batch(survey=survey, name=batch_a.name, description='something else')
+        self.assertRaises(IntegrityError, batch.save)
