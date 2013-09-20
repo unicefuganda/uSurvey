@@ -4,7 +4,7 @@ class SurveyListPage(PageObject):
     url = '/surveys/'
 
     def validate_fields(self):
-        self.validate_fields_present(["Survey List", "Name", "Description", "Type", "Sample Size", "Actions"])
+        self.validate_fields_present(["Survey List", "Name", "Description", "Type", "Number of Households per Investigator", "Actions"])
 
 class AddSurveyPage(PageObject):
     url = '/surveys/new/'
