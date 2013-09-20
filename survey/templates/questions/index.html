@@ -48,6 +48,7 @@
           <td>
             {% if question.options.all %}
             <a href="#view_options_{{question.id}}" data-toggle="modal">View options</a>
+            <a href="{% url 'add_subquestion_page' question.pk %}" id="add_sub_question">Add Subquestion</a>
             <div class="modal fade hide" id="view_options_{{question.id}}" tabindex="-1" role="dialog"  aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -79,13 +80,13 @@
                               </tr>
                             {% endfor %}
                           </tbody>
-                        </table>     
+                        </table>
                         <button type="button" class="btn btn-primary pull-right" id="close_view_options_{{question.id}}" data-dismiss="modal">Close</button>
                       </div>
                     </div>
                 </div>
             </div>
-            
+
             {% endif %}
           </td>
         </tr>

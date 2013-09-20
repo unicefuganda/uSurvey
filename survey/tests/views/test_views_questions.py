@@ -298,3 +298,29 @@ class QuestionsViews(BaseTest):
         self.assertIn(self.question_1, response.context['questions'])
         self.assertIn(self.question_2, response.context['questions'])
         self.assertIsNotNone(response.context['request'])
+
+    def test_add_new_subquestion(self):
+        group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        question = Question.objects.create(text="some qn?", group=group, order=1)
+        response = self.client.get('/questions/%d/sub_questions/new/'%question.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('questions/new.html', templates)
+        self.assertIsInstance(response.context['questionform'], QuestionForm)
+        self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['id'], 'add-sub_question-form')
+
+    def test_post_sub_question(self):
+        group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        question = Question.objects.create(text="some qn?", group=group, order=1)
+        subquestion_form_data={
+                    'text': 'This is a Question',
+                    'answer_type': Question.NUMBER,
+                    'group' : group.id,
+                    'options':'some option that should not be created'
+                    }
+        response = self.client.post('/questions/%d/sub_questions/new/' % int(question.id), data=subquestion_form_data)
+        saved_sub_question = Question.objects.filter(text=subquestion_form_data['text'])
+        self.failUnless(saved_sub_question)
+        self.assertEquals(saved_sub_question[0].parent, question)
+        self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)

@@ -56,3 +56,14 @@ Feature: Questions related features
     Then I should see the question options in a modal
     And when I click the close button
     Then I should be back to questions list page
+
+  Scenario: Add Subquestion
+    Given I am logged in as researcher
+    And I have a member group
+    And I have a multichoice question
+    And I visit questions list page
+    And I click on view add subquestion link
+    Then I should go to add subquestion page
+    When I fill in subquestion details
+    And I submit the form
+    And I should see subquestion successfully added message

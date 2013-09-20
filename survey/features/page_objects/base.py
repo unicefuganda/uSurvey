@@ -50,6 +50,9 @@ class PageObject(object):
     def see_the_about_link(self):
         assert self.browser.find_link_by_text('About')
 
+    def find_link_by_text(self,text):
+        assert self.browser.find_link_by_text(text)
+
     def click_the_about_link(self):
         self.browser.click_link_by_text('About')
 

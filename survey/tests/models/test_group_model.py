@@ -424,8 +424,8 @@ class HouseholdMemberGroupTest(TestCase):
         self.assertEqual(1, len(member_group.all_unanswered_open_batch_questions(household_member)))
 
         investigator.member_answered(question_1, household_member, answer=1)
+
         self.assertEqual(0, len(member_group.all_unanswered_open_batch_questions(household_member)))
-        self.assertEqual(0, len(member_group.all_open_batch_questions(household_member)))
 
     def test_should_return_zero_if_no_group_created_yet(self):
         HouseholdMemberGroup.objects.all().delete()

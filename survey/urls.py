@@ -59,6 +59,7 @@ urlpatterns = patterns('',
     url(r'^questions/$', 'survey.views.questions.list_all_questions', name='list_all_questions'),
     url(r'^questions/groups/(?P<group_id>\w+)/$', 'survey.views.questions.filter_by_group', name='list_questions_in_agroup'),
     url(r'^questions/new/$', 'survey.views.questions.new', name='new_question_page'),
+    url(r'^questions/(?P<question_id>\d+)/sub_questions/new/$', 'survey.views.questions.new_subquestion', name='add_subquestion_page'),
 
 )
 

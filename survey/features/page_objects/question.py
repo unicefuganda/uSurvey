@@ -46,3 +46,11 @@ class CreateNewQuestionPage(PageObject):
 
     def option_not_present(self, option):
         assert not self.browser.is_text_present(option)
+
+
+class CreateNewSubQuestionPage(PageObject):
+
+    def __init__(self, browser, question):
+        self.browser = browser
+        self.question = question
+        self.url ="/questions/%d/sub_questions/new/"%question.id

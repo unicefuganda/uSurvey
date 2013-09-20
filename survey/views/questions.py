@@ -59,3 +59,22 @@ def list_all_questions(request):
     questions = Question.objects.all()
     context = {'questions':questions, 'request': request}
     return render(request, 'questions/index.html', context)
+
+def __process_sub_question_form(request, questionform, parent_question):
+    if questionform.is_valid():
+        sub_question = questionform.save(commit=False)
+        sub_question.subquestion =True
+        sub_question.parent = parent_question
+        sub_question.save()
+        messages.success(request, 'Sub question successfully added.')
+        return HttpResponseRedirect('/questions/')
+
+def new_subquestion(request,question_id):
+    parent_question = Question.objects.get(pk=question_id)
+    questionform = QuestionForm()
+    response = None
+    if request.method == 'POST':
+        questionform = QuestionForm(request.POST)
+        response = __process_sub_question_form(request, questionform, parent_question)
+    context = {'questionform':questionform, 'button_label':'Save', 'id':'add-sub_question-form'}
+    return response or render(request, 'questions/new.html', context)

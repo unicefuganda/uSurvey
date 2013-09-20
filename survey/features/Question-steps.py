@@ -1,6 +1,6 @@
 from random import randint
 from lettuce import *
-from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage
+from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage, CreateNewSubQuestionPage
 from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
 
@@ -145,7 +145,26 @@ def then_i_should_see_the_question_options_in_a_modal(step):
 @step(u'And when I click the close button')
 def and_when_i_click_the_close_button(step):
     world.page.click_by_css("#close_view_options_%d"%world.multi_choice_question.id)
-    
+
 @step(u'Then I should be back to questions list page')
 def then_i_should_see_questions_list_page(step):
     world.page.validate_back_to_questions_list_page()
+
+@step(u'And I click on view add subquestion link')
+def and_i_click_on_view_add_subquestion_link(step):
+    world.browser.click_link_by_text("Add Subquestion")
+
+@step(u'Then I should go to add subquestion page')
+def then_i_should_go_to_add_subquestion_page(step):
+    world.page = CreateNewSubQuestionPage(world.browser, question=world.multi_choice_question)
+    world.page.validate_url()
+
+@step(u'When I fill in subquestion details')
+def when_i_fill_in_subquestion_details(step):
+    world.page.fill_valid_values({'text':'hritik  question'})
+    world.page.select('group', [world.household_member_group.pk])
+    world.page.select('answer_type', [Question.NUMBER])
+
+@step(u'And I should see subquestion successfully added message')
+def and_i_should_see_subquestion_successfully_added_message(step):
+    world.page.see_success_message('Sub question', 'added')
