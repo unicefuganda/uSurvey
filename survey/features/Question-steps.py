@@ -31,7 +31,7 @@ def then_i_should_see_error_message_on_the_page(step):
 
 @step(u'And I click add question button')
 def and_i_click_add_question_button(step):
-    world.page.click_link_by_text("Add Question")
+    world.page.click_link_by_text("Select Question")
 
 @step(u'Then I should see a add question page')
 def then_i_should_see_a_add_question_page(step):
