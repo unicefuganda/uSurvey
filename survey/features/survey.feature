@@ -5,6 +5,8 @@ Feature: Survey features
     And I have 100 surveys
     And I visit surveys listing page
     Then I should see the survey list paginated
+    And when I click on add batch action for first survey
+    Then I should go to add batch page
 
   Scenario: Link to batch list
     Given I am logged in as researcher

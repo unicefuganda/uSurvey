@@ -1,7 +1,7 @@
 from random import randint
 
 from lettuce import *
-from survey.features.page_objects.batches import BatchListPage
+from survey.features.page_objects.batches import BatchListPage, AddBatchPage
 from survey.models.surveys import Survey
 from survey.features.page_objects.surveys import SurveyListPage, AddSurveyPage
 
@@ -12,10 +12,11 @@ def and_i_visit_surveys_listing_page(step):
 
 @step(u'And I have 100 surveys')
 def and_i_have_100_surveys(step):
-    for _ in xrange(100):
-        random_number = randint(1, 99999)
+    world.survey =list()
+    for  i in xrange(100):
         try:
-            survey = Survey.objects.create(name='survey %d'%random_number, description= 'survey descrpition %d'%random_number, type=(True if random_number%2 else False), sample_size=random_number)
+            world.survey.append(Survey.objects.create(name='survey %d' % i, description='survey descrpition %d' % i,
+                                                    type=(True if i % 2 else False), sample_size=i))
         except Exception:
             pass
 
@@ -81,3 +82,14 @@ def then_i_should_see_the_create_new_survey_modal(step):
 @step(u'And I click the modal save button')
 def and_i_click_the_modal_save_button(step):
     world.page.click_button("save_button")
+
+@step(u'And when I click on add batch action for first survey')
+def and_when_i_click_on_add_batch_action_for_first_survey(step):
+    world.page = SurveyListPage(world.browser)
+    world.page.visit()
+    world.page.click_by_css(".add_batch")
+
+@step(u'Then I should go to add batch page')
+def then_i_should_go_to_add_batch_page(step):
+    world.page = AddBatchPage(world.browser,world.survey[0])
+    world.page.validate_url()

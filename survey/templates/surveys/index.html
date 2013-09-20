@@ -47,7 +47,7 @@
           <td>
             <a href=''>Edit</a>
             <a href=''>Delete</a>
-            <a href=''>Add Batch</a>
+            <a href='{% url 'new_batch_page' survey.pk %}' class="add_batch">Add Batch</a>
           </td>
         </tr>
       {% endfor %}
