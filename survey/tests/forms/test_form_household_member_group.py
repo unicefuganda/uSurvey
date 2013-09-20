@@ -32,7 +32,7 @@ class HouseholdMemberGroupTests(TestCase):
         self.assertFalse(household_member_group_form.is_valid())
         self.assertEquals(1, len(household_member_group_form.errors))
         self.assertTrue(household_member_group_form.errors.has_key('order'))
-        expected_form_error = 'Household member group with this Order already exists.'
+        expected_form_error = 'This order already exists. The minimum available is %d.'% (HouseholdMemberGroup.max_order()+1)
         self.assertEqual(household_member_group_form.errors['order'][0], expected_form_error)
 
     def test_invalid_given_empty_fields_present(self):

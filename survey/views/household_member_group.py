@@ -74,12 +74,12 @@ def _process_groupform(request, group_form):
         group_form.save()
         messages.success(request, 'Group successfully added.')
         return HttpResponseRedirect("/groups/")
-        
+
 @permission_required('auth.can_view_household_groups')
 def add_group(request):
     params = request.POST
     response = None
-    group_form = HouseholdMemberGroupForm()
+    group_form = HouseholdMemberGroupForm(initial={'order':HouseholdMemberGroup.max_order()+1})
 
     if request.method == 'POST':
         group_form = HouseholdMemberGroupForm(params)
@@ -94,7 +94,7 @@ def add_group(request):
                'condition_title': "New Condition"}
 
     return response or render(request, 'household_member_groups/new.html', context)
-    
+
 @permission_required('auth.can_view_household_groups')
 def details(request, group_id):
     conditions = GroupCondition.objects.filter(groups__id=group_id)

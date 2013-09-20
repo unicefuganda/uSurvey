@@ -425,3 +425,16 @@ class HouseholdMemberGroupTest(TestCase):
 
         investigator.member_answered(question_1, household_member, answer=1)
         self.assertEqual(0, len(member_group.all_unanswered_open_batch_questions(household_member)))
+        self.assertEqual(0, len(member_group.all_open_batch_questions(household_member)))
+
+    def test_should_return_zero_if_no_group_created_yet(self):
+        HouseholdMemberGroup.objects.all().delete()
+
+        self.assertEqual(0, HouseholdMemberGroup.max_order())
+
+    def test_should_return_max_order_of_all_groups(self):
+        HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=7)
+        HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=3)
+
+        self.assertEqual(7, HouseholdMemberGroup.max_order())

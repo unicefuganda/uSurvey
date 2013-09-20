@@ -69,8 +69,27 @@ class HouseholdMemberGroup(BaseModel):
         all_questions = self.all_questions()
         return all_questions.order_by('order').reverse()[0].order if all_questions else 0
 
-    class Meta:
-        app_label = 'survey'
+    def get_next_question_for(self, member, last_question=None):
+        if not last_question:
+            last_question = member.last_question_answered()
+
+        if last_question and last_question.group == self:
+            try:
+                order = last_question.parent.order if last_question.subquestion else last_question.order
+                last_question = self.all_questions().get(order=order + 1)
+            except:
+                return None
+            return last_question if last_question.is_in_open_batch(member.get_location()) else self.get_next_question_for(member, last_question)
+
+        return self.all_questions().order_by('order')[0]
+
+    @classmethod
+    def max_order(cls):
+        all_groups = cls.objects.all()
+        return all_groups.order_by('-order')[0].order if all_groups else 0
+
+        class Meta:
+            app_label = 'survey'
 
 
 class GroupCondition(BaseModel):

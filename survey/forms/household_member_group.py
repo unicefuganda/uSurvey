@@ -21,3 +21,11 @@ class HouseholdMemberGroupForm(ModelForm):
             self.add_conditions(group)
 
         return group
+
+    def clean_order(self):
+        order = self.cleaned_data['order']
+        if HouseholdMemberGroup.objects.filter(order=order).count()>0:
+            message = 'This order already exists. The minimum available is %d.'% (HouseholdMemberGroup.max_order()+1)
+            self._errors['order'] = self.error_class([message])
+            del self.cleaned_data['order']
+        return order
