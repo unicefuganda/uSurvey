@@ -8,6 +8,7 @@ from survey.models.question import Question
 from survey.models.batch import Batch
 from survey.tests.base_test import BaseTest
 from survey.forms.batch import BatchForm, BatchQuestionsForm
+import json
 
 
 class BatchViews(BaseTest):
@@ -87,6 +88,7 @@ class BatchViews(BaseTest):
         self.assert_restricted_permission_for('/batches/1/close_to')
         self.assert_restricted_permission_for('/surveys/%d/batches/%d/edit/'%(self.survey.id, self.batch.id))
         self.assert_restricted_permission_for('/surveys/%d/batches/%d/delete/'%(self.survey.id, self.batch.id))
+        self.assert_login_required('/surveys/%d/batches/check_name/'%(self.survey.id))
 
 
     def test_add_new_batch_should_load_new_template(self):
@@ -100,14 +102,16 @@ class BatchViews(BaseTest):
         self.assertIsInstance(response.context['batchform'], BatchForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'add-batch-form')
+        self.assertEqual(response.context['title'], 'New Batch')
 
     def test_post_add_new_batch_is_invalid_if_name_field_is_empty(self):
         response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'', 'description':''})
         self.assertTrue(len(response.context['batchform'].errors)>0)
 
     def test_post_add_new_batch(self):
-        response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch1', 'description':'description'})
-        self.assertEqual(len(Batch.objects.filter(name='Batch1')),1)
+        data = {'name':'Batch1', 'description':'description'}
+        response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data=data)
+        self.assertEqual(len(Batch.objects.filter(survey__id=self.survey.id, **data)),1)
 
     def test_post_add_new_batch_redirects_to_batches_table_if_valid(self):
          response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch1', 'description':'description'})
@@ -185,3 +189,14 @@ class BatchViews(BaseTest):
         success_message ="Questions successfully assigned to batch: %s."%self.batch.name.capitalize()
         self.assertTrue(success_message in response.cookies['messages'].value)
 
+    def test_should_tell_if_name_is_already_taken(self):
+        batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
+        response = self.client.get('/surveys/%d/batches/check_name/?name=%s'%(self.survey.id, batch.name))
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertFalse(json_response)
+
+        response = self.client.get('/surveys/%d/batches/check_name/?name=%s'%(self.survey.id, 'some other name that does not exist'))
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)

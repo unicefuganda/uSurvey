@@ -29,7 +29,7 @@ class BatchFormTest(TestCase):
                     }
         batch_form = BatchForm(data=form_data, instance= Batch(survey=survey))
         self.assertFalse(batch_form.is_valid())
-        self.assertIn('Batch with the same name already exist', batch_form.errors['name'])
+        self.assertIn('Batch with the same name already exists.', batch_form.errors['name'])
 
     def test_form_should_be_valid_if_name_already_exists_on_a_different_survey(self):
         survey = Survey.objects.create(name="very fast")

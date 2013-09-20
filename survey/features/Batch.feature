@@ -111,3 +111,11 @@ Feature: Batch related features
     When I select the group
     Then I should see in selected list the question which belong to that group
     And I should see the previously selected questions on the page
+
+  Scenario: remote validation for unique (name,survey) for batch
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I visit add batch page
+    When I fill the same name of the batch
+    Then I should see batch name already exists error message

@@ -10,14 +10,15 @@ from survey.models.surveys import Survey
 from survey.models.batch import Batch
 
 from survey.forms.batch import BatchForm, BatchQuestionsForm
-
+import json
 
 @login_required
 @permission_required('auth.can_view_batches')
 def index(request, survey_id):
+    survey = Survey.objects.get(id=survey_id)
     batches = Batch.objects.filter(survey__id= survey_id)
-    context = {'batches': batches, 'survey': Survey.objects.get(id=survey_id),
-               'request': request, 'batchform':BatchForm(),
+    context = {'batches': batches, 'survey': survey,
+               'request': request, 'batchform':BatchForm(instance=Batch(survey=survey)),
                'action':'/surveys/%s/batches/new/' %survey_id, }
     return render(request, 'batches/index.html',
                   context)
@@ -65,12 +66,13 @@ def _process_form(request, batchform, action_str='added'):
             return HttpResponseRedirect(batch_list_url)
     return  render(request, 'batches/new.html', {'batchform':batchform,
                                                         'button_label':'Save',
-                                                        'id':'add-batch-form'
+                                                        'id':'add-batch-form',
+                                                        'title':'New Batch'
                                                         })
 
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id, batch_id):
-    batchform= BatchForm(instance=Batch.objects.get(id=batch_id))
+    batchform= BatchForm(instance=Batch.objects.get(id=batch_id, survey__id=survey_id))
     return _process_form(request=request, batchform=batchform, action_str='edited')
 
 def _add_success_message(request, action_str):
@@ -98,3 +100,8 @@ def assign(request, batch_id):
                'button_label':'Save', 'id':'assign-question-to-batch-form', 'groups':groups}
     return render(request, 'batches/assign.html',
                   context)
+
+@login_required
+def check_name(request, survey_id):
+  response = Batch.objects.filter(name=request.GET['name'], survey__id=survey_id).exists()
+  return HttpResponse(json.dumps(not response), content_type="application/json")

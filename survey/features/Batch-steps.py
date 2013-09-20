@@ -203,6 +203,7 @@ def and_i_click_add_batch_modal_button(step):
 
 @step(u'Then I should see the add batch modal')
 def then_i_should_see_the_add_batch_modal(step):
+    world.page.validate_page_got_survey_id()
     world.page.validate_fields_present(["New Batch", "Name", "Description"])
 
 @step(u'And I have 2 member groups')
@@ -230,3 +231,12 @@ def then_i_should_see_in_selected_list_the_question_which_belong_to_that_group(s
 @step(u'And I should see the previously selected questions on the page')
 def and_i_should_see_the_previously_selected_questions_on_the_page(step):
     world.page.see_the_selected_question(True, world.question_1_with_group_2.id)
+
+@step(u'When I fill the same name of the batch')
+def when_i_fill_the_same_name_of_the_batch(step):
+    world.page.fill('name', world.batch.name)
+    world.page.fill('description', 'some description')
+
+@step(u'Then I should see batch name already exists error message')
+def then_i_should_see_batch_name_already_exists_error_message(step):
+    world.page.is_text_present("Batch with the same name already exists.")

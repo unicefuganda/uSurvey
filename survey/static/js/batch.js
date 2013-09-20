@@ -18,6 +18,7 @@ function set_display(text, set){
     }
 };
 
+
 jQuery(function($){
   $('.switch').on('switch-change', function(e, data){
     var $el = $(data.el), form;
@@ -31,11 +32,18 @@ jQuery(function($){
     });
   });
 
+  var survey_id = $("#survey_id").val();
   $('#add-batch-form').validate({
       rules: {
-        'name': 'required',
+        'name': {required:true, remote:'/surveys/'+ survey_id +'/batches/check_name/'},
         'description':'required'
-      }
+      },
+      messages: {
+        "name": {
+          remote: jQuery.format("Batch with the same name already exists.")
+        }
+      },
+
    });
 
   $('#assign_question_group').on('change', function(){
@@ -50,5 +58,3 @@ jQuery(function($){
   });
 
 });
-
-
