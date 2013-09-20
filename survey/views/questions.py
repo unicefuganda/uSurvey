@@ -20,8 +20,10 @@ def index(request, batch_id):
 
     group_id = request.GET.get('group_id', None)
 
-    questions = HouseholdMemberGroup.objects.get(id=group_id).all_questions() if group_id \
-        else Question.objects.filter(batch=batch)
+    if group_id and group_id!='all':
+        questions = HouseholdMemberGroup.objects.get(id=group_id).all_questions()
+    else:
+        questions = Question.objects.filter(batch=batch)
 
     if not questions.exists():
         messages.error(request,'There are no questions associated with this batch yet.')
@@ -45,7 +47,10 @@ def new(request):
 
 @permission_required('auth.can_view_batches')
 def filter_by_group(request, group_id):
-    questions= Question.objects.filter(group__id=group_id).values('id', 'text').order_by('text')
+    if group_id.lower()!='all':
+        questions= Question.objects.filter(group__id=group_id).values('id', 'text').order_by('text')
+    else:
+        questions = Question.objects.filter().values('id', 'text').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')
 

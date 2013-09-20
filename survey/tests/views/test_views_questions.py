@@ -143,6 +143,71 @@ class QuestionsViews(BaseTest):
         [self.assertIn(question, questions) for question in all_group_questions]
         [self.assertNotIn(question, questions) for question in another_group_questions]
 
+    def test_should_retrieve_all_questions_in_context_if_selected_group_key_is_all_in_request(self):
+        group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                            answer_type=Question.NUMBER, order=1,
+                                            group=self.household_member_group)
+
+        group_question_again = Question.objects.create(batch=self.batch, text="How many women are there in this household?",
+                                            answer_type=Question.NUMBER, order=2,
+                                            group=self.household_member_group)
+
+        another_group_question = Question.objects.create(batch=self.batch, text="What is your name?",
+                                            answer_type=Question.NUMBER, order=2,
+                                            group=HouseholdMemberGroup.objects.create(name='Age 6-10', order=2))
+
+        all_group_questions = [group_question, group_question_again, another_group_question]
+
+        response = self.client.get('/batches/%d/questions/?group_id=%s'% (self.batch.id, 'all'))
+
+        questions = response.context["questions"]
+
+        [self.assertIn(question, questions) for question in all_group_questions]
+
+    def test_should_retrieve_all_questions_as_data_for_filter_if_all_is_group_id_key(self):
+        group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                            answer_type=Question.NUMBER, order=1,
+                                            group=self.household_member_group)
+
+        group_question_again = Question.objects.create(batch=self.batch, text="How many women are there in this household?",
+                                            answer_type=Question.NUMBER, order=2,
+                                            group=self.household_member_group)
+
+        another_group_question = Question.objects.create(batch=self.batch, text="What is your name?",
+                                            answer_type=Question.NUMBER, order=2,
+                                            group=HouseholdMemberGroup.objects.create(name='Age 6-10', order=2))
+
+        all_group_questions = [group_question, group_question_again, another_group_question]
+
+        response = self.client.get('/questions/groups/%s/'% 'all')
+
+        questions = json.loads(response.content)
+
+        [self.assertIn(dict(text=question.text, id=question.id), questions) for question in all_group_questions]
+
+    def test_should_retrieve_group_specific_questions_as_data_for_filter_if_group_id_key(self):
+        group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+                                            answer_type=Question.NUMBER, order=1,
+                                            group=self.household_member_group)
+
+        group_question_again = Question.objects.create(batch=self.batch, text="How many women are there in this household?",
+                                            answer_type=Question.NUMBER, order=2,
+                                            group=self.household_member_group)
+
+        another_group_question = Question.objects.create(batch=self.batch, text="What is your name?",
+                                            answer_type=Question.NUMBER, order=2,
+                                            group=HouseholdMemberGroup.objects.create(name='Age 6-10', order=2))
+
+        all_group_questions = [group_question, group_question_again]
+        another_all_group_questions = [another_group_question]
+
+        response = self.client.get('/questions/groups/%s/'% self.household_member_group.id)
+
+        questions = json.loads(response.content)
+
+        [self.assertIn(dict(text=question.text, id=question.id), questions) for question in all_group_questions]
+        [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in another_all_group_questions]
+
     def test_should_save_options_for_multichoice_questions(self):
         form_data={
             'text': 'This is a Question',

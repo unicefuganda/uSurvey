@@ -11,7 +11,7 @@
     <div class="control-group">
         <div class="controls">
             <select name="group" id="assign_question_group">
-                <option value="">All</option>
+                <option value="All">All</option>
                 {% for group in groups %}
                     <option value="{{ group.id }}">{{ group.name }}</option>
                 {% endfor %}
