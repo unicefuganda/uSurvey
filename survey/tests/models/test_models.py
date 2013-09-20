@@ -238,6 +238,10 @@ class QuestionTest(TestCase):
     def setUp(self):
         self.batch = Batch.objects.create(order=1)
 
+    def test_unicode_representation_of_question(self):
+        question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.NUMBER)
+        self.assertEqual(question.text, str(question))
+
     def test_numerical_question(self):
         question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.NUMBER)
         self.failUnless(question.id)
@@ -320,6 +324,57 @@ class QuestionTest(TestCase):
         investigator.member_answered(question_1, household_member, answer=1)
         self.assertTrue(question_1.has_been_answered(household_member))
         self.assertFalse(question_1.has_been_answered(household_member_1))
+
+    def test_knows_next_question_for_household_member(self):
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+        household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+        self.batch.open_for_location(investigator.location)
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=household_member_group, batch=self.batch)
+        question_2 = Question.objects.create(identifier="identifier1",
+                                             text="Question 2", answer_type='number',
+                                             order=2, subquestion=False, group=household_member_group, batch=self.batch)
+        investigator.member_answered(question_1, household_member, answer=1)
+        self.assertEqual(question_2, question_1.next_question_for_household_member(household_member))
+
+    def test_knows_next_question_for_household_member_based_on_answer_rule(self):
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+        household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+        self.batch.open_for_location(investigator.location)
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=household_member_group, batch=self.batch)
+        question_2 = Question.objects.create(identifier="identifier1",
+                                             text="Question 2", answer_type='number',
+                                             order=2, subquestion=False, group=household_member_group, batch=self.batch)
+        question_3 = Question.objects.create(identifier="identifier1",
+                                             text="Question 3", answer_type='number',
+                                             order=3, subquestion=False, group=household_member_group, batch=self.batch)
+
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['SKIP_TO'],
+                                         condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=1,
+                                         next_question=question_3)
+
+        investigator.member_answered(question_1, household_member, answer=1)
+        self.assertNotEqual(question_2, question_1.next_question_for_household_member(household_member))
+        self.assertEqual(question_3, question_1.next_question_for_household_member(household_member))
 
 class QuestionOptionTest(TestCase):
     def setUp(self):
