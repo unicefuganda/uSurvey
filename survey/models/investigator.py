@@ -100,7 +100,7 @@ class Investigator(BaseModel):
                 return question
 
         answer = answer_class.objects.create(investigator=self, question=question, householdmember=household_member,
-                                             answer=answer, household=household_member.household)
+                                             answer=answer, household=household_member.household, batch=question.batch)
         if answer.pk:
             next_question = question.next_question_for_household_member(household_member)
 

@@ -43,12 +43,14 @@ class HouseholdMemberGroup(BaseModel):
         else:
             return None
 
-    def all_open_batch_questions(self, member):
-        all_questions = self.all_questions()
+    def all_unanswered_open_batch_questions(self, member):
+        all_questions = self.all_questions().order_by('order')
         open_batch_questions = []
+
         for question in all_questions:
             if question.batch and question.batch.is_open_for(member.get_location()) and not question.has_been_answered(member):
                 open_batch_questions.append(question)
+
         return open_batch_questions
 
     def last_question(self):
@@ -66,20 +68,6 @@ class HouseholdMemberGroup(BaseModel):
     def maximum_question_order(self):
         all_questions = self.all_questions()
         return all_questions.order_by('order').reverse()[0].order if all_questions else 0
-
-    def get_next_question_for(self, member, last_question=None):
-        if not last_question:
-            last_question = member.last_question_answered()
-
-        if last_question and last_question.group == self:
-            try:
-                order = last_question.parent.order if last_question.subquestion else last_question.order
-                last_question = self.all_questions().get(order=order + 1)
-            except:
-                return None
-            return last_question if last_question.is_in_open_batch(member.get_location()) else self.get_next_question_for(member, last_question)
-
-        return self.all_questions().order_by('order')[0]
 
     class Meta:
         app_label = 'survey'

@@ -141,7 +141,7 @@ class HouseholdMemberGroupTest(TestCase):
         investigator.member_answered(question=question_2, household_member=household_member, answer=1)
         self.assertTrue(member_group.all_questions_answered(household_member))
 
-    def test_knows_how_to_get_the_next_questions(self):
+    def test_knows_how_to_get_all_unanswered_open_batch_question_for_member(self):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
@@ -166,10 +166,17 @@ class HouseholdMemberGroupTest(TestCase):
         question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group, batch=batch)
+        self.assertIn(question_1, member_group.all_unanswered_open_batch_questions(household_member))
+        self.assertIn(question_2, member_group.all_unanswered_open_batch_questions(household_member))
 
-        self.assertEqual(question_1, member_group.get_next_question_for(household_member))
         investigator.member_answered(question=question_1, household_member=household_member, answer=1)
-        self.assertEqual(question_2, member_group.get_next_question_for(household_member))
+
+        self.assertNotIn(question_1, member_group.all_unanswered_open_batch_questions(household_member))
+        self.assertIn(question_2, member_group.all_unanswered_open_batch_questions(household_member))
+
+        batch.close_for_location(investigator.location)
+        self.assertNotIn(question_1, member_group.all_unanswered_open_batch_questions(household_member))
+        self.assertNotIn(question_2, member_group.all_unanswered_open_batch_questions(household_member))
 
     def test_knows_member_belongs_to_group_from_a_selected_household_member(self):
         age_value = 6
@@ -411,10 +418,10 @@ class HouseholdMemberGroupTest(TestCase):
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group, batch=batch_2)
 
-        self.assertEqual(2, len(member_group.all_open_batch_questions(household_member)))
+        self.assertEqual(2, len(member_group.all_unanswered_open_batch_questions(household_member)))
 
         batch_2.close_for_location(investigator.location)
-        self.assertEqual(1, len(member_group.all_open_batch_questions(household_member)))
+        self.assertEqual(1, len(member_group.all_unanswered_open_batch_questions(household_member)))
 
         investigator.member_answered(question_1, household_member, answer=1)
-        self.assertEqual(0, len(member_group.all_open_batch_questions(household_member)))
+        self.assertEqual(0, len(member_group.all_unanswered_open_batch_questions(household_member)))

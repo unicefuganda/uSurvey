@@ -157,7 +157,6 @@ class HouseholdMember(BaseModel):
 
     def get_member_groups(self):
         member_groups = []
-
         for group in HouseholdMemberGroup.objects.all():
             if group.belongs_to_group(self):
                 member_groups.append(group)
@@ -171,8 +170,15 @@ class HouseholdMember(BaseModel):
         member_groups = self.get_member_groups()
 
         for member_group in member_groups:
-            if not member_group.all_questions_answered(self) and member_group.all_open_batch_questions(self):
+            all_group_open_questions = member_group.all_unanswered_open_batch_questions(self)
+            if all_group_open_questions and not self.all_questions_answered(all_group_open_questions):
                 return member_group
+
+    def all_questions_answered(self, all_group_open_questions):
+        for question in all_group_open_questions:
+            if len(question.answer_class().objects.filter(question=question, batch=question.batch, householdmember=self)) == 0:
+                return False
+        return True
 
     def last_question_answered(self):
         answered = []
@@ -184,34 +190,30 @@ class HouseholdMember(BaseModel):
 
     def next_question(self, last_question_answered=None):
         next_group = self.get_next_group()
-        question = None
 
         if not next_group:
-            return question
+            return None
 
-        if not last_question_answered:
-            last_question_answered = self.last_question_answered()
+        next_group_questions = next_group.all_unanswered_open_batch_questions(self)
 
-        if not last_question_answered:
-            question = next_group.first_question(self)
-
-        if last_question_answered and next_group and not next_group.all_questions_answered(self):
-            question = next_group.get_next_question_for(self)
-
-        return question
+        return next_group_questions[0]
 
     def can_retake_survey(self, batch, minutes):
-        last_batch_completed_time = self.completed_member_batches.filter(batch=batch, householdmember=self)[0].created
-        timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(
-            minutes=minutes)
-        return last_batch_completed_time >= timeout
+        completed_batches_by_member = self.completed_member_batches.filter(batch=batch, householdmember=self)
+        if completed_batches_by_member:
+            last_batch_completed_time = completed_batches_by_member[0].created
+            timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(
+                minutes=minutes)
+            return last_batch_completed_time >= timeout
+
+        return True
 
     def batch_completed(self, batch):
         return self.completed_member_batches.get_or_create(householdmember=self, household=self.household,
                                                            investigator=self.household.investigator, batch=batch)
 
     def survey_completed(self):
-        return (self.next_question() is None)
+        return (self.get_next_group() is None)
 
     def has_started_the_survey(self):
         return bool(self.last_question_answered())

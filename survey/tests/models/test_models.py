@@ -64,18 +64,18 @@ class InvestigatorTest(TestCase):
     def test_next_answerable_question(self):
         batch = Batch.objects.create(order=1)
         batch.open_for_location(self.investigator.location)
-        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(batch=batch, text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=batch, text="How many of them are male?",
+        question_2 = Question.objects.create(batch=batch, text="Question 2?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
 
         self.assertEqual(question_1, self.investigator.next_answerable_question(self.household_member))
 
-        NumericalAnswer.objects.create(investigator=self.investigator, householdmember=self.household_member, question=question_1, answer=10)
+        NumericalAnswer.objects.create(investigator=self.investigator, batch=batch, householdmember=self.household_member, question=question_1, answer=10)
 
         self.assertEqual(question_2, self.investigator.next_answerable_question(self.household_member))
 
-        NumericalAnswer.objects.create(investigator=self.investigator, householdmember=self.household_member, question=question_2, answer=10)
+        NumericalAnswer.objects.create(investigator=self.investigator, batch=batch,  householdmember=self.household_member, question=question_2, answer=10)
 
         self.assertEqual(None, self.investigator.next_answerable_question(self.household_member))
 
@@ -606,11 +606,11 @@ class AnswerRuleTest(TestCase):
 
     def test_numerical_equals_and_skip_to_rule(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(batch=self.batch, text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(batch=self.batch, text="Question 2?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
-        question_3 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_3 = Question.objects.create(batch=self.batch, text="Question 3?",
                                              answer_type=Question.NUMBER, order=3, group=self.member_group)
 
         next_question = self.investigator.member_answered(question_1, self.household_member, answer=1)
