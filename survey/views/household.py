@@ -58,7 +58,7 @@ def create_household(householdform, investigator, valid):
     return valid
 
 def create_remaining_modelforms(householdform, valid):
-    if valid['household']:
+    if valid.get('household', None):
         householdform['householdHead'].instance.household = householdform['household'].instance
         is_valid_form = householdform['householdHead'].is_valid()
         if is_valid_form:
