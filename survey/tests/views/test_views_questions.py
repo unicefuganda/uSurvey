@@ -8,25 +8,28 @@ from survey.models.question import Question, QuestionOption
 from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
 from survey.models.householdgroups import HouseholdMemberGroup
+from survey.views.questions import filter_by_group
 
 
 class QuestionsViews(BaseTest):
-
     def setUp(self):
         self.client = Client()
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_batches')
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com',
+                                                           password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_batches')
         self.client.login(username='Rajni', password='I_Rock')
         self.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
 
-        self.batch = Batch.objects.create(order = 1, name = "Batch A")
-        self.question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
-                                            answer_type=Question.NUMBER, order=1)
+        self.batch = Batch.objects.create(order=1, name="Batch A")
+        self.question_1 = Question.objects.create(batch=self.batch,
+                                                  text="How many members are there in this household?",
+                                                  answer_type=Question.NUMBER, order=1)
         self.question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
-                                            answer_type=Question.NUMBER, order=2)
+                                                  answer_type=Question.NUMBER, order=2)
 
     def test_get_index_per_batch(self):
-        response = self.client.get('/batches/%d/questions/'%self.batch.id)
+        response = self.client.get('/batches/%d/questions/' % self.batch.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions/index.html', templates)
@@ -38,14 +41,15 @@ class QuestionsViews(BaseTest):
     @patch('django.contrib.messages.error')
     def test_no_questions_in_batch(self, mock_error):
         other_batch = Batch.objects.create(order=2, name="Other Batch")
-        response = self.client.get('/batches/%d/questions/'%other_batch.id)
+        response = self.client.get('/batches/%d/questions/' % other_batch.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions/index.html', templates)
         self.assertEquals(0, len(response.context['questions']))
         self.assertEqual(other_batch, response.context['batch'])
         self.assertIsNotNone(response.context['request'])
-        mock_error.assert_called_once_with(response.context['request'], 'There are no questions associated with this batch yet.')
+        mock_error.assert_called_once_with(response.context['request'],
+                                           'There are no questions associated with this batch yet.')
 
 
     def test_add_new_question(self):
@@ -64,18 +68,18 @@ class QuestionsViews(BaseTest):
     def test_restricted_permissions(self):
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         self.assert_restricted_permission_for("/questions/new/")
-        self.assert_restricted_permission_for('/batches/%d/questions/'%self.batch.id)
+        self.assert_restricted_permission_for('/batches/%d/questions/' % self.batch.id)
         self.assert_restricted_permission_for('/questions/')
-        self.assert_restricted_permission_for('/questions/groups/%d/'%member_group.id)
+        self.assert_restricted_permission_for('/batches/%d/questions/groups/%d/' % (self.batch.id, member_group.id))
 
     @patch('django.contrib.messages.success')
     def test_create_question_number_does_not_create_options(self, mock_success):
-        form_data={
-                    'text': 'This is a Question',
-                    'answer_type': Question.NUMBER,
-                    'group' : self.household_member_group.id,
-                    'options':'some option that should not be created',
-                    }
+        form_data = {
+            'text': 'This is a Question',
+            'answer_type': Question.NUMBER,
+            'group': self.household_member_group.id,
+            'options': 'some option that should not be created',
+        }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
         response = self.client.post('/questions/new/', data=form_data)
@@ -88,12 +92,12 @@ class QuestionsViews(BaseTest):
         assert mock_success.called
 
     def test_create_question_saves_order_based_on_group_created_for(self):
-        form_data={
-                'text': "This is a question",
-                'answer_type': Question.NUMBER,
-                'group' : self.household_member_group.id,
-                'options': ''
-                }
+        form_data = {
+            'text': "This is a question",
+            'answer_type': Question.NUMBER,
+            'group': self.household_member_group.id,
+            'options': ''
+        }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
         response = self.client.post('/questions/new/', data=form_data)
@@ -122,21 +126,24 @@ class QuestionsViews(BaseTest):
 
     def test_should_retrieve_group_specific_questions_in_context_if_selected_group_key_is_in_request(self):
         group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
-                                            answer_type=Question.NUMBER, order=1,
-                                            group=self.household_member_group)
+                                                 answer_type=Question.NUMBER, order=1,
+                                                 group=self.household_member_group)
 
-        group_question_again = Question.objects.create(batch=self.batch, text="How many women are there in this household?",
-                                            answer_type=Question.NUMBER, order=2,
-                                            group=self.household_member_group)
+        group_question_again = Question.objects.create(batch=self.batch,
+                                                       text="How many women are there in this household?",
+                                                       answer_type=Question.NUMBER, order=2,
+                                                       group=self.household_member_group)
 
         another_group_question = Question.objects.create(batch=self.batch, text="What is your name?",
-                                            answer_type=Question.NUMBER, order=2,
-                                            group=HouseholdMemberGroup.objects.create(name='Age 6-10', order=2))
+                                                         answer_type=Question.NUMBER, order=2,
+                                                         group=HouseholdMemberGroup.objects.create(name='Age 6-10',
+                                                                                                   order=2))
 
         all_group_questions = [group_question, group_question_again]
         another_group_questions = [another_group_question]
 
-        response = self.client.get('/batches/%d/questions/?group_id=%s'% (self.batch.id, self.household_member_group.id))
+        response = self.client.get(
+            '/batches/%d/questions/?group_id=%s' % (self.batch.id, self.household_member_group.id))
 
         questions = response.context["questions"]
 
@@ -145,20 +152,22 @@ class QuestionsViews(BaseTest):
 
     def test_should_retrieve_all_questions_in_context_if_selected_group_key_is_all_in_request(self):
         group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
-                                            answer_type=Question.NUMBER, order=1,
-                                            group=self.household_member_group)
+                                                 answer_type=Question.NUMBER, order=1,
+                                                 group=self.household_member_group)
 
-        group_question_again = Question.objects.create(batch=self.batch, text="How many women are there in this household?",
-                                            answer_type=Question.NUMBER, order=2,
-                                            group=self.household_member_group)
+        group_question_again = Question.objects.create(batch=self.batch,
+                                                       text="How many women are there in this household?",
+                                                       answer_type=Question.NUMBER, order=2,
+                                                       group=self.household_member_group)
 
         another_group_question = Question.objects.create(batch=self.batch, text="What is your name?",
-                                            answer_type=Question.NUMBER, order=2,
-                                            group=HouseholdMemberGroup.objects.create(name='Age 6-10', order=2))
+                                                         answer_type=Question.NUMBER, order=2,
+                                                         group=HouseholdMemberGroup.objects.create(name='Age 6-10',
+                                                                                                   order=2))
 
         all_group_questions = [group_question, group_question_again, another_group_question]
 
-        response = self.client.get('/batches/%d/questions/?group_id=%s'% (self.batch.id, 'all'))
+        response = self.client.get('/batches/%d/questions/?group_id=%s' % (self.batch.id, 'all'))
 
         questions = response.context["questions"]
 
@@ -166,55 +175,60 @@ class QuestionsViews(BaseTest):
 
     def test_should_retrieve_all_questions_as_data_for_filter_if_all_is_group_id_key(self):
         group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
-                                            answer_type=Question.NUMBER, order=1,
-                                            group=self.household_member_group)
+                                                 answer_type=Question.NUMBER, order=1,
+                                                 group=self.household_member_group)
 
-        group_question_again = Question.objects.create(batch=self.batch, text="How many women are there in this household?",
-                                            answer_type=Question.NUMBER, order=2,
-                                            group=self.household_member_group)
+        group_question_again = Question.objects.create(batch=self.batch,
+                                                       text="How many women are there in this household?",
+                                                       answer_type=Question.NUMBER, order=2,
+                                                       group=self.household_member_group)
 
         another_group_question = Question.objects.create(batch=self.batch, text="What is your name?",
-                                            answer_type=Question.NUMBER, order=2,
-                                            group=HouseholdMemberGroup.objects.create(name='Age 6-10', order=2))
+                                                         answer_type=Question.NUMBER, order=2,
+                                                         group=HouseholdMemberGroup.objects.create(name='Age 6-10',
+                                                                                                   order=2))
 
         all_group_questions = [group_question, group_question_again, another_group_question]
 
-        response = self.client.get('/questions/groups/%s/'% 'all')
+        response = self.client.get('/batches/%s/questions/groups/%s/' % (self.batch.id, 'all'))
 
         questions = json.loads(response.content)
 
-        [self.assertIn(dict(text=question.text, id=question.id), questions) for question in all_group_questions]
+        [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in all_group_questions]
 
     def test_should_retrieve_group_specific_questions_as_data_for_filter_if_group_id_key(self):
-        group_question = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
-                                            answer_type=Question.NUMBER, order=1,
-                                            group=self.household_member_group)
+        group_question = Question.objects.create(text="How many members are there in this household?",
+                                                 answer_type=Question.NUMBER, order=1,
+                                                 group=self.household_member_group)
 
-        group_question_again = Question.objects.create(batch=self.batch, text="How many women are there in this household?",
-                                            answer_type=Question.NUMBER, order=2,
-                                            group=self.household_member_group)
+        group_question_again = Question.objects.create(batch=self.batch,
+                                                       text="How many women are there in this household?",
+                                                       answer_type=Question.NUMBER, order=2,
+                                                       group=self.household_member_group)
 
         another_group_question = Question.objects.create(batch=self.batch, text="What is your name?",
-                                            answer_type=Question.NUMBER, order=2,
-                                            group=HouseholdMemberGroup.objects.create(name='Age 6-10', order=2))
+                                                         answer_type=Question.NUMBER, order=2,
+                                                         group=HouseholdMemberGroup.objects.create(name='Age 6-10',
+                                                                                                   order=2))
 
-        all_group_questions = [group_question, group_question_again]
-        another_all_group_questions = [another_group_question]
+        expected_questions= [group_question]
+        questions_that_should_not_appear_in_response = [group_question_again, another_group_question]
 
-        response = self.client.get('/questions/groups/%s/'% self.household_member_group.id)
+        response = self.client.get('/batches/%s/questions/groups/%s/' % (self.batch.id, self.household_member_group.id))
 
         questions = json.loads(response.content)
 
-        [self.assertIn(dict(text=question.text, id=question.id), questions) for question in all_group_questions]
-        [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in another_all_group_questions]
+        [self.assertIn(dict(text=question.text, id=question.id), questions) for question in expected_questions]
+        [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in
+         questions_that_should_not_appear_in_response]
 
     def test_should_save_options_for_multichoice_questions(self):
-        form_data={
+        form_data = {
             'text': 'This is a Question',
             'answer_type': Question.MULTICHOICE,
-            'group' : self.household_member_group.id,
-            'options':['some question option 1', 'some question option 2'],
-            }
+            'group': self.household_member_group.id,
+            'options': ['some question option 1', 'some question option 2'],
+        }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
         response = self.client.post('/questions/new/', data=form_data)
@@ -224,16 +238,16 @@ class QuestionsViews(BaseTest):
         self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         question_options = question[0].options.all()
         self.assertEqual(2, question_options.count())
-        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options )
-        self.assertIn(QuestionOption.objects.get(text=form_data['options'][1]), question_options )
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options)
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][1]), question_options)
 
     def test_should_not_save_empty_options_on_multichoice_questions(self):
-        form_data={
+        form_data = {
             'text': 'This is a Question',
             'answer_type': Question.MULTICHOICE,
-            'group' : self.household_member_group.id,
-            'options':['some question option 1', '', 'some question option 2', ''],
-            }
+            'group': self.household_member_group.id,
+            'options': ['some question option 1', '', 'some question option 2', ''],
+        }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
         response = self.client.post('/questions/new/', data=form_data)
@@ -243,16 +257,16 @@ class QuestionsViews(BaseTest):
         self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         question_options = question[0].options.all()
         self.assertEqual(2, question_options.count())
-        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options )
-        self.assertIn(QuestionOption.objects.get(text=form_data['options'][2]), question_options )
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options)
+        self.assertIn(QuestionOption.objects.get(text=form_data['options'][2]), question_options)
 
     def test_should_not_save_multichoice_questions_if_no_option_supplied(self):
-        form_data={
+        form_data = {
             'text': 'This is a Question',
             'answer_type': Question.MULTICHOICE,
-            'group' : self.household_member_group.id,
-            'options':'',
-            }
+            'group': self.household_member_group.id,
+            'options': '',
+        }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
         response = self.client.post('/questions/new/', data=form_data)
@@ -261,12 +275,12 @@ class QuestionsViews(BaseTest):
         self.failIf(question)
 
     def test_should_not_save_options_if_question_not_multichoice_even_if_options_supplied(self):
-        form_data={
-                'text': 'This is a Question',
-                'answer_type': Question.TEXT,
-                'group' : self.household_member_group.id,
-                'options':['some question option 1', 'some question option 2'],
-                }
+        form_data = {
+            'text': 'This is a Question',
+            'answer_type': Question.TEXT,
+            'group': self.household_member_group.id,
+            'options': ['some question option 1', 'some question option 2'],
+        }
         question = Question.objects.filter(text=form_data['text'])
         self.failIf(question)
         response = self.client.post('/questions/new/', data=form_data)
@@ -281,7 +295,7 @@ class QuestionsViews(BaseTest):
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         question_1 = Question.objects.create(text="question1", answer_type=Question.NUMBER, group=member_group)
         question_2 = Question.objects.create(text="question2", answer_type=Question.NUMBER)
-        response = self.client.get('/questions/groups/%d/'%member_group.id)
+        response = self.client.get('/batches/%d/questions/groups/%d/' % (self.batch.id, member_group.id))
         self.failUnlessEqual(response.status_code, 200)
 
         content = json.loads(response.content)
@@ -302,7 +316,7 @@ class QuestionsViews(BaseTest):
     def test_add_new_subquestion(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         question = Question.objects.create(text="some qn?", group=group, order=1)
-        response = self.client.get('/questions/%d/sub_questions/new/'%question.id)
+        response = self.client.get('/questions/%d/sub_questions/new/' % question.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions/new.html', templates)
@@ -313,14 +327,29 @@ class QuestionsViews(BaseTest):
     def test_post_sub_question(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         question = Question.objects.create(text="some qn?", group=group, order=1)
-        subquestion_form_data={
-                    'text': 'This is a Question',
-                    'answer_type': Question.NUMBER,
-                    'group' : group.id,
-                    'options':'some option that should not be created'
-                    }
+        subquestion_form_data = {
+            'text': 'This is a Question',
+            'answer_type': Question.NUMBER,
+            'group': group.id,
+            'options': 'some option that should not be created'
+        }
         response = self.client.post('/questions/%d/sub_questions/new/' % int(question.id), data=subquestion_form_data)
         saved_sub_question = Question.objects.filter(text=subquestion_form_data['text'])
         self.failUnless(saved_sub_question)
         self.assertEquals(saved_sub_question[0].parent, question)
         self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
+
+    def test_should_filter_questions_in_a_group_that_does_not_belong_to_the_batch(self):
+        group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        question = Question.objects.create(text="some qn?", group=group, order=1, batch=self.batch)
+        question_1 = Question.objects.create(text="some qn1?", group=group, order=2)
+        question_2 = Question.objects.create(text="some qn2?", group=group, order=3)
+        response = self.client.get('/batches/%s/questions/groups/%s/' % (self.batch.id, group.id))
+        self.assertEqual(response.status_code, 200)
+        parsed_response = json.loads(response.content)
+        self.assertEqual(2, len(parsed_response))
+        self.assertFalse(question.text in [item['text'] for item in parsed_response])
+        self.assertTrue(question_2.text in [item['text'] for item in parsed_response])
+        self.assertTrue(question_1.text in [item['text'] for item in parsed_response])
+
+

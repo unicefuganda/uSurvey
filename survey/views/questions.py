@@ -20,15 +20,16 @@ def index(request, batch_id):
 
     group_id = request.GET.get('group_id', None)
 
-    if group_id and group_id!='all':
+    if group_id and group_id != 'all':
         questions = HouseholdMemberGroup.objects.get(id=group_id).all_questions()
     else:
         questions = Question.objects.filter(batch=batch)
 
     if not questions.exists():
-        messages.error(request,'There are no questions associated with this batch yet.')
-    context = {'questions':questions, 'request': request, 'batch':batch}
+        messages.error(request, 'There are no questions associated with this batch yet.')
+    context = {'questions': questions, 'request': request, 'batch': batch}
     return render(request, 'questions/index.html', context)
+
 
 @permission_required('auth.can_view_batches')
 def new(request):
@@ -39,42 +40,48 @@ def new(request):
             question_form.save(**request.POST)
             messages.success(request, 'Question successfully added.')
             return HttpResponseRedirect('/questions/')
-    context = { 'button_label':'Save',
-                'id':'add-question-form',
-                'request':request,
-                'questionform':question_form}
+    context = {'button_label': 'Save',
+               'id': 'add-question-form',
+               'request': request,
+               'questionform': question_form}
     return render(request, 'questions/new.html', context)
 
+
 @permission_required('auth.can_view_batches')
-def filter_by_group(request, group_id):
-    if group_id.lower()!='all':
-        questions= Question.objects.filter(group__id=group_id).values('id', 'text').order_by('text')
+def filter_by_group(request, batch_id, group_id):
+    if group_id.lower() != 'all':
+        questions = Question.objects.filter(group__id=group_id)
     else:
-        questions = Question.objects.filter().values('id', 'text').order_by('text')
+        questions = Question.objects.filter()
+    questions_from_batch = Question.objects.filter(batch__id=batch_id)
+    questions = questions.exclude(id__in=questions_from_batch).values('id', 'text').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')
+
 
 @permission_required('auth.can_view_batches')
 def list_all_questions(request):
     questions = Question.objects.all()
-    context = {'questions':questions, 'request': request}
+    context = {'questions': questions, 'request': request}
     return render(request, 'questions/index.html', context)
+
 
 def __process_sub_question_form(request, questionform, parent_question):
     if questionform.is_valid():
         sub_question = questionform.save(commit=False)
-        sub_question.subquestion =True
+        sub_question.subquestion = True
         sub_question.parent = parent_question
         sub_question.save()
         messages.success(request, 'Sub question successfully added.')
         return HttpResponseRedirect('/questions/')
 
-def new_subquestion(request,question_id):
+
+def new_subquestion(request, question_id):
     parent_question = Question.objects.get(pk=question_id)
     questionform = QuestionForm()
     response = None
     if request.method == 'POST':
         questionform = QuestionForm(request.POST)
         response = __process_sub_question_form(request, questionform, parent_question)
-    context = {'questionform':questionform, 'button_label':'Save', 'id':'add-sub_question-form'}
+    context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form'}
     return response or render(request, 'questions/new.html', context)

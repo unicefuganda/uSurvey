@@ -19,5 +19,6 @@
         </div>
     </div>
 
+    <input type="hidden" value="{{ batch.id }}" id="batch_id">
     {% include 'naked_form.html' with a_form=batch_questions_form %}
 {% endblock %}

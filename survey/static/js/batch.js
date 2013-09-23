@@ -20,6 +20,9 @@ function set_display(text, set){
 
 
 jQuery(function($){
+
+    load_questions_for_batch_and_group();
+
   $('.switch').on('switch-change', function(e, data){
     var $el = $(data.el), form;
     if (data.value) {
@@ -42,19 +45,25 @@ jQuery(function($){
         "name": {
           remote: jQuery.format("Batch with the same name already exists.")
         }
-      },
+      }
 
    });
 
   $('#assign_question_group').on('change', function(){
-      var select_element = $(this),
-      url = '/questions/groups/'+ select_element.val();
-      $.getJSON(url, function(data){
-          set_display('', false);
-          $.each(data, function(){
-              set_display(this.text, true);
-          });
-    });
+      load_questions_for_batch_and_group();
   });
 
 });
+
+
+function load_questions_for_batch_and_group(){
+    var select_element = $('#assign_question_group'),
+        batch_id = $("#batch_id").val(),
+        url = '/batches/'+ batch_id +'/questions/groups/'+ select_element.val();
+    $.getJSON(url, function(data){
+        set_display('', false);
+        $.each(data, function(){
+            set_display(this.text, true);
+        });
+    });
+}

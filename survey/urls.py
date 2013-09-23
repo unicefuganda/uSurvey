@@ -58,9 +58,9 @@ urlpatterns = patterns('',
     url(r'^surveys/(?P<survey_id>\d+)/batches/(?P<batch_id>\d+)/delete/$', 'survey.views.batch.delete', name='delete_batch'),
     url(r'^surveys/(?P<survey_id>\d+)/batches/check_name/$', 'survey.views.batch.check_name'),
     url(r'^questions/$', 'survey.views.questions.list_all_questions', name='list_all_questions'),
-    url(r'^questions/groups/(?P<group_id>\w+)/$', 'survey.views.questions.filter_by_group', name='list_questions_in_agroup'),
+    url(r'^batches/(?P<batch_id>\w+)/questions/groups/(?P<group_id>\w+)/', 'survey.views.questions.filter_by_group',name='list_questions_in_agroup'),
     url(r'^questions/new/$', 'survey.views.questions.new', name='new_question_page'),
-    url(r'^questions/(?P<question_id>\d+)/sub_questions/new/$', 'survey.views.questions.new_subquestion', name='add_subquestion_page'),
+    url(r'^questions/(?P<question_id>\d+)/sub_questions/new/$', 'survey.views.questions.new_subquestion', name='add_subquestion_page')
 
 )
 
