@@ -438,3 +438,69 @@ class HouseholdMemberGroupTest(TestCase):
         HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=3)
 
         self.assertEqual(7, HouseholdMemberGroup.max_order())
+
+    def test_knows_next_question_for_member(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+
+        less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
+        greater_condition = GroupCondition.objects.create(attribute="age", condition="LESS_THAN", value=6)
+        member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
+        less_condition.groups.add(member_group)
+        greater_condition.groups.add(member_group)
+
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
+                                                          male=False,
+                                                          household=household)
+        batch.open_for_location(investigator.location)
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                             answer_type='number', order=2,
+                                             subquestion=False, group=member_group, batch=batch)
+
+        self.assertEqual(question_1, member_group.get_next_question_for(household_member))
+
+        investigator.member_answered(question=question_1, household_member=household_member, answer=1)
+        self.assertEqual(question_2, member_group.get_next_question_for(household_member))
+
+        investigator.member_answered(question=question_2, household_member=household_member, answer=1)
+        self.assertIsNone(member_group.get_next_question_for(household_member))
+
+    def test_knows_first_question_for_member(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+
+        less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
+        greater_condition = GroupCondition.objects.create(attribute="age", condition="LESS_THAN", value=6)
+        member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
+        less_condition.groups.add(member_group)
+        greater_condition.groups.add(member_group)
+
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
+                                                          male=False,
+                                                          household=household)
+        batch.close_for_location(investigator.location)
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+                                             answer_type='number', order=2,
+                                             subquestion=False, group=member_group, batch=batch)
+
+        self.assertIsNone(member_group.first_question(household_member))
+        batch.open_for_location(investigator.location)
+        self.assertEqual(question_1, member_group.first_question(household_member))
+
+

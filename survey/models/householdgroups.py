@@ -88,8 +88,8 @@ class HouseholdMemberGroup(BaseModel):
         all_groups = cls.objects.all()
         return all_groups.order_by('-order')[0].order if all_groups else 0
 
-        class Meta:
-            app_label = 'survey'
+    class Meta:
+        app_label = 'survey'
 
 
 class GroupCondition(BaseModel):

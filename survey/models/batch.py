@@ -33,8 +33,9 @@ class Batch(BaseModel):
         return list(set(map(lambda question: question.group, questions)))
 
     def first_question(self):
-        first_group = self.get_groups()[0]
-        return self.questions.get(order=1, group=first_group)
+        all_groups = self.get_groups()
+        all_groups.sort(key=lambda group: group.order)
+        return self.questions.get(order=1, group=all_groups[0])
 
     def all_questions(self):
         return self.questions.all()

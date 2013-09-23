@@ -220,15 +220,15 @@ class BatchTest(TestCase):
         group_3 = HouseholdMemberGroup.objects.create(name="Group 3", order=2)
 
         question_1 = Question.objects.create(batch=batch, group=group_1,
-                                             text="Question 1", answer_type=Question.NUMBER,
+                                             text="Question 1 group 1", answer_type=Question.NUMBER,
                                              identifier="identifier", order=1)
 
         question_2 = Question.objects.create(batch=batch, group=group_2,
-                                             text="Question 1", answer_type=Question.NUMBER,
+                                             text="Question 1 group 2", answer_type=Question.NUMBER,
                                              identifier="identifier", order=1)
 
         question_3 = Question.objects.create(batch=batch, group=group_3,
-                                             text="Question 1", answer_type=Question.NUMBER,
+                                             text="Question 1 group 3", answer_type=Question.NUMBER,
                                              identifier="identifier", order=1)
 
         self.assertEqual(question_1, batch.first_question())
