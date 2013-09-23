@@ -120,6 +120,3 @@ class GroupConditionTest(TestCase):
         is_head = False
 
         self.assertFalse(general_condition.matches_condition(is_head))
-
-
-

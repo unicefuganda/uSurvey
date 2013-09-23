@@ -19,6 +19,7 @@ class GroupsListingPage(PageObject):
 class AddConditionPage(PageObject):
     url = "/conditions/new/"
 
+
 class AddGroupPage(PageObject):
     url = '/groups/new/'
 
@@ -32,8 +33,16 @@ class GroupConditionModalPage(PageObject):
     def validate_latest_condition(self, condition):
         self.browser.find_by_value("%s > %s > %s" % (condition.attribute, condition.condition, condition.value))
 
-class GroupDetailsPage(PageObject):
 
+class GroupDetailsPage(PageObject):
     def __init__(self, browser, group_id):
-        self.browser = browser
-        self.url = '/groups/' + str(group_id)
+        super(GroupDetailsPage, self).__init__(browser)
+        self.url = '/groups/%s/' % group_id
+
+
+class AddNewConditionToGroupPage(PageObject):
+
+    def __init__(self, browser, group):
+        super(AddNewConditionToGroupPage, self).__init__(browser)
+        self.group = group
+        self.url = '/groups/%d/conditions/new/' % group.id

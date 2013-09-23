@@ -1,4 +1,5 @@
 import json
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -15,7 +16,7 @@ from survey.views.views_helper import contains_key
 def conditions(request):
     conditions = GroupCondition.objects.all().order_by('condition')
     return render(request, 'household_member_groups/conditions/index.html',
-                  {'conditions': conditions, 'request': request})
+                  {'conditions': conditions, 'add_condition_url': 'new_group_condition', 'request': request})
 
 
 @permission_required('auth.can_view_investigators')
@@ -28,6 +29,7 @@ def _get_conditions_hash():
     condition = GroupCondition.objects.all().latest('created')
     return {'id': condition.id,
             'value': "%s > %s > %s" % (condition.attribute, condition.condition, condition.value)}
+
 
 @permission_required('auth.can_view_household_groups')
 def add_condition(request):
@@ -75,6 +77,7 @@ def _process_groupform(request, group_form):
         messages.success(request, 'Group successfully added.')
         return HttpResponseRedirect("/groups/")
 
+
 @permission_required('auth.can_view_household_groups')
 def add_group(request):
     params = request.POST
@@ -95,10 +98,39 @@ def add_group(request):
 
     return response or render(request, 'household_member_groups/new.html', context)
 
+
 @permission_required('auth.can_view_household_groups')
 def details(request, group_id):
     conditions = GroupCondition.objects.filter(groups__id=group_id)
     if not conditions.exists():
         messages.error(request, "No conditions in this group.")
         return HttpResponseRedirect("/groups/")
-    return render(request, "household_member_groups/conditions/index.html", {'conditions': conditions })
+    return render(request, "household_member_groups/conditions/index.html",
+                  {'conditions': conditions, 'add_condition_url': 'new_condition_for_group', 'group_id': group_id})
+
+
+@permission_required('auth.can_view_household_groups')
+def add_group_condition(request,group_id):
+    condition_form = GroupConditionForm()
+    if request.method == 'POST':
+        condition_form = GroupConditionForm(data=request.POST)
+        if condition_form.is_valid():
+            try:
+                group = HouseholdMemberGroup.objects.get(id=group_id)
+                condition = condition_form.save()
+                condition.groups.add(group)
+                condition.save()
+                messages.success(request, "Condition successfully added.")
+                redirect_url = '/groups/%s/' % group_id
+            except ObjectDoesNotExist:
+                messages.error(request, "Group does not exist.")
+                redirect_url = '/groups/'
+            return HttpResponseRedirect(redirect_url)
+
+    context = {'button_label': 'Save',
+               'title': 'New condition',
+               'id': 'add-condition-to-group-form',
+               'action': '/groups/%s/conditions/new/' % group_id,
+               'request': request,
+               'condition_form': condition_form}
+    return render(request, 'household_member_groups/conditions/new.html', context)

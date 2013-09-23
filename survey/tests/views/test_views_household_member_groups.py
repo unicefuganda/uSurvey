@@ -209,7 +209,7 @@ class HouseholdMemberGroupTest(BaseTest):
         hmg_1.groups.add(group)
         hmg_2.groups.add(group)
         
-        response = self.client.get('/groups/'+str(group.pk)+'/')
+        response = self.client.get('/groups/%s/' % str(group.pk))
         self.assertEquals(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn("household_member_groups/conditions/index.html", templates)
@@ -222,13 +222,58 @@ class HouseholdMemberGroupTest(BaseTest):
 
         self.failIf(group.conditions.all())
         
-        response = self.client.get('/groups/'+str(group.pk)+'/')
+        response = self.client.get('/groups/%s/' % str(group.pk))
         self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')
         self.assertTrue("No conditions in this group.", response.cookies['messages'].value)
         
     def test_restricted_permissions_for_group_details(self):
         group = HouseholdMemberGroup.objects.create(name='some name', order=1)
-        self.assert_restricted_permission_for('/groups/'+str(group.pk)+'/')
+        self.assert_restricted_permission_for('/groups/%s/' % str(group.pk))
 
     def test_restricted_permissions_for_add_group(self):
         self.assert_restricted_permission_for('/groups/new/')
+
+    def test_add_new_condition_to_group_should_get_a_condition_form(self):
+        group = HouseholdMemberGroup.objects.create(name='some name', order=1)
+        response = self.client.get('/groups/%d/conditions/new/' % group.id)
+        self.assertEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('household_member_groups/conditions/new.html', templates)
+        self.assertIsInstance(response.context['condition_form'], GroupConditionForm)
+        self.assertIn('add-condition-to-group-form', response.context['id'])
+        self.assertIn('Save', response.context['button_label'])
+        self.assertIn('New condition', response.context['title'])
+        self.assertIn('/groups/%d/conditions/new/' % group.id, response.context['action'])
+
+    def test_add_condition_to_group_adds_the_condition_to_that_groups_conditions(self):
+        group = HouseholdMemberGroup.objects.create(name='some name', order=1)
+
+        data = {'attribute': 'AGE',
+                'condition': 'EQUALS',
+                'value': '9'}
+
+        response = self.client.post('/groups/%s/conditions/new/' % group.id, data=data)
+        condition = GroupCondition.objects.filter(**data)
+        self.failUnless(condition)
+        self.assertTrue(group in condition[0].groups.all())
+        self.assertRedirects(response, expected_url='/groups/%s/' %group.id, status_code=302, target_status_code=200, msg_prefix='')
+        success_message = "Condition successfully added."
+        self.assertTrue(success_message in response.cookies['messages'].value)
+
+    def test_add_condition_to_group_with_non_existing_group_raises_group_does_not_exist(self):
+        data = {'attribute': 'AGE',
+                'condition': 'EQUALS',
+                'value': '9'}
+
+        NON_EXISTING_GROUP_ID = 44
+
+        response = self.client.post('/groups/%s/conditions/new/' % NON_EXISTING_GROUP_ID, data=data)
+        condition = GroupCondition.objects.filter(**data)
+        self.failIf(condition)
+        self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')
+        error_message = "Group does not exist."
+        self.assertTrue(error_message in response.cookies['messages'].value)
+
+    def test_restricted_permissions_for_add_condition_to_group(self):
+        group = HouseholdMemberGroup.objects.create(name='some name', order=1)
+        self.assert_restricted_permission_for('/groups/%s/conditions/new/' % str(group.pk))

@@ -161,4 +161,3 @@ class HouseholdMemberViewsTest(BaseTest):
         success_message = "Household member successfully deleted."
 
         self.assertTrue(success_message in response.cookies['messages'].value)
-

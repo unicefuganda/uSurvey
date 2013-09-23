@@ -66,6 +66,11 @@ Feature: Group features
     And I click the actions button
     And I click view conditions link
     Then I should see a list of conditions
+    When I click on add condition button
+    Then I should see a new condition form for this group
+    And When I fill condition details
+    And I submit the form
+    And I should see the newly added condition on that page
 
   Scenario: Add group from group listing page
     Given I am logged in as researcher

@@ -3,7 +3,7 @@ from random import randint
 from lettuce import *
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
-from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage, GroupDetailsPage
+from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage, GroupDetailsPage, AddNewConditionToGroupPage
 
 
 @step(u'And I have 10 conditions')
@@ -91,11 +91,12 @@ def and_i_visit_the_new_group_page(step):
     world.page = AddGroupPage(world.browser)
     world.page.visit()
 
+
 @step(u'When I fill in the group details')
 def when_i_fill_in_the_group_details(step):
     data = {'name': 'aged between 15 and 49',
             'order': 1,
-            }
+    }
     world.page.fill_valid_values(data)
 
 
@@ -136,6 +137,7 @@ def and_i_have_2_conditions(step):
     world.condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
     world.condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
 
+
 @step(u'When I fill name and order')
 def when_i_fll_name_and_order(step):
     data = {'name': 'aged between 15 and 49',
@@ -147,13 +149,16 @@ def when_i_fll_name_and_order(step):
 def and_i_select_conditions(step):
     world.page.select('conditions', [world.condition_1.pk, world.condition_2.pk])
 
+
 @step(u'Then I should see the form errors of required fields')
 def then_i_should_see_the_form_errors_of_required_fields(step):
     world.page.is_text_present("This field is required.")
 
+
 @step(u'And I click the actions button')
 def and_i_click_the_actions_button(step):
     world.page.click_actions_button()
+
 
 @step(u'And I have a groups')
 def and_i_have_a_groups(step):
@@ -163,65 +168,108 @@ def and_i_have_a_groups(step):
     condition_1.groups.add(world.group)
     condition_2.groups.add(world.group)
 
+
 @step(u'And I click view conditions link')
 def and_i_click_view_conditions_link(step):
     world.page.click_link_by_text(" View Conditions")
+
 
 @step(u'Then I should see a list of conditions')
 def then_i_should_see_a_list_of_conditions(step):
     world.page = GroupDetailsPage(world.browser, world.group)
     world.page.validate_fields_present(["Groups Condition List", "Condition", "Attribute", "Value"])
 
+
 @step(u'When I click Groups tab')
 def when_i_click_groups_tab(step):
     world.page.click_link_by_text("Groups")
 
+
 @step(u'Then I should see group dropdown list')
 def then_i_should_see_group_dropdown_list(step):
-    reverse_url_links = ["household_member_groups_page", "new_household_member_groups_page", "show_group_condition", "new_group_condition"]
+    reverse_url_links = ["household_member_groups_page", "new_household_member_groups_page", "show_group_condition",
+                         "new_group_condition"]
     world.page.see_dropdown(reverse_url_links)
+
 
 @step(u'And I select a condition')
 def and_i_select_a_condition(step):
-    world.page.select("conditions",[world.condition.pk])
+    world.page.select("conditions", [world.condition.pk])
+
 
 @step(u'When I click the add group button')
 def when_i_click_the_add_group_button(step):
     world.page.click_link_by_text("Add Group")
+
 
 @step(u'Then I should go to add group page')
 def then_i_should_go_to_add_group_page(step):
     world.page = AddGroupPage(world.browser)
     world.page.validate_url()
 
+
 @step(u'When I select gender as attribute')
 def when_i_select_gender_as_attribute(step):
     world.page.select('attribute', ['GENDER'])
+
 
 @step(u'Then I should see only Equals as available for condition')
 def then_i_should_see_only_equals_as_available_for_condition(step):
     world.page.see_select_option(['EQUALS'], 'condition')
 
+
 @step(u'And male and female for values')
 def and_male_and_female_for_values(step):
     world.page.see_select_option(['Male', 'Female'], 'value')
+
 
 @step(u'When I select general as attribute')
 def when_i_select_general_as_attribute(step):
     world.page.select('attribute', ['GENERAL'])
 
+
 @step(u'And HEAD for values')
 def and_head_for_values(step):
     world.page.find_by_css('input[name=value][readonly=readonly]', 'HEAD')
 
+
 @step(u'When I select age as attribute')
 def when_i_select_age_as_attribute(step):
     world.page.select('attribute', ['AGE'])
-    
+
+
 @step(u'And If I add in a negative number')
 def and_if_i_add_in_a_negative_number(step):
     world.page.fill('value', '-8')
 
+
 @step(u'Then I see error age cannot be negative')
 def then_i_should_see_error(step):
     world.page.is_text_present('Age cannot be negative.')
+
+
+@step(u'When I click on add condition button')
+def when_i_click_on_add_condition_button(step):
+    world.page.click_link_by_text(" Add Condition")
+
+
+@step(u'Then I should see a new condition form for this group')
+def then_i_should_see_a_new_condition_form(step):
+    world.page = AddNewConditionToGroupPage(world.browser, world.group)
+    world.page.validate_url()
+    world.page.validate_fields_present(['Attribute', 'Condition', 'Value'])
+
+
+@step(u'And When I fill condition details')
+def and_when_i_fill_condition_details(step):
+    world.data = {
+        'attribute': 'AGE',
+        'condition': 'EQUALS'
+        }
+    world.page.fill_valid_values(world.data)
+    world.page.fill('value', '9')
+
+@step(u'And I should see the newly added condition on that page')
+def and_i_should_see_the_newly_added_condition_on_that_page(step):
+    world.page.see_success_message("Condition", "added")
+    world.page.validate_fields_present([world.data['attribute'], world.data['condition'], '9'])
