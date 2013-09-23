@@ -1,4 +1,5 @@
 from random import randint
+from time import sleep
 from lettuce import *
 from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage, CreateNewSubQuestionPage
 from survey.models.question import Question, QuestionOption
@@ -144,10 +145,11 @@ def then_i_should_see_the_question_options_in_a_modal(step):
 
 @step(u'And when I click the close button')
 def and_when_i_click_the_close_button(step):
-    world.page.click_by_css("#close_view_options_%d"%world.multi_choice_question.id)
+    world.page.click_link_by_text("Close")
 
 @step(u'Then I should be back to questions list page')
 def then_i_should_see_questions_list_page(step):
+    sleep(2)
     world.page.validate_back_to_questions_list_page()
 
 @step(u'And I click on view add subquestion link')
