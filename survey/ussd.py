@@ -19,11 +19,17 @@ class USSDBase(object):
         'HOUSEHOLDS_COUNT_QUESTION': "How many households have you listed in your segment?",
         'HOUSEHOLD_SELECTION_SMS_MESSAGE': "Thank you. You will receive the household numbers selected for your segment",
         'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s. How many households have you listed in your segment?" % NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR,
+        'MEMBER_SUCCESS_MESSAGE':"Thank you. Would you like to proceed to the next Household Member?\n1: Yes\n2: No",
     }
 
     ACTIONS = {
         'REQUEST': 'request',
         'END': 'end'
+    }
+
+    ANSWER = {
+        'YES':"1",
+        'NO':"2"
     }
 
     DEFAULT_SESSION_VARIABLES = {
@@ -49,9 +55,11 @@ class USSD(USSDBase):
         self.responseString = ""
         self.household = None
         self.household_member = None
+        self.current_member_is_done = False
         self.set_session()
         self.set_household()
         self.set_household_member()
+        self.set_current_member_is_done()
         self.clean_investigator_input()
 
     def set_household(self):
@@ -74,6 +82,10 @@ class USSD(USSDBase):
         #     household_member = last_answered.householdmember
         #     if household_member.next_question():
         #         self.household_member = household_member
+
+    def set_current_member_is_done(self):
+        if self.household_member:
+            self.current_member_is_done = self.household_member.survey_completed()
 
     def set_session(self):
         self.session_string = "SESSION-%s" % self.request['transactionId']
@@ -132,17 +144,37 @@ class USSD(USSDBase):
         if self.invalid_answered_question():
             self.responseString += "INVALID ANSWER: "
 
+    def restart_survey(self):
+        answer = self.request['ussdRequestString'].strip()
+        if  answer == self.ANSWER['YES']:
+            self.set_in_session('HOUSEHOLD_MEMBER', None)
+            self.render_household_members_list()
+        if  answer == self.ANSWER['NO']:
+            self.set_in_session('HOUSEHOLD', None)
+            self.household = None
+            self.render_households_list(answer)
+
+        self.action = self.ACTIONS['REQUEST']
+
+
+
     def end_interview(self):
         self.action = self.ACTIONS['END']
         if self.investigator.completed_open_surveys():
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
+            self.investigator.clear_interview_caches()
         elif self.household_member.last_question_answered() and \
                 not self.household_member.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
             self.responseString = USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE']
+            self.investigator.clear_interview_caches()
+        elif self.household_member.survey_completed():
+            if self.current_member_is_done:
+                self.restart_survey()
+            else:
+                self.responseString = USSD.MESSAGES['MEMBER_SUCCESS_MESSAGE']
         else:
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE']
-
-        self.investigator.clear_interview_caches()
+            self.investigator.clear_interview_caches()
 
     def render_survey_response(self):
         if not self.question:
