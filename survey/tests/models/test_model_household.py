@@ -2,6 +2,7 @@ from django.template.defaultfilters import slugify
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
+from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -137,3 +138,37 @@ class HouseholdTest(TestCase):
         self.assertTrue(household_head in all_members)
         self.assertTrue(household_member1 in all_members)
         self.assertTrue(household_member2 in all_members)
+
+    def test_should_know_if_all_members_have_completed_currently_open_batches(self):
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+        hhold = Household.objects.create(investigator=investigator, uid=0)
+        household_head = HouseholdHead.objects.create(household=hhold,surname="Name", date_of_birth=date(1989, 2, 2))
+        household_member1 = HouseholdMember.objects.create(household=hhold, surname="name2", male=False, date_of_birth=date(1989, 2, 2))
+        household_member2 = HouseholdMember.objects.create(household=hhold, surname="name3", male=False, date_of_birth=date(1989, 2, 2))
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        condition.groups.add(member_group)
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        batch_2 = Batch.objects.create(name="BATCH B", order=2)
+
+        batch.open_for_location(investigator.location)
+
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+
+        member_list = [household_head, household_member1, household_member2]
+
+        self.assertFalse(hhold.completed_currently_open_batches())
+        investigator.member_answered(question_1, household_member1, answer=1)
+        self.assertFalse(hhold.completed_currently_open_batches())
+        investigator.member_answered(question_1, household_member2, answer=1)
+        self.assertFalse(hhold.completed_currently_open_batches())
+        investigator.member_answered(question_1, household_head, answer=1)
+        self.assertTrue(hhold.completed_currently_open_batches())
+        self.assertEqual(3, HouseholdBatchCompletion.objects.filter(batch=batch).count())
+        [self.assertEqual(1, HouseholdBatchCompletion.objects.filter(batch=batch, householdmember=member).count()) for member in member_list]

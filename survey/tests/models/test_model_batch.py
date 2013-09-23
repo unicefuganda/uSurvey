@@ -1,7 +1,7 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question
+from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion
 from survey.models.batch import Batch
 from survey.models.households import HouseholdMember
 from survey.models.surveys import Survey
@@ -79,6 +79,37 @@ class BatchTest(TestCase):
 
         self.assertIn(batch, Batch.open_batches(uganda))
         self.assertNotIn(batch_1, Batch.open_batches(uganda))
+
+    def test_knows_batch_is_complete_if_completion_object_exists_for_member(self):
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 5 years", order=1)
+        condition = GroupCondition.objects.create(attribute="AGE", value=5, condition="GREATER_THAN")
+        condition.groups.add(member_group)
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+
+        another_household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1990, 2, 2), male=False, household=household)
+        batch = Batch.objects.create(name="BATCH A", order=1)
+
+        batch.open_for_location(investigator.location)
+
+        Question.objects.create(identifier="identifier1",
+                                 text="Question 1", answer_type='number',
+                                 order=1, subquestion=False, group=member_group, batch=batch)
+
+        HouseholdBatchCompletion.objects.create(householdmember=household_member, batch=batch, household=household_member.household)
+
+        self.assertIsNone(household_member.get_next_batch())
+        self.assertEqual(batch, another_household_member.get_next_batch())
+
 
     def test_knows_has_unanswered_questions_in_member_group(self):
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 5 years", order=1)

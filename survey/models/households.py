@@ -116,6 +116,13 @@ class Household(BaseModel):
         household_members.insert(0, self.get_head())
         return household_members
 
+    def completed_currently_open_batches(self):
+        all_members = self.household_member.all()
+        for member in all_members:
+            if not member.survey_completed():
+                return False
+        return True
+
     def members_list(self, page=1):
         all_members = self.all_members()
         paginator = Paginator(all_members, self.MEMBERS_PER_PAGE)
@@ -124,7 +131,7 @@ class Household(BaseModel):
         for member in members:
             name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.surname
             text = "%s: %s" % (all_members.index(member) + 1, name)
-            if not member.has_open_batches():
+            if member.survey_completed():
                 text += "*"
             members_list.append(text)
         if members.has_previous():
@@ -177,7 +184,7 @@ class HouseholdMember(BaseModel):
     def get_next_batch(self):
         open_batches = Batch.open_batches(self.get_location())
         for batch in open_batches:
-            if batch.has_unanswered_question(self):
+            if batch.has_unanswered_question(self) and not self.completed_member_batches.filter(batch=batch):
                 return batch
         return None
 
