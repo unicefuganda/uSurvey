@@ -67,7 +67,11 @@ def _process_condition_form(request, condition_form):
     if condition_form.is_valid():
         condition_form.save()
         messages.success(request, 'Condition successfully added.')
-        return HttpResponseRedirect('/conditions/')
+        redirect_url = '/conditions/'
+    else:
+        print condition_form.errors
+        redirect_url = '/conditions/new/'
+    return HttpResponseRedirect(redirect_url)
 
 
 def _process_groupform(request, group_form):

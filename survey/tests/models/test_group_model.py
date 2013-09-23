@@ -215,7 +215,7 @@ class HouseholdMemberGroupTest(TestCase):
                                                       condition='LESS_THAN')
         age_condition.groups.add(member_group)
 
-        another_age_condition = GroupCondition.objects.create(attribute=age_attribute_type, value=age_value,
+        another_age_condition = GroupCondition.objects.create(attribute=age_attribute_type, value=15,
                                                               condition='LESS_THAN')
 
         gender_condition = GroupCondition.objects.create(attribute=gender_attribute_type, value=True,

@@ -5,12 +5,12 @@ from survey.forms.household_member_group import HouseholdMemberGroupForm
 
 class HouseholdMemberGroupTests(TestCase):
     def setUp(self):
-        group_condition = GroupCondition.objects.create(condition='haha', value="True", attribute="hmm")
-        group_condition_2 = GroupCondition.objects.create(condition='another', value="True", attribute="hmm")
+        self.group_condition = GroupCondition.objects.create(condition='haha', value="True", attribute="hmm")
+        self.group_condition_2 = GroupCondition.objects.create(condition='another', value="True", attribute="hmm")
         self.form_data = {
             'name': "5 to 12 years",
             'order': 1,
-            'conditions': [group_condition.id, group_condition_2.id]
+            'conditions': [self.group_condition.id, self.group_condition_2.id]
         }
 
     def test_valid(self):
@@ -20,12 +20,11 @@ class HouseholdMemberGroupTests(TestCase):
 
     def test_invalid_group_exists(self):
         household_member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=7)
-        group_condition = GroupCondition.objects.create(condition='haha', value="True", attribute="hmm")
 
         form_data = {
             'name': household_member_group.name,
             'order': household_member_group.order,
-            'conditions': [group_condition.id]
+            'conditions': [self.group_condition.id]
         }
 
         household_member_group_form = HouseholdMemberGroupForm(form_data)

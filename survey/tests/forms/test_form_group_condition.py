@@ -4,8 +4,7 @@ from survey.forms.group_condition import GroupConditionForm
 
 
 class GroupConditionFormTests(TestCase):
-    
-    
+
     def test_valid_form(self):
         form_data = {
             'value' : 3,
@@ -102,3 +101,23 @@ class GroupConditionFormTests(TestCase):
         self.assertFalse(group_condition_form.is_valid())
         message = "GENERAL can only have the value: HEAD."
         self.assertEqual([message], group_condition_form.errors['value'])
+
+    def test_validates_unqique_constraint_on_group_condition(self):
+        form_data = {
+            'value': 'HEAD',
+            'attribute': GroupCondition.GROUP_TYPES['GENERAL'],
+            'condition': GroupCondition.CONDITIONS['EQUALS'],
+        }
+
+        group_condition_form = GroupConditionForm(form_data)
+        self.assertTrue(group_condition_form.is_valid())
+        group_condition_form.save()
+
+        duplicate_data = {
+            'value': 'HEAD',
+            'attribute': GroupCondition.GROUP_TYPES['GENERAL'],
+            'condition': GroupCondition.CONDITIONS['EQUALS'],
+            }
+
+        duplicate_group_condition_form = GroupConditionForm(duplicate_data)
+        self.assertFalse(duplicate_group_condition_form.is_valid())

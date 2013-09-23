@@ -134,8 +134,8 @@ def and_i_should_see_the_new_condition_in_the_groups_form(step):
 
 @step(u'And I have 2 conditions')
 def and_i_have_2_conditions(step):
-    world.condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
-    world.condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
+    world.condition_1 = GroupCondition.objects.create(value=False, attribute="GENDER", condition="EQUALS")
+    world.condition_2 = GroupCondition.objects.create(value=40, attribute="AGE", condition="EQUALS")
 
 
 @step(u'When I fill name and order')

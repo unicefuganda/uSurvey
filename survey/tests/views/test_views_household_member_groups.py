@@ -106,7 +106,7 @@ class HouseholdMemberGroupTest(BaseTest):
     @patch('django.contrib.messages.success')
     def test_add_group_post(self, mock_success):
         hmg_1 = GroupCondition.objects.create(value="some string")
-        hmg_2 = GroupCondition.objects.create(value="some string")
+        hmg_2 = GroupCondition.objects.create(value="another value")
         data = {'name': 'aged between 15 and 49',
                 'order': 1,
                 'conditions': hmg_1.id}
@@ -185,7 +185,7 @@ class HouseholdMemberGroupTest(BaseTest):
         
     def test_save_multiple_conditions(self):
         hmg_1 = GroupCondition.objects.create(value="some string")
-        hmg_2 = GroupCondition.objects.create(value="some string")
+        hmg_2 = GroupCondition.objects.create(value="another value")
         data = {'name': 'aged between 15 and 49',
                 'order': '2',
                 'conditions': [int(hmg_1.id), int(hmg_2.id)]}
@@ -277,3 +277,15 @@ class HouseholdMemberGroupTest(BaseTest):
     def test_restricted_permissions_for_add_condition_to_group(self):
         group = HouseholdMemberGroup.objects.create(name='some name', order=1)
         self.assert_restricted_permission_for('/groups/%s/conditions/new/' % str(group.pk))
+
+    def test_post_condtion_form(self):
+
+        data = {'attribute': 'AGE',
+                'condition': 'EQUALS',
+                'value': '8'}
+
+        GroupCondition.objects.create(**data)
+        self.failUnless(GroupCondition.objects.filter(**data))
+        response = self.client.post('/conditions/new/', data=data)
+        self.assertRedirects(response, expected_url='/conditions/new/', status_code=302, target_status_code=200,
+                             msg_prefix='')
