@@ -127,6 +127,7 @@ class GroupCondition(BaseModel):
 
     class Meta:
         app_label = 'survey'
+        unique_together = ('value', 'attribute', 'condition')
 
     def __unicode__(self):
         return "%s > %s > %s" % (self.attribute, self.condition, self.value)

@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.test import TestCase
 from survey.models.householdgroups import GroupCondition
 
@@ -120,3 +121,13 @@ class GroupConditionTest(TestCase):
         is_head = False
 
         self.assertFalse(general_condition.matches_condition(is_head))
+
+    def test_should_know_condition_is_unique(self):
+        gender_value = "Male"
+        attribute_type = "gender"
+
+        gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
+        self.failUnless(gender_condition)
+
+        duplicate_condition = GroupCondition(attribute=attribute_type, value=gender_value, condition='EQUALS')
+        self.assertRaises(IntegrityError, duplicate_condition.save)
