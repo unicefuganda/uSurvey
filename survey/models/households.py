@@ -126,7 +126,9 @@ class Household(BaseModel):
     def members_list(self, page=1):
         all_members = self.all_members()
         paginator = Paginator(all_members, self.MEMBERS_PER_PAGE)
+        page = 1 if paginator.num_pages < page else page
         members = paginator.page(page)
+
         members_list = []
         for member in members:
             name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.surname
