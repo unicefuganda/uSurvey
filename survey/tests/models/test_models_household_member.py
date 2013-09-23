@@ -165,7 +165,7 @@ class HouseholdMemberTest(TestCase):
                                              subquestion=False, group=female_group, batch=batch)
         investigator.member_answered(question=question_1, household_member=household_member, answer=1)
         investigator.member_answered(question=question_2, household_member=household_member, answer=1)
-        self.assertEqual(female_group, household_member.get_next_group())
+        self.assertEqual(female_group, household_member.get_next_group(batch))
 
     def test_knows_how_to_get_the_next_questions_from_the_next_group(self):
         country = LocationType.objects.create(name="Country", slug="country")
@@ -338,3 +338,41 @@ class HouseholdMemberTest(TestCase):
         investigator.member_answered(question_1,household_member,answer=1)
 
         self.assertTrue(household_member.has_open_batches())
+
+    def test_knows_the_next_open_batch(self):
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        condition.groups.add(member_group)
+        backend = Backend.objects.create(name='something')
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="", mobile_number="123456789",
+                                                   location=kampala,
+                                                   backend=backend)
+
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        household_member = HouseholdMember.objects.create(surname="Member",
+                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+        batch = Batch.objects.create(name="BATCH A", order=1)
+        batch_2 = Batch.objects.create(name="BATCH A", order=1)
+
+        batch.open_for_location(investigator.location)
+        batch_2.open_for_location(investigator.location)
+
+        question_1 = Question.objects.create(identifier="identifier1",
+                                             text="Question 1", answer_type='number',
+                                             order=1, subquestion=False, group=member_group, batch=batch)
+
+        question_2 = Question.objects.create(identifier="identifier2",
+                                             text="Question 2", answer_type='number',
+                                             order=2, subquestion=False, group=member_group, batch=batch)
+
+        Question.objects.create(identifier="identifier3", text="Question 3",
+                                         answer_type='number', order=3,
+                                         subquestion=False, group=member_group, batch=batch_2)
+
+        self.assertEqual(household_member.get_next_batch(), batch)
+        investigator.member_answered(question_1, household_member, answer=2)
+        self.assertEqual(household_member.get_next_batch(), batch)
+        investigator.member_answered(question_2, household_member, answer=4)
+        self.assertEqual(household_member.get_next_batch(), batch_2)

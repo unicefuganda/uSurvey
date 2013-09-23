@@ -43,12 +43,12 @@ class HouseholdMemberGroup(BaseModel):
         else:
             return None
 
-    def all_unanswered_open_batch_questions(self, member):
-        all_questions = self.all_questions().order_by('order')
+    def all_unanswered_open_batch_questions(self, member, batch):
+        all_questions = self.all_questions().filter(batch=batch).order_by('order')
         open_batch_questions = []
 
         for question in all_questions:
-            if question.batch and question.batch.is_open_for(member.get_location()) and not question.has_been_answered(member):
+            if batch.is_open_for(member.get_location()) and not question.has_been_answered(member):
                 open_batch_questions.append(question)
 
         return open_batch_questions

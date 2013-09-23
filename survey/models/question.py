@@ -89,7 +89,7 @@ class Question(BaseModel):
         try:
             return self.get_next_question_by_rule(answer, household_member.household.investigator)
         except ObjectDoesNotExist, e:
-            return household_member.next_question(last_question_answered = self)
+            return household_member.next_question()
 
     def next_question(self, location, member=None):
         order = self.parent.order if self.subquestion else self.order

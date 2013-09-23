@@ -157,7 +157,7 @@ class HouseholdMember(BaseModel):
 
     def get_member_groups(self):
         member_groups = []
-        for group in HouseholdMemberGroup.objects.all():
+        for group in HouseholdMemberGroup.objects.all().order_by('order'):
             if group.belongs_to_group(self):
                 member_groups.append(group)
         return member_groups
@@ -166,13 +166,20 @@ class HouseholdMember(BaseModel):
         days_in_year = 365.2425
         return int((datetime.date.today() - self.date_of_birth).days / days_in_year)
 
-    def get_next_group(self):
+    def get_next_group(self, batch):
         member_groups = self.get_member_groups()
 
         for member_group in member_groups:
-            all_group_open_questions = member_group.all_unanswered_open_batch_questions(self)
+            all_group_open_questions = member_group.all_unanswered_open_batch_questions(self, batch)
             if all_group_open_questions and not self.all_questions_answered(all_group_open_questions):
                 return member_group
+
+    def get_next_batch(self):
+        open_batches = Batch.open_batches(self.get_location())
+        for batch in open_batches:
+            if batch.has_unanswered_question(self):
+                return batch
+        return None
 
     def all_questions_answered(self, all_group_open_questions):
         for question in all_group_open_questions:
@@ -189,12 +196,14 @@ class HouseholdMember(BaseModel):
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
     def next_question(self, last_question_answered=None):
-        next_group = self.get_next_group()
+        next_batch = self.get_next_batch()
 
-        if not next_group:
+        if not next_batch:
             return None
 
-        next_group_questions = next_group.all_unanswered_open_batch_questions(self)
+        next_group = self.get_next_group(next_batch)
+
+        next_group_questions = next_group.all_unanswered_open_batch_questions(self, next_batch)
 
         return next_group_questions[0]
 
@@ -213,7 +222,7 @@ class HouseholdMember(BaseModel):
                                                            investigator=self.household.investigator, batch=batch)
 
     def survey_completed(self):
-        return (self.get_next_group() is None)
+        return (self.get_next_batch() is None)
 
     def has_started_the_survey(self):
         return bool(self.last_question_answered())

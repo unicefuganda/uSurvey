@@ -166,17 +166,17 @@ class HouseholdMemberGroupTest(TestCase):
         question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group, batch=batch)
-        self.assertIn(question_1, member_group.all_unanswered_open_batch_questions(household_member))
-        self.assertIn(question_2, member_group.all_unanswered_open_batch_questions(household_member))
+        self.assertIn(question_1, member_group.all_unanswered_open_batch_questions(household_member, batch))
+        self.assertIn(question_2, member_group.all_unanswered_open_batch_questions(household_member, batch))
 
         investigator.member_answered(question=question_1, household_member=household_member, answer=1)
 
-        self.assertNotIn(question_1, member_group.all_unanswered_open_batch_questions(household_member))
-        self.assertIn(question_2, member_group.all_unanswered_open_batch_questions(household_member))
+        self.assertNotIn(question_1, member_group.all_unanswered_open_batch_questions(household_member, batch))
+        self.assertIn(question_2, member_group.all_unanswered_open_batch_questions(household_member, batch))
 
         batch.close_for_location(investigator.location)
-        self.assertNotIn(question_1, member_group.all_unanswered_open_batch_questions(household_member))
-        self.assertNotIn(question_2, member_group.all_unanswered_open_batch_questions(household_member))
+        self.assertNotIn(question_1, member_group.all_unanswered_open_batch_questions(household_member, batch))
+        self.assertNotIn(question_2, member_group.all_unanswered_open_batch_questions(household_member, batch))
 
     def test_knows_member_belongs_to_group_from_a_selected_household_member(self):
         age_value = 6
@@ -418,14 +418,16 @@ class HouseholdMemberGroupTest(TestCase):
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group, batch=batch_2)
 
-        self.assertEqual(2, len(member_group.all_unanswered_open_batch_questions(household_member)))
+        self.assertEqual(1, len(member_group.all_unanswered_open_batch_questions(household_member, batch)))
+        self.assertEqual(1, len(member_group.all_unanswered_open_batch_questions(household_member, batch_2)))
 
         batch_2.close_for_location(investigator.location)
-        self.assertEqual(1, len(member_group.all_unanswered_open_batch_questions(household_member)))
+        self.assertEqual(1, len(member_group.all_unanswered_open_batch_questions(household_member, batch)))
+        self.assertEqual(0, len(member_group.all_unanswered_open_batch_questions(household_member, batch_2)))
 
         investigator.member_answered(question_1, household_member, answer=1)
 
-        self.assertEqual(0, len(member_group.all_unanswered_open_batch_questions(household_member)))
+        self.assertEqual(0, len(member_group.all_unanswered_open_batch_questions(household_member, batch)))
 
     def test_should_return_zero_if_no_group_created_yet(self):
         HouseholdMemberGroup.objects.all().delete()
