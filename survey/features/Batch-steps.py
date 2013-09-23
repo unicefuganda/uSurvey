@@ -155,7 +155,7 @@ def and_i_click_on_assign_question_link(step):
 def then_i_should_see_the_assign_question_page_of_that_batch(step):
     world.page = AssignQuestionToBatchPage(world.browser, world.batch)
     world.page.validate_url()
-    world.page.is_text_present("Assign Questions to %s - %s"%(world.survey.name.capitalize(), world.batch.name.capitalize()))
+    world.page.is_text_present("Select Questions for %s - %s"%(world.survey.name.capitalize(), world.batch.name.capitalize()))
 
 @step(u'When I select some questions')
 def when_i_select_some_questions(step):
