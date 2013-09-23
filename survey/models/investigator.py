@@ -123,10 +123,9 @@ class Investigator(BaseModel):
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
         households_list = []
-        open_batches = self.get_open_batch()
         for household in households:
             text = "%s: %s" % (all_households.index(household) + 1, household.get_head().surname)
-            if household.has_completed_batches(open_batches):
+            if household.completed_currently_open_batches():
                 text += "*"
             households_list.append(text)
         if households.has_previous():

@@ -59,7 +59,6 @@ class HouseholdMemberGroup(BaseModel):
 
     def belongs_to_group(self, household_member):
         condition_match = []
-
         for condition in self.get_all_conditions():
             condition_match.append(self.has_condition(household_member, condition))
 

@@ -156,7 +156,7 @@ class HouseholdMember(BaseModel):
     household = models.ForeignKey(Household, related_name='household_member')
 
     def is_head(self):
-        return False
+        return len(HouseholdHead.objects.filter(householdmember_ptr_id=self.id))>0
 
     def get_location(self):
         investigator = self.household.investigator

@@ -601,7 +601,7 @@ class USSDTest(TestCase):
         self.ussd_params['ussdRequestString'] = "2"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        households_list_1 = "%s\n1: %s*\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list_1 = "%s\n1: %s\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
 
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -667,8 +667,9 @@ class USSDTestCompleteFlow(TestCase):
                                                             COUNTRY_PHONE_CODE, ''),
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
+
         self.head_group = HouseholdMemberGroup.objects.create(name="General", order=0)
-        self.condition = GroupCondition.objects.create(value=True, attribute="HEAD", condition="EQUALS")
+        self.condition = GroupCondition.objects.create(value='HEAD', attribute="GENERAL", condition="EQUALS")
         self.condition.groups.add(self.head_group)
 
         self.member_group = HouseholdMemberGroup.objects.create(name="Less than 10", order=1)
@@ -685,8 +686,8 @@ class USSDTestCompleteFlow(TestCase):
         self.household_head_8 = self.create_household_head(7)
         self.household_head_9 = self.create_household_head(8)
 
-        self.batch = Batch.objects.create(order=1)
-        self.batch_b = Batch.objects.create(order=2)
+        self.batch = Batch.objects.create(name="Batch A", order=1)
+        self.batch_b = Batch.objects.create(name="Batch B", order=2)
         self.batch.open_for_location(self.investigator.location)
         self.question_1 = Question.objects.create(batch=self.batch,
                                                   text="How many members are there in this household?",
@@ -888,7 +889,7 @@ class USSDTestCompleteFlow(TestCase):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        households_list_1 = "%s\n1: %s*\n2: %s" % (
+        households_list_1 = "%s\n1: %s\n2: %s" % (
             USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
 
         self.ussd_params['response'] = "true"
@@ -945,7 +946,7 @@ class USSDTestCompleteFlow(TestCase):
         self.ussd_params['ussdRequestString'] = "2"
 
         response = self.client.post('/ussd', data=self.ussd_params)
-        households_list = "%s\n1: %s*\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
+        households_list = "%s\n1: %s\n2: %s*" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
         response_string = "responseString=%s&action=request" % households_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -980,8 +981,8 @@ class USSDTestCompleteFlow(TestCase):
 
 
     def test_show_completion_star_next_to_household_head_name(self):
-        self.household_head_1.household.batch_completed(self.batch)
-        self.household_head_3.household.batch_completed(self.batch)
+        self.household_head_1.batch_completed(self.batch)
+        self.household_head_3.batch_completed(self.batch)
         homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
 
         response = self.client.post('/ussd', data=self.ussd_params)
@@ -1015,7 +1016,6 @@ class USSDTestCompleteFlow(TestCase):
 
         self.batch.close_for_location(self.investigator.location)
         self.batch_b.open_for_location(self.investigator.location)
-
         self.client.post('/ussd', data=self.ussd_params)
 
         households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'],
