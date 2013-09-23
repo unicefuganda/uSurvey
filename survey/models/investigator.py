@@ -78,20 +78,6 @@ class Investigator(BaseModel):
     def last_answered_question(self):
         return self.last_answered().question
 
-    def answered(self, question, household, answer):
-        answer_class = question.answer_class()
-        if question.is_multichoice():
-            answer = question.get_option(answer, self)
-            if not answer:
-                return question
-        if answer_class.objects.create(investigator=self, question=question, household=household, answer=answer).pk:
-            next_question = household.next_question(last_question_answered = question)
-            if next_question == None or next_question.batch != question.batch:
-                household.batch_completed(question.batch)
-            return next_question
-        else:
-            return question
-
     def member_answered(self, question, household_member, answer):
         answer_class = question.answer_class()
         if question.is_multichoice():
