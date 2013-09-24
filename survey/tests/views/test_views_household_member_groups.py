@@ -43,8 +43,18 @@ class GroupConditionViewTest(BaseTest):
         self.assertIn('New condition', response.context['title'])
         self.assertIn('/conditions/new/', response.context['action'])
 
-    @patch('django.contrib.messages.success')
-    def test_post_condtion_form(self, mock_success):
+    def test_duplicate_condition_shows_error_on_views(self):
+        data = {'attribute': 'AGE',
+                'condition': 'EQUALS',
+                'value': '8'}
+        GroupCondition.objects.create(**data)
+        response = self.client.post('/conditions/new/', data=data)
+        error_message = 'Condition not added: Group condition with this Value, Attribute and Condition already exists.'
+        self.assertTrue(error_message in response.cookies['messages'].value)
+        self.assertEqual(1, GroupCondition.objects.filter(**data).count())
+
+
+    def test_post_condtion_form(self):
         data = {'attribute': 'AGE',
                 'condition': 'EQUALS',
                 'value': '8'}
@@ -54,7 +64,8 @@ class GroupConditionViewTest(BaseTest):
         self.assertRedirects(response, expected_url='/conditions/', status_code=302, target_status_code=200,
                              msg_prefix='')
         self.assertEquals(1, len(GroupCondition.objects.filter(**data)))
-        assert mock_success.called
+        success_message = 'Condition successfully added.'
+        self.assertTrue(success_message in response.cookies['messages'].value)
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/conditions/new/')

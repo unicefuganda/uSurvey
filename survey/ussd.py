@@ -195,7 +195,8 @@ class USSD(USSDBase):
         if self.household_member:
             last_question_entered = self.household_member.last_question_answered()
             if last_question_entered:
-                return last_question_entered.batch
+                next_question = self.household_member.next_question()
+                return last_question_entered.batch if not next_question else next_question.batch
         return self.investigator.first_open_batch()
 
     def render_survey(self):

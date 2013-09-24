@@ -69,7 +69,7 @@ def _process_condition_form(request, condition_form):
         messages.success(request, 'Condition successfully added.')
         redirect_url = '/conditions/'
     else:
-        print condition_form.errors
+        messages.error(request, 'Condition not added: %s' % condition_form.non_field_errors()[0])
         redirect_url = '/conditions/new/'
     return HttpResponseRedirect(redirect_url)
 
