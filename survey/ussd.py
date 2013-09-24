@@ -295,6 +295,8 @@ class USSD(USSDBase):
 
     def render_household_or_household_member(self, answer):
         if self.has_chosen_household():
+            if not self.is_pagination_option(answer):
+                self.set_in_session('PAGE', self.DEFAULT_SESSION_VARIABLES['PAGE'])
             if self.has_chosen_household_member():
                 self.render_survey()
             else:
