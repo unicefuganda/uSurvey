@@ -8,7 +8,6 @@ from survey.models.question import Question, QuestionOption
 from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
 from survey.models.householdgroups import HouseholdMemberGroup
-from survey.views.questions import filter_by_group
 
 
 class QuestionsViews(BaseTest):
@@ -352,4 +351,26 @@ class QuestionsViews(BaseTest):
         self.assertTrue(question_2.text in [item['text'] for item in parsed_response])
         self.assertTrue(question_1.text in [item['text'] for item in parsed_response])
 
+    def test_returns_added_optoions_when_form_has_error(self):
+        too_long_to_be_accepted_question = 'Get all the apps and games you love on Nexus 4 - with over\
+        titles to choose from on Google Play, s something for everyone. Find the most popular free and \
+        paid apps, explore hand-picked collections'
+        option_1 = 'some question option 1'
+        option_2 = 'some question option 2'
+        
+        form_data = {
+            'order': self.question_1.order,
+            'text': too_long_to_be_accepted_question,
+            'answer_type': Question.TEXT,
+            'group': '',
+            'options': [option_1,option_2],
+        }
 
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        response = self.client.post('/questions/new/', data=form_data)
+        question = Question.objects.filter(text=form_data['text'])
+        self.failIf(question)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(option_1, response.context['options'])
+        self.assertIn(option_2, response.context['options'])

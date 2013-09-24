@@ -153,11 +153,11 @@ class PageObject(object):
     def click_tab(self, tab_name):
         self.browser.click_link_by_text(tab_name)
 
-    def see_dropdown(self,links):
+    def see_dropdown(self, links):
         for url_name in links:
             assert self.browser.find_link_by_partial_href(reverse(url_name))
 
-    def select(self,name,values):
+    def select(self, name, values):
         for value in values:
             self.browser.select(name,value)
 
@@ -179,3 +179,6 @@ class PageObject(object):
 
     def fill(self, name, value):
         self.browser.fill(name, value)
+
+    def see_message(self, text):
+        assert self.browser.is_text_present(text)

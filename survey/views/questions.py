@@ -11,7 +11,6 @@ from survey.models.question import Question
 from survey.models.householdgroups import HouseholdMemberGroup
 
 from survey.forms.question import QuestionForm
-from survey.views.views_helper import contains_key
 
 
 @permission_required('auth.can_view_batches')
@@ -33,18 +32,25 @@ def index(request, batch_id):
 
 @permission_required('auth.can_view_batches')
 def new(request):
+    response = None
     question_form = QuestionForm()
+    options = None
     if request.method == 'POST':
         question_form = QuestionForm(data=request.POST)
         if question_form.is_valid():
             question_form.save(**request.POST)
             messages.success(request, 'Question successfully added.')
-            return HttpResponseRedirect('/questions/')
+            response = HttpResponseRedirect('/questions/')
+        else:
+            messages.error(request, 'Question was not added.')
+            options = dict(request.POST).get('options', None)
     context = {'button_label': 'Save',
                'id': 'add-question-form',
                'request': request,
                'questionform': question_form}
-    return render(request, 'questions/new.html', context)
+    if options:
+        context['options'] = list(set(options))
+    return response or render(request, 'questions/new.html', context)
 
 
 @permission_required('auth.can_view_batches')

@@ -51,6 +51,13 @@ class CreateNewQuestionPage(PageObject):
     def option_not_present(self, option):
         assert not self.browser.is_text_present(option)
 
+    def see_option_text(self, option_text, field_name):
+        elements = self.browser.find_by_name(field_name)
+        for element in elements:
+            if option_text in element.text:
+                return True
+        return False
+
 
 class CreateNewSubQuestionPage(PageObject):
     def __init__(self, browser, question):
