@@ -6,7 +6,7 @@
   {% include "naked_form.html" with a_form=batchform %}
   <div class="form-actions">
     <button type="submit" class="btn btn-primary" name="save_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
-    <a href="javascript:back()" class="btn btn-primary" name="cancel_button">Cancel</a>
+    <a href="javascript:window.history.back()" class="btn btn-primary" name="cancel_button">Cancel</a>
   </div>
 </form>
 <input type="hidden" id="survey_id" value={{batchform.instance.survey.id}} />

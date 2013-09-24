@@ -6,7 +6,7 @@
   {% include "naked_form.html" with a_form=condition_form %}
   <div class="form-actions">
     <button type="submit" class="btn btn-primary" name="save_condition_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
-    <a href="javascript:back()" class="btn btn-primary" name="cancel_button">Cancel</a>
+    <a href="javascript:window.history.back()" class="btn btn-primary" name="cancel_button">Cancel</a>
   </div>
 </form>
 <script type="text/template" id="gender_value_select_template">
