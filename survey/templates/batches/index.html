@@ -35,7 +35,7 @@
           <td>
             <a href="{% url 'batch_edit_page' survey.id batch.pk %}">Edit</a>
             <a data-toggle="modal" href="#delete_batch_{{batch.id}}">Delete</a>
-            <a href="{% url 'assign_questions_page' batch.id %}">Assign Questions</a>
+            <a href="{% url 'assign_questions_page' batch.id %}">Select Questions</a>
             <a href="{% url 'batch_show_page' survey.id batch.pk %}">Open/Close</a>
             {% include "batches/delete.html" with batch=batch %}
           </td>
