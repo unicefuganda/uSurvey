@@ -69,10 +69,11 @@ class Household(BaseModel):
         self.completed_batches.filter(household=self).delete()
 
     def can_retake_survey(self, batch, minutes):
-        last_batch_completed_time = self.completed_batches.filter(batch=batch, household=self)[0].created
-        timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(
-            minutes=minutes)
-        return last_batch_completed_time >= timeout
+        all_members = self.household_member.all()
+        for member in all_members:
+          if member.can_retake_survey(batch, minutes):
+            return True
+        return False
 
     def answers_for(self, questions):
         answers = []
@@ -217,14 +218,19 @@ class HouseholdMember(BaseModel):
         return next_group_questions[0]
 
     def can_retake_survey(self, batch, minutes):
-        completed_batches_by_member = self.completed_member_batches.filter(batch=batch, householdmember=self)
-        if completed_batches_by_member:
-            last_batch_completed_time = completed_batches_by_member[0].created
-            timeout = datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - datetime.timedelta(
-                minutes=minutes)
-            return last_batch_completed_time >= timeout
+        batch_completed_by_member = self.completed_member_batches.filter(batch=batch, householdmember=self,
+                                                              household=self.household)
+        if batch_completed_by_member:
+          last_batch_completed_time = batch_completed_by_member[0].created
 
+          elapsed_seconds = (datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - last_batch_completed_time).seconds
+          expected_timeout = minutes * 60
+
+          if expected_timeout >= elapsed_seconds:
+              return True
+          return False
         return True
+
 
     def batch_completed(self, batch):
         return self.completed_member_batches.get_or_create(householdmember=self, household=self.household,

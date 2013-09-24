@@ -173,6 +173,7 @@ class USSD(USSDBase):
             if self.current_member_is_done:
                 self.restart_survey()
             else:
+                self.action = self.ACTIONS['REQUEST']
                 current_household = self.household
                 self.investigator.clear_interview_caches()
                 self.set_in_session('HOUSEHOLD', current_household)
