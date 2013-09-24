@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.conf import settings
 from survey.investigator_configs import *
+from survey.models import HouseholdHead
 from survey.models.random_household_selection import RandomHouseHoldSelection
 
 
@@ -21,6 +22,7 @@ class USSDBase(object):
         'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s. How many households have you listed in your segment?" % NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR,
         'MEMBER_SUCCESS_MESSAGE':"Thank you. Would you like to proceed to the next Household Member?\n1: Yes\n2: No",
         'HOUSEHOLD_COMPLETION_MESSAGE':"Thank you. You have completed this household. Would you like to start again?\n1: Yes\n2: No",
+        'RESUME_MESSAGE':"Would you like to to resume with member question?\n1: Yes\n2: No",
     }
 
     ACTIONS = {
@@ -57,36 +59,34 @@ class USSD(USSDBase):
         self.household = None
         self.household_member = None
         self.current_member_is_done = False
+        self.is_resuming_survey = False
         self.set_session()
         self.set_household()
         self.set_household_member()
         self.set_current_member_is_done()
+        self.set_is_resuming_survey()
         self.clean_investigator_input()
 
     def set_household(self):
         household = self.get_from_session('HOUSEHOLD')
         if household:
             self.household = household
-        # elif self.is_active():
-        #     last_answered = self.investigator.last_answered()
-        #     if last_answered:
-        #         household = last_answered.household
-        #         if household.has_next_question():
-        #             self.household = household
 
     def set_household_member(self):
         household_member = self.get_from_session('HOUSEHOLD_MEMBER')
         if household_member:
             self.household_member = household_member
-        # elif self.is_active():
-        #     last_answered = self.investigator.last_answered()
-        #     household_member = last_answered.householdmember
-        #     if household_member.next_question():
-        #         self.household_member = household_member
 
     def set_current_member_is_done(self):
         if self.household_member:
             self.current_member_is_done = self.household_member.survey_completed()
+
+    def set_is_resuming_survey(self):
+        try:
+            cache_resuming_session = self.get_from_session('IS_RESUMING')
+            self.is_resuming_survey = cache_resuming_session
+        except:
+            pass
 
     def set_session(self):
         self.session_string = "SESSION-%s" % self.request['transactionId']
@@ -158,8 +158,6 @@ class USSD(USSDBase):
 
         self.action = self.ACTIONS['REQUEST']
 
-
-
     def end_interview(self):
         self.action = self.ACTIONS['END']
         if self.investigator.completed_open_surveys():
@@ -213,6 +211,11 @@ class USSD(USSDBase):
         else:
             self.end_interview()
 
+    def render_resume_message(self):
+        self.responseString = self.MESSAGES['RESUME_MESSAGE']
+        self.action = self.ACTIONS['REQUEST']
+        self.set_in_session('IS_RESUMING', True)
+
     def render_welcome_text(self):
         if self.investigator.has_households():
             welcome_message = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
@@ -242,16 +245,41 @@ class USSD(USSDBase):
         except (ValueError, IndexError) as e:
             self.responseString += "INVALID SELECTION: "
 
+    def show_member_question(self, household_member):
+        self.household_member = household_member if not household_member.is_head() else HouseholdHead.objects.get(
+            householdmember_ptr_id=household_member.id)
+        self.set_in_session('HOUSEHOLD_MEMBER', household_member)
+        self.set_in_session('HOUSEHOLD', household_member.household)
+        self.behave_like_new_request()
+        self.render_survey()
+
+    def show_member_list(self, household_member):
+        self.set_in_session('HOUSEHOLD', household_member.household)
+        self.render_household_members_list()
+
+    def resume_survey(self, answer, household_member):
+        if self.ANSWER["YES"] == answer:
+            self.show_member_question(household_member)
+        elif self.ANSWER["NO"] == answer:
+            self.show_member_list(household_member)
+
     def select_or_render_household(self, answer):
         if self.is_browsing_households_list(answer):
             self.render_households_list(answer)
         else:
-            self.select_household(answer)
-            if self.is_invalid_response():
-                self.render_households_list(answer)
+            if self.is_resuming_survey:
+                last_answered = self.investigator.last_answered()
+                household_member = last_answered.householdmember
+                self.household = household_member.household
+                self.resume_survey(answer, household_member)
+                self.set_in_session('IS_RESUMING', False)
             else:
-                self.request['ussdRequestString'] = ""
-                self.render_household_or_household_member(answer)
+                self.select_household(answer)
+                if self.is_invalid_response():
+                    self.render_households_list(answer)
+                else:
+                    self.request['ussdRequestString'] = ""
+                    self.render_household_or_household_member(answer)
 
     def select_or_render_household_member(self, answer):
         if self.is_browsing_households_list(answer):
@@ -286,10 +314,11 @@ class USSD(USSDBase):
         self.responseString += "%s\n%s" % (self.MESSAGES['MEMBERS_LIST'], self.household.members_list(page))
 
     def render_homepage(self):
-
         answer = self.request['ussdRequestString'].strip()
-        if not answer:
+        if not answer and not self.is_active():
             self.render_welcome_text()
+        elif not answer and self.is_active():
+            self.render_resume_message()
         else:
             self.render_household_or_household_member(answer)
 

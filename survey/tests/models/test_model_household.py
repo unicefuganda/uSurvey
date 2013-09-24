@@ -6,7 +6,7 @@ from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch,
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
-
+from django.utils.timezone import utc
 
 
 class HouseholdTest(TestCase):
@@ -212,7 +212,7 @@ class HouseholdTest(TestCase):
 
         HouseholdBatchCompletion.objects.all().delete()
 
-        ten_minutes_ago = datetime.now() - timedelta(minutes=10)
+        ten_minutes_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(minutes=10)
 
         HouseholdBatchCompletion.objects.create(batch=batch, householdmember=household_member,
                                                 investigator=investigator, household=household_member.household,
@@ -232,7 +232,7 @@ class HouseholdTest(TestCase):
 
         HouseholdBatchCompletion.objects.all().delete()
 
-        three_minutes_ago = datetime.now() - timedelta(minutes=3)
+        three_minutes_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(minutes=3)
 
         HouseholdBatchCompletion.objects.create(batch=batch, householdmember=household_member,
                                                 investigator=investigator, household=household_member.household,
