@@ -13,7 +13,7 @@ class Migration(DataMigration):
             condition_count = len(similar_conditions)
             count = 0
             while count<(condition_count-1):
-                orm['survey.groupcondition'].objects.get(id=similar_conditions[count]).delete()
+                orm['survey.groupcondition'].objects.get(id=similar_conditions[count].id).delete()
 
     def backwards(self, orm):
         "Write your backwards methods here."
