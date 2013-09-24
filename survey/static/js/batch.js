@@ -20,8 +20,9 @@ function set_display(text, set){
 
 
 jQuery(function($){
-
-    load_questions_for_batch_and_group();
+    if ($('#assign_question_group').val()){
+        load_questions_for_batch_and_group();
+    }
 
   $('.switch').on('switch-change', function(e, data){
     var $el = $(data.el), form;
