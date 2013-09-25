@@ -1,97 +1,117 @@
 {% extends "layout.html" %}
 {% block title %}
-  Questions List
+    Questions List
 {% endblock %}
 {% block content %}
-{% load pagination_tags %}
-{% autopaginate questions 50 %}
-  {% if batch %}
-    <h3>
-      {{batch.name.capitalize}} Questions
-    </h3>
-    <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary pull-right" id="add_question">Select Question</a>
-  {% else %}
-    <h3>
-       Questions List
-    </h3>
-    <a href="{% url 'new_question_page' %}" class="btn btn_primary pull-right" id="add_question">Create New Question</a>
-  {% endif %}
-  <table class="table table-striped table-bordered table-hover">
-    <thead>
-      <tr>
-        <th class="span8">
-          Question
-        </th>
-        <th>
-          Type
-        </th>
-        <th>
-          Group
-        </th>
-        <th>
-          Actions
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for question in questions %}
+    {% load pagination_tags %}
+    {% autopaginate questions 50 %}
+    {% if batch %}
+        <h3>
+            {{ batch.name.capitalize }} Questions
+        </h3>
+        <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary pull-right" id="add_question">Select
+            Question</a>
+    {% else %}
+        <h3>
+            Questions List
+        </h3>
+        <a href="{% url 'new_question_page' %}" class="btn btn_primary pull-right" id="add_question">Create New
+            Question</a>
+    {% endif %}
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
         <tr>
-          <td class="span8">
-            {{question.text}}
-          </td>
-          <td>
-            {{question.answer_type.upper}}
-          </td>
-          <td>
-            {{question.group.name}}
-          </td>
-          <td>
-            {% if question.options.all %}
-            <a href="#view_options_{{question.id}}" data-toggle="modal">View options</a>
-            <a href="{% url 'add_subquestion_page' question.pk %}" id="add_sub_question">Add Subquestion</a>
-            <div class="modal fade hide" id="view_options_{{question.id}}" tabindex="-1" role="dialog"  aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">{{question.text}}</h4>
-                      </div>
-                      <div class="modal-body">
-                        <table class="table table-striped table-bordered table-hover">
-                          <thead>
-                            <tr>
-                              <th>
-                                Text
-                              </th>
-                              <th>
-                                Order
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {% for option in question.options.all %}
-                              <tr>
-                                <td >
-                                  {{option.text}}
-                                </td>
-                                <td>
-                                  {{option.order }}
-                                </td>
-                              </tr>
-                            {% endfor %}
-                          </tbody>
-                        </table>
-                        <a href="#" class="btn btn-primary pull-right" id="close_view_options_{{question.id}}" data-dismiss="modal">Close</a>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            {% endif %}
-          </td>
+            <th class="span8">
+                Question
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Group
+            </th>
+            <th>
+                Actions
+            </th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% paginate %}
+        </thead>
+        <tbody>
+        {% for question in questions %}
+            <tr>
+                <td class="span8">
+                    {{ question.text }}
+                </td>
+                <td>
+                    {{ question.answer_type.upper }}
+                </td>
+                <td>
+                    {{ question.group.name }}
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a class="btn btn-mini btn-primary" href="#"></i>Actions</a>
+                        <a class="btn btn-mini btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+                            <span class="caret" id="action_caret"></span></a>
+                        <ul class="dropdown-menu">
+                            {% if batch %}
+                            <li><a href="{% url 'add_question_logic_page' question.pk %}"><i class="icon-plus"></i>Add
+                                Logic</a></li>
+                            {% endif %}
+                            {% if question.options.all %}
+                                <li>
+                                    <a href="#view_options_{{ question.id }}" data-toggle="modal">View options</a>
+                                </li>
+                            {% endif %}
+                            <li><a href="{% url 'add_subquestion_page' question.pk %}" id="add_sub_question">Add
+                                Subquestion</a></li>
+                        </ul>
+                    </div>
+                        {% if question.options.all %}
+                            <div class="modal fade hide" id="view_options_{{ question.id }}" tabindex="-1" role="dialog"
+                                 aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                    aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title">{{ question.text }}</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <table class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>
+                                                        Text
+                                                    </th>
+                                                    <th>
+                                                        Order
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for option in question.options.all %}
+                                                    <tr>
+                                                        <td>
+                                                            {{ option.text }}
+                                                        </td>
+                                                        <td>
+                                                            {{ option.order }}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                            <a href="#" class="btn btn-primary pull-right"
+                                               id="close_view_options_{{ question.id }}" data-dismiss="modal">Close</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% paginate %}
 {% endblock %}

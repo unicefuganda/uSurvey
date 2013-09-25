@@ -167,8 +167,8 @@ def then_i_should_see_the_questions_successfully_assigned_to_that_batch(step):
 
 @step(u'And I have 2 questions')
 def and_i_have_2_questions(step):
-    world.question_1=Question.objects.create(text="question1", answer_type=Question.NUMBER)
-    world.question_2=Question.objects.create(text="question2", answer_type=Question.TEXT)
+    world.question_1=Question.objects.create(text="question1", answer_type=Question.NUMBER, order=1)
+    world.question_2=Question.objects.create(text="question2", answer_type=Question.TEXT, order=2)
 
 @step(u'And I visit the assign question to page batch')
 def and_i_visit_the_assign_question_to_page_batch(step):

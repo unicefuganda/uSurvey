@@ -2,6 +2,8 @@ import json
 from django.test.client import Client
 from django.contrib.auth.models import User
 from mock import patch
+from survey.forms.logic import LogicForm
+from survey.models import AnswerRule
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
 
@@ -374,3 +376,79 @@ class QuestionsViews(BaseTest):
         self.assertEqual(response.status_code, 200)
         self.assertIn(option_1, response.context['options'])
         self.assertIn(option_2, response.context['options'])
+
+class LogicViewTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
+                                        'can_view_batches')
+        self.client.login(username='User', password='password')
+
+        self.batch = Batch.objects.create(order=1)
+        self.question = Question.objects.create(batch=self.batch, text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1)
+        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?",
+                                                answer_type=Question.NUMBER, order=2)
+
+    def test_views_add_logic_get_has_logic_form_in_context_and_has_success_response(self):
+        response = self.client.get('/questions/%s/add_logic/' % self.question.pk)
+
+        self.assertIsInstance(response.context['logic_form'], LogicForm)
+        self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(200, response.status_code)
+
+    def test_views_saves_answer_rule_on_post_if_all_values_are_selected(self):
+        form_data = {'condition': 'EQUALS',
+                     'attribute': 'value',
+                     'value': 0,
+                     'action': 'SKIP_TO',
+                     'next_question': self.question_2.pk}
+
+        response = self.client.post('/questions/%s/add_logic/' % self.question.pk, data=form_data)
+        self.assertRedirects(response, '/batches/%s/questions/' % self.question.batch.id, status_code=302, target_status_code=200)
+        success_message= 'Logic successfully added.'
+        self.assertIn(success_message, response.cookies['messages'].value)
+        answer_rules = AnswerRule.objects.filter()
+
+        self.failUnless(answer_rules)
+
+        answer_rule = answer_rules[0]
+
+        self.assertEqual(self.question, answer_rule.question)
+        self.assertEqual(form_data['action'], answer_rule.action)
+        self.assertEqual(form_data['condition'], answer_rule.condition)
+        self.assertEqual(self.question_2, answer_rule.next_question)
+        self.assertEqual(form_data['value'], answer_rule.validate_with_value)
+        self.assertIsNone(answer_rule.validate_with_question)
+        self.assertIsNone(answer_rule.validate_with_option)
+
+    def test_views_saves_answer_rule_on_post_if_all_values_are_selected_on_multichoice_question(self):
+
+        question_with_option = Question.objects.create(batch=self.batch, text="MultiChoice Question 1?",
+                                                       answer_type=Question.MULTICHOICE, order=3)
+        question_option_1 = QuestionOption.objects.create(question=question_with_option, text="Option 1", order=1)
+        question_option_2 = QuestionOption.objects.create(question=question_with_option, text="Option 2", order=2)
+        question_option_3 = QuestionOption.objects.create(question=question_with_option, text="Option 3", order=3)
+
+
+        form_data = {'condition': 'EQUALS_OPTION',
+                     'attribute': 'option',
+                     'option': question_option_1.id,
+                     'action': 'END_INTERVIEW',
+                     }
+
+        response = self.client.post('/questions/%s/add_logic/' % question_with_option.pk, data=form_data)
+        self.assertRedirects(response, '/batches/%s/questions/' % self.question.batch.id, status_code=302, target_status_code=200)
+        answer_rules = AnswerRule.objects.filter()
+
+        self.failUnless(answer_rules)
+
+        answer_rule = answer_rules[0]
+
+        self.assertEqual(question_with_option, answer_rule.question)
+        self.assertEqual(form_data['action'], answer_rule.action)
+        self.assertEqual(form_data['condition'], answer_rule.condition)
+        self.assertEqual(form_data['option'], answer_rule.validate_with_option.id)
+        self.assertIsNone(answer_rule.next_question)
+        self.assertIsNone(answer_rule.validate_with_question)
+        self.assertIsNone(answer_rule.validate_with_value)

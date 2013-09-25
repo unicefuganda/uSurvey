@@ -5,9 +5,11 @@ from django.contrib import messages
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
+from survey.forms.logic import LogicForm
+from survey.models import AnswerRule
 
 from survey.models.batch import Batch
-from survey.models.question import Question
+from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
 
 from survey.forms.question import QuestionForm
@@ -91,3 +93,28 @@ def new_subquestion(request, question_id):
         response = __process_sub_question_form(request, questionform, parent_question)
     context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form'}
     return response or render(request, 'questions/new.html', context)
+
+def _get_post_values(post_data):
+    next_question_key = post_data.get('next_question', None)
+    option_key = post_data.get('option', None)
+    question_key = post_data.get('validate_with_question', None)
+    save_data = {'action': post_data['action'],
+                 'condition': post_data['condition'],
+                 'next_question': Question.objects.get(id=next_question_key) if next_question_key else None,
+                 'validate_with_value': post_data.get('value', None),
+                 'validate_with_option': QuestionOption.objects.get(id=option_key) if option_key else None,
+                 'validate_with_question': Question.objects.get(id=question_key) if question_key else None
+                 }
+    return save_data
+
+def add_logic(request, question_id):
+    question = Question.objects.get(id=question_id)
+    logic_form = LogicForm(question=question)
+    if request.method == "POST":
+        logic_form = LogicForm(data=request.POST, question=question)
+        if logic_form.is_valid():
+            AnswerRule.objects.create(question=question, **_get_post_values(request.POST))
+            messages.success(request, 'Logic successfully added.')
+            return HttpResponseRedirect('/batches/%s/questions/' % question.batch.id)
+    context = {'logic_form': logic_form, 'button_label': 'Save'}
+    return render(request, "questions/logic.html", context)
