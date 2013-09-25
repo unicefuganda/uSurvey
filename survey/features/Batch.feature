@@ -54,7 +54,7 @@ Feature: Batch related features
     And I have a batch
     And I visit batches listing page
     And I click delete batch link
-    Then I should see confirm delete
+    Then I should see confirm delete batch
     And if I click yes
     Then I should go back to batches listing page
     And I should see the batch successfully deleted

@@ -102,9 +102,6 @@ class BatchListPage(PageObject):
     def click_link_by_text(self,text):
         self.browser.click_link_by_text(text)
 
-    def see_confirm_delete_message(self,batch_name):
-        self.is_text_present("Confirm: Are you sure you want to delete %s?" % batch_name)
-
     def validate_page_got_survey_id(self):
         assert self.browser.find_by_css('#survey_id').first.value == str(self.survey.id)
 

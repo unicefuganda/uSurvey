@@ -41,4 +41,15 @@ Feature: Survey features
     And I submit the form
     Then I should see that the survey was edited successfully
 
+  Scenario: Delete a survey
+    Given I am logged in as researcher
+    And I have a survey
+    And I visit surveys listing page
+    And I click on delete link for this survey
+    Then I should see confirm delete survey
+    And if I click yes
+    Then I should go back to survey listing page
+    And I should see that the survey was deleted successfully
+
+
 

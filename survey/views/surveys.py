@@ -52,3 +52,8 @@ def edit(request, survey_id):
                'action': '/surveys/%s/edit/' %survey_id
                }
     return render(request, 'surveys/new.html', context)
+
+def delete(request,survey_id):
+    Survey.objects.get(id=survey_id).delete()
+    messages.success(request, 'Survey successfully deleted.')
+    return HttpResponseRedirect('/surveys/')

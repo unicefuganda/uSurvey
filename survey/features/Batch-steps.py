@@ -126,8 +126,8 @@ def and_i_should_see_the_batch_successfully_edited(step):
 def and_i_click_delete_batch_link(step):
     world.page.click_link_by_text('Delete')
 
-@step(u'Then I should see confirm delete')
-def then_i_should_see_confirm_delete(step):
+@step(u'Then I should see confirm delete batch')
+def then_i_should_see_confirm_delete_bacth(step):
     world.page.see_confirm_delete_message(world.batch.name)
 
 @step(u'And if I click yes')

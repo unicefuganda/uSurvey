@@ -90,3 +90,15 @@ class SurveyViewTest(BaseTest):
         self.assertRedirects(response,'/surveys/', status_code=302, target_status_code=200, msg_prefix='')
         success_message = "Survey successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
+
+    def test_delete_should_delete_the_survey(self):
+        survey = Survey.objects.create(**self.form_data)
+        self.failUnless(survey)
+
+        response = self.client.get('/surveys/%d/delete/' % survey.id,)
+        self.failIf(Survey.objects.filter(id=survey.id))
+
+        self.assertRedirects(response,'/surveys/', status_code=302, target_status_code=200, msg_prefix='')
+        success_message = "Survey successfully deleted"
+        self.assertIn(success_message, response.cookies['messages'].value)
+
