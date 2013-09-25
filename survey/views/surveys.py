@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
@@ -36,24 +37,31 @@ def new(request):
     return response or render(request, 'surveys/new.html', context)
 
 def edit(request, survey_id):
-    survey = Survey.objects.get(id=survey_id)
-    survey_form = SurveyForm(instance=survey)
-    if request.method == 'POST':
-        survey_form = SurveyForm(instance=survey, data=request.POST)
-        if survey_form.is_valid():
-            survey_form.save()
-            messages.success(request, 'Survey successfully edited.')
-            return  HttpResponseRedirect('/surveys/')
+    try:
+        survey = Survey.objects.get(id=survey_id)
+        survey_form = SurveyForm(instance=survey)
+        if request.method == 'POST':
+            survey_form = SurveyForm(instance=survey, data=request.POST)
+            if survey_form.is_valid():
+                survey_form.save()
+                messages.success(request, 'Survey successfully edited.')
+                return  HttpResponseRedirect('/surveys/')
 
-    context = {'survey_form': survey_form,
-               'title': "Edit Survey",
-               'button_label': 'Save',
-               'id': 'edit-survey-form',
-               'action': '/surveys/%s/edit/' %survey_id
-               }
-    return render(request, 'surveys/new.html', context)
+        context = {'survey_form': survey_form,
+                   'title': "Edit Survey",
+                   'button_label': 'Save',
+                   'id': 'edit-survey-form',
+                   'action': '/surveys/%s/edit/' %survey_id
+                   }
+        return render(request, 'surveys/new.html', context)
+    except ObjectDoesNotExist:
+        messages.error(request, "Survey does not exist.")
+        return HttpResponseRedirect('/surveys/')
 
 def delete(request,survey_id):
-    Survey.objects.get(id=survey_id).delete()
-    messages.success(request, 'Survey successfully deleted.')
+    try:
+        Survey.objects.get(id=survey_id).delete()
+        messages.success(request, 'Survey successfully deleted.')
+    except ObjectDoesNotExist:
+        messages.error(request, "Survey does not exist.")
     return HttpResponseRedirect('/surveys/')
