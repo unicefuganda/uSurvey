@@ -160,18 +160,18 @@ def and_i_click_the_actions_button(step):
     world.page.click_actions_button()
 
 
-@step(u'And I have a groups')
+@step(u'And I have member group with conditions')
 def and_i_have_a_groups(step):
-    condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
-    condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
+    world.condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
+    world.condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
     world.group = HouseholdMemberGroup.objects.create(order=1, name="group 1")
-    condition_1.groups.add(world.group)
-    condition_2.groups.add(world.group)
+    world.condition_1.groups.add(world.group)
+    world.condition_2.groups.add(world.group)
 
 
 @step(u'And I click view conditions link')
 def and_i_click_view_conditions_link(step):
-    world.page.click_link_by_text(" View Conditions")
+    world.page.click_link_by_text(" Conditions")
 
 
 @step(u'Then I should see a list of conditions')
@@ -273,3 +273,32 @@ def and_when_i_fill_condition_details(step):
 def and_i_should_see_the_newly_added_condition_on_that_page(step):
     world.page.see_success_message("Condition", "added")
     world.page.validate_fields_present([world.data['attribute'], world.data['condition'], '9'])
+
+@step(u'And I click edit group link')
+def and_i_click_edit_group_link(step):
+    world.page.click_link_by_text(" Edit")
+
+@step(u'When I fill in edited group details')
+def when_i_fill_in_edited_group_details(step):
+    data = {'name': 'aged between 15 and 39',
+            'order': 1,
+    }
+    world.page.fill_valid_values(data)
+
+@step(u'Then I should see that the group was edited successfully')
+def then_i_should_see_that_the_group_was_edited_successfully(step):
+    world.page.see_success_message("Group", "edited")
+
+@step(u'Then I should see the groups details in an edit group form')
+def then_i_should_see_the_groups_details_in_an_edit_group_form(step):
+    form = {'name': 'Name',
+            'order': 'Order'}
+    form_values = {'name': world.group.name,
+                   'order': world.group.order }
+    world.page.validate_form_present(form)
+    world.page.validate_form_values(form_values)
+
+@step(u'And I select new conditions')
+def and_i_select_new_conditions(step):
+    new_condition = GroupCondition.objects.create(value=39, attribute='AGE', condition="LESS_THAN")
+    world.page.select_multiple('#id_conditions', world.condition_1, new_condition)

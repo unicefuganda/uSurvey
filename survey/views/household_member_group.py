@@ -74,12 +74,12 @@ def _process_condition_form(request, condition_form):
     return HttpResponseRedirect(redirect_url)
 
 
-def _process_groupform(request, group_form):
+def _process_groupform(request, group_form, action, redirect_url):
 
     if group_form.is_valid() and has_valid_condition(request.POST):
         group_form.save()
-        messages.success(request, 'Group successfully added.')
-        return HttpResponseRedirect("/groups/")
+        messages.success(request, 'Group successfully %s.' % action)
+        return HttpResponseRedirect(redirect_url)
 
 
 @permission_required('auth.can_view_household_groups')
@@ -90,7 +90,7 @@ def add_group(request):
 
     if request.method == 'POST':
         group_form = HouseholdMemberGroupForm(params)
-        response = _process_groupform(request, group_form)
+        response = _process_groupform(request, group_form, action='added', redirect_url='/groups/')
     context = {'groups_form': group_form,
                'conditions': GroupCondition.objects.all(),
                'title': "New Group",
@@ -138,3 +138,24 @@ def add_group_condition(request,group_id):
                'request': request,
                'condition_form': condition_form}
     return render(request, 'household_member_groups/conditions/new.html', context)
+
+def edit_group(request, group_id):
+    params = request.POST
+    response = None
+    group = HouseholdMemberGroup.objects.get(id=group_id)
+    group_form = HouseholdMemberGroupForm(instance=group, initial={'conditions':[gp.id for gp in group.conditions.all()]})
+    if request.method == 'POST':
+        group_form = HouseholdMemberGroupForm(params, instance=group)
+        redirect_url = "/groups/%s/" % group_id
+        performed_action = 'edited'
+        response = _process_groupform(request, group_form, performed_action, redirect_url)
+    context = {'groups_form': group_form,
+               'conditions': GroupCondition.objects.all(),
+               'title': "Edit Group",
+               'button_label': 'Save',
+               'id': 'add_group_form',
+               'action': "/groups/%s/edit/"%group_id,
+               'condition_form': GroupConditionForm(),
+               'condition_title': "New Condition"}
+
+    return response or render(request, 'household_member_groups/new.html', context)

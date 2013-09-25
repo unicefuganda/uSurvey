@@ -34,14 +34,9 @@
           </td>
           <td>
             <div class="btn-group">
-                <a class="btn btn-mini btn-primary" href="#"></i>Actions</a>
-                <a class="btn btn-mini btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
-                  <span class="caret" id="action_caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="{% url 'household_member_groups_details' group.id %}"><i class="icon-plus"></i> View Conditions</a></li>
-                <li><a href=""><i class="icon-pencil"></i> Edit</a></li>
-            </ul>
-          </div>
+              <a class="btn" href="{% url 'household_member_groups_details' group.id %}"><i class="icon icon-align-justify"></i> Conditions</a>
+              <a class="btn" href="{% url 'household_member_groups_edit' group.id %}"><i class="icon-pencil"></i> Edit</a>
+            </div>
           </td>
         </tr>
       {% endfor %}

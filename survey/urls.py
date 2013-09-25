@@ -47,6 +47,7 @@ urlpatterns = patterns('',
     url(r'^groups/(?P<group_id>\d+)/conditions/new/$', 'survey.views.household_member_group.add_group_condition', name='new_condition_for_group'),
     url(r'^groups/$', 'survey.views.household_member_group.index', name='household_member_groups_page'),
     url(r'^groups/new/$', 'survey.views.household_member_group.add_group', name='new_household_member_groups_page'),
+    url(r'^groups/(?P<group_id>\d+)/edit/$', 'survey.views.household_member_group.edit_group', name='household_member_groups_edit'),
     url(r'^conditions/$', 'survey.views.household_member_group.conditions', name='show_group_condition'),
     url(r'^conditions/new/$', 'survey.views.household_member_group.add_condition', name='new_group_condition'),
     url(r'^surveys/$', 'survey.views.surveys.index', name='survey_list_page'),
@@ -63,7 +64,6 @@ urlpatterns = patterns('',
     url(r'^batches/(?P<batch_id>\w+)/questions/groups/(?P<group_id>\w+)/', 'survey.views.questions.filter_by_group',name='list_questions_in_agroup'),
     url(r'^questions/new/$', 'survey.views.questions.new', name='new_question_page'),
     url(r'^questions/(?P<question_id>\d+)/sub_questions/new/$', 'survey.views.questions.new_subquestion', name='add_subquestion_page')
-
 )
 
 if not settings.PRODUCTION:

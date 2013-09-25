@@ -60,10 +60,8 @@ Feature: Group features
 
   Scenario: List group details
     Given I am logged in as researcher
-    And I have a groups
-    And I have 2 conditions
+    And I have member group with conditions
     And I visit groups listing page
-    And I click the actions button
     And I click view conditions link
     Then I should see a list of conditions
     When I click on add condition button
@@ -91,3 +89,14 @@ Feature: Group features
     And If I add in a negative number
     And I click the new condition form save button
     Then I see error age cannot be negative
+
+  Scenario: Edit a group
+    Given I am logged in as researcher
+    And I have member group with conditions
+    And I visit groups listing page
+    And I click edit group link
+    Then I should see the groups details in an edit group form
+    When I fill in edited group details
+    And I select new conditions
+    And I submit the form
+    Then I should see that the group was edited successfully

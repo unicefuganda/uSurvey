@@ -185,3 +185,12 @@ class PageObject(object):
 
     def see_confirm_delete_message(self,name):
         self.is_text_present("Confirm: Are you sure you want to delete %s?" % name)
+
+    def validate_form_present(self, form):
+        for key in form.keys():
+            assert self.browser.find_by_name(key)
+            self.is_text_present(form[key])
+
+    def validate_form_values(self, form_values):
+        for key in form_values.keys():
+            assert self.browser.find_by_name(key).first.value == str(form_values[key])

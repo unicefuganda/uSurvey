@@ -18,7 +18,7 @@ class HouseholdMemberGroupTests(TestCase):
         household_member_group_form = HouseholdMemberGroupForm(form_data)
         self.assertTrue(household_member_group_form.is_valid())
 
-    def test_invalid_group_exists(self):
+    def test_invalid_order_on_add_group_if_group_already_exists(self):
         household_member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=7)
 
         form_data = {
@@ -33,6 +33,18 @@ class HouseholdMemberGroupTests(TestCase):
         self.assertTrue(household_member_group_form.errors.has_key('order'))
         expected_form_error = 'This order already exists. The minimum available is %d.'% (HouseholdMemberGroup.max_order()+1)
         self.assertEqual(household_member_group_form.errors['order'][0], expected_form_error)
+
+    def test_valid_order_edit_group_if_group_already_exists(self):
+        household_member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=7)
+
+        form_data = {
+            'name': household_member_group.name,
+            'order': str(household_member_group.order),
+            'conditions': [self.group_condition.id]
+        }
+
+        household_member_group_form = HouseholdMemberGroupForm(form_data, instance=household_member_group)
+        self.assertTrue(household_member_group_form.is_valid())
 
     def test_invalid_given_empty_fields_present(self):
 
