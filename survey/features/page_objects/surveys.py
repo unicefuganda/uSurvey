@@ -8,3 +8,9 @@ class SurveyListPage(PageObject):
 
 class AddSurveyPage(PageObject):
     url = '/surveys/new/'
+
+class EditSurveyPage(PageObject):
+    def __init__(self, browser, survey):
+        super(EditSurveyPage, self).__init__(browser)
+        self.survey = survey
+        self.url = '/surveys/%d/edit/' %survey.id

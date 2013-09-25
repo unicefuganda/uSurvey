@@ -3,7 +3,8 @@ from random import randint
 from lettuce import *
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage
 from survey.models.surveys import Survey
-from survey.features.page_objects.surveys import SurveyListPage, AddSurveyPage
+from survey.features.page_objects.surveys import SurveyListPage, AddSurveyPage, EditSurveyPage
+
 
 @step(u'And I visit surveys listing page')
 def and_i_visit_surveys_listing_page(step):
@@ -43,12 +44,12 @@ def and_i_visit_the_new_survey_page(step):
 
 @step(u'When I fill in the survey details')
 def when_i_fill_in_the_survey_details(step):
-    data = {'name': 'survey rajni',
+    world.data = {'name': 'survey rajni',
             'description': 'survey description rajni',
             'sample_size': 10,
             'type': True,
             }
-    world.page.fill_valid_values(data)
+    world.page.fill_valid_values(world.data)
 
 @step(u'And I select the questions')
 def and_i_select_the_questions(step):
@@ -93,3 +94,17 @@ def and_when_i_click_on_add_batch_action_for_first_survey(step):
 def then_i_should_go_to_add_batch_page(step):
     world.page = AddBatchPage(world.browser,world.survey[0])
     world.page.validate_url()
+
+@step(u'And I click on edit link for this survey')
+def and_i_click_on_edit_link_for_this_survey(step):
+    world.page.click_link_by_text("Edit")
+
+@step(u'Then I should see the edit survey page')
+def then_i_should_see_the_edit_survey_page(step):
+    world.page = EditSurveyPage(world.browser, world.survey)
+    world.page.validate_url()
+
+@step(u'Then I should see that the survey was edited successfully')
+def then_i_should_see_that_the_survey_was_edited_successfully(step):
+    world.page.is_text_present(world.data['name'])
+    world.page.see_success_message("Survey", "edited")

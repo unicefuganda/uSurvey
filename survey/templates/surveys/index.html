@@ -45,7 +45,7 @@
               {{ survey.sample_size }}
           </td>
           <td>
-            <a href=''>Edit</a>
+            <a href='{% url "edit_survey_page" survey.id %}'>Edit</a>
             <a href=''>Delete</a>
             <a href='{% url 'new_batch_page' survey.pk %}' class="add_batch">Add Batch</a>
           </td>

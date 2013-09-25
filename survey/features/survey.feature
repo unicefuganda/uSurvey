@@ -31,3 +31,14 @@ Feature: Survey features
     And I click the modal save button
     Then I should see that the survey was saved successfully
 
+  Scenario: Edit a survey
+    Given I am logged in as researcher
+    And I have a survey
+    And I visit surveys listing page
+    And I click on edit link for this survey
+    Then I should see the edit survey page
+    When I fill in the survey details
+    And I submit the form
+    Then I should see that the survey was edited successfully
+
+

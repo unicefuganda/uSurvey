@@ -34,3 +34,21 @@ def new(request):
                }
 
     return response or render(request, 'surveys/new.html', context)
+
+def edit(request, survey_id):
+    survey = Survey.objects.get(id=survey_id)
+    survey_form = SurveyForm(instance=survey)
+    if request.method == 'POST':
+        survey_form = SurveyForm(instance=survey, data=request.POST)
+        if survey_form.is_valid():
+            survey_form.save()
+            messages.success(request, 'Survey successfully edited.')
+            return  HttpResponseRedirect('/surveys/')
+
+    context = {'survey_form': survey_form,
+               'title': "Edit Survey",
+               'button_label': 'Save',
+               'id': 'edit-survey-form',
+               'action': '/surveys/%s/edit/' %survey_id
+               }
+    return render(request, 'surveys/new.html', context)
