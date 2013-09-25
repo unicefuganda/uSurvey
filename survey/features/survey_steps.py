@@ -97,7 +97,7 @@ def then_i_should_go_to_add_batch_page(step):
 
 @step(u'And I click on edit link for this survey')
 def and_i_click_on_edit_link_for_this_survey(step):
-    world.page.click_link_by_text("Edit")
+    world.page.click_link_by_text(" Edit")
 
 @step(u'Then I should see the edit survey page')
 def then_i_should_see_the_edit_survey_page(step):
@@ -111,7 +111,7 @@ def then_i_should_see_that_the_survey_was_edited_successfully(step):
 
 @step(u'And I click on delete link for this survey')
 def and_i_click_on_delete_link_for_this_survey(step):
-    world.page.click_link_by_text("Delete")
+    world.page.click_link_by_text(" Delete")
 
 @step(u'Then I should go back to survey listing page')
 def then_i_should_go_back_to_survey_listing_page(step):

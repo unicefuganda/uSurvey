@@ -133,7 +133,6 @@ class HouseholdDetailsPage(PageObject):
         self.browser.find_link_by_text('Add Member')
 
     def validate_actions_edit_and_delete_member(self):
-        self.is_text_present('Actions')
         self.browser.find_link_by_text('Edit')
         self.browser.find_link_by_text('Delete')
 

@@ -45,7 +45,7 @@ class InvestigatorsListPage(PageObject):
 
     def validate_fields(self):
         self.validate_fields_present(["Investigators List", "Name", "Mobile Number", "Action"])
-        
+
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
@@ -118,7 +118,6 @@ class InvestigatorDetailsPage(PageObject):
 
     def validate_navigation_links(self):
         assert self.browser.find_link_by_text(' Back')
-        assert self.browser.find_link_by_text(' Actions')
 
     def validate_back_link(self):
         self.browser.find_link_by_href(django_url(InvestigatorsListPage.url))

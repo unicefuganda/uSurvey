@@ -25,7 +25,7 @@
                     </td>
                     <td>
                       {% if user.groups.all %}
-                        {{ user.groups.all|display_list }}  
+                        {{ user.groups.all|display_list }}
                       {% else %}
                         {{  "Unknown role" }}
                       {% endif %}
@@ -35,15 +35,9 @@
                     </td>
                     <td>
                         <div class="btn-group">
-                            <a class="btn btn-mini btn-primary" href="#"><i class="icon-user icon-white"></i>
-                                Actions</a>
-                            <a class="btn btn-mini btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span
-                                    class="caret" id="action_caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{% url 'users_edit' user.pk %}" class="edit"><i class="icon-pencil"></i> Edit</a></li>
-                                <li><a href="#"><i class="icon-list"></i> Details</a></li>
-                                <li><a href="#"><i class="icon-trash"></i> Delete</a></li>
-                            </ul>
+                            <a href="{% url 'users_edit' user.pk %}" class="btn btn-small edit"><i class="icon-pencil"></i> Edit</a>
+                            <a href="#" class="btn btn-small"><i class="icon-list"></i> Details</a>
+                            <a href="#" class="btn btn-small"><i class="icon-trash"></i> Delete</a>
                         </div>
                     </td>
                 </tr>

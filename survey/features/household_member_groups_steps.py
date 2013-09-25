@@ -154,12 +154,6 @@ def and_i_select_conditions(step):
 def then_i_should_see_the_form_errors_of_required_fields(step):
     world.page.is_text_present("This field is required.")
 
-
-@step(u'And I click the actions button')
-def and_i_click_the_actions_button(step):
-    world.page.click_actions_button()
-
-
 @step(u'And I have member group with conditions')
 def and_i_have_a_groups(step):
     world.condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
@@ -199,7 +193,7 @@ def and_i_select_a_condition(step):
 
 @step(u'When I click the add group button')
 def when_i_click_the_add_group_button(step):
-    world.page.click_link_by_text("Add Group")
+    world.page.click_link_by_text(" Add Group")
 
 
 @step(u'Then I should go to add group page')

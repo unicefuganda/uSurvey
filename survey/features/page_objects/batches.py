@@ -90,7 +90,7 @@ class BatchListPage(PageObject):
         self.url = '/surveys/' + str(self.survey.id) + '/batches/'
 
     def visit_batch(self, batch):
-        self.browser.click_link_by_text("Open/Close")
+        self.browser.click_link_by_text(" Open/Close")
         return BatchShowPage(self.browser, batch)
 
     def click_add_batch_button(self):

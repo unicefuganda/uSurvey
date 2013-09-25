@@ -156,7 +156,6 @@ def then_back_button_should_take_back_to_investigator_listing_page(step):
 
 @step(u'And I click on the edit button')
 def and_i_click_on_the_edit_button(step):
-    world.page.click_actions_button()
     world.page.click_link_by_text(" Edit")
 
 @step(u'Then it should be able to take me to edit form page')

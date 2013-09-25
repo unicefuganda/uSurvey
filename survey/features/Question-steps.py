@@ -164,7 +164,6 @@ def and_i_have_a_multichoice_question(step):
 
 @step(u'And I click on view options link')
 def and_i_click_on_view_options_link(step):
-    world.page.click_actions_button()
     world.page.click_modal_link("#view_options_%d" % world.multi_choice_question.id)
 
 
@@ -186,7 +185,6 @@ def then_i_should_see_questions_list_page(step):
 
 @step(u'And I click on view add subquestion link')
 def and_i_click_on_view_add_subquestion_link(step):
-    world.page.click_actions_button()
     world.browser.click_link_by_text("Add Subquestion")
 
 

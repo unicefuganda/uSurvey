@@ -8,10 +8,11 @@
   <h3>
     Investigators List
   </h3>
-  <form id="aggregates-form" action="{% url 'investigators_page' %}" method="get">
+  <form id="aggregates-form" action="{% url 'investigators_page' %}" method="get" class="padded-bottom">
     {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
     <button class="btn btn-primary" id="a-investigator-list" href="{% url 'investigators_page' %}"> Get List</button>
   </form>
+  <br class="clear"/>
   {% if investigators %}
     <table class="table table-striped table-bordered table-hover">
       <thead>

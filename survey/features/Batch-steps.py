@@ -104,7 +104,7 @@ def and_i_should_see_the_batches_list_paginated(step):
 
 @step(u'And I click edit batch link')
 def and_i_click_edit_batch_link(step):
-    world.page.click_link_by_text('Edit')
+    world.page.click_link_by_text(' Edit')
 
 @step(u'Then I should see edit batch page')
 def then_i_should_see_edit_batch_page(step):
@@ -124,7 +124,7 @@ def and_i_should_see_the_batch_successfully_edited(step):
 
 @step(u'And I click delete batch link')
 def and_i_click_delete_batch_link(step):
-    world.page.click_link_by_text('Delete')
+    world.page.click_link_by_text(' Delete')
 
 @step(u'Then I should see confirm delete batch')
 def then_i_should_see_confirm_delete_bacth(step):
@@ -149,7 +149,7 @@ def then_i_should_be_on_the_list_of_questions_under_the_batch_page(step):
 
 @step(u'And I click on assign question link')
 def and_i_click_on_assign_question_link(step):
-    world.page.click_link_by_text("Select Questions")
+    world.page.click_link_by_text(" Select Questions")
 
 @step(u'Then I should see the assign question page of that batch')
 def then_i_should_see_the_assign_question_page_of_that_batch(step):

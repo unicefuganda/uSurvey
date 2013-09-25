@@ -22,8 +22,7 @@ def and_i_visit_batches_question_list_page(step):
 
 @step(u'And I click on add logic link')
 def and_i_click_on_add_logic_link(step):
-    world.page.click_actions_button()
-    world.page.click_link_by_text("Add Logic")
+    world.page.click_link_by_text(" Add Logic")
 
 @step(u'Then I should see the add logic page')
 def then_i_should_see_the_add_logic_page(step):
