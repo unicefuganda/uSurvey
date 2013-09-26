@@ -36,7 +36,7 @@
           <td>
             <div class="btn-group">
               <a class="btn btn-small" href="{% url 'batch_edit_page' survey.id batch.pk %}"><i class="icon-pencil"></i> Edit</a>
-              <a class="btn btn-small" data-toggle="modal" href="#delete_{{batch.id}}"><i class="icon-trash"></i> Delete</a>
+              <a class="btn btn-small" data-toggle="modal" href="#delete_batch_{{batch.id}}"><i class="icon-trash"></i> Delete</a>
               <a class="btn btn-small" href="{% url 'assign_questions_page' batch.id %}"><i class="icon-plus"></i> Select Questions</a>
               <a class="btn btn-small" href="{% url 'batch_show_page' survey.id batch.pk %}"><i class="icon-lock"></i> Open/Close</a>
             </div>

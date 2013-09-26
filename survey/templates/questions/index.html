@@ -47,13 +47,14 @@
               </td>
               <td>
                 <div class="btn-group">
+                  <a class="btn btn-small" href="{% url 'add_subquestion_page' question.pk %}" id="add_sub_question"><i class="icon-plus"></i>Add Subquestion</a>
                   {% if batch %}
                     <a href="{% url 'add_question_logic_page' question.pk %}" class="btn btn-small"><i class="icon-plus"></i> Add Logic</a>
                   {% endif %}
                   {% if question.options.all %}
                     <a class="btn btn-small" href="#view_options_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View options</a>
                   {% endif %}
-                    <a class="btn btn-small" href="{% url 'add_subquestion_page' question.pk %}" id="add_sub_question"><i class="icon-plus"></i>Add Subquestion</a>
+                    
                 </div>
 
                 {% if question.options.all %}

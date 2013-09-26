@@ -5,6 +5,7 @@
 {% block content %}
 {% load pagination_tags %}
 {% autopaginate surveys 50 %}
+{% load template_tags %}
   <h3>
     Survey List
   </h3>
@@ -51,8 +52,8 @@
                 <a class="btn btn-small" href='{% url "edit_survey_page" survey.id %}'><i class="icon-pencil"></i> Edit</a>
                 <a class="btn btn-small " data-toggle="modal" href="#delete_survey_{{survey.id}}"><i class="icon-trash"></i> Delete</a>
                 <a class="add_batch btn btn-small" href='{% url 'new_batch_page' survey.pk %}'><i class="icon-plus"></i> Add Batch</a>
-                  {% include "surveys/delete.html" with survey=survey %}
             </div>
+          {% include "base/delete_modal.html" with object_name=survey.name id=survey.id name="Survey" url=survey.id|get_url_with_ids:"delete_survey" %}
           </td>
         </tr>
       {% endfor %}
