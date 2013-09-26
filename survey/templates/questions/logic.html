@@ -7,3 +7,7 @@
 {% block display_form_fields %}
     {% include "naked_form.html" with a_form=logic_form %}
 {% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}/js/logic.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

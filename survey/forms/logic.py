@@ -18,6 +18,13 @@ class LogicForm(forms.Form):
         if question:
             self.fields['condition'].label = "If %s" % question.text
             is_multichoice = question.is_multichoice()
+            self.fields['condition'].choices = self.choices_for_condition_field(is_multichoice)
+            question_choices = []
+            for next_question in question.batch.all_questions():
+                if next_question.id != question.id:
+                    question_choices.append((next_question.id, next_question.text))
+
+
             if is_multichoice:
                 del self.fields['value']
                 del self.fields['validate_with_question']
@@ -28,11 +35,10 @@ class LogicForm(forms.Form):
             else:
                 del self.fields['option']
                 self.fields['attribute'].choices = [('value', 'Value'), ('validate_with_question', "Question")]
+                self.fields['condition'].initial = 'EQUALS'
+                self.fields['validate_with_question'].choices = question_choices
 
-            self.fields['condition'].choices = self.choices_for_condition_field(is_multichoice)
-            self.fields['next_question'].choices = map(lambda next_question: (
-            next_question.id, next_question.text) if next_question.id != question.id else ('',''),
-                                                       question.batch.all_questions())
+            self.fields['next_question'].choices = question_choices
 
     def choices_for_condition_field(self, is_multichoice):
         condition_choices = {}

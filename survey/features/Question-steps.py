@@ -157,9 +157,9 @@ def and_i_visit_create_new_question_page(step):
 def and_i_have_a_multichoice_question(step):
     world.multi_choice_question = Question.objects.create(text="Are these insecticide?",
                                                           answer_type=Question.MULTICHOICE, order=6)
-    QuestionOption.objects.create(question=world.multi_choice_question, text="Yes", order=1)
-    QuestionOption.objects.create(question=world.multi_choice_question, text="No", order=2)
-    QuestionOption.objects.create(question=world.multi_choice_question, text="Dont Know", order=3)
+    world.option1 = QuestionOption.objects.create(question=world.multi_choice_question, text="Yes", order=1)
+    world.option2 = QuestionOption.objects.create(question=world.multi_choice_question, text="No", order=2)
+    world.option3 = QuestionOption.objects.create(question=world.multi_choice_question, text="Dont Know", order=3)
 
 
 @step(u'And I click on view options link')

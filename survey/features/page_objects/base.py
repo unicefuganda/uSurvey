@@ -26,7 +26,7 @@ class PageObject(object):
 
     def is_disabled(self, element_id):
         try:
-            self.browser.find_by_css('#%s[disabled]' % element_id).first
+            element = self.browser.find_by_css('#%s[disabled]' % element_id).first
             return True
         except Exception, e:
             return False
@@ -194,3 +194,9 @@ class PageObject(object):
     def validate_form_values(self, form_values):
         for key in form_values.keys():
             assert self.browser.find_by_name(key).first.value == str(form_values[key])
+
+    def field_not_present(self, field_name):
+        assert not self.browser.find_by_name(field_name)
+
+    def field_is_visible(self, field_name):
+        return self.browser.find_by_name(field_name).first.visible
