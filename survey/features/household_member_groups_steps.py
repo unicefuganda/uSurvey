@@ -154,7 +154,7 @@ def then_i_should_see_the_form_errors_of_required_fields(step):
     world.page.is_text_present("This field is required.")
 
 @step(u'And I have member group with conditions')
-def and_i_have_a_groups(step):
+def and_i_have_member_group_with_conditions(step):
     world.condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
     world.condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
     world.group = HouseholdMemberGroup.objects.create(order=1, name="group 1")
@@ -170,7 +170,7 @@ def and_i_click_view_conditions_link(step):
 @step(u'Then I should see a list of conditions')
 def then_i_should_see_a_list_of_conditions(step):
     world.page = GroupDetailsPage(world.browser, world.group)
-    world.page.validate_fields_present(["Groups Condition List", "Condition", "Attribute", "Value"])
+    world.page.validate_fields()
 
 
 @step(u'When I click Groups tab')
@@ -312,3 +312,17 @@ def when_i_click_yes(step):
 @step(u'Then I should see that the group was deleted successfully')
 def then_i_should_see_that_the_group_was_deleted_successfully(step):
     world.page.see_success_message("Group", "deleted")
+
+@step(u'And I click delete condition link')
+def and_i_click_delete_condition_link(step):
+    world.page.click_link_by_text(" Delete")
+
+@step(u'Then I should see a delete condition confirmation modal')
+def then_i_should_see_a_delete_condition_confirmation_modal(step):
+  world.page.see_confirm_delete_message(world.condition_1.__str__())
+  world.page.is_text_present("It is attached to the following groups:")
+  world.page.find_link_by_text(world.group.name)
+
+@step(u'Then I should see that the condition was deleted successfully')
+def then_i_should_see_that_the_condition_was_deleted_successfully(step):
+    world.page.see_success_message("Condition", "deleted")

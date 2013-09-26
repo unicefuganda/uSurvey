@@ -70,7 +70,19 @@ class GroupConditionViewTest(BaseTest):
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/conditions/new/')
         self.assert_restricted_permission_for('/conditions/')
-
+        self.assert_restricted_permission_for('/conditions/1/delete/')
+        
+    def test_delete_condition(self):       
+        condition_1 = GroupCondition.objects.create(value="some string")
+        group = HouseholdMemberGroup.objects.create(order=1, name="group 1")
+        condition_1.groups.add(group)
+        response = self.client.get('/conditions/%s/delete/'%condition_1.id)
+        retrieved_condition = GroupCondition.objects.filter(id=condition_1.id)
+        self.failIf(retrieved_condition)
+        self.assertEqual(0, group.conditions.all().count())
+        self.assertRedirects(response, expected_url='/conditions/', status_code=302, target_status_code=200, msg_prefix='')
+        success_message = 'Condition successfully deleted.'
+        self.assertIn(success_message, response.cookies['messages'].value)
 
 class HouseholdMemberGroupTest(BaseTest):
     def setUp(self):
@@ -226,6 +238,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertIn(hmg_1, response.context['conditions'])
         self.assertIn(hmg_2, response.context['conditions'])
         self.assertNotIn(hmg_3, response.context['conditions'])
+        self.assertEqual(group, response.context['group'])
 
     def test_view_returns_no_conditions_message_if_no_conditions_on_a_group(self):
         group = HouseholdMemberGroup.objects.create(name='some name', order=1)
@@ -235,6 +248,7 @@ class HouseholdMemberGroupTest(BaseTest):
         response = self.client.get('/groups/%s/' % str(group.pk))
         self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')
         self.assertTrue("No conditions in this group.", response.cookies['messages'].value)
+        
 
     def test_restricted_permissions_for_group_details(self):
         group = HouseholdMemberGroup.objects.create(name='some name', order=1)
@@ -345,7 +359,7 @@ class HouseholdMemberGroupTest(BaseTest):
 
        self.assertRedirects(response, expected_url='/groups/%s/'%group.id, status_code=302, target_status_code=200, msg_prefix='')
 
-    def test_edit_group_post(self):
+    def test_delete_group(self):
         condition_1 = GroupCondition.objects.create(value="some string")
         condition_2 = GroupCondition.objects.create(value="5")
         condition_3 = GroupCondition.objects.create(value="4")
@@ -356,7 +370,9 @@ class HouseholdMemberGroupTest(BaseTest):
         retrieved_group = HouseholdMemberGroup.objects.filter(name=group.name, order=group.order)
         self.failIf(retrieved_group)
         all_conditions = GroupCondition.objects.all()
-        conditions_that_beloged_to_deleted_group = [condition_1, condition_2, condition_3]
-        [self.assertIn(condition, all_conditions) for  condition in conditions_that_beloged_to_deleted_group]
-        [self.assertNotIn(group, condition.groups.all()) for condition in conditions_that_beloged_to_deleted_group]
+        conditions_for_deleted_group = [condition_1, condition_2, condition_3]
+        [self.assertIn(condition, all_conditions) for  condition in conditions_for_deleted_group]
+        [self.assertNotIn(group, condition.groups.all()) for condition in conditions_for_deleted_group]
         self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')
+        success_message = 'Group successfully deleted.'
+        self.assertIn(success_message, response.cookies['messages'].value)

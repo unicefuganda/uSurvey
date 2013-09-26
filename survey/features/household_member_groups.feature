@@ -109,3 +109,12 @@ Feature: Group features
     Then I should see a delete confirmation modal 
     When I click yes 
     Then I should see that the group was deleted successfully
+
+  Scenario: Delete a group condition
+    Given I am logged in as researcher
+    And I have member group with conditions
+    And I visit conditions listing page
+    And I click delete condition link
+    Then I should see a delete condition confirmation modal 
+    When I click yes 
+    Then I should see that the condition was deleted successfully

@@ -4,54 +4,57 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
+{% load template_tags %}
   <h3>
-    Groups Condition List
+    Group {{ group.name}} Condition List
   </h3>
-    {% if group_id %}
-        <a href="{% url add_condition_url group_id %}" class="btn pull-right" id="add_condition">
+    {% if group %}
+        <a href="{% url add_condition_url group.id %}" class="btn pull-right" id="add_condition">
             <i class="icon-plus"></i> Add Condition</a>
     {% else %}
         <a href="{% url add_condition_url %}" class="btn pull-right" id="add_condition">
             <i class="icon-plus"></i> Add Condition</a>
     {% endif %}
-    <br class="clear">
-    <br/>
-  <table class="table table-striped table-bordered table-hover">
-    <thead>
-      <tr>
-        <th>
-           Attribute
-        </th>
-        <th>
-          Condition
-        </th>
-        <th>
-          Value
-        </th>
-        <th>
-          Actions
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for condition in conditions %}
+    
+      <br class="clear">
+      <br/>
+    <table class="table table-striped table-bordered table-hover">
+      <thead>
         <tr>
-          <td>
-            <a href="">{{ condition.attribute }}</a>
-          </td>
-          <td>
-            {{ condition.condition }}
-          </td>
-          <td>
-            {{ condition.value }}
-          </td>
-          <td>
-            <div class="btn-group">
-              <a href="" class="btn btn-small"><i class="icon-pencil"></i> Edit</a>
-            </div>
-          </td>
+          <th>
+             Attribute
+          </th>
+          <th>
+            Condition
+          </th>
+          <th>
+            Value
+          </th>
+          <th>
+            Actions
+          </th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for condition in conditions %}
+          <tr>
+            <td>
+              <a href="">{{ condition.attribute }}</a>
+            </td>
+            <td>
+              {{ condition.condition }}
+            </td>
+            <td>
+              {{ condition.value }}
+            </td>
+            <td>
+              <div class="btn-group">
+                <a href="#delete_{{ condition.id }}" data-toggle="modal" class="btn btn-small"><i class="icon-trash"></i> Delete</a>
+              </div>
+            </td>
+          </tr>
+          {% include "household_member_groups/conditions/delete_condition_modal.html" with object_name=condition id=condition.id name="Condition" url="delete_condition_page"|get_url:condition.id %}
+        {% endfor %}
+      </tbody>
+    </table>
 {% endblock %}

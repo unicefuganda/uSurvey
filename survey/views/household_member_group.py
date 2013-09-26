@@ -105,12 +105,12 @@ def add_group(request):
 
 @permission_required('auth.can_view_household_groups')
 def details(request, group_id):
+    group = HouseholdMemberGroup.objects.get(id=group_id)
     conditions = GroupCondition.objects.filter(groups__id=group_id)
     if not conditions.exists():
         messages.error(request, "No conditions in this group.")
         return HttpResponseRedirect("/groups/")
-    return render(request, "household_member_groups/conditions/index.html",
-                  {'conditions': conditions, 'add_condition_url': 'new_condition_for_group', 'group_id': group_id})
+    return render(request, "household_member_groups/conditions/index.html", {'conditions': conditions, 'add_condition_url': 'new_condition_for_group', 'group': group})
 
 
 @permission_required('auth.can_view_household_groups')
@@ -168,3 +168,9 @@ def delete_group(request, group_id):
   HouseholdMemberGroup.objects.get(id=group_id).delete()
   messages.success(request, "Group successfully deleted.")
   return HttpResponseRedirect("/groups/")
+
+@permission_required('auth.can_view_household_groups')
+def delete_condition(request, condition_id):
+  GroupCondition.objects.get(id=condition_id).delete()
+  messages.success(request, "Condition successfully deleted.")
+  return HttpResponseRedirect("/conditions/")

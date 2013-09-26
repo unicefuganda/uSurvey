@@ -37,3 +37,7 @@ class TemplateTagsTest(TestCase):
         self.assertEqual('N/A', get_month(None))
         self.assertEqual('N/A', get_month(''))
 
+    def test_should_return_url_given_url_name(self):
+        self.assertEqual('/surveys/', get_url('survey_list_page'))
+        self.assertEqual('/surveys/1/delete/', get_url('delete_survey', 1))
+        self.assertEqual('/surveys/1/batches/2/', get_url('batch_show_page', "1, 2"))

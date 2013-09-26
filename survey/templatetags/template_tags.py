@@ -1,5 +1,6 @@
 from django import template
 from survey.investigator_configs import MONTHS
+from django.core.urlresolvers import reverse
 
 register = template.Library()
 
@@ -54,3 +55,15 @@ def get_month(index):
 @register.filter
 def format_date(date):
     return date.strftime("%b %d, %Y")
+
+def _reverse_url_with_args(url_name, args):
+  if not str(args).isdigit():
+    arg_list = [int(arg) for arg in args.split(',')]
+    return reverse(url_name, args=arg_list)
+  return reverse(url_name, args=(args,))    
+    
+@register.filter
+def get_url(url_name, args=None):
+    if args:
+      return _reverse_url_with_args(url_name, args)
+    return reverse(url_name)
