@@ -98,8 +98,9 @@ def _get_post_values(post_data):
     next_question_key = post_data.get('next_question', None)
     option_key = post_data.get('option', None)
     question_key = post_data.get('validate_with_question', None)
+    condition_response = post_data.get('condition', None)
     save_data = {'action': post_data['action'],
-                 'condition': post_data['condition'],
+                 'condition': condition_response if condition_response else 'EQUALS_OPTION',
                  'next_question': Question.objects.get(id=next_question_key) if next_question_key else None,
                  'validate_with_value': post_data.get('value', None),
                  'validate_with_option': QuestionOption.objects.get(id=option_key) if option_key else None,

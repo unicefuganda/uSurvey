@@ -49,9 +49,9 @@ class LogicForm(forms.Form):
         return condition_choices.items()
 
 
-    condition = forms.ChoiceField(label='If', choices=AnswerRule.CONDITIONS.items(), widget=forms.Select, required=True)
-    attribute = forms.ChoiceField(label='Attribute', choices=[], widget=forms.Select, required=True)
-    option = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=False)
+    condition = forms.ChoiceField(label='If', choices=AnswerRule.CONDITIONS.items(), widget=forms.Select, required=False)
+    attribute = forms.ChoiceField(label='Attribute', choices=[], widget=forms.Select, required=False)
+    option = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=True)
     value = forms.CharField(label='', required=False)
     validate_with_question = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=False)
     action = forms.ChoiceField(label='Then', choices=[], widget=forms.Select, required=True)
