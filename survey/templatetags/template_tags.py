@@ -56,14 +56,18 @@ def get_month(index):
 def format_date(date):
     return date.strftime("%b %d, %Y")
 
-def _reverse_url_with_args(url_name, args):
-  if not str(args).isdigit():
-    arg_list = [int(arg) for arg in args.split(',')]
-    return reverse(url_name, args=arg_list)
-  return reverse(url_name, args=(args,))    
-    
 @register.filter
-def get_url(url_name, args=None):
-    if args:
-      return _reverse_url_with_args(url_name, args)
-    return reverse(url_name)
+def get_url_with_ids(args, url_name):
+    if not str(args).isdigit():
+      arg_list = [int(arg) for arg in args.split(',')]
+      return reverse(url_name, args=arg_list)
+    return reverse(url_name, args=(args,))    
+
+@register.filter
+def get_url_without_ids(url_name):
+    return reverse(url_name)    
+
+@register.filter
+def add_string(int_1, int_2):
+  return "%s, %s"%(str(int_1), str(int_2)) 
+  

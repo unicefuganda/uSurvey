@@ -43,7 +43,7 @@
             </div>
           </td>
         </tr>
-           {% include "base/delete_modal.html" with object_name=group.name id=group.id name="Group" url="household_member_groups_delete"|get_url:group.id %}
+           {% include "base/delete_modal.html" with object_name=group.name id=group.id name="Group" url=group.id|get_url_with_ids:"household_member_groups_delete" %}
       {% endfor %}
     </tbody>
   </table>

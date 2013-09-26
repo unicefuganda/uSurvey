@@ -38,6 +38,12 @@ class TemplateTagsTest(TestCase):
         self.assertEqual('N/A', get_month(''))
 
     def test_should_return_url_given_url_name(self):
-        self.assertEqual('/surveys/', get_url('survey_list_page'))
-        self.assertEqual('/surveys/1/delete/', get_url('delete_survey', 1))
-        self.assertEqual('/surveys/1/batches/2/', get_url('batch_show_page', "1, 2"))
+        self.assertEqual('/surveys/', get_url_without_ids('survey_list_page'))
+
+    def test_should_return_url_given_url_name_and_ids(self):    
+        self.assertEqual('/surveys/1/delete/', get_url_with_ids( 1, 'delete_survey'))
+        self.assertEqual('/surveys/1/batches/2/', get_url_with_ids("1, 2", 'batch_show_page'))
+
+    def test_should_return_concatenated_ints_in_a_single_string(self):    
+        self.assertEqual('1, 2', add_string(1,2))
+        self.assertEqual('1, 2', add_string('1','2'))

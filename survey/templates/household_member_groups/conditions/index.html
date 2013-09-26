@@ -53,7 +53,7 @@
               </div>
             </td>
           </tr>
-          {% include "household_member_groups/conditions/delete_condition_modal.html" with object_name=condition id=condition.id name="Condition" url="delete_condition_page"|get_url:condition.id %}
+          {% include "household_member_groups/conditions/delete_condition_modal.html" with object_name=condition id=condition.id name="Condition" url=condition.id|get_url_with_ids:"delete_condition_page" %}
         {% endfor %}
       </tbody>
     </table>
