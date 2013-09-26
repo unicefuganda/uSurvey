@@ -183,7 +183,7 @@ class PageObject(object):
     def see_message(self, text):
         assert self.browser.is_text_present(text)
 
-    def see_confirm_delete_message(self,name):
+    def see_confirm_delete_message(self, name):
         self.is_text_present("Confirm: Are you sure you want to delete %s?" % name)
 
     def validate_form_present(self, form):

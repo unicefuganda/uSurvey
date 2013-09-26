@@ -239,6 +239,8 @@ class HouseholdMemberGroupTest(BaseTest):
     def test_restricted_permissions_for_group_details(self):
         group = HouseholdMemberGroup.objects.create(name='some name', order=1)
         self.assert_restricted_permission_for('/groups/%s/' % str(group.pk))
+        self.assert_restricted_permission_for('/groups/%s/delete/' % group.id)
+        self.assert_restricted_permission_for('/groups/%s/edit/' % group.id)
 
     def test_restricted_permissions_for_add_group(self):
         self.assert_restricted_permission_for('/groups/new/')
@@ -342,3 +344,19 @@ class HouseholdMemberGroupTest(BaseTest):
        self.assertTrue(success_message in response.cookies['messages'].value)
 
        self.assertRedirects(response, expected_url='/groups/%s/'%group.id, status_code=302, target_status_code=200, msg_prefix='')
+
+    def test_edit_group_post(self):
+        condition_1 = GroupCondition.objects.create(value="some string")
+        condition_2 = GroupCondition.objects.create(value="5")
+        condition_3 = GroupCondition.objects.create(value="4")
+        group = HouseholdMemberGroup.objects.create(order=1, name="group 1")
+        condition_1.groups.add(group)
+        condition_2.groups.add(group)
+        response = self.client.get('/groups/%s/delete/'%group.id)
+        retrieved_group = HouseholdMemberGroup.objects.filter(name=group.name, order=group.order)
+        self.failIf(retrieved_group)
+        all_conditions = GroupCondition.objects.all()
+        conditions_that_beloged_to_deleted_group = [condition_1, condition_2, condition_3]
+        [self.assertIn(condition, all_conditions) for  condition in conditions_that_beloged_to_deleted_group]
+        [self.assertNotIn(group, condition.groups.all()) for condition in conditions_that_beloged_to_deleted_group]
+        self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')

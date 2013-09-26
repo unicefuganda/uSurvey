@@ -139,6 +139,8 @@ def add_group_condition(request,group_id):
                'condition_form': condition_form}
     return render(request, 'household_member_groups/conditions/new.html', context)
 
+
+@permission_required('auth.can_view_household_groups')
 def edit_group(request, group_id):
     params = request.POST
     response = None
@@ -159,3 +161,10 @@ def edit_group(request, group_id):
                'condition_title': "New Condition"}
 
     return response or render(request, 'household_member_groups/new.html', context)
+
+
+@permission_required('auth.can_view_household_groups')
+def delete_group(request, group_id):
+  HouseholdMemberGroup.objects.get(id=group_id).delete()
+  messages.success(request, "Group successfully deleted.")
+  return HttpResponseRedirect("/groups/")

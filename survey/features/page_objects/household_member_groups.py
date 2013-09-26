@@ -46,3 +46,9 @@ class AddNewConditionToGroupPage(PageObject):
         super(AddNewConditionToGroupPage, self).__init__(browser)
         self.group = group
         self.url = '/groups/%d/conditions/new/' % group.id
+
+class DeleteHouseholdMemberGroup(PageObject):
+    def __init__(self, browser, group):
+        super(DeleteHouseholdMemberGroup, self).__init__(browser)
+        self.group = group
+        self.url = '/groups/%d/delete/' % group.id

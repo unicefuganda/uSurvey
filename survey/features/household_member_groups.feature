@@ -22,7 +22,7 @@ Feature: Group features
     And I click save button
     Then I should see that the condition was saved successfully
 
-  Scenario: Add a group
+  Scenario: Add household member a group
     Given I am logged in as researcher
     And I have a condition
     And I visit the new group page
@@ -90,7 +90,7 @@ Feature: Group features
     And I click the new condition form save button
     Then I see error age cannot be negative
 
-  Scenario: Edit a group
+  Scenario: Edit a member group
     Given I am logged in as researcher
     And I have member group with conditions
     And I visit groups listing page
@@ -100,3 +100,12 @@ Feature: Group features
     And I select new conditions
     And I submit the form
     Then I should see that the group was edited successfully
+
+  Scenario: Delete a member a group
+    Given I am logged in as researcher
+    And I have member group with conditions
+    And I visit groups listing page
+    And I click delete group link
+    Then I should see a delete confirmation modal 
+    When I click yes 
+    Then I should see that the group was deleted successfully

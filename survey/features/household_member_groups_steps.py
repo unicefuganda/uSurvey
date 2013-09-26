@@ -3,8 +3,7 @@ from random import randint
 from lettuce import *
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
-from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage, GroupDetailsPage, AddNewConditionToGroupPage
-
+from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage, GroupDetailsPage, AddNewConditionToGroupPage, DeleteHouseholdMemberGroup
 
 @step(u'And I have 10 conditions')
 def and_i_have_10_conditions(step):
@@ -296,3 +295,20 @@ def then_i_should_see_the_groups_details_in_an_edit_group_form(step):
 def and_i_select_new_conditions(step):
     new_condition = GroupCondition.objects.create(value=39, attribute='AGE', condition="LESS_THAN")
     world.page.select_multiple('#id_conditions', world.condition_1, new_condition)
+
+@step(u'And I click delete group link')
+def and_i_click_delete_group_link(step):
+    world.page.click_link_by_text(" Delete")
+    world.page = DeleteHouseholdMemberGroup(world.browser, world.group)
+
+@step(u'Then I should see a delete confirmation modal')
+def then_i_should_see_a_delete_confirmation_modal(step):
+    world.page.see_confirm_delete_message(world.group.name)
+
+@step(u'When I click yes')
+def when_i_click_yes(step):
+    world.page.click_link_by_text("Yes")
+
+@step(u'Then I should see that the group was deleted successfully')
+def then_i_should_see_that_the_group_was_deleted_successfully(step):
+    world.page.see_success_message("Group", "deleted")
