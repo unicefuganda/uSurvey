@@ -7,24 +7,35 @@ function disable_field_based_on_value(field, value) {
 }
 
 function show_or_hide_attribute_fields(attribute_value){
+    var validate_with_question_field = $('#id_validate_with_question');
+    var value_field = $('#id_value');
+
     if(attribute_value == 'value'){
-        $('#id_validate_with_question').hide();
-        $('#id_value').show();
+        validate_with_question_field.hide();
+        validate_with_question_field.attr('disabled', 'disabled');
+        value_field.show();
+        value_field.attr('disabled', false);
     }
     if(attribute_value == 'validate_with_question')
     {
-        $('#id_validate_with_question').show();
-        $('#id_value').hide();
+        validate_with_question_field.show();
+        validate_with_question_field.attr('disabled', false);
+        value_field.hide();
+        value_field.attr('disabled', 'disabled');
     }
 }
 function show_or_hide_next_question(action_value) {
     show_next_question = ['SKIP_TO', 'ASK_SUBQUESTION'];
 
+    var next_question_field = $('#id_next_question');
+
     if (show_next_question.indexOf(action_value) != -1) {
-        $('#id_next_question').show()
+        next_question_field.show();
+        next_question_field.attr('disabled', false)
     }
     else {
-        $('#id_next_question').hide()
+        next_question_field.hide();
+        next_question_field.attr('disabled', 'disabled')
     }
 }
 
