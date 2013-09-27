@@ -91,3 +91,13 @@ Feature: Questions related features
     When I fill in edited question details
     And I submit the form
     Then I should see the question successfully edited
+
+  Scenario: Delete question
+    Given I am logged in as researcher
+    And I have a member group
+    And I have a multichoice question
+    And I visit questions list page
+    And I click on delete question link
+    Then I should see a delete question confirmation modal 
+    When I click yes 
+    Then I should see that the question was deleted successfully

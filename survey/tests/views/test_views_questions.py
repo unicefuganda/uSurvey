@@ -243,6 +243,12 @@ class QuestionsViews(BaseTest):
         self.assertEqual(2, question_options.count())
         self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), question_options)
         self.assertIn(QuestionOption.objects.get(text=form_data['options'][1]), question_options)
+        option_index=0
+        for option_text in form_data['options']:
+            option_index +=1
+            self.assertIn(QuestionOption.objects.get(text=option_text), question_options)
+            self.assertEqual(option_index, QuestionOption.objects.get(text=form_data['options'][option_index-1]).order)
+        
 
     def test_should_not_save_empty_options_on_multichoice_questions(self):
         form_data = {
@@ -440,6 +446,36 @@ class QuestionsViews(BaseTest):
         self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         success_message = "Question successfully edited."
         self.assertTrue(success_message in response.cookies['messages'].value)
+        
+    def test_should_not_recreate_already_existing_options_and_update_options_order_on_edit_mutlichoicequestion(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group, batch=self.batch, answer_type=Question.MULTICHOICE)
+        question_option = QuestionOption.objects.create(text="question option text 1", question=question)
+        question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question)
+
+        form_data = {
+              'text': 'I edited this question',
+              'answer_type': Question.MULTICHOICE,
+              'group': group.id, 
+              'options':[question_option.text, 'hahaha', question_option_2.text ]
+          }
+
+        form_data1=form_data.copy()
+        del form_data1['options']
+        self.failIf(Question.objects.filter(**form_data1))
+        response = self.client.post('/questions/%d/edit/' % question.id, data=form_data)
+        self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
+        retrieved_question = Question.objects.filter(**form_data1)
+        self.assertEqual(1, retrieved_question.count())
+        options = retrieved_question[0].options.all()
+        self.assertEqual(3, options.count())
+        self.assertIn(question_option, options)
+        self.assertIn(question_option_2, options)
+        option_index=0
+        for option_text in form_data['options']:
+            self.assertIn(option_text, [option.text for option in options])
+            option_index +=1
+            self.assertEqual(option_index, QuestionOption.objects.get(text=form_data['options'][option_index-1]).order)
 
     def test_should_not_save_on_post_edit_question_failure(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)
@@ -457,7 +493,31 @@ class QuestionsViews(BaseTest):
         self.failIf(saved_question)
         error_message = 'Question was not edited.'
         self.assertTrue(error_message, response.context['messages'])
+        
+    def test_should_throw_error_if_editing_non_question_survey(self):
+        response = self.client.get('/questions/11/edit/')
+        self.assertRedirects(response,'/questions/', status_code=302, target_status_code=200, msg_prefix='')
+        error_message = "Question does not exist."
+        self.assertIn(error_message, response.cookies['messages'].value)
 
+    def test_should_delete_question(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group, batch=self.batch)
+        self.failUnless(question)
+
+        response = self.client.get('/questions/%d/delete/' % question.id,)
+        self.failIf(Question.objects.filter(id=question.id))
+
+        self.assertRedirects(response,'/questions/', status_code=302, target_status_code=200, msg_prefix='')
+        success_message = "Question successfully deleted."
+        self.assertIn(success_message, response.cookies['messages'].value)
+
+    def test_should_delete_question(self):
+        non_existing_id = 222222
+        response = self.client.get('/questions/%d/delete/' % non_existing_id)
+        self.assertRedirects(response,'/questions/', status_code=302, target_status_code=200, msg_prefix='')
+        error_message = "Question does not exist."
+        self.assertIn(error_message, response.cookies['messages'].value)
 
 class LogicViewTest(BaseTest):
     def setUp(self):

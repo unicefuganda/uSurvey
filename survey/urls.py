@@ -69,7 +69,8 @@ urlpatterns = patterns('',
     url(r'^questions/(?P<question_id>\d+)/add_logic/$', 'survey.views.questions.add_logic', name='add_question_logic_page'),
     url(r'^questions/(?P<question_id>\d+)/edit/$', 'survey.views.questions.edit', name='edit_question_page'),
     url(r'^questions/(?P<question_id>\d+)/questions_json/$', 'survey.views.questions.get_questions_for_batch', name='batch_questions_json_page'),
-    url(r'^questions/(?P<question_id>\d+)/sub_questions_json/$', 'survey.views.questions.get_sub_questions_for_question', name='questions_subquestion_json_page')
+    url(r'^questions/(?P<question_id>\d+)/sub_questions_json/$', 'survey.views.questions.get_sub_questions_for_question', name='questions_subquestion_json_page'),
+    url(r'^questions/(?P<question_id>\d+)/delete/$', 'survey.views.questions.delete', name='delete_question_page'),
 
 )
 

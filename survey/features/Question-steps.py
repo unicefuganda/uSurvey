@@ -260,3 +260,15 @@ def when_i_fill_in_edited_question_details(step):
 @step(u'Then I should see the question successfully edited')
 def then_i_should_see_the_question_successfully_edited(step):
     world.page.see_success_message("Question", "edited")
+
+@step(u'And I click on delete question link')
+def and_i_click_on_delete_question_link(step):
+    world.page.click_modal_link("#delete_question_%d"%world.multi_choice_question.id)
+
+@step(u'Then I should see a delete question confirmation modal')
+def then_i_should_see_a_delete_question_confirmation_modal(step):
+    world.page.see_confirm_delete_message(world.multi_choice_question.text)
+
+@step(u'Then I should see that the question was deleted successfully')
+def then_i_should_see_that_the_question_was_deleted_successfully(step):
+    world.page.see_success_message("Question", "deleted")

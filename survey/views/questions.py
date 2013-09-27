@@ -107,9 +107,21 @@ def new(request):
 
 @permission_required('auth.can_view_batches')
 def edit(request, question_id):
-    question = Question.objects.get(id=question_id)
-    response, context = _render_question_view(request, question)
+    question = Question.objects.filter(id=question_id)
+    if not question:
+        messages.error(request, "Question does not exist.")
+        return HttpResponseRedirect('/questions/')
+    response, context = _render_question_view(request, question[0])
     return response or render(request, 'questions/new.html', context)
+
+def delete(request, question_id):
+    question = Question.objects.filter(pk=question_id)
+    if question:
+        messages.success(request, "Question successfully deleted.")
+    else:
+        messages.error(request, "Question does not exist.") 
+    question.delete()
+    return HttpResponseRedirect("/questions/")
 
 def _process_question_form(request, options, response, instance=None):
     question_form = QuestionForm(data=request.POST, instance=instance)
