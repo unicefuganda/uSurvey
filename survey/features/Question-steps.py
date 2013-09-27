@@ -1,7 +1,7 @@
 from random import randint
 from time import sleep
 from lettuce import *
-from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage, CreateNewSubQuestionPage
+from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage, CreateNewSubQuestionPage, EditQuestionPage
 from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
 
@@ -156,7 +156,8 @@ def and_i_visit_create_new_question_page(step):
 @step(u'And I have a multichoice question')
 def and_i_have_a_multichoice_question(step):
     world.multi_choice_question = Question.objects.create(text="Are these insecticide?",
-                                                          answer_type=Question.MULTICHOICE, order=6)
+                                                          answer_type=Question.MULTICHOICE, order=6,
+                                                           group = world.household_member_group)
     world.option1 = QuestionOption.objects.create(question=world.multi_choice_question, text="Yes", order=1)
     world.option2 = QuestionOption.objects.create(question=world.multi_choice_question, text="No", order=2)
     world.option3 = QuestionOption.objects.create(question=world.multi_choice_question, text="Dont Know", order=3)
@@ -221,3 +222,41 @@ def and_i_should_see_question_was_not_added(step):
 @step(u'And I should see that option in the form')
 def and_i_should_see_that_option_in_the_form(step):
     world.page.see_option_text(world.option['options'],'options')
+
+@step(u'And I visit question listing page')
+def and_i_visit_question_listing_page(step):
+    world.page = ListAllQuestionsPage(world.browser)
+    world.page.visit()
+
+@step(u'And I click the edit question link')
+def and_i_click_the_edit_question_link(step):
+    world.page.click_link_by_text(" Edit")
+
+@step(u'Then I should see the edit question page')
+def then_i_should_see_the_edit_question_page(step):
+    world.page = EditQuestionPage(world.browser, world.multi_choice_question)
+    world.page.validate_url()
+
+@step(u'And I see the question form with values')
+def and_i_see_the_question_form_with_values(step):
+  world.form = {'text': 'Text',
+          'group': 'Group',
+          'answer_type':'Answer type'}
+
+  form_values = {'text': world.multi_choice_question.text,
+                 'group': world.multi_choice_question.group.id,
+                 'answer_type': world.multi_choice_question.answer_type}
+  world.page.validate_form_present(world.form)
+  world.page.validate_form_values(form_values)
+
+@step(u'When I fill in edited question details')
+def when_i_fill_in_edited_question_details(step):
+    world.edited_question_details = {'text': 'edited question',
+              'group': world.multi_choice_question.group.id
+              }
+    world.page.see_select_option(['Number'], 'answer_type')
+    world.page.fill_valid_values(world.edited_question_details)
+
+@step(u'Then I should see the question successfully edited')
+def then_i_should_see_the_question_successfully_edited(step):
+    world.page.see_success_message("Question", "edited")

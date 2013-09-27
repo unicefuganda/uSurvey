@@ -72,9 +72,11 @@ class QuestionsViews(BaseTest):
         self.assert_restricted_permission_for('/batches/%d/questions/' % self.batch.id)
         self.assert_restricted_permission_for('/questions/')
         self.assert_restricted_permission_for('/batches/%d/questions/groups/%d/' % (self.batch.id, member_group.id))
+        self.assert_restricted_permission_for('/questions/1/edit/')
+        self.assert_restricted_permission_for('/questions/1/add_logic/')
+        self.assert_restricted_permission_for('/questions/1/sub_questions/new/')
 
-    @patch('django.contrib.messages.success')
-    def test_create_question_number_does_not_create_options(self, mock_success):
+    def test_create_question_number_does_not_create_options(self):
         form_data = {
             'text': 'This is a Question',
             'answer_type': Question.NUMBER,
@@ -89,8 +91,8 @@ class QuestionsViews(BaseTest):
         self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         question_options = question[0].options.all()
         self.assertEqual(0, question_options.count())
-
-        assert mock_success.called
+        success_message = "Question successfully added."
+        self.assertTrue(success_message in response.cookies['messages'].value)
 
     def test_create_question_saves_order_based_on_group_created_for(self):
         form_data = {
@@ -376,6 +378,86 @@ class QuestionsViews(BaseTest):
         self.assertEqual(response.status_code, 200)
         self.assertIn(option_1, response.context['options'])
         self.assertIn(option_2, response.context['options'])
+
+    def test_should_display_form_on_edit_question(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group, batch=self.batch)
+        response = self.client.get('/questions/%d/edit/' % question.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('questions/new.html', templates)
+        self.assertIsInstance(response.context['questionform'], QuestionForm)
+        self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['id'], 'add-question-form')
+
+    def test_should_display_options_on_edit_multichoice_question(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group, batch=self.batch, answer_type=Question.MULTICHOICE)
+        question_option = QuestionOption.objects.create(text="question option text 1", question=question)
+        question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question)
+        response = self.client.get('/questions/%d/edit/' % question.id)
+        self.assertEqual(2, len(response.context['options']))
+        self.assertIn(question_option.text, response.context['options'])
+        self.assertIn(question_option_2.text, response.context['options'])
+
+    def test_empty_options_and_or_duplicates_should_be_removed_on_edit_multichoice_question(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group, batch=self.batch, answer_type=Question.MULTICHOICE)
+        question_option = QuestionOption.objects.create(text="question option text 1", question=question)
+        question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question)
+        
+        form_data = {
+              'text': '',
+              'answer_type': Question.MULTICHOICE,
+              'group': group.id, 
+              'options':['', question_option.text, '', question_option_2.text, '', question_option_2.text]
+          }
+          
+        form_data1=form_data.copy()
+        del form_data1['options']
+        self.failIf(Question.objects.filter(**form_data1))
+        response = self.client.post('/questions/%d/edit/' % question.id, data=form_data)
+        self.failUnlessEqual(response.status_code, 200)
+        self.failIf(Question.objects.filter(**form_data1))
+        self.assertEqual(2, len(response.context['options']))
+        self.assertIn(question_option.text, response.context['options'])
+        self.assertIn(question_option_2.text, response.context['options'])
+
+    def test_should_save_on_post_edit_question(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group, batch=self.batch)
+        form_data = {
+              'text': 'This is a Question',
+              'answer_type': Question.NUMBER,
+              'group': self.household_member_group.id
+          }
+
+        self.failIf(Question.objects.filter(**form_data))
+        response = self.client.post('/questions/%d/edit/' % question.id, data=form_data)
+        saved_question = Question.objects.filter(**form_data)
+        self.failUnless(saved_question)
+        self.assertEqual(1, saved_question.count())
+        self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
+        success_message = "Question successfully edited."
+        self.assertTrue(success_message in response.cookies['messages'].value)
+
+    def test_should_not_save_on_post_edit_question_failure(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group, batch=self.batch)
+        form_data = {
+              'text': '',
+              'answer_type': Question.TEXT,
+              'group': self.household_member_group.id
+          }
+
+        self.failIf(Question.objects.filter(**form_data))
+        response = self.client.post('/questions/%d/edit/' % question.id, data=form_data)
+        self.failUnlessEqual(response.status_code, 200)
+        saved_question = Question.objects.filter(**form_data)
+        self.failIf(saved_question)
+        error_message = 'Question was not edited.'
+        self.assertTrue(error_message, response.context['messages'])
+
 
 class LogicViewTest(BaseTest):
     def setUp(self):

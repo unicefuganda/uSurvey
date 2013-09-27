@@ -23,11 +23,12 @@ CACHES = {
 }
 
 if ('test' in sys.argv) or ('harvest' in sys.argv):
+    LETTUCE_SERVER_PORT = 7000
     CACHES = {
         'default': {
             'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
             'LOCATION': 'localhost:11211',
-            'TIMEOUT': 1,
+            'TIMEOUT': 3,
             'BINARY': False,
             'OPTIONS': {  # Maps to pylibmc "behaviors"
                 'tcp_nodelay': True,
@@ -35,3 +36,36 @@ if ('test' in sys.argv) or ('harvest' in sys.argv):
             }
         }
     }
+
+    LETTUCE_AVOID_APPS = (
+            'south',
+            'lettuce.django',
+            'django_extensions',
+            'rapidsms.contrib.locations',
+            'rapidsms.contrib.locations.nested',
+            'bootstrap_pagination',
+            'django_nose',
+            'rapidsms.backends.database',
+            'rapidsms.contrib.httptester',
+    )
+
+    DATABASES = {
+       "default": {
+           "ENGINE": "django.db.backends.postgresql_psycopg2",
+           "NAME": "mics_test",
+           "USER": "andrew",
+           "PASSWORD": "",
+           "HOST": "localhost",
+       }
+    }
+
+
+    INSTALLED_BACKENDS = {
+      "HTTP": {
+          "ENGINE": "rapidsms.backends.database.DatabaseBackend",
+      },
+    }
+
+    import logging
+    south_logger=logging.getLogger('south')
+    south_logger.setLevel(logging.INFO)

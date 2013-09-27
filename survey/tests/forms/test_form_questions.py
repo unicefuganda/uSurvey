@@ -18,7 +18,6 @@ class QuestionFormTest(TestCase):
                         'group' : self.household_member_group.id
         }
 
-
     def test_valid(self):
         question_form = QuestionForm(self.form_data)
         question_form.is_valid()
@@ -30,9 +29,7 @@ class QuestionFormTest(TestCase):
 
     def test_question_form_fields(self):
         question_form = QuestionForm()
-
         fields = ['text', 'answer_type', 'group']
-
         [self.assertIn(field, question_form.fields) for field in fields]
 
     def test_should_know_household_member_group_id_and_name_tuple_is_the_group_choice(self):
@@ -80,6 +77,16 @@ class QuestionFormTest(TestCase):
         form_data = self.form_data.copy()
         form_data['answer_type'] = Question.TEXT
         form_data['options']=['some option question']
+        question_form = QuestionForm(form_data)
+        self.assertTrue(question_form.is_valid())
+        question = question_form.save(group=[self.household_member_group.id])
+        self.assertIsNone(question.batch)
+        self.assertEquals(0, question.options.all().count())
+        
+    def test_should_filter_options_not_supplied(self):
+        form_data = self.form_data.copy()
+        form_data['answer_type'] = Question.TEXT
+        del form_data['options']
         question_form = QuestionForm(form_data)
         self.assertTrue(question_form.is_valid())
         question = question_form.save(group=[self.household_member_group.id])

@@ -50,6 +50,7 @@ Feature: Questions related features
 
   Scenario: View multichoice question options
     Given I am logged in as researcher
+    And I have a member group
     And I have a multichoice question
     And I visit questions list page
     And I click on view options link
@@ -78,3 +79,15 @@ Feature: Questions related features
     And I submit the form
     And I should see question was not added
     And I should see that option in the form
+
+  Scenario: Edit question
+    Given I am logged in as researcher
+    And I have a member group
+    And I have a multichoice question
+    And I visit question listing page
+    And I click the edit question link
+    Then I should see the edit question page
+    And I see the question form with values
+    When I fill in edited question details
+    And I submit the form
+    Then I should see the question successfully edited

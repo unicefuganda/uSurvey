@@ -31,30 +31,6 @@ def index(request, batch_id):
     context = {'questions': questions, 'request': request, 'batch': batch}
     return render(request, 'questions/index.html', context)
 
-
-@permission_required('auth.can_view_batches')
-def new(request):
-    response = None
-    question_form = QuestionForm()
-    options = None
-    if request.method == 'POST':
-        question_form = QuestionForm(data=request.POST)
-        if question_form.is_valid():
-            question_form.save(**request.POST)
-            messages.success(request, 'Question successfully added.')
-            response = HttpResponseRedirect('/questions/')
-        else:
-            messages.error(request, 'Question was not added.')
-            options = dict(request.POST).get('options', None)
-    context = {'button_label': 'Save',
-               'id': 'add-question-form',
-               'request': request,
-               'questionform': question_form}
-    if options:
-        context['options'] = list(set(options))
-    return response or render(request, 'questions/new.html', context)
-
-
 @permission_required('auth.can_view_batches')
 def filter_by_group(request, batch_id, group_id):
     if group_id.lower() != 'all':
@@ -84,6 +60,7 @@ def __process_sub_question_form(request, questionform, parent_question):
         return HttpResponseRedirect('/questions/')
 
 
+@permission_required('auth.can_view_batches')
 def new_subquestion(request, question_id):
     parent_question = Question.objects.get(pk=question_id)
     questionform = QuestionForm()
@@ -93,6 +70,7 @@ def new_subquestion(request, question_id):
         response = __process_sub_question_form(request, questionform, parent_question)
     context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form'}
     return response or render(request, 'questions/new.html', context)
+
 
 def _get_post_values(post_data):
     next_question_key = post_data.get('next_question', None)
@@ -108,6 +86,8 @@ def _get_post_values(post_data):
                  }
     return save_data
 
+
+@permission_required('auth.can_view_batches')
 def add_logic(request, question_id):
     question = Question.objects.get(id=question_id)
     logic_form = LogicForm(question=question)
@@ -119,3 +99,47 @@ def add_logic(request, question_id):
             return HttpResponseRedirect('/batches/%s/questions/' % question.batch.id)
     context = {'logic_form': logic_form, 'button_label': 'Save'}
     return render(request, "questions/logic.html", context)
+
+@permission_required('auth.can_view_batches')
+def new(request):
+    response, context = _render_question_view(request)
+    return response or render(request, 'questions/new.html', context)
+
+@permission_required('auth.can_view_batches')
+def edit(request, question_id):
+    question = Question.objects.get(id=question_id)
+    response, context = _render_question_view(request, question)
+    return response or render(request, 'questions/new.html', context)
+
+def _process_question_form(request, options, response, instance=None):
+    question_form = QuestionForm(data=request.POST, instance=instance)
+    action_str = 'edit' if instance else 'add'
+    if question_form.is_valid():
+        question_form.save(**request.POST)
+        messages.success(request, 'Question successfully %sed.'%action_str)
+        response = HttpResponseRedirect('/questions/')
+    else:
+        messages.error(request, 'Question was not %sed.'%action_str)
+        options = dict(request.POST).get('options', None)  
+    return response, options, question_form
+
+def _render_question_view(request, instance=None):
+    question_form = QuestionForm(instance=instance)
+    options = None
+    response = None
+    if instance:
+        options = instance.options.all()
+        options = [option.text for option in options] if options else None
+
+    if request.method == 'POST':
+        response, options, question_form = _process_question_form(request, options, response,  instance)
+
+    context = {'button_label': 'Save',
+             'id': 'add-question-form',
+             'request': request,
+             'questionform': question_form}
+
+    if options:
+        context['options'] = filter(lambda text: text.strip(), list(set(options)))
+
+    return response, context

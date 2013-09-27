@@ -23,7 +23,7 @@ jQuery(function($){
         }else{
             $form.find("div.question-option").remove();
         };
-    }).change();
+    });
 
     $form.on("click", ".add-option", function(){
         addQuestionOption($(this).parents("div.question-option"));
@@ -33,5 +33,4 @@ jQuery(function($){
         $(this).parents("div.question-option").remove();
         assignOptionNumbers();
     });
-
 });

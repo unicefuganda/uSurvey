@@ -24,8 +24,9 @@ class QuestionForm(ModelForm):
 
     def clean_options(self):
         options = dict(self.data).get('options')
-        options = filter(lambda text: text.strip(), options)
-        self.cleaned_data['options'] = options
+        if options:
+          options = filter(lambda text: text.strip(), options)
+          self.cleaned_data['options'] = options          
         return options
 
     def clean(self):
@@ -46,11 +47,12 @@ class QuestionForm(ModelForm):
         return kwargs.has_key('batch') and isinstance(kwargs['batch'], Batch)
 
     def options_supplied(self, commit):
-        return commit and self.cleaned_data.has_key('options')
+        return commit and self.cleaned_data.get('options', None) 
 
     def save_question_options(self, question):
         order = 0
-        for text in self.cleaned_data['options']:
+        options = self.cleaned_data['options']
+        for text in options:
             order += 1
             QuestionOption.objects.create(question=question, text=text, order=order)
 
