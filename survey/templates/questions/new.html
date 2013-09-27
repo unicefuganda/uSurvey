@@ -1,9 +1,17 @@
 {% extends "form.html" %}
 
 {% block title %}
-New Question
+  {% if parent_question %}
+    Add SubQuestion
+  {% else %}
+    New Question
+  {% endif %}
 {% endblock %}
-
+{% block pre_form_content %}
+  {% if parent_question %}
+     <h4> to question: {{parent_question.text}} <h4>
+  {% endif %}
+{% endblock%}
 {% block display_form_fields %}
 {% include "naked_form.html" with a_form=questionform %}
 {% if options %}
@@ -31,6 +39,13 @@ New Question
         </div>
     </div>
 </script>
+{% if parent_question %}
+<script type="text/template" id="question-group-template">
+    <select id="id_group" name="group">
+      <option value="{{parent_question.group.pk}}" selected="selected">{{parent_question.group.name}}</option>
+    </select>
+</script>
+{% endif %}
 
 {% endblock %}
 

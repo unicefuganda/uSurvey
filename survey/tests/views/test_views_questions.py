@@ -248,7 +248,7 @@ class QuestionsViews(BaseTest):
             option_index +=1
             self.assertIn(QuestionOption.objects.get(text=option_text), question_options)
             self.assertEqual(option_index, QuestionOption.objects.get(text=form_data['options'][option_index-1]).order)
-        
+
 
     def test_should_not_save_empty_options_on_multichoice_questions(self):
         form_data = {
@@ -332,6 +332,7 @@ class QuestionsViews(BaseTest):
         self.assertIsInstance(response.context['questionform'], QuestionForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'add-sub_question-form')
+        self.assertEqual(response.context['parent_question'], question)
 
     def test_post_sub_question(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
@@ -346,6 +347,7 @@ class QuestionsViews(BaseTest):
         saved_sub_question = Question.objects.filter(text=subquestion_form_data['text'])
         self.failUnless(saved_sub_question)
         self.assertEquals(saved_sub_question[0].parent, question)
+        self.assertEquals(saved_sub_question[0].group, question.group)
         self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
 
     def test_should_filter_questions_in_a_group_that_does_not_belong_to_the_batch(self):
@@ -367,7 +369,7 @@ class QuestionsViews(BaseTest):
         paid apps, explore hand-picked collections'
         option_1 = 'some question option 1'
         option_2 = 'some question option 2'
-        
+
         form_data = {
             'order': self.question_1.order,
             'text': too_long_to_be_accepted_question,
@@ -411,14 +413,14 @@ class QuestionsViews(BaseTest):
         question = Question.objects.create(text="question text", group=group, batch=self.batch, answer_type=Question.MULTICHOICE)
         question_option = QuestionOption.objects.create(text="question option text 1", question=question)
         question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question)
-        
+
         form_data = {
               'text': '',
               'answer_type': Question.MULTICHOICE,
-              'group': group.id, 
+              'group': group.id,
               'options':['', question_option.text, '', question_option_2.text, '', question_option_2.text]
           }
-          
+
         form_data1=form_data.copy()
         del form_data1['options']
         self.failIf(Question.objects.filter(**form_data1))
@@ -446,7 +448,7 @@ class QuestionsViews(BaseTest):
         self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
         success_message = "Question successfully edited."
         self.assertTrue(success_message in response.cookies['messages'].value)
-        
+
     def test_should_not_recreate_already_existing_options_and_update_options_order_on_edit_mutlichoicequestion(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)
         question = Question.objects.create(text="question text", group=group, batch=self.batch, answer_type=Question.MULTICHOICE)
@@ -456,7 +458,7 @@ class QuestionsViews(BaseTest):
         form_data = {
               'text': 'I edited this question',
               'answer_type': Question.MULTICHOICE,
-              'group': group.id, 
+              'group': group.id,
               'options':[question_option.text, 'hahaha', question_option_2.text ]
           }
 
@@ -493,7 +495,7 @@ class QuestionsViews(BaseTest):
         self.failIf(saved_question)
         error_message = 'Question was not edited.'
         self.assertTrue(error_message, response.context['messages'])
-        
+
     def test_should_throw_error_if_editing_non_question_survey(self):
         response = self.client.get('/questions/11/edit/')
         self.assertRedirects(response,'/questions/', status_code=302, target_status_code=200, msg_prefix='')

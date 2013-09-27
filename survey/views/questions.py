@@ -55,6 +55,7 @@ def __process_sub_question_form(request, questionform, parent_question):
         sub_question = questionform.save(commit=False)
         sub_question.subquestion = True
         sub_question.parent = parent_question
+        sub_question.group = parent_question.group
         sub_question.save()
         messages.success(request, 'Sub question successfully added.')
         return HttpResponseRedirect('/questions/')
@@ -68,7 +69,7 @@ def new_subquestion(request, question_id):
     if request.method == 'POST':
         questionform = QuestionForm(request.POST)
         response = __process_sub_question_form(request, questionform, parent_question)
-    context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form'}
+    context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form', 'parent_question':parent_question}
     return response or render(request, 'questions/new.html', context)
 
 
@@ -119,7 +120,7 @@ def delete(request, question_id):
     if question:
         messages.success(request, "Question successfully deleted.")
     else:
-        messages.error(request, "Question does not exist.") 
+        messages.error(request, "Question does not exist.")
     question.delete()
     return HttpResponseRedirect("/questions/")
 
@@ -132,7 +133,7 @@ def _process_question_form(request, options, response, instance=None):
         response = HttpResponseRedirect('/questions/')
     else:
         messages.error(request, 'Question was not %sed.'%action_str)
-        options = dict(request.POST).get('options', None)  
+        options = dict(request.POST).get('options', None)
     return response, options, question_form
 
 def _render_question_view(request, instance=None):

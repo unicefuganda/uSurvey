@@ -168,7 +168,7 @@ class PageObject(object):
         self.browser.click_link_by_partial_href(modal_id)
 
     def click_button(self,name):
-        self.browser.find_by_name(name).click()
+        self.browser.find_by_name(name).first.click()
 
     def find_by_css(self, css_selector, text):
         assert self.browser.find_by_css(css_selector).first.value == text

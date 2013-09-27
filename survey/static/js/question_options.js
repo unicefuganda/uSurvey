@@ -33,4 +33,14 @@ jQuery(function($){
         $(this).parents("div.question-option").remove();
         assignOptionNumbers();
     });
+
+    var group_select_template = $("#question-group-template").html();
+    replaceQuestionGroupSelect(group_select_template);
+
+    function replaceQuestionGroupSelect(template){
+      if(!$.isEmptyObject(template)){
+        $('#id_group').replaceWith(template);
+      };
+    };
+
 });

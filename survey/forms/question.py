@@ -19,14 +19,14 @@ class QuestionForm(ModelForm):
         fields =['text', 'group', 'answer_type']
 
         widgets ={
-            'text': forms.Textarea(attrs={"rows":4, "cols":50})
+            'text': forms.Textarea(attrs={"rows":4, "cols":100})
         }
 
     def clean_options(self):
         options = dict(self.data).get('options')
         if options:
           options = filter(lambda text: text.strip(), options)
-          self.cleaned_data['options'] = options          
+          self.cleaned_data['options'] = options
         return options
 
     def clean(self):
@@ -47,7 +47,7 @@ class QuestionForm(ModelForm):
         return kwargs.has_key('batch') and isinstance(kwargs['batch'], Batch)
 
     def options_supplied(self, commit):
-        return commit and self.cleaned_data.get('options', None) 
+        return commit and self.cleaned_data.get('options', None)
 
     def save_question_options(self, question):
         order = 0
