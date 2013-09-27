@@ -376,6 +376,18 @@ class QuestionTest(TestCase):
         self.assertNotEqual(question_2, question_1.next_question_for_household_member(household_member))
         self.assertEqual(question_3, question_1.next_question_for_household_member(household_member))
 
+    def test_knows_subquestions_for_a_question(self):
+        question_1 = Question.objects.create(batch=self.batch, text="question1", answer_type="number",order=1)
+        sub_question1 = Question.objects.create(text='sub1', answer_type=Question.NUMBER, batch=self.batch,
+                                                subquestion=True, parent=question_1)
+        sub_question2 = Question.objects.create(text='sub2', answer_type=Question.NUMBER, batch=self.batch,
+                                                subquestion=True, parent=question_1)
+
+        subquestions = question_1.get_subquestions()
+        self.assertIn(sub_question1,subquestions)
+        self.assertIn(sub_question2,subquestions)
+
+
 class QuestionOptionTest(TestCase):
     def setUp(self):
         batch = Batch.objects.create(order=1)
