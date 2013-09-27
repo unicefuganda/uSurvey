@@ -28,7 +28,7 @@ def index(request, batch_id):
 
     if not questions.exists():
         messages.error(request, 'There are no questions associated with this batch yet.')
-    context = {'questions': questions, 'request': request, 'batch': batch}
+    context = {'questions': questions.filter(subquestion=False), 'request': request, 'batch': batch}
     return render(request, 'questions/index.html', context)
 
 @permission_required('auth.can_view_batches')

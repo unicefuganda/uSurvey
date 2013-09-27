@@ -200,3 +200,17 @@ class BatchViews(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
         self.assertTrue(json_response)
+
+    def test_list_questions_under_batch_should_bring_only_questions_and_not_subquestion(self):
+        batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
+        q1=Question.objects.create(text="question1", answer_type=Question.NUMBER,batch=batch)
+        q2=Question.objects.create(text="question2", answer_type=Question.TEXT,batch=batch)
+
+        sub_question1 = Question.objects.create(text='sub1',answer_type=Question.NUMBER,batch=batch,subquestion=True,parent=q1)
+        sub_question2 = Question.objects.create(text='sub2',answer_type=Question.NUMBER,batch=batch,subquestion=True,parent=q1)
+        sub_question3 = Question.objects.create(text='sub3',answer_type=Question.NUMBER,batch=batch,subquestion=True,parent=q2)
+
+        response = self.client.get('/batches/%s/questions/' % batch.id)
+        self.assertIn(q1, response.context['questions'])
+        self.assertIn(q2, response.context['questions'])
+        self.assertNotIn(sub_question1, response.context['questions'])
