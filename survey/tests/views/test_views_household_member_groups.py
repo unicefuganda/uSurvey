@@ -52,7 +52,8 @@ class GroupConditionViewTest(BaseTest):
         error_message = 'Condition not added: Group condition with this Value, Attribute and Condition already exists.'
         self.assertTrue(error_message in response.cookies['messages'].value)
         self.assertEqual(1, GroupCondition.objects.filter(**data).count())
-
+        self.assertRedirects(response, expected_url='/conditions/new/', status_code=302, target_status_code=200,
+                             msg_prefix='')
 
     def test_post_condtion_form(self):
         data = {'attribute': 'AGE',

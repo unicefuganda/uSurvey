@@ -56,12 +56,15 @@ $(function(){
           'value': {required:true, positive_if_age:true}
         },
         submitHandler: function(form, e){
-            e.preventDefault()
-            form = $(form);
-            $.post(form.attr('action'), form.serializeArray(), function(data){
+            e.preventDefault();
+            var $form = $(form);
+            if($form.parent('div').attr('class') == 'modal-body'){
+                $.post($form.attr('action'), $form.serializeArray(), function(data){
                     window.location.reload();
-            });
-            return true;
+                });
+            }else{
+                form.submit();
+            };
         }
     });
     

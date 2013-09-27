@@ -20,7 +20,7 @@ Feature: Group features
     And I visit the new condition page
     When I fill in the condition details
     And I click save button
-    Then I should see that the condition was saved successfully
+    Then I should see that the condition was saved on the condition list page
 
   Scenario: Add household member a group
     Given I am logged in as researcher
@@ -38,7 +38,7 @@ Feature: Group features
     Then I should see the modal open
     When I fill in the condition details
     And I click the new condition form save button
-    Then I should see the condition was saved successfully
+    Then I should see the condition saved on create group page
     And I should see the new condition in the groups form
 
   Scenario: Create a condition with invalid form on the group form

@@ -45,7 +45,6 @@ def add_condition(request):
     elif request.method == 'POST':
         condition_form = GroupConditionForm(data=request.POST)
         response = _process_condition_form(request, condition_form)
-
     context = {'button_label': 'Save',
                'title': 'New condition',
                'id': 'add-condition-form',

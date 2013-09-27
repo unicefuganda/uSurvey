@@ -80,8 +80,10 @@ def and_i_click_save_button(step):
     world.page.submit()
 
 
-@step(u'Then I should see that the condition was saved successfully')
+@step(u'Then I should see that the condition was saved on the condition list page')
 def then_i_should_see_that_the_condition_was_saved_successfully(step):
+    world.page = GroupConditionListPage(world.browser)
+    world.page.validate_url()
     world.page.see_success_message('Condition', 'added')
 
 
@@ -120,8 +122,10 @@ def and_i_click_the_save_button(step):
     world.page.click_button("save_condition_button")
 
 
-@step(u'Then I should see the condition was saved successfully')
+@step(u'Then I should see the condition saved on create group page')
 def then_i_should_see_the_condition_was_saved_successfully(step):
+    world.page = AddGroupPage(world.browser)
+    world.page.validate_url()
     world.page.see_success_message("Condition", "added")
 
 
