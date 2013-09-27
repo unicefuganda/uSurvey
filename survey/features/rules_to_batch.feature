@@ -57,4 +57,18 @@ Feature: Batch related features
     And I should not see option dropdown box and value text box
     And I should see all the action dropdown options
 
+  Scenario: add rule ask subquestion to a question
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I have a question
+    And I assign batch to these questions
+    And I have two subquestions for this question
+    And I visit batches question list page
+    And I click on add logic link
+    Then I should see the add logic page
+    When I select ask subquestion from then field
+    Then I should see next question populated with subquestions
+
+
 

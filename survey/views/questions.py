@@ -97,7 +97,7 @@ def add_logic(request, question_id):
             AnswerRule.objects.create(question=question, **_get_post_values(request.POST))
             messages.success(request, 'Logic successfully added.')
             return HttpResponseRedirect('/batches/%s/questions/' % question.batch.id)
-    context = {'logic_form': logic_form, 'button_label': 'Save'}
+    context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question}
     return render(request, "questions/logic.html", context)
 
 @permission_required('auth.can_view_batches')
@@ -143,3 +143,16 @@ def _render_question_view(request, instance=None):
         context['options'] = filter(lambda text: text.strip(), list(set(options)))
 
     return response, context
+
+def _create_question_hash_response(questions):
+    questions_to_display = map(lambda question: {'id': str(question.id), 'text':question.text}, questions)
+    return HttpResponse(json.dumps(questions_to_display), mimetype='application/json')
+
+def get_questions_for_batch(request, question_id):
+    question = Question.objects.get(id=question_id)
+    batch = question.batch
+    return _create_question_hash_response(batch.questions.filter(subquestion=False).exclude(id=question_id))
+
+def get_sub_questions_for_question(request, question_id):
+    question = Question.objects.get(id=question_id)
+    return _create_question_hash_response(question.get_subquestions())

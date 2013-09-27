@@ -20,7 +20,7 @@
     {% endfor %}
         </div>
     </div>
-
+    <input type="hidden" value='{{ question.id }}' id='id_question' >
     {% for hidden in a_form.hidden_fields %}
         {{ hidden }}
     {% endfor %}

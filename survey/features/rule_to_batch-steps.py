@@ -155,3 +155,17 @@ def and_i_should_not_see_option_dropdown_box_and_value_text_box(step):
 def and_i_should_see_all_the_action_dropdown_options(step):
     action_options =['REANSWER', 'END INTERVIEW', 'ASK SUBQUESTION', 'JUMP TO']
     world.page.see_select_option(action_options, 'action')
+
+@step(u'And I have two subquestions for this question')
+def and_i_have_two_subquestions_for_this_question(step):
+    world.sub_question1 = Question.objects.create(batch=world.batch,text="sub question1", answer_type=Question.NUMBER, subquestion=True, parent=world.question)
+    world.sub_question2 = Question.objects.create(batch=world.batch,text="sub question2", answer_type=Question.NUMBER, subquestion=True, parent=world.question)
+
+@step(u'When I select ask subquestion from then field')
+def when_i_select_ask_subquestion_from_then_field(step):
+    world.page.select('action', ['ASK_SUBQUESTION'])
+
+@step(u'Then I should see next question populated with subquestions')
+def then_i_should_see_next_question_populated_with_subquestions(step):
+    next_question_options =[world.sub_question1.text, world.sub_question2.text]
+    world.page.see_select_option(next_question_options, 'next_question')

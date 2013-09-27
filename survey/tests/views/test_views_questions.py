@@ -479,6 +479,13 @@ class LogicViewTest(BaseTest):
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(200, response.status_code)
 
+    def test_views_add_logic_get_has_question_in_context(self):
+        response = self.client.get('/questions/%s/add_logic/' % self.question.pk)
+
+        self.assertIsInstance(response.context['question'], Question)
+        self.assertEqual(response.context['question'], self.question)
+        self.assertEqual(200, response.status_code)
+
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected(self):
         form_data = {'condition': 'EQUALS',
                      'attribute': 'value',
@@ -534,3 +541,46 @@ class LogicViewTest(BaseTest):
         self.assertIsNone(answer_rule.next_question)
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_value)
+
+class QuestionJsonDataDumpTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
+                                                         'can_view_batches')
+        self.client.login(username='User', password='password')
+
+        self.batch = Batch.objects.create(order=1)
+        self.question = Question.objects.create(batch=self.batch, text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1)
+
+        self.sub_question_1 = Question.objects.create(parent=self.question, batch=self.batch, text="Sub Question 1?",
+                                                answer_type=Question.NUMBER, subquestion=True)
+        self.sub_question_2 = Question.objects.create(parent=self.question, batch=self.batch, text="Sub Question 2?",
+                                                answer_type=Question.NUMBER, subquestion=True)
+
+        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?",
+                                                  answer_type=Question.NUMBER, order=2)
+
+    def test_returns_data_dump_of_questions_in_batch_excluding_the_current_selected_question(self):
+        response = self.client.get('/questions/%s/questions_json/' % self.question.pk, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)
+        self.assertIn(dict(id=str(self.question_2.id), text=self.question_2.text), json_response)
+        self.assertNotIn(dict(id=str(self.question.id), text=self.question.text), json_response)
+        self.assertNotIn(dict(id=str(self.sub_question_1.id), text=self.sub_question_1.text), json_response)
+        self.assertNotIn(dict(id=str(self.sub_question_2.id), text=self.sub_question_2.text), json_response)
+
+
+    def test_returns_data_dump_of_sub_questions_infor_selected_question(self):
+        response = self.client.get('/questions/%s/sub_questions_json/' % self.question.pk, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)
+        self.assertIn(dict(id=str(self.sub_question_1.id), text=self.sub_question_1.text), json_response)
+        self.assertIn(dict(id=str(self.sub_question_2.id), text=self.sub_question_2.text), json_response)
+
+        self.assertNotIn(dict(id=str(self.question_2.id), text=self.question_2.text), json_response)
+        self.assertNotIn(dict(id=str(self.question.id), text=self.question.text), json_response)
