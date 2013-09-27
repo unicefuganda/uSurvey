@@ -72,10 +72,11 @@ class Question(BaseModel):
         return "\n".join(options_list)
 
     def get_next_question_by_rule(self, answer, investigator):
-        if self.rule.validate(answer):
-            return self.rule.action_to_take(investigator, answer)
-        else:
-            raise ObjectDoesNotExist
+        all_rules = self.rule.all()
+        for rule in all_rules:
+            if rule.validate(answer):
+                return rule.action_to_take(investigator, answer)
+        raise ObjectDoesNotExist
 
     def next_question_for_household(self, household):
         answer = self.answer_class().objects.get(household=household, question=self)

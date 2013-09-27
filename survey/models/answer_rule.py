@@ -32,7 +32,7 @@ class AnswerRule(BaseModel):
                 'LESS_THAN_VALUE': 'less_than_value',
     }
 
-    question = models.OneToOneField(Question, null=True, related_name="rule")
+    question = models.ForeignKey(Question, null=True, related_name="rule")
     action = models.CharField(max_length=100, blank=False, null=False, choices=ACTIONS.items())
     condition = models.CharField(max_length=100, blank=False, null=False, choices=CONDITIONS.items())
     next_question = models.ForeignKey(Question, null=True, related_name="parent_question_rules")
