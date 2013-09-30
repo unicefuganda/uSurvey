@@ -184,7 +184,7 @@ def then_i_should_see_a_modal_for_add_subquestion(step):
 
 @step(u'When I fill the subquestion details')
 def when_i_fill_the_subquestion_details(step):
-    world.data = {'text': 'hritik  question',
+    world.data = {'text': 'hritik question',
             'answer_type': Question.NUMBER}
 
     world.page.fill_valid_values(world.data)
