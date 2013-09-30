@@ -599,6 +599,33 @@ class LogicViewTest(BaseTest):
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_option)
 
+    def test_views_saves_answer_rule_for_sub_question_on_post_if_all_values_are_selected(self):
+        sub_question1 = Question.objects.create(batch=self.batch,text="sub question1", answer_type=Question.NUMBER, subquestion=True, parent=self.question)
+
+        form_data = {'condition': 'EQUALS',
+                     'attribute': 'value',
+                     'value': 0,
+                     'action': 'ASK_SUBQUESTION',
+                     'next_question': sub_question1.pk}
+
+        response = self.client.post('/questions/%s/add_logic/' % self.question.pk, data=form_data)
+        self.assertRedirects(response, '/batches/%s/questions/' % self.question.batch.id, status_code=302, target_status_code=200)
+        success_message= 'Logic successfully added.'
+        self.assertIn(success_message, response.cookies['messages'].value)
+        answer_rules = AnswerRule.objects.filter()
+
+        self.failUnless(answer_rules)
+
+        answer_rule = answer_rules[0]
+
+        self.assertEqual(self.question, answer_rule.question)
+        self.assertEqual(form_data['action'], answer_rule.action)
+        self.assertEqual(form_data['condition'], answer_rule.condition)
+        self.assertEqual(sub_question1, answer_rule.next_question)
+        self.assertEqual(form_data['value'], answer_rule.validate_with_value)
+        self.assertIsNone(answer_rule.validate_with_question)
+        self.assertIsNone(answer_rule.validate_with_option)
+
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected_on_multichoice_question(self):
 
         question_with_option = Question.objects.create(batch=self.batch, text="MultiChoice Question 1?",

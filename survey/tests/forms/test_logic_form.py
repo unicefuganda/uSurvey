@@ -120,3 +120,18 @@ class LogicFormTest(TestCase):
 
         self.assertEqual(5, len(logic_form.fields[field].choices))
         self.assertNotIn(('EQUALS_OPTION', 'EQUALS_OPTION'), logic_form.fields[field].choices)
+
+    def test_next_question_knows_all_sub_questions_if_data_sent_with_action_ask_subquestion(self):
+        field = 'next_question'
+
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(batch=batch, text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+
+        sub_question1 = Question.objects.create(batch=batch, text="sub question1", answer_type=Question.NUMBER,
+                                                subquestion=True, parent=question_without_option)
+
+        data= {'action': 'ASK_SUBQUESTION'}
+        logic_form = LogicForm(question=question_without_option,data=data)
+
+        self.assertIn((sub_question1.id,sub_question1.text), logic_form.fields[field].choices)

@@ -15,6 +15,8 @@ class LogicForm(forms.Form):
 
         self.fields['action'].choices = ACTIONS.items()
 
+        action_sent = data.get('action', None) if data else None
+
         if question:
             self.fields['condition'].label = "If %s" % question.text
             is_multichoice = question.is_multichoice()
@@ -37,6 +39,9 @@ class LogicForm(forms.Form):
                 self.fields['attribute'].choices = [('value', 'Value'), ('validate_with_question', "Question")]
                 self.fields['condition'].initial = 'EQUALS'
                 self.fields['validate_with_question'].choices = question_choices
+
+            if action_sent and action_sent == 'ASK_SUBQUESTION':
+                question_choices = map(lambda next_question: (next_question.id, next_question.text), question.get_subquestions())
 
             self.fields['next_question'].choices = question_choices
 
