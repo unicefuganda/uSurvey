@@ -1,0 +1,38 @@
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+    <tr>
+        <th>
+            Text
+        </th>
+        <th>
+            Order
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for option in question.options.all %}
+        <tr>
+            <td >
+                {% if option.answer_rule.all %}
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_question_option_{{option.id}}">{{option.text}}</a>
+                    <div id="collapse_question_option_{{option.id}}" class="accordion-body collapse in">
+                    <div class="accordion-inner">
+                    <ul>
+                        {% for rule in option.answer_rule.all %}
+                            <li>{{rule.action}}</li>
+                            {% if rule.action == "ASK_SUBQUESTION" or rule.action == "SKIP_TO" %}
+                             <span class="muted"> Next Question:</span><span>{{ rule.next_question.text }} </span>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {{option.text}}
+                {% endif %}
+            </td>
+            <td>
+                {{option.order }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
