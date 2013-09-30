@@ -177,6 +177,10 @@ class PageObject(object):
         for option in option_list:
             assert option in self.browser.find_by_name(field_name).first.text
 
+    def option_not_present(self, option_list, field_name):
+        for option in option_list:
+            assert not option in self.browser.find_by_name(field_name).first.text
+
     def fill(self, name, value):
         self.browser.fill(name, value)
 

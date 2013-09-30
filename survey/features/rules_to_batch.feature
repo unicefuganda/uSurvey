@@ -53,6 +53,21 @@ Feature: Batch related features
     And I should also have question in the attribute field dropdown
     And I should see attribute field is not disabled
     And I should see value text field
+    When I select greater than value from the drop down
+    Then I should see attribute field defaulted to value
+    And I should not see question in the attribute
+    When I select less than value from the drop down
+    Then I should see attribute field defaulted to value
+    And I should not see question in the attribute
+    When I select greater than question from the drop down
+    Then I should see attribute field defaulted to question
+    And I should not see value in the attribute
+    When I select less than question from the drop down
+    Then I should see attribute field defaulted to question
+    And I should not see value in the attribute
+    When I select equals from drop down
+    And I should see attribute field defaulted to value
+    And I should see question in the attribute
     And I should not see option dropdown box and questions dropdown
     When I select question option from dropdown
     Then I should see questions dropdown

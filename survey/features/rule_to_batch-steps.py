@@ -207,3 +207,45 @@ def and_i_should_not_see_the_add_subquestion_button(step):
 @step(u'And I should not the add subquestion button')
 def and_i_should_not_the_add_subquestion_button(step):
     assert world.page.field_is_visible("add_subquestion_button")
+
+@step(u'When I select greater than value from the drop down')
+def when_i_select_greater_than_value_from_the_drop_down(step):
+    world.page.select('condition', ['GREATER_THAN_VALUE'])
+
+@step(u'Then I should see attribute field defaulted to value')
+def then_i_should_see_attribute_field_defaulted_to_value(step):
+    form_data = {'attribute': 'value'}
+    world.page.validate_form_values(form_data)
+
+@step(u'And I should not see question in the attribute')
+def and_i_should_not_see_question_in_the_attribute(step):
+    world.page.option_not_present(['Question'], 'attribute')
+
+@step(u'When I select less than value from the drop down')
+def when_i_select_less_than_value_from_the_drop_down(step):
+    world.page.select('condition', ['LESS_THAN_VALUE'])
+
+@step(u'When I select greater than question from the drop down')
+def when_i_select_greater_than_question_from_the_drop_down(step):
+    world.page.select('condition', ['GREATER_THAN_QUESTION'])
+
+@step(u'Then I should see attribute field defaulted to question')
+def then_i_should_see_attribute_field_defaulted_to_question(step):
+    form_data = {'attribute': 'validate_with_question'}
+    world.page.validate_form_values(form_data)
+
+@step(u'And I should not see value in the attribute')
+def and_i_should_not_see_value_in_the_attribute(step):
+    world.page.option_not_present(['Value'], 'attribute')
+
+@step(u'When I select less than question from the drop down')
+def when_i_select_less_than_question_from_the_drop_down(step):
+    world.page.select('condition', ['LESS_THAN_QUESTION'])
+
+@step(u'When I select equals from drop down')
+def when_i_select_equals_from_drop_down(step):
+    world.page.select('condition', ['EQUALS'])
+
+@step(u'And I should see question in the attribute')
+def and_i_should_see_question_in_the_attribute(step):
+    world.page.see_select_option(['Question'], 'attribute')

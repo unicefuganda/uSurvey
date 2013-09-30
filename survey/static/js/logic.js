@@ -63,6 +63,37 @@ function replace_next_question_with_right_data(questions_url) {
     append_to_drop_down_options(questions_url)
 }
 
+function append_attribute_option(key, value) {
+    $('#id_attribute').append("<option value=" + key + ">" + value + "</option>");
+}
+function clear_attribute_dropdown_and_append_right_option(condition_selected){
+    var value_fields = ['GREATER_THAN_VALUE', 'LESS_THAN_VALUE'];
+    var question_fields = ['GREATER_THAN_QUESTION', 'LESS_THAN_QUESTION'];
+    var value_key = 'value';
+    var value_string = 'Value';
+    var question_key = 'validate_with_question';
+    var question_string = 'Question';
+
+    $('#id_attribute').find('option')
+        .remove()
+        .end();
+
+    if(value_fields.indexOf(condition_selected) != -1){
+        append_attribute_option(value_key, value_string);
+    }
+
+    if(question_fields.indexOf(condition_selected) != -1){
+        append_attribute_option(question_key, question_string);
+    }
+
+    if(condition_selected == 'EQUALS'){
+        append_attribute_option(value_key, value_string);
+        append_attribute_option(question_key, question_string)
+    }
+
+
+}
+
 function fill_questions_or_subquestions_in_next_question_field(action_value){
     var show_questions = ['SKIP_TO'];
     var show_sub_questions = ['ASK_SUBQUESTION'];
@@ -95,6 +126,10 @@ jQuery(function($){
     show_or_hide_attribute_fields(attribute.val());
     show_or_hide_next_question(action_value.val());
     $('#add_subquestion').hide();
+
+    condition.on('change', function(){
+        clear_attribute_dropdown_and_append_right_option(condition.val())
+    });
 
     action_value.on('change', function(){
         show_or_hide_next_question($(this).val());
