@@ -45,7 +45,7 @@ def filter_by_group(request, batch_id, group_id):
 
 @permission_required('auth.can_view_batches')
 def list_all_questions(request):
-    questions = Question.objects.all()
+    questions = Question.objects.filter(subquestion=False)
     context = {'questions': questions, 'request': request}
     return render(request, 'questions/index.html', context)
 

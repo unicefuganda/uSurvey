@@ -314,12 +314,15 @@ class QuestionsViews(BaseTest):
         self.assertEquals(content[0]['text'], question_1.text)
 
     def test_get_index_all(self):
+        sub_question = Question.objects.create(parent=self.question_1,text="Sub Question 2?",
+                                                answer_type=Question.NUMBER, subquestion=True)
         response = self.client.get('/questions/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions/index.html', templates)
         self.assertIn(self.question_1, response.context['questions'])
         self.assertIn(self.question_2, response.context['questions'])
+        self.assertNotIn(sub_question, response.context['questions'])
         self.assertIsNotNone(response.context['request'])
 
     def test_add_new_subquestion(self):
