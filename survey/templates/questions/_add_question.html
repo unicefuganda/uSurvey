@@ -1,6 +1,11 @@
 <h3>
     {% block title %} {{ title }} {% endblock %}
 </h3>
+{% block pre_form_content %}
+    <div class="control-group" style="width: 40%; padding-left: 1%">
+        <label class="control-label"><span id="text-counter" style="float: right;"></span></label>
+    </div>
+{% endblock %}
  <form action="{{ modal_action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
     {% csrf_token %}
     {% include "naked_form.html" with a_form=questionform %}

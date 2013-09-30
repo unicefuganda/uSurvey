@@ -19,7 +19,7 @@ class QuestionForm(ModelForm):
         fields =['text', 'group', 'answer_type']
 
         widgets ={
-            'text': forms.Textarea(attrs={"rows":4, "cols":100})
+            'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"})
         }
 
     def clean_options(self):

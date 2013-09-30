@@ -75,7 +75,8 @@ def new_subquestion(request, question_id):
     if request.method == 'POST':
         questionform = QuestionForm(request.POST)
         response = __process_sub_question_form(request, questionform, parent_question)
-    context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form', 'parent_question':parent_question}
+    context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form',
+               'parent_question': parent_question, 'class': 'question-form'}
     return response or render(request, 'questions/new.html', context)
 
 
@@ -105,7 +106,8 @@ def add_logic(request, question_id):
             messages.success(request, 'Logic successfully added.')
             return HttpResponseRedirect('/batches/%s/questions/' % question.batch.id)
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
-               'questionform':QuestionForm(), 'modal_action': '/questions/%s/sub_questions/new/' % question.id}
+               'questionform':QuestionForm(), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
+               'class': 'question-form'}
     return render(request, "questions/logic.html", context)
 
 @permission_required('auth.can_view_batches')
@@ -157,6 +159,7 @@ def _render_question_view(request, instance=None):
     context = {'button_label': 'Save',
              'id': 'add-question-form',
              'request': request,
+             'class': 'question-form',
              'questionform': question_form}
 
     if options:

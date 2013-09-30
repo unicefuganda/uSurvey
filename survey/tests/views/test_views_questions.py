@@ -65,6 +65,7 @@ class QuestionsViews(BaseTest):
         self.assertIsInstance(response.context['questionform'], QuestionForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'add-question-form')
+        self.assertEqual(response.context['class'], 'question-form')
 
     def test_restricted_permissions(self):
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
@@ -336,6 +337,7 @@ class QuestionsViews(BaseTest):
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'add-sub_question-form')
         self.assertEqual(response.context['parent_question'], question)
+        self.assertEqual(response.context['class'], 'question-form')
 
     def test_post_sub_question(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
@@ -552,6 +554,7 @@ class LogicViewTest(BaseTest):
         self.assertEqual(response.context['question'], self.question)
         self.assertEqual(response.context['modal_action'], action)
         self.assertIsInstance(response.context['questionform'], QuestionForm)
+        self.assertEqual(response.context['class'], 'question-form')
         self.assertEqual(200, response.status_code)
 
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected(self):

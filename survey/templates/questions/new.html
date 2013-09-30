@@ -11,6 +11,9 @@
   {% if parent_question %}
      <h4> to question: {{parent_question.text}} <h4>
   {% endif %}
+    <div class="control-group" style="width: 40%">
+        <label class="control-label"><span id="text-counter" style="float: right;"></span></label>
+    </div>
 {% endblock%}
 {% block display_form_fields %}
 {% include "naked_form.html" with a_form=questionform %}
@@ -47,4 +50,8 @@
 </script>
 {% endif %}
 
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
