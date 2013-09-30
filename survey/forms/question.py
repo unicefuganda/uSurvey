@@ -33,6 +33,7 @@ class QuestionForm(ModelForm):
     def clean(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         options = self.cleaned_data.get('options', None)
+        text = self.cleaned_data.get('text', None)
 
         if answer_type==Question.MULTICHOICE and not options:
             message = 'Question Options missing.'
@@ -42,8 +43,9 @@ class QuestionForm(ModelForm):
         if answer_type != Question.MULTICHOICE and options:
             del self.cleaned_data['options']
 
-        self.cleaned_data['text'] = re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', self.cleaned_data['text'])
-        self.cleaned_data['text'] = re.sub("  ", ' ', self.cleaned_data['text'])
+        if text:
+            text = re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', text)
+            self.cleaned_data['text'] = re.sub("  ", ' ', text)
 
         return self.cleaned_data
 
