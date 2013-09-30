@@ -72,17 +72,6 @@ Feature: Questions related features
     And I submit the form
     And I should see subquestion successfully added message
 
- Scenario: Invalid MultiChoice question
-    Given I am logged in as researcher
-    And I have a member group
-    And I visit create new question page
-    And I fill the invalid details details for question
-    When I select multichoice for answer type
-    And I fill an option question
-    And I submit the form
-    And I should see question was not added
-    And I should see that option in the form
-
   Scenario: Edit question
     Given I am logged in as researcher
     And I have a member group

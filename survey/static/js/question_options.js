@@ -3,7 +3,7 @@
 
 jQuery(function($){
 
-    var $form = $("#add-question-form"),
+    var $form = $(".question-form"),
         template = $("#question-option-template").html();
 
     function assignOptionNumbers(){
