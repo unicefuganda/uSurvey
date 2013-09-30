@@ -34,19 +34,23 @@ function show_or_hide_next_question(action_value) {
         next_question_field.attr('disabled', false)
     }
     else {
+        $('#add_subquestion').hide();
         next_question_field.hide();
         next_question_field.attr('disabled', 'disabled')
     }
 }
 
+function append_to_next_question_dropdown(data) {
+    counter=0;
+    $.each(data, function () {
+        $('#id_next_question').append("<option value=" + data[counter]['id'] + ">" + data[counter]['text'] + "</option>");
+        counter++;
+    });
+}
 function append_to_drop_down_options(url)
 {
-    counter=0;
     $.get( url, function( data ) {
-        $.each(data, function() {
-            $('#id_next_question').append("<option value=" + data[counter]['id'] + ">" + data[counter]['text'] +"</option>");
-            counter++;
-        });
+        append_to_next_question_dropdown(data);
     });
     }
 
@@ -69,10 +73,12 @@ function fill_questions_or_subquestions_in_next_question_field(action_value){
     if(show_questions.indexOf(action_value) != -1)
     {
         questions_url = '/questions/' + question_id +'/questions_json/'
+        $('#add_subquestion').hide();
     }
     else if (show_sub_questions.indexOf(action_value) != -1)
     {
         questions_url = '/questions/' + question_id +'/sub_questions_json/'
+        $('#add_subquestion').show();
     }
     replace_next_question_with_right_data(questions_url);
 }
@@ -88,6 +94,7 @@ jQuery(function($){
     disable_field_based_on_value(attribute, attribute_value);
     show_or_hide_attribute_fields(attribute.val());
     show_or_hide_next_question(action_value.val());
+    $('#add_subquestion').hide();
 
     action_value.on('change', function(){
         show_or_hide_next_question($(this).val());
@@ -97,5 +104,20 @@ jQuery(function($){
     attribute.on('change', function(){
         show_or_hide_attribute_fields(attribute.val());
     });
+
+    $('#add-question-form').submit(function(event){
+        event.preventDefault();
+        var $form = $(this),
+            url = $form.attr("action"),
+            data = $form.serialize();
+
+        var post = $.post(url, data);
+
+        post.done(function(data){
+           $('#id_next_question').append("<option value=" + $.parseJSON(data)['id'] + ">" + $.parseJSON(data)['text'] + "</option>");
+            $('#close_modal').click();
+        })
+    })
+
 
 });

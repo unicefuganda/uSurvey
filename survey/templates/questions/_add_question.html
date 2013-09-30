@@ -1,0 +1,23 @@
+<h3>
+    {% block title %} {{ title }} {% endblock %}
+</h3>
+ <form action="{{ modal_action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
+    {% csrf_token %}
+    {% include "naked_form.html" with a_form=questionform %}
+     <div class="form-actions">
+         <button type="submit" class="btn btn-primary" name="save_sub_question_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+         <a href="javascript:window.history.back()" class="btn btn-primary" name="cancel_button">Cancel</a>
+     </div>
+
+ </form>
+    <script type="text/template" id="question-option-template">
+        <div class="control-group options question-option">
+            <label class="control-label">Option <span class="number"></span></label>
+            <div class="controls">
+                <input type="text" maxlength="100" name="options">
+                <a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>
+                <a href="javascript:;" class="add-on btn btn_primary remove-option"><i class="icon-remove"></i></a>
+            </div>
+        </div>
+    </script>
+

@@ -49,6 +49,8 @@ def list_all_questions(request):
     context = {'questions': questions, 'request': request}
     return render(request, 'questions/index.html', context)
 
+def _sub_question_hash(sub_question):
+    return {'id': str(sub_question.id), 'text': sub_question.text}
 
 def __process_sub_question_form(request, questionform, parent_question):
     if questionform.is_valid():
@@ -57,8 +59,12 @@ def __process_sub_question_form(request, questionform, parent_question):
         sub_question.parent = parent_question
         sub_question.group = parent_question.group
         sub_question.save()
-        messages.success(request, 'Sub question successfully added.')
-        return HttpResponseRedirect('/questions/')
+
+        if request.is_ajax():
+            return HttpResponse(json.dumps(_sub_question_hash(sub_question)))
+        else:
+            messages.success(request, 'Sub question successfully added.')
+            return HttpResponseRedirect('/questions/')
 
 
 @permission_required('auth.can_view_batches')
@@ -98,7 +104,8 @@ def add_logic(request, question_id):
             AnswerRule.objects.create(question=question, **_get_post_values(request.POST))
             messages.success(request, 'Logic successfully added.')
             return HttpResponseRedirect('/batches/%s/questions/' % question.batch.id)
-    context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question}
+    context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
+               'questionform':QuestionForm(), 'modal_action': '/questions/%s/sub_questions/new/' % question.id}
     return render(request, "questions/logic.html", context)
 
 @permission_required('auth.can_view_batches')

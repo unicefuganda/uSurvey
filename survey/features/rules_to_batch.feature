@@ -4,6 +4,7 @@ Feature: Batch related features
     Given I am logged in as researcher
     And I have a survey
     And I have a batch
+    And I have a member group
     And I have a question
     And I assign batch to these questions
     And I visit batches question list page
@@ -39,6 +40,7 @@ Feature: Batch related features
     Given I am logged in as researcher
     And I have a survey
     And I have a batch
+    And I have a member group
     And I have a question
     And I assign batch to these questions
     And I visit batches question list page
@@ -61,14 +63,35 @@ Feature: Batch related features
     Given I am logged in as researcher
     And I have a survey
     And I have a batch
+    And I have a member group
     And I have a question
     And I assign batch to these questions
     And I have two subquestions for this question
     And I visit batches question list page
     And I click on add logic link
     Then I should see the add logic page
+    And I should not see the add subquestion button
     When I select ask subquestion from then field
     Then I should see next question populated with subquestions
+    And I should not the add subquestion button
+
+  Scenario: Add subquestion modal
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I have a member group
+    And I have a question
+    And I assign batch to these questions
+    And I visit batches question list page
+    And I click on add logic link
+    Then I should see the add logic page
+    When I select ask subquestion from then field
+    Then I should see add subquestion button
+    When I click add subquestion button
+    Then I should see a modal for add subquestion
+    When I fill the subquestion details
+    And I click save question button on the form
+    Then I should see the recent subquestion in next question dropdown
 
 
 

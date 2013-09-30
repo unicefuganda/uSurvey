@@ -11,7 +11,7 @@ def save_batch_to_question(question, batch):
     question.save()
 @step(u'And I have a question')
 def and_i_have_a_question(step):
-    world.question = Question.objects.create(text="question1", answer_type=Question.NUMBER, order=1)
+    world.question = Question.objects.create(text="question1", answer_type=Question.NUMBER, order=1,group=world.household_member_group)
 
 @step(u'And I assign batch to these questions')
 def and_i_assign_batch_to_these_questions(step):
@@ -24,7 +24,7 @@ def and_i_visit_batches_question_list_page(step):
 
 @step(u'And I click on add logic link')
 def and_i_click_on_add_logic_link(step):
-    sleep(15)
+    sleep(5)
     world.page.click_link_by_text(" Add Logic")
 
 @step(u'Then I should see the add logic page')
@@ -169,3 +169,41 @@ def when_i_select_ask_subquestion_from_then_field(step):
 def then_i_should_see_next_question_populated_with_subquestions(step):
     next_question_options =[world.sub_question1.text, world.sub_question2.text]
     world.page.see_select_option(next_question_options, 'next_question')
+
+@step(u'Then I should see add subquestion button')
+def then_i_should_see_add_subquestion_button(step):
+    world.page.find_link_by_text("Add Subquestion")
+
+@step(u'When I click add subquestion button')
+def when_i_click_add_subquestion_button(step):
+    world.page.click_link_by_text("Add Subquestion")
+
+@step(u'Then I should see a modal for add subquestion')
+def then_i_should_see_a_modal_for_add_subquestion(step):
+    world.page.validate_fields_present(["New Sub Question", "Text", "Group", "Answer type"])
+
+@step(u'When I fill the subquestion details')
+def when_i_fill_the_subquestion_details(step):
+    world.data = {'text': 'hritik  question',
+            'answer_type': Question.NUMBER}
+
+    world.page.fill_valid_values(world.data)
+
+@step(u'And I click save question button on the form')
+def and_i_click_save_question_button_on_the_form(step):
+    world.browser.find_by_name("save_sub_question_button").first.click()
+
+@step(u'Then I should see the recent subquestion in next question dropdown')
+def then_i_should_see_the_recent_subquestion_in_next_question_dropdown(step):
+    sleep(2)
+    sub_question = Question.objects.get(text = world.data['text'],parent=world.question)
+    next_question_options = [sub_question.text]
+    world.page.see_select_option(next_question_options, 'next_question')
+
+@step(u'And I should not see the add subquestion button')
+def and_i_should_not_see_the_add_subquestion_button(step):
+    assert not world.page.field_is_visible("add_subquestion_button")
+
+@step(u'And I should not the add subquestion button')
+def and_i_should_not_the_add_subquestion_button(step):
+    assert world.page.field_is_visible("add_subquestion_button")

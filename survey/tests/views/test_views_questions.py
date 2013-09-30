@@ -546,9 +546,12 @@ class LogicViewTest(BaseTest):
 
     def test_views_add_logic_get_has_question_in_context(self):
         response = self.client.get('/questions/%s/add_logic/' % self.question.pk)
+        action = '/questions/%s/sub_questions/new/' % self.question.pk
 
         self.assertIsInstance(response.context['question'], Question)
         self.assertEqual(response.context['question'], self.question)
+        self.assertEqual(response.context['modal_action'], action)
+        self.assertIsInstance(response.context['questionform'], QuestionForm)
         self.assertEqual(200, response.status_code)
 
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected(self):
@@ -649,3 +652,30 @@ class QuestionJsonDataDumpTest(BaseTest):
 
         self.assertNotIn(dict(id=str(self.question_2.id), text=self.question_2.text), json_response)
         self.assertNotIn(dict(id=str(self.question.id), text=self.question.text), json_response)
+
+class AddQuestionFromModalTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
+                                                         'can_view_batches')
+        self.client.login(username='User', password='password')
+
+        self.batch = Batch.objects.create(order=1)
+        self.question = Question.objects.create(batch=self.batch, text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1)
+
+    def test_knows_how_to_add_sub_question_from_ajax_call(self):
+        member_group = HouseholdMemberGroup.objects.create(name="Test Group", order=1)
+
+        data = {'text': 'hritik  question',
+                'answer_type': Question.NUMBER,
+                'group': member_group.id }
+
+        response = self.client.post('/questions/%s/sub_questions/new/' % self.question.pk, data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        sub_question = self.question.get_subquestions().latest('created')
+
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)
+        self.assertEqual(dict(id=str(sub_question.id), text=sub_question.text), json_response)

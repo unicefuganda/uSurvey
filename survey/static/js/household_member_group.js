@@ -41,8 +41,8 @@ $(function(){
     });
 
     jQuery.validator.addMethod("positive_if_age", function(value, element) {
-          $(element).next().text("")
-          attribute_value = $('#id_attribute').val()
+          $(element).next().text("");
+          attribute_value = $('#id_attribute').val();
           if (attribute_value == 'AGE'){
               return value > 0;
           }

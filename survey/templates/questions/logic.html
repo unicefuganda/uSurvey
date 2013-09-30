@@ -18,13 +18,32 @@
         {% endif %}
         {% include 'shared/_standard_field.html' with field=field %}
     {% endfor %}
-        </div>
+    <a class="btn btn-small" data-toggle="modal" href="#add_sub_question_modal" name="add_subquestion_button" id="add_subquestion"><i class="icon-plus"></i>Add Subquestion</a>
     </div>
+    </div>
+
     <input type="hidden" value='{{ question.id }}' id='id_question' >
     {% for hidden in a_form.hidden_fields %}
         {{ hidden }}
     {% endfor %}
 {% endblock %}
+
+{% block non_form_content %}
+    <div class="modal fade hide" id="add_sub_question_modal" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="close_modal">&times;</button>
+                    <h4 class="modal-title">New Sub Question</h4>
+                </div>
+                <div class="modal-body">
+                     {% include 'questions/_add_question.html' with title="" button_label="Save" id="add-question-form" class="sub_question_modal"%}
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+{% endblock %}
+
 
 
 {% block javascripts %}
