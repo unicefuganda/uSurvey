@@ -100,7 +100,19 @@
                                   {% for option in question.options.all %}
                                     <tr>
                                       <td >
-                                        {{option.text}}
+                                        {% if option.answer_rule.all %}
+                                          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_question_option_{{option.id}}">{{option.text}}</a>
+                                          <div id="collapse_question_option_{{option.id}}" class="accordion-body collapse in">
+                                            <div class="accordion-inner">
+                                            <span class="muted">Subquestion:</span>
+                                            <ul>
+                                              {% for rule in option.answer_rule.all %}
+                                                <li>{{rule.next_question.text}}</li>
+                                              {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                          {{option.text}}
+                                        {% endif %}
                                       </td>
                                       <td>
                                         {{option.order }}

@@ -110,8 +110,6 @@ class Question(BaseModel):
         return Question.objects.filter(subquestion=True,parent=self)
 
 
-
-
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
     text = models.CharField(max_length=150, blank=False, null=False)

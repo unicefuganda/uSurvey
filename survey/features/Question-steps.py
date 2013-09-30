@@ -4,7 +4,7 @@ from lettuce import *
 from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage, CreateNewSubQuestionPage, EditQuestionPage
 from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
-
+from survey.models.answer_rule import AnswerRule
 
 @step(u'And I have 100 questions under the batch')
 def and_i_have_100_questions_under_the_batch(step):
@@ -290,3 +290,8 @@ def and_i_click_on_the_question(step):
 def then_i_should_see_the_sub_question_below_the_question(step):
     world.page.is_text_present("Subquestion")
     world.page.is_text_present(world.sub_question.text)
+
+@step(u'And I have a rule linking one option with that subquestion')
+def and_i_have_a_rule_linking_one_option_with_that_subquestion(step):
+    AnswerRule.objects.create(question=world.multi_choice_question, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=world.option3, next_question=world.sub_question)
+    

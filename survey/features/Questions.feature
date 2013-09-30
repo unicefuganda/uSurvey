@@ -52,9 +52,12 @@ Feature: Questions related features
     Given I am logged in as researcher
     And I have a member group
     And I have a multichoice question
+    And I have a sub question for that question
+    And I have a rule linking one option with that subquestion
     And I visit questions list page
     And I click on view options link
     Then I should see the question options in a modal
+    Then I should see the sub question below the question
     And when I click the close button
     Then I should be back to questions list page
 

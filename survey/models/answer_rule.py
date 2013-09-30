@@ -38,7 +38,7 @@ class AnswerRule(BaseModel):
     next_question = models.ForeignKey(Question, null=True, related_name="parent_question_rules")
     validate_with_value = models.PositiveIntegerField(max_length=2, null=True)
     validate_with_question = models.ForeignKey(Question, null=True)
-    validate_with_option = models.ForeignKey(QuestionOption, null=True)
+    validate_with_option = models.ForeignKey(QuestionOption, null=True, related_name="answer_rule")
 
     class Meta:
         app_label = 'survey'
