@@ -34,7 +34,7 @@ class LoginPage(PageObject):
     url = "/accounts/login"
 
     def login(self, user):
-        self.is_text_present('Type your username and password')
+        self.is_text_present('Type your username and password to login')
 
         user.set_password('secret')
         user.save()

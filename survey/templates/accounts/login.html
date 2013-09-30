@@ -11,33 +11,18 @@
   {% endif %}
 
   {% if not form.errors %}
-    <div class="control-group offset2">
-      <div class="controls">
-        <h4 class="brand">Type your username and password to login</h4>
-      </div>
-    </div>
-    <hr/>
-  {% endif %}
-  <form class="form-horizontal offset2" method="post" action="{% url 'django.contrib.auth.views.login' %}">
-    {% csrf_token %}
 
-    <div class="control-group">
+  {% endif %}
+  <form class="login-form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+      <span>Type your username and password to login</span>
+      <hr>
+    {% csrf_token %}
       <label class="control-label" for="username">{{ form.username.label_tag }}</label>
-      <div class="controls">
+
         {{ form.username }}
-      </div>
-    </div>
-    <div class="control-group">
       <label class="control-label" for="inputPassword">{{ form.password.label_tag }}</label>
-      <div class="controls">
         {{ form.password }}
-      </div>
-    </div>
-    <div class="control-group">
-      <div class="controls">
-        <button type="submit" class="btn btn-primary" >Login</button>
-      </div>
-    </div>
+        <button type="submit" class="btn btn-primary btn-large" >Login</button>
     {% if next %}
         <input type="hidden" name="next" value="{{ next }}" />
     {% else %}
