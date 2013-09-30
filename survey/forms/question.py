@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+import re
 
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
@@ -40,6 +41,9 @@ class QuestionForm(ModelForm):
 
         if answer_type != Question.MULTICHOICE and options:
             del self.cleaned_data['options']
+
+        self.cleaned_data['text'] = re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', self.cleaned_data['text'])
+        self.cleaned_data['text'] = re.sub("  ", ' ', self.cleaned_data['text'])
 
         return self.cleaned_data
 

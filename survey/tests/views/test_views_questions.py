@@ -355,6 +355,23 @@ class QuestionsViews(BaseTest):
         self.assertEquals(saved_sub_question[0].group, question.group)
         self.assertRedirects(response, expected_url='/questions/', status_code=302, target_status_code=200)
 
+    def test_post_sub_question_knows_to_strip_strange_characters(self):
+        group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        question = Question.objects.create(text="some qn?", group=group, order=1)
+        subquestion_form_data = {
+            'text': "This is a *!#'; Question",
+            'answer_type': Question.NUMBER,
+            'group': group.id,
+            'options': 'some option that should not be created'
+        }
+
+        modified_text = "This is a Question"
+
+        response = self.client.post('/questions/%d/sub_questions/new/' % int(question.id), data=subquestion_form_data)
+        saved_sub_question = Question.objects.filter().latest('created')
+        self.assertNotEqual(saved_sub_question.text, subquestion_form_data['text'])
+        self.assertEquals(saved_sub_question.text, modified_text)
+
     def test_should_filter_questions_in_a_group_that_does_not_belong_to_the_batch(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         question = Question.objects.create(text="some qn?", group=group, order=1, batch=self.batch)
