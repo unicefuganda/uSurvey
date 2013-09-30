@@ -3,7 +3,7 @@ from random import randint
 from time import sleep
 from django.core.urlresolvers import reverse
 from lettuce.django import django_url
-
+from nose.tools import assert_equals
 
 class PageObject(object):
     def __init__(self, browser):
@@ -21,8 +21,8 @@ class PageObject(object):
     def fill(self, name, value):
         self.browser.fill(name, value)
 
-    def is_text_present(self, text):
-        assert self.browser.is_text_present(text)
+    def is_text_present(self, text, status=True):
+        assert_equals(status, self.browser.is_text_present(text))
 
     def is_disabled(self, element_id):
         try:

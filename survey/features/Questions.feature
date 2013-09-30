@@ -101,3 +101,13 @@ Feature: Questions related features
     Then I should see a delete question confirmation modal 
     When I click yes 
     Then I should see that the question was deleted successfully
+
+  Scenario: View sub question
+    Given I am logged in as researcher
+    And I have a member group
+    And I have a multichoice question
+    And I have a sub question for that question
+    And I visit questions list page
+    Then I should not see the sub question
+    When I click on the question
+    Then I should see the sub question below the question 

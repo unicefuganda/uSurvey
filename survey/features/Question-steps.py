@@ -272,3 +272,21 @@ def then_i_should_see_a_delete_question_confirmation_modal(step):
 @step(u'Then I should see that the question was deleted successfully')
 def then_i_should_see_that_the_question_was_deleted_successfully(step):
     world.page.see_success_message("Question", "deleted")
+
+@step(u'And I have a sub question for that question')
+def and_i_have_a_sub_question_for_that_question(step):
+    world.sub_question = Question.objects.create(parent=world.multi_choice_question,text="Sub Question 2?",
+                                            answer_type=Question.NUMBER, subquestion=True)
+
+@step(u'Then I should not see the sub question')
+def then_i_should_not_see_the_sub_question(step):
+    world.page.is_text_present(world.sub_question.text, False)
+
+@step(u'When I click on the question')
+def and_i_click_on_the_question(step):
+    world.page.click_link_by_text(world.multi_choice_question.text)
+
+@step(u'Then I should see the sub question below the question')
+def then_i_should_see_the_sub_question_below_the_question(step):
+    world.page.is_text_present("Subquestion")
+    world.page.is_text_present(world.sub_question.text)
