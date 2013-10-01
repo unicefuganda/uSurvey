@@ -294,4 +294,18 @@ def then_i_should_see_the_sub_question_below_the_question(step):
 @step(u'And I have a rule linking one option with that subquestion')
 def and_i_have_a_rule_linking_one_option_with_that_subquestion(step):
     AnswerRule.objects.create(question=world.multi_choice_question, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=world.option3, next_question=world.sub_question)
+
+@step(u'And I have a subquestion under that question')
+def and_i_have_a_subquestion_under_that_question(step):
+    world.sub_question = Question.objects.create(subquestion=True,parent=world.multi_choice_question, text="this is a subquestion")
+
+@step(u'When I fill in duplicate subquestion details')
+def when_i_fill_in_duplicate_subquestion_details(step):
+    world.page.fill_valid_values({'text': world.sub_question.text})
+    world.page.select('group', [world.household_member_group.pk])
+    world.page.select('answer_type', [Question.NUMBER])
+
+@step(u'And I should see subquestion not added message')
+def and_i_should_see_subquestion_not_added_message(step):
+    world.page.is_text_present("Sub question not saved.")
     

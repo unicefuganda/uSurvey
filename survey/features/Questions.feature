@@ -102,4 +102,16 @@ Feature: Questions related features
     And I visit questions list page
     Then I should not see the sub question
     When I click on the question
-    Then I should see the sub question below the question 
+    Then I should see the sub question below the question
+
+  Scenario: Duplicate sub question
+    Given I am logged in as researcher
+    And I have a member group
+    And I have a multichoice question
+    And I have a subquestion under that question
+    And I visit questions list page
+    And I click on view add subquestion link
+    Then I should go to add subquestion page
+    When I fill in duplicate subquestion details
+    And I submit the form
+    And I should see subquestion not added message
