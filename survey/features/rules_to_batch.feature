@@ -108,5 +108,29 @@ Feature: Batch related features
     And I click save question button on the form
     Then I should see the recent subquestion in next question dropdown
 
+  Scenario: Add duplicate subquestion on modal
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I have a member group
+    And I have a question
+    And I assign batch to these questions
+    And I have a subquestion under this question
+    And I visit batches question list page
+    And I click on add logic link
+    Then I should see the add logic page
+    When I select ask subquestion from then field
+    Then I should see add subquestion button
+    When I click add subquestion button
+    Then I should see a modal for add subquestion
+    When I fill the  duplicate subquestion details
+    And I click save question button on the form
+    And I should see error on the form text field
+    When I refill the form with valid values
+    And I click save question button on the form
+    Then I should see the recent subquestion in next question dropdown
+
+
+
 
 

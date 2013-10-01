@@ -78,7 +78,11 @@ def new_subquestion(request, question_id):
         response = __process_sub_question_form(request, questionform, parent_question)
     context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form',
                'parent_question': parent_question, 'class': 'question-form'}
-    return response or render(request, 'questions/new.html', context)
+
+    template_name = 'questions/new.html'
+    if request.is_ajax():
+        template_name= 'questions/_add_question.html'
+    return response or render(request, template_name, context)
 
 
 def _get_post_values(post_data):

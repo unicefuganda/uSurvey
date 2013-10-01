@@ -249,3 +249,28 @@ def when_i_select_equals_from_drop_down(step):
 @step(u'And I should see question in the attribute')
 def and_i_should_see_question_in_the_attribute(step):
     world.page.see_select_option(['Question'], 'attribute')
+
+@step(u'And I have a subquestion under this question')
+def and_i_have_a_subquestion_under_this_question(step):
+    world.sub_question = Question.objects.create(subquestion=True,parent=world.question, text="this is a subquestion")
+
+@step(u'When I fill the  duplicate subquestion details')
+def when_i_fill_the_duplicate_subquestion_details(step):
+    world.page.fill_valid_values({'text': world.sub_question.text})
+    world.page.select('group', [world.household_member_group.pk])
+    world.page.select('answer_type', [Question.NUMBER])
+
+@step(u'And I should see error on the form text field')
+def and_i_should_see_error_on_the_form_text_field(step):
+    world.page.is_text_present("Sub question for this question with this text already exists.")
+
+@step(u'When I refill the form with valid values')
+def when_i_refill_the_form_with_valid_values(step):
+    world.data={
+        'text' : world.sub_question.text + "edited text",
+        'answer_type' : Question.NUMBER,
+        'group': world.household_member_group.pk
+    }
+    world.page.fill_valid_values({'text': world.data['text']})
+    world.page.select('group', [ world.data['group']])
+    world.page.select('answer_type', [ world.data['answer_type']])

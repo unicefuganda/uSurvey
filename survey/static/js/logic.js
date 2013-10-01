@@ -114,6 +114,15 @@ function fill_questions_or_subquestions_in_next_question_field(action_value){
     replace_next_question_with_right_data(questions_url);
 }
 
+function isHTML(str) {
+    var a = document.createElement('div');
+    a.innerHTML = str;
+    for (var c = a.childNodes, i = c.length; i--; ) {
+        if (c[i].nodeType == 1) return true;
+    }
+    return false;
+}
+
 jQuery(function($){
     var condition = $('#id_condition');
     var condition_value = 'EQUALS_OPTION';
@@ -149,8 +158,18 @@ jQuery(function($){
         var post = $.post(url, data);
 
         post.done(function(data){
-           $('#id_next_question').append("<option value=" + $.parseJSON(data)['id'] + ">" + $.parseJSON(data)['text'] + "</option>");
-            $('#close_modal').click();
+            var text_error_field = $('#id_text').next();
+            text_error_field.text('');
+            if(isHTML(data)){
+                var text_error = $(data).find('#id_text').next().text();
+                if(text_error != ''){
+                text_error_field.text(text_error);
+                }
+            }
+            else{
+                $('#id_next_question').append("<option value=" + $.parseJSON(data)['id'] + ">" + $.parseJSON(data)['text'] + "</option>");
+                $('#close_modal').click();
+            }
         })
     })
 
