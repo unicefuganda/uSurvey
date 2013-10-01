@@ -82,7 +82,7 @@ class QuestionFormTest(TestCase):
         question = question_form.save(group=[self.household_member_group.id])
         self.assertIsNone(question.batch)
         self.assertEquals(0, question.options.all().count())
-        
+
     def test_should_filter_options_not_supplied(self):
         form_data = self.form_data.copy()
         form_data['answer_type'] = Question.TEXT
@@ -92,3 +92,17 @@ class QuestionFormTest(TestCase):
         question = question_form.save(group=[self.household_member_group.id])
         self.assertIsNone(question.batch)
         self.assertEquals(0, question.options.all().count())
+
+    def test_form_should_not_be_valid_for_subquestion_if_same_subquestion_already_exist(self):
+       question = Question.objects.create(batch=self.batch, text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1,group=self.household_member_group)
+       sub_question = Question.objects.create(text="this is a sub question", answer_type=Question.NUMBER,
+                                               batch=self.batch, subquestion=True, parent=question,group=self.household_member_group)
+       form_data = self.form_data.copy()
+       form_data['text'] = sub_question.text
+       form_data['answer_type'] = sub_question.answer_type
+       del form_data['options']
+       question_form = QuestionForm(data=form_data, parent_question=sub_question.parent)
+       self.assertFalse(question_form.is_valid())
+       message= "Sub question for this question with this text already exists."
+       self.assertIn(message, question_form.errors.values()[0])

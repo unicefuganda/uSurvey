@@ -65,7 +65,8 @@ def __process_sub_question_form(request, questionform, parent_question):
         else:
             messages.success(request, 'Sub question successfully added.')
             return HttpResponseRedirect('/questions/')
-
+    else:
+        messages.error(request, 'Sub question not saved.')
 
 @permission_required('auth.can_view_batches')
 def new_subquestion(request, question_id):
@@ -73,7 +74,7 @@ def new_subquestion(request, question_id):
     questionform = QuestionForm()
     response = None
     if request.method == 'POST':
-        questionform = QuestionForm(request.POST)
+        questionform = QuestionForm(request.POST,parent_question=parent_question)
         response = __process_sub_question_form(request, questionform, parent_question)
     context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form',
                'parent_question': parent_question, 'class': 'question-form'}

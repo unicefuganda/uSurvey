@@ -10,10 +10,11 @@ class QuestionForm(ModelForm):
 
     options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
 
-    def __init__(self, *args, **kwargs):
-        super(QuestionForm, self).__init__(*args, **kwargs)
+    def __init__(self,data=None, initial=None, parent_question=None ,instance=None):
+        super(QuestionForm, self).__init__(data=data,initial=initial,instance=instance)
         self.fields['answer_type'].choices = list(Question.TYPE_OF_ANSWERS)
         self.fields['group'].choices = [(group.id, group.name) for group in HouseholdMemberGroup.objects.all()]
+        self.parent_question = parent_question
 
     class Meta:
         model = Question
@@ -46,6 +47,11 @@ class QuestionForm(ModelForm):
         if text:
             text = re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', text)
             self.cleaned_data['text'] = re.sub("  ", ' ', text)
+
+        if self.parent_question:
+            duplicate_sub_question = self.parent_question.get_subquestions().filter(text__iexact=text)
+            if duplicate_sub_question.exists():
+                self._errors['text'] = self.error_class(["Sub question for this question with this text already exists."])
 
         return self.cleaned_data
 

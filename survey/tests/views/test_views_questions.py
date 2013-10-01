@@ -726,3 +726,31 @@ class AddQuestionFromModalTest(BaseTest):
         json_response = json.loads(response.content)
         self.assertTrue(json_response)
         self.assertEqual(dict(id=str(sub_question.id), text=sub_question.text), json_response)
+
+class AddSubQuestionTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
+                                                         'can_view_batches')
+        self.client.login(username='User', password='password')
+
+        self.batch = Batch.objects.create(order=1)
+        self. group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        self.question = Question.objects.create(batch=self.batch, text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1,group=self.group)
+
+    def test_should_not_allow_to_add_same_sub_question_under_one_question(self):
+        sub_question = Question.objects.create(text="this is a sub question", answer_type=Question.NUMBER,
+                                               batch=self.batch, subquestion=True, parent=self.question,group=self.group)
+        subquestion_form_data = {
+            'text': sub_question.text,
+            'answer_type': Question.NUMBER,
+            'group': self.group.id,
+            'option': ''
+        }
+        response = self.client.post('/questions/%d/sub_questions/new/' % int(self.question.id), data=subquestion_form_data)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('questions/new.html', templates)
+        self.assertIsInstance(response.context['questionform'], QuestionForm)
+        self.assertIsNotNone(response.context['questionform'].errors)
