@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from survey.models import AnswerRule
 
 
@@ -14,7 +15,7 @@ class LogicForm(forms.Form):
             }
 
         self.fields['action'].choices = ACTIONS.items()
-
+        self.question = question
         action_sent = data.get('action', None) if data else None
 
         if question:
@@ -52,6 +53,23 @@ class LogicForm(forms.Form):
             if (is_equals_option and is_multichoice) or (not is_equals_option and not is_multichoice):
                 condition_choices[key] = value
         return condition_choices.items()
+
+    def clean(self):
+        rule = []
+        if self.question.is_multichoice():
+            rule = AnswerRule.objects.filter(question=self.question, validate_with_option=self.data['option'])
+            field_name = 'option'
+        else:
+            if self.data.get('value',None):
+                rule = AnswerRule.objects.filter(question=self.question, validate_with_value=self.data['value'], condition=self.data['condition'])
+                field_name = 'value with %s condition' %self.data['condition']
+            elif self.data.get('validate_with_question',None):
+                rule = AnswerRule.objects.filter(question=self.question, validate_with_question=self.data['validate_with_question'], condition=self.data['condition'])
+                field_name = 'question value with %s condition' %self.data['condition']
+
+        if len(rule)>0:
+            raise ValidationError("rule on this %s already exists." %field_name)
+        return self.cleaned_data
 
 
     condition = forms.ChoiceField(label='If', choices=AnswerRule.CONDITIONS.items(), widget=forms.Select, required=False)

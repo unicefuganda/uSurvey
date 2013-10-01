@@ -135,3 +135,89 @@ class LogicFormTest(TestCase):
         logic_form = LogicForm(question=question_without_option,data=data)
 
         self.assertIn((sub_question1.id,sub_question1.text), logic_form.fields[field].choices)
+
+    def test_should_not_add_answer_rule_twice_on_same_option_of_multichoice_question(self):
+        batch = Batch.objects.create(order=1)
+        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+                                                 answer_type=Question.MULTICHOICE, order=1)
+        option_1_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
+        option_1_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
+
+        sub_question_1 = Question.objects.create(batch=batch, text="Specify others", answer_type=Question.TEXT,
+                                                 subquestion=True, parent=question_1)
+
+        rule = AnswerRule.objects.create(action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
+                                         condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
+                                         validate_with_option=option_1_1, next_question=sub_question_1)
+
+        data = dict(action=rule.action,
+                    condition=rule.condition,
+                    option=rule.validate_with_option, next_question=rule.next_question)
+
+        logic_form = LogicForm(question = question_1, data = data)
+
+        self.assertFalse(logic_form.is_valid())
+
+    def test_should_not_add_answer_rule_twice_on_same_value_of_numeric_question(self):
+        batch = Batch.objects.create(order=1)
+        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+                                                 answer_type=Question.NUMBER, order=1)
+        value_1 = 0
+        value_2 = 20
+
+        sub_question_1 = Question.objects.create(batch=batch, text="Specify others", answer_type=Question.TEXT,
+                                                 subquestion=True, parent=question_1)
+
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
+                                         condition=AnswerRule.CONDITIONS['EQUALS'],
+                                         validate_with_value=value_1, next_question=sub_question_1)
+
+        data = dict(action=rule.action,
+                    condition=rule.condition,
+                    value=rule.validate_with_value, next_question=rule.next_question)
+
+        logic_form = LogicForm(question = question_1, data = data)
+
+        self.assertFalse(logic_form.is_valid())
+
+        another_data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['GREATER_THAN_VALUE'],
+                    value=rule.validate_with_value)
+
+        logic_form = LogicForm(question = question_1, data = another_data)
+
+        self.assertTrue(logic_form.is_valid())
+
+    def test_should_not_add_answer_rule_twice_on_same_question_value_of_numeric_question(self):
+        batch = Batch.objects.create(order=1)
+        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1)
+
+        question_2 = Question.objects.create(batch=batch, text="How many members are above 18 years?",
+                                             answer_type=Question.NUMBER, order=2)
+
+        question_3 = Question.objects.create(batch=batch, text="Some random question",
+                                             answer_type=Question.NUMBER, order=3)
+        sub_question_1 = Question.objects.create(batch=batch, text="Specify others", answer_type=Question.TEXT,
+                                                 subquestion=True, parent=question_1)
+
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
+                                         condition=AnswerRule.CONDITIONS['EQUALS'],
+                                         validate_with_question=question_2, next_question=sub_question_1)
+
+        data = dict(action=rule.action,
+                    condition=rule.condition,
+                    validate_with_question=rule.validate_with_question, next_question=rule.next_question)
+
+        logic_form = LogicForm(question = question_1, data = data)
+
+        self.assertFalse(logic_form.is_valid())
+
+        another_data = dict(action=rule.action,
+                            condition=rule.condition,
+                            validate_with_question=question_3.pk)
+
+        logic_form = LogicForm(question = question_1, data = another_data)
+
+        self.assertTrue(logic_form.is_valid())
+
