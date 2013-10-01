@@ -72,6 +72,8 @@
                   {% endif %}
                   {% if question.options.all %}
                     <a class="btn btn-small" href="#view_options_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View options</a>
+                  {% else %}
+                    <a class="btn btn-small" href="#view_logic_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View Logic</a>
                   {% endif %}
                     
                 </div>
@@ -86,6 +88,21 @@
                             </div>
                             <div class="modal-body">
                             {% include 'questions/_view_question_options.html' %}
+                              <a href="#" class="btn btn-primary pull-right" id="close_view_options_{{question.id}}" data-dismiss="modal">Close</a>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+                {% else %}
+                    <div class="modal fade hide" id="view_logic_{{question.id}}" tabindex="-1" role="dialog"  aria-hidden="true">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                              <h4 class="modal-title">{{question.text}}</h4>
+                            </div>
+                            <div class="modal-body">
+                            {% include 'questions/_view_question_logic.html' %}
                               <a href="#" class="btn btn-primary pull-right" id="close_view_options_{{question.id}}" data-dismiss="modal">Close</a>
                             </div>
                           </div>

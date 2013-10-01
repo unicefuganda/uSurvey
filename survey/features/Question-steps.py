@@ -282,6 +282,12 @@ def and_i_have_a_sub_question_for_that_question(step):
 def then_i_should_not_see_the_sub_question(step):
     world.page.is_text_present(world.sub_question.text, False)
 
+@step(u'And I have a non multichoice question')
+def then_i_should_not_see_the_sub_question(step):
+    world.multi_choice_question = Question.objects.create(text="Are these insecticide?",
+                                                          answer_type=Question.NUMBER, order=7,
+                                                           group = world.household_member_group)
+
 @step(u'When I click on the question')
 def and_i_click_on_the_question(step):
     world.page.click_link_by_text(world.multi_choice_question.text)
@@ -308,4 +314,16 @@ def when_i_fill_in_duplicate_subquestion_details(step):
 @step(u'And I should see subquestion not added message')
 def and_i_should_see_subquestion_not_added_message(step):
     world.page.is_text_present("Sub question not saved.")
-    
+
+@step(u'And I have a rule on value with that subquestion')
+def and_i_have_a_rule_on_value_with_that_subquestion(step):
+    world.answer_rule = AnswerRule.objects.create(question=world.multi_choice_question, validate_with_value=1,
+                                                  condition=AnswerRule.CONDITIONS['EQUALS'], action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
+                                                  next_question=world.sub_question)
+@step(u'And I click on view logic link')
+def and_i_click_on_view_logic_link(step):
+    world.page.click_modal_link("#view_logic_%d" % world.multi_choice_question.id)
+
+@step(u'Then I should see the logic in a modal')
+def then_i_should_see_the_logic_in_a_modal(step):
+    world.page.validate_fields_present([world.multi_choice_question.text, "Condition", "Question/Value", "Action"])

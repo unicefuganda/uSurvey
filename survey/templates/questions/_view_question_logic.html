@@ -1,0 +1,40 @@
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+    <tr>
+        <th>
+            Condition
+        </th>
+        <th>
+            Question/Value
+        </th>
+         <th>
+            Action
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if question.rule.all %}
+        {% for rule in question.rule.all %}
+            <tr>
+                <td >
+                    {{ rule.condition }}
+                </td>
+                <td>
+                    {% if rule.validate_with_value %}
+                        {{ rule.validate_with_value }}
+                    {% else %}
+                        <span class="muted"> Value of:</span>{{ rule.validate_with_question }}
+                    {% endif %}
+
+                </td>
+                <td>
+                    {{rule.action }}
+                    {% if rule.action == "ASK_SUBQUESTION" or rule.action == "SKIP_TO" %}
+                         <span class="muted"> Next Question:</span><span>{{ rule.next_question.text }} </span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
