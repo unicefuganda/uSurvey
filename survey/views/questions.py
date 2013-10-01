@@ -184,3 +184,9 @@ def get_questions_for_batch(request, question_id):
 def get_sub_questions_for_question(request, question_id):
     question = Question.objects.get(id=question_id)
     return _create_question_hash_response(question.get_subquestions())
+
+def delete_logic(request,question_id,answer_rule_id):
+    rule = AnswerRule.objects.get(id=answer_rule_id)
+    rule.delete()
+    question = Question.objects.get(id=question_id)
+    return HttpResponseRedirect('/batches/%s/questions/' %question.batch.id)

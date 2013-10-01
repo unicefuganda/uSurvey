@@ -754,3 +754,21 @@ class AddSubQuestionTest(BaseTest):
         self.assertIn('questions/new.html', templates)
         self.assertIsInstance(response.context['questionform'], QuestionForm)
         self.assertIsNotNone(response.context['questionform'].errors)
+
+class DeleteLogicViewsTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
+                                        'can_view_batches')
+        self.client.login(username='User', password='password')
+
+        self.batch = Batch.objects.create(order=1)
+        self.question = Question.objects.create(batch=self.batch, text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1)
+        self.answer_rule = AnswerRule.objects.create(question=self.question, condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                     action=AnswerRule.ACTIONS['END_INTERVIEW'], validate_with_value=0)
+
+    def test_knows_how_to_delete_logic_given_valid_question_id_and_logic_id(self):
+        response = self.client.get('/questions/%d/delete_logic/%d/' % (int(self.question.id), int(self.answer_rule.id)))
+        self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
+        self.failIf(AnswerRule.objects.filter(id=self.answer_rule.id))

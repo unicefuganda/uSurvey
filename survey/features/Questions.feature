@@ -118,6 +118,8 @@ Feature: Questions related features
 
   Scenario: View question logic
     Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
     And I have a member group
     And I have a non multichoice question
     And I have a sub question for that question
@@ -128,3 +130,19 @@ Feature: Questions related features
     Then I should see the sub question below the question
     And when I click the close button
     Then I should be back to questions list page
+
+  Scenario: Delete question logic
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I have a member group
+    And I have a non multichoice question
+    And I have a sub question for that question
+    And I have a rule on value with that subquestion
+    And I visit questions list page
+    And I click on view logic link
+    Then I should see the logic in a modal
+    Then I should see delete logic icon
+    When I click delete logic icon
+    And I click confirm delete
+    Then I should redirected to batch question page

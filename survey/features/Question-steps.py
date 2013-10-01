@@ -284,7 +284,7 @@ def then_i_should_not_see_the_sub_question(step):
 
 @step(u'And I have a non multichoice question')
 def then_i_should_not_see_the_sub_question(step):
-    world.multi_choice_question = Question.objects.create(text="Are these insecticide?",
+    world.multi_choice_question = Question.objects.create(batch= world.batch, text="Are these insecticide?",
                                                           answer_type=Question.NUMBER, order=7,
                                                            group = world.household_member_group)
 
@@ -327,3 +327,20 @@ def and_i_click_on_view_logic_link(step):
 @step(u'Then I should see the logic in a modal')
 def then_i_should_see_the_logic_in_a_modal(step):
     world.page.validate_fields_present([world.multi_choice_question.text, "Condition", "Question/Value", "Action"])
+
+@step(u'Then I should see delete logic icon')
+def then_i_should_delete_logic_icon(step):
+    world.browser.find_by_css('.icon-trash')
+
+@step(u'When I click delete logic icon')
+def when_i_click_delete_logic_icon(step):
+    world.page.click_by_css('#delete-icon-%s'%world.answer_rule.id)
+
+@step(u'And I click confirm delete')
+def and_i_click_confirm_delete(step):
+    world.page.click_by_css('#delete-logic-%s'%world.answer_rule.id)
+
+@step(u'Then I should redirected to batch question page')
+def then_i_should_redirected_to_batch_question_page(step):
+    world.page = BatchQuestionsListPage(world.browser, world.batch)
+    world.page.validate_url()
