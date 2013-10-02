@@ -181,7 +181,7 @@ def and_when_i_click_the_close_button(step):
 @step(u'Then I should be back to questions list page')
 def then_i_should_see_questions_list_page(step):
     sleep(2)
-    world.page.validate_back_to_questions_list_page()
+    world.page.validate_fields()
 
 
 @step(u'And I click on view add subquestion link')
@@ -283,7 +283,7 @@ def then_i_should_not_see_the_sub_question(step):
     world.page.is_text_present(world.sub_question.text, False)
 
 @step(u'And I have a non multichoice question')
-def then_i_should_not_see_the_sub_question(step):
+def and_i_have_a_non_multi_choice_question(step):
     world.multi_choice_question = Question.objects.create(batch= world.batch, text="Are these insecticide?",
                                                           answer_type=Question.NUMBER, order=7,
                                                            group = world.household_member_group)
@@ -319,7 +319,7 @@ def and_i_should_see_subquestion_not_added_message(step):
 def and_i_have_a_rule_on_value_with_that_subquestion(step):
     world.answer_rule = AnswerRule.objects.create(question=world.multi_choice_question, validate_with_value=1,
                                                   condition=AnswerRule.CONDITIONS['EQUALS'], action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
-                                                  next_question=world.sub_question)
+                                                  next_question=world.sub_question, batch=world.batch)
 @step(u'And I click on view logic link')
 def and_i_click_on_view_logic_link(step):
     world.page.click_modal_link("#view_logic_%d" % world.multi_choice_question.id)

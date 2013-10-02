@@ -17,8 +17,8 @@
     </tr>
     </thead>
     <tbody>
-    {% if question.rule.all %}
-        {% for rule in question.rule.all %}
+    {% if rules_for_batch|get_value:question %}
+        {% for rule in rules_for_batch|get_value:question %}
             <tr>
                 <td >
                     {{ rule.condition }}
@@ -40,7 +40,7 @@
                 <td>
                     <a class="btn btn-small" data-toggle="modal" href="#delete_logic_{{rule.id}}"><i class="icon-trash" id="delete-icon-{{rule.id}}"></i></a>
                 </td>
-                {% include "base/delete_modal.html" with object_name="" id=rule.id name="Logic" url=question.id|add_string:rule.id|get_url_with_ids:"delete_question_logic_page" %}
+                {% include "base/delete_modal.html" with object_name="" id=rule.id name="Logic" url=batch.id|add_string:rule.id|get_url_with_ids:"delete_question_logic_page" %}
             </tr>
         {% endfor %}
     {% endif %}

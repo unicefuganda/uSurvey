@@ -111,6 +111,8 @@ class Question(BaseModel):
     def get_subquestions(self):
         return Question.objects.filter(subquestion=True,parent=self)
 
+    def rules_for_batch(self, batch):
+        return self.rule.all().filter(batch=batch)
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")

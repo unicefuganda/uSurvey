@@ -18,17 +18,18 @@ class BatchQuestionsListPage(PageObject):
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
+    def validate_back_to_questions_list_page(self):
+        assert_equals(False, self.browser.is_text_present("Text"))
+        assert_equals(False, self.browser.is_text_present("Order"))
+        assert_equals(False, self.browser.is_text_present("Close"))
+
+
 
 class ListAllQuestionsPage(PageObject):
     url = "/questions/"
 
     def validate_fields(self):
         self.validate_fields_present(['Questions List', 'Question', 'Type', 'Group', 'Actions'])
-
-    def validate_back_to_questions_list_page(self):
-        assert_equals(False, self.browser.is_text_present("Text"))
-        assert_equals(False, self.browser.is_text_present("Order"))
-        assert_equals(False, self.browser.is_text_present("Close"))
 
 
 class AddQuestionPage(PageObject):

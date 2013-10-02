@@ -125,7 +125,7 @@ Feature: Questions related features
     And I have a non multichoice question
     And I have a sub question for that question
     And I have a rule on value with that subquestion
-    And I visit questions list page
+    And I visit batches question list page
     And I click on view logic link
     Then I should see the logic in a modal
     Then I should see the sub question below the question
@@ -140,7 +140,7 @@ Feature: Questions related features
     And I have a non multichoice question
     And I have a sub question for that question
     And I have a rule on value with that subquestion
-    And I visit questions list page
+    And I visit batches question list page
     And I click on view logic link
     Then I should see the logic in a modal
     Then I should see delete logic icon

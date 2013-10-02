@@ -74,7 +74,7 @@ class QuestionsViews(BaseTest):
         self.assert_restricted_permission_for('/questions/')
         self.assert_restricted_permission_for('/batches/%d/questions/groups/%d/' % (self.batch.id, member_group.id))
         self.assert_restricted_permission_for('/questions/1/edit/')
-        self.assert_restricted_permission_for('/questions/1/add_logic/')
+        self.assert_restricted_permission_for('/batches/%d/questions/1/add_logic/'% self.batch.id)
         self.assert_restricted_permission_for('/questions/1/sub_questions/new/')
 
     def test_create_question_number_does_not_create_options(self):
@@ -556,15 +556,40 @@ class LogicViewTest(BaseTest):
         self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?",
                                                 answer_type=Question.NUMBER, order=2)
 
+    def test_knows_questions_have_all_rules_for_batch_when_sent_in_context(self):
+        answer_rule = AnswerRule.objects.create(batch=self.batch, question=self.question,
+                                                         action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                                         condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                         validate_with_value=0)
+
+        answer_rule_2 = AnswerRule.objects.create(batch=self.batch, question=self.question,
+                                                         action=AnswerRule.ACTIONS['REANSWER'],
+                                                         condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                         validate_with_value=1)
+        all_rules = [answer_rule, answer_rule_2]
+
+        response = self.client.get('/batches/%s/questions/' % self.batch.pk)
+        all_questions = response.context['questions']
+        self.assertEqual(2, len(all_questions))
+        self.assertIn(self.question,all_questions)
+        rule_question = all_questions.get(id=self.question.id)
+
+        all_question_batch_rules = response.context['rules_for_batch']
+        self.assertEqual(2,len(all_question_batch_rules))
+        self.assertEqual(2,len(all_question_batch_rules[rule_question]))
+        [self.assertIn(rule, all_question_batch_rules[rule_question]) for rule in all_rules]
+
+
     def test_views_add_logic_get_has_logic_form_in_context_and_has_success_response(self):
-        response = self.client.get('/questions/%s/add_logic/' % self.question.pk)
+        response = self.client.get('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk))
 
         self.assertIsInstance(response.context['logic_form'], LogicForm)
         self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['batch_id'], str(self.batch.id))
         self.assertEqual(200, response.status_code)
 
     def test_views_add_logic_get_has_question_in_context(self):
-        response = self.client.get('/questions/%s/add_logic/' % self.question.pk)
+        response = self.client.get('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk))
         action = '/questions/%s/sub_questions/new/' % self.question.pk
 
         self.assertIsInstance(response.context['question'], Question)
@@ -581,7 +606,7 @@ class LogicViewTest(BaseTest):
                      'action': 'SKIP_TO',
                      'next_question': self.question_2.pk}
 
-        response = self.client.post('/questions/%s/add_logic/' % self.question.pk, data=form_data)
+        response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk), data=form_data)
         self.assertRedirects(response, '/batches/%s/questions/' % self.question.batch.id, status_code=302, target_status_code=200)
         success_message= 'Logic successfully added.'
         self.assertIn(success_message, response.cookies['messages'].value)
@@ -595,6 +620,7 @@ class LogicViewTest(BaseTest):
         self.assertEqual(form_data['action'], answer_rule.action)
         self.assertEqual(form_data['condition'], answer_rule.condition)
         self.assertEqual(self.question_2, answer_rule.next_question)
+        self.assertEqual(self.batch, answer_rule.batch)
         self.assertEqual(form_data['value'], answer_rule.validate_with_value)
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_option)
@@ -608,7 +634,7 @@ class LogicViewTest(BaseTest):
                      'action': 'ASK_SUBQUESTION',
                      'next_question': sub_question1.pk}
 
-        response = self.client.post('/questions/%s/add_logic/' % self.question.pk, data=form_data)
+        response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk), data=form_data)
         self.assertRedirects(response, '/batches/%s/questions/' % self.question.batch.id, status_code=302, target_status_code=200)
         success_message= 'Logic successfully added.'
         self.assertIn(success_message, response.cookies['messages'].value)
@@ -622,6 +648,7 @@ class LogicViewTest(BaseTest):
         self.assertEqual(form_data['action'], answer_rule.action)
         self.assertEqual(form_data['condition'], answer_rule.condition)
         self.assertEqual(sub_question1, answer_rule.next_question)
+        self.assertEqual(self.batch, answer_rule.batch)
         self.assertEqual(form_data['value'], answer_rule.validate_with_value)
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_option)
@@ -641,7 +668,7 @@ class LogicViewTest(BaseTest):
                      'action': 'END_INTERVIEW',
                      }
 
-        response = self.client.post('/questions/%s/add_logic/' % question_with_option.pk, data=form_data)
+        response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, question_with_option.pk), data=form_data)
         self.assertRedirects(response, '/batches/%s/questions/' % self.question.batch.id, status_code=302, target_status_code=200)
         answer_rules = AnswerRule.objects.filter()
 
@@ -650,6 +677,7 @@ class LogicViewTest(BaseTest):
         answer_rule = answer_rules[0]
 
         self.assertEqual(question_with_option, answer_rule.question)
+        self.assertEqual(self.batch, answer_rule.batch)
         self.assertEqual(form_data['action'], answer_rule.action)
         self.assertEqual(form_data['condition'], answer_rule.condition)
         self.assertEqual(form_data['option'], answer_rule.validate_with_option.id)
@@ -677,7 +705,7 @@ class QuestionJsonDataDumpTest(BaseTest):
                                                   answer_type=Question.NUMBER, order=2)
 
     def test_returns_data_dump_of_questions_in_batch_excluding_the_current_selected_question(self):
-        response = self.client.get('/questions/%s/questions_json/' % self.question.pk, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.get('/batches/%s/questions/%s/questions_json/' % (self.batch.pk, self.question.pk), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         self.failUnlessEqual(response.status_code, 200)
         json_response = json.loads(response.content)
@@ -769,6 +797,6 @@ class DeleteLogicViewsTest(BaseTest):
                                                      action=AnswerRule.ACTIONS['END_INTERVIEW'], validate_with_value=0)
 
     def test_knows_how_to_delete_logic_given_valid_question_id_and_logic_id(self):
-        response = self.client.get('/questions/%d/delete_logic/%d/' % (int(self.question.id), int(self.answer_rule.id)))
+        response = self.client.get('/batches/%s/questions/delete_logic/%d/' % (int(self.batch.id), int(self.answer_rule.id)))
         self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
         self.failIf(AnswerRule.objects.filter(id=self.answer_rule.id))

@@ -387,6 +387,22 @@ class QuestionTest(TestCase):
         self.assertIn(sub_question1,subquestions)
         self.assertIn(sub_question2,subquestions)
 
+    def test_knows_rules_that_belong_to_particular_batch(self):
+        question_1 = Question.objects.create(batch=self.batch, text="question1", answer_type="number",order=1)
+        answer_rule_in_batch = AnswerRule.objects.create(batch=self.batch, question=question_1,
+                                                         action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                                         condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                         validate_with_value=0)
+        another_batch = Batch.objects.create(order=2)
+
+        answer_rule_in_another_batch = AnswerRule.objects.create(batch=another_batch, question=question_1,
+                                                         action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                                         condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                         validate_with_value=0)
+
+        self.assertIn(answer_rule_in_batch, question_1.rules_for_batch(self.batch))
+        self.assertNotIn(answer_rule_in_another_batch, question_1.rules_for_batch(self.batch))
+
 
 class QuestionOptionTest(TestCase):
     def setUp(self):

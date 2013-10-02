@@ -43,8 +43,8 @@ def display_list(list):
     return ', '.join(new_list)
 
 @register.filter
-def get_location(location_dict, key):
-    return location_dict.get(key, "")
+def get_value(dict, key):
+    return dict.get(key, "")
 
 @register.filter
 def get_month(index):

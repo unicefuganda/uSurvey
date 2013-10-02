@@ -5,7 +5,7 @@ from survey.models import AnswerRule
 
 class LogicForm(forms.Form):
 
-    def __init__(self, data=None, initial=None, question=None):
+    def __init__(self, data=None, initial=None, question=None, batch=None):
         super(LogicForm, self).__init__(data=data, initial=initial)
         ACTIONS = {
             'END_INTERVIEW': 'END INTERVIEW',
@@ -16,6 +16,7 @@ class LogicForm(forms.Form):
 
         self.fields['action'].choices = ACTIONS.items()
         self.question = question
+        self.batch = batch
         action_sent = data.get('action', None) if data else None
 
         if question:
@@ -57,14 +58,14 @@ class LogicForm(forms.Form):
     def clean(self):
         rule = []
         if self.question.is_multichoice():
-            rule = AnswerRule.objects.filter(question=self.question, validate_with_option=self.data['option'])
+            rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_option=self.data['option'])
             field_name = 'option'
         else:
             if self.data.get('value',None):
-                rule = AnswerRule.objects.filter(question=self.question, validate_with_value=self.data['value'], condition=self.data['condition'])
+                rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_value=self.data['value'], condition=self.data['condition'])
                 field_name = 'value with %s condition' %self.data['condition']
             elif self.data.get('validate_with_question',None):
-                rule = AnswerRule.objects.filter(question=self.question, validate_with_question=self.data['validate_with_question'], condition=self.data['condition'])
+                rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_question=self.data['validate_with_question'], condition=self.data['condition'])
                 field_name = 'question value with %s condition' %self.data['condition']
 
         if len(rule)>0:

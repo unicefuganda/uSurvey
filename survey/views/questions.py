@@ -28,7 +28,13 @@ def index(request, batch_id):
 
     if not questions.exists():
         messages.error(request, 'There are no questions associated with this batch yet.')
-    context = {'questions': questions.filter(subquestion=False), 'request': request, 'batch': batch}
+    all_questions = questions.filter(subquestion=False)
+
+    question_rules_for_batch = {}
+    for question in all_questions:
+        question_rules_for_batch[question] = question.rules_for_batch(batch)
+
+    context = {'questions': all_questions, 'request': request, 'batch': batch, 'rules_for_batch':question_rules_for_batch}
     return render(request, 'questions/index.html', context)
 
 @permission_required('auth.can_view_batches')
@@ -46,7 +52,7 @@ def filter_by_group(request, batch_id, group_id):
 @permission_required('auth.can_view_batches')
 def list_all_questions(request):
     questions = Question.objects.filter(subquestion=False)
-    context = {'questions': questions, 'request': request}
+    context = {'questions': questions, 'request': request, 'rules_for_batch': {}}
     return render(request, 'questions/index.html', context)
 
 def _sub_question_hash(sub_question):
@@ -101,18 +107,19 @@ def _get_post_values(post_data):
 
 
 @permission_required('auth.can_view_batches')
-def add_logic(request, question_id):
+def add_logic(request, batch_id, question_id):
     question = Question.objects.get(id=question_id)
+    batch = Batch.objects.get(id=batch_id)
     logic_form = LogicForm(question=question)
     if request.method == "POST":
         logic_form = LogicForm(data=request.POST, question=question)
         if logic_form.is_valid():
-            AnswerRule.objects.create(question=question, **_get_post_values(request.POST))
+            AnswerRule.objects.create(question=question, batch=batch, **_get_post_values(request.POST))
             messages.success(request, 'Logic successfully added.')
-            return HttpResponseRedirect('/batches/%s/questions/' % question.batch.id)
+            return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'questionform':QuestionForm(), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
-               'class': 'question-form'}
+               'class': 'question-form', 'batch_id': batch_id}
     return render(request, "questions/logic.html", context)
 
 @permission_required('auth.can_view_batches')
@@ -176,17 +183,16 @@ def _create_question_hash_response(questions):
     questions_to_display = map(lambda question: {'id': str(question.id), 'text':question.text}, questions)
     return HttpResponse(json.dumps(questions_to_display), mimetype='application/json')
 
-def get_questions_for_batch(request, question_id):
+def get_questions_for_batch(request, batch_id,  question_id):
     question = Question.objects.get(id=question_id)
-    batch = question.batch
+    batch = Batch.objects.get(id=batch_id)
     return _create_question_hash_response(batch.questions.filter(subquestion=False).exclude(id=question_id))
 
 def get_sub_questions_for_question(request, question_id):
     question = Question.objects.get(id=question_id)
     return _create_question_hash_response(question.get_subquestions())
 
-def delete_logic(request,question_id,answer_rule_id):
+def delete_logic(request, batch_id, answer_rule_id):
     rule = AnswerRule.objects.get(id=answer_rule_id)
     rule.delete()
-    question = Question.objects.get(id=question_id)
-    return HttpResponseRedirect('/batches/%s/questions/' %question.batch.id)
+    return HttpResponseRedirect('/batches/%s/questions/' %batch_id)

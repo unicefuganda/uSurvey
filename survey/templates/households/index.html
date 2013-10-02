@@ -55,19 +55,19 @@
                         {% endwith %}
                     </td>
                     <td>
-                        {{ household.related_locations|get_location:"District" }}
+                        {{ household.related_locations|get_value:"District" }}
                     </td>
                     <td>
-                        {{ household.related_locations|get_location:"County" }}
+                        {{ household.related_locations|get_value:"County" }}
                     </td>
                     <td>
-                        {{ household.related_locations|get_location:"Subcounty" }}
+                        {{ household.related_locations|get_value:"Subcounty" }}
                     </td>
                     <td>
-                        {{ household.related_locations|get_location:"Parish" }}
+                        {{ household.related_locations|get_value:"Parish" }}
                     </td>
                     <td>
-                        {{ household.related_locations|get_location:"Village" }}
+                        {{ household.related_locations|get_value:"Village" }}
                     </td>
                     <td>
                         <a href="{% url 'show_investigator_page' household.investigator.pk %}">{{ household.investigator.name }}</a>

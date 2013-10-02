@@ -68,7 +68,7 @@
                   <a class="btn btn-small" href="{% url 'edit_question_page' question.pk %}" id="edit_question"><i class="icon-pencil"></i> Edit</a>
                   <a class="btn btn-small" href="#delete_question_{{ question.pk }}" data-toggle="modal" id="delete_question"><i class="icon-trash"></i> Delete</a>
                   {% if batch %}
-                    <a href="{% url 'add_question_logic_page' question.pk %}" class="btn btn-small"><i class="icon-plus"></i> Add Logic</a>
+                    <a href="{% url 'add_question_logic_page' batch.pk question.pk %}" class="btn btn-small"><i class="icon-plus"></i> Add Logic</a>
                   {% endif %}
                   {% if question.options.all %}
                     <a class="btn btn-small" href="#view_options_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View options</a>

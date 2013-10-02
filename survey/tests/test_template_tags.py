@@ -12,9 +12,9 @@ class TemplateTagsTest(TestCase):
 
         location_dict = {'Country': country_name, 'District': district_name, 'County': county_name}
 
-        self.assertEqual(get_location(location_dict, 'Country'), country_name)
-        self.assertEqual(get_location(location_dict, 'District'), district_name)
-        self.assertEqual(get_location(location_dict, 'County'), county_name)
+        self.assertEqual(get_value(location_dict, 'Country'), country_name)
+        self.assertEqual(get_value(location_dict, 'District'), district_name)
+        self.assertEqual(get_value(location_dict, 'County'), county_name)
 
     def test_returns_empty_string_if_key_does_not_exist_from_location_dict(self):
         country_name = 'Uganda'
@@ -22,9 +22,9 @@ class TemplateTagsTest(TestCase):
 
         location_dict = {'Country': country_name, 'District': district_name}
 
-        self.assertEqual(get_location(location_dict, 'Country'), country_name)
-        self.assertEqual(get_location(location_dict, 'District'), district_name)
-        self.assertEqual(get_location(location_dict, 'County'), "")
+        self.assertEqual(get_value(location_dict, 'Country'), country_name)
+        self.assertEqual(get_value(location_dict, 'District'), district_name)
+        self.assertEqual(get_value(location_dict, 'County'), "")
 
     def test_should_know_how_to_format_date(self):
         date_entered = date(2008, 4, 5)
