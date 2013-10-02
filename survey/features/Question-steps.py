@@ -344,3 +344,11 @@ def and_i_click_confirm_delete(step):
 def then_i_should_redirected_to_batch_question_page(step):
     world.page = BatchQuestionsListPage(world.browser, world.batch)
     world.page.validate_url()
+
+@step(u'Then I should see special characters message')
+def and_i_should_see_special_characters_message(step):
+    special_characters = "Please note that the following special characters will be removed ["
+    for character in Question.IGNORED_CHARACTERS:
+        special_characters = special_characters + character + " "
+    special_characters = special_characters.strip() + "]"
+    world.page.is_text_present(special_characters)

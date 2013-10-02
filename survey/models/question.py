@@ -24,7 +24,7 @@ class Question(BaseModel):
         MULTICHOICE: 'MultiChoiceAnswer'
     }
 
-    IGNORED_CHARACTERS = "*!#';"
+    IGNORED_CHARACTERS = "*!#';&"
 
     OPTIONS_PER_PAGE = 3
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')

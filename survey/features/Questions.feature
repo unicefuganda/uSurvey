@@ -29,6 +29,7 @@ Feature: Questions related features
     Given I am logged in as researcher
     And I have a member group
     And I visit create new question page
+    Then I should see special characters message
     And I fill the details for question
     When I select multichoice for answer type
     Then I should see one option field
