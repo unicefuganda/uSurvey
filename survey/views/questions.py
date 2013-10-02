@@ -112,7 +112,7 @@ def add_logic(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
     logic_form = LogicForm(question=question)
     if request.method == "POST":
-        logic_form = LogicForm(data=request.POST, question=question)
+        logic_form = LogicForm(data=request.POST, question=question, batch=batch)
         if logic_form.is_valid():
             AnswerRule.objects.create(question=question, batch=batch, **_get_post_values(request.POST))
             messages.success(request, 'Logic successfully added.')

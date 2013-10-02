@@ -132,7 +132,7 @@ class LogicFormTest(TestCase):
                                                 subquestion=True, parent=question_without_option)
 
         data= {'action': 'ASK_SUBQUESTION'}
-        logic_form = LogicForm(question=question_without_option,data=data)
+        logic_form = LogicForm(question=question_without_option,data=data, batch=batch)
 
         self.assertIn((sub_question1.id,sub_question1.text), logic_form.fields[field].choices)
 
@@ -148,13 +148,13 @@ class LogicFormTest(TestCase):
 
         rule = AnswerRule.objects.create(action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
                                          condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
-                                         validate_with_option=option_1_1, next_question=sub_question_1)
+                                         validate_with_option=option_1_1, next_question=sub_question_1, batch=batch)
 
         data = dict(action=rule.action,
                     condition=rule.condition,
                     option=rule.validate_with_option, next_question=rule.next_question)
 
-        logic_form = LogicForm(question = question_1, data = data)
+        logic_form = LogicForm(question = question_1, data = data, batch=batch)
 
         self.assertFalse(logic_form.is_valid())
 
@@ -170,13 +170,13 @@ class LogicFormTest(TestCase):
 
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'],
-                                         validate_with_value=value_1, next_question=sub_question_1)
+                                         validate_with_value=value_1, next_question=sub_question_1, batch=batch)
 
         data = dict(action=rule.action,
                     condition=rule.condition,
                     value=rule.validate_with_value, next_question=rule.next_question)
 
-        logic_form = LogicForm(question = question_1, data = data)
+        logic_form = LogicForm(question = question_1, data = data, batch=batch)
 
         self.assertFalse(logic_form.is_valid())
 
@@ -184,7 +184,7 @@ class LogicFormTest(TestCase):
                     condition=AnswerRule.CONDITIONS['GREATER_THAN_VALUE'],
                     value=rule.validate_with_value)
 
-        logic_form = LogicForm(question = question_1, data = another_data)
+        logic_form = LogicForm(question = question_1, data = another_data, batch=batch)
 
         self.assertTrue(logic_form.is_valid())
 
@@ -203,13 +203,13 @@ class LogicFormTest(TestCase):
 
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'],
-                                         validate_with_question=question_2, next_question=sub_question_1)
+                                         validate_with_question=question_2, next_question=sub_question_1, batch=batch)
 
         data = dict(action=rule.action,
                     condition=rule.condition,
                     validate_with_question=rule.validate_with_question, next_question=rule.next_question)
 
-        logic_form = LogicForm(question = question_1, data = data)
+        logic_form = LogicForm(question = question_1, data = data, batch=batch)
 
         self.assertFalse(logic_form.is_valid())
 
@@ -217,7 +217,7 @@ class LogicFormTest(TestCase):
                             condition=rule.condition,
                             validate_with_question=question_3.pk)
 
-        logic_form = LogicForm(question = question_1, data = another_data)
+        logic_form = LogicForm(question = question_1, data = another_data, batch=batch)
 
         self.assertTrue(logic_form.is_valid())
 
