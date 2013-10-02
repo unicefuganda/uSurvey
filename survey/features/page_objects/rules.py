@@ -2,7 +2,7 @@ from survey.features.page_objects.base import PageObject
 
 
 class AddLogicToBatchQuestionPage(PageObject):
-    def __init__(self, browser, question, batch):
+    def __init__(self, browser, batch, question):
         super(AddLogicToBatchQuestionPage, self).__init__(browser)
         self.question = question
         self.batch = batch

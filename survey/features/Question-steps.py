@@ -9,8 +9,9 @@ from survey.models.answer_rule import AnswerRule
 @step(u'And I have 100 questions under the batch')
 def and_i_have_100_questions_under_the_batch(step):
     for i in xrange(100):
-        q = Question.objects.create(batch=world.batch, text="some questions %d" % i,
+        q = Question.objects.create( text="some questions %d" % i,
                                     answer_type=Question.NUMBER, order=i)
+        q.batches.add(world.batch)
 
 
 @step(u'And I visit questions listing page of the batch')
@@ -28,7 +29,7 @@ def then_i_should_see_the_questions_list_paginated(step):
 
 @step(u'And I have no questions under the batch')
 def and_i_have_no_questions_under_the_batch(step):
-    Question.objects.filter(batch=world.batch).delete()
+    Question.objects.filter(batches=world.batch).delete()
 
 
 @step(u'Then I should see error message on the page')

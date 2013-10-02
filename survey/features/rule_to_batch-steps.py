@@ -7,8 +7,7 @@ from survey.models.question import QuestionOption
 
 
 def save_batch_to_question(question, batch):
-    question.batch = batch
-    question.save()
+    question.batches.add(batch)
 
 @step(u'And I have a question')
 def and_i_have_a_question(step):
@@ -30,7 +29,7 @@ def and_i_click_on_add_logic_link(step):
 
 @step(u'Then I should see the add logic page')
 def then_i_should_see_the_add_logic_page(step):
-    world.page = AddLogicToBatchQuestionPage(world.browser, world.question, world.batch)
+    world.page = AddLogicToBatchQuestionPage(world.browser, world.batch, world.question)
     world.page.validate_url()
     world.page.validate_fields()
 
@@ -159,8 +158,10 @@ def and_i_should_see_all_the_action_dropdown_options(step):
 
 @step(u'And I have two subquestions for this question')
 def and_i_have_two_subquestions_for_this_question(step):
-    world.sub_question1 = Question.objects.create(batch=world.batch,text="sub question1", answer_type=Question.NUMBER, subquestion=True, parent=world.question)
-    world.sub_question2 = Question.objects.create(batch=world.batch,text="sub question2", answer_type=Question.NUMBER, subquestion=True, parent=world.question)
+    world.sub_question1 = Question.objects.create(text="sub question1", answer_type=Question.NUMBER, subquestion=True, parent=world.question)
+    world.sub_question2 = Question.objects.create(text="sub question2", answer_type=Question.NUMBER, subquestion=True, parent=world.question)
+    world.sub_question1.batches.add(world.batch)
+    world.sub_question2.batches.add(world.batch)
 
 @step(u'When I select ask subquestion from then field')
 def when_i_select_ask_subquestion_from_then_field(step):

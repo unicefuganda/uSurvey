@@ -6,32 +6,33 @@ from survey.models.formula import *
 
 
 class BatchForm(ModelForm):
+
     class Meta:
         model = Batch
-        fields =['name','description']
-        widgets={
-            'description':forms.Textarea(attrs={"rows":4, "cols":50})
+        fields = ['name', 'description']
+        widgets = {
+            'description': forms.Textarea(attrs={"rows": 4, "cols": 50})
         }
 
     def clean_name(self):
-        if self.instance and self.instance.survey and Batch.objects.filter(name=self.cleaned_data['name'], survey=self.instance.survey).count() > 0:
+        if self.instance and self.instance.survey and Batch.objects.filter(name=self.cleaned_data['name'],
+                                                                           survey=self.instance.survey).count() > 0:
             raise ValidationError('Batch with the same name already exists.')
         return self.cleaned_data['name']
 
 
 class BatchQuestionsForm(ModelForm):
     questions = forms.ModelMultipleChoiceField(label=u'', queryset=Question.objects.all(),
-                                                widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
+                                               widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
 
     class Meta:
         model = Batch
-        fields = ['questions' ]
-
+        fields = ['questions']
 
     def save_question_to_batch(self, batch):
         for question in self.cleaned_data['questions']:
-            question.batch = batch
             question.save()
+            question.batches.add(batch)
 
     def save(self, commit=True, *args, **kwargs):
         batch = super(BatchQuestionsForm, self).save(commit=commit, *args, **kwargs)
@@ -39,5 +40,3 @@ class BatchQuestionsForm(ModelForm):
         if commit:
             batch.save()
             self.save_question_to_batch(batch)
-
-

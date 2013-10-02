@@ -26,9 +26,10 @@ class NumericalFormulaResults(BaseTest):
         self.client.login(username='Rajni', password='I_Rock')
 
         self.batch = Batch.objects.create(order=1)
-        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1, group=self.member_group)
-        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2, group=self.member_group)
-
+        self.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1, group=self.member_group)
+        self.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER, order=2, group=self.member_group)
+        self.question_1.batches.add(self.batch)
+        self.question_2.batches.add(self.batch)
         self.formula_1 = Formula.objects.create(name="Formula 1", numerator=self.question_1, denominator=self.question_2, batch=self.batch)
 
         district = LocationType.objects.create(name = 'District', slug = 'district')
@@ -52,18 +53,17 @@ class NumericalFormulaResults(BaseTest):
         self.member3 = self.create_household_member(self.household_3)
         self.member4 = self.create_household_member(self.household_4)
 
-        investigator.member_answered(self.question_1, self.member1, 20)
-        investigator.member_answered(self.question_2, self.member1, 200)
-        investigator.member_answered(self.question_1, self.member2, 10)
-        investigator.member_answered(self.question_2, self.member2, 100)
+        investigator.member_answered(self.question_1, self.member1, 20, self.batch)
+        investigator.member_answered(self.question_2, self.member1, 200, self.batch)
+        investigator.member_answered(self.question_1, self.member2, 10, self.batch)
+        investigator.member_answered(self.question_2, self.member2, 100, self.batch)
 
-        investigator_1.member_answered(self.question_1, self.member3, 40)
-        investigator_1.member_answered(self.question_2, self.member3, 400)
-        investigator_1.member_answered(self.question_1, self.member4, 50)
-        investigator_1.member_answered(self.question_2, self.member4, 500)
+        investigator_1.member_answered(self.question_1, self.member3, 40, self.batch)
+        investigator_1.member_answered(self.question_2, self.member3, 400, self.batch)
+        investigator_1.member_answered(self.question_1, self.member4, 50, self.batch)
+        investigator_1.member_answered(self.question_2, self.member4, 500, self.batch)
         for household in Household.objects.all():
             HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='1980-09-01')
-
 
     def create_household_member(self,household):
         return HouseholdMember.objects.create(surname="Member", date_of_birth=date(1980, 2, 2), male=False,
@@ -119,9 +119,12 @@ class MultichoiceResults(BaseTest):
         self.client.login(username='Rajni', password='I_Rock')
 
         self.batch = Batch.objects.create(order=1)
-        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER, order=1, group=self.member_group)
-        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER, order=2, group=self.member_group)
-        self.question_3 = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=3, group=self.member_group)
+        self.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1, group=self.member_group)
+        self.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER, order=2, group=self.member_group)
+        self.question_3 = Question.objects.create(text="This is a question", answer_type=Question.MULTICHOICE, order=3, group=self.member_group)
+        self.question_1.batches.add(self.batch)
+        self.question_2.batches.add(self.batch)
+        self.question_3.batches.add(self.batch)
         self.option_1 = QuestionOption.objects.create(question=self.question_3, text="OPTION 2", order=1)
         self.option_2 = QuestionOption.objects.create(question=self.question_3, text="OPTION 1", order=2)
 
@@ -155,19 +158,19 @@ class MultichoiceResults(BaseTest):
         self.member5 = self.create_household_member(household_5)
         self.member6 = self.create_household_member(household_6)
 
-        investigator.member_answered(self.question_1, self.member1, 20)
-        investigator.member_answered(self.question_3, self.member1, 1)
-        investigator.member_answered(self.question_1, self.member2, 10)
-        investigator.member_answered(self.question_3, self.member2, 1)
-        investigator.member_answered(self.question_1, self.member3, 30)
-        investigator.member_answered(self.question_3, self.member3, 2)
+        investigator.member_answered(self.question_1, self.member1, 20, self.batch)
+        investigator.member_answered(self.question_3, self.member1, 1, self.batch)
+        investigator.member_answered(self.question_1, self.member2, 10, self.batch)
+        investigator.member_answered(self.question_3, self.member2, 1, self.batch)
+        investigator.member_answered(self.question_1, self.member3, 30, self.batch)
+        investigator.member_answered(self.question_3, self.member3, 2, self.batch)
 
-        investigator_1.member_answered(self.question_1, self.member4, 30)
-        investigator_1.member_answered(self.question_3, self.member4, 2)
-        investigator_1.member_answered(self.question_1, self.member5, 20)
-        investigator_1.member_answered(self.question_3, self.member5, 2)
-        investigator_1.member_answered(self.question_1, self.member6, 40)
-        investigator_1.member_answered(self.question_3, self.member6, 1)
+        investigator_1.member_answered(self.question_1, self.member4, 30, self.batch)
+        investigator_1.member_answered(self.question_3, self.member4, 2, self.batch)
+        investigator_1.member_answered(self.question_1, self.member5, 20, self.batch)
+        investigator_1.member_answered(self.question_3, self.member5, 2, self.batch)
+        investigator_1.member_answered(self.question_1, self.member6, 40, self.batch)
+        investigator_1.member_answered(self.question_3, self.member6, 1, self.batch)
         for household in Household.objects.all():
             HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='1980-09-01')
 

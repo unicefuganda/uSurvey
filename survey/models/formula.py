@@ -9,7 +9,7 @@ from survey.models.question import Question
 
 
 class Formula(BaseModel):
-    name = models.CharField(max_length=50,unique=True, blank=False)
+    name = models.CharField(max_length=50, unique=True, blank=False)
     numerator = models.ForeignKey(Question, blank=False, related_name="as_numerator")
     denominator = models.ForeignKey(Question, blank=False, related_name="as_denominator")
     batch = models.ForeignKey(Batch, null=True, related_name="formula")
@@ -17,10 +17,11 @@ class Formula(BaseModel):
     class Meta:
         app_label = 'survey'
 
-
     def clean(self, *args, **kwargs):
-        if self.numerator.batch != self.denominator.batch:
-            raise ValidationError('Numerator and Denominator must belong to the same batch')
+        message = self.batch.name if self.batch else 'the same batch'
+        if self.batch and not (
+                    self.batch in self.numerator.batches.all() and self.batch in self.denominator.batches.all()):
+            raise ValidationError('Numerator and Denominator must belong to %s.' % message)
 
     def save(self, *args, **kwargs):
         self.clean(*args, **kwargs)
@@ -44,7 +45,7 @@ class Formula(BaseModel):
         values = []
         for investigator in investigators:
             values.append(self.compute_numerical_question_for_investigator(investigator))
-        return sum(values)/len(values)
+        return sum(values) / len(values)
 
     def compute_multichoice_question_for_investigators(self, investigators):
         values = []
@@ -66,15 +67,22 @@ class Formula(BaseModel):
         denominator = self.answer_sum_for_investigator(self.denominator, investigator)
         for option in self.numerator.options.all():
             numerator = self.compute_numerator_for_option(option, investigator)
-            values[ option.text ] = self.process_formula(numerator, denominator, investigator)
+            values[option.text] = self.process_formula(numerator, denominator, investigator)
         return values
 
     def compute_numerator_for_option(self, option, investigator):
-        households = self.numerator.answer_class().objects.filter(investigator=investigator, answer=option).values_list('household', flat=True)
-        return self.denominator.answer_class().objects.filter(household__in=households, question=self.denominator).aggregate(Sum('answer'))['answer__sum']
+        households = self.numerator.answer_class().objects.filter(investigator=investigator, answer=option).values_list(
+            'household', flat=True)
+        return \
+            self.denominator.answer_class().objects.filter(household__in=households,
+                                                           question=self.denominator).aggregate(
+                Sum('answer'))['answer__sum']
 
     def answer_sum_for_investigator(self, question, investigator):
-        return question.answer_class().objects.filter(investigator=investigator, question=question).aggregate(Sum('answer'))['answer__sum']
+        return \
+            question.answer_class().objects.filter(investigator=investigator, question=question).aggregate(
+                Sum('answer'))[
+                'answer__sum']
 
     def answer_for_household(self, question, household):
         return question.answer_class().objects.get(household=household, question=question).answer

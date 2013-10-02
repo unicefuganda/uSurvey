@@ -13,25 +13,26 @@ class LogicFormTest(TestCase):
     def test_does_not_have_value_and_validate_question_if_question_has_options(self):
         fields = ['value', 'validate_with_question']
         batch = Batch.objects.create(order=1)
-        question_with_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_with_option = Question.objects.create(text="Question 1?",
                                                        answer_type=Question.MULTICHOICE, order=1)
-
+        question_with_option.batches.add(batch)
         logic_form = LogicForm(question=question_with_option, batch=batch)
         [self.assertNotIn(field, logic_form.fields) for field in fields]
 
     def test_does_not_have_option_if_question_does_not_have_options(self):
         field = 'option'
         batch = Batch.objects.create(order=1)
-        question_without_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_without_option = Question.objects.create(text="Question 1?",
                                                        answer_type=Question.NUMBER, order=1)
-
+        question_without_option.batches.add(batch)
         logic_form = LogicForm(question=question_without_option, batch=batch)
         self.assertNotIn(field, logic_form.fields)
 
     def test_choice_of_attribute_is_value_and_validate_with_question_if_question_does_not_have_options(self):
         batch = Batch.objects.create(order=1)
-        question_without_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_without_option = Question.objects.create(text="Question 1?",
                                                           answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
         attribute_choices = [('value', 'Value'), ('validate_with_question', "Question")]
         logic_form = LogicForm(question=question_without_option, batch=batch)
         self.assertEqual(2, len(logic_form.fields['attribute'].choices))
@@ -39,8 +40,9 @@ class LogicFormTest(TestCase):
 
     def test_choice_of_attribute_is_option_if_question_has_options(self):
         batch = Batch.objects.create(order=1)
-        question_with_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_with_option = Question.objects.create(text="Question 1?",
                                                        answer_type=Question.MULTICHOICE, order=1)
+        question_with_option.batches.add(batch)
 
         attribute_choice = ('option', 'Option')
         logic_form = LogicForm(question=question_with_option, batch=batch)
@@ -50,8 +52,9 @@ class LogicFormTest(TestCase):
     def test_label_of_condition_has_question_text(self):
         field = 'condition'
         batch = Batch.objects.create(order=1)
-        question_without_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_without_option = Question.objects.create(text="Question 1?",
                                                           answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
 
         logic_form = LogicForm(question=question_without_option, batch=batch)
         self.assertIn(question_without_option.text, logic_form.fields[field].label)
@@ -59,8 +62,9 @@ class LogicFormTest(TestCase):
     def test_option_field_is_prepopulatad_with_question_options_if_selected_question_is_multi_choice(self):
         field = 'option'
         batch = Batch.objects.create(order=1)
-        question_with_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_with_option = Question.objects.create(text="Question 1?",
                                                        answer_type=Question.MULTICHOICE, order=1)
+        question_with_option.batches.add(batch)
         question_option_1 = QuestionOption.objects.create(question=question_with_option, text="Option 1", order=1)
         question_option_2 = QuestionOption.objects.create(question=question_with_option, text="Option 2", order=2)
         question_option_3 = QuestionOption.objects.create(question=question_with_option, text="Option 3", order=3)
@@ -101,9 +105,9 @@ class LogicFormTest(TestCase):
     def test_condition_field_should_have_equals_option_if_multichoice_question(self):
         field = 'condition'
         batch = Batch.objects.create(order=1)
-        question_with_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_with_option = Question.objects.create(text="Question 1?",
                                                        answer_type=Question.MULTICHOICE, order=1)
-
+        question_with_option.batches.add(batch)
         logic_form = LogicForm(question=question_with_option, batch=batch)
 
         self.assertEqual(1,len(logic_form.fields[field].choices))
@@ -113,11 +117,11 @@ class LogicFormTest(TestCase):
     def test_condition_field_should_not_have_equals_option_if_not_multichoice_question(self):
         field = 'condition'
         batch = Batch.objects.create(order=1)
-        question_without_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_without_option = Question.objects.create(text="Question 1?",
                                                        answer_type=Question.NUMBER, order=1)
 
+        question_without_option.batches.add(batch)
         logic_form = LogicForm(question=question_without_option, batch=batch)
-
         self.assertEqual(5, len(logic_form.fields[field].choices))
         self.assertNotIn(('EQUALS_OPTION', 'EQUALS_OPTION'), logic_form.fields[field].choices)
 

@@ -1,4 +1,5 @@
 import datetime
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from survey.investigator_configs import LEVEL_OF_EDUCATION, MONTHS
@@ -6,7 +7,7 @@ from survey.models.base import BaseModel
 from survey.models.batch import Batch
 from survey.models.investigator import Investigator
 from django.conf import settings
-from survey.models.householdgroups import HouseholdMemberGroup
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from django.core.paginator import Paginator
 
 
@@ -71,8 +72,8 @@ class Household(BaseModel):
     def can_retake_survey(self, batch, minutes):
         all_members = self.household_member.all()
         for member in all_members:
-          if member.can_retake_survey(batch, minutes):
-            return True
+            if member.can_retake_survey(batch, minutes):
+                return True
         return False
 
     def answers_for(self, questions):
@@ -159,41 +160,59 @@ class HouseholdMember(BaseModel):
     household = models.ForeignKey(Household, related_name='household_member')
 
     def is_head(self):
-        return len(HouseholdHead.objects.filter(householdmember_ptr_id=self.id))>0
+        return len(HouseholdHead.objects.filter(householdmember_ptr_id=self.id)) > 0
 
     def get_location(self):
         investigator = self.household.investigator
         return investigator.location if investigator else None
 
-    def get_member_groups(self):
+    def attribute_matches(self, condition):
+        age = self.get_age()
+        gender = self.male
+        is_head = self.is_head()
+
+        if condition.attribute.lower() == GroupCondition.GROUP_TYPES["AGE"].lower():
+            condition_value = condition.matches_condition(age)
+        elif condition.attribute.lower() == GroupCondition.GROUP_TYPES["GENDER"].lower():
+            condition_value = condition.matches_condition(gender)
+        else:
+            condition_value = condition.matches_condition(is_head)
+        return condition_value
+
+    def belongs_to(self, member_group):
+        condition_match = []
+        for condition in member_group.get_all_conditions():
+            condition_match.append(self.attribute_matches(condition))
+
+        return all(condition is True for condition in condition_match)
+
+    def get_member_groups(self, order_above=0):
         member_groups = []
-        for group in HouseholdMemberGroup.objects.all().order_by('order'):
-            if group.belongs_to_group(self):
+        all_groups = HouseholdMemberGroup.objects.all().order_by('order')
+        if order_above:
+            all_groups = all_groups.filter(order__gte=order_above)
+
+        for group in all_groups:
+            if self.belongs_to(group):
                 member_groups.append(group)
+
         return member_groups
 
     def get_age(self):
         days_in_year = 365.2425
         return int((datetime.date.today() - self.date_of_birth).days / days_in_year)
 
-    def get_next_group(self, batch):
-        member_groups = self.get_member_groups()
-
-        for member_group in member_groups:
-            all_group_open_questions = member_group.all_unanswered_open_batch_questions(self, batch)
-            if all_group_open_questions and not self.all_questions_answered(all_group_open_questions):
-                return member_group
-
     def get_next_batch(self):
-        open_batches = Batch.open_batches(self.get_location())
-        for batch in open_batches:
+        open_ordered_batches = Batch.open_ordered_batches(self.get_location())
+        for batch in open_ordered_batches:
             if batch.has_unanswered_question(self) and not self.completed_member_batches.filter(batch=batch):
                 return batch
         return None
 
-    def all_questions_answered(self, all_group_open_questions):
+    def all_questions_answered(self, all_group_open_questions, batch):
         for question in all_group_open_questions:
-            if len(question.answer_class().objects.filter(question=question, batch=question.batch, householdmember=self)) == 0:
+            if question.answer_class().objects.filter(question=question, batch=batch,
+                                                      householdmember=self).count() == 0:
                 return False
         return True
 
@@ -205,39 +224,79 @@ class HouseholdMember(BaseModel):
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
-    def next_question(self, last_question_answered=None):
-        next_batch = self.get_next_batch()
+    def has_answered(self, question, batch):
+        answer_class = question.answer_class()
+        return len(answer_class.objects.filter(question=question, householdmember=self, batch=batch)) > 0
 
-        if not next_batch:
-            return None
+    def next_unanswered_question_in(self, member_group, batch, order):
+        all_questions = member_group.all_questions().filter(batches=batch, order__gte=order).order_by('order')
+        for question in all_questions:
+            if not self.has_answered(question, batch):
+                return question
+        return None
 
-        next_group = self.get_next_group(next_batch)
+    def next_question(self, question, batch):
+        member = self if not self.is_head() else self.get_member()
+        answer = question.answer_class().objects.get(householdmember=member, question=question, batch=batch)
+        try:
+            return question.get_next_question_by_rule(answer, self.household.investigator)
+        except ObjectDoesNotExist, e:
+            return self.next_question_in_order(batch, question)
 
-        next_group_questions = next_group.all_unanswered_open_batch_questions(self, next_batch)
+    def get_next_question_orders(self, last_question_answered):
+        group_order = 0
+        question_order = 0
+        if not last_question_answered:
+            last_question_answered = self.last_question_answered()
 
-        return next_group_questions[0]
+        if last_question_answered:
+            if last_question_answered.subquestion:
+                last_question_answered = last_question_answered.parent
+
+            if last_question_answered.is_last_question_of_group():
+                group_order = last_question_answered.group.order + 1
+            else:
+                question_order = last_question_answered.order
+                group_order = last_question_answered.group.order
+
+        return group_order, question_order
+
+    def next_question_in_order(self, batch, last_question_answered=None):
+        group_order, question_order = self.get_next_question_orders(last_question_answered)
+
+        for member_group in self.get_member_groups(order_above=group_order):
+            next_group_question = self.next_unanswered_question_in(member_group, batch, question_order)
+            if next_group_question:
+                return next_group_question
+        return None
 
     def can_retake_survey(self, batch, minutes):
+        if not batch:
+            return False
+
         batch_completed_by_member = self.completed_member_batches.filter(batch=batch, householdmember=self,
-                                                              household=self.household)
+                                                                         household=self.household)
         if batch_completed_by_member:
-          last_batch_completed_time = batch_completed_by_member[0].created
+            last_batch_completed_time = batch_completed_by_member[0].created
 
-          elapsed_seconds = (datetime.datetime.utcnow().replace(tzinfo=last_batch_completed_time.tzinfo) - last_batch_completed_time).seconds
-          expected_timeout = minutes * 60
+            elapsed_seconds = (datetime.datetime.utcnow().replace(
+                tzinfo=last_batch_completed_time.tzinfo) - last_batch_completed_time).seconds
+            expected_timeout = minutes * 60
 
-          if expected_timeout >= elapsed_seconds:
-              return True
-          return False
+            if expected_timeout >= elapsed_seconds:
+                return True
+            return False
         return True
 
+    def location(self):
+        return self.household.investigator.location
 
     def batch_completed(self, batch):
         return self.completed_member_batches.get_or_create(householdmember=self, household=self.household,
                                                            investigator=self.household.investigator, batch=batch)
 
     def survey_completed(self):
-        return (self.get_next_batch() is None)
+        return self.get_next_batch() is None
 
     def has_started_the_survey(self):
         return bool(self.last_question_answered())
@@ -248,9 +307,15 @@ class HouseholdMember(BaseModel):
     def has_open_batches(self):
         for batch in self.household.investigator.get_open_batch():
             if not self.completed_member_batches.filter(householdmember=self, household=self.household,
-                                                    investigator=self.household.investigator, batch=batch):
+                                                        investigator=self.household.investigator, batch=batch):
                 return True
         return False
+
+    def has_completed(self, batch):
+        for question in batch.all_questions().order_by('-order'):
+            if not self.has_answered(question, batch):
+                return False
+        return True
 
     class Meta:
         app_label = 'survey'

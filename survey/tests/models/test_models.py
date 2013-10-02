@@ -64,11 +64,12 @@ class InvestigatorTest(TestCase):
     def test_next_answerable_question(self):
         batch = Batch.objects.create(order=1)
         batch.open_for_location(self.investigator.location)
-        question_1 = Question.objects.create(batch=batch, text="Question 1?",
+        question_1 = Question.objects.create(text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=batch, text="Question 2?",
+        question_2 = Question.objects.create(text="Question 2?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
-
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
         self.assertEqual(question_1, self.investigator.next_answerable_question(self.household_member))
 
         NumericalAnswer.objects.create(investigator=self.investigator, batch=batch, householdmember=self.household_member, question=question_1, answer=10)
@@ -89,15 +90,14 @@ class InvestigatorTest(TestCase):
         self.assertEquals(investigator.location_hierarchy(), {'Country': uganda, 'City': kampala})
 
     def test_saves_household_member_answer_and_batch_is_complete(self):
-        self.batch = Batch.objects.create(name="Batch 1", order=1)
-
         household_member1 = HouseholdMember.objects.create(household=self.household, surname="abcd", male=True,
                                                            date_of_birth=date(1989, 2, 2))
         batch = Batch.objects.create(order=1)
         batch.open_for_location(self.investigator.location)
-        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        self.investigator.member_answered(question_1, household_member1, answer=34)
+        question_1.batches.add(batch)
+        self.investigator.member_answered(question_1, household_member1, answer=34, batch=batch)
         completed_batches = HouseholdBatchCompletion.objects.filter()
 
         self.assertEqual(self.investigator.last_answered_question(), question_1)
@@ -105,19 +105,18 @@ class InvestigatorTest(TestCase):
         self.assertEqual(completed_batches[0].householdmember, household_member1)
 
     def test_saves_household_member_answer_and_batch_is_not_complete_if_more_questions_exists(self):
-        self.batch = Batch.objects.create(name="Batch 1", order=1)
-
         household_member1 = HouseholdMember.objects.create(household=self.household, surname="abcd", male=True,
                                                            date_of_birth=date(1989, 2, 2))
         batch = Batch.objects.create(order=1)
         batch.open_for_location(self.investigator.location)
-        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
 
-        question_2 = Question.objects.create(batch=batch, text="How many women are there in this household?",
+        question_2 = Question.objects.create(text="How many women are there in this household?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
-
-        self.investigator.member_answered(question_1, household_member1, answer=34)
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        self.investigator.member_answered(question_1, household_member1, answer=34, batch=batch)
         completed_batches = HouseholdBatchCompletion.objects.filter()
 
         self.assertEqual(self.investigator.last_answered_question(), question_1)
@@ -197,231 +196,25 @@ class BatchTest(TestCase):
         group_2 = HouseholdMemberGroup.objects.create(name="Group 2", order=1)
         group_3 = HouseholdMemberGroup.objects.create(name="Group 3", order=2)
 
-        question_1 = Question.objects.create(batch=batch, group=group_1,
+        question_1 = Question.objects.create(group=group_1,
                                              text="Question 1", answer_type=Question.NUMBER,
                                              identifier="identifier", order=1)
 
-        question_2 = Question.objects.create(batch=batch, group=group_2,
+        question_2 = Question.objects.create(group=group_2,
                                              text="Question 1", answer_type=Question.NUMBER,
                                              identifier="identifier", order=1)
 
-        question_3 = Question.objects.create(batch=batch, group=group_3,
+        question_3 = Question.objects.create(group=group_3,
                                              text="Question 1", answer_type=Question.NUMBER,
                                              identifier="identifier", order=1)
+
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        question_3.batches.add(batch)
 
         batch_groups = [group_1, group_2, group_3]
         self.assertEqual(3, len(batch.get_groups()))
         [self.assertIn(batch_group, batch.get_groups()) for batch_group in batch_groups]
-
-    def test_knows_first_question_in_first_group_for_batch(self):
-        batch = Batch.objects.create(name="Batch name", description='description')
-        group_1 = HouseholdMemberGroup.objects.create(name="Group 1", order=0)
-        group_2 = HouseholdMemberGroup.objects.create(name="Group 2", order=1)
-        group_3 = HouseholdMemberGroup.objects.create(name="Group 3", order=2)
-
-        question_1 = Question.objects.create(batch=batch, group=group_1,
-                                             text="Question 1 group 1", answer_type=Question.NUMBER,
-                                             identifier="identifier", order=1)
-
-        question_2 = Question.objects.create(batch=batch, group=group_2,
-                                             text="Question 1 group 2", answer_type=Question.NUMBER,
-                                             identifier="identifier", order=1)
-
-        question_3 = Question.objects.create(batch=batch, group=group_3,
-                                             text="Question 1 group 3", answer_type=Question.NUMBER,
-                                             identifier="identifier", order=1)
-
-        self.assertEqual(question_1, batch.first_question())
-
-
-class QuestionTest(TestCase):
-    def setUp(self):
-        self.batch = Batch.objects.create(order=1)
-
-    def test_unicode_representation_of_question(self):
-        question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.NUMBER)
-        self.assertEqual(question.text, str(question))
-
-    def test_numerical_question(self):
-        question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.NUMBER)
-        self.failUnless(question.id)
-
-    def test_text_question(self):
-        question = Question.objects.create(batch=self.batch, text="This is a question", answer_type=Question.TEXT)
-        self.failUnless(question.id)
-
-    def test_multichoice_question(self):
-        question = Question.objects.create(batch=self.batch, text="This is a question",
-                                           answer_type=Question.MULTICHOICE)
-        self.failUnless(question.id)
-
-    def test_order(self):
-        question_2 = Question.objects.create(batch=self.batch, text="This is a question", answer_type="number", order=2)
-        question_1 = Question.objects.create(batch=self.batch, text="This is another question", answer_type="number",
-                                             order=1)
-        questions = self.batch.questions.order_by('order').all()
-        self.assertEqual(questions[0], question_1)
-        self.assertEqual(questions[1], question_2)
-
-    def test_is_in_open_batch_for_location(self):
-        location = Location.objects.create(name="Soroti")
-        self.batch.open_for_location(location)
-        question_2 = Question.objects.create(batch=self.batch, text="This is a question", answer_type="number", order=2)
-
-        self.assertTrue(question_2.is_in_open_batch(location))
-
-    def test_knows_question_is_not_in_open_batch_for_location(self):
-        location = Location.objects.create(name="Soroti")
-        self.batch.close_for_location(location)
-        question_2 = Question.objects.create(batch=self.batch, text="This is a question", answer_type="number", order=2)
-
-        self.assertFalse(question_2.is_in_open_batch(location))
-
-    def test_question_should_know_it_all_question_fields(self):
-        question = Question()
-
-        fields = [str(item.attname) for item in question._meta.fields]
-
-        for field in ['id', 'identifier', 'batch_id', 'group_id', 'text', 'answer_type', 'order', 'subquestion',
-                      'parent_id', 'created', 'modified']:
-            self.assertIn(field, fields)
-
-        self.assertEqual(len(fields), 11)
-
-    def test_knows_what_group_question_belongs_to_when_successfully_created(self):
-        household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
-
-        data = {'identifier': 'question',
-                'text': "This is a question",
-                'answer_type': 'number',
-                'order': 1,
-                'subquestion': False,
-                'group': household_member_group}
-
-        question = Question.objects.create(**data)
-
-        self.assertEqual(household_member_group, question.group)
-
-    def test_knows_has_been_answered_by_member(self):
-        backend = Backend.objects.create(name='something')
-        kampala = Location.objects.create(name="Kampala")
-        investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
-                                                   backend=backend)
-        household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
-
-        household = Household.objects.create(investigator=investigator, uid=0)
-
-        household_member = HouseholdMember.objects.create(surname="Member",
-                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
-        household_member_1 = HouseholdMember.objects.create(surname="Member",
-                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
-
-        question_1 = Question.objects.create(identifier="identifier1",
-                                             text="Question 1", answer_type='number',
-                                             order=1, subquestion=False, group=household_member_group, batch=self.batch)
-        self.assertFalse(question_1.has_been_answered(household_member))
-        investigator.member_answered(question_1, household_member, answer=1)
-        self.assertTrue(question_1.has_been_answered(household_member))
-        self.assertFalse(question_1.has_been_answered(household_member_1))
-
-    def test_knows_next_question_for_household_member(self):
-        backend = Backend.objects.create(name='something')
-        kampala = Location.objects.create(name="Kampala")
-        investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
-                                                   backend=backend)
-        household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
-
-        household = Household.objects.create(investigator=investigator, uid=0)
-        household_member = HouseholdMember.objects.create(surname="Member",
-                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
-        self.batch.open_for_location(investigator.location)
-        question_1 = Question.objects.create(identifier="identifier1",
-                                             text="Question 1", answer_type='number',
-                                             order=1, subquestion=False, group=household_member_group, batch=self.batch)
-        question_2 = Question.objects.create(identifier="identifier1",
-                                             text="Question 2", answer_type='number',
-                                             order=2, subquestion=False, group=household_member_group, batch=self.batch)
-        investigator.member_answered(question_1, household_member, answer=1)
-        self.assertEqual(question_2, question_1.next_question_for_household_member(household_member))
-
-    def test_knows_next_question_for_household_member_based_on_answer_rule(self):
-        backend = Backend.objects.create(name='something')
-        kampala = Location.objects.create(name="Kampala")
-        investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
-                                                   backend=backend)
-        household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
-
-        household = Household.objects.create(investigator=investigator, uid=0)
-        household_member = HouseholdMember.objects.create(surname="Member",
-                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
-        self.batch.open_for_location(investigator.location)
-        question_1 = Question.objects.create(identifier="identifier1",
-                                             text="Question 1", answer_type='number',
-                                             order=1, subquestion=False, group=household_member_group, batch=self.batch)
-        question_2 = Question.objects.create(identifier="identifier1",
-                                             text="Question 2", answer_type='number',
-                                             order=2, subquestion=False, group=household_member_group, batch=self.batch)
-        question_3 = Question.objects.create(identifier="identifier1",
-                                             text="Question 3", answer_type='number',
-                                             order=3, subquestion=False, group=household_member_group, batch=self.batch)
-
-        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['SKIP_TO'],
-                                         condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=1,
-                                         next_question=question_3)
-
-        investigator.member_answered(question_1, household_member, answer=1)
-        self.assertNotEqual(question_2, question_1.next_question_for_household_member(household_member))
-        self.assertEqual(question_3, question_1.next_question_for_household_member(household_member))
-
-    def test_knows_subquestions_for_a_question(self):
-        question_1 = Question.objects.create(batch=self.batch, text="question1", answer_type="number",order=1)
-        sub_question1 = Question.objects.create(text='sub1', answer_type=Question.NUMBER, batch=self.batch,
-                                                subquestion=True, parent=question_1)
-        sub_question2 = Question.objects.create(text='sub2', answer_type=Question.NUMBER, batch=self.batch,
-                                                subquestion=True, parent=question_1)
-
-        subquestions = question_1.get_subquestions()
-        self.assertIn(sub_question1,subquestions)
-        self.assertIn(sub_question2,subquestions)
-
-    def test_knows_rules_that_belong_to_particular_batch(self):
-        question_1 = Question.objects.create(batch=self.batch, text="question1", answer_type="number",order=1)
-        answer_rule_in_batch = AnswerRule.objects.create(batch=self.batch, question=question_1,
-                                                         action=AnswerRule.ACTIONS['END_INTERVIEW'],
-                                                         condition=AnswerRule.CONDITIONS['EQUALS'],
-                                                         validate_with_value=0)
-        another_batch = Batch.objects.create(order=2)
-
-        answer_rule_in_another_batch = AnswerRule.objects.create(batch=another_batch, question=question_1,
-                                                         action=AnswerRule.ACTIONS['END_INTERVIEW'],
-                                                         condition=AnswerRule.CONDITIONS['EQUALS'],
-                                                         validate_with_value=0)
-
-        self.assertIn(answer_rule_in_batch, question_1.rules_for_batch(self.batch))
-        self.assertNotIn(answer_rule_in_another_batch, question_1.rules_for_batch(self.batch))
-
-
-class QuestionOptionTest(TestCase):
-    def setUp(self):
-        batch = Batch.objects.create(order=1)
-        self.question = Question.objects.create(batch=batch, text="This is a question", answer_type="multichoice")
-
-    def test_store(self):
-        option_2 = QuestionOption.objects.create(question=self.question, text="OPTION 1", order=2)
-        option_1 = QuestionOption.objects.create(question=self.question, text="OPTION 2", order=1)
-        options = self.question.options.order_by('order').all()
-        self.assertEqual(len(options), 2)
-        options_in_text = "1: %s\n2: %s" % (option_1.text, option_2.text)
-        self.assertEqual(self.question.options_in_text(), options_in_text)
-
-    def test_question_text(self):
-        option_2 = QuestionOption.objects.create(question=self.question, text="OPTION 1", order=2)
-        option_1 = QuestionOption.objects.create(question=self.question, text="OPTION 2", order=1)
-        question_in_text = "%s\n%s" % (self.question.text, self.question.options_in_text())
-        self.assertEqual(self.question.to_ussd(), question_in_text)
 
 
 class HouseHoldTest(TestCase):
@@ -447,35 +240,38 @@ class HouseHoldTest(TestCase):
         batch = Batch.objects.create(order=1)
         batch.open_for_location(self.kampala)
 
-        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        self.assertTrue(self.household.has_pending_survey())
+
+        self.investigator.member_answered(question_1, self.household_member, 1, batch)
 
         self.assertTrue(self.household.has_pending_survey())
 
-        self.investigator.member_answered(question_1, self.household_member, 1)
-
-        self.assertTrue(self.household.has_pending_survey())
-
-        self.investigator.member_answered(question_2, self.household_member, 1)
+        self.investigator.member_answered(question_2, self.household_member, 1, batch)
 
         self.assertFalse(self.household.has_pending_survey())
 
     def test_retake_latest_batch(self):
         batch_1 = Batch.objects.create(order=1)
-        question_1 = Question.objects.create(batch=batch_1, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
+        question_1.batches.add(batch_1)
         batch_1.open_for_location(self.investigator.location)
-        self.investigator.member_answered(question_1, self.household_member, 1)
+        self.investigator.member_answered(question_1, self.household_member, 1, batch_1)
         batch_1.close_for_location(self.investigator.location)
 
         batch_2 = Batch.objects.create(order=2)
 
-        question_2 = Question.objects.create(batch=batch_2, text="How many members are there in this household?",
+        question_2 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
+        question_2.batches.add(batch_2)
         batch_2.open_for_location(self.investigator.location)
-        self.investigator.member_answered(question_2, self.household_member, 1)
+        self.investigator.member_answered(question_2, self.household_member, 1, batch_2)
 
         self.assertEquals(NumericalAnswer.objects.count(), 2)
 
@@ -483,39 +279,18 @@ class HouseHoldTest(TestCase):
 
         self.assertEquals(NumericalAnswer.objects.count(), 1)
 
-    def test_gets_next_question_when_previous_batch_is_closed(self):
-        self.batch = Batch.objects.create(order=1)
-        self.another_batch = Batch.objects.create(order=2)
-        self.batch.open_for_location(self.investigator.location)
-        batch_question_1 = Question.objects.create(order=1, batch=self.batch, text="Test question 1",
-                                                   answer_type=Question.NUMBER, group=self.member_group)
-        Question.objects.create(order=2, batch=self.batch, text="Test question 2",
-                                answer_type=Question.NUMBER, group=self.member_group)
-        another_batch_question = Question.objects.create(order=3, batch=self.another_batch,
-                                                         text="Test question 1 in another batch",
-                                                         answer_type=Question.NUMBER, group=self.member_group)
-
-        house_hold_1 = Household.objects.create(investigator=self.investigator, uid=1)
-        household_member_1 = HouseholdMember.objects.create(surname="Member 1",
-                                                               date_of_birth=date(1980, 2, 2), male=False, household=house_hold_1)
-
-        self.investigator.member_answered(batch_question_1, household_member_1, 1)
-
-        self.batch.close_for_location(self.investigator.location)
-        self.another_batch.open_for_location(self.investigator.location)
-        self.assertEqual(household_member_1.next_question().text, another_batch_question.text)
-
     def test_last_answered(self):
         self.batch = Batch.objects.create(order=1, name="Batch Name")
         self.another_batch = Batch.objects.create(order=2, name="Batch Name 2")
 
         self.batch.open_for_location(self.investigator.location)
-        batch_question_1 = Question.objects.create(order=1, batch=self.batch, text="Test question 1",
+        batch_question_1 = Question.objects.create(order=1, text="Test question 1",
                                                    answer_type=Question.NUMBER, group=self.member_group)
-        Question.objects.create(order=2, batch=self.batch, text="Test question 2",
+        question_2 = Question.objects.create(order=2, text="Test question 2",
                                 answer_type=Question.NUMBER, group=self.member_group)
-        self.investigator.member_answered(batch_question_1, self.household_member, 1)
-
+        batch_question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+        self.investigator.member_answered(batch_question_1, self.household_member, 1, self.batch)
         self.assertEqual(batch_question_1.text, self.household_member.last_question_answered().text)
 
 
@@ -526,8 +301,8 @@ class NumericalAnswerTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
-        question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.NUMBER)
-
+        question = Question.objects.create(text="This is a question", answer_type=Question.NUMBER)
+        question.batches.add(batch)
         answer = NumericalAnswer.objects.create(investigator=investigator, household=household, question=question,
                                                 answer=10)
         self.failUnless(answer.id)
@@ -540,8 +315,8 @@ class TextAnswerTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
-        question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.TEXT)
-
+        question = Question.objects.create(text="This is a question", answer_type=Question.TEXT)
+        question.batches.add(batch)
         answer = TextAnswer.objects.create(investigator=investigator, household=household, question=question,
                                            answer="This is an answer")
         self.failUnless(answer.id)
@@ -554,7 +329,8 @@ class MultiChoiceAnswerTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
-        question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.MULTICHOICE)
+        question = Question.objects.create(text="This is a question", answer_type=Question.MULTICHOICE)
+        question.batches.add(batch)
         option = QuestionOption.objects.create(question=question, text="This is an option")
 
         answer = MultiChoiceAnswer.objects.create(investigator=investigator, household=household, question=question,
@@ -565,9 +341,10 @@ class MultiChoiceAnswerTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
                                                    location=Location.objects.create(name="Kampala"),
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator, uid=0)
+        Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
-        question = Question.objects.create(batch=batch, text="This is a question", answer_type=Question.MULTICHOICE)
+        question = Question.objects.create(text="This is a question", answer_type=Question.MULTICHOICE)
+        question.batches.add(batch)
         option_1 = QuestionOption.objects.create(question=question, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(question=question, text="OPTION 2", order=2)
         option_3 = QuestionOption.objects.create(question=question, text="OPTION 3", order=3)
@@ -614,152 +391,172 @@ class AnswerRuleTest(TestCase):
 
     def test_numerical_equals_and_end_rule(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
-
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=1)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=self.batch)
         self.assertEqual(next_question, question_2)
 
         NumericalAnswer.objects.all().delete()
-        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
+        AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=0)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=0, batch=self.batch)
         self.assertEqual(next_question, question_1)
 
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=0)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=0, batch=self.batch)
         self.assertEqual(next_question, None)
 
     def test_numerical_equals_and_skip_to_rule(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(batch=self.batch, text="Question 1?",
+        question_1 = Question.objects.create(text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="Question 2?",
+        question_2 = Question.objects.create(text="Question 2?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
-        question_3 = Question.objects.create(batch=self.batch, text="Question 3?",
+        question_3 = Question.objects.create(text="Question 3?",
                                              answer_type=Question.NUMBER, order=3, group=self.member_group)
-
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=1)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+        question_3.batches.add(self.batch)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=self.batch)
         self.assertEqual(next_question, question_2)
 
         NumericalAnswer.objects.all().delete()
-        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['SKIP_TO'],
+        AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['SKIP_TO'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0,
                                          next_question=question_3)
 
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=0)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=0, batch=self.batch)
         self.assertEqual(next_question, question_3)
 
     def test_numerical_greater_than_value_and_reanswer(self):
         NumericalAnswer.objects.all().delete()
-        question_0 = Question.objects.create(batch=self.batch, text="How are you?", answer_type=Question.NUMBER,
+        question_0 = Question.objects.create( text="How are you?", answer_type=Question.NUMBER,
                                              order=0, group=self.member_group)
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'],
+        AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'],
                                          condition=AnswerRule.CONDITIONS['GREATER_THAN_VALUE'], validate_with_value=4)
 
-        next_question = self.investigator.member_answered(question_0, self.household_member, answer=5)
+        question_1.batches.add(self.batch)
+        question_0.batches.add(self.batch)
+
+        self.investigator.member_answered(question_0, self.household_member, answer=5, batch=self.batch)
 
         self.assertEqual(NumericalAnswer.objects.count(), 1)
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=5)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=5, batch=self.batch)
         self.assertEqual(next_question, question_1)
         self.assertEqual(NumericalAnswer.objects.count(), 1)
 
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=4)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=4, batch=self.batch)
         self.assertEqual(next_question, None)
         self.assertEqual(NumericalAnswer.objects.count(), 2)
 
     def test_numerical_greater_than_question_and_reanswer(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
-        question_3 = Question.objects.create(batch=self.batch, text="How many of them are children?",
+        question_3 = Question.objects.create(text="How many of them are children?",
                                              answer_type=Question.NUMBER, order=3, group=self.member_group)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+        question_3.batches.add(self.batch)
 
         rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'],
                                          condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'],
                                          validate_with_question=question_1)
 
         self.assertEqual(NumericalAnswer.objects.count(), 0)
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=1)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=self.batch)
         self.assertEqual(next_question, question_2)
         self.assertEqual(NumericalAnswer.objects.count(), 1)
 
-        next_question = self.investigator.member_answered(question_2, self.household_member, answer=10)
+        next_question = self.investigator.member_answered(question_2, self.household_member, answer=10, batch=self.batch)
         self.assertEqual(next_question, question_1)
         self.assertEqual(NumericalAnswer.objects.count(), 0)
 
     def test_numerical_less_than_value_and_reanswer(self):
         NumericalAnswer.objects.all().delete()
-        question_0 = Question.objects.create(batch=self.batch, text="How are you?", answer_type=Question.NUMBER,
+        question_0 = Question.objects.create(text="How are you?", answer_type=Question.NUMBER,
                                              order=0, group=self.member_group)
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'],
+
+        question_1.batches.add(self.batch)
+        question_0.batches.add(self.batch)
+
+        AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'],
                                          condition=AnswerRule.CONDITIONS['LESS_THAN_VALUE'], validate_with_value=4)
 
-        next_question = self.investigator.member_answered(question_0, self.household_member, answer=5)
+        self.investigator.member_answered(question_0, self.household_member, answer=5, batch=self.batch)
 
         self.assertEqual(NumericalAnswer.objects.count(), 1)
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=3)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=3, batch=self.batch)
         self.assertEqual(next_question, question_1)
         self.assertEqual(NumericalAnswer.objects.count(), 1)
 
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=4)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=4, batch=self.batch)
         self.assertEqual(next_question, None)
         self.assertEqual(NumericalAnswer.objects.count(), 2)
 
     def test_numerical_less_than_question_and_reanswer(self):
         NumericalAnswer.objects.all().delete()
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
-        question_3 = Question.objects.create(batch=self.batch, text="How many of them are children?",
+        question_3 = Question.objects.create(text="How many of them are children?",
                                              answer_type=Question.NUMBER, order=3, group=self.member_group)
 
-        rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'],
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+        question_3.batches.add(self.batch)
+
+
+        AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'],
                                          condition=AnswerRule.CONDITIONS['LESS_THAN_QUESTION'],
                                          validate_with_question=question_1)
 
         self.assertEqual(NumericalAnswer.objects.count(), 0)
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=10)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=10, batch=self.batch)
         self.assertEqual(next_question, question_2)
         self.assertEqual(NumericalAnswer.objects.count(), 1)
 
-        next_question = self.investigator.member_answered(question_2, self.household_member, answer=9)
+        next_question = self.investigator.member_answered(question_2, self.household_member, answer=9, batch=self.batch)
         self.assertEqual(next_question, question_1)
         self.assertEqual(NumericalAnswer.objects.count(), 0)
 
     def test_multichoice_equals_option_and_ask_sub_question(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
-                                             answer_type=Question.MULTICHOICE, order=1,group=self.member_group)
-        option_1_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
+        question_1 = Question.objects.create(text="How many members are there in this household?",
+                                             answer_type=Question.MULTICHOICE, order=1, group=self.member_group)
+        QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_1_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
-        sub_question_1 = Question.objects.create(batch=self.batch, text="Specify others", answer_type=Question.TEXT,
+        sub_question_1 = Question.objects.create(text="Specify others", answer_type=Question.TEXT,
                                                  subquestion=True, parent=question_1, group=self.member_group)
 
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
+        for question in [question_1, question_2, sub_question_1]:
+            self.batch.questions.add(question)
 
-        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
+        AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
                                          condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
                                          validate_with_option=option_1_2, next_question=sub_question_1)
 
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=1)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=self.batch)
         self.assertEqual(next_question, question_2)
 
         MultiChoiceAnswer.objects.all().delete()
 
-        next_question = self.investigator.member_answered(question_1, self.household_member, answer=2)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=2, batch=self.batch)
         self.assertEqual(next_question, sub_question_1)
-        next_question = self.investigator.member_answered(sub_question_1, self.household_member, answer="Some explanation")
+        next_question = self.investigator.member_answered(sub_question_1, self.household_member, answer="Some explanation", batch=self.batch)
         self.assertEqual(next_question, question_2)
 
 
@@ -840,11 +637,14 @@ class FormulaTest(TestCase):
         self.condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         self.condition.groups.add(self.member_group)
 
-        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER,
+        self.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER,
                                                   order=1, group=self.member_group)
-        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER,
+        self.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER,
                                                   order=2, group=self.member_group)
-    def create_household_member(self,household):
+        self.question_1.batches.add(self.batch)
+        self.question_2.batches.add(self.batch)
+
+    def create_household_member(self, household):
         return HouseholdMember.objects.create(surname="Member", date_of_birth=date(1980, 2, 2), male=False,
                                               household=household)
 
@@ -855,7 +655,8 @@ class FormulaTest(TestCase):
 
     def test_validation(self):
         batch_2 = Batch.objects.create(order=2)
-        question_3 = Question.objects.create(batch=batch_2, text="Question 1?", answer_type=Question.NUMBER, order=1)
+        question_3 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1)
+        question_3.batches.add(batch_2)
         formula = Formula(name="Name", numerator=self.question_1, denominator=question_3, batch=self.batch)
         self.assertRaises(ValidationError, formula.save)
 
@@ -881,15 +682,15 @@ class FormulaTest(TestCase):
 
         formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2,
                                          batch=self.batch)
-        investigator.member_answered(self.question_1, member_1, 20)
-        investigator.member_answered(self.question_2, member_1, 200)
-        investigator.member_answered(self.question_1, member_2, 10)
-        investigator.member_answered(self.question_2, member_2, 100)
+        investigator.member_answered(self.question_1, member_1, 20, self.batch)
+        investigator.member_answered(self.question_2, member_1, 200, self.batch)
+        investigator.member_answered(self.question_1, member_2, 10, self.batch)
+        investigator.member_answered(self.question_2, member_2, 100, self.batch)
 
-        investigator_1.member_answered(self.question_1, member_3, 40)
-        investigator_1.member_answered(self.question_2, member_3, 400)
-        investigator_1.member_answered(self.question_1, member_4, 50)
-        investigator_1.member_answered(self.question_2, member_4, 500)
+        investigator_1.member_answered(self.question_1, member_3, 40, self.batch)
+        investigator_1.member_answered(self.question_2, member_3, 400, self.batch)
+        investigator_1.member_answered(self.question_1, member_4, 50, self.batch)
+        investigator_1.member_answered(self.question_2, member_4, 500, self.batch)
 
         self.assertEquals(formula.compute_for_location(kampala), 3)
         self.assertEquals(formula.compute_for_location(abim), 9)
@@ -919,26 +720,28 @@ class FormulaTest(TestCase):
         member_5 = self.create_household_member(household_5)
         member_6 = self.create_household_member(household_6)
 
-        self.question_3 = Question.objects.create(batch=self.batch, text="This is a question",
+        self.question_3 = Question.objects.create(text="This is a question",
                                                   answer_type=Question.MULTICHOICE, order=3,group=self.member_group)
         option_1 = QuestionOption.objects.create(question=self.question_3, text="OPTION 2", order=1)
         option_2 = QuestionOption.objects.create(question=self.question_3, text="OPTION 1", order=2)
 
-        formula = Formula.objects.create(name="Name", numerator=self.question_3, denominator=self.question_1)
+        self.question_3.batches.add(self.batch)
 
-        investigator.member_answered(self.question_1, member_1, 20)
-        investigator.member_answered(self.question_3, member_1, 1)
-        investigator.member_answered(self.question_1, member_2, 10)
-        investigator.member_answered(self.question_3, member_2, 1)
-        investigator.member_answered(self.question_1, member_3, 30)
-        investigator.member_answered(self.question_3, member_3, 2)
+        formula = Formula.objects.create(name="Name", numerator=self.question_3, denominator=self.question_1, batch=self.batch)
 
-        investigator_1.member_answered(self.question_1, member_4, 30)
-        investigator_1.member_answered(self.question_3, member_4, 2)
-        investigator_1.member_answered(self.question_1, member_5, 20)
-        investigator_1.member_answered(self.question_3, member_5, 2)
-        investigator_1.member_answered(self.question_1, member_6, 40)
-        investigator_1.member_answered(self.question_3, member_6, 1)
+        investigator.member_answered(self.question_1, member_1, 20, batch=self.batch)
+        investigator.member_answered(self.question_3, member_1, 1, batch=self.batch)
+        investigator.member_answered(self.question_1, member_2, 10, batch=self.batch)
+        investigator.member_answered(self.question_3, member_2, 1, batch=self.batch)
+        investigator.member_answered(self.question_1, member_3, 30, batch=self.batch)
+        investigator.member_answered(self.question_3, member_3, 2, batch=self.batch)
+
+        investigator_1.member_answered(self.question_1, member_4, 30, batch=self.batch)
+        investigator_1.member_answered(self.question_3, member_4, 2, batch=self.batch)
+        investigator_1.member_answered(self.question_1, member_5, 20, batch=self.batch)
+        investigator_1.member_answered(self.question_3, member_5, 2, batch=self.batch)
+        investigator_1.member_answered(self.question_1, member_6, 40, batch=self.batch)
+        investigator_1.member_answered(self.question_3, member_6, 1, batch=self.batch)
 
         self.assertEquals(formula.compute_for_location(kampala), {option_1.text: 15, option_2.text: 15})
         self.assertEquals(formula.compute_for_location(abim), {option_1.text: 40, option_2.text: 50})

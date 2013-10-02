@@ -49,38 +49,42 @@ def and_i_have_investigators_completed_batches(step):
     household_member_6 = create_household_member(household_6)
 
     world.batch = Batch.objects.create(order=1)
-    world.question_1 = Question.objects.create(batch=world.batch, text="Question 1?", answer_type=Question.NUMBER, order=1, group=member_group)
-    world.question_2 = Question.objects.create(batch=world.batch, text="Question 2?", answer_type=Question.NUMBER, order=2, group=member_group)
-    world.question_3 = Question.objects.create(batch=world.batch, text="This is a question", answer_type=Question.MULTICHOICE, order=3, group=member_group)
+    world.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1, group=member_group)
+    world.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER, order=2, group=member_group)
+    world.question_3 = Question.objects.create(text="This is a question", answer_type=Question.MULTICHOICE, order=3, group=member_group)
+    world.question_1.batches.add(world.batch)
+    world.question_2.batches.add(world.batch)
+    world.question_3.batches.add(world.batch)
+
     option_1 = QuestionOption.objects.create(question=world.question_3, text="OPTION 2", order=1)
     option_2 = QuestionOption.objects.create(question=world.question_3, text="OPTION 1", order=2)
 
     world.formula_1 = Formula.objects.create(name="Name", numerator=world.question_1, denominator=world.question_2, batch=world.batch)
     world.formula_2 = Formula.objects.create(name="Name 1", numerator=world.question_3, denominator=world.question_1, batch=world.batch)
 
-    investigator.member_answered(world.question_1, household_member_1, 20)
-    investigator.member_answered(world.question_2, household_member_1, 20)
-    investigator.member_answered(world.question_3, household_member_1, 1)
+    investigator.member_answered(world.question_1, household_member_1, 20, world.batch)
+    investigator.member_answered(world.question_2, household_member_1, 20, world.batch)
+    investigator.member_answered(world.question_3, household_member_1, 1, world.batch)
 
-    investigator.member_answered(world.question_1, household_member_2, 10)
-    investigator.member_answered(world.question_2, household_member_2, 20)
-    investigator.member_answered(world.question_3, household_member_2, 1)
+    investigator.member_answered(world.question_1, household_member_2, 10, world.batch)
+    investigator.member_answered(world.question_2, household_member_2, 20, world.batch)
+    investigator.member_answered(world.question_3, household_member_2, 1, world.batch)
 
-    investigator.member_answered(world.question_1, household_member_3, 30)
-    investigator.member_answered(world.question_2, household_member_3, 30)
-    investigator.member_answered(world.question_3, household_member_3, 2)
+    investigator.member_answered(world.question_1, household_member_3, 30, world.batch)
+    investigator.member_answered(world.question_2, household_member_3, 30, world.batch)
+    investigator.member_answered(world.question_3, household_member_3, 2, world.batch)
 
-    investigator_1.member_answered(world.question_1, household_member_4, 30)
-    investigator_1.member_answered(world.question_2, household_member_4, 30)
-    investigator_1.member_answered(world.question_3, household_member_4, 2)
+    investigator_1.member_answered(world.question_1, household_member_4, 30, world.batch)
+    investigator_1.member_answered(world.question_2, household_member_4, 30, world.batch)
+    investigator_1.member_answered(world.question_3, household_member_4, 2, world.batch)
 
-    investigator_1.member_answered(world.question_1, household_member_5, 20)
-    investigator_1.member_answered(world.question_2, household_member_5, 20)
-    investigator_1.member_answered(world.question_3, household_member_5, 2)
+    investigator_1.member_answered(world.question_1, household_member_5, 20, world.batch)
+    investigator_1.member_answered(world.question_2, household_member_5, 20, world.batch)
+    investigator_1.member_answered(world.question_3, household_member_5, 2, world.batch)
 
-    investigator_1.member_answered(world.question_1, household_member_6, 40)
-    investigator_1.member_answered(world.question_2, household_member_6, 40)
-    investigator_1.member_answered(world.question_3, household_member_6, 1)
+    investigator_1.member_answered(world.question_1, household_member_6, 40, world.batch)
+    investigator_1.member_answered(world.question_2, household_member_6, 40, world.batch)
+    investigator_1.member_answered(world.question_3, household_member_6, 1, world.batch)
 
     for household in Household.objects.all():
         HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='2000-03-01')

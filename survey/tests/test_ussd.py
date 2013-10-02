@@ -90,10 +90,12 @@ class USSDTest(TestCase):
 
     def test_numerical_questions(self):
         HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
 
         self.select_household()
         response = self.select_household_member()
@@ -120,10 +122,12 @@ class USSDTest(TestCase):
 
     def test_textual_questions(self):
         member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.TEXT, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.TEXT, order=2, group=self.member_group)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
 
         self.select_household()
         response = self.select_household_member()
@@ -153,15 +157,18 @@ class USSDTest(TestCase):
 
     def test_multichoice_questions(self):
         HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.MULTICHOICE, order=1, group=self.member_group)
         option_1_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_1_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.MULTICHOICE, order=2, group=self.member_group)
         option_2_1 = QuestionOption.objects.create(question=question_2, text="OPTION 1", order=1)
         option_2_2 = QuestionOption.objects.create(question=question_2, text="OPTION 2", order=2)
+
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
 
         self.select_household()
         response = self.select_household_member()
@@ -190,7 +197,7 @@ class USSDTest(TestCase):
                           MultiChoiceAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
 
     def test_multichoice_questions_pagination(self):
-        question = Question.objects.create(batch=self.batch, text="This is a question",
+        question = Question.objects.create(text="This is a question",
                                            answer_type=Question.MULTICHOICE, order=1, group=self.member_group)
         option_1 = QuestionOption.objects.create(question=question, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(question=question, text="OPTION 2", order=2)
@@ -202,10 +209,13 @@ class USSDTest(TestCase):
         back_text = Question.PREVIOUS_PAGE_TEXT
         next_text = Question.NEXT_PAGE_TEXT
 
-        question_2 = Question.objects.create(batch=self.batch, text="This is a question",
+        question_2 = Question.objects.create(text="This is a question",
                                              answer_type=Question.MULTICHOICE, order=2, group=self.member_group)
         option_8 = QuestionOption.objects.create(question=question_2, text="OPTION 1", order=1)
         option_9 = QuestionOption.objects.create(question=question_2, text="OPTION 2", order=2)
+
+        question.batches.add(self.batch)
+        question_2.batches.add(self.batch)
 
         page_1 = "%s\n1: %s\n2: %s\n3: %s\n%s" % (question.text, option_1.text, option_2.text, option_3.text, next_text)
         page_2 = "%s\n4: %s\n5: %s\n6: %s\n%s\n%s" % (
@@ -261,13 +271,15 @@ class USSDTest(TestCase):
 
     def test_reanswer_question(self):
         HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'],
                                          condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'],
                                          validate_with_question=question_1)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
 
         self.select_household()
         response = self.select_household_member()
@@ -304,10 +316,13 @@ class USSDTest(TestCase):
 
     def test_text_invalid_answer(self):
         member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.TEXT, order=1, group=self.member_group)
 
+        question_1.batches.add(self.batch)
+
         self.select_household()
+
         response = self.select_household_member()
         response_string = "responseString=%s&action=request" % question_1.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -328,8 +343,10 @@ class USSDTest(TestCase):
 
     def test_numerical_invalid_answer(self):
         HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
+        question_1.batches.add(self.batch)
+
         self.select_household()
         response = self.select_household_member()
         response_string = "responseString=%s&action=request" % question_1.text
@@ -351,8 +368,9 @@ class USSDTest(TestCase):
 
     def test_multichoice_invalid_answer(self):
         HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="This is a question",
+        question_1 = Question.objects.create(text="This is a question",
                                              answer_type=Question.MULTICHOICE, order=1, group=self.member_group)
+        question_1.batches.add(self.batch)
         option_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
         self.select_household()
@@ -384,10 +402,12 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_end_interview_confirmation(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2= Question.objects.create(text="How many of them are male?",
                                 answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
         AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
                                   condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
@@ -498,10 +518,12 @@ class USSDTest(TestCase):
         return self.client.post('/ussd', data=self.ussd_params)
 
     def test_end_interview_confirmation_alternative(self):
-        question_1 = Question.objects.create(batch=self.batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
@@ -536,10 +558,13 @@ class USSDTest(TestCase):
 
     def test_should_show_member_completion_message_and_choose_to_go_to_member_list(self):
         member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="Question 1?",
+        question_1 = Question.objects.create(text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="Question 2?",
+        question_2 = Question.objects.create(text="Question 2?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
+
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
 
         response = self.select_household()
 
@@ -575,10 +600,12 @@ class USSDTest(TestCase):
 
     def test_should_show_member_completion_message_and_choose_to_go_to_household_list(self):
         member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(batch=self.batch, text="Question 1?",
+        question_1 = Question.objects.create(text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="Question 2?",
+        question_2 = Question.objects.create(text="Question 2?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
 
         response = self.select_household()
 
@@ -614,10 +641,12 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_should_show_thank_you_message_on_completion_of_all_members_questions(self):
-        question_1 = Question.objects.create(batch=self.batch, text="Question 1?",
+        question_1 = Question.objects.create(text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(batch=self.batch, text="Question 2?",
+        question_2 = Question.objects.create(text="Question 2?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
 
         response = self.select_household()
 
@@ -696,18 +725,21 @@ class USSDTestCompleteFlow(TestCase):
         self.batch = Batch.objects.create(name="Batch A", order=1)
         self.batch_b = Batch.objects.create(name="Batch B", order=2)
         self.batch.open_for_location(self.investigator.location)
-        self.question_1 = Question.objects.create(batch=self.batch,
-                                                  text="How many members are there in this household?",
+        self.question_1 = Question.objects.create(text="How many members are there in this household?",
                                                   answer_type=Question.NUMBER, order=1, group=self.head_group)
 
-        self.question_2 = Question.objects.create(batch=self.batch, text="How many of them are male?",
+        self.question_2 = Question.objects.create(text="How many of them are male?",
                                                   answer_type=Question.NUMBER, order=2, group=self.head_group)
-        self.question_1_b = Question.objects.create(batch=self.batch_b,
-                                                    text="How many members are there in this household? Batch B",
+        self.question_1_b = Question.objects.create(text="How many members are there in this household? Batch B",
                                                 answer_type=Question.NUMBER, order=3, group=self.head_group)
-        self.question_3 = Question.objects.create(batch=self.batch, text="Question for member group?",
+        self.question_3 = Question.objects.create(text="Question for member group?",
                                                   answer_type=Question.NUMBER, order=1, group=self.member_group)
 
+        self.question_1.batches.add(self.batch)
+        self.question_2.batches.add(self.batch)
+        self.question_3.batches.add(self.batch)
+
+        self.question_1_b.batches.add(self.batch_b)
 
     def select_household(self, household=1):
         self.ussd_params['response'] = "true"
@@ -1059,8 +1091,8 @@ class USSDTestCompleteFlow(TestCase):
 
     def test_completed_batch_timeout_for_household_after_5_min_should_allow_other_batches(self):
         self.household_head_1.household.batch_completed(self.batch)
-        self.investigator.member_answered(self.question_1, self.household_head_1, 1)
-        self.investigator.member_answered(self.question_2, self.household_head_1, 1)
+        self.investigator.member_answered(self.question_1, self.household_head_1, 1, self.batch)
+        self.investigator.member_answered(self.question_2, self.household_head_1, 1, self.batch)
 
         completion = HouseholdBatchCompletion.objects.filter(batch=self.batch)[0]
 
@@ -1157,15 +1189,21 @@ class USSDWithMultipleBatches(TestCase):
             household=Household.objects.create(investigator=self.investigator, uid=1),
             surname="Name " + str(randint(1, 9999)), date_of_birth='1929-02-02', male=False)
         self.batch = Batch.objects.create(order=1)
-        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER,
+        self.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER,
                                                   order=1, group=self.female_group)
-        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER,
+        self.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER,
                                                   order=2, group=self.female_group)
+
+        self.question_1.batches.add(self.batch)
+        self.question_2.batches.add(self.batch)
+
         self.batch_1 = Batch.objects.create(order=2)
-        self.question_3 = Question.objects.create(batch=self.batch_1, text="Question 3?", answer_type=Question.NUMBER,
+        self.question_3 = Question.objects.create(text="Question 3?", answer_type=Question.NUMBER,
                                                   order=3, group=self.female_group)
-        self.question_4 = Question.objects.create(batch=self.batch_1, text="Question 4?", answer_type=Question.NUMBER,
+        self.question_4 = Question.objects.create(text="Question 4?", answer_type=Question.NUMBER,
                                                   order=4, group=self.female_group)
+        self.question_3.batches.add(self.batch_1)
+        self.question_4.batches.add(self.batch_1)
 
     def select_household(self, household=1):
         self.ussd_params['response'] = "true"
@@ -1478,21 +1516,23 @@ class USSDHouseholdMemberQuestionNavigationTest(TestCase):
         self.condition.groups.add(self.female_group)
         self.general_condition.groups.add(self.general_group)
 
-        self.question_1 = Question.objects.create(batch=self.batch, text="Question 1?", answer_type=Question.NUMBER,
+        self.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER,
                                                   order=1, group=self.general_group)
-        self.question_2 = Question.objects.create(batch=self.batch, text="Question 2?", answer_type=Question.NUMBER,
+        self.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER,
                                                   order=2, group=self.general_group)
 
-        self.question_3 = Question.objects.create(batch=self.batch, text="Question 3?", answer_type=Question.NUMBER,
+        self.question_3 = Question.objects.create(text="Question 3?", answer_type=Question.NUMBER,
                                                   order=3, group=self.general_group)
-        self.question_4 = Question.objects.create(batch=self.batch, text="Question 4?", answer_type=Question.NUMBER,
+        self.question_4 = Question.objects.create(text="Question 4?", answer_type=Question.NUMBER,
                                                   order=4, group=self.general_group)
 
-        self.question_5 = Question.objects.create(batch=self.batch, text="Question 5?", answer_type=Question.NUMBER,
+        self.question_5 = Question.objects.create(text="Question 5?", answer_type=Question.NUMBER,
                                                   order=1, group=self.female_group)
 
-        self.question_6 = Question.objects.create(batch=self.batch, text="Question 6?", answer_type=Question.NUMBER,
+        self.question_6 = Question.objects.create(text="Question 6?", answer_type=Question.NUMBER,
                                                   order=2, group=self.female_group)
+        for question in [self.question_1, self.question_2, self.question_3, self.question_4, self.question_5, self.question_6 ]:
+            question.batches.add(self.batch)
 
     def select_household(self, household=1):
         self.ussd_params['response'] = "true"

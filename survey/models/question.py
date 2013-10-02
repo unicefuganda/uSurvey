@@ -1,12 +1,11 @@
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.paginator import Paginator
 from django.db import models
 from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
-from django.conf import settings
 
 
 class Question(BaseModel):
@@ -31,7 +30,7 @@ class Question(BaseModel):
     NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
 
     identifier = models.CharField(max_length=100, blank=False, null=True)
-    batch = models.ForeignKey(Batch, null=True, related_name="questions")
+    batches = models.ManyToManyField(Batch, null=True, related_name="questions")
     group = models.ForeignKey("HouseholdMemberGroup", null=True, related_name="question_group")
     text = models.CharField(max_length=150, blank=False, null=False)
     answer_type = models.CharField(max_length=15, blank=False, null=False, choices=TYPE_OF_ANSWERS)
@@ -42,8 +41,24 @@ class Question(BaseModel):
     class Meta:
         app_label = 'survey'
 
+    def __init__(self, *args, **kwargs):
+        super(Question, self).__init__(*args, **kwargs)
+        if self.parent:
+            self.subquestion = True
+
     def __unicode__(self):
         return self.text
+
+    def clean(self, *args, **kwargs):
+        if self.subquestion and self.order:
+            raise ValidationError('Subquestions cannot have orders.')
+
+        if self.subquestion and not self.parent:
+            raise ValidationError('Subquestions must have parent questions.')
+
+    def save(self, *args, **kwargs):
+        self.clean(*args, **kwargs)
+        super(Question, self).save(*args, **kwargs)
 
     def get_option(self, answer, investigator):
         try:
@@ -59,9 +74,9 @@ class Question(BaseModel):
 
         return eval(Question.TYPE_OF_ANSWERS_CLASS[self.answer_type])
 
-    def has_been_answered(self, member):
+    def has_been_answered(self, member, batch):
         answer_class = self.answer_class()
-        return  len(answer_class.objects.filter(question=self, householdmember=member, batch=self.batch)) > 0
+        return len(answer_class.objects.filter(question=self, householdmember=member, batch=batch)) > 0
 
     def options_in_text(self, page=1):
         paginator = Paginator(self.options.order_by('order').all(), self.OPTIONS_PER_PAGE)
@@ -78,21 +93,9 @@ class Question(BaseModel):
         for rule in all_rules:
             if rule.validate(answer):
                 return rule.action_to_take(investigator, answer)
+
         raise ObjectDoesNotExist
 
-    def next_question_for_household(self, household):
-        answer = self.answer_class().objects.get(household=household, question=self)
-        try:
-            return self.get_next_question_by_rule(answer, household.investigator)
-        except ObjectDoesNotExist, e:
-            return self.next_question(location=household.investigator.location)
-
-    def next_question_for_household_member(self, household_member):
-        answer = self.answer_class().objects.get(householdmember=household_member if not household_member.is_head() else household_member.get_member(), question=self, batch=self.batch)
-        try:
-            return self.get_next_question_by_rule(answer, household_member.household.investigator)
-        except ObjectDoesNotExist, e:
-            return household_member.next_question()
 
     def next_question(self, location, member=None):
         order = self.parent.order if self.subquestion else self.order
@@ -105,14 +108,15 @@ class Question(BaseModel):
         else:
             return self.text
 
-    def is_in_open_batch(self, location):
-        return self.batch.is_open_for(location) if self.batch else False
-
     def get_subquestions(self):
         return Question.objects.filter(subquestion=True,parent=self)
 
     def rules_for_batch(self, batch):
         return self.rule.all().filter(batch=batch)
+
+    def is_last_question_of_group(self):
+        return self == self.group.last_question()
+
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")

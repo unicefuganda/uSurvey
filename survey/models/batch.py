@@ -32,14 +32,9 @@ class Batch(BaseModel):
         questions = self.all_questions()
         return list(set(map(lambda question: question.group, questions)))
 
-    def first_question(self):
-        all_groups = self.get_groups()
-        all_groups.sort(key=lambda group: group.order)
-        return self.questions.get(order=1, group=all_groups[0])
-
     def has_unanswered_question(self, member):
         for question in self.all_questions():
-            if question.group.belongs_to_group(member) and not question.has_been_answered(member):
+            if member.belongs_to(question.group) and not member.has_answered(question, self):
                 return True
         return False
 
@@ -106,13 +101,14 @@ class Batch(BaseModel):
             return next_batch.get_next_question(order=0, location=location)
 
     @classmethod
-    def open_batches(cls, location):
+    def open_ordered_batches(cls, location):
         all_batches = Batch.objects.all().order_by('order')
         open_batches = []
         for batch in all_batches:
             if batch.is_open_for(location):
                 open_batches.append(batch)
         return open_batches
+
 
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")

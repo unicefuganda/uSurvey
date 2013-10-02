@@ -12,75 +12,14 @@ class HouseholdMemberGroup(BaseModel):
     def get_all_conditions(self):
         return self.conditions.all()
 
-    def has_condition(self, household_member, condition):
-        age = household_member.get_age()
-        gender = household_member.male
-        is_head = household_member.is_head()
-
-        if condition.attribute.lower() == GroupCondition.GROUP_TYPES["AGE"].lower():
-            condition_value = condition.matches_condition(age)
-        elif condition.attribute.lower() == GroupCondition.GROUP_TYPES["GENDER"].lower():
-            condition_value = condition.matches_condition(gender)
-        else:
-            condition_value = condition.matches_condition(is_head)
-        return condition_value
-
-    def all_questions_answered(self, member):
-        last_question = self.last_question()
-        if last_question:
-            answer_class = last_question.answer_class()
-            answered_question = answer_class.objects.filter(question=last_question, householdmember=member)
-            return len(answered_question) > 0
-        return True
-
-    def first_question(self, member):
-        all_questions = self.all_questions().order_by('order')
-
-        open_questions = filter(lambda question: question.is_in_open_batch(member.get_location()), all_questions) if all_questions else None
-
-        if open_questions:
-            return open_questions[0]
-        else:
-            return None
-
-    def all_unanswered_open_batch_questions(self, member, batch):
-        all_questions = self.all_questions().filter(batch=batch).order_by('order')
-        open_batch_questions = []
-
-        for question in all_questions:
-            if batch.is_open_for(member.get_location()) and not question.has_been_answered(member):
-                open_batch_questions.append(question)
-
-        return open_batch_questions
-
     def last_question(self):
         all_questions = self.all_questions().exclude(order=None)
         return all_questions.order_by('order').reverse()[0] if all_questions else None
 
-    def belongs_to_group(self, household_member):
-        condition_match = []
-        for condition in self.get_all_conditions():
-            condition_match.append(self.has_condition(household_member, condition))
-
-        return all(condition is True for condition in condition_match)
 
     def maximum_question_order(self):
         all_questions = self.all_questions()
         return all_questions.order_by('order').reverse()[0].order if all_questions else 0
-
-    def get_next_question_for(self, member, last_question=None):
-        if not last_question:
-            last_question = member.last_question_answered()
-
-        if last_question and last_question.group == self:
-            try:
-                order = last_question.parent.order if last_question.subquestion else last_question.order
-                last_question = self.all_questions().get(order=order + 1)
-            except:
-                return None
-            return last_question if last_question.is_in_open_batch(member.get_location()) else self.get_next_question_for(member, last_question)
-
-        return self.all_questions().order_by('order')[0]
 
     @classmethod
     def max_order(cls):

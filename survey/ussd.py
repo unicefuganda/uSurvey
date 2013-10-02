@@ -129,7 +129,7 @@ class USSD(USSDBase):
     def invalid_answered_question(self):
         return self.question_present_in_cache('INVALID_ANSWER')
 
-    def process_investigator_response(self):
+    def process_investigator_response(self, batch):
         answer = self.request['ussdRequestString'].strip()
 
         if not answer:
@@ -137,7 +137,7 @@ class USSD(USSDBase):
         if self.is_pagination(self.question, answer):
             self.set_current_page(answer)
         else:
-            self.question = self.investigator.member_answered(self.question, self.household_member, answer)
+            self.question = self.investigator.member_answered(self.question, self.household_member, answer, batch)
 
     def add_question_prefix(self):
         if self.reanswerable_question():
@@ -147,10 +147,10 @@ class USSD(USSDBase):
 
     def restart_survey(self):
         answer = self.request['ussdRequestString'].strip()
-        if  answer == self.ANSWER['YES']:
+        if answer == self.ANSWER['YES']:
             self.set_in_session('HOUSEHOLD_MEMBER', None)
             self.render_household_members_list()
-        if  answer == self.ANSWER['NO']:
+        if answer == self.ANSWER['NO']:
             self.set_in_session('HOUSEHOLD', None)
             self.set_in_session('HOUSEHOLD_MEMBER', None)
             self.household = None
@@ -158,14 +158,10 @@ class USSD(USSDBase):
 
         self.action = self.ACTIONS['REQUEST']
 
-    def end_interview(self):
+    def end_interview(self, batch):
         self.action = self.ACTIONS['END']
         if self.investigator.completed_open_surveys():
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
-            self.investigator.clear_interview_caches()
-        elif self.household_member.last_question_answered() and \
-                not self.household_member.can_retake_survey(batch=self.get_current_batch(), minutes=self.TIMEOUT_MINUTES):
-            self.responseString = USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE']
             self.investigator.clear_interview_caches()
         elif self.household_member.survey_completed():
             if self.current_member_is_done:
@@ -176,41 +172,33 @@ class USSD(USSDBase):
                 self.investigator.clear_interview_caches()
                 self.set_in_session('HOUSEHOLD', current_household)
                 self.responseString = USSD.MESSAGES['MEMBER_SUCCESS_MESSAGE'] if not self.household.completed_currently_open_batches() else USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
+        elif self.household_member.last_question_answered() and \
+                not self.household_member.can_retake_survey(batch=batch, minutes=self.TIMEOUT_MINUTES):
+            self.responseString = USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE']
+            self.investigator.clear_interview_caches()
         else:
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE']
             self.investigator.clear_interview_caches()
 
-    def render_survey_response(self):
+    def render_survey_response(self, batch):
         if not self.question:
-            self.end_interview()
+            self.end_interview(batch)
         else:
             page = self.get_from_session('PAGE')
             self.add_question_prefix()
             self.responseString += self.question.to_ussd(page)
 
-    def get_current_batch(self):
-        if not self.household.survey_completed():
-            next_question = self.household_member.next_question()
-            return next_question.batch if next_question else None
-        if self.household_member:
-            last_question_entered = self.household_member.last_question_answered()
-            if last_question_entered:
-                next_question = self.household_member.next_question()
-                return last_question_entered.batch if not next_question else next_question.batch
-        return self.investigator.first_open_batch()
-
     def render_survey(self):
-
         household_member = self.household_member
-
-        if not household_member.survey_completed():
-            self.question = household_member.next_question()
-
+        current_batch = household_member.get_next_batch()
+        if current_batch:
+            self.question = household_member.next_question_in_order(current_batch)
             if not self.is_new_request():
-                self.process_investigator_response()
-            self.render_survey_response()
+                self.process_investigator_response(current_batch)
+
+            self.render_survey_response(current_batch)
         else:
-            self.end_interview()
+            self.end_interview(current_batch)
 
     def render_resume_message(self):
         self.responseString = self.MESSAGES['RESUME_MESSAGE']

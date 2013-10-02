@@ -4,7 +4,6 @@ from survey.models import AnswerRule
 
 
 class LogicForm(forms.Form):
-
     def __init__(self, data=None, initial=None, question=None, batch=None):
         super(LogicForm, self).__init__(data=data, initial=initial)
         ACTIONS = {
@@ -12,22 +11,21 @@ class LogicForm(forms.Form):
             'SKIP_TO': 'JUMP TO',
             'REANSWER': 'REANSWER',
             'ASK_SUBQUESTION': 'ASK SUBQUESTION',
-            }
+        }
 
         self.fields['action'].choices = ACTIONS.items()
         self.question = question
         self.batch = batch
         action_sent = data.get('action', None) if data else None
 
-        if question:
+        if batch and question:
             self.fields['condition'].label = "If %s" % question.text
             is_multichoice = question.is_multichoice()
             self.fields['condition'].choices = self.choices_for_condition_field(is_multichoice)
             question_choices = []
-            for next_question in question.batch.all_questions():
+            for next_question in batch.all_questions():
                 if next_question.id != question.id:
                     question_choices.append((next_question.id, next_question.text))
-
 
             if is_multichoice:
                 del self.fields['value']
@@ -73,7 +71,8 @@ class LogicForm(forms.Form):
         return self.cleaned_data
 
 
-    condition = forms.ChoiceField(label='If', choices=AnswerRule.CONDITIONS.items(), widget=forms.Select, required=False)
+    condition = forms.ChoiceField(label='If', choices=AnswerRule.CONDITIONS.items(), widget=forms.Select,
+                                  required=False)
     attribute = forms.ChoiceField(label='Attribute', choices=[], widget=forms.Select, required=False)
     option = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=True)
     value = forms.CharField(label='', required=False)

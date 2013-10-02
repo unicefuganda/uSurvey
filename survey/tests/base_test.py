@@ -1,8 +1,9 @@
-from django.test import TestCase
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.test.client import Client
 from  urllib import quote
+
+from django.test import TestCase
+from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
+
 
 class BaseTest(TestCase):
 

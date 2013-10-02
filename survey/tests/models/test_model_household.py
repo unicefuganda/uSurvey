@@ -159,16 +159,16 @@ class HouseholdTest(TestCase):
 
         question_1 = Question.objects.create(identifier="identifier1",
                                              text="Question 1", answer_type='number',
-                                             order=1, subquestion=False, group=member_group, batch=batch)
-
+                                             order=1, subquestion=False, group=member_group)
+        question_1.batches.add(batch)
         member_list = [household_head, household_member1, household_member2]
 
         self.assertFalse(hhold.completed_currently_open_batches())
-        investigator.member_answered(question_1, household_member1, answer=1)
+        investigator.member_answered(question_1, household_member1, answer=1, batch=batch)
         self.assertFalse(hhold.completed_currently_open_batches())
-        investigator.member_answered(question_1, household_member2, answer=1)
+        investigator.member_answered(question_1, household_member2, answer=1, batch=batch)
         self.assertFalse(hhold.completed_currently_open_batches())
-        investigator.member_answered(question_1, household_head, answer=1)
+        investigator.member_answered(question_1, household_head, answer=1, batch=batch)
         self.assertTrue(hhold.completed_currently_open_batches())
         self.assertEqual(3, HouseholdBatchCompletion.objects.filter(batch=batch).count())
         [self.assertEqual(1, HouseholdBatchCompletion.objects.filter(batch=batch, householdmember=member).count()) for member in member_list]

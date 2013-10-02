@@ -54,7 +54,8 @@ class QuestionFormTest(TestCase):
         self.assertTrue(question_form.is_valid())
         batch = Batch.objects.create()
         question = question_form.save(batch=batch, group=[self.household_member_group.id])
-        self.assertEqual(batch, question.batch)
+        self.assertEqual(1, question.batches.all().count())
+        self.assertEqual(batch, question.batches.all()[0])
         options = question.options.all()
         self.assertEqual(2, options.count())
         self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), options)
@@ -67,7 +68,7 @@ class QuestionFormTest(TestCase):
         question_form = QuestionForm(form_data)
         self.assertTrue(question_form.is_valid())
         question = question_form.save(group=[self.household_member_group.id])
-        self.assertIsNone(question.batch)
+        self.assertEqual(0, len(question.batches.all()))
         options = question.options.all()
         self.assertEqual(2, options.count())
         self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), options)
@@ -80,7 +81,7 @@ class QuestionFormTest(TestCase):
         question_form = QuestionForm(form_data)
         self.assertTrue(question_form.is_valid())
         question = question_form.save(group=[self.household_member_group.id])
-        self.assertIsNone(question.batch)
+        self.assertEqual(0, question.batches.all().count())
         self.assertEquals(0, question.options.all().count())
 
     def test_should_filter_options_not_supplied(self):
@@ -90,7 +91,7 @@ class QuestionFormTest(TestCase):
         question_form = QuestionForm(form_data)
         self.assertTrue(question_form.is_valid())
         question = question_form.save(group=[self.household_member_group.id])
-        self.assertIsNone(question.batch)
+        self.assertEqual(0, question.batches.all().count())
         self.assertEquals(0, question.options.all().count())
 
     def test_form_should_not_be_valid_for_subquestion_if_same_subquestion_already_exist(self):

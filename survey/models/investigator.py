@@ -64,9 +64,6 @@ class Investigator(BaseModel):
     def clear_interview_caches(self):
         cache.delete(self.cache_key)
 
-    def next_answerable_question(self, household_member):
-        return household_member.next_question()
-
     def last_answered(self):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
@@ -78,7 +75,7 @@ class Investigator(BaseModel):
     def last_answered_question(self):
         return self.last_answered().question
 
-    def member_answered(self, question, household_member, answer):
+    def member_answered(self, question, household_member, answer, batch):
         answer_class = question.answer_class()
         if question.is_multichoice():
             answer = question.get_option(answer, self)
@@ -86,15 +83,16 @@ class Investigator(BaseModel):
                 return question
 
         answer = answer_class.objects.create(investigator=self, question=question, householdmember=household_member,
-                                             answer=answer, household=household_member.household, batch=question.batch)
+                                             answer=answer, household=household_member.household, batch=batch)
         if answer.pk:
-            next_question = question.next_question_for_household_member(household_member)
-
-            if next_question == None or next_question.batch != question.batch:
-                household_member.batch_completed(question.batch)
+            next_question = household_member.next_question(question, batch)
+            if next_question is None:
+                household_member.batch_completed(batch)
+                next_batch = household_member.get_next_batch()
+                next_question = household_member.next_question_in_order(next_batch) if next_batch else None
             return next_question
-        else:
-            return question
+
+        return question
 
     def last_answer_for(self, question):
         answer_class = question.answer_class()
