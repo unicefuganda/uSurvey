@@ -129,11 +129,14 @@ class LogicFormTest(TestCase):
         field = 'next_question'
 
         batch = Batch.objects.create(order=1)
-        question_without_option = Question.objects.create(batch=batch, text="Question 1?",
+        question_without_option = Question.objects.create(text="Question 1?",
                                                           answer_type=Question.NUMBER, order=1)
 
-        sub_question1 = Question.objects.create(batch=batch, text="sub question1", answer_type=Question.NUMBER,
+        sub_question1 = Question.objects.create(text="sub question1", answer_type=Question.NUMBER,
                                                 subquestion=True, parent=question_without_option)
+
+        sub_question1.batches.add(batch)
+        question_without_option.batches.add(batch)
 
         data= {'action': 'ASK_SUBQUESTION'}
         logic_form = LogicForm(question=question_without_option,data=data, batch=batch)
@@ -142,13 +145,16 @@ class LogicFormTest(TestCase):
 
     def test_should_not_add_answer_rule_twice_on_same_option_of_multichoice_question(self):
         batch = Batch.objects.create(order=1)
-        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                                  answer_type=Question.MULTICHOICE, order=1)
         option_1_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_1_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
-        sub_question_1 = Question.objects.create(batch=batch, text="Specify others", answer_type=Question.TEXT,
+        sub_question_1 = Question.objects.create(text="Specify others", answer_type=Question.TEXT,
                                                  subquestion=True, parent=question_1)
+
+        question_1.batches.add(batch)
+        sub_question_1.batches.add(batch)
 
         rule = AnswerRule.objects.create(action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
                                          condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
@@ -164,17 +170,20 @@ class LogicFormTest(TestCase):
 
     def test_should_not_add_answer_rule_twice_on_same_value_of_numeric_question(self):
         batch = Batch.objects.create(order=1)
-        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                                  answer_type=Question.NUMBER, order=1)
         value_1 = 0
         value_2 = 20
 
-        sub_question_1 = Question.objects.create(batch=batch, text="Specify others", answer_type=Question.TEXT,
+        sub_question_1 = Question.objects.create(text="Specify others", answer_type=Question.TEXT,
                                                  subquestion=True, parent=question_1)
 
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'],
                                          validate_with_value=value_1, next_question=sub_question_1, batch=batch)
+
+        question_1.batches.add(batch)
+        sub_question_1.batches.add(batch)
 
         data = dict(action=rule.action,
                     condition=rule.condition,
@@ -194,20 +203,26 @@ class LogicFormTest(TestCase):
 
     def test_should_not_add_answer_rule_twice_on_same_question_value_of_numeric_question(self):
         batch = Batch.objects.create(order=1)
-        question_1 = Question.objects.create(batch=batch, text="How many members are there in this household?",
+        question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1)
 
-        question_2 = Question.objects.create(batch=batch, text="How many members are above 18 years?",
+        question_2 = Question.objects.create(text="How many members are above 18 years?",
                                              answer_type=Question.NUMBER, order=2)
 
-        question_3 = Question.objects.create(batch=batch, text="Some random question",
+        question_3 = Question.objects.create(text="Some random question",
                                              answer_type=Question.NUMBER, order=3)
-        sub_question_1 = Question.objects.create(batch=batch, text="Specify others", answer_type=Question.TEXT,
+        sub_question_1 = Question.objects.create(text="Specify others", answer_type=Question.TEXT,
                                                  subquestion=True, parent=question_1)
 
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'],
                                          validate_with_question=question_2, next_question=sub_question_1, batch=batch)
+
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        question_3.batches.add(batch)
+        sub_question_1.batches.add(batch)
+
 
         data = dict(action=rule.action,
                     condition=rule.condition,

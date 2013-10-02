@@ -95,10 +95,14 @@ class QuestionFormTest(TestCase):
         self.assertEquals(0, question.options.all().count())
 
     def test_form_should_not_be_valid_for_subquestion_if_same_subquestion_already_exist(self):
-       question = Question.objects.create(batch=self.batch, text="Question 1?",
+       question = Question.objects.create(text="Question 1?",
                                                 answer_type=Question.NUMBER, order=1,group=self.household_member_group)
        sub_question = Question.objects.create(text="this is a sub question", answer_type=Question.NUMBER,
-                                               batch=self.batch, subquestion=True, parent=question,group=self.household_member_group)
+                                               subquestion=True, parent=question,group=self.household_member_group)
+
+       question.batches.add(self.batch)
+       sub_question.batches.add(self.batch)
+
        form_data = self.form_data.copy()
        form_data['text'] = sub_question.text
        form_data['answer_type'] = sub_question.answer_type

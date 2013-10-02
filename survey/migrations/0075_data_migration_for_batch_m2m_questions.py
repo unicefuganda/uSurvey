@@ -14,7 +14,7 @@ class Migration(DataMigration):
         for question in orm['survey.question'].objects.all():
             batches_for_that_question = question.batches.all()
             if batches_for_that_question:
-                question.batch = batches_for_that_question[0] 
+                question.batch = batches_for_that_question[0]
                 question.save()
 
     models = {
@@ -82,6 +82,7 @@ class Migration(DataMigration):
         'survey.answerrule': {
             'Meta': {'object_name': 'AnswerRule'},
             'action': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'batch': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'batch_rule'", 'null': 'True', 'to': "orm['survey.Batch']"}),
             'condition': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

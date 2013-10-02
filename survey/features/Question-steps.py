@@ -285,9 +285,10 @@ def then_i_should_not_see_the_sub_question(step):
 
 @step(u'And I have a non multichoice question')
 def and_i_have_a_non_multi_choice_question(step):
-    world.multi_choice_question = Question.objects.create(batch= world.batch, text="Are these insecticide?",
+    world.multi_choice_question = Question.objects.create(text="Are these insecticide?",
                                                           answer_type=Question.NUMBER, order=7,
                                                            group = world.household_member_group)
+    world.multi_choice_question.batches.add(world.batch)
 
 @step(u'When I click on the question')
 def and_i_click_on_the_question(step):

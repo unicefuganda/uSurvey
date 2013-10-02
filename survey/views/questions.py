@@ -113,7 +113,7 @@ def _get_post_values(post_data):
 def add_logic(request, batch_id, question_id):
     question = Question.objects.get(id=question_id)
     batch = Batch.objects.get(id=batch_id)
-    logic_form = LogicForm(question=question)
+    logic_form = LogicForm(question=question, batch=batch)
     if request.method == "POST":
         logic_form = LogicForm(data=request.POST, question=question, batch=batch)
         if logic_form.is_valid():

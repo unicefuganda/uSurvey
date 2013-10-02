@@ -61,25 +61,6 @@ class InvestigatorTest(TestCase):
         mobile_number_of_length_11 = "01234567891"
         self.failUnlessRaises(DatabaseError, Investigator.objects.create, mobile_number=mobile_number_of_length_11)
 
-    def test_next_answerable_question(self):
-        batch = Batch.objects.create(order=1)
-        batch.open_for_location(self.investigator.location)
-        question_1 = Question.objects.create(text="Question 1?",
-                                             answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(text="Question 2?",
-                                             answer_type=Question.NUMBER, order=2, group=self.member_group)
-        question_1.batches.add(batch)
-        question_2.batches.add(batch)
-        self.assertEqual(question_1, self.investigator.next_answerable_question(self.household_member))
-
-        NumericalAnswer.objects.create(investigator=self.investigator, batch=batch, householdmember=self.household_member, question=question_1, answer=10)
-
-        self.assertEqual(question_2, self.investigator.next_answerable_question(self.household_member))
-
-        NumericalAnswer.objects.create(investigator=self.investigator, batch=batch,  householdmember=self.household_member, question=question_2, answer=10)
-
-        self.assertEqual(None, self.investigator.next_answerable_question(self.household_member))
-
     def test_location_hierarchy(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
         city = LocationType.objects.create(name="City", slug=slugify("city"))
@@ -121,7 +102,7 @@ class InvestigatorTest(TestCase):
 
         self.assertEqual(self.investigator.last_answered_question(), question_1)
         self.assertEqual(len(completed_batches), 0)
-        self.assertEqual(household_member1.next_question(), question_2)
+        self.assertEqual(household_member1.next_question_in_order(batch), question_2)
 
 
 class LocationTest(TestCase):
