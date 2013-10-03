@@ -1,4 +1,5 @@
 import json
+import re
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import messages
@@ -186,7 +187,9 @@ def _render_question_view(request, instance=None):
                'questionform': question_form}
 
     if options:
-        context['options'] = filter(lambda text: text.strip(), list(set(options)))
+        options = filter(lambda text: text.strip(), list(set(options)))
+        options = map(lambda option: re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', option), options)
+        context['options'] = map(lambda option: re.sub("  ", ' ', option), options)
 
     return response, context
 

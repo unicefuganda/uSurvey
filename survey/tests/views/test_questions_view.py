@@ -394,7 +394,7 @@ class QuestionsViews(BaseTest):
         self.assertTrue(question_2.text in [item['text'] for item in parsed_response])
         self.assertTrue(question_1.text in [item['text'] for item in parsed_response])
 
-    def test_returns_added_optoions_when_form_has_error(self):
+    def test_returns_added_options_when_form_has_error(self):
         too_long_to_be_accepted_question = 'Get all the apps and games you love on Nexus 4 - with over\
         titles to choose from on Google Play, s something for everyone. Find the most popular free and \
         paid apps, explore hand-picked collections'
@@ -465,6 +465,27 @@ class QuestionsViews(BaseTest):
         self.assertEqual(2, len(response.context['options']))
         self.assertIn(question_option.text, response.context['options'])
         self.assertIn(question_option_2.text, response.context['options'])
+
+    def test_should_strip_special_characters_from_options(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group, answer_type=Question.MULTICHOICE)
+        question.batches.add(self.batch)
+
+        option_1 = "option 1"
+        option_2 = "option 2"
+        option_3 = "dont know"
+        form_data = {
+            'text': '',
+            'answer_type': Question.MULTICHOICE,
+            'group': group.id,
+            'options': [option_1, "option ! 2", "don't know"]
+        }
+
+        all_options = [option_1, option_2, option_3]
+        response = self.client.post('/questions/new/', data=form_data)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(3, len(response.context['options']))
+        [self.assertIn(option, response.context['options']) for option in all_options]
 
     def test_should_save_on_post_edit_question(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)
