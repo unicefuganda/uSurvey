@@ -53,7 +53,7 @@ def then_i_should_see_the_groups_list_paginated(step):
 
 @step(u'When I click the add button')
 def when_i_click_the_add_button(step):
-    world.page.click_link_by_text(" Add Condition")
+    world.page.click_link_by_text(" Add Eligibility Criteria")
 
 
 @step(u'Then I should see the new condition form')
@@ -247,7 +247,7 @@ def then_i_should_see_error(step):
 
 @step(u'When I click on add condition button')
 def when_i_click_on_add_condition_button(step):
-    world.page.click_link_by_text(" Add Condition")
+    world.page.click_link_by_text(" Add Eligibility Criteria")
 
 
 @step(u'Then I should see a new condition form for this group')
