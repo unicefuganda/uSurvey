@@ -124,6 +124,8 @@ def add_logic(request, batch_id, question_id):
             AnswerRule.objects.create(question=question, batch=batch, **_get_post_values(request.POST))
             messages.success(request, 'Logic successfully added.')
             return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
+
+        messages.error(request, 'Rule already exist.')
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'questionform': QuestionForm(), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
                'class': 'question-form', 'batch_id': batch_id}

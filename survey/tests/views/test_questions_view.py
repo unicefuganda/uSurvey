@@ -725,6 +725,21 @@ class LogicViewTest(BaseTest):
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_value)
 
+    def test_views_has_error_message_if_rule_already_exists(self):
+        AnswerRule.objects.create(question= self.question, batch=self.batch, action=AnswerRule.ACTIONS['SKIP_TO'],
+                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0, next_question=self.question_2)
+
+        form_data = {'condition': 'EQUALS',
+                     'attribute': 'value',
+                     'value': 0,
+                     'action': 'SKIP_TO',
+                     'next_question': self.question_2.pk}
+
+        response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk), data=form_data)
+
+        error_message = 'Rule already exist.'
+        self.assertIn(error_message, str(response))
+
 
 class QuestionJsonDataDumpTest(BaseTest):
     def setUp(self):
