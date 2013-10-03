@@ -47,7 +47,7 @@ class Question(BaseModel):
             self.subquestion = True
 
     def __unicode__(self):
-        return self.text
+        return "%s: (%s)" % (self.text, self.answer_type.upper())
 
     def clean(self, *args, **kwargs):
         if self.subquestion and self.order:

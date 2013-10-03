@@ -203,7 +203,7 @@ class QuestionsViews(BaseTest):
 
         questions = json.loads(response.content)
 
-        [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in all_group_questions]
+        [self.assertNotIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for question in all_group_questions]
 
     def test_should_retrieve_group_specific_questions_as_data_for_filter_if_group_id_key(self):
         group_question = Question.objects.create(text="How many members are there in this household?",
@@ -228,7 +228,7 @@ class QuestionsViews(BaseTest):
 
         questions = json.loads(response.content)
 
-        [self.assertIn(dict(text=question.text, id=question.id), questions) for question in expected_questions]
+        [self.assertIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for question in expected_questions]
         [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in
          questions_that_should_not_appear_in_response]
 

@@ -10,3 +10,10 @@ class Survey(BaseModel):
 
     class Meta:
         app_label = 'survey'
+
+    def is_open(self):
+        all_batches = self.batch.all()
+        for batch in all_batches:
+            if batch.open_locations.all():
+                return True
+        return False

@@ -193,7 +193,7 @@ def when_i_fill_the_subquestion_details(step):
 
 @step(u'And I click save question button on the form')
 def and_i_click_save_question_button_on_the_form(step):
-    world.browser.find_by_name("save_sub_question_button").first.click()
+    world.page.click_by_css('#modal_sub_question_button')
 
 @step(u'Then I should see the recent subquestion in next question dropdown')
 def then_i_should_see_the_recent_subquestion_in_next_question_dropdown(step):

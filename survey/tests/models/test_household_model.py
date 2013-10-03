@@ -43,6 +43,11 @@ class HouseholdTest(TestCase):
         self.failUnless(hhold.modified)
         self.assertEquals(0, hhold.uid)
 
+    def test_knows_next_uid_for_households(self):
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", backend=Backend.objects.create(name='something1'))
+        Household.objects.create(investigator=investigator, uid=101)
+        self.assertEqual(102, Household.next_uid())
+
     def test_should_know_household_related_location_to_village_level(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
         district = LocationType.objects.create(name="District", slug=slugify("district"))

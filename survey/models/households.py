@@ -151,6 +151,11 @@ class Household(BaseModel):
             household.related_locations = household.get_related_location()
         return households
 
+    @classmethod
+    def next_uid(cls):
+        all_households = Household.objects.filter()
+        return (all_households.order_by('uid').reverse()[0].uid + 1) if all_households else 1
+
 
 class HouseholdMember(BaseModel):
     surname = models.CharField(max_length=25, verbose_name="Family Name")

@@ -36,6 +36,8 @@ def new(request):
 
     return response or render(request, 'surveys/new.html', context)
 
+
+@permission_required('auth.can_view_batches')
 def edit(request, survey_id):
     try:
         survey = Survey.objects.get(id=survey_id)
@@ -58,10 +60,16 @@ def edit(request, survey_id):
         messages.error(request, "Survey does not exist.")
         return HttpResponseRedirect('/surveys/')
 
-def delete(request,survey_id):
+
+@permission_required('auth.can_view_batches')
+def delete(request, survey_id):
     try:
-        Survey.objects.get(id=survey_id).delete()
-        messages.success(request, 'Survey successfully deleted.')
+        survey = Survey.objects.get(id=survey_id)
+        if not survey.is_open():
+            survey.delete()
+            messages.success(request, 'Survey successfully deleted.')
+        else:
+            messages.error(request, "Survey cannot be deleted as it is open.")
     except ObjectDoesNotExist:
         messages.error(request, "Survey does not exist.")
     return HttpResponseRedirect('/surveys/')

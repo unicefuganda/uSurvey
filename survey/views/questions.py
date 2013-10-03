@@ -34,7 +34,8 @@ def index(request, batch_id):
     for question in all_questions:
         question_rules_for_batch[question] = question.rules_for_batch(batch)
 
-    context = {'questions': all_questions, 'request': request, 'batch': batch, 'rules_for_batch':question_rules_for_batch}
+    context = {'questions': all_questions, 'request': request, 'batch': batch,
+               'rules_for_batch': question_rules_for_batch}
     return render(request, 'questions/index.html', context)
 
 
@@ -45,7 +46,7 @@ def filter_by_group(request, batch_id, group_id):
     else:
         questions = Question.objects.filter()
     questions_from_batch = Question.objects.filter(batches__id=batch_id)
-    questions = questions.exclude(id__in=questions_from_batch).values('id', 'text').order_by('text')
+    questions = questions.exclude(id__in=questions_from_batch).values('id', 'text', 'answer_type').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')
 
@@ -77,20 +78,21 @@ def __process_sub_question_form(request, questionform, parent_question):
     else:
         messages.error(request, 'Sub question not saved.')
 
+
 @permission_required('auth.can_view_batches')
 def new_subquestion(request, question_id):
     parent_question = Question.objects.get(pk=question_id)
     questionform = QuestionForm()
     response = None
     if request.method == 'POST':
-        questionform = QuestionForm(request.POST,parent_question=parent_question)
+        questionform = QuestionForm(request.POST, parent_question=parent_question)
         response = __process_sub_question_form(request, questionform, parent_question)
     context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form',
                'parent_question': parent_question, 'class': 'question-form'}
 
     template_name = 'questions/new.html'
     if request.is_ajax():
-        template_name= 'questions/_add_question.html'
+        template_name = 'questions/_add_question.html'
 
     return response or render(request, template_name, context)
 
@@ -122,7 +124,7 @@ def add_logic(request, batch_id, question_id):
             messages.success(request, 'Logic successfully added.')
             return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
-               'questionform':QuestionForm(), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
+               'questionform': QuestionForm(), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
                'class': 'question-form', 'batch_id': batch_id}
     return render(request, "questions/logic.html", context)
 
@@ -178,10 +180,10 @@ def _render_question_view(request, instance=None):
         response, options, question_form = _process_question_form(request, options, response, instance)
 
     context = {'button_label': 'Save',
-             'id': 'add-question-form',
-             'request': request,
-             'class': 'question-form',
-             'questionform': question_form}
+               'id': 'add-question-form',
+               'request': request,
+               'class': 'question-form',
+               'questionform': question_form}
 
     if options:
         context['options'] = filter(lambda text: text.strip(), list(set(options)))
@@ -193,6 +195,7 @@ def _create_question_hash_response(questions):
     questions_to_display = map(lambda question: {'id': str(question.id), 'text': question.text}, questions)
     return HttpResponse(json.dumps(questions_to_display), mimetype='application/json')
 
+
 def get_questions_for_batch(request, batch_id, question_id):
     question = Question.objects.get(id=question_id)
     batch = Batch.objects.get(id=batch_id)
@@ -203,7 +206,8 @@ def get_sub_questions_for_question(request, question_id):
     question = Question.objects.get(id=question_id)
     return _create_question_hash_response(question.get_subquestions())
 
+
 def delete_logic(request, batch_id, answer_rule_id):
     rule = AnswerRule.objects.get(id=answer_rule_id)
     rule.delete()
-    return HttpResponseRedirect('/batches/%s/questions/' %batch_id)
+    return HttpResponseRedirect('/batches/%s/questions/' % batch_id)

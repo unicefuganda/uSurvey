@@ -19,7 +19,7 @@ class QuestionTest(TestCase):
 
     def test_unicode_representation_of_question(self):
         question = Question.objects.create(text="This is a question", answer_type=Question.NUMBER)
-        self.assertEqual(question.text, str(question))
+        self.assertEqual("%s: (%s)" % (question.text, question.answer_type.upper()), str(question))
 
     def test_numerical_question(self):
         question = Question.objects.create(text="This is a question", answer_type=Question.NUMBER)

@@ -61,10 +61,12 @@ function load_questions_for_batch_and_group(){
     var select_element = $('#assign_question_group'),
         batch_id = $("#batch_id").val(),
         url = '/batches/'+ batch_id +'/questions/groups/'+ select_element.val();
+
     $.getJSON(url, function(data){
         set_display('', false);
         $.each(data, function(){
-            set_display(this.text, true);
+            representation = this.text + ": (" + this.answer_type.toUpperCase() + ")"
+            set_display(representation , true);
         });
     });
 }

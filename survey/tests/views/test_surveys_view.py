@@ -1,9 +1,12 @@
 from django.test.client import Client
 from mock import patch
 from django.contrib.auth.models import User
+from rapidsms.contrib.locations.models import Location
+from survey.models import Batch, Investigator, Backend
 from survey.models.surveys import Survey
 from survey.forms.surveys import SurveyForm
 from survey.tests.base_test import BaseTest
+
 
 class SurveyViewTest(BaseTest):
     def setUp(self):
@@ -15,11 +18,11 @@ class SurveyViewTest(BaseTest):
 
         self.client.login(username='Rajni', password='I_Rock')
         self.form_data = {
-                'name': 'survey rajni',
-                'description': 'survey description rajni',
-                'sample_size': 10,
-                'type': True,
-                }
+            'name': 'survey rajni',
+            'description': 'survey description rajni',
+            'sample_size': 10,
+            'type': True,
+        }
 
 
     def test_view_survey_list(self):
@@ -54,18 +57,28 @@ class SurveyViewTest(BaseTest):
         response = self.client.post('/surveys/new/', data=form_data)
         self.assertRedirects(response, expected_url='/surveys/', status_code=302, target_status_code=200,
                              msg_prefix='')
-        retrieved_surveys= Survey.objects.filter(**form_data)
+        retrieved_surveys = Survey.objects.filter(**form_data)
         self.assertEquals(1, len(retrieved_surveys))
         self.assertIn('Survey successfully added.', response.cookies['messages'].__str__())
+
+    def test_new_should_not_create_survey_on_post_if_survey_with_same_name_exists(self):
+        form_data = self.form_data
+        Survey.objects.create(**form_data)
+
+        response = self.client.post('/surveys/new/', data=form_data)
+        error_message = "Survey with name %s already exist." % form_data['name']
+        self.assertIn(error_message, response.context['survey_form'].errors['name'])
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/groups/new/')
         self.assert_restricted_permission_for('/groups/')
+        self.assert_restricted_permission_for('/surveys/1/delete/')
+        self.assert_restricted_permission_for('/surveys/1/edit/')
 
     def test_edit_should_get_form_with_data_of_the_survey(self):
         survey = Survey.objects.create(**self.form_data)
         self.failUnless(survey)
-        response = self.client.get('/surveys/%d/edit/' %survey.id)
+        response = self.client.get('/surveys/%d/edit/' % survey.id)
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('surveys/new.html', templates)
@@ -73,7 +86,7 @@ class SurveyViewTest(BaseTest):
         self.assertIn('edit-survey-form', response.context['id'])
         self.assertIn('Save', response.context['button_label'])
         self.assertIn('Edit Survey', response.context['title'])
-        self.assertIn('/surveys/%d/edit/' %survey.id, response.context['action'])
+        self.assertIn('/surveys/%d/edit/' % survey.id, response.context['action'])
 
     def test_edit_should_post_should_edit_the_survey(self):
         survey = Survey.objects.create(**self.form_data)
@@ -87,13 +100,13 @@ class SurveyViewTest(BaseTest):
 
         survey = Survey.objects.get(name=form_data['name'], description=form_data['description'])
         self.failUnless(survey)
-        self.assertRedirects(response,'/surveys/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
         success_message = "Survey successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_should_throw_error_if_editing_non_existing_survey(self):
         response = self.client.get('/surveys/11/edit/')
-        self.assertRedirects(response,'/surveys/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
         error_message = "Survey does not exist."
         self.assertIn(error_message, response.cookies['messages'].value)
 
@@ -101,15 +114,30 @@ class SurveyViewTest(BaseTest):
         survey = Survey.objects.create(**self.form_data)
         self.failUnless(survey)
 
-        response = self.client.get('/surveys/%d/delete/' % survey.id,)
+        response = self.client.get('/surveys/%d/delete/' % survey.id, )
         self.failIf(Survey.objects.filter(id=survey.id))
 
-        self.assertRedirects(response,'/surveys/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
         success_message = "Survey successfully deleted"
         self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_should_throw_error_if_deleting_non_existing_survey(self):
         response = self.client.get('/surveys/11/delete/')
-        self.assertRedirects(response,'/surveys/', status_code=302, target_status_code=200, msg_prefix='')
+        self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
         error_message = "Survey does not exist."
+        self.assertIn(error_message, response.cookies['messages'].value)
+
+    def test_should_throw_error_if_deleting_with_an_open_batch(self):
+        investigator = Investigator.objects.create(name="investigator name",
+                                                   mobile_number='123456789',
+                                                   location=Location.objects.create(name="Kampala"),
+                                                   backend=Backend.objects.create(name='something'))
+
+        survey = Survey.objects.create(**self.form_data)
+        batch = Batch.objects.create(order=1, survey=survey)
+        batch.open_for_location(investigator.location)
+
+        response = self.client.get('/surveys/%s/delete/' % survey.id)
+        self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
+        error_message = "Survey cannot be deleted as it is open."
         self.assertIn(error_message, response.cookies['messages'].value)
