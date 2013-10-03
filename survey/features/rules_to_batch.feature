@@ -129,8 +129,3 @@ Feature: Batch related features
     When I refill the form with valid values
     And I click save question button on the form
     Then I should see the recent subquestion in next question dropdown
-
-
-
-
-

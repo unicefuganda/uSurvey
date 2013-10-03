@@ -194,7 +194,6 @@ def when_i_fill_the_subquestion_details(step):
 @step(u'And I click save question button on the form')
 def and_i_click_save_question_button_on_the_form(step):
     world.browser.find_by_name("save_sub_question_button").first.click()
-    sleep(5)
 
 @step(u'Then I should see the recent subquestion in next question dropdown')
 def then_i_should_see_the_recent_subquestion_in_next_question_dropdown(step):
@@ -266,6 +265,7 @@ def when_i_fill_the_duplicate_subquestion_details(step):
 
 @step(u'And I should see error on the form text field')
 def and_i_should_see_error_on_the_form_text_field(step):
+    sleep(5)
     world.page.is_text_present("Sub question for this question with this text already exists.")
 
 @step(u'When I refill the form with valid values')
