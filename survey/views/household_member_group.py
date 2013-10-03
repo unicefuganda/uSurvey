@@ -97,7 +97,7 @@ def add_group(request):
                'id': 'add_group_form',
                'action': "/groups/new/",
                'condition_form': GroupConditionForm(),
-               'condition_title': "New Condition"}
+               'condition_title': "New Eligibility Criteria"}
 
     return response or render(request, 'household_member_groups/new.html', context)
 

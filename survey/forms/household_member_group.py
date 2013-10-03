@@ -5,7 +5,7 @@ from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
 class HouseholdMemberGroupForm(ModelForm):
 
-    conditions = forms.ModelMultipleChoiceField(label=u'Conditions', queryset=GroupCondition.objects.all(),
+    conditions = forms.ModelMultipleChoiceField(label=u'Eligibility Criteria', queryset=GroupCondition.objects.all(),
                                                 widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
 
     class Meta:

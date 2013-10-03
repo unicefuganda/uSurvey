@@ -31,7 +31,7 @@ class GroupConditionModalPage(PageObject):
     url = ''
 
     def validate_contents(self):
-        self.validate_fields_present(["Value", "Attribute", "Condition", "New Condition"])
+        self.validate_fields_present(["Value", "Attribute", "Eligibility Criteria", "New Eligibility Criteria"])
 
 
 class GroupDetailsPage(PageObject):

@@ -108,7 +108,7 @@ def then_i_should_see_that_the_group_was_saved_successfully(step):
 
 @step(u'When I click the add new condition')
 def when_i_click_the_add_new_condition(step):
-    world.page.click_link_by_text("Add condition ")
+    world.page.click_link_by_text("Add Eligibility Criteria ")
 
 
 @step(u'Then I should see the modal open')

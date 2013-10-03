@@ -124,7 +124,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertEquals("add_group_form", response.context['id'])
         self.assertEquals("/groups/new/", response.context['action'])
         self.assertIsInstance(response.context['condition_form'], GroupConditionForm)
-        self.assertEquals("New Condition", response.context['condition_title'])
+        self.assertEquals("New Eligibility Criteria", response.context['condition_title'])
 
     @patch('django.contrib.messages.success')
     def test_add_group_post(self, mock_success):
