@@ -49,16 +49,6 @@ class LogicFormTest(TestCase):
         self.assertEqual(1, len(logic_form.fields['attribute'].choices))
         self.assertIn(attribute_choice, logic_form.fields['attribute'].choices)
 
-    def test_label_of_condition_has_question_text(self):
-        field = 'condition'
-        batch = Batch.objects.create(order=1)
-        question_without_option = Question.objects.create(text="Question 1?",
-                                                          answer_type=Question.NUMBER, order=1)
-        question_without_option.batches.add(batch)
-
-        logic_form = LogicForm(question=question_without_option, batch=batch)
-        self.assertIn(question_without_option.text, logic_form.fields[field].label)
-
     def test_option_field_is_prepopulatad_with_question_options_if_selected_question_is_multi_choice(self):
         field = 'option'
         batch = Batch.objects.create(order=1)
@@ -93,14 +83,14 @@ class LogicFormTest(TestCase):
         choices_returned = LogicForm().choices_for_condition_field(is_multichoice=True)
 
         self.assertEqual(1,len(choices_returned))
-        self.assertIn(('EQUALS_OPTION', 'EQUALS_OPTION'), choices_returned)
+        self.assertIn(('EQUALS_OPTION', 'EQUALS OPTION'), choices_returned)
         self.assertNotIn(('EQUALS', 'EQUALS'), choices_returned)
 
     def test_choices_for_condition_field_does_not_know_equals_option_is_choice_if_not_multichoice(self):
         choices_returned = LogicForm().choices_for_condition_field(is_multichoice=False)
 
         self.assertEqual(5,len(choices_returned))
-        self.assertNotIn(('EQUALS_OPTION', 'EQUALS_OPTION'), choices_returned)
+        self.assertNotIn(('EQUALS_OPTION', 'EQUALS OPTION'), choices_returned)
 
     def test_condition_field_should_have_equals_option_if_multichoice_question(self):
         field = 'condition'
@@ -111,7 +101,7 @@ class LogicFormTest(TestCase):
         logic_form = LogicForm(question=question_with_option, batch=batch)
 
         self.assertEqual(1,len(logic_form.fields[field].choices))
-        self.assertIn(('EQUALS_OPTION', 'EQUALS_OPTION'), logic_form.fields[field].choices)
+        self.assertIn(('EQUALS_OPTION', 'EQUALS OPTION'), logic_form.fields[field].choices)
         self.assertNotIn(('EQUALS', 'EQUALS'), logic_form.fields[field].choices)
 
     def test_condition_field_should_not_have_equals_option_if_not_multichoice_question(self):
@@ -123,7 +113,7 @@ class LogicFormTest(TestCase):
         question_without_option.batches.add(batch)
         logic_form = LogicForm(question=question_without_option, batch=batch)
         self.assertEqual(5, len(logic_form.fields[field].choices))
-        self.assertNotIn(('EQUALS_OPTION', 'EQUALS_OPTION'), logic_form.fields[field].choices)
+        self.assertNotIn(('EQUALS_OPTION', 'EQUALS OPTION'), logic_form.fields[field].choices)
 
     def test_next_question_knows_all_sub_questions_if_data_sent_with_action_ask_subquestion(self):
         field = 'next_question'

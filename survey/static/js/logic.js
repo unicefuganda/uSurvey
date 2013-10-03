@@ -24,6 +24,7 @@ function show_or_hide_attribute_fields(attribute_value){
         value_field.attr('disabled', 'disabled');
     }
 }
+
 function show_or_hide_next_question(action_value) {
     show_next_question = ['SKIP_TO', 'ASK_SUBQUESTION'];
 
@@ -47,6 +48,7 @@ function append_to_next_question_dropdown(data) {
         counter++;
     });
 }
+
 function append_to_drop_down_options(url)
 {
     $.get( url, function( data ) {
@@ -137,7 +139,8 @@ jQuery(function($){
     $('#add_subquestion').hide();
 
     condition.on('change', function(){
-        clear_attribute_dropdown_and_append_right_option(condition.val())
+        clear_attribute_dropdown_and_append_right_option(condition.val());
+        show_or_hide_attribute_fields(attribute.val());
     });
 
     action_value.on('change', function(){

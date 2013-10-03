@@ -4,6 +4,9 @@
 {% block title %}
     Add Logic
 {% endblock %}
+{% block pre_form_content %}
+    <p>Question: {{ question }}</p>
+{% endblock %}
 
 {% block display_form_fields %}
     {% for field in logic_form.visible_fields %}

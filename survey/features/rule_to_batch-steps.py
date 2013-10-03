@@ -111,7 +111,7 @@ def and_i_should_see_if_field_is_not_disabled(step):
 
 @step(u'And I should also have all other conditions in the dropdown')
 def and_i_should_also_have_all_other_conditions_in_the_dropdown(step):
-    condition_options =['GREATER_THAN_QUESTION','GREATER_THAN_VALUE','LESS_THAN_QUESTION','LESS_THAN_VALUE','EQUALS']
+    condition_options =['> THAN QUESTION RESPONSE','> THAN VALUE','< THAN QUESTION RESPONSE','< THAN VALUE','EQUALS']
     world.page.see_select_option(condition_options, 'condition')
 
 @step(u'And I should see attribute field defaulted to value')
@@ -194,6 +194,7 @@ def when_i_fill_the_subquestion_details(step):
 @step(u'And I click save question button on the form')
 def and_i_click_save_question_button_on_the_form(step):
     world.browser.find_by_name("save_sub_question_button").first.click()
+    sleep(5)
 
 @step(u'Then I should see the recent subquestion in next question dropdown')
 def then_i_should_see_the_recent_subquestion_in_next_question_dropdown(step):
@@ -254,7 +255,8 @@ def and_i_should_see_question_in_the_attribute(step):
 
 @step(u'And I have a subquestion under this question')
 def and_i_have_a_subquestion_under_this_question(step):
-    world.sub_question = Question.objects.create(subquestion=True,parent=world.question, text="this is a subquestion")
+    world.sub_question = Question.objects.create(subquestion=True, parent=world.question,
+                                                 text="this is a subquestion")
 
 @step(u'When I fill the  duplicate subquestion details')
 def when_i_fill_the_duplicate_subquestion_details(step):

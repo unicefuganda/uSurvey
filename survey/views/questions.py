@@ -91,6 +91,7 @@ def new_subquestion(request, question_id):
     template_name = 'questions/new.html'
     if request.is_ajax():
         template_name= 'questions/_add_question.html'
+
     return response or render(request, template_name, context)
 
 

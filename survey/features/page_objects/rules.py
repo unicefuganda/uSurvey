@@ -9,6 +9,6 @@ class AddLogicToBatchQuestionPage(PageObject):
         self.url = '/batches/%s/questions/%s/add_logic/' % (batch.id, question.id)
 
     def validate_fields(self):
-        fields = ['If %s' % self.question.text, 'Attribute', 'Then']
+        fields = ['Question: %s' % self.question.text, 'Eligibility criteria', 'Attribute', 'Then']
 
         self.validate_fields_present(fields)

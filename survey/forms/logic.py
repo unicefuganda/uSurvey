@@ -13,13 +13,21 @@ class LogicForm(forms.Form):
             'ASK_SUBQUESTION': 'ASK SUBQUESTION',
         }
 
+        self.CONDITIONS = {
+                'EQUALS': 'EQUALS',
+                'EQUALS_OPTION': 'EQUALS OPTION',
+                'GREATER_THAN_QUESTION': '> THAN QUESTION RESPONSE',
+                'GREATER_THAN_VALUE': '> THAN VALUE',
+                'LESS_THAN_QUESTION': '< THAN QUESTION RESPONSE',
+                'LESS_THAN_VALUE': '< THAN VALUE',
+        }
+
         self.fields['action'].choices = ACTIONS.items()
         self.question = question
         self.batch = batch
         action_sent = data.get('action', None) if data else None
 
         if batch and question:
-            self.fields['condition'].label = "If %s" % question.text
             is_multichoice = question.is_multichoice()
             self.fields['condition'].choices = self.choices_for_condition_field(is_multichoice)
             question_choices = []
@@ -47,7 +55,7 @@ class LogicForm(forms.Form):
 
     def choices_for_condition_field(self, is_multichoice):
         condition_choices = {}
-        for key, value in AnswerRule.CONDITIONS.items():
+        for key, value in self.CONDITIONS.items():
             is_equals_option = (key == 'EQUALS_OPTION')
             if (is_equals_option and is_multichoice) or (not is_equals_option and not is_multichoice):
                 condition_choices[key] = value
@@ -71,7 +79,7 @@ class LogicForm(forms.Form):
         return self.cleaned_data
 
 
-    condition = forms.ChoiceField(label='If', choices=AnswerRule.CONDITIONS.items(), widget=forms.Select,
+    condition = forms.ChoiceField(label='Eligibility criteria', choices=AnswerRule.CONDITIONS.items(), widget=forms.Select,
                                   required=False)
     attribute = forms.ChoiceField(label='Attribute', choices=[], widget=forms.Select, required=False)
     option = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=True)
