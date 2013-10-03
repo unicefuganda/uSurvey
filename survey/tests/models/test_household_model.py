@@ -2,7 +2,7 @@ from django.template.defaultfilters import slugify
 from datetime import date, datetime, timedelta
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion
+from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion, NumericalAnswer
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -10,6 +10,24 @@ from django.utils.timezone import utc
 
 
 class HouseholdTest(TestCase):
+
+    def setUp(self):
+        self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=11)
+        self.condition = GroupCondition.objects.create(attribute="AGE", value=4, condition="GREATER_THAN")
+        self.condition.groups.add(self.member_group)
+        self.backend = Backend.objects.create(name='something backend')
+        self.kampala = Location.objects.create(name="Kampala")
+        self.investigator = Investigator.objects.create(name="", mobile_number="123456788",
+                                                  location=self.kampala,
+                                                  backend=self.backend)
+
+        self.household = Household.objects.create(investigator=self.investigator, uid=100)
+
+        self.household_member = HouseholdMember.objects.create(surname="Member",
+                                                               date_of_birth=date(1980, 2, 2), male=False, household=self.household)
+    def test_store(self):
+        household = Household.objects.create(investigator=self.investigator, uid=1)
+        self.failUnless(household.id)
 
     def test_fields(self):
         hHead = Household()
@@ -175,7 +193,7 @@ class HouseholdTest(TestCase):
 
     def test_household_knows_survey_can_be_retaken(self):
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
-        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        condition = GroupCondition.objects.create(attribute="AGE", value=3, condition="GREATER_THAN")
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
@@ -251,3 +269,60 @@ class HouseholdTest(TestCase):
                                                 created=ten_minutes_ago)
         self.assertTrue(household.can_retake_survey(batch, 5))
         self.assertTrue(household.can_retake_survey(batch_2, 5))
+
+    def test_last_answered(self):
+        self.batch = Batch.objects.create(order=1, name="Batch Name")
+        self.another_batch = Batch.objects.create(order=2, name="Batch Name 2")
+
+        self.batch.open_for_location(self.investigator.location)
+        batch_question_1 = Question.objects.create(order=1, text="Test question 1",
+                                                   answer_type=Question.NUMBER, group=self.member_group)
+        question_2 = Question.objects.create(order=2, text="Test question 2",
+                                answer_type=Question.NUMBER, group=self.member_group)
+        batch_question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+        self.investigator.member_answered(batch_question_1, self.household_member, 1, self.batch)
+        self.assertEqual(batch_question_1.text, self.household_member.last_question_answered().text)
+
+    def test_retake_latest_batch(self):
+        batch_1 = Batch.objects.create(order=1)
+        question_1 = Question.objects.create(text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1, group=self.member_group)
+        question_1.batches.add(batch_1)
+        batch_1.open_for_location(self.investigator.location)
+        self.investigator.member_answered(question_1, self.household_member, 1, batch_1)
+        batch_1.close_for_location(self.investigator.location)
+
+        batch_2 = Batch.objects.create(order=2)
+
+        question_2 = Question.objects.create(text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1, group=self.member_group)
+        question_2.batches.add(batch_2)
+        batch_2.open_for_location(self.investigator.location)
+        self.investigator.member_answered(question_2, self.household_member, 1, batch_2)
+
+        self.assertEquals(NumericalAnswer.objects.count(), 2)
+
+        self.household.retake_latest_batch()
+
+        self.assertEquals(NumericalAnswer.objects.count(), 1)
+
+    def test_has_pending_survey(self):
+        batch = Batch.objects.create(order=1)
+        batch.open_for_location(self.kampala)
+
+        question_1 = Question.objects.create(text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1, group=self.member_group)
+        question_2 = Question.objects.create(text="How many of them are male?",
+                                             answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        self.assertTrue(self.household.has_pending_survey())
+
+        self.investigator.member_answered(question_1, self.household_member, 1, batch)
+
+        self.assertTrue(self.household.has_pending_survey())
+
+        self.investigator.member_answered(question_2, self.household_member, 1, batch)
+
+        self.assertFalse(self.household.has_pending_survey())

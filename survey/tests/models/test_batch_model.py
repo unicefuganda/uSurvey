@@ -1,8 +1,8 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion
-from survey.models.batch import Batch
+from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion, Batch
+from survey.models.batch import Batch, BatchLocationStatus
 from survey.models.households import HouseholdMember
 from survey.models.surveys import Survey
 from django.db import IntegrityError
@@ -133,3 +133,92 @@ class BatchTest(TestCase):
 
         self.assertFalse(batch.has_unanswered_question(another_household_member))
         self.assertFalse(batch_2.has_unanswered_question(another_household_member))
+
+    def test_batch_knows_all_groups_it_has(self):
+        batch = Batch.objects.create(name="Batch name", description='description')
+        group_1 = HouseholdMemberGroup.objects.create(name="Group 1", order=0)
+        group_2 = HouseholdMemberGroup.objects.create(name="Group 2", order=1)
+        group_3 = HouseholdMemberGroup.objects.create(name="Group 3", order=2)
+
+        question_1 = Question.objects.create(group=group_1,
+                                             text="Question 1", answer_type=Question.NUMBER,
+                                             identifier="identifier", order=1)
+
+        question_2 = Question.objects.create(group=group_2,
+                                             text="Question 1", answer_type=Question.NUMBER,
+                                             identifier="identifier", order=1)
+
+        question_3 = Question.objects.create(group=group_3,
+                                             text="Question 1", answer_type=Question.NUMBER,
+                                             identifier="identifier", order=1)
+
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        question_3.batches.add(batch)
+
+        batch_groups = [group_1, group_2, group_3]
+        self.assertEqual(3, len(batch.get_groups()))
+        [self.assertIn(batch_group, batch.get_groups()) for batch_group in batch_groups]
+
+
+class BatchLocationStatusTest(TestCase):
+    def test_store(self):
+        batch_1 = Batch.objects.create(order=1)
+        kampala = Location.objects.create(name="Kampala")
+        batch_location_status = BatchLocationStatus.objects.create(batch=batch_1, location=kampala)
+        self.failUnless(batch_location_status.id)
+
+    def test_open_and_close_for_location(self):
+        batch_1 = Batch.objects.create(order=1)
+        batch_2 = Batch.objects.create(order=2)
+        kampala = Location.objects.create(name="Kampala")
+        abim = Location.objects.create(name="Abim")
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+                                                     backend=Backend.objects.create(name='something'))
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+                                                     backend=Backend.objects.create(name='something1'))
+
+        self.assertEqual(len(investigator_1.get_open_batch()), 0)
+        self.assertEqual(len(investigator_2.get_open_batch()), 0)
+
+        batch_1.open_for_location(kampala)
+        batch_2.open_for_location(abim)
+
+        self.assertEqual(investigator_1.get_open_batch(), [batch_1])
+        self.assertEqual(investigator_2.get_open_batch(), [batch_2])
+
+        batch_1.close_for_location(kampala)
+        batch_2.close_for_location(abim)
+
+        self.assertEqual(len(investigator_1.get_open_batch()), 0)
+        self.assertEqual(len(investigator_2.get_open_batch()), 0)
+
+
+class HouseholdBatchCompletionTest(TestCase):
+    def test_store(self):
+        batch = Batch.objects.create(order=1)
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        batch_completion = HouseholdBatchCompletion.objects.create(household=household, investigator=investigator,
+                                                                   batch=batch)
+        self.failUnless(batch_completion.id)
+
+    def test_completed(self):
+        batch = Batch.objects.create(order=1)
+        kampala = Location.objects.create(name="Kampala")
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+
+        self.assertFalse(household.has_completed_batch(batch))
+
+        household.batch_completed(batch)
+
+        self.assertTrue(household.has_completed_batch(batch))
+
+        household.batch_reopen(batch)
+
+        self.assertFalse(household.has_completed_batch(batch))
