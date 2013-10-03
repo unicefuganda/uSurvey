@@ -168,7 +168,7 @@ def and_i_have_member_group_with_conditions(step):
 
 @step(u'And I click view conditions link')
 def and_i_click_view_conditions_link(step):
-    world.page.click_link_by_text(" Conditions")
+    world.page.click_link_by_text(" Criteria")
 
 
 @step(u'Then I should see a list of conditions')
