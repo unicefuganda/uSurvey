@@ -5,7 +5,7 @@ from rapidsms.contrib.locations.models import *
 from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage
 from survey.features.page_objects.question import BatchQuestionsListPage
 from survey.investigator_configs import *
-from survey.models import HouseholdMemberGroup
+from survey.models import HouseholdMemberGroup, Survey
 from survey.models.question import Question
 from survey.models.batch import Batch, BatchLocationStatus
 
@@ -240,3 +240,18 @@ def when_i_fill_the_same_name_of_the_batch(step):
 @step(u'Then I should see batch name already exists error message')
 def then_i_should_see_batch_name_already_exists_error_message(step):
     world.page.is_text_present("Batch with the same name already exists.")
+
+@step(u'And If I have an open batch in another survey in this location')
+def and_if_i_have_an_open_batch_in_another_survey_in_this_location(step):
+    world.survey1 = Survey.objects.create(name='another survey', description= 'another survey descrpition', type=False, sample_size=10)
+    batch = Batch.objects.create(order = 1, name = "Batch B", description='description', survey=world.survey1)
+    batch.open_for_location(world.districts[1])
+
+@step(u'Then I should see an error that another batch from another survey is already open')
+def then_i_should_see_an_error_that_another_batch_from_another_survey_is_already_open(step):
+    open_batch_error_message = "%s has already open batches from survey %s" %(world.districts[1].name, world.survey1.name)
+    world.page.is_text_present(open_batch_error_message)
+
+@step(u'And I should not be able to open this batch')
+def and_i_should_not_be_able_to_open_this_batch(step):
+    world.page.is_disabled("open_close_switch_%s" %world.districts[1].id)

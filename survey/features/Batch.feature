@@ -12,6 +12,10 @@ Feature: Batch related features
     Then I should see it is open for that location in db
     When I close batch for a location
     Then I should see it is closed for that location in db
+    And If I have an open batch in another survey in this location
+    When I open batch for a location
+    Then I should see an error that another batch from another survey is already open
+    And I should not be able to open this batch
 
   Scenario: Add new Batch
     Given I am logged in as researcher

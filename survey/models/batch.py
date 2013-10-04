@@ -20,6 +20,9 @@ class Batch(BaseModel):
         app_label = 'survey'
         unique_together = ('survey', 'name',)
 
+    def other_surveys_with_open_batches_in(self, location):
+        batch_ids = location.open_batches.all().exclude(batch__survey=self.survey).values_list('batch',flat=True)
+        return Survey.objects.filter(batch__id__in = batch_ids)
 
     @classmethod
     def currently_open_for(self, location):

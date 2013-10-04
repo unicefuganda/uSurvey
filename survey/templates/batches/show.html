@@ -34,7 +34,7 @@
               <input type="text" name="location_id" value="{{ location.pk }}">
             </form>
             <div class="switch" data-on="success" data-off="danger" data-on-label="Open" data-off-label="Close">
-              <input type="checkbox" {{ open_locations|is_batch_open_for_location:location }} />
+              <input type="checkbox" id="open_close_switch_{{ location.id }}" {{ open_locations|is_batch_open_for_location:location }} />
             </div>
           </td>
         </tr>

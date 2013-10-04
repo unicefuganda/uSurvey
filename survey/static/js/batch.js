@@ -20,19 +20,24 @@ function set_display(text, set){
 
 
 jQuery(function($){
-    if ($('#assign_question_group').val()){
+  if ($('#assign_question_group').val()){
         load_questions_for_batch_and_group();
     }
-
   $('.switch').on('switch-change', function(e, data){
+    var current_switch = $(this);
+    current_switch.parent().find('.error').remove();
     var $el = $(data.el), form;
     if (data.value) {
       form = $el.parents('tr').find('form.open-for-location-form');
     }else{
       form = $el.parents('tr').find('form.close-for-location-form');
     }
-    $.post(form.attr('action'), form.serializeArray(), function(){
-      // do nothing
+    $.post(form.attr('action'), form.serializeArray(), function(data){
+        if(data !=''){
+            current_switch.bootstrapSwitch('toggleState');
+            current_switch.bootstrapSwitch('setActive', false);
+            current_switch.after('<span><label class="error">' + data + '</label></span>');
+        }
     });
   });
 

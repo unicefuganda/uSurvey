@@ -68,6 +68,24 @@ class BatchViews(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
             self.assertTrue(self.batch.is_open_for(loc))
+        json_response = json.loads(response.content)
+        self.assertEqual('', json_response)
+
+
+    def test_should_not_allow_open_batch_for_location_if_already_open_for_another_survey(self):
+        another_survey = Survey.objects.create(name='survey name 2', description= 'survey descrpition 2', type=False, sample_size=10)
+        another_batch = Batch.objects.create(order = 1, name = "Batch A",survey=another_survey)
+        another_batch.open_for_location(self.kampala)
+
+        self.assertTrue(another_batch.is_open_for(self.kampala))
+        self.assertFalse(self.batch.is_open_for(self.kampala))
+        response = self.client.post('/batches/' + str(self.batch.pk) + "/open_to", data={'location_id': self.kampala.pk})
+        self.failUnlessEqual(response.status_code, 200)
+        for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
+            self.assertFalse(self.batch.is_open_for(loc))
+        open_batch_error_message = "%s has already open batches from survey %s" %(self.kampala.name, another_survey.name)
+        json_response = json.loads(response.content)
+        self.assertEqual(open_batch_error_message, json_response)
 
     def test_close_batch_for_location(self):
         for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
@@ -77,6 +95,9 @@ class BatchViews(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
             self.assertFalse(self.batch.is_open_for(loc))
+        json_response = json.loads(response.content)
+        self.assertEqual('', json_response)
+
 
 
     def test_restricted_permssion(self):

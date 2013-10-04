@@ -7,7 +7,7 @@ from django.contrib import messages
 from survey.investigator_configs import *
 from survey.models import HouseholdMemberGroup
 from survey.models.surveys import Survey
-from survey.models.batch import Batch
+from survey.models.batch import Batch, BatchLocationStatus
 
 from survey.forms.batch import BatchForm, BatchQuestionsForm
 import json
@@ -40,10 +40,17 @@ def show(request, survey_id, batch_id):
 @permission_required('auth.can_view_batches')
 def open(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
-    locations = Location.objects.get(id=request.POST['location_id']).get_descendants(include_self=True)
-    for location in locations:
-        batch.open_for_location(location)
-    return HttpResponse()
+    location = Location.objects.get(id=request.POST['location_id'])
+    other_surveys = batch.other_surveys_with_open_batches_in(location)
+
+    if other_surveys.count() > 0:
+        message = "%s has already open batches from survey %s" %(location.name, other_surveys[0].name)
+        return HttpResponse(json.dumps(message), content_type="application/json")
+    else:
+        locations = location.get_descendants(include_self=True)
+        for location in locations:
+            batch.open_for_location(location)
+        return HttpResponse(json.dumps(""), content_type="application/json")
 
 
 @login_required
@@ -52,7 +59,7 @@ def close(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     location = Location.objects.get(id=request.POST['location_id'])
     batch.close_for_location(location)
-    return HttpResponse()
+    return HttpResponse(json.dumps(""), content_type="application/json")
 
 
 @login_required

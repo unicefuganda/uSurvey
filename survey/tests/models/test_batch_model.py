@@ -160,6 +160,18 @@ class BatchTest(TestCase):
         self.assertEqual(3, len(batch.get_groups()))
         [self.assertIn(batch_group, batch.get_groups()) for batch_group in batch_groups]
 
+    def test_knows_open_batches_from_other_surveys_given_location(self):
+        survey = Survey.objects.create(name='survey name', description= 'survey descrpition', type=False, sample_size=10)
+        another_survey = Survey.objects.create(name='survey name 2', description= 'survey descrpition 2', type=False, sample_size=10)
+        batch = Batch.objects.create(name="Batch name", description='description', survey=survey)
+        another_batch = Batch.objects.create(name="Batch name", description='description', survey=another_survey)
+
+        kampala = Location.objects.create(name="Kampala")
+        another_batch.open_for_location(kampala)
+
+        self.assertEqual(1, batch.other_surveys_with_open_batches_in(kampala).count())
+        self.assertIn(another_survey, batch.other_surveys_with_open_batches_in(kampala))
+
 
 class BatchLocationStatusTest(TestCase):
     def test_store(self):
