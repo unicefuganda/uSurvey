@@ -770,11 +770,14 @@ class QuestionJsonDataDumpTest(BaseTest):
 
         self.question_2 = Question.objects.create(text="Question 2?",
                                                   answer_type=Question.NUMBER, order=2)
+        self.question_3 = Question.objects.create(text="Question 3?",
+                                                  answer_type=Question.NUMBER, order=3)
 
         self.question.batches.add(self.batch)
         self.sub_question_1.batches.add(self.batch)
         self.sub_question_2.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
+        self.question_3.batches.add(self.batch)
 
     def test_returns_data_dump_of_questions_in_batch_excluding_the_current_selected_question(self):
         response = self.client.get('/batches/%s/questions/%s/questions_json/' % (self.batch.pk, self.question.pk),
@@ -787,6 +790,21 @@ class QuestionJsonDataDumpTest(BaseTest):
         self.assertNotIn(dict(id=str(self.question.id), text=self.question.text), json_response)
         self.assertNotIn(dict(id=str(self.sub_question_1.id), text=self.sub_question_1.text), json_response)
         self.assertNotIn(dict(id=str(self.sub_question_2.id), text=self.sub_question_2.text), json_response)
+
+
+    def test_returns_data_dump_of_questions_in_batch_greater_than_order_of_the_current_selected_question(self):
+        response = self.client.get('/batches/%s/questions/%s/questions_json/' % (self.batch.pk, self.question_2.pk),
+                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.failUnlessEqual(response.status_code, 200)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response)
+        self.assertNotIn(dict(id=str(self.question_2.id), text=self.question_2.text), json_response)
+        self.assertNotIn(dict(id=str(self.question.id), text=self.question.text), json_response)
+        self.assertNotIn(dict(id=str(self.sub_question_1.id), text=self.sub_question_1.text), json_response)
+        self.assertNotIn(dict(id=str(self.sub_question_2.id), text=self.sub_question_2.text), json_response)
+        self.assertNotIn(dict(id=str(self.question_2.id), text=self.question_2.text), json_response)
+        self.assertIn(dict(id=str(self.question_3.id), text=self.question_3.text), json_response)
 
 
     def test_returns_data_dump_of_sub_questions_infor_selected_question(self):

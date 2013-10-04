@@ -68,6 +68,7 @@ function replace_next_question_with_right_data(questions_url) {
 function append_attribute_option(key, value) {
     $('#id_attribute').append("<option value=" + key + ">" + value + "</option>");
 }
+
 function clear_attribute_dropdown_and_append_right_option(condition_selected){
     var value_fields = ['GREATER_THAN_VALUE', 'LESS_THAN_VALUE'];
     var question_fields = ['GREATER_THAN_QUESTION', 'LESS_THAN_QUESTION'];
@@ -101,11 +102,12 @@ function fill_questions_or_subquestions_in_next_question_field(action_value){
     var show_sub_questions = ['ASK_SUBQUESTION'];
 
     var question_id = $('#id_question').val();
+    var batch_id = $('#id_batch').val()
     var questions_url = "";
 
     if(show_questions.indexOf(action_value) != -1)
     {
-        questions_url = '/questions/' + question_id +'/questions_json/'
+        questions_url = '/batches/'+ batch_id+'/questions/' + question_id +'/questions_json/'
         $('#add_subquestion').hide();
     }
     else if (show_sub_questions.indexOf(action_value) != -1)

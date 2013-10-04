@@ -203,7 +203,9 @@ def _create_question_hash_response(questions):
 
 def get_questions_for_batch(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
-    return _create_question_hash_response(batch.questions.filter(subquestion=False).exclude(id=question_id))
+    question = Question.objects.get(id=question_id)
+    questions = batch.questions.filter(subquestion=False, order__gt=question.order)
+    return _create_question_hash_response(questions)
 
 
 def get_sub_questions_for_question(request, question_id):

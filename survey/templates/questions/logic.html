@@ -26,6 +26,7 @@
     </div>
 
     <input type="hidden" value='{{ question.id }}' id='id_question' >
+    <input type="hidden" value='{{ batch_id }}' id='id_batch' >
     {% for hidden in a_form.hidden_fields %}
         {{ hidden }}
     {% endfor %}
