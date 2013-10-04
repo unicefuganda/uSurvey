@@ -1,4 +1,3 @@
-from django.core.urlresolvers import reverse
 from survey.features.page_objects.base import PageObject
 
 
@@ -22,7 +21,7 @@ class AddConditionPage(PageObject):
 
 class AddGroupPage(PageObject):
     url = '/groups/new/'
-    
+
     def validate_latest_condition(self, condition):
         self.browser.find_by_value("%s > %s > %s" % (condition.attribute, condition.condition, condition.value))
 
@@ -39,18 +38,17 @@ class GroupDetailsPage(PageObject):
         super(GroupDetailsPage, self).__init__(browser)
         self.group = group
         self.url = '/groups/%s/' % group.id
-    
+
     def validate_fields(self):
-        self.validate_fields_present(["Group %s Condition List"%self.group.name, "Condition", "Attribute", "Value"])
-    
+        self.validate_fields_present(["Group %s Condition List" % self.group.name, "Condition", "Attribute", "Value"])
 
 
 class AddNewConditionToGroupPage(PageObject):
-
     def __init__(self, browser, group):
         super(AddNewConditionToGroupPage, self).__init__(browser)
         self.group = group
         self.url = '/groups/%d/conditions/new/' % group.id
+
 
 class DeleteHouseholdMemberGroup(PageObject):
     def __init__(self, browser, group):

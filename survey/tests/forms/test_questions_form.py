@@ -111,3 +111,36 @@ class QuestionFormTest(TestCase):
        self.assertFalse(question_form.is_valid())
        message= "Sub question for this question with this text already exists."
        self.assertIn(message, question_form.errors.values()[0])
+
+    def test_form_has_parent_groups_only_if_parent_question_is_supplied(self):
+        question = Question.objects.create(text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1,group=self.household_member_group)
+
+        another_member_group = HouseholdMemberGroup.objects.create(name='Age 6-7', order=2)
+
+        question_form = QuestionForm(parent_question=question)
+
+        self.assertIn((self.household_member_group.id, self.household_member_group.name), question_form.fields['group'].choices)
+        self.assertNotIn((another_member_group.id, another_member_group.name), question_form.fields['group'].choices)
+
+    def test_form_has_no_groups_only_if_parent_question_has_no_group_and_is_supplied(self):
+        question = Question.objects.create(text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1)
+
+        another_member_group = HouseholdMemberGroup.objects.create(name='Age 6-7', order=2)
+
+        question_form = QuestionForm(parent_question=question)
+
+        self.assertNotIn((self.household_member_group.id, self.household_member_group.name), question_form.fields['group'].choices)
+        self.assertNotIn((another_member_group.id, another_member_group.name), question_form.fields['group'].choices)
+
+    def test_form_has_all_groups_only_if_no_parent_question_is_supplied(self):
+        question = Question.objects.create(text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1,group=self.household_member_group)
+
+        another_member_group = HouseholdMemberGroup.objects.create(name='Age 6-7', order=2)
+
+        question_form = QuestionForm()
+
+        self.assertIn((self.household_member_group.id, self.household_member_group.name), question_form.fields['group'].choices)
+        self.assertIn((another_member_group.id, another_member_group.name), question_form.fields['group'].choices)

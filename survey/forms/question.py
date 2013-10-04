@@ -13,7 +13,16 @@ class QuestionForm(ModelForm):
     def __init__(self,data=None, initial=None, parent_question=None ,instance=None):
         super(QuestionForm, self).__init__(data=data,initial=initial,instance=instance)
         self.fields['answer_type'].choices = list(Question.TYPE_OF_ANSWERS)
-        self.fields['group'].choices = [(group.id, group.name) for group in HouseholdMemberGroup.objects.all()]
+
+        groups = []
+
+        if parent_question and parent_question.group:
+            groups = [parent_question.group]
+
+        if not parent_question:
+            groups = HouseholdMemberGroup.objects.all()
+
+        self.fields['group'].choices = [(group.id, group.name) for group in groups]
         self.parent_question = parent_question
 
     class Meta:

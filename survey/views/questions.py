@@ -127,7 +127,7 @@ def add_logic(request, batch_id, question_id):
 
         messages.error(request, 'Rule already exist.')
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
-               'questionform': QuestionForm(), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
+               'questionform': QuestionForm(parent_question=question), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
                'class': 'question-form', 'batch_id': batch_id}
     return render(request, "questions/logic.html", context)
 
