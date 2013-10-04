@@ -59,14 +59,14 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.batch = Batch.objects.create(name="Batch A", order=1)
         self.batch_b = Batch.objects.create(name="Batch B", order=2)
         self.batch.open_for_location(self.investigator.location)
-        self.question_1 = Question.objects.create(text="How many members are there in this household?",
+        self.question_1 = Question.objects.create(text="Question 1",
                                                   answer_type=Question.NUMBER, order=0, group=self.head_group)
 
-        self.question_2 = Question.objects.create(text="How many of them are male?",
+        self.question_2 = Question.objects.create(text="Question 2",
                                                   answer_type=Question.NUMBER, order=1, group=self.head_group)
-        self.question_1_b = Question.objects.create(text="How many members are there in this household? Batch B",
+        self.question_1_b = Question.objects.create(text="Question 1b ",
                                                 answer_type=Question.NUMBER, order=2, group=self.head_group)
-        self.question_3 = Question.objects.create(text="Question for member group?",
+        self.question_3 = Question.objects.create(text="Question 3",
                                                   answer_type=Question.NUMBER, order=0, group=self.member_group)
 
         self.question_1.batches.add(self.batch)
@@ -74,18 +74,6 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.question_3.batches.add(self.batch)
 
         self.question_1_b.batches.add(self.batch_b)
-
-    def select_household(self, household=1):
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = "00"
-        response = self.client.post('/ussd', data=self.ussd_params)
-        self.ussd_params['ussdRequestString'] = str(household)
-        return self.client.post('/ussd', data=self.ussd_params)
-
-    def select_household_member(self, member_id="1"):
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = member_id
-        return self.client.post('/ussd', data=self.ussd_params)
 
     def create_household_member(self, member_name, household):
         return HouseholdMember.objects.create(surname="member %s" % member_name, date_of_birth=datetime.date(2012, 2, 2), male=True,
@@ -433,10 +421,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
     def test_allows_retaking_of_house_hold_member_with_in_5min_session(self):
         self.batch.open_for_location(self.investigator.location)
         self.investigator.member_answered(self.question_1, self.household_head_1, 1, self.batch)
-
-        self.reset_session()
         self.take_survey()
         response = self.select_household()
+
         households_member_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
         response_string = "responseString=%s&action=request" % households_member_list
         self.assertEquals(urllib2.unquote(response.content), response_string)

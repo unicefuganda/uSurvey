@@ -28,6 +28,7 @@ class USSDBaseTest(TestCase):
         return self.respond("2")
 
     def select_household(self, household_id="1"):
+        self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = household_id
         return self.client.post('/ussd', data=self.ussd_params)
 

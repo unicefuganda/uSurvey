@@ -141,7 +141,6 @@ class USSD(USSDBase):
 
     def process_investigator_response(self, batch):
         answer = self.request['ussdRequestString'].strip()
-
         if not answer:
             return self.investigator.invalid_answer(self.question)
         if self.is_pagination(self.question, answer):
