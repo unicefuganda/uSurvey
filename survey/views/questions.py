@@ -219,6 +219,7 @@ def delete_logic(request, batch_id, answer_rule_id):
     rule.delete()
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
+
 @permission_required('auth.can_view_batches')
 def remove(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
