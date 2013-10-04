@@ -137,6 +137,7 @@ class Answer(BaseModel):
     question = models.ForeignKey(Question, null=True)
     batch = models.ForeignKey("Batch", null=True)
     rule_applied = models.ForeignKey("AnswerRule", null=True)
+    is_old = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'survey'

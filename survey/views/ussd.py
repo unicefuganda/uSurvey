@@ -11,8 +11,10 @@ from survey.ussd import *
 @csrf_exempt
 def ussd(request):
     params = request.POST if request.method == 'POST' else request.GET
-
-    mobile_number = params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+    mobile_number = ""
+    msisdn = params.get('msisdn', None)
+    if msisdn:
+        mobile_number = msisdn.replace(COUNTRY_PHONE_CODE, '')
     try:
         investigator = Investigator.objects.get(mobile_number=mobile_number)
         response = USSD(investigator, params).response()

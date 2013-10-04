@@ -1,22 +1,39 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
-from survey.models.question import NumericalAnswer, MultiChoiceAnswer, TextAnswer
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        #answer_classes = ['NumericalAnswer', 'TextAnswer', 'MultiChoiceAnswer']
-        #for answer_class in answer_classes:
-        #    for answer in eval(answer_class).objects.filter():
-        #        answer.batch = answer.question.batch
-        #        answer.save()
-        pass
+        # Adding field 'TextAnswer.is_old'
+        db.add_column(u'survey_textanswer', 'is_old',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'MultiChoiceAnswer.is_old'
+        db.add_column(u'survey_multichoiceanswer', 'is_old',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'NumericalAnswer.is_old'
+        db.add_column(u'survey_numericalanswer', 'is_old',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
 
     def backwards(self, orm):
-        pass
+        # Deleting field 'TextAnswer.is_old'
+        db.delete_column(u'survey_textanswer', 'is_old')
+
+        # Deleting field 'MultiChoiceAnswer.is_old'
+        db.delete_column(u'survey_multichoiceanswer', 'is_old')
+
+        # Deleting field 'NumericalAnswer.is_old'
+        db.delete_column(u'survey_numericalanswer', 'is_old')
+
 
     models = {
         u'auth.group': {
@@ -83,13 +100,14 @@ class Migration(DataMigration):
         'survey.answerrule': {
             'Meta': {'object_name': 'AnswerRule'},
             'action': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'batch': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'batch_rule'", 'null': 'True', 'to': "orm['survey.Batch']"}),
             'condition': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'next_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parent_question_rules'", 'null': 'True', 'to': "orm['survey.Question']"}),
-            'question': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'rule'", 'unique': 'True', 'null': 'True', 'to': "orm['survey.Question']"}),
-            'validate_with_option': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.QuestionOption']", 'null': 'True'}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'rule'", 'null': 'True', 'to': "orm['survey.Question']"}),
+            'validate_with_option': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'answer_rule'", 'null': 'True', 'to': "orm['survey.QuestionOption']"}),
             'validate_with_question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'}),
             'validate_with_value': ('django.db.models.fields.PositiveIntegerField', [], {'max_length': '2', 'null': 'True'})
         },
@@ -127,7 +145,7 @@ class Migration(DataMigration):
             'numerator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'as_numerator'", 'to': "orm['survey.Question']"})
         },
         'survey.groupcondition': {
-            'Meta': {'object_name': 'GroupCondition'},
+            'Meta': {'unique_together': "(('value', 'attribute', 'condition'),)", 'object_name': 'GroupCondition'},
             'attribute': ('django.db.models.fields.CharField', [], {'default': "'AGE'", 'max_length': '20'}),
             'condition': ('django.db.models.fields.CharField', [], {'default': "'EQUALS'", 'max_length': '20'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -211,6 +229,7 @@ class Migration(DataMigration):
             'householdmember': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'multichoiceanswer'", 'null': 'True', 'to': "orm['survey.HouseholdMember']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'multichoiceanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
+            'is_old': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'}),
             'rule_applied': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.AnswerRule']", 'null': 'True'})
@@ -224,6 +243,7 @@ class Migration(DataMigration):
             'householdmember': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'numericalanswer'", 'null': 'True', 'to': "orm['survey.HouseholdMember']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'numericalanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
+            'is_old': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'}),
             'rule_applied': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.AnswerRule']", 'null': 'True'})
@@ -231,7 +251,7 @@ class Migration(DataMigration):
         'survey.question': {
             'Meta': {'object_name': 'Question'},
             'answer_type': ('django.db.models.fields.CharField', [], {'max_length': '15'}),
-            'batch': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'questions'", 'null': 'True', 'to': "orm['survey.Batch']"}),
+            'batches': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'questions'", 'null': 'True', 'to': "orm['survey.Batch']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'question_group'", 'null': 'True', 'to': "orm['survey.HouseholdMemberGroup']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -279,6 +299,7 @@ class Migration(DataMigration):
             'householdmember': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'textanswer'", 'null': 'True', 'to': "orm['survey.HouseholdMember']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'textanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
+            'is_old': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'}),
             'rule_applied': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.AnswerRule']", 'null': 'True'})
@@ -294,4 +315,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['survey']
-    symmetrical = True

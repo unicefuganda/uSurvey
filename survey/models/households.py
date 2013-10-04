@@ -209,6 +209,7 @@ class HouseholdMember(BaseModel):
 
     def get_next_batch(self):
         open_ordered_batches = Batch.open_ordered_batches(self.get_location())
+
         for batch in open_ordered_batches:
             if batch.has_unanswered_question(self) and not self.completed_member_batches.filter(batch=batch):
                 return batch
@@ -225,13 +226,13 @@ class HouseholdMember(BaseModel):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
             answer = getattr(self, related_name).all()
-            if answer: answered.append(answer.latest())
+            if answer and answer.filter(is_old=False): answered.append(answer.latest())
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
     def has_answered(self, question, batch):
         answer_class = question.answer_class()
-        return len(answer_class.objects.filter(question=question, householdmember=self, batch=batch)) > 0
+        return len(answer_class.objects.filter(question=question, householdmember=self, batch=batch, is_old=False)) > 0
 
     def next_unanswered_question_in(self, member_group, batch, order):
         all_questions = member_group.all_questions().filter(batches=batch, order__gte=order).order_by('order')
@@ -242,7 +243,7 @@ class HouseholdMember(BaseModel):
 
     def next_question(self, question, batch):
         member = self if not self.is_head() else self.get_member()
-        answer = question.answer_class().objects.get(householdmember=member, question=question, batch=batch)
+        answer = question.answer_class().objects.get(householdmember=member, question=question, batch=batch, is_old=False)
         try:
             return question.get_next_question_by_rule(answer, self.household.investigator)
         except ObjectDoesNotExist, e:
@@ -321,6 +322,15 @@ class HouseholdMember(BaseModel):
             if not self.has_answered(question, batch):
                 return False
         return True
+
+    def mark_past_answers_as_old(self):
+        self.completed_member_batches.all().delete()
+
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+            answers = getattr(self, related_name).all()
+            for answer in answers:
+                answer.is_old = True
+                answer.save()
 
     class Meta:
         app_label = 'survey'

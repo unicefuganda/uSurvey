@@ -74,8 +74,10 @@ class USSD(USSDBase):
 
     def set_household_member(self):
         household_member = self.get_from_session('HOUSEHOLD_MEMBER')
+
         if household_member:
             self.household_member = household_member
+
 
     def set_current_member_is_done(self):
         if self.household_member:
@@ -149,6 +151,10 @@ class USSD(USSDBase):
         answer = self.request['ussdRequestString'].strip()
         if answer == self.ANSWER['YES']:
             self.set_in_session('HOUSEHOLD_MEMBER', None)
+            if self.household.completed_currently_open_batches():
+                for member in self.household.household_member.all():
+                    member.mark_past_answers_as_old()
+
             self.render_household_members_list()
         if answer == self.ANSWER['NO']:
             self.set_in_session('HOUSEHOLD', None)
@@ -156,10 +162,12 @@ class USSD(USSDBase):
             self.household = None
             self.render_households_list(answer)
 
+
         self.action = self.ACTIONS['REQUEST']
 
     def end_interview(self, batch):
         self.action = self.ACTIONS['END']
+
         if self.investigator.completed_open_surveys():
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
             self.investigator.clear_interview_caches()
@@ -190,7 +198,9 @@ class USSD(USSDBase):
 
     def render_survey(self):
         household_member = self.household_member
+
         current_batch = household_member.get_next_batch()
+
         if current_batch:
             self.question = household_member.next_question_in_order(current_batch)
             if not self.is_new_request():

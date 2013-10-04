@@ -7,6 +7,7 @@ from survey.models.households import HouseholdMember
 
 
 class AnswerRuleTest(TestCase):
+
     def setUp(self):
         self.location = Location.objects.create(name="Kampala")
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",

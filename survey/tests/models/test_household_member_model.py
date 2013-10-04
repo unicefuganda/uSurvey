@@ -533,6 +533,12 @@ class HouseholdMemberTest(TestCase):
         NumericalAnswer.objects.create(investigator=investigator, question=question_2, householdmember=household_member,
                                        answer=1, household=household_member.household, batch=self.batch)
         self.assertTrue(household_member.has_completed(self.batch))
+        household_member.batch_completed(self.batch)
+        self.assertEqual(1, len(household_member.completed_member_batches.all()))
+
+        household_member.mark_past_answers_as_old()
+        self.assertFalse(household_member.has_completed(self.batch))
+        self.assertEqual(0, len(household_member.completed_member_batches.all()))
 
     def test_knows_how_to_get_next_unanswered_question(self):
         country = LocationType.objects.create(name="Country", slug="country")
@@ -608,6 +614,11 @@ class HouseholdMemberTest(TestCase):
         investigator.member_answered(question=question_1, household_member=household_member, answer=1, batch=batch)
         self.assertEqual(question_2, household_member.next_unanswered_question_in(member_group, batch, 1))
         self.assertNotEqual(question_2, household_member.next_unanswered_question_in(member_group, batch, 2))
+        self.assertEqual(question_3, household_member.next_unanswered_question_in(member_group, batch, 2))
+
+        household_member.mark_past_answers_as_old()
+        self.assertEqual(question_1, household_member.next_unanswered_question_in(member_group, batch, 0))
+        self.assertEqual(question_2, household_member.next_unanswered_question_in(member_group, batch, 1))
         self.assertEqual(question_3, household_member.next_unanswered_question_in(member_group, batch, 2))
 
 
@@ -793,7 +804,6 @@ class HouseholdMemberTest(TestCase):
 
         self.assertTrue(household_member.attribute_matches(age_condition))
 
-
     def test_member_knows_its_location(self):
         uganda = Location.objects.create(name="Uganda")
         investigator = Investigator.objects.create(name="inv1", location=uganda,
@@ -804,3 +814,30 @@ class HouseholdMemberTest(TestCase):
                                                           male=False,
                                                           household=household)
         self.assertEqual(uganda, household_member.location())
+
+    def test_knows_to_mark_answers_as_old(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
+                                                          male=False,
+                                                  household=household)
+
+        batch = Batch.objects.create(name="Batch 1", order=1)
+        group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
+        group_condition = GroupCondition.objects.create(attribute="GENDER", condition="EQUALS", value=True)
+        group_condition.groups.add(group)
+
+        question_1 = Question.objects.create(group=group, text="This is another question", answer_type="number",
+                                             order=1)
+        question_1.batches.add(batch)
+        batch.open_for_location(investigator.location)
+        investigator.member_answered(question_1, household_member, 1, batch)
+
+        self.assertFalse(NumericalAnswer.objects.filter(question=question_1)[0].is_old)
+
+        household_member.mark_past_answers_as_old()
+        self.assertTrue(NumericalAnswer.objects.filter(question=question_1)[0].is_old)
