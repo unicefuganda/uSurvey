@@ -127,6 +127,10 @@ function isHTML(str) {
     return false;
 }
 
+function clear_all_errors(){
+    $('#id_value').next().text('');
+}
+
 jQuery(function($){
     var condition = $('#id_condition');
     var condition_value = 'EQUALS_OPTION';
@@ -151,6 +155,7 @@ jQuery(function($){
     });
 
     attribute.on('change', function(){
+        clear_all_errors();
         show_or_hide_attribute_fields(attribute.val());
     });
 

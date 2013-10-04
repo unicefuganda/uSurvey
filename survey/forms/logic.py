@@ -61,8 +61,14 @@ class LogicForm(forms.Form):
                 condition_choices[key] = value
         return condition_choices.items()
 
+    def clean_value(self):
+        if self.cleaned_data['attribute'] == 'value' and len(self.cleaned_data['value'].strip()) == 0:
+            raise ValidationError("Field is required.")
+        return self.cleaned_data['value']
+
     def clean(self):
         rule = []
+
         if self.question.is_multichoice():
             rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_option=self.data['option'])
             field_name = 'option'

@@ -19,6 +19,21 @@ class LogicFormTest(TestCase):
         logic_form = LogicForm(question=question_with_option, batch=batch)
         [self.assertNotIn(field, logic_form.fields) for field in fields]
 
+    def test_form_has_validation_error_if_value_attribute_is_selected_and_value_field_is_empty(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['EQUALS'],
+                    attribute = 'value',
+                    value="")
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Field is required.', logic_form.errors['value'])
+
     def test_does_not_have_option_if_question_does_not_have_options(self):
         field = 'option'
         batch = Batch.objects.create(order=1)

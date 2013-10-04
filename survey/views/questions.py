@@ -103,13 +103,17 @@ def _get_post_values(post_data):
     option_key = post_data.get('option', None)
     question_key = post_data.get('validate_with_question', None)
     condition_response = post_data.get('condition', None)
+    value_key = post_data.get('value', None)
+
     save_data = {'action': post_data['action'],
                  'condition': condition_response if condition_response else 'EQUALS_OPTION',
                  'next_question': Question.objects.get(id=next_question_key) if next_question_key else None,
-                 'validate_with_value': post_data.get('value', None),
                  'validate_with_option': QuestionOption.objects.get(id=option_key) if option_key else None,
                  'validate_with_question': Question.objects.get(id=question_key) if question_key else None
     }
+    if value_key:
+        save_data['validate_with_value'] = value_key
+
     return save_data
 
 
@@ -125,10 +129,10 @@ def add_logic(request, batch_id, question_id):
             messages.success(request, 'Logic successfully added.')
             return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
-        messages.error(request, 'Rule already exist.')
+        messages.error(request, 'Rule not valid.')
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'questionform': QuestionForm(parent_question=question), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
-               'class': 'question-form', 'batch_id': batch_id}
+               'class': 'question-form', 'batch_id': batch_id, 'cancel_url': '/batches/%s/questions/' % batch_id}
     return render(request, "questions/logic.html", context)
 
 

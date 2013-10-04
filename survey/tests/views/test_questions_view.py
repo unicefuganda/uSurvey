@@ -628,6 +628,7 @@ class LogicViewTest(BaseTest):
         self.assertIsInstance(response.context['logic_form'], LogicForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['batch_id'], str(self.batch.id))
+        self.assertEqual(response.context['cancel_url'], '/batches/%s/questions/' % self.batch.pk)
         self.assertEqual(200, response.status_code)
 
     def test_views_add_logic_get_has_question_in_context(self):
@@ -748,7 +749,7 @@ class LogicViewTest(BaseTest):
         response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk),
                                     data=form_data)
 
-        error_message = 'Rule already exist.'
+        error_message = 'Rule not valid.'
         self.assertIn(error_message, str(response))
 
 
