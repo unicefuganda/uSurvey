@@ -34,6 +34,7 @@ class Investigator(BaseModel):
         'REANSWER': [],
         'INVALID_ANSWER': [],
         'CONFIRM_END_INTERVIEW': [],
+        'IS_REGISTERING_HOUSEHOLD': True,
     }
 
     def __init__(self, *args, **kwargs):
@@ -64,6 +65,12 @@ class Investigator(BaseModel):
     def clear_interview_caches(self):
         cache.delete(self.cache_key)
 
+    def clear_all_cache_fields_except(self, field_name):
+        old_field_value = self.get_from_cache(field_name)
+        cache.delete(self.cache_key)
+        self.generate_cache()
+        self.set_in_cache(field_name, old_field_value)
+
     def last_answered(self):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
@@ -91,6 +98,7 @@ class Investigator(BaseModel):
                 next_batch = household_member.get_next_batch()
                 next_question = household_member.next_question_in_order(next_batch) if next_batch else None
             return next_question
+
 
         return question
 

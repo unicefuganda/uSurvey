@@ -10,7 +10,7 @@ class USSDBase(object):
         'SUCCESS_MESSAGE': "This survey has come to an end. Your responses have been received. Thank you.",
         'BATCH_5_MIN_TIMEDOUT_MESSAGE': "This batch is already completed and 5 minutes have passed. You may no longer retake it.",
         'USER_NOT_REGISTERED': "Sorry, your mobile number is not registered for this survey",
-        'WELCOME_TEXT': "Welcome %s to the survey.",
+        'WELCOME_TEXT': "Welcome %s to the survey.\n1: Register households\n2: Take survey",
         'HOUSEHOLD_LIST': "Please select a household from the list",
         'MEMBERS_LIST': "Please select a member from the list",
         'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
@@ -32,13 +32,15 @@ class USSDBase(object):
 
     ANSWER = {
         'YES':"1",
-        'NO':"2"
+        'NO':"2",
+        "REGISTER_HOUSEHOLD":"1",
+        'TAKE_SURVEY':"2",
     }
 
     DEFAULT_SESSION_VARIABLES = {
         'PAGE': 1,
         'HOUSEHOLD': None,
-        'HOUSEHOLD_MEMBER': None
+        'HOUSEHOLD_MEMBER': None,
     }
 
     HOUSEHOLD_LIST_OPTION = "00"
@@ -60,11 +62,13 @@ class USSD(USSDBase):
         self.household_member = None
         self.current_member_is_done = False
         self.is_resuming_survey = False
+        self.is_registering_household = True
         self.set_session()
         self.set_household()
         self.set_household_member()
         self.set_current_member_is_done()
         self.set_is_resuming_survey()
+        self.set_is_registering_household()
         self.clean_investigator_input()
 
     def set_household(self):
@@ -78,6 +82,10 @@ class USSD(USSDBase):
         if household_member:
             self.household_member = household_member
 
+    def set_is_registering_household(self):
+        is_registering_household = self.investigator.get_from_cache('IS_REGISTERING_HOUSEHOLD')
+        if is_registering_household is not None:
+            self.is_registering_household = is_registering_household
 
     def set_current_member_is_done(self):
         if self.household_member:
@@ -160,7 +168,7 @@ class USSD(USSDBase):
             self.set_in_session('HOUSEHOLD', None)
             self.set_in_session('HOUSEHOLD_MEMBER', None)
             self.household = None
-            self.render_households_list(answer)
+            self.render_households_list()
 
 
         self.action = self.ACTIONS['REQUEST']
@@ -177,7 +185,7 @@ class USSD(USSDBase):
             else:
                 self.action = self.ACTIONS['REQUEST']
                 current_household = self.household
-                self.investigator.clear_interview_caches()
+                self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
                 self.set_in_session('HOUSEHOLD', current_household)
                 self.responseString = USSD.MESSAGES['MEMBER_SUCCESS_MESSAGE'] if not self.household.completed_currently_open_batches() else USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
         elif self.household_member.last_question_answered() and \
@@ -264,7 +272,7 @@ class USSD(USSDBase):
 
     def select_or_render_household(self, answer):
         if self.is_browsing_households_list(answer):
-            self.render_households_list(answer)
+            self.render_households_list()
         else:
             if self.is_resuming_survey:
                 last_answered = self.investigator.last_answered()
@@ -275,7 +283,7 @@ class USSD(USSDBase):
             else:
                 self.select_household(answer)
                 if self.is_invalid_response():
-                    self.render_households_list(answer)
+                    self.render_households_list()
                 else:
                     self.request['ussdRequestString'] = ""
                     self.render_household_or_household_member(answer)
@@ -302,7 +310,7 @@ class USSD(USSDBase):
         else:
             self.select_or_render_household(answer)
 
-    def render_households_list(self, answer):
+    def render_households_list(self):
         if not self.household:
             page = self.get_from_session('PAGE')
             self.responseString += "%s\n%s" % (self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page))
@@ -316,8 +324,9 @@ class USSD(USSDBase):
 
     def render_homepage(self):
         answer = self.request['ussdRequestString'].strip()
-        if not answer and not self.is_active():
-            self.render_welcome_text()
+        if not self.investigator.has_households():
+            self.action = self.ACTIONS['END']
+            self.responseString = self.MESSAGES['NO_HOUSEHOLDS']
         elif not answer and self.is_active():
             self.render_resume_message()
         else:
@@ -344,12 +353,42 @@ class USSD(USSDBase):
         self.action = self.ACTIONS['END']
         self.responseString = self.MESSAGES['NO_OPEN_BATCH']
 
-    def response(self):
+    def take_survey(self):
         if self.investigator.has_open_batch():
             self.process_open_batch()
         else:
             self.show_message_for_no_open_batch()
-        return {'action': self.action, 'responseString': self.responseString}
+
+    def render_select_household(self):
+        self.request['ussdRequestString']="00"
+        self.take_survey()
+
+    def response(self):
+        answer = self.request['ussdRequestString'].strip()
+        if not answer and self.is_new_request():
+            self.action = self.ACTIONS['REQUEST']
+            if not self.is_active():
+                self.responseString = self.MESSAGES['WELCOME_TEXT']% self.investigator.name
+                self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
+            else:
+                self.render_resume_message()
+        else:
+            self.action = self.ACTIONS['REQUEST']
+            if not self.is_registering_household:
+                self.take_survey()
+            elif answer == self.ANSWER['TAKE_SURVEY']:
+                self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', False)
+                self.is_registering_household = False
+                self.render_select_household()
+            elif answer == self.ANSWER['REGISTER_HOUSEHOLD']:
+                self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
+                self.is_registering_household = True
+                ## do registering stuff -- potentiall inject othe class
+            else:
+                pass
+                ## do registering stuff -- potentiall inject othe class
+
+        return {'action': self.action, 'responseString': self.responseString, 'investigator':self.investigator}
 
     def clean_investigator_input(self):
         if self.is_new_request():

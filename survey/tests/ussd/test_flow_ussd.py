@@ -7,10 +7,11 @@ from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdBatchCompletion
 from survey.models.households import HouseholdMember
+from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd import USSD
 
 
-class USSDTestCompleteFlow(TestCase):
+class USSDTestCompleteFlow(USSDBaseTest):
     def create_household_head(self, uid):
         self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=uid)
         return HouseholdHead.objects.create(household=self.household,
@@ -107,7 +108,8 @@ class USSDTestCompleteFlow(TestCase):
         member_list_2 = "%s\n5: %s\n6: %s\n7: %s\n8: %s\n*: Back" % (
             USSD.MESSAGES['MEMBERS_LIST'], member_4.surname, member_5.surname,
             member_6.surname, member_7.surname)
-
+        self.reset_session()
+        self.take_survey()
         response = self.select_household()
         response_string = "responseString=%s&action=request" % member_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -151,11 +153,10 @@ class USSDTestCompleteFlow(TestCase):
         household1_member = self.create_household_member("Member 1", self.household_head_1.household)
         household2_member = self.create_household_member("Member 2", self.household_head_2.household)
 
-        homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
 
-        self.ussd_params['ussdRequestString'] = "adassd"
+        homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
 
-        response = self.client.post('/ussd', data=self.ussd_params)
+        response = self.reset_session()
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -169,10 +170,7 @@ class USSDTestCompleteFlow(TestCase):
 
         households_list_3 = "%s\n9: %s\n*: Back" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_9.surname)
 
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = "00"
-
-        response = self.client.post('/ussd', data=self.ussd_params)
+        response = self.take_survey()
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -271,10 +269,7 @@ class USSDTestCompleteFlow(TestCase):
         households_list_1 = "%s\n1: %s\n2: %s" % (
             USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
 
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = "00"
-
-        response = self.client.post('/ussd', data=self.ussd_params)
+        response = self.take_survey()
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -359,46 +354,30 @@ class USSDTestCompleteFlow(TestCase):
                                                          household=self.household_head_1.household).answer)
 
     def test_should_ask_to_resume_questions_or_go_back_to_member_list_upon_session_timeout_or_session_cancel(self):
-        homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
+        homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
 
-        response = self.client.post('/ussd', data=self.ussd_params)
+        response = self.reset_session()
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
-
+        self.take_survey()
         self.select_household()
         self.select_household_member()
 
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = "1"
-        response = self.client.post('/ussd', data=self.ussd_params)
-
-        self.ussd_params['transactionId']=randint(89999, 9000000)
-        self.ussd_params['response']= "false"
-        self.ussd_params['ussdRequestString']= ""
-        response = self.client.post('/ussd', data=self.ussd_params)
+        self.respond("1")
+        response = self.reset_session()
 
         response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = USSD.ANSWER["YES"]
-        response = self.client.post('/ussd', data=self.ussd_params)
-
+        response =self.respond(USSD.ANSWER['YES'])
         response_string = "responseString=%s&action=request" % self.question_2.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.ussd_params['transactionId']=randint(89999, 9000000)
-        self.ussd_params['response']= "false"
-        self.ussd_params['ussdRequestString']= ""
-        response = self.client.post('/ussd', data=self.ussd_params)
-
+        response = self.reset_session()
         response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = USSD.ANSWER["NO"]
-        response = self.client.post('/ussd', data=self.ussd_params)
-
+        response =self.respond(USSD.ANSWER['NO'])
         households_member_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
         response_string = "responseString=%s&action=request" % households_member_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -406,19 +385,17 @@ class USSDTestCompleteFlow(TestCase):
     def test_show_completion_star_next_to_household_head_name(self):
         self.household_head_1.batch_completed(self.batch)
         self.household_head_3.batch_completed(self.batch)
-        homepage = "Welcome %s to the survey.\n00: Households list" % self.investigator.name
+        homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
 
-        response = self.client.post('/ussd', data=self.ussd_params)
+        response = self.reset_session()
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         households_list_1 = "%s\n1: %s*\n2: %s\n3: %s*\n4: %s\n#: Next" % (
             USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname,
             self.household_head_3.surname, self.household_head_4.surname)
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = "00"
 
-        response = self.client.post('/ussd', data=self.ussd_params)
+        response = self.take_survey()
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -437,24 +414,18 @@ class USSDTestCompleteFlow(TestCase):
 
         self.batch.close_for_location(self.investigator.location)
         self.batch_b.open_for_location(self.investigator.location)
-        self.client.post('/ussd', data=self.ussd_params)
+        self.reset_session()
 
         households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'],
                                                                          self.household_head_1.surname,
                                                                          self.household_head_2.surname,
                                                                          self.household_head_3.surname,
                                                                          self.household_head_4.surname)
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = "00"
-
-        response = self.client.post('/ussd', data=self.ussd_params)
+        response = self.take_survey()
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = "1"
-
-        self.client.post('/ussd', data=self.ussd_params)
+        self.respond("1")
         response = self.select_household_member()
         response_string = "responseString=%s&action=request" % self.question_1_b.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -463,6 +434,8 @@ class USSDTestCompleteFlow(TestCase):
         self.batch.open_for_location(self.investigator.location)
         self.investigator.member_answered(self.question_1, self.household_head_1, 1, self.batch)
 
+        self.reset_session()
+        self.take_survey()
         response = self.select_household()
         households_member_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
         response_string = "responseString=%s&action=request" % households_member_list

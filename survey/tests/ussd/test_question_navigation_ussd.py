@@ -7,9 +7,10 @@ from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question
 from survey.models.households import HouseholdMember
+from survey.tests.ussd.ussd_base_test import USSDBaseTest
 
 
-class USSDHouseholdMemberQuestionNavigationTest(TestCase):
+class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
@@ -76,6 +77,8 @@ class USSDHouseholdMemberQuestionNavigationTest(TestCase):
 
     def test_knows_to_select_the_first_general_question_for_household_head(self):
         self.batch.open_for_location(self.location)
+        self.reset_session()
+        self.take_survey()
         self.select_household()
 
         response = self.select_household_member()
@@ -89,6 +92,8 @@ class USSDHouseholdMemberQuestionNavigationTest(TestCase):
         return response
 
     def test_knows_to_not_select_the_general_questions_for_household_member(self):
+        self.reset_session()
+        self.take_survey()
         self.batch.open_for_location(self.location)
         self.select_household()
 
@@ -102,6 +107,8 @@ class USSDHouseholdMemberQuestionNavigationTest(TestCase):
 
     def test_head_knows_how_to_get_questions_in_other_groups_when_general_questions_are_done(self):
         self.batch.open_for_location(self.location)
+        self.reset_session()
+        self.take_survey()
         self.select_household()
 
         response = self.select_household_member()
