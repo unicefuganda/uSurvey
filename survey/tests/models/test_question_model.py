@@ -128,6 +128,17 @@ class QuestionTest(TestCase):
         self.assertIn(sub_question1, subquestions)
         self.assertIn(sub_question2, subquestions)
 
+    def test_question_knows_de_associate_self_from_batch(self):
+        batch = Batch.objects.create(order=1, name="Test")
+        batch_question = Question.objects.create(text="This is a test question", answer_type="multichoice")
+        batch_question.batches.add(batch)
+
+        batch_question.de_associate_from(batch)
+
+        updated_question = Question.objects.filter(text="This is a test question", answer_type="multichoice", batches=batch)
+
+        self.assertEqual(0, len(updated_question))
+
 
 class QuestionOptionTest(TestCase):
     def setUp(self):

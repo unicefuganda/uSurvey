@@ -202,7 +202,6 @@ def _create_question_hash_response(questions):
 
 
 def get_questions_for_batch(request, batch_id, question_id):
-    question = Question.objects.get(id=question_id)
     batch = Batch.objects.get(id=batch_id)
     return _create_question_hash_response(batch.questions.filter(subquestion=False).exclude(id=question_id))
 
@@ -212,7 +211,16 @@ def get_sub_questions_for_question(request, question_id):
     return _create_question_hash_response(question.get_subquestions())
 
 
+@permission_required('auth.can_view_batches')
 def delete_logic(request, batch_id, answer_rule_id):
     rule = AnswerRule.objects.get(id=answer_rule_id)
     rule.delete()
+    return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
+
+@permission_required('auth.can_view_batches')
+def remove(request, batch_id, question_id):
+    batch = Batch.objects.get(id=batch_id)
+    question = Question.objects.get(id=question_id, batches__id=batch_id)
+    question.de_associate_from(batch)
+    messages.success(request, "Question successfully removed from %s." % batch.name)
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)

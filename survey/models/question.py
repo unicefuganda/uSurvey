@@ -117,6 +117,9 @@ class Question(BaseModel):
     def is_last_question_of_group(self):
         return self == self.group.last_question()
 
+    def de_associate_from(self, batch):
+        self.batches.remove(batch)
+
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
