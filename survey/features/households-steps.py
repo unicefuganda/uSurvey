@@ -124,7 +124,7 @@ def given_i_have_100_households(step):
     for i in xrange(100):
         random_number = str(randint(1, 99999))
         try:
-            HouseholdHead.objects.create(surname="head" + random_number, date_of_birth='1980-06-01', male=False, household=Household.objects.create(investigator=world.investigator, uid=i))
+            HouseholdHead.objects.create(surname="head" + random_number, date_of_birth='1980-06-01', male=False, household=Household.objects.create(investigator=world.investigator, location=world.investigator.location, uid=i))
         except Exception:
             pass
 

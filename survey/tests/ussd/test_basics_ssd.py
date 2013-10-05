@@ -26,10 +26,10 @@ class USSDTest(TestCase):
                                                             COUNTRY_PHONE_CODE, ''),
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname",
                                                            date_of_birth='1980-09-01')
-        self.household_1 = Household.objects.create(investigator=self.investigator, uid=1)
+        self.household_1 = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=1)
         self.household_head_1 = HouseholdHead.objects.create(
             household=self.household_1,
             surname="Name " + str(randint(1, 9999)), date_of_birth='1980-09-01')

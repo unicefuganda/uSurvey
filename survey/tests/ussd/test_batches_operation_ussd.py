@@ -33,11 +33,11 @@ class USSDOpenBatch(TestCase):
                                                             COUNTRY_PHONE_CODE, ''),
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname",
                                                            date_of_birth='1980-09-01')
         self.household_head_1 = HouseholdHead.objects.create(
-            household=Household.objects.create(investigator=self.investigator, uid=1),
+            household=Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=1),
             surname="Name " + str(randint(1, 9999)), date_of_birth='1980-09-01')
         batch = Batch.objects.create(order=1)
 
@@ -67,14 +67,14 @@ class USSDWithMultipleBatches(TestCase):
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''), location=self.location,
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
         self.female_group = HouseholdMemberGroup.objects.create(name="Female", order=1)
         self.condition = GroupCondition.objects.create(value=False, attribute="GENDER", condition="EQUALS")
 
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname",
                                                            date_of_birth='1929-02-02', male=False)
         self.household_head_1 = HouseholdHead.objects.create(
-            household=Household.objects.create(investigator=self.investigator, uid=1),
+            household=Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=1),
             surname="Name " + str(randint(1, 9999)), date_of_birth='1929-02-02', male=False)
         self.batch = Batch.objects.create(order=1)
         self.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER,

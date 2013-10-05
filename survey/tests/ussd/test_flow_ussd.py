@@ -12,7 +12,7 @@ from survey.ussd import USSD
 
 class USSDTestCompleteFlow(TestCase):
     def create_household_head(self, uid):
-        self.household = Household.objects.create(investigator=self.investigator, uid=uid)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=uid)
         return HouseholdHead.objects.create(household=self.household,
                                             surname="Name " + str(randint(1, 9999)), date_of_birth=datetime.date(1980, 9, 1))
 

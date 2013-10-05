@@ -156,6 +156,7 @@ class HouseholdViewTest(BaseTest):
     def test_create_households(self):
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
+        burundi = Location.objects.create(name="Burundi", type=country)
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
         form_data = {
             'location': uganda.id,
@@ -189,7 +190,14 @@ class HouseholdViewTest(BaseTest):
 
         self.assertEqual(hHead.male, False)
         self.assertEqual(household.investigator, investigator)
+        self.assertEqual(household.location, investigator.location)
         self.assertEqual(hHead.household, household)
+
+        investigator.location = burundi
+        investigator.save()
+        self.assertEqual(household.location, uganda)
+
+
 
     def test_create_households_unsuccessful(self):
 
@@ -234,9 +242,9 @@ class HouseholdViewTest(BaseTest):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda",type=country)
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
-        household_a = Household.objects.create(investigator=investigator, uid=0)
-        household_b = Household.objects.create(investigator=investigator, uid=1)
-        household_c = Household.objects.create(investigator=investigator, uid=2)
+        household_a = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
+        household_b = Household.objects.create(investigator=investigator, location=investigator.location, uid=1)
+        household_c = Household.objects.create(investigator=investigator, location=investigator.location, uid=2)
 
         HouseholdHead.objects.create(surname='Bravo', household=household_b, date_of_birth='1980-09-01')
         HouseholdHead.objects.create(surname='Alpha', household=household_a, date_of_birth='1980-09-01')
@@ -289,9 +297,9 @@ class HouseholdViewTest(BaseTest):
         investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala, backend = Backend.objects.create(name='something2'))
         investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", location=bukoto, backend = Backend.objects.create(name='something3'))
 
-        household1 = Household.objects.create(investigator=investigator1, uid=0)
-        household2 = Household.objects.create(investigator=investigator2, uid=1)
-        household3 = Household.objects.create(investigator=investigator3, uid=2)
+        household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
+        household2 = Household.objects.create(investigator=investigator2, location=investigator2.location, uid=1)
+        household3 = Household.objects.create(investigator=investigator3, location=investigator3.location, uid=2)
 
         response = self.client.get("/households/?location=" + str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
@@ -329,7 +337,7 @@ class HouseholdViewTest(BaseTest):
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
 
-        household1 = Household.objects.create(investigator=investigator1, uid=0)
+        household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
         HouseholdHead.objects.create(surname='Bravo', household=household1, date_of_birth='1980-09-01')
         household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
 
@@ -342,9 +350,9 @@ class HouseholdViewTest(BaseTest):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda",type=country)
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda, backend = Backend.objects.create(name='something'))
-        household_a = Household.objects.create(investigator=investigator, uid=0)
-        household_b = Household.objects.create(investigator=investigator, uid=1)
-        household_c = Household.objects.create(investigator=investigator, uid=2)
+        household_a = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
+        household_b = Household.objects.create(investigator=investigator, location=investigator.location, uid=1)
+        household_c = Household.objects.create(investigator=investigator, location=investigator.location, uid=2)
 
         HouseholdHead.objects.create(surname='Bravo', household=household_b, date_of_birth='1980-09-01')
         HouseholdHead.objects.create(surname='Alpha', household=household_a, date_of_birth='1980-09-01')
@@ -379,7 +387,7 @@ class  ViewHouseholdDetailsTest(BaseTest):
             kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
             investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
 
-            household = Household.objects.create(investigator=investigator, uid=0)
+            household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
             HouseholdHead.objects.create(surname='Bravo', household=household, first_name='Test', date_of_birth='1980-09-01', male=True, occupation='Agricultural labor',
                                          level_of_education='Primary', resident_since_year=2000, resident_since_month=7)
 

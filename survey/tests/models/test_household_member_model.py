@@ -118,7 +118,7 @@ class HouseholdMemberTest(TestCase):
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
                                                     location=some_village,
                                                     backend=Backend.objects.create(name='something1'))
-        hhold = Household.objects.create(investigator=investigator1, uid=0)
+        hhold = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
         household_member = HouseholdMember.objects.create(household=hhold, surname="name", male=True,
                                                           date_of_birth=date(1998, 2, 2))
 
@@ -283,7 +283,7 @@ class HouseholdMemberTest(TestCase):
                                                    location=kampala,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -382,7 +382,7 @@ class HouseholdMemberTest(TestCase):
                                                    location=kampala,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -809,7 +809,7 @@ class HouseholdMemberTest(TestCase):
         investigator = Investigator.objects.create(name="inv1", location=uganda,
                                                    backend=Backend.objects.create(name='something'))
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                           male=False,
                                                           household=household)

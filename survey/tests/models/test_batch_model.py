@@ -62,7 +62,7 @@ class BatchTest(TestCase):
                                                    location=kampala,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -97,7 +97,7 @@ class BatchTest(TestCase):
                                                    location=kampala,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,

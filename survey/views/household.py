@@ -53,6 +53,7 @@ def create_household(householdform, investigator, valid):
     is_valid_household = householdform['household'].is_valid()
     if investigator and is_valid_household:
         householdform['household'].instance.investigator = investigator
+        householdform['household'].instance.location = investigator.location
         householdform['household'].save()
         valid['household'] = True
     return valid

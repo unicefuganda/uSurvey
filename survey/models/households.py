@@ -2,6 +2,8 @@ import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils.datastructures import SortedDict
+from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import LEVEL_OF_EDUCATION, MONTHS
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
@@ -13,6 +15,7 @@ from django.core.paginator import Paginator
 
 class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
+    location = models.ForeignKey(Location, null=True)
     uid = models.PositiveIntegerField(blank=False, default=0, unique=True,
                                       verbose_name="Household Unique Identification")
 
@@ -103,8 +106,18 @@ class Household(BaseModel):
 
         return location_name
 
+    def location_hierarchy(self):
+        hierarchy = []
+        location = self.location
+        hierarchy.append([location.type.name, location])
+        while location.tree_parent:
+            location = location.tree_parent
+            hierarchy.append([location.type.name, location])
+        hierarchy.reverse()
+        return SortedDict(hierarchy)
+
     def get_related_location(self):
-        location_hierarchy = self.investigator.location_hierarchy()
+        location_hierarchy = self.location_hierarchy()
 
         keys = ['District', 'County', 'Subcounty', 'Parish', 'Village']
         related_location = {}
@@ -168,8 +181,7 @@ class HouseholdMember(BaseModel):
         return len(HouseholdHead.objects.filter(householdmember_ptr_id=self.id)) > 0
 
     def get_location(self):
-        investigator = self.household.investigator
-        return investigator.location if investigator else None
+        return self.household.location
 
     def attribute_matches(self, condition):
         age = self.get_age()
@@ -295,7 +307,7 @@ class HouseholdMember(BaseModel):
         return True
 
     def location(self):
-        return self.household.investigator.location
+        return self.household.location
 
     def batch_completed(self, batch):
         return self.completed_member_batches.get_or_create(householdmember=self, household=self.household,

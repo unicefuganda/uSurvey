@@ -29,7 +29,7 @@ class USSDHouseholdMemberQuestionNavigationTest(TestCase):
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''), location=self.location,
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, male=False, surname="Surname",
                                                            date_of_birth=datetime.date(1929, 2, 2))
         self.household_member = HouseholdMember.objects.create(surname="Surnmae", household=self.household,

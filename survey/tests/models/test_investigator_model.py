@@ -27,7 +27,7 @@ class InvestigatorTest(TestCase):
                                                   location=self.kampala,
                                                   backend=self.backend)
 
-        self.household = Household.objects.create(investigator=self.investigator, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
 
         self.household_member = HouseholdMember.objects.create(surname="Member",
                                                                date_of_birth=date(1980, 2, 2), male=False, household=self.household)
