@@ -883,6 +883,32 @@ class AddSubQuestionTest(BaseTest):
         self.assertIsInstance(response.context['questionform'], QuestionForm)
         self.assertIsNotNone(response.context['questionform'].errors)
 
+    def test_add_sub_question_redirects_to_master_questions_if_batch_is_not_present(self):
+
+        subquestion_form_data = {
+            'text': "this is a new sub question",
+            'answer_type': Question.NUMBER,
+            'group': self.group.id,
+            'option': ''
+        }
+        expected_url = '/questions/'
+        response = self.client.post('/questions/%d/sub_questions/new/' % int(self.question.id),
+                                    data=subquestion_form_data)
+
+        self.assertRedirects(response, expected_url, 302, 200)
+
+    def test_add_sub_question_redirects_to_batch_questions_if_batch_is_present(self):
+        subquestion_form_data = {
+            'text': "this is a new sub question",
+            'answer_type': Question.NUMBER,
+            'group': self.group.id,
+            'option': ''
+        }
+        expected_url = '/batches/%s/questions/' % self.batch.id
+        response = self.client.post('/batches/%s/questions/%d/sub_questions/new/' % (self.batch.id, int(self.question.id)),
+                                    data=subquestion_form_data)
+
+        self.assertRedirects(response, expected_url, 302, 200)
 
 class DeleteLogicViewsTest(BaseTest):
     def setUp(self):
