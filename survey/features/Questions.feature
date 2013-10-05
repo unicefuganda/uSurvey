@@ -147,3 +147,15 @@ Feature: Questions related features
     When I click delete logic icon
     And I click confirm delete
     Then I should redirected to batch question page
+
+  Scenario: Delete sub question
+    Given I am logged in as researcher
+    And I have a member group
+    And I have a multichoice question
+    And I have a sub question for that question
+    And I visit questions list page
+    When I click on the question
+    And I click delete sub question link
+    Then I should see a confirm delete subqestion modal
+    When I click confirm delete
+    Then I should see the sub question deleted successfully

@@ -354,3 +354,20 @@ def and_i_should_see_special_characters_message(step):
         special_characters = special_characters + character + " "
     special_characters = special_characters.strip() + "]"
     world.page.is_text_present(special_characters)
+
+@step(u'And I click delete sub question link')
+def and_i_click_delete_sub_question_link(step):
+    sleep(3)
+    world.page.click_delete_subquestion()
+
+@step(u'Then I should see a confirm delete subqestion modal')
+def then_i_should_see_a_confirm_delete_subqestion_modal(step):
+    world.page.see_confirm_delete_message(world.sub_question.text)
+
+@step(u'Then I should see the sub question deleted successfully')
+def then_i_should_see_the_sub_question_deleted_successfully(step):
+    world.page.see_success_message("Sub question", "deleted")
+
+@step(u'When I click confirm delete')
+def when_i_click_confirm_delete(step):
+    world.page.click_by_css("#delete-subquestion-%s" % world.sub_question.id)

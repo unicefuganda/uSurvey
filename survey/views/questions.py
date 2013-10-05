@@ -145,14 +145,17 @@ def edit(request, question_id):
     response, context = _render_question_view(request, question[0])
     return response or render(request, 'questions/new.html', context)
 
-def delete(request, question_id):
+@permission_required('auth.can_view_batches')
+def delete(request, question_id, batch_id=None):
     question = Question.objects.filter(pk=question_id)
+    redirect_url = '/batches/%s/questions/' % batch_id if batch_id else '/questions/'
     if question:
-        messages.success(request, "Question successfully deleted.")
+        success_message = "%s successfully deleted."
+        messages.success(request, success_message % ("Sub question" if question[0].subquestion else "Question"))
     else:
-        messages.error(request, "Question does not exist.")
+        messages.error(request, "Question / Subquestion does not exist.")
     question.delete()
-    return HttpResponseRedirect("/questions/")
+    return HttpResponseRedirect(redirect_url)
 
 def _process_question_form(request, options, response, instance=None):
     question_form = QuestionForm(data=request.POST, instance=instance)

@@ -565,7 +565,8 @@ class QuestionsViews(BaseTest):
 
     def test_should_delete_question(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)
-        question = Question.objects.create(text="question text", group=group, batch=self.batch)
+        question = Question.objects.create(text="question text", group=group)
+        question.batches.add(self.batch)
         self.failUnless(question)
 
         response = self.client.get('/questions/%d/delete/' % question.id, )
@@ -579,8 +580,29 @@ class QuestionsViews(BaseTest):
         non_existing_id = 222222
         response = self.client.get('/questions/%d/delete/' % non_existing_id)
         self.assertRedirects(response, '/questions/', status_code=302, target_status_code=200, msg_prefix='')
-        error_message = "Question does not exist."
+        error_message = "Question / Subquestion does not exist."
         self.assertIn(error_message, response.cookies['messages'].value)
+
+    def test_delete_shows_question_successfully_deleted_if_question_is_being_deleted(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group)
+        question.batches.add(self.batch)
+        response = self.client.get('/questions/%d/delete/' % question.id)
+
+        success_message = 'Question successfully deleted.'
+        self.assertIn(success_message, response.cookies['messages'].value)
+
+    def test_delete_shows_sub_question_successfully_deleted_if_sub_question_is_being_deleted(self):
+        group = HouseholdMemberGroup.objects.create(name="group", order=33)
+        question = Question.objects.create(text="question text", group=group)
+        sub_question = Question.objects.create(parent=question, text="sub question text", subquestion=True, group=group)
+        question.batches.add(self.batch)
+        response = self.client.get('/questions/%d/delete/' % sub_question.id)
+
+        success_message = 'Sub question successfully deleted.'
+        self.assertIn(success_message, response.cookies['messages'].value)
+
+
 
 
 class LogicViewTest(BaseTest):
@@ -961,3 +983,38 @@ class RemoveQuestionFromBatchTest(BaseTest):
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/batches/%d/questions/%s/remove/' % (self.batch.id, self.question.id))
+
+class DeleteSubQuestionFromBatchTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
+                                                         'can_view_batches')
+        self.client.login(username='User', password='password')
+
+        self.batch = Batch.objects.create(order=1)
+        self.batch_2 = Batch.objects.create(order=2)
+        self.question = Question.objects.create(text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1)
+        self.question.batches.add(self.batch)
+        self.question.batches.add(self.batch_2)
+        self.subquestion = Question.objects.create(text="Sub Question 1?", parent=self.question, subquestion=True,
+                                                answer_type=Question.NUMBER)
+
+    def test_should_delete_subquestion_and_redirect_to_batch_question_lists_if_batch_id_supplied(self):
+
+        response = self.client.get('/batches/%s/questions/%s/delete/' % (int(self.batch.id), int(self.subquestion.id)))
+        self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
+
+        success_message = 'Sub question successfully deleted.'
+        self.assertIn(success_message, response.cookies['messages'].value)
+
+    def test_should_delete_subquestion_and_redirect_to_master_question_lists_if_no_batch_id_supplied(self):
+        response = self.client.get('/questions/%s/delete/' % (int(self.subquestion.id)))
+        self.assertRedirects(response, '/questions/', 302, 200)
+
+        success_message = 'Sub question successfully deleted.'
+        self.assertIn(success_message, response.cookies['messages'].value)
+
+    def test_restricted_permissions(self):
+        self.assert_restricted_permission_for('/batches/%d/questions/%s/delete/' % (self.batch.id, self.subquestion.id))
+        self.assert_restricted_permission_for('/questions/%s/delete/' % (self.subquestion.id))

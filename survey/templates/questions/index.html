@@ -47,7 +47,12 @@
                     <span class="muted">Subquestion:</span>
                     <ul>
                     {% for subquestion in question.get_subquestions %}
-                          <li>{{subquestion.text}}</li>
+                          <li>{{subquestion.text}}  &nbsp;&nbsp;<a href="#delete_subquestion_{{subquestion.id}}" data-toggle="modal" id="delete_subquestion">Delete</a> </li>
+                        {% if batch %}
+                            {% include "base/delete_modal.html" with object_name=subquestion.text id=subquestion.id name="Subquestion" url=batch.id|add_string:subquestion.id|get_url_with_ids:"delete_batch_question_page" %}
+                        {% else %}
+                            {% include "base/delete_modal.html" with object_name=subquestion.text id=subquestion.id name="Subquestion" url=subquestion.id|get_url_with_ids:"delete_question_page" %}
+                        {% endif %}
                     {% endfor %}
                     </ul>
                     </div>

@@ -24,12 +24,14 @@ class BatchQuestionsListPage(PageObject):
         assert_equals(False, self.browser.is_text_present("Close"))
 
 
-
 class ListAllQuestionsPage(PageObject):
     url = "/questions/"
 
     def validate_fields(self):
         self.validate_fields_present(['Questions List', 'Question', 'Type', 'Group', 'Actions'])
+
+    def click_delete_subquestion(self):
+        self.click_by_css("#delete_subquestion")
 
 
 class AddQuestionPage(PageObject):
