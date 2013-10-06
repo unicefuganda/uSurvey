@@ -963,6 +963,23 @@ class EditSubQuestionTest(BaseTest):
         self.assertEqual(self.sub_question.group.id, response.context['questionform'].initial['group'])
         self.assertIsNotNone(response.context['questionform'].errors)
 
+    def test_should_post_edit_subquestion(self):
+        subquestion_form_data = {
+            'text': "Edited subquestion text",
+            'answer_type': Question.NUMBER,
+            'group': self.group.id
+        }
+        expected_url = '/questions/'
+        self.failIf(Question.objects.filter(**subquestion_form_data))
+        response = self.client.post('/questions/%d/sub_questions/edit/' % int(self.sub_question.id),
+                                    data=subquestion_form_data)
+        edited_sub_question = Question.objects.filter(**subquestion_form_data)
+        self.failUnless(edited_sub_question)
+        self.failIf(Question.objects.filter(text=self.sub_question.text, answer_type=Question.NUMBER,
+                            subquestion=True, parent=self.question))
+        success_message = "Sub question successfully edited."
+        self.assertIn(success_message, response.cookies['messages'].value)
+
     def test_edit_sub_question_redirects_to_master_questions_if_batch_is_not_present(self):
         subquestion_form_data = {
             'text': "edited text for subqn",
