@@ -52,9 +52,9 @@
                             <a href="#delete_subquestion_{{subquestion.id}}" data-toggle="modal" id="delete_subquestion">Delete</a> 
                             &nbsp;&nbsp;
                             {% if batch %}
-                              <a href="{% url 'edit_batch_subquestion_page' batch.id subquestion.id %}" id="edit-subquestion-{{subquestion.id}}">Edit</a>
+                              <a href="{% url 'edit_batch_subquestion_page' batch.id subquestion.id %}" id="edit_subquestion_{{subquestion.id}}">Edit</a>
                             {% else %}
-                              <a href="{% url 'edit_subquestion_page' subquestion.id %}" data-toggle="modal" id="edit-subquestion-{{subquestion.id}}">Edit</a>
+                              <a href="{% url 'edit_subquestion_page' subquestion.id %}" id="edit_subquestion_{{subquestion.id}}">Edit</a>
                             {% endif %}
                              </li>
                         {% if batch %}

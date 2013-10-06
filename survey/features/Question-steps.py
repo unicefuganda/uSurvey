@@ -375,7 +375,7 @@ def when_i_click_confirm_delete(step):
 @step(u'And I click edit sub question link')
 def and_i_click_edit_sub_question_link(step):
     sleep(3)
-    world.page.click_by_css("#edit-subquestion-%s" % world.sub_question.id)
+    world.page.click_by_css("#edit_subquestion_%s" % world.sub_question.id)
 
 @step(u'Then I see the sub question form with values')
 def then_i_see_the_sub_question_form_with_values(step):
