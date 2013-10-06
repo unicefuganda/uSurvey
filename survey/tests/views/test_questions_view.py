@@ -346,6 +346,7 @@ class QuestionsViews(BaseTest):
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'add-sub_question-form')
         self.assertEqual(response.context['parent_question'], question)
+        self.assertEqual(response.context['heading'], "Add SubQuestion")
         self.assertEqual(response.context['class'], 'question-form')
 
     def test_post_sub_question(self):
@@ -931,6 +932,65 @@ class AddSubQuestionTest(BaseTest):
                                     data=subquestion_form_data)
 
         self.assertRedirects(response, expected_url, 302, 200)
+
+
+class EditSubQuestionTest(BaseTest):
+
+    def setUp(self):
+        self.client = Client()
+        user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
+                                                         'can_view_batches')
+        self.client.login(username='User', password='password')
+
+        self.batch = Batch.objects.create(order=1)
+        self.group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        self.question = Question.objects.create(text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1, group=self.group)
+        self.sub_question = Question.objects.create(text="this is a sub question", answer_type=Question.NUMBER,
+                                                                               subquestion=True, parent=self.question, group=self.group)
+        
+        self.question.batches.add(self.batch)
+        
+    def test_should_get_edit_subquestion(self):
+        response = self.client.get('/questions/%d/sub_questions/edit/' % int(self.sub_question.id))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('questions/new.html', templates)
+        self.assertIsInstance(response.context['questionform'], QuestionForm)
+        self.assertEqual(response.context['heading'], "Edit Subquestion")
+        self.assertEqual(self.sub_question.text, response.context['questionform'].initial['text'])
+        self.assertEqual(self.sub_question.answer_type, response.context['questionform'].initial['answer_type'])
+        self.assertEqual(self.sub_question.group.id, response.context['questionform'].initial['group'])
+        self.assertIsNotNone(response.context['questionform'].errors)
+
+    def test_edit_sub_question_redirects_to_master_questions_if_batch_is_not_present(self):
+        subquestion_form_data = {
+            'text': "edited text for subqn",
+            'answer_type': Question.NUMBER,
+            'group': self.group.id
+        }
+        expected_url = '/questions/'
+        response = self.client.post('/questions/%d/sub_questions/edit/' % int(self.sub_question.id),
+                                    data=subquestion_form_data)
+
+        self.assertRedirects(response, expected_url, 302, 200)
+
+    def test_edit_sub_question_redirects_to_batch_questions_if_batch_is_not_present(self):
+        subquestion_form_data = {
+            'text': "edited text for subqn",
+            'answer_type': Question.NUMBER,
+            'group': self.group.id
+        }
+        expected_url = '/batches/%s/questions/' % self.batch.id
+        response = self.client.post('/batches/%s/questions/%s/sub_questions/edit/' % (self.batch.id, self.sub_question.id),
+                                    data=subquestion_form_data)
+
+        self.assertRedirects(response, expected_url, 302, 200)
+
+    def test_restricted_permissions_for_edit_sub_questions(self):
+        self.assert_restricted_permission_for('/batches/%s/questions/%s/sub_questions/edit/' % (self.batch.id, self.sub_question.id))
+        self.assert_restricted_permission_for('/questions/%d/sub_questions/edit/' % self.sub_question.id)
+
 
 class DeleteLogicViewsTest(BaseTest):
     def setUp(self):

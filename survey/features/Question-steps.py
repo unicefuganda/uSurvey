@@ -371,3 +371,32 @@ def then_i_should_see_the_sub_question_deleted_successfully(step):
 @step(u'When I click confirm delete')
 def when_i_click_confirm_delete(step):
     world.page.click_by_css("#delete-subquestion-%s" % world.sub_question.id)
+
+@step(u'And I click edit sub question link')
+def and_i_click_edit_sub_question_link(step):
+    sleep(3)
+    world.page.click_by_css("#edit-subquestion-%s" % world.sub_question.id)
+
+@step(u'Then I see the sub question form with values')
+def then_i_see_the_sub_question_form_with_values(step):
+    world.form = {'text': 'Text',
+              'group': 'Group',
+              'answer_type':'Answer type'}
+
+    form_values = {'text': world.sub_question.text,
+                     'group': world.multi_choice_question.group.id,
+                     'answer_type': world.sub_question.answer_type}
+    world.page.validate_form_present(world.form)
+    world.page.validate_form_values(form_values)
+
+@step(u'When I fill in edited sub question details')
+def when_i_fill_in_edited_sub_question_details(step):
+    world.edited_sub_question_details = {'text': 'edited question',
+                 'group': world.multi_choice_question.group.id
+                 }
+    world.page.see_select_option(['Number'], 'answer_type')
+    world.page.fill_valid_values(world.edited_sub_question_details)
+
+@step(u'Then I should see the sub question successfully edited')
+def then_i_should_see_the_sub_question_successfully_edited(step):
+    world.page.see_success_message("Sub question", "edited")

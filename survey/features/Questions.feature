@@ -159,3 +159,16 @@ Feature: Questions related features
     Then I should see a confirm delete subqestion modal
     When I click confirm delete
     Then I should see the sub question deleted successfully
+
+  Scenario: Edit sub question
+    Given I am logged in as researcher
+    And I have a member group
+    And I have a multichoice question
+    And I have a sub question for that question
+    And I visit questions list page
+    When I click on the question
+    And I click edit sub question link
+    Then I see the sub question form with values
+    When I fill in edited sub question details
+    And I submit the form
+    Then I should see the sub question successfully edited

@@ -59,7 +59,7 @@ def list_all_questions(request):
 def _sub_question_hash(sub_question):
     return {'id': str(sub_question.id), 'text': sub_question.text}
 
-def __process_sub_question_form(request, questionform, parent_question, batch_id=None):
+def __process_sub_question_form(request, questionform, parent_question, action_performed, batch_id=None):
     if questionform.is_valid():
         redirect_url = '/batches/%s/questions/' % batch_id if batch_id else '/questions/'
 
@@ -72,7 +72,7 @@ def __process_sub_question_form(request, questionform, parent_question, batch_id
         if request.is_ajax():
             return HttpResponse(json.dumps(_sub_question_hash(sub_question)))
         else:
-            messages.success(request, 'Sub question successfully added.')
+            messages.success(request, 'Sub question successfully %s.' % action_performed)
             return HttpResponseRedirect(redirect_url)
     else:
         messages.error(request, 'Sub question not saved.')
@@ -85,9 +85,26 @@ def new_subquestion(request, question_id, batch_id=None):
     response = None
     if request.method == 'POST':
         questionform = QuestionForm(request.POST, parent_question=parent_question)
-        response = __process_sub_question_form(request, questionform, parent_question, batch_id)
+        response = __process_sub_question_form(request, questionform, parent_question, 'added', batch_id)
     context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form',
-               'parent_question': parent_question, 'class': 'question-form'}
+               'parent_question': parent_question, 'class': 'question-form', 'heading': 'Add SubQuestion'}
+
+    template_name = 'questions/new.html'
+    if request.is_ajax():
+        template_name = 'questions/_add_question.html'
+
+    return response or render(request, template_name, context)
+
+@permission_required('auth.can_view_batches')
+def edit_subquestion(request, question_id, batch_id=None):
+    question = Question.objects.get(pk=question_id)
+    questionform = QuestionForm(instance=question)
+    response = None
+    if request.method == 'POST':
+        questionform = QuestionForm(request.POST, instance=question)
+        response = __process_sub_question_form(request, questionform, question.parent, 'edited', batch_id)
+    context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form',
+               'parent_question': question.parent, 'class': 'question-form', 'heading': 'Edit Subquestion'}
 
     template_name = 'questions/new.html'
     if request.is_ajax():
