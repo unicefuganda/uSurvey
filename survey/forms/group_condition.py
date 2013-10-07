@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
 from survey.models.householdgroups import GroupCondition
@@ -33,15 +34,24 @@ class GroupConditionForm(ModelForm):
                 del self.cleaned_data['value']
             return self.cleaned_data
 
+    def set_value_error_message(self, message):
+        self._errors['value'] = self.error_class([message])
+        del self.cleaned_data['value']
+
     def clean_age_values(self):
         if self.cleaned_data.get('condition', None) and self.cleaned_data.get('value', None):
             value = self.cleaned_data['value']
             attribute = self.cleaned_data['attribute']
 
-            if attribute == GroupCondition.GROUP_TYPES['AGE'] and int(value) < 0:
-                message = "Age cannot be negative."
-                self._errors['value'] = self.error_class([message])
-                del self.cleaned_data['value']
+            if attribute == GroupCondition.GROUP_TYPES['AGE']:
+                try:
+                    if int(value) < 0:
+                        message = "Age cannot be negative."
+                        self.set_value_error_message(message)
+                except ValueError:
+                        message = "Age must be a whole number."
+                        self.set_value_error_message(message)
+
             return self.cleaned_data
 
     def clean_general_values(self):

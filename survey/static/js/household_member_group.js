@@ -44,7 +44,7 @@ $(function(){
           $(element).next().text("");
           attribute_value = $('#id_attribute').val();
           if (attribute_value == 'AGE'){
-              return value > 0;
+              return value >= 0;
           }
           return true;
         }, "Age cannot be negative.");

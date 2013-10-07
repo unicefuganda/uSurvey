@@ -604,13 +604,11 @@ class QuestionsViews(BaseTest):
         self.assertIn(success_message, response.cookies['messages'].value)
 
 
-
-
 class LogicViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
-                                                         'can_view_batches')
+                                  'can_view_batches')
         self.client.login(username='User', password='password')
 
         self.batch = Batch.objects.create(order=1)
@@ -907,7 +905,6 @@ class AddSubQuestionTest(BaseTest):
         self.assertIsNotNone(response.context['questionform'].errors)
 
     def test_add_sub_question_redirects_to_master_questions_if_batch_is_not_present(self):
-
         subquestion_form_data = {
             'text': "this is a new sub question",
             'answer_type': Question.NUMBER,
@@ -928,14 +925,14 @@ class AddSubQuestionTest(BaseTest):
             'option': ''
         }
         expected_url = '/batches/%s/questions/' % self.batch.id
-        response = self.client.post('/batches/%s/questions/%d/sub_questions/new/' % (self.batch.id, int(self.question.id)),
-                                    data=subquestion_form_data)
+        response = self.client.post(
+            '/batches/%s/questions/%d/sub_questions/new/' % (self.batch.id, int(self.question.id)),
+            data=subquestion_form_data)
 
         self.assertRedirects(response, expected_url, 302, 200)
 
 
 class EditSubQuestionTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
@@ -947,10 +944,10 @@ class EditSubQuestionTest(BaseTest):
         self.question = Question.objects.create(text="Question 1?",
                                                 answer_type=Question.NUMBER, order=1, group=self.group)
         self.sub_question = Question.objects.create(text="this is a sub question", answer_type=Question.NUMBER,
-                                                                               subquestion=True, parent=self.question, group=self.group)
-        
+                                                    subquestion=True, parent=self.question, group=self.group)
+
         self.question.batches.add(self.batch)
-        
+
     def test_should_get_edit_subquestion(self):
         response = self.client.get('/questions/%d/sub_questions/edit/' % int(self.sub_question.id))
         self.failUnlessEqual(response.status_code, 200)
@@ -976,7 +973,7 @@ class EditSubQuestionTest(BaseTest):
         edited_sub_question = Question.objects.filter(**subquestion_form_data)
         self.failUnless(edited_sub_question)
         self.failIf(Question.objects.filter(text=self.sub_question.text, answer_type=Question.NUMBER,
-                            subquestion=True, parent=self.question))
+                                            subquestion=True, parent=self.question))
         success_message = "Sub question successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
 
@@ -999,13 +996,15 @@ class EditSubQuestionTest(BaseTest):
             'group': self.group.id
         }
         expected_url = '/batches/%s/questions/' % self.batch.id
-        response = self.client.post('/batches/%s/questions/%s/sub_questions/edit/' % (self.batch.id, self.sub_question.id),
-                                    data=subquestion_form_data)
+        response = self.client.post(
+            '/batches/%s/questions/%s/sub_questions/edit/' % (self.batch.id, self.sub_question.id),
+            data=subquestion_form_data)
 
         self.assertRedirects(response, expected_url, 302, 200)
 
     def test_restricted_permissions_for_edit_sub_questions(self):
-        self.assert_restricted_permission_for('/batches/%s/questions/%s/sub_questions/edit/' % (self.batch.id, self.sub_question.id))
+        self.assert_restricted_permission_for(
+            '/batches/%s/questions/%s/sub_questions/edit/' % (self.batch.id, self.sub_question.id))
         self.assert_restricted_permission_for('/questions/%d/sub_questions/edit/' % self.sub_question.id)
 
 
@@ -1013,7 +1012,7 @@ class DeleteLogicViewsTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
-                                                         'can_view_batches')
+                                  'can_view_batches')
         self.client.login(username='User', password='password')
 
         self.batch = Batch.objects.create(order=1)
@@ -1024,7 +1023,8 @@ class DeleteLogicViewsTest(BaseTest):
                                                      action=AnswerRule.ACTIONS['END_INTERVIEW'], validate_with_value=0)
 
     def test_restricted_permissions_for_delete_question(self):
-        self.assert_restricted_permission_for('/batches/%s/questions/delete_logic/%s/' % (self.batch.id, self.question.id))
+        self.assert_restricted_permission_for(
+            '/batches/%s/questions/delete_logic/%s/' % (self.batch.id, self.question.id))
 
     def test_knows_how_to_delete_logic_given_valid_question_id_and_logic_id(self):
         response = self.client.get(
@@ -1061,6 +1061,7 @@ class RemoveQuestionFromBatchTest(BaseTest):
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/batches/%d/questions/%s/remove/' % (self.batch.id, self.question.id))
 
+
 class DeleteSubQuestionFromBatchTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -1075,10 +1076,9 @@ class DeleteSubQuestionFromBatchTest(BaseTest):
         self.question.batches.add(self.batch)
         self.question.batches.add(self.batch_2)
         self.subquestion = Question.objects.create(text="Sub Question 1?", parent=self.question, subquestion=True,
-                                                answer_type=Question.NUMBER)
+                                                   answer_type=Question.NUMBER)
 
     def test_should_delete_subquestion_and_redirect_to_batch_question_lists_if_batch_id_supplied(self):
-
         response = self.client.get('/batches/%s/questions/%s/delete/' % (int(self.batch.id), int(self.subquestion.id)))
         self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
 

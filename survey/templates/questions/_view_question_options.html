@@ -12,8 +12,8 @@
     <tbody>
     {% for option in question.options.all %}
         <tr>
-            <td >
-                {% if option.answer_rule.all %}
+            <td>
+                {% if option.answer_rule.all and batch %}
                     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_question_option_{{option.id}}">{{option.text}}</a>
                     <div id="collapse_question_option_{{option.id}}" class="accordion-body collapse in">
                     <div class="accordion-inner">

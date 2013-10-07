@@ -186,6 +186,13 @@ class Investigator(BaseModel):
         hierarchy.reverse()
         return SortedDict(hierarchy)
 
+    def remove_invalid_households(self):
+        all_households = self.households.all()
+        for household in all_households:
+            if household.location != self.location:
+                self.households.remove(household)
+
+
     @classmethod
     def get_summarised_answers_for(self, batch, questions, data):
         for investigator in self.objects.all():

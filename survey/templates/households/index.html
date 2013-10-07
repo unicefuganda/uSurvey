@@ -70,7 +70,9 @@
                         {{ household.related_locations|get_value:"Village" }}
                     </td>
                     <td>
-                        <a href="{% url 'show_investigator_page' household.investigator.pk %}">{{ household.investigator.name }}</a>
+                        {% if household.investigator %}
+                            <a href="{% url 'show_investigator_page' household.investigator.pk %}">{{ household.investigator.name }}</a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

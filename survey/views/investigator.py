@@ -28,13 +28,14 @@ def _add_error_response_message(investigator, request,action_text):
         for err in investigator.non_field_errors():
             messages.error(request, error_message + str(err))
 
-def _process_form(investigator, request, action_text,
+def _process_form(investigator_form, request, action_text,
                   redirect_url):
-    if investigator.is_valid():
-        investigator.save()
+    if investigator_form.is_valid():
+        investigator = investigator_form.save()
+        investigator.remove_invalid_households()
         messages.success(request, "Investigator successfully %s " % action_text)
         return HttpResponseRedirect(redirect_url)
-    _add_error_response_message(investigator, request,action_text)
+    _add_error_response_message(investigator_form, request,action_text)
     return None
 
 @login_required

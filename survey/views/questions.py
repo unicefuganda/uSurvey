@@ -192,6 +192,7 @@ def _render_question_view(request, instance=None):
         options = instance.options.all()
         options = [option.text for option in options] if options else None
 
+
     if request.method == 'POST':
         response, options, question_form = _process_question_form(request, options, response, instance)
 

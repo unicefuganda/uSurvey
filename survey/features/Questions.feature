@@ -58,7 +58,6 @@ Feature: Questions related features
     And I visit questions list page
     And I click on view options link
     Then I should see the question options in a modal
-    Then I should see the sub question below the question
     And when I click the close button
     Then I should be back to questions list page
 

@@ -14,7 +14,17 @@ class GroupConditionFormTests(TestCase):
         
         group_condition_form = GroupConditionForm(form_data)
         self.assertTrue(group_condition_form.is_valid())
-        
+
+    def test_invalid_value_which_is_not_an_integer_form(self):
+        form_data = {
+            'value' : 0.1,
+            'attribute': "AGE",
+            'condition': 'GREATER_THAN'
+        }
+
+        group_condition_form = GroupConditionForm(form_data)
+        self.assertFalse(group_condition_form.is_valid())
+
     def test_valid_form_due_to_invalid_condition(self):
         form_data = {
             'value' : 3,
@@ -51,6 +61,7 @@ class GroupConditionFormTests(TestCase):
 
         group_condition_form = GroupConditionForm(form_data)
         self.assertFalse(group_condition_form.is_valid())
+
         message = "GENDER can only have condition: EQUALS."
         self.assertEqual([message], group_condition_form.errors['condition'])
 

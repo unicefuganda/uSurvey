@@ -178,3 +178,13 @@ class InvestigatorTest(TestCase):
         next_question = self.investigator.member_answered(question_4, self.household_member, answer=1, batch=batch2)
         self.assertEqual(question_5, next_question)
 
+    def test_should_know_how_to_remove_all_households_that_do_not_belong_to_investigators_location(self):
+        entebbe = Location.objects.create(name="Entebbe")
+        self.investigator.location = entebbe
+        self.investigator.save()
+
+        self.investigator.remove_invalid_households()
+
+        updated_household = Household.objects.get(id=self.household.id)
+        self.assertEqual(0, len(self.investigator.households.all()))
+        self.assertIsNone(updated_household.investigator)

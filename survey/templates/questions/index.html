@@ -93,7 +93,9 @@
                   {% if question.options.all %}
                     <a class="btn btn-small" href="#view_options_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View options</a>
                   {% else %}
-                    <a class="btn btn-small" href="#view_logic_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View Logic</a>
+                      {% if batch %}
+                            <a class="btn btn-small" href="#view_logic_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View Logic</a>
+                      {% endif %}
                   {% endif %}
                     
                 </div>

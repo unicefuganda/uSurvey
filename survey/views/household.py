@@ -142,7 +142,7 @@ def get_investigators(request):
 def list_households(request):
     selected_location = None
 
-    all_households = Household.objects.all().order_by('household_member__householdhead__surname').exclude(investigator=None)
+    all_households = Household.objects.all().order_by('household_member__householdhead__surname')
     households = list()
     map(lambda household: not household in households and households.append(household), all_households)
 
@@ -156,6 +156,7 @@ def list_households(request):
     if not households:
         location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'
         messages.error(request, "There are  no households currently registered  for this %s." % location_type)
+
     return render(request, 'households/index.html',
                   {'households': households, 'location_data': LocationWidget(selected_location), 'request': request})
 
