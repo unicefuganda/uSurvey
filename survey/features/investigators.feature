@@ -22,7 +22,7 @@ Feature: Investigators feature
       And I have locations
       And I visit investigators listing page
       And I should see the investigators list paginated
-    
+
     Scenario: No investigators list
       Given I have no investigators
       Given I am logged in as researcher
@@ -64,3 +64,16 @@ Feature: Investigators feature
       Then I should go back to investigator details page
       And I should see name of investigator updated
 
+    Scenario: Block investigators
+      Given I am logged in as researcher
+      And I have one investigator
+      And I visit investigators listing page
+      And I click block the investigator
+      Then I should see block investigator confirmation modal
+      When I confirm block the investigator
+      Then I should see the investigator blocked successfully
+      And I should see unblock investigator
+      And I click unblock the investigator
+      Then I should see unblock investigator confirmation modal
+      When I confirm unblock the investigator
+      Then I should see the investigator unblocked successfully

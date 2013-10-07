@@ -59,6 +59,9 @@ class InvestigatorsListPage(PageObject):
     def visit_investigator(self, investigator):
         self.browser.click_link_by_text(investigator.name)
 
+    def see_confirm_block_message(self, confirmation_type, investigator):
+        self.is_text_present("Confirm: Are you sure you want to %s investigator %s" % (confirmation_type, investigator.name))
+
 
 class FilteredInvestigatorsListPage(InvestigatorsListPage):
     def __init__(self, browser, location_id):

@@ -78,7 +78,7 @@ def list_investigators(request):
     investigators = Investigator.objects.all()
 
     if params.has_key('location') and params['location'].isdigit():
-        selected_location = Location.objects.get(id=int(params['location']));
+        selected_location = Location.objects.get(id=int(params['location']))
         corresponding_locations = selected_location.get_descendants(include_self=True)
         investigators = Investigator.objects.filter(location__in=corresponding_locations)
 
@@ -122,3 +122,26 @@ def edit_investigator(request, investigator_id):
                 'form': investigator_form,
                 'locations': LocationWidget(investigator.location)}
     return response or render(request, 'investigators/investigator_form.html', context)
+
+@permission_required('auth.can_view_investigators')
+def block_investigator(request, investigator_id):
+    try:
+        investigator = Investigator.objects.get(id=investigator_id)
+        investigator.is_blocked = True
+        investigator.save()
+        investigator.households.clear()
+        messages.success(request, "Investigator successfully blocked.")
+    except Investigator.DoesNotExist:
+        messages.error(request, "Investigator does not exist.")
+    return HttpResponseRedirect('/investigators/')
+
+@permission_required('auth.can_view_investigators')
+def unblock_investigator(request, investigator_id):
+    try:
+        investigator = Investigator.objects.get(id=investigator_id)
+        investigator.is_blocked = False
+        investigator.save()
+        messages.success(request, "Investigator successfully unblocked.")
+    except Investigator.DoesNotExist:
+        messages.error(request, "Investigator does not exist.")
+    return HttpResponseRedirect('/investigators/')

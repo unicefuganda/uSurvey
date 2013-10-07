@@ -1,0 +1,17 @@
+<div class="modal fade hide" id="block_{{name.lower}}_{{id}}" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Block {{ name }}</h4>
+      </div>
+      <div class="modal-body">
+        <span class="alert_confirm">Confirm:</span> Are you sure you want to block investigator {{ object_name }}?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="{{ url }}" id="block-{{name.lower}}-{{id}}">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>

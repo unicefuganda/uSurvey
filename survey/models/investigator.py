@@ -25,6 +25,7 @@ class Investigator(BaseModel):
                                 blank=False, default='English', verbose_name="Preferred language of communication")
     backend = models.ForeignKey(Backend, null=True, verbose_name="Connection")
     weights = models.FloatField(default=0, blank=False)
+    is_blocked = models.BooleanField(default=False)
 
     HOUSEHOLDS_PER_PAGE = 4
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
@@ -194,7 +195,6 @@ class Investigator(BaseModel):
         for household in all_households:
             if household.location != self.location:
                 self.households.remove(household)
-
 
     @classmethod
     def get_summarised_answers_for(self, batch, questions, data):

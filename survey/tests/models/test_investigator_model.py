@@ -34,9 +34,9 @@ class InvestigatorTest(TestCase):
     def test_fields(self):
         investigator = Investigator()
         fields = [str(item.attname) for item in investigator._meta.fields]
-        self.assertEqual(len(fields), 12)
+        self.assertEqual(len(fields), 13)
         for field in ['id', 'name', 'mobile_number', 'created', 'modified', 'male', 'age', 'level_of_education',
-                      'location_id', 'language', 'backend_id', 'weights']:
+                      'location_id', 'language', 'backend_id', 'weights', 'is_blocked']:
             self.assertIn(field, fields)
 
     def test_store(self):

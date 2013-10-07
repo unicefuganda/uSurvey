@@ -180,3 +180,39 @@ def then_i_should_go_back_to_investigator_details_page(step):
 @step(u'And I should see name of investigator updated')
 def and_i_should_see_name_of_investigator_updated(step):
     world.page.validate_successful_edited_message()
+
+@step(u'And I click block the investigator')
+def and_i_click_block_the_investigator(step):
+    world.page.click_link_by_text(" Block")
+
+@step(u'Then I should see block investigator confirmation modal')
+def then_i_should_see_block_investigator_confirmation_modal(step):
+    world.page.see_confirm_block_message("block", world.investigator)
+
+@step(u'When I confirm block the investigator')
+def when_i_confirm_block_the_investigator(step):
+    world.page.click_by_css("#block-investigator-%s" %world.investigator.id)
+
+@step(u'Then I should see the investigator blocked successfully')
+def then_i_should_see_the_investigator_blocked_successfully(step):
+    world.page.see_success_message("Investigator", "blocked")
+
+@step(u'And I should see unblock investigator')
+def and_i_should_see_unblock_investigator(step):
+    world.page.is_text_present(" Unblock")
+
+@step(u'And I click unblock the investigator')
+def and_i_click_unblock_the_investigator(step):
+    world.page.click_link_by_text(" Unblock")
+
+@step(u'Then I should see unblock investigator confirmation modal')
+def then_i_should_see_unblock_investigator_confirmation_modal(step):
+    world.page.see_confirm_block_message("unblock", world.investigator)
+
+@step(u'When I confirm unblock the investigator')
+def when_i_confirm_unblock_the_investigator(step):
+    world.page.click_by_css("#unblock-investigator-%s" %world.investigator.id)
+
+@step(u'Then I should see the investigator unblocked successfully')
+def then_i_should_see_the_investigator_unblocked_successfully(step):
+    world.page.see_success_message("Investigator", "unblocked")
