@@ -44,10 +44,11 @@ $(function(){
           $(element).next().text("");
           attribute_value = $('#id_attribute').val();
           if (attribute_value == 'AGE'){
-              return value >= 0;
+              var integer_regex = /^\d+$/;
+              return integer_regex.test(value) && value >= 0;
           }
           return true;
-        }, "Age cannot be negative.");
+        }, "Age must be a whole number.");
     
     $('#add-condition-form').validate({
         rules: {
