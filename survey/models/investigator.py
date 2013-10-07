@@ -34,7 +34,7 @@ class Investigator(BaseModel):
         'REANSWER': [],
         'INVALID_ANSWER': [],
         'CONFIRM_END_INTERVIEW': [],
-        'IS_REGISTERING_HOUSEHOLD': True,
+        'IS_REGISTERING_HOUSEHOLD': None,
     }
 
     def __init__(self, *args, **kwargs):

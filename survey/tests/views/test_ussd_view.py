@@ -4,8 +4,7 @@ import urllib2
 from django.test import TestCase
 from django.test.client import Client
 
-from rapidsms.contrib.locations.models import Location
-from survey.views.ussd import *
+from survey.ussd.ussd import USSD
 
 
 class USSDTest(TestCase):

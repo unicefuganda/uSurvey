@@ -248,7 +248,7 @@ class USSDSurvey(USSD):
         self.action = self.ACTIONS['REQUEST']
         if not self.is_active():
             self.responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-            self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
+            self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', None)
         else:
             self.render_resume_message()
         return self.action, self.responseString
