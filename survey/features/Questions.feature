@@ -52,7 +52,9 @@ Feature: Questions related features
   Scenario: View multichoice question options
     Given I am logged in as researcher
     And I have a member group
+    And I have a survey
     And I have a multichoice question
+    And I select multichoice question in batch
     And I have a sub question for that question
     And I have a rule linking one option with that subquestion
     And I visit questions list page
@@ -60,6 +62,12 @@ Feature: Questions related features
     Then I should see the question options in a modal
     And when I click the close button
     Then I should be back to questions list page
+    And I visit questions listing page of the batch
+    And I click on view options link again
+    And I click delete question rule
+    And I click confirm delete
+    Then I should go back to questions listing page
+    And I should see that the logic was deleted successfully
 
   Scenario: Add Subquestion
     Given I am logged in as researcher

@@ -2,6 +2,7 @@ from random import randint
 from time import sleep
 from lettuce import *
 from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage, CreateNewSubQuestionPage, EditQuestionPage
+from survey.models import Batch
 from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
 from survey.models.answer_rule import AnswerRule
@@ -301,7 +302,7 @@ def then_i_should_see_the_sub_question_below_the_question(step):
 
 @step(u'And I have a rule linking one option with that subquestion')
 def and_i_have_a_rule_linking_one_option_with_that_subquestion(step):
-    AnswerRule.objects.create(question=world.multi_choice_question, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=world.option3, next_question=world.sub_question)
+    world.answer_rule = AnswerRule.objects.create(question=world.multi_choice_question, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'], condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=world.option3, next_question=world.sub_question)
 
 @step(u'And I have a subquestion under that question')
 def and_i_have_a_subquestion_under_that_question(step):
@@ -400,3 +401,17 @@ def when_i_fill_in_edited_sub_question_details(step):
 @step(u'Then I should see the sub question successfully edited')
 def then_i_should_see_the_sub_question_successfully_edited(step):
     world.page.see_success_message("Sub question", "edited")
+
+@step(u'And I click delete question rule')
+def and_i_click_delete_question_rule(step):
+    sleep(2)
+    world.page.click_by_css('#delete-icon-%s'% world.answer_rule.id)
+
+@step(u'And I should see that the logic was deleted successfully')
+def and_i_should_see_that_the_logic_was_deleted_successfully(step):
+    world.page.see_success_message("Logic", "deleted")
+
+@step(u'And I select multichoice question in batch')
+def and_i_select_multichoice_question_in_batch(step):
+    world.batch = Batch.objects.create(order = 1, name = "Batch A", description='description', survey=world.survey)
+    world.multi_choice_question.batches.add(world.batch)

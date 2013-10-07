@@ -231,6 +231,7 @@ def get_sub_questions_for_question(request, question_id):
 def delete_logic(request, batch_id, answer_rule_id):
     rule = AnswerRule.objects.get(id=answer_rule_id)
     rule.delete()
+    messages.success(request, "Logic successfully deleted.")
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
 @permission_required('auth.can_view_batches')
