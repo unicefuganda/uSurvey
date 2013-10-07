@@ -93,3 +93,11 @@ class USSD(USSDBase):
     def clean_investigator_input(self):
         if self.is_new_request():
             self.request['ussdRequestString'] = ''
+
+    def select_household(self, answer):
+        try:
+            answer = int(answer)
+            self.household = self.investigator.all_households()[answer - 1]
+            self.set_in_session('HOUSEHOLD', self.household)
+        except (ValueError, IndexError) as e:
+            self.responseString += "INVALID SELECTION: "

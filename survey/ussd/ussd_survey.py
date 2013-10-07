@@ -108,18 +108,7 @@ class USSDSurvey(USSD):
             self.action = self.ACTIONS['END']
             self.responseString = self.MESSAGES['NO_HOUSEHOLDS']
 
-    def is_browsing_households_list(self, answer,list_option="00"):
-        if answer == list_option or self.is_pagination_option(answer):
-            self.set_current_page(answer)
-            return True
 
-    def select_household(self, answer):
-        try:
-            answer = int(answer)
-            self.household = self.investigator.all_households()[answer - 1]
-            self.set_in_session('HOUSEHOLD', self.household)
-        except (ValueError, IndexError) as e:
-            self.responseString += "INVALID SELECTION: "
 
     def select_household_member(self, answer):
         try:

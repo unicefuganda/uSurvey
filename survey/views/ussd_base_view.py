@@ -29,10 +29,7 @@ class USSDBaseView(object):
 
 
     def response(self):
-        print self.is_registering_household
         answer = self.request['ussdRequestString'].strip()
-        print"(((((((((((((((("
-        print answer
         if not answer and self.is_new_request():
             action, responseString = self.ussd_survey.render_welcome_or_resume()
 
@@ -44,7 +41,7 @@ class USSDBaseView(object):
                 action, responseString = self.ussd_survey.start()
             elif answer == self.ANSWER['REGISTER_HOUSEHOLD']:
                 self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
-                action, responseString = self.ussd_register_household.start(answer)
+                action, responseString = self.ussd_register_household.start("00")
 
         elif not self.is_registering_household:
             action, responseString = self.ussd_survey.take_survey()

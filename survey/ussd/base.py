@@ -47,3 +47,8 @@ class USSDBase(object):
 
     def is_new_request(self):
         return self.request['response'] == 'false'
+
+    def is_browsing_households_list(self, answer,list_option="00"):
+        if answer == list_option or self.is_pagination_option(answer):
+            self.set_current_page(answer)
+            return True

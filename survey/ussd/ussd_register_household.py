@@ -7,17 +7,16 @@ class USSDRegisterHousehold(USSD):
         super(USSDRegisterHousehold, self).__init__(investigator, request)
 
 
-    def start(self,answer):
+    def start(self, answer):
         self.register_households(answer)
         return self.action, self.responseString
 
     def register_households(self, answer):
-        if self.is_pagination_option(answer):
-            self.set_current_page(answer)
+        if self.is_browsing_households_list(answer):
             self.get_household_list()
-        elif not self.household:
-            self.get_household_list()
+
         else:
+            self.select_household(answer)
             self.render_select_member_or_head()
 
     def render_select_member_or_head(self):
