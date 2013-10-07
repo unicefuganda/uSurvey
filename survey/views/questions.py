@@ -133,6 +133,10 @@ def add_logic(request, batch_id, question_id):
     question = Question.objects.get(id=question_id)
     batch = Batch.objects.get(id=batch_id)
     logic_form = LogicForm(question=question, batch=batch)
+
+    question_rules_for_batch = {}
+    question_rules_for_batch[question] = question.rules_for_batch(batch)
+
     if request.method == "POST":
         logic_form = LogicForm(data=request.POST, question=question, batch=batch)
         if logic_form.is_valid():
@@ -141,9 +145,9 @@ def add_logic(request, batch_id, question_id):
             return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
         messages.error(request, 'Logic not valid.')
-    context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
+    context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question, 'rules_for_batch': question_rules_for_batch,
                'questionform': QuestionForm(parent_question=question), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
-               'class': 'question-form', 'batch_id': batch_id, 'cancel_url': '/batches/%s/questions/' % batch_id}
+               'class': 'question-form', 'batch_id': batch_id, 'batch': batch, 'cancel_url': '/batches/%s/questions/' % batch_id}
     return render(request, "questions/logic.html", context)
 
 @permission_required('auth.can_view_batches')

@@ -48,7 +48,7 @@ $(function(){
               return integer_regex.test(value) && value >= 0;
           }
           return true;
-        }, "Age must be a whole number.");
+        }, "Age must be a whole non negative number.");
     
     $('#add-condition-form').validate({
         rules: {

@@ -242,7 +242,7 @@ def and_if_i_add_in_a_negative_number(step):
 
 @step(u'Then I see error age cannot be negative')
 def then_i_should_see_error(step):
-    world.page.is_text_present('Age cannot be negative.')
+    world.page.is_text_present('Age must be a whole non negative number.')
 
 
 @step(u'When I click on add condition button')

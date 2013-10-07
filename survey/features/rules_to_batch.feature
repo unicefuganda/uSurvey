@@ -10,6 +10,7 @@ Feature: Batch related features
     And I visit batches question list page
     And I click on add logic link
     Then I should see the add logic page
+    And I should see already existing logic for the question
     When I fill in skip rule details
     And I submit the form
     Then I should see the logic was successfully added to the question

@@ -642,12 +642,17 @@ class LogicViewTest(BaseTest):
         self.assertEqual(2, len(all_question_batch_rules[rule_question]))
         [self.assertIn(rule, all_question_batch_rules[rule_question]) for rule in all_rules]
 
-
     def test_views_add_logic_get_has_logic_form_in_context_and_has_success_response(self):
+        answer_rule_2 = AnswerRule.objects.create(batch=self.batch, question=self.question,
+                                                  action=AnswerRule.ACTIONS['REANSWER'],
+                                                  condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                  validate_with_value=1)
         response = self.client.get('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk))
 
         self.assertIsInstance(response.context['logic_form'], LogicForm)
         self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['batch'], self.batch)
+        self.assertIn(answer_rule_2, response.context['rules_for_batch'].get(self.question, None))
         self.assertEqual(response.context['batch_id'], str(self.batch.id))
         self.assertEqual(response.context['cancel_url'], '/batches/%s/questions/' % self.batch.pk)
         self.assertEqual(200, response.status_code)
