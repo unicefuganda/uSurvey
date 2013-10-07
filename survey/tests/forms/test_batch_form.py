@@ -64,3 +64,15 @@ class BatchQuestionsFormTest(TestCase):
         self.assertFalse(batch_questions_form.is_valid())
         message = 'Enter a list of values.'
         self.assertEquals([message], batch_questions_form.errors['questions'])
+
+    def test_has_only_questions_not_subquestions_in_the_form(self):
+        question1 = Question.objects.create(text="question1", answer_type=Question.NUMBER)
+        question2 = Question.objects.create(text="question2", answer_type=Question.TEXT)
+        sub_question1 = Question.objects.create(text="sub-question1", answer_type=Question.TEXT, parent=question1, subquestion=True)
+        batch_form = BatchQuestionsForm()
+
+        question_choices = batch_form.fields['questions']._queryset
+        self.assertIn(question1, question_choices)
+        self.assertIn(question2, question_choices)
+
+        self.assertNotIn(sub_question1, question_choices)

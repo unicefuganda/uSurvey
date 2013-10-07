@@ -577,7 +577,7 @@ class QuestionsViews(BaseTest):
         success_message = "Question successfully deleted."
         self.assertIn(success_message, response.cookies['messages'].value)
 
-    def test_should_delete_question(self):
+    def test_should_throw_error_when_trying_to_delete_non_existent_question(self):
         non_existing_id = 222222
         response = self.client.get('/questions/%d/delete/' % non_existing_id)
         self.assertRedirects(response, '/questions/', status_code=302, target_status_code=200, msg_prefix='')
@@ -770,7 +770,7 @@ class LogicViewTest(BaseTest):
         response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk),
                                     data=form_data)
 
-        error_message = 'Rule not valid.'
+        error_message = 'Logic not valid.'
         self.assertIn(error_message, str(response))
 
 

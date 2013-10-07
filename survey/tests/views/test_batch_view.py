@@ -180,12 +180,12 @@ class BatchViews(BaseTest):
 
     def test_assign_question_to_the_batch_should_show_list_of_questions(self):
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        question = Question.objects.create(group=group, text="Haha?")
+
         response = self.client.get('/batches/%d/assign_questions/'%(self.batch.id))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('batches/assign.html', templates)
-
-        question = Question.objects.create(group=group, text="Haha?")
         self.assertEqual(1, len(response.context['batch_questions_form'].fields['questions']._queryset))
         self.assertIn(question, response.context['batch_questions_form'].fields['questions']._queryset)
         self.assertEqual(self.batch, response.context['batch'])

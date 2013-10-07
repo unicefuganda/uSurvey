@@ -29,7 +29,7 @@ def index(request, batch_id):
 
     if not questions.exists():
         messages.error(request, 'There are no questions associated with this batch yet.')
-    all_questions = questions.filter(subquestion=False)
+    all_questions = questions.exclude(subquestion=True)
 
     question_rules_for_batch = {}
     for question in all_questions:
@@ -140,7 +140,7 @@ def add_logic(request, batch_id, question_id):
             messages.success(request, 'Logic successfully added.')
             return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
-        messages.error(request, 'Rule not valid.')
+        messages.error(request, 'Logic not valid.')
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'questionform': QuestionForm(parent_question=question), 'modal_action': '/questions/%s/sub_questions/new/' % question.id,
                'class': 'question-form', 'batch_id': batch_id, 'cancel_url': '/batches/%s/questions/' % batch_id}

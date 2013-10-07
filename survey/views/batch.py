@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 
 from survey.investigator_configs import *
-from survey.models import HouseholdMemberGroup
+from survey.models import HouseholdMemberGroup, Question
 from survey.models.surveys import Survey
 from survey.models.batch import Batch, BatchLocationStatus
 
@@ -105,6 +105,7 @@ def delete(request, survey_id, batch_id):
 @permission_required('auth.can_view_batches')
 def assign(request, batch_id):
     batch_questions_form = BatchQuestionsForm()
+
     groups = HouseholdMemberGroup.objects.all()
     batch = Batch.objects.get(id=batch_id)
     if request.method == 'POST':
