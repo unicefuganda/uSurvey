@@ -124,15 +124,18 @@ class Investigator(BaseModel):
         questions.append(question)
         self.set_in_cache(label, questions)
 
-    def households_list(self, page=1):
+    def households_list(self, page=1,registered=False):
         all_households = list(self.all_households())
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
         households_list = []
         for household in households:
-            text = "%s: %s" % (all_households.index(household) + 1, household.get_head().surname)
-            if household.completed_currently_open_batches():
-                text += "*"
+            if not registered:
+                text = "%s: Household-%s" % (all_households.index(household) + 1, household.uid)
+            else:
+                text = "%s: %s" % (all_households.index(household) + 1, household.get_head().surname)
+                if household.completed_currently_open_batches():
+                    text += "*"
             households_list.append(text)
         if households.has_previous():
             households_list.append(self.PREVIOUS_PAGE_TEXT)

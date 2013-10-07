@@ -6,6 +6,7 @@ from random import randint
 from django.test import TestCase
 from django.test.client import Client
 from rapidsms.contrib.locations.models import LocationType, Location
+from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import HouseholdMemberGroup, GroupCondition
 from survey.models.backend import Backend
 from survey.models.household_batch_completion import HouseholdBatchCompletion
@@ -15,7 +16,7 @@ from survey.models.investigator import Investigator
 
 from survey.models.question import Question
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
-from survey.ussd import *
+from survey.ussd.ussd import *
 
 
 class USSDOpenBatchTest(USSDBaseTest):

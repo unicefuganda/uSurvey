@@ -8,7 +8,7 @@ from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
-from survey.ussd import USSD
+from survey.ussd.ussd import USSD
 
 
 class USSDTest(USSDBaseTest):
@@ -570,6 +570,5 @@ class USSDTest(USSDBaseTest):
 
         response = self.register_household()
 
-        self.assertEqual(response.context['investigator'], self.investigator)
         self.assertTrue(self.investigator.get_from_cache('IS_REGISTERING_HOUSEHOLD'))
 

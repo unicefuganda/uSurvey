@@ -8,7 +8,7 @@ from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdBatchCompletion
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
-from survey.ussd import USSD
+from survey.ussd.ussd import USSD
 
 
 class USSDTestCompleteFlow(USSDBaseTest):

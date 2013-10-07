@@ -5,7 +5,7 @@ from django.test import TestCase, Client
 from rapidsms.backends.database.models import BackendMessage
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Backend, RandomHouseHoldSelection
-from survey.ussd import HouseHoldSelection
+from survey.ussd.household_selection import HouseHoldSelection
 
 
 class RandomHouseHoldSelectionTest(TestCase):

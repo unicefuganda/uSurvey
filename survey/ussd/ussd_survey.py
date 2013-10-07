@@ -1,65 +1,11 @@
-from django.core.cache import cache
-from django.conf import settings
-from survey.investigator_configs import *
+# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from survey.models import HouseholdHead
-from survey.models.random_household_selection import RandomHouseHoldSelection
+from survey.ussd.ussd import USSD
 
 
-class USSDBase(object):
-    MESSAGES = {
-        'SUCCESS_MESSAGE': "This survey has come to an end. Your responses have been received. Thank you.",
-        'BATCH_5_MIN_TIMEDOUT_MESSAGE': "This batch is already completed and 5 minutes have passed. You may no longer retake it.",
-        'USER_NOT_REGISTERED': "Sorry, your mobile number is not registered for this survey",
-        'WELCOME_TEXT': "Welcome %s to the survey.\n1: Register households\n2: Take survey",
-        'HOUSEHOLD_LIST': "Please select a household from the list",
-        'MEMBERS_LIST': "Please select a member from the list",
-        'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
-        'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
-        'NO_HOUSEHOLDS': "Sorry, you have no households registered.",
-        'NO_OPEN_BATCH': "Sorry, there are no open surveys currently.",
-        'HOUSEHOLDS_COUNT_QUESTION': "How many households have you listed in your segment?",
-        'HOUSEHOLD_SELECTION_SMS_MESSAGE': "Thank you. You will receive the household numbers selected for your segment",
-        'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s. How many households have you listed in your segment?" % NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR,
-        'MEMBER_SUCCESS_MESSAGE':"Thank you. Would you like to proceed to the next Household Member?\n1: Yes\n2: No",
-        'HOUSEHOLD_COMPLETION_MESSAGE':"Thank you. You have completed this household. Would you like to retake this household?\n1: Yes\n2: No",
-        'RESUME_MESSAGE':"Would you like to to resume with member question?\n1: Yes\n2: No",
-    }
-
-    ACTIONS = {
-        'REQUEST': 'request',
-        'END': 'end'
-    }
-
-    ANSWER = {
-        'YES':"1",
-        'NO':"2",
-        "REGISTER_HOUSEHOLD":"1",
-        'TAKE_SURVEY':"2",
-    }
-
-    DEFAULT_SESSION_VARIABLES = {
-        'PAGE': 1,
-        'HOUSEHOLD': None,
-        'HOUSEHOLD_MEMBER': None,
-    }
-
-    HOUSEHOLD_LIST_OPTION = "00"
-
-    TIMEOUT_MINUTES = 5
-
-    def is_new_request(self):
-        return self.request['response'] == 'false'
-
-
-class USSD(USSDBase):
+class USSDSurvey(USSD):
     def __init__(self, investigator, request):
-        super(USSD, self).__init__()
-        self.investigator = investigator
-        self.request = request.dict()
-        self.action = self.ACTIONS['REQUEST']
-        self.responseString = ""
-        self.household = None
-        self.household_member = None
+        super(USSDSurvey, self).__init__(investigator, request)
         self.current_member_is_done = False
         self.is_resuming_survey = False
         self.is_registering_household = True
@@ -68,76 +14,8 @@ class USSD(USSDBase):
         self.set_household_member()
         self.set_current_member_is_done()
         self.set_is_resuming_survey()
-        self.set_is_registering_household()
         self.clean_investigator_input()
 
-    def set_household(self):
-        household = self.get_from_session('HOUSEHOLD')
-        if household:
-            self.household = household
-
-    def set_household_member(self):
-        household_member = self.get_from_session('HOUSEHOLD_MEMBER')
-
-        if household_member:
-            self.household_member = household_member
-
-    def set_is_registering_household(self):
-        is_registering_household = self.investigator.get_from_cache('IS_REGISTERING_HOUSEHOLD')
-        if is_registering_household is not None:
-            self.is_registering_household = is_registering_household
-
-    def set_current_member_is_done(self):
-        if self.household_member:
-            self.current_member_is_done = self.household_member.survey_completed()
-
-    def set_is_resuming_survey(self):
-        try:
-            cache_resuming_session = self.get_from_session('IS_RESUMING')
-            self.is_resuming_survey = cache_resuming_session
-        except:
-            pass
-
-    def set_session(self):
-        self.session_string = "SESSION-%s" % self.request['transactionId']
-        if not cache.get(self.session_string):
-            cache.set(self.session_string, self.DEFAULT_SESSION_VARIABLES)
-
-    def get_from_session(self, key):
-        return cache.get(self.session_string)[key]
-
-    def set_in_session(self, key, value):
-        session = cache.get(self.session_string)
-        session[key] = value
-        cache.set(self.session_string, session)
-
-    def is_pagination_option(self, answer):
-        return answer in getattr(settings, 'USSD_PAGINATION', None).values()
-
-    def is_pagination(self, question, answer):
-        pagination = False
-        if question.is_multichoice():
-            pagination = self.is_pagination_option(answer)
-        if not pagination:
-            self.set_in_session('PAGE', self.DEFAULT_SESSION_VARIABLES['PAGE'])
-        return pagination
-
-    def set_current_page(self, answer):
-        current_page = self.get_from_session('PAGE')
-        if answer == getattr(settings, 'USSD_PAGINATION', None).get('PREVIOUS'):
-            current_page -= 1
-        elif answer == getattr(settings, 'USSD_PAGINATION', None).get('NEXT'):
-            current_page += 1
-        self.set_in_session('PAGE', current_page)
-
-    def question_present_in_cache(self, label):
-        return self.question in self.investigator.get_from_cache(label)
-
-    def reanswerable_question(self):
-        return self.question_present_in_cache('REANSWER')
-
-    def invalid_answered_question(self):
-        return self.question_present_in_cache('INVALID_ANSWER')
 
     def process_investigator_response(self, batch):
         answer = self.request['ussdRequestString'].strip()
@@ -312,7 +190,7 @@ class USSD(USSDBase):
     def render_households_list(self):
         if not self.household:
             page = self.get_from_session('PAGE')
-            self.responseString += "%s\n%s" % (self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page))
+            self.responseString += "%s\n%s" % (self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page,registered=True))
         else:
             self.behave_like_new_request()
             self.render_survey()
@@ -358,40 +236,24 @@ class USSD(USSDBase):
         else:
             self.show_message_for_no_open_batch()
 
+        return self.action, self.responseString
+
     def render_select_household(self):
         self.request['ussdRequestString']="00"
         self.take_survey()
 
-    def response(self):
-        answer = self.request['ussdRequestString'].strip()
-        if not answer and self.is_new_request():
-            self.action = self.ACTIONS['REQUEST']
-            if not self.is_active():
-                self.responseString = self.MESSAGES['WELCOME_TEXT']% self.investigator.name
-                self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
-            else:
-                self.render_resume_message()
+
+
+    def render_welcome_or_resume(self):
+        self.action = self.ACTIONS['REQUEST']
+        if not self.is_active():
+            self.responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+            self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
         else:
-            self.action = self.ACTIONS['REQUEST']
-            if not self.is_registering_household:
-                self.take_survey()
-            elif answer == self.ANSWER['TAKE_SURVEY']:
-                self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', False)
-                self.is_registering_household = False
-                self.render_select_household()
-            elif answer == self.ANSWER['REGISTER_HOUSEHOLD']:
-                self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
-                self.is_registering_household = True
-                ## do registering stuff -- potentiall inject othe class
-            else:
-                pass
-                ## do registering stuff -- potentiall inject othe class
+            self.render_resume_message()
+        return self.action, self.responseString
 
-        return {'action': self.action, 'responseString': self.responseString, 'investigator':self.investigator}
 
-    def clean_investigator_input(self):
-        if self.is_new_request():
-            self.request['ussdRequestString'] = ''
 
     def behave_like_new_request(self):
         self.request['ussdRequestString'] = ""
@@ -404,25 +266,6 @@ class USSD(USSDBase):
     def investigator_not_registered_response(self):
         return {'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['USER_NOT_REGISTERED']}
 
-
-class HouseHoldSelection(USSDBase):
-    def __init__(self, mobile_number, request):
-        super(HouseHoldSelection, self).__init__()
-        self.mobile_number = mobile_number
-        self.request = request
-
-    def randomly_select_households(self):
-        no_of_households = int(self.request['ussdRequestString'].strip())
-        if no_of_households >= NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR:
-            RandomHouseHoldSelection.objects.get_or_create(mobile_number=self.mobile_number)[0].generate(
-                no_of_households=no_of_households)
-            return {'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['HOUSEHOLD_SELECTION_SMS_MESSAGE']}
-        else:
-            return {'action': self.ACTIONS['REQUEST'],
-                    'responseString': self.MESSAGES['HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE']}
-
-    def response(self):
-        if self.is_new_request():
-            return {'action': self.ACTIONS['REQUEST'], 'responseString': self.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']}
-        else:
-            return self.randomly_select_households()
+    def start(self):
+        self.render_select_household()
+        return self.action, self.responseString
