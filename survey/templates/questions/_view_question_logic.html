@@ -6,7 +6,7 @@
             Condition
         </th>
         <th>
-            Question/Value
+            Question/Value/Option
         </th>
          <th>
             Action
@@ -27,7 +27,11 @@
                     {% if rule.validate_with_value or rule.validate_with_value == 0 %}
                         {{ rule.validate_with_value }}
                     {% else %}
-                        <span class="muted"> Value of:</span>{{ rule.validate_with_question }}
+                        {% if rule.validate_with_question %}
+                            <span class="muted"> Value of:</span>{{ rule.validate_with_question }}
+                        {% else %}
+                            <span class="muted"> Option of:</span>{{ rule.validate_with_option.text }}
+                        {% endif %}
                     {% endif %}
 
                 </td>

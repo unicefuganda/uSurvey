@@ -339,4 +339,4 @@ def when_i_refill_the_form_with_valid_values(step):
 
 @step(u'And I should see already existing logic for the question')
 def and_i_should_see_already_existing_logic_for_the_question(step):
-    world.page.validate_fields_present([world.question.text, "Condition", "Question/Value", "Action"])
+    world.page.validate_fields_present([world.question.text, "Condition", "Question/Value/Option", "Action"])
