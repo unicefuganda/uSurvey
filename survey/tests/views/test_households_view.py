@@ -53,6 +53,18 @@ class HouseholdViewTest(BaseTest):
             'inv1': investigator.id,
         })
 
+    def test_gets_only_investigators_who_are_not_blocked(self):
+        uganda = Location.objects.create(name="Uganda")
+        backend = Backend.objects.create(name='something')
+        investigator = Investigator.objects.create(name="inv1", mobile_number="1234", location=uganda, backend=backend)
+        blocked_investigator = Investigator.objects.create(name="inv2", mobile_number="12345", location=uganda, is_blocked=True, backend=backend)
+        response = self.client.get('/households/investigators?location='+str(uganda.id))
+        self.failUnlessEqual(response.status_code, 200)
+        result_investigator = json.loads(response.content)
+        self.failUnlessEqual(result_investigator, {
+            'inv1': investigator.id,
+        })
+
     def test_get_investigators_returns_investigators_with_no_location_if_location_empty(self):
         uganda = Location.objects.create(name="Uganda")
         investigator = Investigator.objects.create(name="inv1", location=uganda, backend = Backend.objects.create(name='something'))

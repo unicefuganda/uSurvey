@@ -49,5 +49,3 @@ Feature: Households feature
       And I have locations
       And I visit households listing page
       And I should see no household message
-
-

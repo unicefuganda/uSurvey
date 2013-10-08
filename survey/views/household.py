@@ -132,7 +132,7 @@ def new(request):
 @login_required
 def get_investigators(request):
     location = request.GET['location'] if request.GET.has_key('location') and request.GET['location'] else None
-    investigators = Investigator.objects.filter(location=location)
+    investigators = Investigator.objects.filter(location=location, is_blocked=False)
     investigator_hash = {}
     for investigator in investigators:
         investigator_hash[investigator.name] = investigator.id
