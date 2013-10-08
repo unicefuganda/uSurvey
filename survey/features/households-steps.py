@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from random import randint
 from datetime import date
+from time import sleep
 
 from lettuce import *
 
 from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
 
-from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage, HouseholdDetailsPage
+from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage, HouseholdDetailsPage, EditHouseholdsPage
 from survey.features.page_objects.root import HomePage
 from survey.models.households import HouseholdMember, HouseholdHead, Household
 from survey.models.investigator import Investigator
@@ -24,8 +25,7 @@ def and_i_see_all_households_fields_are_present(step):
 
 @step(u'And I have an investigator in that location')
 def and_i_have_an_investigator_in_that_location(step):
-    kampala_county = Location.objects.get(name="Kampala County")
-    world.investigator = Investigator.objects.create(name="Investigator name", location=kampala_county)
+    world.investigator = Investigator.objects.create(name="Investigator name", location=world.kampala_village)
 
 @step(u'Then I should see that the household is created')
 def then_i_should_see_that_the_household_is_created(step):
@@ -158,7 +158,7 @@ def and_i_select_list_households(step):
 
 @step(u'And then I click on that household ID')
 def and_when_i_click_on_that_household_id(step):
-    world.page.click_link_by_text(world.household_uid)
+    world.page.click_link_by_text(world.household.uid)
 
 @step(u'And I should see that household details, its head and members')
 def and_i_should_see_that_household_details_its_head_and_members(step):
@@ -179,3 +179,33 @@ def then_i_should_see_household_member_title_and_add_household_member_link(step)
 @step(u'And I should see actions edit and delete member')
 def and_i_should_see_actions_edit_and_delete_member(step):
     world.page.validate_actions_edit_and_delete_member()
+
+@step(u'And I have two other investigators')
+def and_i_have_two_other_investigators(step):
+    world.investigator_1 = Investigator.objects.create(name="Investigator name", location=world.kampala_village, mobile_number="123456789")
+    world.investigator_2 = Investigator.objects.create(name="Investigator name", location=world.kampala_village, mobile_number="123456782")
+
+@step(u'And I click on that household ID')
+def and_i_click_on_that_household_id(step):
+    world.page.click_link_by_text(world.household.uid)
+
+@step(u'When I click edit household')
+def when_i_click_edit_household(step):
+    world.page.browser.click_link_by_text(" Edit Household")
+
+@step(u'Then I should see edit household form')
+def then_i_should_see_edit_household_form(step):
+    world.page = EditHouseholdsPage(world.browser)
+    world.related_location = world.household.get_related_location()
+    form_values = {}
+    for key, value in world.related_location.items():
+        world.page.is_text_present(value)
+
+
+@step(u'When I assign a new investigator')
+def when_i_assign_a_new_investigator(step):
+    world.page.fill_in_with_js('$("#household-investigator")', world.investigator_1.id)
+
+@step(u'Then I should see the investigator was saved successfully')
+def then_i_should_see_the_investigator_was_saved_successfully(step):
+    world.page.see_success_message('Household', 'edited')

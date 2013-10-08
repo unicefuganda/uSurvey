@@ -11,8 +11,8 @@ from survey.models.investigator import Investigator
 def and_i_have_a_household(step):
     district = LocationType.objects.get(slug = 'district')
     world.kampala = Location.objects.create(name='Kampala', type = district)
-    world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.kampala)
-    world.household = Household.objects.create(investigator=world.investigator, uid=4)
+    world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.kampala_village)
+    world.household = Household.objects.create(investigator=world.investigator, location=world.investigator.location, uid=4)
     HouseholdHead.objects.create(household=world.household, surname="Test", first_name="User", date_of_birth="1980-09-01", male=True,
                                  occupation='Agricultural labor', level_of_education='Primary', resident_since_year=2013, resident_since_month=2)
 

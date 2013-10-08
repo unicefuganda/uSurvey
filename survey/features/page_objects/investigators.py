@@ -21,6 +21,17 @@ class NewInvestigatorPage(PageObject):
 
     def fill_valid_values(self):
         self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
+        kampala = Location.objects.get(name="Kampala")
+        kampala_county = Location.objects.get(name="County")
+        kampala_subcounty = Location.objects.get(name="Subcounty")
+        kampala_parish = Location.objects.get(name="Parish")
+        kampala_village = Location.objects.get(name="Village")
+        self.fill_in_with_js('$("#location-district")', kampala.id)
+        self.fill_in_with_js('$("#location-county")', kampala_county.id)
+        self.fill_in_with_js('$("#location-subcounty")', kampala_subcounty.id)
+        self.fill_in_with_js('$("#location-parish")', kampala_parish.id)
+        self.fill_in_with_js('$("#location-village")', kampala_village.id)
+
         self.values = {
             'name': self.random_text('Investigator Name'),
             'mobile_number': "987654321",
@@ -31,13 +42,6 @@ class NewInvestigatorPage(PageObject):
             'language': 'Luo',
         }
         self.browser.fill_form(self.values)
-        kampala = Location.objects.get(name="Kampala")
-        kampala_county = Location.objects.get(name="Kampala County")
-        script = '$("#location-district").val(%s);$("#location-district").trigger("liszt:updated").chosen().change()' % kampala.id
-        self.browser.execute_script(script)
-        sleep(3)
-        script = '$("#location-county").val(%s);$("#location-county").trigger("liszt:updated").chosen().change()' % kampala_county.id
-        self.browser.execute_script(script)
 
 
 class InvestigatorsListPage(PageObject):

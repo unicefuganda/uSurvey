@@ -7,9 +7,9 @@ from survey.models.investigator import Investigator
 
 class HouseholdFormTest(TestCase):
     def test_valid(self):
-        form_data = {'uid': '6'}
+        form_data = {'uid': 6}
 
-        household_form = HouseholdForm(form_data)
+        household_form = HouseholdForm(data=form_data)
         self.assertTrue(household_form.is_valid())
         investigator = Investigator.objects.create(name="test", backend=Backend.objects.create(name='something'))
         household_form.instance.investigator = investigator
@@ -22,18 +22,18 @@ class HouseholdFormTest(TestCase):
         form_data = {
             'uid': -6,
         }
-        household_form = HouseholdForm(form_data)
+        household_form = HouseholdForm(data=form_data)
         self.assertFalse(household_form.is_valid())
         message = "Ensure this value is greater than or equal to 0."
         self.assertEquals(household_form.errors['uid'], [message])
 
         form_data['uid'] = 'not a number'
-        household_form = HouseholdForm(form_data)
+        household_form = HouseholdForm(data=form_data)
         self.assertFalse(household_form.is_valid())
         self.assertEquals(household_form.errors['uid'], ['Enter a whole number.'])
 
         form_data['uid'] = None
-        household_form = HouseholdForm(form_data)
+        household_form = HouseholdForm(data=form_data)
         self.assertFalse(household_form.is_valid())
         self.assertEquals(household_form.errors['uid'], ['This field is required.'])
 
@@ -43,3 +43,27 @@ class HouseholdFormTest(TestCase):
 
         household_form = HouseholdForm()
         self.assertEqual(2, household_form.fields['uid'].initial)
+
+    def test_raises_validation_error_if_uid_entered_already_exists(self):
+        investigator = Investigator.objects.create(name="test", backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(uid=1, investigator=investigator)
+
+        form_data = {
+            'uid': 1
+        }
+        household_form = HouseholdForm(data=form_data)
+        self.assertFalse(household_form.is_valid())
+        message = "Household with this Household Unique Identification already exists."
+        self.assertEquals(household_form.errors['uid'], [message])
+
+    def test_raises_cannot_change_uid_validation_error_if_different_uid_is_entered_for_instance(self):
+        investigator = Investigator.objects.create(name="test", backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(uid=1, investigator=investigator)
+
+        form_data = {
+            'uid': 2
+        }
+        household_form = HouseholdForm(data=form_data, instance=household, is_edit=True)
+        self.assertFalse(household_form.is_valid())
+        message = "Household Unique Identification cannot be modified."
+        self.assertEquals(household_form.errors['uid'], [message])

@@ -49,3 +49,17 @@ Feature: Households feature
       And I have locations
       And I visit households listing page
       And I should see no household message
+
+    Scenario: Edit households
+      Given I am logged in as researcher
+      And I have locations
+      And I have an investigator in that location
+      And I have a household
+      And I have two other investigators
+      And I visit households listing page
+      And then I click on that household ID
+      When I click edit household
+      Then I should see edit household form
+      When I assign a new investigator
+      And I submit the form
+      Then I should see the investigator was saved successfully

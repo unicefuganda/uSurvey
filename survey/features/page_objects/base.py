@@ -204,3 +204,6 @@ class PageObject(object):
 
     def field_is_visible(self, field_name):
         return self.browser.find_by_name(field_name).first.visible
+
+    def find_element_by_css(self, selector):
+        assert self.browser.find_by_css(selector).first

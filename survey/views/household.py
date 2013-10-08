@@ -52,9 +52,10 @@ def validate_investigator(request, householdform, posted_locations):
 def create_household(householdform, investigator, valid):
     is_valid_household = householdform['household'].is_valid()
     if investigator and is_valid_household:
-        householdform['household'].instance.investigator = investigator
-        householdform['household'].instance.location = investigator.location
-        householdform['household'].save()
+        household = householdform['household'].save(commit=False)
+        household.investigator = investigator
+        household.location = investigator.location
+        household.save()
         valid['household'] = True
     return valid
 
@@ -71,30 +72,41 @@ def delete_created_modelforms(householdform, valid):
     for key in valid.keys():
         householdform[key].instance.delete()
 
-def _process_form(householdform, investigator, request):
+def _process_form(householdform, investigator, request, is_edit=False):
     valid = {}
     valid = create_household(householdform, investigator, valid)
-    valid = create_remaining_modelforms(householdform, valid)
+
+    if not is_edit:
+        valid = create_remaining_modelforms(householdform, valid)
 
     if valid.values().count(True) == len(householdform.keys()):
-        messages.success(request, "Household successfully registered.")
-        return HttpResponseRedirect("/households/new")
+
+        redirect_url = "/households/new"
+        action_text = 'registered'
+        if is_edit:
+            action_text = 'edited'
+            redirect_url = "/households/"
+
+        messages.success(request, "Household successfully %s." % action_text)
+        return HttpResponseRedirect(redirect_url)
 
     delete_created_modelforms(householdform, valid)
     _add_error_response_message(householdform, request)
     return None
 
-def set_household_form(data):
+def set_household_form(data=None, is_edit=False, instance=None):
     householdform = {}
-    householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
-    householdform['household'] = HouseholdForm(data=data, auto_id='household-%s', label_suffix='')
+    if not is_edit:
+        householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
+
+    householdform['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, auto_id='household-%s', label_suffix='')
     return householdform
 
-def create(request, selected_location):
-    householdform = set_household_form(data=request.POST)
+def create(request, selected_location, instance=None, is_edit=False):
+    householdform = set_household_form(data=request.POST, instance=instance, is_edit=is_edit)
     posted_locations = selected_location.get_descendants(include_self=True)
     investigator, investigator_form = validate_investigator(request, householdform['household'], posted_locations)
-    response = _process_form(householdform, investigator, request)
+    response = _process_form(householdform, investigator, request, is_edit=is_edit)
 
     return response, householdform, investigator, investigator_form
 
@@ -126,6 +138,7 @@ def new(request):
                                                                'months_choices': householdHead.resident_since_month_choices(month_choices),
                                                                'years_choices': householdHead.resident_since_year_choices(year_choices),
                                                                'action': "/households/new/",
+                                                               'heading': "Edit Household",
                                                                'id': "create-household-form",
                                                                'button_label': "Create Household",
                                                                'loading_text': "Creating..."})
@@ -164,3 +177,28 @@ def list_households(request):
 def view_household(request, household_id):
     household = Household.objects.get(id=household_id)
     return render(request, 'households/show.html', {'household': household})
+
+
+def edit_household(request, household_id):
+    household_selected = Household.objects.get(id=household_id)
+    selected_location = household_selected.location
+    response = None
+    household_form = set_household_form(is_edit=True, instance=household_selected)
+    investigators = Investigator.objects.filter(location=selected_location, is_blocked=False)
+    investigator_form = {'value': '', 'text': '',
+                         'options': investigators,
+                         'error': ''}
+
+    if request.method == 'POST':
+        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
+        response, household_form, investigator, investigator_form = create(request, selected_location,
+                                                                           instance=household_selected, is_edit=True)
+    return response or render(request, 'households/new.html', {'selected_location': selected_location,
+                                                               'locations': LocationWidget(selected_location),
+                                                               'investigator_form': investigator_form,
+                                                               'householdform': household_form,
+                                                               'action': "/households/%s/edit/" % household_id,
+                                                               'id': "add-household-form",
+                                                               'button_label': "Update Household",
+                                                               'heading': "Edit Household",
+                                                               'loading_text': "Updating...", 'is_edit': True})

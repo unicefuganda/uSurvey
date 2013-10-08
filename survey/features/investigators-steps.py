@@ -40,11 +40,18 @@ def given_i_am_logged_in_as_researcher(step):
 
 @step(u'And I have locations')
 def and_i_have_locations(step):
-    district = LocationType.objects.create(name="district", slug=slugify("district"))
-    county = LocationType.objects.create(name="county", slug=slugify("county"))
+    district = LocationType.objects.create(name="District", slug=slugify("district"))
+    county = LocationType.objects.create(name="County", slug=slugify("county"))
+    subcounty = LocationType.objects.create(name="Subcounty", slug=slugify("subcounty"))
+    parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
+    village = LocationType.objects.create(name="Village", slug=slugify("village"))
 
-    kampala = Location.objects.create(name="Kampala", type=district)
-    kampala_county = Location.objects.create(name="Kampala County", type=county, tree_parent=kampala)
+    kampala_district = Location.objects.create(name="Kampala", type=district)
+    kampala_county = Location.objects.create(name="County", type=county, tree_parent=kampala_district)
+    kampala_subcounty = Location.objects.create(name="Subcounty", type=subcounty, tree_parent=kampala_county)
+    kampala_parish = Location.objects.create(name="Parish", type=parish, tree_parent=kampala_subcounty)
+    world.kampala_village = Location.objects.create(name="Village", type=village, tree_parent=kampala_parish)
+    world.kampala_county = Location.objects.create(name="Kampala County", type=village, tree_parent=kampala_parish)
 
 
 @step(u'And I visit new investigator page')
@@ -114,7 +121,7 @@ def and_i_should_see_no_investigators_registered_message(step):
 
 @step(u'And I request filter list of a County with no associated investigator')
 def and_i_request_filter_list_for_another_county_with_no_investigator(step):
-    county_type = LocationType.objects.get(name='county')
+    county_type = LocationType.objects.get(name='County')
     new_county = Location.objects.create(name="some county", type=county_type)
     Investigator.objects.filter(location=new_county).delete()
     world.page = FilteredInvestigatorsListPage(world.browser, new_county.id)

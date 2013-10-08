@@ -26,12 +26,20 @@ class NewHouseholdPage(PageObject):
             'date_of_birth': '1980-02-01',
             'uid':'2'
         }
+
         self.browser.fill_form(self.values)
         kampala = Location.objects.get(name="Kampala")
-        kampala_county = Location.objects.get(name="Kampala County")
-        investigator = Investigator.objects.get(name="Investigator name")
+        kampala_county = Location.objects.get(name="County")
+        kampala_subcounty = Location.objects.get(name="Subcounty")
+        kampala_parish = Location.objects.get(name="Parish")
+        kampala_village = Location.objects.get(name="Village")
         self.fill_in_with_js('$("#location-district")', kampala.id)
         self.fill_in_with_js('$("#location-county")', kampala_county.id)
+        self.fill_in_with_js('$("#location-subcounty")', kampala_subcounty.id)
+        self.fill_in_with_js('$("#location-parish")', kampala_parish.id)
+        self.fill_in_with_js('$("#location-village")', kampala_village.id)
+
+        investigator = Investigator.objects.get(name="Investigator name")
         self.fill_in_with_js('$("#household-investigator")', investigator.id)
         self.fill_in_with_js('$("#household-extra_resident_since_year")', 1984)
         self.fill_in_with_js('$("#household-extra_resident_since_month")', 1)
@@ -152,3 +160,7 @@ class HouseholdsListPage(PageObject):
 
     def no_registered_huseholds(self):
         self.browser.is_text_present('There are  no households currently registered  for this country.')
+
+
+class EditHouseholdsPage(PageObject):
+    url = '/households/%s/edit/'

@@ -18,9 +18,10 @@
     </select><label class="error">{{ investigator_form.error }}</label>
   </div>
 </div>
+{% if not is_edit %}
 <h4>Head of Household's Information</h4>
-{% include "naked_form.html" with a_form=headform %}
-<div class="control-group">
+    {% include "naked_form.html" with a_form=headform %}
+    <div class="control-group">
   <label class="control-label" for="resident_since">Since when have you lived here</label>
   <div class="controls">
    <select name="extra_resident_since_month" id="household-extra_resident_since_month"  data-placeholder="Month"  single class="chzn-select" required>
@@ -39,6 +40,8 @@
 
   </div>
 </div>
+{% endif %}
+
 <h4>Household Information</h4>
 {% include "naked_form.html" with a_form=householdform.household %}
 {% endblock %}
