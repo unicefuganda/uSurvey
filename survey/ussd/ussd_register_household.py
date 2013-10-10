@@ -122,7 +122,7 @@ class USSDRegisterHousehold(USSD):
             member_dict[member_fields[count]] = self.REGISTRATION_DICT[question.text]
             count += 1
         member_dict['household'] = self.household
-        if self.is_head:
+        if not self.is_head:
             object_to_create = HouseholdMember
         else:
             object_to_create = HouseholdHead
