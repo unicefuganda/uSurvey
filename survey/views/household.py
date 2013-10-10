@@ -138,7 +138,7 @@ def new(request):
                                                                'months_choices': householdHead.resident_since_month_choices(month_choices),
                                                                'years_choices': householdHead.resident_since_year_choices(year_choices),
                                                                'action': "/households/new/",
-                                                               'heading': "Edit Household",
+                                                               'heading': "New Household",
                                                                'id': "create-household-form",
                                                                'button_label': "Create Household",
                                                                'loading_text': "Creating..."})

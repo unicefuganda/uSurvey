@@ -26,7 +26,12 @@ class Household(BaseModel):
         app_label = 'survey'
 
     def get_head(self):
-        return HouseholdHead.objects.get(household=self)
+        household_head = None
+        try:
+            household_head = HouseholdHead.objects.get(household=self)
+        except:
+            pass
+        return household_head
 
     def last_question_answered(self):
         answered = []

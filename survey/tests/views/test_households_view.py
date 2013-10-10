@@ -32,7 +32,7 @@ class HouseholdViewTest(BaseTest):
         self.assertEquals(response.context['action'], '/households/new/')
         self.assertEquals(response.context['id'], 'create-household-form')
         self.assertEquals(response.context['button_label'], 'Create Household')
-        self.assertEquals(response.context['heading'], 'Edit Household')
+        self.assertEquals(response.context['heading'], 'New Household')
         self.assertEquals(response.context['loading_text'], 'Creating...')
         investigator_form = {'value': '', 'text': '', 'options': Investigator.objects.all(), 'error': ''}
         self.assert_dictionary_equal(response.context['investigator_form'], investigator_form)

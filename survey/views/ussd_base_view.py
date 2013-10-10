@@ -42,6 +42,8 @@ class USSDBaseView(object):
             elif answer == self.ANSWER['REGISTER_HOUSEHOLD']:
                 self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
                 action, responseString = self.ussd_register_household.start("00")
+            else:
+                action, responseString = self.ussd_survey.render_welcome_or_resume()
 
         elif not self.is_registering_household:
             action, responseString = self.ussd_survey.take_survey()

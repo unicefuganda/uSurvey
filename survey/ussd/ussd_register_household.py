@@ -41,7 +41,7 @@ class USSDRegisterHousehold(USSD):
             self.investigator.set_in_cache('is_head', self.is_head)
 
     def set_head(self,answer):
-        if self.is_head is not None:
+        if self.is_head is None:
             if answer == self.HEAD_ANSWER['HEAD']:
                 self.is_head = True
             else:
@@ -127,6 +127,7 @@ class USSDRegisterHousehold(USSD):
         else:
             object_to_create = HouseholdHead
         member = object_to_create.objects.create(**member_dict)
+
         self.set_in_session('HOUSEHOLD_MEMBER',member)
 
     def format_age_to_date_of_birth(self, question):
