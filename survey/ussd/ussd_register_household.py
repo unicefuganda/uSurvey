@@ -18,11 +18,13 @@ class USSDRegisterHousehold(USSD):
         super(USSDRegisterHousehold, self).__init__(investigator, request)
         self.question = None
         self.is_head = None
+        self.is_selecting_member = False
         self.set_question()
         self.set_form_in_cache()
         self.set_household()
         self.set_household_member()
         self.set_head_in_cache()
+        self.set_is_selecting_member()
 
     def set_question(self):
         try:
@@ -37,15 +39,31 @@ class USSDRegisterHousehold(USSD):
             self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
 
     def set_head_in_cache(self):
-        if not self.investigator.get_from_cache('is_head'):
-            self.investigator.set_in_cache('is_head', self.is_head)
+        try:
+            is_head = self.investigator.get_from_cache('is_head')
+            if is_head is not None:
+                self.is_head = is_head
+        except KeyError:
+            pass
+
+    def set_is_selecting_member(self):
+        try:
+            is_selecting_member = self.investigator.get_from_cache('is_selecting_member')
+            if is_selecting_member is not None:
+                self.is_selecting_member = is_selecting_member
+        except KeyError:
+            self.investigator.set_in_cache('is_selecting_member', False)
 
     def set_head(self,answer):
+        print "!@@"
+        print self.is_head
         if self.is_head is None:
             if answer == self.HEAD_ANSWER['HEAD']:
-                self.is_head = True
+                self.investigator.set_in_cache('is_head', True)
             else:
-                self.is_head = False
+                self.investigator.set_in_cache('is_head', None)
+        self.is_head = self.investigator.get_from_cache('is_head')
+        self.investigator.set_in_cache('is_selecting_member', False)
 
     def start(self, answer):
         self.register_households(answer)
@@ -56,8 +74,9 @@ class USSDRegisterHousehold(USSD):
         if self.is_browsing_households_list(answer):
             self.get_household_list()
         elif self.household:
-            self.set_head(answer)
-            response = self.render_registration_questions(answer)
+            if self.is_selecting_member:
+                self.set_head(answer)
+            response = self.render_registration_options(answer)
             if not response is None:
                 self.responseString = response
         else:
@@ -65,25 +84,37 @@ class USSDRegisterHousehold(USSD):
             self.render_select_member_or_head()
 
     def render_select_member_or_head(self):
+        self.investigator.set_in_cache('is_selecting_member', True)
         self.responseString = self.MESSAGES['SELECT_HEAD_OR_MEMBER']
 
     def render_welcome_screen(self):
         self.responseString = self.MESSAGES['WELCOME_TEXT']
 
-    def render_registration_questions(self, answer):
+    def render_questions_or_member_selection(self, answer):
+        if self.household.get_head():
+            self.investigator.set_in_cache('is_head', False)
+            return self.render_questions(answer)
+
+        else:
+            self.render_select_member_or_head()
+
+    def render_questions(self, answer):
+        all_questions = Question.objects.filter(group__name="REGISTRATION GROUP").order_by('order')
+        if not self.question:
+            self.question = all_questions[0]
+        else:
+            self.question = self.process_registration_answer(answer)
+        return self.question.text if self.question else None
+
+    def render_registration_options(self, answer):
         if self.household_member:
             if answer == self.ANSWER['YES']:
-                self.render_select_member_or_head()
+                return self.render_questions_or_member_selection(answer)
             if answer == self.ANSWER['NO']:
                 self.render_welcome_screen()
             self.set_in_session('HOUSEHOLD_MEMBER',None)
         else:
-            all_questions = Question.objects.filter(group__name="REGISTRATION GROUP").order_by('order')
-            if not self.question:
-                self.question = all_questions[0]
-            else:
-                self.question = self.process_registration_answer(answer)
-            return self.question.text if self.question else None
+            return self.render_questions(answer)
 
     def process_registration_answer(self, answer):
         try:
