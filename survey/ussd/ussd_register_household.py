@@ -17,6 +17,7 @@ class USSDRegisterHousehold(USSD):
     def __init__(self, investigator, request):
         super(USSDRegisterHousehold, self).__init__(investigator, request)
         self.question = None
+        self.household_member = None
         self.is_head = None
         self.is_selecting_member = False
         self.set_question()
@@ -55,13 +56,11 @@ class USSDRegisterHousehold(USSD):
             self.investigator.set_in_cache('is_selecting_member', False)
 
     def set_head(self,answer):
-        print "!@@"
-        print self.is_head
-        if self.is_head is None:
+        if self.is_head is None or not self.is_head:
             if answer == self.HEAD_ANSWER['HEAD']:
                 self.investigator.set_in_cache('is_head', True)
             else:
-                self.investigator.set_in_cache('is_head', None)
+                self.investigator.set_in_cache('is_head', False)
         self.is_head = self.investigator.get_from_cache('is_head')
         self.investigator.set_in_cache('is_selecting_member', False)
 
@@ -93,7 +92,7 @@ class USSDRegisterHousehold(USSD):
     def render_questions_or_member_selection(self, answer):
         if self.household.get_head():
             self.investigator.set_in_cache('is_head', False)
-            return self.render_questions(answer)
+            self.responseString = self.render_questions(answer)
 
         else:
             self.render_select_member_or_head()
@@ -109,10 +108,10 @@ class USSDRegisterHousehold(USSD):
     def render_registration_options(self, answer):
         if self.household_member:
             if answer == self.ANSWER['YES']:
-                return self.render_questions_or_member_selection(answer)
+                self.render_questions_or_member_selection(answer)
             if answer == self.ANSWER['NO']:
                 self.render_welcome_screen()
-            self.set_in_session('HOUSEHOLD_MEMBER',None)
+            self.set_in_session('HOUSEHOLD_MEMBER', None)
         else:
             return self.render_questions(answer)
 
@@ -136,6 +135,7 @@ class USSDRegisterHousehold(USSD):
             return next_questions[0]
         else:
             self.save_member_object()
+            self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
             self.responseString = USSD.MESSAGES['END_REGISTRATION']
 
     def save_member_object(self):

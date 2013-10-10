@@ -289,6 +289,52 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         first_registration_question = "responseString=%s&action=request" % question_1.text
         self.assertEquals(urllib2.unquote(response.content), first_registration_question)
 
+    def test_complete_registration_flow(self):
+
+        answers = {'name': 'dummy name',
+                   'age': '10',
+                   'gender': '1'
+                   }
+        self.registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+
+        question_1 = Question.objects.create(text="Please Enter the name",
+                                             answer_type=Question.TEXT, order=1, group=self.registration_group)
+
+        Question.objects.create(text="Please Enter the age",
+                                             answer_type=Question.TEXT, order=2, group=self.registration_group)
+
+        Question.objects.create(text="Please Enter the gender: 1.Male\n2.Female",
+                                             answer_type=Question.NUMBER, order=3, group=self.registration_group)
+        self.reset_session()
+        self.register_household()
+        selected_household_id = '2'
+        self.select_household(selected_household_id)
+        self.respond('2')
+        self.respond(answers['name'])
+        self.respond(answers['age'])
+        self.respond(answers['gender'])
+
+        response = self.respond('1')
+        select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+        self.assertEquals(urllib2.unquote(response.content), select_head_or_member)
+        response = self.respond('1')
+        first_registration_question = "responseString=%s&action=request" % question_1.text
+        self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+        self.respond(answers['name'])
+        self.respond(answers['age'])
+        self.respond(answers['gender'])
+
+        response = self.respond('1')
+        first_registration_question = "responseString=%s&action=request" % question_1.text
+        self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+        self.respond(answers['name'])
+        self.respond(answers['age'])
+        self.respond(answers['gender'])
+
+        response = self.respond('2')
+        ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['WELCOME_TEXT']
+        self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
+
 
 class FakeRequest(HttpRequest):
 

@@ -131,7 +131,7 @@ def add_group_condition(request,group_id):
             return HttpResponseRedirect(redirect_url)
 
     context = {'button_label': 'Save',
-               'title': 'New condition',
+               'title': 'New Criteria',
                'id': 'add-condition-to-group-form',
                'action': '/groups/%s/conditions/new/' % group_id,
                'request': request,

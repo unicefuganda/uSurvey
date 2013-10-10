@@ -269,7 +269,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertIsInstance(response.context['condition_form'], GroupConditionForm)
         self.assertIn('add-condition-to-group-form', response.context['id'])
         self.assertIn('Save', response.context['button_label'])
-        self.assertIn('New condition', response.context['title'])
+        self.assertIn('New Criteria', response.context['title'])
         self.assertIn('/groups/%d/conditions/new/' % group.id, response.context['action'])
 
     def test_add_condition_to_group_adds_the_condition_to_that_groups_conditions(self):
