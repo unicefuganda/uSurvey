@@ -3,6 +3,7 @@ import urllib2
 
 from django.test import TestCase
 from django.test.client import Client
+from survey.models import Investigator, Backend
 
 from survey.ussd.ussd import USSD
 
@@ -35,6 +36,15 @@ class USSDTest(TestCase):
         self.assertEquals(urllib2.unquote(response.content), response_message)
 
         response = self.client.post('/ussd/', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(urllib2.unquote(response.content), response_message)
+
+    def test_should_know_to_respond_with_blocked_message_for_investigator_if_blocked(self):
+        Investigator.objects.create(name='Investigator 1', mobile_number='776520831', male=True, age=32,
+                                    backend=Backend.objects.create(name="Test"), is_blocked=True)
+
+        response_message = "responseString=%s&action=end" % USSD.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']
+        response = self.client.get('/ussd', data=self.ussd_params)
         self.failUnlessEqual(response.status_code, 200)
         self.assertEquals(urllib2.unquote(response.content), response_message)
 

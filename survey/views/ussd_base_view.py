@@ -30,6 +30,10 @@ class USSDBaseView(object):
 
     def response(self):
         answer = self.request['ussdRequestString'].strip()
+        if self.investigator.is_blocked:
+            return {'action': self.ussd_survey.ACTIONS['END'],
+                    'responseString': self.ussd_survey.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']}
+
         if not answer and self.is_new_request():
             action, responseString = self.ussd_survey.render_welcome_or_resume()
 
