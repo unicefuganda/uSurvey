@@ -21,6 +21,7 @@ class USSDBase(object):
         'HOUSEHOLD_COMPLETION_MESSAGE':"Thank you. You have completed this household. Would you like to retake this household?\n1: Yes\n2: No",
         'RESUME_MESSAGE':"Would you like to to resume with member question?\n1: Yes\n2: No",
         'SELECT_HEAD_OR_MEMBER':'Please select household member to register:\n1: Head\n2: Member',
+        'END_REGISTRATION': 'Thank you for registering household member. Would you like to register another member?\n1: Yes\n2: No'
     }
 
     ACTIONS = {

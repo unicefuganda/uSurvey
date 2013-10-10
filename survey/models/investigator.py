@@ -36,6 +36,8 @@ class Investigator(BaseModel):
         'INVALID_ANSWER': [],
         'CONFIRM_END_INTERVIEW': [],
         'IS_REGISTERING_HOUSEHOLD': None,
+        'registration_dict': {},
+        'is_head':None
     }
 
     def __init__(self, *args, **kwargs):
