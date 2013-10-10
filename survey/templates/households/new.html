@@ -49,4 +49,7 @@
 {% block javascripts %}
   <script src="{{STATIC_URL}}/js/household.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+    {% if not is_edit %}
+         <script src="{{STATIC_URL}}/js/new_household.js" type="text/javascript" charset="utf-8"></script>
+    {% endif %}
 {% endblock %}

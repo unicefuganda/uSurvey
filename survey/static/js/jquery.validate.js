@@ -121,7 +121,6 @@ $.extend($.fn, {
 	// http://docs.jquery.com/Plugins/Validation/rules
 	rules: function( command, argument ) {
 		var element = this[0];
-
 		if ( command ) {
 			var settings = $.data(element.form, "validator").settings;
 			var staticRules = settings.rules;
