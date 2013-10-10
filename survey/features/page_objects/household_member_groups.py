@@ -5,7 +5,7 @@ class GroupConditionListPage(PageObject):
     url = '/conditions/'
 
     def validate_fields(self):
-        self.validate_fields_present(["Group Condition List", "Condition", "Attribute", "Value"])
+        self.validate_fields_present(["Group Criteria List", "Condition", "Attribute", "Value"])
 
 
 class GroupsListingPage(PageObject):
@@ -40,7 +40,7 @@ class GroupDetailsPage(PageObject):
         self.url = '/groups/%s/' % group.id
 
     def validate_fields(self):
-        self.validate_fields_present(["Group %s Condition List" % self.group.name, "Condition", "Attribute", "Value"])
+        self.validate_fields_present(["Group %s Criteria List" % self.group.name, "Condition", "Attribute", "Value"])
 
 
 class AddNewConditionToGroupPage(PageObject):

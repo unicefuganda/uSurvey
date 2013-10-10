@@ -46,7 +46,7 @@ def add_condition(request):
         condition_form = GroupConditionForm(data=request.POST)
         response = _process_condition_form(request, condition_form)
     context = {'button_label': 'Save',
-               'title': 'New condition',
+               'title': 'New Criteria',
                'id': 'add-condition-form',
                'action': '/conditions/new/',
                'request': request,
@@ -123,7 +123,7 @@ def add_group_condition(request,group_id):
                 condition = condition_form.save()
                 condition.groups.add(group)
                 condition.save()
-                messages.success(request, "Condition successfully added.")
+                messages.success(request, "Criteria successfully added.")
                 redirect_url = '/groups/%s/' % group_id
             except ObjectDoesNotExist:
                 messages.error(request, "Group does not exist.")
@@ -157,7 +157,7 @@ def edit_group(request, group_id):
                'id': 'add_group_form',
                'action': "/groups/%s/edit/"%group_id,
                'condition_form': GroupConditionForm(),
-               'condition_title': "New Condition"}
+               'condition_title': "New Criteria"}
 
     return response or render(request, 'household_member_groups/new.html', context)
 
@@ -171,5 +171,5 @@ def delete_group(request, group_id):
 @permission_required('auth.can_view_household_groups')
 def delete_condition(request, condition_id):
   GroupCondition.objects.get(id=condition_id).delete()
-  messages.success(request, "Condition successfully deleted.")
+  messages.success(request, "Criteria successfully deleted.")
   return HttpResponseRedirect("/conditions/")

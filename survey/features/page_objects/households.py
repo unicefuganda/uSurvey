@@ -163,4 +163,7 @@ class HouseholdsListPage(PageObject):
 
 
 class EditHouseholdsPage(PageObject):
-    url = '/households/%s/edit/'
+    def __init__(self, browser, household):
+        self.browser = browser
+        self.household = household
+        self.url = '/households/%s/edit/' %  str(household.id)

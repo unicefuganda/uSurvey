@@ -40,7 +40,7 @@ class GroupConditionViewTest(BaseTest):
         self.assertIsInstance(response.context['condition_form'], GroupConditionForm)
         self.assertIn('add-condition-form', response.context['id'])
         self.assertIn('Save', response.context['button_label'])
-        self.assertIn('New condition', response.context['title'])
+        self.assertIn('New Criteria', response.context['title'])
         self.assertIn('/conditions/new/', response.context['action'])
 
     def test_duplicate_condition_shows_error_on_views(self):
@@ -82,7 +82,7 @@ class GroupConditionViewTest(BaseTest):
         self.failIf(retrieved_condition)
         self.assertEqual(0, group.conditions.all().count())
         self.assertRedirects(response, expected_url='/conditions/', status_code=302, target_status_code=200, msg_prefix='')
-        success_message = 'Condition successfully deleted.'
+        success_message = 'Criteria successfully deleted.'
         self.assertIn(success_message, response.cookies['messages'].value)
 
 class HouseholdMemberGroupTest(BaseTest):
@@ -284,7 +284,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.failUnless(condition)
         self.assertTrue(group in condition[0].groups.all())
         self.assertRedirects(response, expected_url='/groups/%s/' %group.id, status_code=302, target_status_code=200, msg_prefix='')
-        success_message = "Condition successfully added."
+        success_message = "Criteria successfully added."
         self.assertTrue(success_message in response.cookies['messages'].value)
 
     def test_add_condition_to_group_with_non_existing_group_raises_group_does_not_exist(self):
@@ -335,7 +335,7 @@ class HouseholdMemberGroupTest(BaseTest):
        self.assertEquals("add_group_form", response.context['id'])
        self.assertEquals("/groups/%s/edit/" % group.id, response.context['action'])
        self.assertIsInstance(response.context['condition_form'], GroupConditionForm)
-       self.assertEquals("New Condition", response.context['condition_title'])
+       self.assertEquals("New Criteria", response.context['condition_title'])
 
     def test_edit_group_post(self):
        condition_1 = GroupCondition.objects.create(value="some string")

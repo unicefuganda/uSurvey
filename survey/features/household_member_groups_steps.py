@@ -58,7 +58,7 @@ def when_i_click_the_add_button(step):
 
 @step(u'Then I should see the new condition form')
 def then_i_should_see_the_new_condition_form(step):
-    world.page.is_text_present("New condition")
+    world.page.is_text_present("New Criteria")
 
 
 @step(u'And I visit the new condition page')
@@ -184,8 +184,7 @@ def when_i_click_groups_tab(step):
 
 @step(u'Then I should see group dropdown list')
 def then_i_should_see_group_dropdown_list(step):
-    reverse_url_links = ["household_member_groups_page", "new_household_member_groups_page", "show_group_condition",
-                         "new_group_condition"]
+    reverse_url_links = ["household_member_groups_page", "new_household_member_groups_page"]
     world.page.see_dropdown(reverse_url_links)
 
 
@@ -268,7 +267,7 @@ def and_when_i_fill_condition_details(step):
 
 @step(u'And I should see the newly added condition on that page')
 def and_i_should_see_the_newly_added_condition_on_that_page(step):
-    world.page.see_success_message("Condition", "added")
+    world.page.see_success_message("Criteria", "added")
     world.page.validate_fields_present([world.data['attribute'], world.data['condition'], '9'])
 
 @step(u'And I click edit group link')
@@ -329,4 +328,4 @@ def then_i_should_see_a_delete_condition_confirmation_modal(step):
 
 @step(u'Then I should see that the condition was deleted successfully')
 def then_i_should_see_that_the_condition_was_deleted_successfully(step):
-    world.page.see_success_message("Condition", "deleted")
+    world.page.see_success_message("Criteria", "deleted")

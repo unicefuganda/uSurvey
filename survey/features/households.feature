@@ -58,6 +58,7 @@ Feature: Households feature
       And I have two other investigators
       And I visit households listing page
       And then I click on that household ID
+      Then I should be on the household details page
       When I click edit household
       Then I should see edit household form
       When I assign a new investigator

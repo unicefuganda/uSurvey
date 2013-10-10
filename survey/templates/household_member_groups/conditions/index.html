@@ -6,7 +6,7 @@
 {% load pagination_tags %}
 {% load template_tags %}
   <h3>
-    Group {{ group.name}} Condition List
+    Group {{ group.name}} Criteria List
   </h3>
     {% if group %}
         <a href="{% url add_condition_url group.id %}" class="btn pull-right" id="add_condition">
@@ -53,7 +53,7 @@
               </div>
             </td>
           </tr>
-          {% include "household_member_groups/conditions/delete_condition_modal.html" with object_name=condition id=condition.id name="Condition" url=condition.id|get_url_with_ids:"delete_condition_page" %}
+          {% include "household_member_groups/conditions/delete_condition_modal.html" with object_name=condition id=condition.id name="Criteria" url=condition.id|get_url_with_ids:"delete_condition_page" %}
         {% endfor %}
       </tbody>
     </table>

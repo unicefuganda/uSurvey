@@ -189,18 +189,21 @@ def and_i_have_two_other_investigators(step):
 def and_i_click_on_that_household_id(step):
     world.page.click_link_by_text(world.household.uid)
 
+@step(u'Then I should be on the household details page')
+def then_i_should_be_on_the_household_details_page(step):
+    world.page = HouseholdDetailsPage(world.browser, world.household)
+    world.page.validate_url()
+
 @step(u'When I click edit household')
 def when_i_click_edit_household(step):
-    world.page.browser.click_link_by_text(" Edit Household")
+    world.browser.find_link_by_text(' Edit Household').first.click()
 
 @step(u'Then I should see edit household form')
 def then_i_should_see_edit_household_form(step):
-    world.page = EditHouseholdsPage(world.browser)
+    world.page = EditHouseholdsPage(world.browser, world.household)
     world.related_location = world.household.get_related_location()
-    form_values = {}
     for key, value in world.related_location.items():
         world.page.is_text_present(value)
-
 
 @step(u'When I assign a new investigator')
 def when_i_assign_a_new_investigator(step):
