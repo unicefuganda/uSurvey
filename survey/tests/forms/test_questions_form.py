@@ -34,6 +34,18 @@ class QuestionFormTest(TestCase):
         fields = ['module', 'text', 'answer_type', 'group']
         [self.assertIn(field, question_form.fields) for field in fields]
 
+    def test_question_form_has_tuple_of_all_question_modules_as_choices(self):
+        health_module = QuestionModule.objects.create(name="Health")
+        education_module = QuestionModule.objects.create(name="Education")
+        question_modules = [health_module, education_module]
+        question_form = QuestionForm()
+        [self.assertIn((module.id, module.name), question_form.fields['module'].choices) for module in question_modules]
+
+    def test_question_form_has_no_choices_if_there_are_no_question_modules(self):
+        QuestionModule.objects.all().delete()
+        question_form = QuestionForm()
+        self.assertEqual(0, len(question_form.fields['module'].choices))
+
     def test_should_know_household_member_group_id_and_name_tuple_is_the_group_choice(self):
         question_form = QuestionForm(self.form_data)
         self.assertEqual(question_form.fields['group'].choices, [(self.household_member_group.id, self.household_member_group.name)])

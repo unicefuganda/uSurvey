@@ -1,10 +1,13 @@
 from django.contrib import messages
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from survey.forms.question_module_form import QuestionModuleForm
 from survey.models import QuestionModule
 
 
+@login_required
+@permission_required('auth.can_view_batches')
 def new(request):
     question_module_form = QuestionModuleForm()
     if request.method == 'POST':
@@ -14,10 +17,12 @@ def new(request):
             messages.success(request, "Question module successfully created.")
             return HttpResponseRedirect("/modules/")
         messages.error(request, "Question module was not created.")
-    return render_to_response('question_module/new.html', {'question_module_form': question_module_form})
+    return render(request, 'question_module/new.html', {'question_module_form': question_module_form})
 
 
+@login_required
+@permission_required('auth.can_view_batches')
 def index(request):
     all_question_modules = QuestionModule.objects.all()
     context = {'question_modules': all_question_modules}
-    return render_to_response("question_module/index.html", context)
+    return render(request, "question_module/index.html", context)

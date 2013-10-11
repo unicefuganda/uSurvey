@@ -3,7 +3,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from mock import patch
 from survey.forms.logic import LogicForm
-from survey.models import AnswerRule
+from survey.models import AnswerRule, QuestionModule
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
 
@@ -21,12 +21,15 @@ class QuestionsViews(BaseTest):
                                         'can_view_batches')
         self.client.login(username='Rajni', password='I_Rock')
         self.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
+        self.module = QuestionModule.objects.create(name="Education")
 
         self.batch = Batch.objects.create(order=1, name="Batch A")
         self.question_1 = Question.objects.create(text="How many members are there in this household?",
-                                                  answer_type=Question.NUMBER, order=1)
+                                                  answer_type=Question.NUMBER, order=1,
+                                                  module=self.module)
         self.question_2 = Question.objects.create(text="How many of them are male?",
-                                                  answer_type=Question.NUMBER, order=2)
+                                                  answer_type=Question.NUMBER, order=2,
+                                                  module=self.module)
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
 
@@ -79,6 +82,7 @@ class QuestionsViews(BaseTest):
 
     def test_create_question_number_does_not_create_options(self):
         form_data = {
+            'module': self.module.id,
             'text': 'This is a Question',
             'answer_type': Question.NUMBER,
             'group': self.household_member_group.id,
@@ -97,6 +101,7 @@ class QuestionsViews(BaseTest):
 
     def test_create_question_saves_order_based_on_group_created_for(self):
         form_data = {
+            'module': self.module.id,
             'text': "This is a question",
             'answer_type': Question.NUMBER,
             'group': self.household_member_group.id,
@@ -127,20 +132,22 @@ class QuestionsViews(BaseTest):
         self.failUnless(question)
         self.assertEqual(1, question[0].order)
 
-
     def test_should_retrieve_group_specific_questions_in_context_if_selected_group_key_is_in_request(self):
         group_question = Question.objects.create(text="How many members are there in this household?",
                                                  answer_type=Question.NUMBER, order=1,
-                                                 group=self.household_member_group)
+                                                 group=self.household_member_group,
+                                                 module=self.module)
 
         group_question_again = Question.objects.create(text="How many women are there in this household?",
                                                        answer_type=Question.NUMBER, order=2,
-                                                       group=self.household_member_group)
+                                                       group=self.household_member_group,
+                                                       module=self.module)
 
         another_group_question = Question.objects.create(text="What is your name?",
                                                          answer_type=Question.NUMBER, order=2,
                                                          group=HouseholdMemberGroup.objects.create(name='Age 6-10',
-                                                                                                   order=2))
+                                                                                                   order=2),
+                                                         module=self.module)
 
         all_group_questions = [group_question, group_question_again]
         another_group_questions = [another_group_question]
@@ -159,16 +166,19 @@ class QuestionsViews(BaseTest):
     def test_should_retrieve_all_questions_in_context_if_selected_group_key_is_all_in_request(self):
         group_question = Question.objects.create(text="How many members are there in this household?",
                                                  answer_type=Question.NUMBER, order=1,
-                                                 group=self.household_member_group)
+                                                 group=self.household_member_group,
+                                                 module=self.module)
 
         group_question_again = Question.objects.create(text="How many women are there in this household?",
                                                        answer_type=Question.NUMBER, order=2,
-                                                       group=self.household_member_group)
+                                                       group=self.household_member_group,
+                                                       module=self.module)
 
         another_group_question = Question.objects.create(text="What is your name?",
                                                          answer_type=Question.NUMBER, order=2,
                                                          group=HouseholdMemberGroup.objects.create(name='Age 6-10',
-                                                                                                   order=2))
+                                                                                                   order=2),
+                                                         module=self.module)
 
         all_group_questions = [group_question, group_question_again, another_group_question]
         for question in all_group_questions:
@@ -183,16 +193,19 @@ class QuestionsViews(BaseTest):
     def test_should_retrieve_all_questions_as_data_for_filter_if_all_is_group_id_key(self):
         group_question = Question.objects.create(text="How many members are there in this household?",
                                                  answer_type=Question.NUMBER, order=1,
-                                                 group=self.household_member_group)
+                                                 group=self.household_member_group,
+                                                 module=self.module)
 
         group_question_again = Question.objects.create(text="How many women are there in this household?",
                                                        answer_type=Question.NUMBER, order=2,
-                                                       group=self.household_member_group)
+                                                       group=self.household_member_group,
+                                                       module=self.module)
 
         another_group_question = Question.objects.create(text="What is your name?",
                                                          answer_type=Question.NUMBER, order=2,
                                                          group=HouseholdMemberGroup.objects.create(name='Age 6-10',
-                                                                                                   order=2))
+                                                                                                   order=2),
+                                                         module=self.module)
 
         all_group_questions = [group_question, group_question_again, another_group_question]
 
@@ -209,16 +222,19 @@ class QuestionsViews(BaseTest):
     def test_should_retrieve_group_specific_questions_as_data_for_filter_if_group_id_key(self):
         group_question = Question.objects.create(text="How many members are there in this household?",
                                                  answer_type=Question.NUMBER, order=1,
-                                                 group=self.household_member_group)
+                                                 group=self.household_member_group,
+                                                 module=self.module)
 
         group_question_again = Question.objects.create(text="How many women are there in this household?",
                                                        answer_type=Question.NUMBER, order=2,
-                                                       group=self.household_member_group)
+                                                       group=self.household_member_group,
+                                                       module=self.module)
 
         another_group_question = Question.objects.create(text="What is your name?",
                                                          answer_type=Question.NUMBER, order=2,
                                                          group=HouseholdMemberGroup.objects.create(name='Age 6-10',
-                                                                                                   order=2))
+                                                                                                   order=2),
+                                                         module=self.module)
 
         expected_questions = [group_question]
         questions_that_should_not_appear_in_response = [group_question_again, another_group_question]
@@ -236,6 +252,7 @@ class QuestionsViews(BaseTest):
 
     def test_should_save_options_for_multichoice_questions(self):
         form_data = {
+            'module': self.module.id,
             'text': 'This is a Question',
             'answer_type': Question.MULTICHOICE,
             'group': self.household_member_group.id,
@@ -259,9 +276,9 @@ class QuestionsViews(BaseTest):
             self.assertEqual(option_index,
                              QuestionOption.objects.get(text=form_data['options'][option_index - 1]).order)
 
-
     def test_should_not_save_empty_options_on_multichoice_questions(self):
         form_data = {
+            'module': self.module.id,
             'text': 'This is a Question',
             'answer_type': Question.MULTICHOICE,
             'group': self.household_member_group.id,
@@ -281,6 +298,7 @@ class QuestionsViews(BaseTest):
 
     def test_should_not_save_multichoice_questions_if_no_option_supplied(self):
         form_data = {
+            'module': self.module,
             'text': 'This is a Question',
             'answer_type': Question.MULTICHOICE,
             'group': self.household_member_group.id,
@@ -295,6 +313,7 @@ class QuestionsViews(BaseTest):
 
     def test_should_not_save_options_if_question_not_multichoice_even_if_options_supplied(self):
         form_data = {
+            'module': self.module.id,
             'text': 'This is a Question',
             'answer_type': Question.TEXT,
             'group': self.household_member_group.id,
@@ -312,8 +331,9 @@ class QuestionsViews(BaseTest):
 
     def test_should_render_json_questions_filtered_by_group(self):
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
-        question_1 = Question.objects.create(text="question1", answer_type=Question.NUMBER, group=member_group)
-        question_2 = Question.objects.create(text="question2", answer_type=Question.NUMBER)
+        question_1 = Question.objects.create(text="question1", answer_type=Question.NUMBER,
+                                             group=member_group, module=self.module)
+        question_2 = Question.objects.create(text="question2", answer_type=Question.NUMBER, module=self.module)
         response = self.client.get('/batches/%d/questions/groups/%d/' % (self.batch.id, member_group.id))
         self.failUnlessEqual(response.status_code, 200)
 
@@ -325,7 +345,7 @@ class QuestionsViews(BaseTest):
 
     def test_get_index_all(self):
         sub_question = Question.objects.create(parent=self.question_1, text="Sub Question 2?",
-                                               answer_type=Question.NUMBER, subquestion=True)
+                                               answer_type=Question.NUMBER, subquestion=True, module=self.module)
         response = self.client.get('/questions/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -337,7 +357,7 @@ class QuestionsViews(BaseTest):
 
     def test_add_new_subquestion(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
-        question = Question.objects.create(text="some qn?", group=group, order=1)
+        question = Question.objects.create(text="some qn?", group=group, order=1, module=self.module)
         response = self.client.get('/questions/%d/sub_questions/new/' % question.id)
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -351,8 +371,9 @@ class QuestionsViews(BaseTest):
 
     def test_post_sub_question(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
-        question = Question.objects.create(text="some qn?", group=group, order=1)
+        question = Question.objects.create(text="some qn?", group=group, order=1, module=self.module)
         subquestion_form_data = {
+            'module': self.module.id,
             'text': 'This is a Question',
             'answer_type': Question.NUMBER,
             'group': group.id,
@@ -370,6 +391,7 @@ class QuestionsViews(BaseTest):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         question = Question.objects.create(text="some qn?", group=group, order=1)
         subquestion_form_data = {
+            'module': self.module.id,
             'text': "This is a *!#'; Question",
             'answer_type': Question.NUMBER,
             'group': group.id,
@@ -385,10 +407,10 @@ class QuestionsViews(BaseTest):
 
     def test_should_filter_questions_in_a_group_that_does_not_belong_to_the_batch(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
-        question = Question.objects.create(text="some qn?", group=group, order=1)
+        question = Question.objects.create(text="some qn?", group=group, order=1, module=self.module)
         question.batches.add(self.batch)
-        question_1 = Question.objects.create(text="some qn1?", group=group, order=2)
-        question_2 = Question.objects.create(text="some qn2?", group=group, order=3)
+        question_1 = Question.objects.create(text="some qn1?", group=group, order=2, module=self.module)
+        question_2 = Question.objects.create(text="some qn2?", group=group, order=3, module=self.module)
         response = self.client.get('/batches/%s/questions/groups/%s/' % (self.batch.id, group.id))
         self.assertEqual(response.status_code, 200)
         parsed_response = json.loads(response.content)
@@ -405,6 +427,7 @@ class QuestionsViews(BaseTest):
         option_2 = 'some question option 2'
 
         form_data = {
+            'module': self.module.id,
             'order': self.question_1.order,
             'text': too_long_to_be_accepted_question,
             'answer_type': Question.TEXT,
@@ -423,7 +446,7 @@ class QuestionsViews(BaseTest):
 
     def test_should_display_form_on_edit_question(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)
-        question = Question.objects.create(text="question text", group=group)
+        question = Question.objects.create(text="question text", group=group, module=self.module)
         question.batches.add(self.batch)
         response = self.client.get('/questions/%d/edit/' % question.id)
         self.failUnlessEqual(response.status_code, 200)
@@ -436,7 +459,7 @@ class QuestionsViews(BaseTest):
     def test_should_display_options_on_edit_multichoice_question(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)
         question = Question.objects.create(text="question text", group=group,
-                                           answer_type=Question.MULTICHOICE)
+                                           answer_type=Question.MULTICHOICE, module=self.module)
         question.batches.add(self.batch)
         question_option = QuestionOption.objects.create(text="question option text 1", question=question)
         question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question)
@@ -447,12 +470,14 @@ class QuestionsViews(BaseTest):
 
     def test_empty_options_and_or_duplicates_should_be_removed_on_edit_multichoice_question(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)
-        question = Question.objects.create(text="question text", group=group, answer_type=Question.MULTICHOICE)
+        question = Question.objects.create(text="question text", group=group, answer_type=Question.MULTICHOICE,
+                                           module=self.module)
         question.batches.add(self.batch)
         question_option = QuestionOption.objects.create(text="question option text 1", question=question)
         question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question)
 
         form_data = {
+            'module': self.module.id,
             'text': '',
             'answer_type': Question.MULTICHOICE,
             'group': group.id,
@@ -478,6 +503,7 @@ class QuestionsViews(BaseTest):
         option_2 = "option 2"
         option_3 = "dont know"
         form_data = {
+            'module': self.module.id,
             'text': '',
             'answer_type': Question.MULTICHOICE,
             'group': group.id,
@@ -495,6 +521,7 @@ class QuestionsViews(BaseTest):
         question = Question.objects.create(text="question text", group=group)
         question.batches.add(self.batch)
         form_data = {
+            'module': self.module.id,
             'text': 'This is a Question',
             'answer_type': Question.NUMBER,
             'group': self.household_member_group.id
@@ -516,6 +543,7 @@ class QuestionsViews(BaseTest):
         question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question)
         question.batches.add(self.batch)
         form_data = {
+            'module': self.module.id,
             'text': 'I edited this question',
             'answer_type': Question.MULTICHOICE,
             'group': group.id,
@@ -545,6 +573,7 @@ class QuestionsViews(BaseTest):
         question = Question.objects.create(text="question text", group=group)
         question.batches.add(self.batch)
         form_data = {
+            'module': self.module.id,
             'text': '',
             'answer_type': Question.TEXT,
             'group': self.household_member_group.id
@@ -603,7 +632,6 @@ class QuestionsViews(BaseTest):
         success_message = 'Sub question successfully deleted.'
         self.assertIn(success_message, response.cookies['messages'].value)
 
-
 class LogicViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -611,11 +639,15 @@ class LogicViewTest(BaseTest):
                                   'can_view_batches')
         self.client.login(username='User', password='password')
 
+        self.module = QuestionModule.objects.create(name="Education")
+
         self.batch = Batch.objects.create(order=1)
         self.question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1)
+                                                answer_type=Question.NUMBER, order=1,
+                                                module=self.module)
         self.question_2 = Question.objects.create(text="Question 2?",
-                                                  answer_type=Question.NUMBER, order=2)
+                                                  answer_type=Question.NUMBER, order=2,
+                                                  module=self.module)
         self.question.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
 
@@ -719,7 +751,7 @@ class LogicViewTest(BaseTest):
 
     def test_views_saves_answer_rule_for_sub_question_on_post_if_all_values_are_selected(self):
         sub_question1 = Question.objects.create(text="sub question1", answer_type=Question.NUMBER, subquestion=True,
-                                                parent=self.question)
+                                                parent=self.question, module=self.module)
         sub_question1.batches.add(self.batch)
 
         form_data = {'condition': 'EQUALS',
@@ -751,7 +783,8 @@ class LogicViewTest(BaseTest):
 
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected_on_multichoice_question(self):
         question_with_option = Question.objects.create(text="MultiChoice Question 1?",
-                                                       answer_type=Question.MULTICHOICE, order=3)
+                                                       answer_type=Question.MULTICHOICE, order=3,
+                                                       module=self.module)
         question_with_option.batches.add(self.batch)
         question_option_1 = QuestionOption.objects.create(question=question_with_option, text="Option 1", order=1)
         QuestionOption.objects.create(question=question_with_option, text="Option 2", order=2)
@@ -782,27 +815,32 @@ class LogicViewTest(BaseTest):
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_value)
 
-
 class QuestionJsonDataDumpTest(BaseTest):
     def setUp(self):
         self.client = Client()
         user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
                                                          'can_view_batches')
         self.client.login(username='User', password='password')
+        self.module = QuestionModule.objects.create(name="Education")
 
         self.batch = Batch.objects.create(order=1)
         self.question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1)
+                                                answer_type=Question.NUMBER, order=1,
+                                                module=self.module)
 
         self.sub_question_1 = Question.objects.create(parent=self.question, text="Sub Question 1?",
-                                                      answer_type=Question.NUMBER, subquestion=True)
+                                                      answer_type=Question.NUMBER, subquestion=True,
+                                                      module=self.module)
         self.sub_question_2 = Question.objects.create(parent=self.question, text="Sub Question 2?",
-                                                      answer_type=Question.NUMBER, subquestion=True)
+                                                      answer_type=Question.NUMBER, subquestion=True,
+                                                      module=self.module)
 
         self.question_2 = Question.objects.create(text="Question 2?",
-                                                  answer_type=Question.NUMBER, order=2)
+                                                  answer_type=Question.NUMBER, order=2,
+                                                  module=self.module)
         self.question_3 = Question.objects.create(text="Question 3?",
-                                                  answer_type=Question.NUMBER, order=3)
+                                                  answer_type=Question.NUMBER, order=3,
+                                                  module=self.module)
 
         self.question.batches.add(self.batch)
         self.sub_question_1.batches.add(self.batch)
@@ -835,7 +873,6 @@ class QuestionJsonDataDumpTest(BaseTest):
         self.assertNotIn(dict(id=str(self.question_2.id), text=self.question_2.text), json_response)
         self.assertNotIn(dict(id=str(self.question.id), text=self.question.text), json_response)
 
-
 class AddQuestionFromModalTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -843,17 +880,20 @@ class AddQuestionFromModalTest(BaseTest):
                                                          'can_view_batches')
         self.client.login(username='User', password='password')
 
+        self.module = QuestionModule.objects.create(name="Health")
         self.batch = Batch.objects.create(order=1)
         self.question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1)
+                                                answer_type=Question.NUMBER, order=1,
+                                                module=self.module)
         self.question.batches.add(self.batch)
 
     def test_knows_how_to_add_sub_question_from_ajax_call(self):
         member_group = HouseholdMemberGroup.objects.create(name="Test Group", order=1)
-
-        data = {'text': 'hritik  question',
+        data = {'module': self.module.id,
+                'text': 'hritik  question',
                 'answer_type': Question.NUMBER,
-                'group': member_group.id}
+                'group': member_group.id
+            }
 
         response = self.client.post('/questions/%s/sub_questions/new/' % self.question.pk, data=data,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -865,18 +905,19 @@ class AddQuestionFromModalTest(BaseTest):
         self.assertTrue(json_response)
         self.assertEqual(dict(id=str(sub_question.id), text=sub_question.text), json_response)
 
-
 class AddSubQuestionTest(BaseTest):
     def setUp(self):
         self.client = Client()
         user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
                                                          'can_view_batches')
         self.client.login(username='User', password='password')
+        self.module = QuestionModule.objects.create(name="Education")
 
         self.batch = Batch.objects.create(order=1)
         self.group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         self.question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1, group=self.group)
+                                                answer_type=Question.NUMBER, order=1,
+                                                group=self.group, module= self.module)
         self.question.batches.add(self.batch)
 
     def test_should_not_allow_to_add_same_sub_question_under_one_question(self):
@@ -884,6 +925,7 @@ class AddSubQuestionTest(BaseTest):
                                                subquestion=True, parent=self.question, group=self.group)
         sub_question.batches.add(self.batch)
         subquestion_form_data = {
+            'module': self.module.id,
             'text': sub_question.text,
             'answer_type': Question.NUMBER,
             'group': self.group.id,
@@ -899,6 +941,7 @@ class AddSubQuestionTest(BaseTest):
 
     def test_add_sub_question_redirects_to_master_questions_if_batch_is_not_present(self):
         subquestion_form_data = {
+            'module': self.module.id,
             'text': "this is a new sub question",
             'answer_type': Question.NUMBER,
             'group': self.group.id,
@@ -912,6 +955,7 @@ class AddSubQuestionTest(BaseTest):
 
     def test_add_sub_question_redirects_to_batch_questions_if_batch_is_present(self):
         subquestion_form_data = {
+            'module': self.module.id,
             'text': "this is a new sub question",
             'answer_type': Question.NUMBER,
             'group': self.group.id,
@@ -924,7 +968,6 @@ class AddSubQuestionTest(BaseTest):
 
         self.assertRedirects(response, expected_url, 302, 200)
 
-
 class EditSubQuestionTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -932,12 +975,15 @@ class EditSubQuestionTest(BaseTest):
                                                          'can_view_batches')
         self.client.login(username='User', password='password')
 
+        self.module = QuestionModule.objects.create(name="Education")
         self.batch = Batch.objects.create(order=1)
         self.group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         self.question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1, group=self.group)
+                                                answer_type=Question.NUMBER, order=1, group=self.group,
+                                                module=self.module)
         self.sub_question = Question.objects.create(text="this is a sub question", answer_type=Question.NUMBER,
-                                                    subquestion=True, parent=self.question, group=self.group)
+                                                    subquestion=True, parent=self.question,
+                                                    group=self.group, module=self.module)
 
         self.question.batches.add(self.batch)
 
@@ -955,6 +1001,7 @@ class EditSubQuestionTest(BaseTest):
 
     def test_should_post_edit_subquestion(self):
         subquestion_form_data = {
+            'module': self.module.id,
             'text': "Edited subquestion text",
             'answer_type': Question.NUMBER,
             'group': self.group.id
@@ -972,6 +1019,7 @@ class EditSubQuestionTest(BaseTest):
 
     def test_edit_sub_question_redirects_to_master_questions_if_batch_is_not_present(self):
         subquestion_form_data = {
+            'module': self.module.id,
             'text': "edited text for subqn",
             'answer_type': Question.NUMBER,
             'group': self.group.id
@@ -984,6 +1032,7 @@ class EditSubQuestionTest(BaseTest):
 
     def test_edit_sub_question_redirects_to_batch_questions_if_batch_is_not_present(self):
         subquestion_form_data = {
+            'module': self.module.id,
             'text': "edited text for subqn",
             'answer_type': Question.NUMBER,
             'group': self.group.id

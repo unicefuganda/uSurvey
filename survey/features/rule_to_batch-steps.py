@@ -13,7 +13,7 @@ def save_batch_to_question(question, batch):
 @step(u'And I have a question')
 def and_i_have_a_question(step):
     world.question = Question.objects.create(text="question1", answer_type=Question.NUMBER, order=1,
-                                             group=world.household_member_group)
+                                             group=world.household_member_group, module=world.module)
 
 
 @step(u'And I assign batch to these questions')

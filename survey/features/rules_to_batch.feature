@@ -5,6 +5,7 @@ Feature: Batch related features
     And I have a survey
     And I have a batch
     And I have a member group
+    And I have a module
     And I have a question
     And I assign batch to these questions
     And I visit batches question list page
@@ -19,6 +20,7 @@ Feature: Batch related features
     Given I am logged in as researcher
     And I have a survey
     And I have a batch
+    And I have a module
     And I have a member group
     And I have a multichoice question
     And I assign batch to multichoice question
@@ -42,6 +44,7 @@ Feature: Batch related features
     And I have a survey
     And I have a batch
     And I have a member group
+    And I have a module
     And I have a question
     And I assign batch to these questions
     And I visit batches question list page
@@ -80,6 +83,7 @@ Feature: Batch related features
     And I have a survey
     And I have a batch
     And I have a member group
+    And I have a module
     And I have a question
     And I assign batch to these questions
     And I have two subquestions for this question
@@ -96,6 +100,7 @@ Feature: Batch related features
     And I have a survey
     And I have a batch
     And I have a member group
+    And I have a module
     And I have a question
     And I assign batch to these questions
     And I visit batches question list page
@@ -114,6 +119,7 @@ Feature: Batch related features
     And I have a survey
     And I have a batch
     And I have a member group
+    And I have a module
     And I have a question
     And I assign batch to these questions
     And I have a subquestion under this question

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Question Module Lists
+{% endblock %}
+
+{% block content %}
+    <h3>Question Module Lists</h3>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>
+              Number
+            </th>
+            <th>
+              Module Name
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for question_module in question_modules %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ question_module.name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

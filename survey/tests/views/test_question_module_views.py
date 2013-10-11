@@ -6,9 +6,13 @@ from survey.tests.base_test import BaseTest
 
 
 class QuestionModuleViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
+        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_batches')
+        self.assign_permission_to(raj, 'can_view_investigators')
+        self.client.login(username='Rajni', password='I_Rock')
 
     def test_get_new_question_module(self):
         response = self.client.get('/modules/new/')
@@ -41,8 +45,13 @@ class QuestionModuleViewTest(BaseTest):
         QuestionModule.objects.create(name="Education")
         form_data = {'name': 'Education'}
         response = self.client.post('/modules/new/', data=form_data)
+
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('question_module/new.html', templates)
         error_message = "Question module was not created."
-        self.assertIn(error_message, response.cookies['messages'].value)
+        self.assertIn(error_message, str(response))
+
+    def test_permission_for_question_modules(self):
+        self.assert_restricted_permission_for('/modules/')
+        self.assert_restricted_permission_for('/modules/new/')

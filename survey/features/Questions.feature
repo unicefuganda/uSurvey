@@ -28,6 +28,7 @@ Feature: Questions related features
   Scenario: MultiChoice question
     Given I am logged in as researcher
     And I have a member group
+    And I have a module
     And I visit create new question page
     Then I should see special characters message
     And I fill the details for question
@@ -53,6 +54,7 @@ Feature: Questions related features
     Given I am logged in as researcher
     And I have a member group
     And I have a survey
+    And I have a module
     And I have a multichoice question
     And I select multichoice question in batch
     And I have a sub question for that question
@@ -72,6 +74,7 @@ Feature: Questions related features
   Scenario: Add Subquestion
     Given I am logged in as researcher
     And I have a member group
+    And I have a module
     And I have a multichoice question
     And I visit questions list page
     And I click on view add subquestion link
@@ -83,6 +86,7 @@ Feature: Questions related features
   Scenario: Edit question
     Given I am logged in as researcher
     And I have a member group
+    And I have a module
     And I have a multichoice question
     And I visit question listing page
     And I click the edit question link
@@ -95,6 +99,7 @@ Feature: Questions related features
   Scenario: Delete question
     Given I am logged in as researcher
     And I have a member group
+    And I have a module
     And I have a multichoice question
     And I visit questions list page
     And I click on delete question link
@@ -105,6 +110,7 @@ Feature: Questions related features
   Scenario: View sub question
     Given I am logged in as researcher
     And I have a member group
+    And I have a module
     And I have a multichoice question
     And I have a sub question for that question
     And I visit questions list page
@@ -115,6 +121,7 @@ Feature: Questions related features
   Scenario: Duplicate sub question
     Given I am logged in as researcher
     And I have a member group
+    And I have a module
     And I have a multichoice question
     And I have a subquestion under that question
     And I visit questions list page
@@ -129,6 +136,7 @@ Feature: Questions related features
     And I have a survey
     And I have a batch
     And I have a member group
+    And I have a module
     And I have a non multichoice question
     And I have a sub question for that question
     And I have a rule on value with that subquestion
@@ -144,6 +152,7 @@ Feature: Questions related features
     And I have a survey
     And I have a batch
     And I have a member group
+    And I have a module
     And I have a non multichoice question
     And I have a sub question for that question
     And I have a rule on value with that subquestion
@@ -158,6 +167,7 @@ Feature: Questions related features
   Scenario: Delete sub question
     Given I am logged in as researcher
     And I have a member group
+    And I have a module
     And I have a multichoice question
     And I have a sub question for that question
     And I visit questions list page
@@ -170,6 +180,7 @@ Feature: Questions related features
   Scenario: Edit sub question
     Given I am logged in as researcher
     And I have a member group
+    And I have a module
     And I have a multichoice question
     And I have a sub question for that question
     And I visit questions list page
