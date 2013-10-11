@@ -240,9 +240,7 @@ def and_i_click_save_question_button_on_the_form(step):
 @step(u'Then I should see the recent subquestion in next question dropdown')
 def then_i_should_see_the_recent_subquestion_in_next_question_dropdown(step):
     sleep(2)
-    sub_question = Question.objects.get(text=world.data['text'], parent=world.question)
-    next_question_options = [sub_question.text]
-    world.page.see_select_option(next_question_options, 'next_question')
+    world.page.see_select_option(world.data['text'], 'next_question')
 
 
 @step(u'And I should not see the add subquestion button')
