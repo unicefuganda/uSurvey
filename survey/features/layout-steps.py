@@ -13,7 +13,7 @@ def then_i_should_see_survey_dropdown_list(step):
 
 @step(u'And I click Questions tab')
 def and_i_click_questions_tab(step):
-    world.page.click_tab("Questions")
+    world.page.click_tab("Question Bank")
 
 @step(u'Then I should see Questions dropdown list')
 def then_i_should_see_questions_dropdown_list(step):

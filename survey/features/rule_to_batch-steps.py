@@ -133,7 +133,7 @@ def and_i_should_see_if_field_is_not_disabled(step):
 
 @step(u'And I should also have all other conditions in the dropdown')
 def and_i_should_also_have_all_other_conditions_in_the_dropdown(step):
-    condition_options = ['> THAN QUESTION RESPONSE', '> THAN VALUE', '< THAN QUESTION RESPONSE', '< THAN VALUE',
+    condition_options = ['> QUESTION RESPONSE', '> VALUE', '< QUESTION RESPONSE', '< VALUE',
                          'EQUALS']
     world.page.see_select_option(condition_options, 'condition')
 
@@ -339,4 +339,4 @@ def when_i_refill_the_form_with_valid_values(step):
 
 @step(u'And I should see already existing logic for the question')
 def and_i_should_see_already_existing_logic_for_the_question(step):
-    world.page.validate_fields_present([world.question.text, "Condition", "Question/Value/Option", "Action"])
+    world.page.validate_fields_present([world.question.text, "Eligibility Criteria", "Question/Value/Option", "Action"])

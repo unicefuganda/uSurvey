@@ -668,6 +668,27 @@ class LogicViewTest(BaseTest):
         self.assertEqual(response.context['class'], 'question-form')
         self.assertEqual(200, response.status_code)
 
+    def test_views_add_logic_returns_rule_already_exists_if_simmilar_rule_exists_on_the_question_and_batch(self):
+        AnswerRule.objects.create(batch=self.batch, question=self.question,
+                                  action=AnswerRule.ACTIONS['REANSWER'],
+                                  condition=AnswerRule.CONDITIONS['EQUALS'],
+                                  validate_with_value=1)
+
+        form_data = {'condition': AnswerRule.CONDITIONS['EQUALS'],
+                     'attribute': 'value',
+                     'value': '1',
+                     'action': AnswerRule.ACTIONS['REANSWER']
+        }
+
+        response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk),
+                                    data=form_data)
+        self.failIf(AnswerRule.objects.filter(condition=form_data['condition'], validate_with_value=form_data['value'],
+                                              action=form_data['action'],
+                                              question=self.question, batch=self.batch).count() > 1)
+        self.assertEqual(200, response.status_code)
+        error_message = 'rule on this value with EQUALS condition already exists.'
+        self.assertIn(error_message, str(response))
+
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected(self):
         form_data = {'condition': 'EQUALS',
                      'attribute': 'value',
@@ -760,23 +781,6 @@ class LogicViewTest(BaseTest):
         self.assertIsNone(answer_rule.next_question)
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_value)
-
-    def test_views_has_error_message_if_rule_already_exists(self):
-        AnswerRule.objects.create(question=self.question, batch=self.batch, action=AnswerRule.ACTIONS['SKIP_TO'],
-                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0,
-                                  next_question=self.question_2)
-
-        form_data = {'condition': 'EQUALS',
-                     'attribute': 'value',
-                     'value': 0,
-                     'action': 'SKIP_TO',
-                     'next_question': self.question_2.pk}
-
-        response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk),
-                                    data=form_data)
-
-        error_message = 'Logic not valid.'
-        self.assertIn(error_message, str(response))
 
 
 class QuestionJsonDataDumpTest(BaseTest):
@@ -1047,7 +1051,7 @@ class RemoveQuestionFromBatchTest(BaseTest):
         success_message = 'Question successfully removed from %s.' % self.batch.name
         self.assertIn(success_message, response.cookies['messages'].value)
 
-    def test_should_delete_all_logic_associted_to_question_and_batch_when_removed_from_batch(self):
+    def test_should_delete_all_logic_associated_with_question_and_batch_when_removed_from_batch(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         question = Question.objects.create(text="some qn?", group=group, order=3)
         answer_rule = AnswerRule.objects.create(batch=self.batch, question=self.question,

@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from survey.models import AnswerRule
+from survey.models.helper_constants import CONDITIONS
 
 
 class LogicForm(forms.Form):
@@ -11,15 +12,6 @@ class LogicForm(forms.Form):
             'SKIP_TO': 'JUMP TO',
             'REANSWER': 'REANSWER',
             'ASK_SUBQUESTION': 'ASK SUBQUESTION',
-        }
-
-        self.CONDITIONS = {
-                'EQUALS': 'EQUALS',
-                'EQUALS_OPTION': 'EQUALS OPTION',
-                'GREATER_THAN_QUESTION': '> THAN QUESTION RESPONSE',
-                'GREATER_THAN_VALUE': '> THAN VALUE',
-                'LESS_THAN_QUESTION': '< THAN QUESTION RESPONSE',
-                'LESS_THAN_VALUE': '< THAN VALUE',
         }
 
         self.fields['action'].choices = ACTIONS.items()
@@ -55,11 +47,11 @@ class LogicForm(forms.Form):
 
     def choices_for_condition_field(self, is_multichoice):
         condition_choices = {}
-        for key, value in self.CONDITIONS.items():
+        for key, value in CONDITIONS.items():
             is_equals_option = (key == 'EQUALS_OPTION')
             if (is_equals_option and is_multichoice) or (not is_equals_option and not is_multichoice):
                 condition_choices[key] = value
-        return condition_choices.items()
+        return sorted(condition_choices.items())
 
     def clean_value(self):
         if self.cleaned_data['attribute'] == 'value' and len(self.cleaned_data['value'].strip()) == 0:
@@ -67,6 +59,7 @@ class LogicForm(forms.Form):
         return self.cleaned_data['value']
 
     def clean(self):
+        field_name = ""
         rule = []
 
         if self.question.is_multichoice():
@@ -81,11 +74,11 @@ class LogicForm(forms.Form):
                 field_name = 'question value with %s condition' %self.data['condition']
 
         if len(rule)>0:
-            raise ValidationError("rule on this %s already exists." %field_name)
+            raise ValidationError("rule on this %s already exists." % field_name)
         return self.cleaned_data
 
 
-    condition = forms.ChoiceField(label='Eligibility criteria', choices=AnswerRule.CONDITIONS.items(), widget=forms.Select,
+    condition = forms.ChoiceField(label='Eligibility criteria', choices=[], widget=forms.Select,
                                   required=False)
     attribute = forms.ChoiceField(label='Attribute', choices=[], widget=forms.Select, required=False)
     option = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=True)

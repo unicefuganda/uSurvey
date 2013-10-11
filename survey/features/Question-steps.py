@@ -329,7 +329,7 @@ def and_i_click_on_view_logic_link(step):
 
 @step(u'Then I should see the logic in a modal')
 def then_i_should_see_the_logic_in_a_modal(step):
-    world.page.validate_fields_present([world.multi_choice_question.text, "Condition", "Question/Value", "Action"])
+    world.page.validate_fields_present([world.multi_choice_question.text, "Eligibility Criteria", "Question/Value/Option", "Action"])
 
 @step(u'Then I should see delete logic icon')
 def then_i_should_delete_logic_icon(step):

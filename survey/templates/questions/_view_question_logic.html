@@ -3,7 +3,7 @@
     <thead>
     <tr>
         <th>
-            Condition
+            Eligibility Criteria
         </th>
         <th>
             Question/Value/Option
@@ -21,7 +21,7 @@
         {% for rule in rules_for_batch|get_value:question %}
             <tr>
                 <td >
-                    {{ rule.condition }}
+                    {{ rule.condition|condition_text }}
                 </td>
                 <td>
                     {% if rule.validate_with_value or rule.validate_with_value == 0 %}

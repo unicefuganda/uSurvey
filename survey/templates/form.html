@@ -5,6 +5,12 @@
   {% block title %} {% endblock %}
 </h3>
 
+{%  block non_form_errors %}
+    {% if logic_form.errors %}
+        <div id="non_field_errors" class="alert alert-error">{{ logic_form.non_field_errors }}</div>
+    {%  endif %}
+{% endblock %}
+
 {% block pre_form_content %}
 {% endblock %}
 

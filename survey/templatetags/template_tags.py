@@ -1,6 +1,7 @@
 from django import template
 from survey.investigator_configs import MONTHS
 from django.core.urlresolvers import reverse
+from survey.models.helper_constants import CONDITIONS
 
 register = template.Library()
 
@@ -69,5 +70,9 @@ def get_url_without_ids(url_name):
 
 @register.filter
 def add_string(int_1, int_2):
-  return "%s, %s"%(str(int_1), str(int_2)) 
-  
+    return "%s, %s"%(str(int_1), str(int_2))
+
+@register.filter
+def condition_text(key):
+    value = CONDITIONS.get(key, "")
+    return value

@@ -16,10 +16,10 @@ class AnswerRule(BaseModel):
                 'ASK_SUBQUESTION': 'ask_subquestion',
     }
     CONDITIONS = {
-                'EQUALS': 'EQUALS',
-                'EQUALS_OPTION': 'EQUALS_OPTION',
                 'GREATER_THAN_QUESTION': 'GREATER_THAN_QUESTION',
                 'GREATER_THAN_VALUE': 'GREATER_THAN_VALUE',
+                'EQUALS': 'EQUALS',
+                'EQUALS_OPTION': 'EQUALS_OPTION',
                 'LESS_THAN_QUESTION': 'LESS_THAN_QUESTION',
                 'LESS_THAN_VALUE': 'LESS_THAN_VALUE',
     }
