@@ -41,6 +41,22 @@ class QuestionModuleViewTest(BaseTest):
         self.assertIn(health_module, response.context['question_modules'])
         self.assertIn(education_module, response.context['question_modules'])
 
+    def test_delete_question_module(self):
+        QuestionModule.objects.create(name="Health")
+        education_module = QuestionModule.objects.create(name="Education")
+        response = self.client.get('/modules/%s/delete/' % education_module.id)
+        self.failIf(QuestionModule.objects.filter(id=education_module.id))
+        self.assertRedirects(response, "/modules/", 302, 200)
+        error_message = "Module successfully deleted."
+        self.assertIn(error_message, response.cookies['messages'].value)
+
+    def test_delete_question_module_returns_error_if_module_does_not_exist(self):
+        some_none_existing_module_id = 999999
+        response = self.client.get('/modules/%s/delete/' % some_none_existing_module_id)
+        self.assertRedirects(response, "/modules/", 302, 200)
+        error_message = "Module does not exist."
+        self.assertIn(error_message, response.cookies['messages'].value)
+
     def test_post_question_module_returns_error_message_if_similar_module_exists(self):
         QuestionModule.objects.create(name="Education")
         form_data = {'name': 'Education'}

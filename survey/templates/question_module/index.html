@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-
+{% load template_tags %}
 {% block title %}
     Question Module Lists
 {% endblock %}
@@ -15,6 +15,9 @@
             <th>
               Module Name
             </th>
+              <th>
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -22,6 +25,12 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ question_module.name }}</td>
+                <td>
+                <div class="btn-group">
+                    <a href="#delete_module_{{question_module.id}}" class="btn btn-small" data-toggle="modal" id="delete-question-module_{{question_module.id}}"><i class="icon-trash"></i> Delete</a>
+                </div>
+                {% include "base/delete_modal.html" with object_name=question_module.name id=question_module.id name="Module" url=question_module.id|get_url_with_ids:"delete_question_module_page" %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>

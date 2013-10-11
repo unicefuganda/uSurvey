@@ -718,7 +718,7 @@ class LogicViewTest(BaseTest):
                                               action=form_data['action'],
                                               question=self.question, batch=self.batch).count() > 1)
         self.assertEqual(200, response.status_code)
-        error_message = 'rule on this value with EQUALS condition already exists.'
+        error_message = 'Rule on this value with EQUALS condition already exists.'
         self.assertIn(error_message, str(response))
 
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected(self):

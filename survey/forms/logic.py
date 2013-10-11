@@ -74,7 +74,7 @@ class LogicForm(forms.Form):
                 field_name = 'question value with %s condition' %self.data['condition']
 
         if len(rule)>0:
-            raise ValidationError("rule on this %s already exists." % field_name)
+            raise ValidationError("Rule on this %s already exists." % field_name)
         return self.cleaned_data
 
 

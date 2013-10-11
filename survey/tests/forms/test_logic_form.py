@@ -242,6 +242,4 @@ class LogicFormTest(TestCase):
                             validate_with_question=question_3.pk)
 
         logic_form = LogicForm(question = question_1, data = another_data, batch=batch)
-
         self.assertTrue(logic_form.is_valid())
-

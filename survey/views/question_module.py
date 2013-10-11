@@ -26,3 +26,12 @@ def index(request):
     all_question_modules = QuestionModule.objects.all()
     context = {'question_modules': all_question_modules}
     return render(request, "question_module/index.html", context)
+
+
+def delete(request, module_id):
+    try:
+        QuestionModule.objects.get(id=module_id).delete()
+        messages.success(request, "Module successfully deleted.")
+    except QuestionModule.DoesNotExist:
+        messages.success(request, "Module does not exist.")
+    return HttpResponseRedirect("/modules/")
