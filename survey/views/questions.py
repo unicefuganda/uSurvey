@@ -238,6 +238,7 @@ def delete_logic(request, batch_id, answer_rule_id):
 def remove(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
     question = Question.objects.get(id=question_id, batches__id=batch_id)
+    AnswerRule.objects.filter(question=question, batch=batch).delete()
     question.de_associate_from(batch)
     messages.success(request, "Question successfully removed from %s." % batch.name)
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)

@@ -9,8 +9,8 @@ from survey.ussd.ussd import USSD
 
 class USSDRegisterHousehold(USSD):
     HEAD_ANSWER = {
-        'HEAD':'1',
-        'MEMBER':'2'
+        'HEAD': '1',
+        'MEMBER': '2'
     }
     REGISTRATION_DICT = {}
 
@@ -55,7 +55,7 @@ class USSDRegisterHousehold(USSD):
         except KeyError:
             self.investigator.set_in_cache('is_selecting_member', False)
 
-    def set_head(self,answer):
+    def set_head(self, answer):
         if self.is_head is None or not self.is_head:
             if answer == self.HEAD_ANSWER['HEAD']:
                 self.investigator.set_in_cache('is_head', True)

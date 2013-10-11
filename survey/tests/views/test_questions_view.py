@@ -1047,6 +1047,55 @@ class RemoveQuestionFromBatchTest(BaseTest):
         success_message = 'Question successfully removed from %s.' % self.batch.name
         self.assertIn(success_message, response.cookies['messages'].value)
 
+    def test_should_delete_all_logic_associted_to_question_and_batch_when_removed_from_batch(self):
+        group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        question = Question.objects.create(text="some qn?", group=group, order=3)
+        answer_rule = AnswerRule.objects.create(batch=self.batch, question=self.question,
+                                                action=AnswerRule.ACTIONS['SKIP_TO'],
+                                                condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                validate_with_value=0, next_question=question)
+        response = self.client.get('/batches/%s/questions/%s/remove/' % (int(self.batch.id), int(self.question.id)))
+        self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
+        updated_question = Question.objects.filter(id=self.question.id)
+        self.failUnless(updated_question)
+        self.assertEqual(1, len(updated_question[0].batches.all()))
+        self.assertIn(self.batch_2, updated_question[0].batches.all())
+        success_message = 'Question successfully removed from %s.' % self.batch.name
+        self.assertIn(success_message, response.cookies['messages'].value)
+        update_answer_rule = AnswerRule.objects.filter(question=self.question, next_question=question,
+                                                       id=answer_rule.id)
+        self.assertEqual(0, len(updated_question[0].rule.all()))
+        self.assertEqual(0, len(update_answer_rule))
+
+    def test_should_retain_logic_attached_to_the_question_in_other_batches(self):
+        batch = Batch.objects.create(name="Another Batch", order=2)
+        group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
+        question = Question.objects.create(text="some qn?", group=group, order=3)
+        AnswerRule.objects.create(batch=self.batch, question=self.question,
+                                  action=AnswerRule.ACTIONS['SKIP_TO'],
+                                  condition=AnswerRule.CONDITIONS['EQUALS'],
+                                  validate_with_value=0, next_question=question)
+        answer_rule_two = AnswerRule.objects.create(batch=batch, question=self.question,
+                                                    action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                                    condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                    validate_with_value=0)
+        answer_rule_three = AnswerRule.objects.create(batch=self.batch_2, question=self.question,
+                                                      action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                                      condition=AnswerRule.CONDITIONS['EQUALS'],
+                                                      validate_with_value=0)
+
+        self.question.batches.add(batch)
+
+        response = self.client.get('/batches/%s/questions/%s/remove/' % (int(self.batch.id), int(self.question.id)))
+        self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
+        updated_question = Question.objects.filter(id=self.question.id)
+        self.failUnless(updated_question)
+        self.assertIn(self.question, batch.questions.all())
+        self.assertEqual(self.question, answer_rule_two.question)
+        self.assertEqual(batch, answer_rule_two.batch)
+        self.assertEqual(self.batch_2, answer_rule_three.batch)
+        self.assertEqual(self.question, answer_rule_three.question)
+
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/batches/%d/questions/%s/remove/' % (self.batch.id, self.question.id))
 
