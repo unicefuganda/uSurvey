@@ -9,13 +9,15 @@ class QuestionFormTest(TestCase):
     def setUp(self):
         self.batch = Batch.objects.create(name='Batch A',description='description')
         self.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
+        self.question_module = QuestionModule.objects.create(name="Education")
 
         self.form_data = {
                         'batch': self.batch.id,
                         'text': 'whaat?',
                         'answer_type': Question.NUMBER,
                         'options':"some option text",
-                        'group' : self.household_member_group.id
+                        'group' : self.household_member_group.id,
+                        'module' : self.question_module.id
         }
 
     def test_valid(self):
@@ -29,7 +31,7 @@ class QuestionFormTest(TestCase):
 
     def test_question_form_fields(self):
         question_form = QuestionForm()
-        fields = ['text', 'answer_type', 'group']
+        fields = ['module', 'text', 'answer_type', 'group']
         [self.assertIn(field, question_form.fields) for field in fields]
 
     def test_should_know_household_member_group_id_and_name_tuple_is_the_group_choice(self):
@@ -144,3 +146,10 @@ class QuestionFormTest(TestCase):
 
         self.assertIn((self.household_member_group.id, self.household_member_group.name), question_form.fields['group'].choices)
         self.assertIn((another_member_group.id, another_member_group.name), question_form.fields['group'].choices)
+
+    def test_form_is_invalid_if_module_not_selected(self):
+        form_data = self.form_data.copy()
+        form_data['module'] = ''
+
+        question_form = QuestionForm(form_data)
+        self.assertFalse(question_form.is_valid())

@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 import re
+from survey.models import QuestionModule
 
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
@@ -27,10 +28,11 @@ class QuestionForm(ModelForm):
 
     class Meta:
         model = Question
-        fields =['text', 'group', 'answer_type']
+        fields =['module', 'text', 'group', 'answer_type']
 
         widgets ={
-            'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"})
+            'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"}),
+            'module': forms.Select(choices=QuestionModule.objects.filter())
         }
 
     def clean_options(self):

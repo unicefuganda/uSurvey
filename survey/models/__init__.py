@@ -12,7 +12,7 @@ from survey.models.question import Question, QuestionOption, NumericalAnswer, Te
 from survey.models.random_household_selection import RandomHouseHoldSelection
 from survey.models.surveys import Survey
 from survey.models.users import UserProfile
-
+from survey.models.question_module import QuestionModule
 __all__= [
             'Answer',
             'AnswerRule',
@@ -35,4 +35,5 @@ __all__= [
             'RandomHouseHoldSelection',
             'Survey',
             'UserProfile',
+            'QuestionModule'
         ]

@@ -69,10 +69,10 @@ class QuestionTest(TestCase):
         fields = [str(item.attname) for item in question._meta.fields]
 
         for field in ['id', 'identifier', 'group_id', 'text', 'answer_type', 'order', 'subquestion',
-                      'parent_id', 'created', 'modified']:
+                      'parent_id', 'created', 'modified', 'module_id']:
             self.assertIn(field, fields)
 
-        self.assertEqual(len(fields), 10)
+        self.assertEqual(len(fields), 11)
 
     def test_knows_what_group_question_belongs_to_when_successfully_created(self):
         household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
