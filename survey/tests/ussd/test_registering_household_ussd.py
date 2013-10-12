@@ -68,10 +68,11 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_render_first_registration_question_when_selected_member_for_registration(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+        module = QuestionModule.objects.create(name='Registration')
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
-        question_2 = Question.objects.create(text="Please Enter the age",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         self.reset_session()
@@ -83,10 +84,11 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_render_next_registration_question_when_answered_one(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+        module = QuestionModule.objects.create(name='Registration')
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
-        question_2 = Question.objects.create(text="Please Enter the age",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         self.reset_session()
