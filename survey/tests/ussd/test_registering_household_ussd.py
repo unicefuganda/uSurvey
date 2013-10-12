@@ -5,7 +5,7 @@ from django.http.request import HttpRequest
 from django.test import Client
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead
+from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
@@ -100,11 +100,15 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
     def test_should_render_third_registration_question_when_answered_two(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        module = QuestionModule.objects.create(name='Registration')
+
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
-        question_2 = Question.objects.create(text="Please Enter the age",
-                                             answer_type=Question.NUMBER, order=2, group=self.registration_group)
-        question_3 = Question.objects.create(text="Please Enter the gender: 1.Male\n2.Female",
+
+        question_2 = Question.objects.create(module=module, text="Please Enter the age",
+                                             answer_type=Question.TEXT, order=2, group=self.registration_group)
+
+        question_3 = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         self.reset_session()
@@ -123,13 +127,15 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    }
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        module = QuestionModule.objects.create(name='Registration')
+
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(text="Please Enter the age",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.TEXT, order=2, group=self.registration_group)
 
-        question_3 = Question.objects.create(text="Please Enter the gender: 1.Male\n2.Female",
+        question_3 = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         self.reset_session()
@@ -160,6 +166,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_know_if_question_is_age_question(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+        module = QuestionModule.objects.create(name='Registration')
 
         question = Question.objects.create(text="Please Enter the age",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
@@ -174,14 +181,17 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    }
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        module = QuestionModule.objects.create(name='Registration')
+
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(text="Please Enter the age",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.TEXT, order=2, group=self.registration_group)
 
-        question_3 = Question.objects.create(text="Please Enter the gender: 1.Male\n2.Female",
+        question_3 = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
+
 
         self.reset_session()
         self.register_household()
@@ -207,14 +217,17 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    }
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        module = QuestionModule.objects.create(name='Registration')
+
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(text="Please Enter the age",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.TEXT, order=2, group=self.registration_group)
 
-        question_3 = Question.objects.create(text="Please Enter the gender: 1.Male\n2.Female",
+        question_3 = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
+
 
         self.reset_session()
         self.register_household()
@@ -237,14 +250,15 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    'gender':'1'
                    }
         self.registration_group =  HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+        module = QuestionModule.objects.create(name='Registration')
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(text="Please Enter the age",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.TEXT, order=2, group=self.registration_group)
 
-        question_3 = Question.objects.create(text="Please Enter the gender: 1.Male\n2.Female",
+        question_3 = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         self.reset_session()
@@ -267,14 +281,15 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    'gender': '1'
                    }
         self.registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+        module = QuestionModule.objects.create(name='Registration')
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        Question.objects.create(text="Please Enter the age",
+        Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.TEXT, order=2, group=self.registration_group)
 
-        Question.objects.create(text="Please Enter the gender: 1.Male\n2.Female",
+        Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
         self.reset_session()
         self.register_household()
@@ -295,15 +310,16 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    'age': '10',
                    'gender': '1'
                    }
+        module = QuestionModule.objects.create(name='Registration')
         self.registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
 
-        question_1 = Question.objects.create(text="Please Enter the name",
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        Question.objects.create(text="Please Enter the age",
+        Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.TEXT, order=2, group=self.registration_group)
 
-        Question.objects.create(text="Please Enter the gender: 1.Male\n2.Female",
+        Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
         self.reset_session()
         self.register_household()

@@ -20,11 +20,8 @@ class HouseholdForm(ModelForm):
     def clean_uid(self):
         uid = self.cleaned_data['uid']
         household = Household.objects.filter(uid=int(uid))
-        try:
-            if not self.is_editing and household:
-                raise ValidationError("Household with this Household Unique Identification already exists.")
-            elif self.is_editing and self.instance.uid != int(uid):
-                raise ValidationError("Household Unique Identification cannot be modified.")
-        except ValueError:
-            raise ValidationError("UID should be a number.")
+        if not self.is_editing and household:
+            raise ValidationError("Household with this Household Unique Identification already exists.")
+        elif self.is_editing and self.instance.uid != int(uid):
+            raise ValidationError("Household Unique Identification cannot be modified.")
         return self.cleaned_data['uid']
