@@ -306,7 +306,7 @@ class HouseholdMemberTest(TestCase):
         investigator.member_answered(question_2, household_member, answer=1, batch=batch)
         self.assertTrue(household_member.survey_completed())
 
-    def test_knows_all_open_batches_are_completed(self):
+    def test_knows_all_open_batches_are_completed_for_multiple_questions(self):
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
         condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         condition.groups.add(member_group)
@@ -864,7 +864,7 @@ class HouseholdMemberTest(TestCase):
         self.assertFalse(household_member.can_retake_survey(None, 5))
         self.assertFalse(household_member.has_open_batches())
         self.assertFalse(household_member.has_open_batches())
-        
+
         batch.open_for_location(investigator.location)
         self.assertFalse(household_member.all_questions_answered([question_1], batch))
         investigator.member_answered(question_1, household_member, 1, batch)
