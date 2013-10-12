@@ -335,3 +335,26 @@ class HouseholdTest(TestCase):
         self.investigator.member_answered(question_2, self.household_member, 1, batch)
 
         self.assertFalse(self.household.has_pending_survey())
+
+    def test_knows_last_question_answered_by_household_and_household_has_next_question(self):
+        batch = Batch.objects.create(order=1)
+        batch.open_for_location(self.kampala)
+
+        question_1 = Question.objects.create(text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1, group=self.member_group)
+        question_2 = Question.objects.create(text="How many of them are male?",
+                                             answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        self.assertIsNone(self.household.last_question_answered())
+
+        self.investigator.member_answered(question_1, self.household_member, 1, batch)
+
+        self.assertEqual(question_1, self.household.last_question_answered())
+        self.assertTrue(self.household.has_next_question(batch))
+        self.assertFalse(self.household.survey_completed())
+
+        self.investigator.member_answered(question_2, self.household_member, 1, batch)
+        self.assertEqual(question_2, self.household.last_question_answered())
+        self.assertFalse(self.household.has_next_question(batch))
+        self.assertTrue(self.household.survey_completed())

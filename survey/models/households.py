@@ -41,9 +41,9 @@ class Household(BaseModel):
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
-    def has_next_question(self):
+    def has_next_question(self, batch):
         for household_member in self.household_member.all():
-            if household_member.next_question():
+            if not household_member.has_completed(batch):
                 return True
         return False
 
@@ -53,9 +53,12 @@ class Household(BaseModel):
                 return True
         return False
 
-
     def survey_completed(self):
-        return not self.has_next_question()
+        batches = self.investigator.get_open_batch()
+        for batch in batches:
+            if self.has_next_question(batch):
+                return False
+        return True
 
     def retake_latest_batch(self):
         batches = self.investigator.get_open_batch()
