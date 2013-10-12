@@ -1,7 +1,7 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion, Batch
+from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion, Batch, QuestionModule
 from survey.models.batch import Batch, BatchLocationStatus
 from survey.models.households import HouseholdMember
 from survey.models.surveys import Survey
@@ -205,6 +205,44 @@ class BatchLocationStatusTest(TestCase):
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
         self.assertEqual(len(investigator_2.get_open_batch()), 0)
 
+    def test_get_next_question_from_batch(self):
+        batch = Batch.objects.create(name="Batch 1", order=1)
+        batch_2 = Batch.objects.create(name="Batch 2", order=2)
+        kampala = Location.objects.create(name="Kampala")
+        abim = Location.objects.create(name="Abim")
+        group_1 = HouseholdMemberGroup.objects.create(name="Group 1", order=0)
+
+        module = QuestionModule.objects.create(name="Education")
+
+        question_1 = Question.objects.create(module=module, group=group_1,
+                                             text="Question 1", answer_type=Question.NUMBER,
+                                             identifier="identifier", order=1)
+
+        question_2 = Question.objects.create(module=module, group=group_1,
+                                             text="Question 2", answer_type=Question.NUMBER,
+                                             identifier="identifier", order=2)
+
+        question_3 = Question.objects.create(module=module, group=group_1,
+                                             text="Question 3", answer_type=Question.NUMBER,
+                                             identifier="identifier", order=1)
+
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        question_3.batches.add(batch_2)
+
+
+        batch.open_for_location(kampala)
+        self.assertIsNone(batch.get_next_open_batch(batch.order, kampala))
+
+        batch_2.open_for_location(kampala)
+        self.assertEqual(batch_2, batch.get_next_open_batch(batch.order, kampala))
+
+        self.assertEqual(question_1, batch.get_next_question(0, kampala))
+        self.assertEqual(question_2, batch.get_next_question(1, kampala))
+        self.assertEqual(question_3, batch.get_next_question(2, kampala))
+
+        batch.close_for_location(kampala)
+        self.assertEqual(question_3, batch.get_next_question(0, kampala))
 
 class HouseholdBatchCompletionTest(TestCase):
     def test_store(self):
