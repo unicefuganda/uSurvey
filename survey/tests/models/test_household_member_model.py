@@ -841,3 +841,32 @@ class HouseholdMemberTest(TestCase):
 
         household_member.mark_past_answers_as_old()
         self.assertTrue(NumericalAnswer.objects.filter(question=question_1)[0].is_old)
+
+    def test_can_retake_survey_with_no_batch(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
+                                                          male=False,
+                                                  household=household)
+        batch = Batch.objects.create(name="Batch 1", order=1)
+        group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
+        group_condition = GroupCondition.objects.create(attribute="GENDER", condition="EQUALS", value=True)
+        group_condition.groups.add(group)
+
+        question_1 = Question.objects.create(group=group, text="This is another question", answer_type="number",
+                                             order=1)
+        question_1.batches.add(batch)
+
+        self.assertFalse(household_member.can_retake_survey(None, 5))
+        self.assertFalse(household_member.has_open_batches())
+        self.assertFalse(household_member.has_open_batches())
+        
+        batch.open_for_location(investigator.location)
+        self.assertFalse(household_member.all_questions_answered([question_1], batch))
+        investigator.member_answered(question_1, household_member, 1, batch)
+
+        self.assertTrue(household_member.all_questions_answered([question_1], batch))

@@ -347,6 +347,12 @@ class HouseholdTest(TestCase):
         question_1.batches.add(batch)
         question_2.batches.add(batch)
         self.assertIsNone(self.household.last_question_answered())
+        self.assertFalse(self.household.has_completed_batches([batch]))
+
+        answers = self.household.answers_for([question_1, question_2])
+
+        self.assertEqual('', answers[0])
+        self.assertEqual('', answers[1])
 
         self.investigator.member_answered(question_1, self.household_member, 1, batch)
 
@@ -358,3 +364,5 @@ class HouseholdTest(TestCase):
         self.assertEqual(question_2, self.household.last_question_answered())
         self.assertFalse(self.household.has_next_question(batch))
         self.assertTrue(self.household.survey_completed())
+        self.assertTrue(self.household.has_completed_batches([batch]))
+
