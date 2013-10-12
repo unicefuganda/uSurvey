@@ -244,6 +244,9 @@ class BatchLocationStatusTest(TestCase):
         batch.close_for_location(kampala)
         self.assertEqual(question_3, batch.get_next_question(0, kampala))
 
+        self.assertEqual(batch_2, batch.currently_open_for(kampala))
+        self.assertIsNone(batch.currently_open_for(abim))
+
 class HouseholdBatchCompletionTest(TestCase):
     def test_store(self):
         batch = Batch.objects.create(order=1)
