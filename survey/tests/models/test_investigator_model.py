@@ -188,3 +188,12 @@ class InvestigatorTest(TestCase):
         updated_household = Household.objects.get(id=self.household.id)
         self.assertEqual(0, len(self.investigator.households.all()))
         self.assertIsNone(updated_household.investigator)
+
+    def test_knows_first_open_batch(self):
+        batch_1 = Batch.objects.create(name="Batch 1", order=1)
+        batch_2 = Batch.objects.create(name="Batch 2", order=2)
+
+        batch_1.open_for_location(self.investigator.location)
+        batch_2.open_for_location(self.investigator.location)
+
+        self.assertEqual(batch_1, self.investigator.first_open_batch())
