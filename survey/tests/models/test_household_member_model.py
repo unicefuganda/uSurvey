@@ -328,13 +328,16 @@ class HouseholdMemberTest(TestCase):
 
         question_1 = Question.objects.create(identifier="identifier1",
                                              text="Question 1", answer_type='number',
-                                             order=1, subquestion=False, group=member_group, batch=batch)
+                                             order=1, subquestion=False, group=member_group)
+        question_1.batches.add(batch)
 
         question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
                                              answer_type='number', order=2,
-                                             subquestion=False, group=member_group, batch=batch_2)
-        investigator.member_answered(question_1, household_member, answer=1)
-        investigator.member_answered(question_2, household_member, answer=1)
+                                             subquestion=False, group=member_group)
+        question_2.batches.add(batch_2)
+
+        investigator.member_answered(question_1, household_member, answer=1, batch=batch)
+        investigator.member_answered(question_2, household_member, answer=1, batch=batch_2)
 
         self.assertFalse(household_member.has_open_batches())
 
