@@ -32,10 +32,6 @@ class HouseholdTest(TestCase):
     def test_location_hierarchy(self):
         self.assertEquals(self.household.location_hierarchy(), {'Country': self.uganda, 'City': self.kampala})
 
-    def test_store(self):
-        household = Household.objects.create(investigator=self.investigator, uid=1)
-        self.failUnless(household.id)
-
     def test_fields(self):
         hHead = Household()
         fields = [str(item.attname) for item in hHead._meta.fields]

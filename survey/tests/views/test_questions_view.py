@@ -10,6 +10,7 @@ from survey.models.question import Question, QuestionOption
 from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
 from survey.models.householdgroups import HouseholdMemberGroup
+from survey.views.questions import _rule_exists
 
 
 class QuestionsViews(BaseTest):
@@ -721,6 +722,21 @@ class LogicViewTest(BaseTest):
         error_message = 'Rule on this value with EQUALS condition already exists.'
         self.assertIn(error_message, str(response))
 
+    def test_knows_rule_exist_when_same_rule_conditions_sent(self):
+        answer_rule_data = {'condition': AnswerRule.CONDITIONS['EQUALS'],
+                     'validate_with_value': '1',
+                     'action': AnswerRule.ACTIONS['REANSWER']
+        }
+        self.assertFalse(_rule_exists(self.question, self.batch, **answer_rule_data))
+
+        AnswerRule.objects.create(batch=self.batch, question=self.question,
+                                  action=AnswerRule.ACTIONS['REANSWER'],
+                                  condition=AnswerRule.CONDITIONS['EQUALS'],
+                                  validate_with_value=1)
+        self.assertTrue(_rule_exists(self.question, self.batch, **answer_rule_data))
+
+
+
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected(self):
         form_data = {'condition': 'EQUALS',
                      'attribute': 'value',
@@ -1049,7 +1065,6 @@ class EditSubQuestionTest(BaseTest):
             '/batches/%s/questions/%s/sub_questions/edit/' % (self.batch.id, self.sub_question.id))
         self.assert_restricted_permission_for('/questions/%d/sub_questions/edit/' % self.sub_question.id)
 
-
 class DeleteLogicViewsTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -1073,7 +1088,6 @@ class DeleteLogicViewsTest(BaseTest):
             '/batches/%s/questions/delete_logic/%d/' % (int(self.batch.id), int(self.answer_rule.id)))
         self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
         self.failIf(AnswerRule.objects.filter(id=self.answer_rule.id))
-
 
 class RemoveQuestionFromBatchTest(BaseTest):
     def setUp(self):
@@ -1151,7 +1165,6 @@ class RemoveQuestionFromBatchTest(BaseTest):
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/batches/%d/questions/%s/remove/' % (self.batch.id, self.question.id))
-
 
 class DeleteSubQuestionFromBatchTest(BaseTest):
     def setUp(self):

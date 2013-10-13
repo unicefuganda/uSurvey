@@ -33,7 +33,7 @@ class QuestionForm(ModelForm):
 
         widgets ={
             'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"}),
-            'module': forms.Select(choices=QuestionModule.objects.filter())
+            'module': forms.Select(choices=[])
         }
 
     def clean_options(self):
