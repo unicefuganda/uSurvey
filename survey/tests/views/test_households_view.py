@@ -258,6 +258,32 @@ class HouseholdViewTest(BaseTest):
         self.failIf(hHead)
         self.failIf(household)
 
+    def test_create_households_unsuccessful_with_non_field_errors(self):
+
+        country = LocationType.objects.create(name='country', slug='country')
+        uganda = Location.objects.create(name="Uganda", type=country)
+
+        form_data = {
+            'location': uganda.id,
+            'surname': 'Rajini',
+            'first_name': 'Kant',
+            'male': 'False',
+            'occupation': 'Student',
+            'level_of_education': 'Nursery',
+            'resident_since_year': '2013',
+            'resident_since_month': '5',
+            'time_measure': 'Years',
+            'uid': '2',
+        }
+
+        form_with_invalid_data = form_data
+        form_with_invalid_data['surname'] = ''
+
+        response = self.client.post('/households/new/', data=form_with_invalid_data)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['householdform'].get('household').non_field_errors())
+        [self.assertIn(str(err), str(response)) for err in response.context['householdform'].get('household').non_field_errors()]
+
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/households/new/')
 
