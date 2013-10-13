@@ -124,6 +124,9 @@ class HouseholdHeadFormTest(TestCase):
     def test_resident_since_year_choices(self):
         year_choices= {'selected_text':'', 'selected_value':''}
         datetime = MockDate
+
+        self.assertEqual(MockDate.now(), datetime(2013, 1, 1))
+
         years= list(xrange(2013-60, 2014, 1))
         years.reverse()
         year_choices = HouseholdHeadForm.resident_since_year_choices(year_choices)
