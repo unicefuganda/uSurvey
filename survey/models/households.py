@@ -16,7 +16,7 @@ from django.core.paginator import Paginator
 class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
     location = models.ForeignKey(Location, null=True)
-    uid = models.PositiveIntegerField(blank=False, default=0, verbose_name="Household Unique Identification")
+    uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Unique Identification")
 
     MEMBERS_PER_PAGE = 4
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings, 'USSD_PAGINATION', None).get('PREVIOUS')

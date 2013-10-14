@@ -1,0 +1,9 @@
+<form id="question-filter-form" action="{{ action }}" method="post" class="pull-left padded-bottom">
+   {% csrf_token %}
+    {% include "horizontal_filter_form.html" with a_form=question_filter_form%}
+    {% if batch %}
+        <button class="btn btn-primary" id="a-question-list"> Get List</button>
+    {% else %}
+        <button class="btn btn-primary" id="a-question-list"> Get List</button>
+    {% endif %}
+</form>

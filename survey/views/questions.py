@@ -7,36 +7,77 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.logic import LogicForm
-from survey.models import AnswerRule
+from survey.forms.question_filter import QuestionFilterForm
+from survey.models import AnswerRule, QuestionModule
 
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
-from survey.models.householdgroups import HouseholdMemberGroup
-
 from survey.forms.question import QuestionForm
 
+def _set_filter_condition_based_on_group(group_id, filter_condition):
+    if group_id and group_id.lower() != 'all':
+        filter_condition['group__id'] = group_id
+    return filter_condition
+
+def _set_filter_condition_based_on_module(module_id, filter_condition):
+    if module_id and module_id.lower() != 'all':
+        filter_condition['module__id'] = module_id
+    return filter_condition
+
+def _set_filter_condition_based_on_answer_type(answer_type, filter_condition):
+    if answer_type and answer_type.lower() != 'all':
+        filter_condition['answer_type'] = answer_type
+    return filter_condition
+
+def _set_filter_condition_based_on_batch_id(filter_condition, batch_id=None):
+    if batch_id:
+        filter_condition['batches'] = Batch.objects.get(id=batch_id)
+    return filter_condition
+
+def _get_questions_based_on_filter(batch_id, group_id='All', module_id='All', question_type='All'):
+    filter_condition = {}
+    filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, batch_id)
+    filter_condition = _set_filter_condition_based_on_group(group_id, filter_condition)
+    filter_condition = _set_filter_condition_based_on_module(module_id, filter_condition)
+    filter_condition = _set_filter_condition_based_on_answer_type(question_type, filter_condition)
+
+    return Question.objects.filter(subquestion=False, **filter_condition)
 
 @permission_required('auth.can_view_batches')
 def index(request, batch_id):
-    batch = Batch.objects.get(id=batch_id)
+    batch = None
 
-    group_id = request.GET.get('group_id', None)
+    if len(batch_id.strip()) != 0:
+        batch = Batch.objects.get(id=batch_id)
 
-    if group_id and group_id != 'all':
-        questions = HouseholdMemberGroup.objects.get(id=group_id).all_questions()
-    else:
-        questions = Question.objects.filter(batches=batch)
+    question_filter_form = QuestionFilterForm()
+    group_id = request.GET.get('groups', None)
+    module_id = request.GET.get('modules', None)
+    question_type = request.GET.get('question_types', None)
+
+    if request.method == "POST":
+        question_filter_form = QuestionFilterForm(data=request.POST)
+        group_id = request.POST.get('groups', None)
+        module_id = request.POST.get('modules', None)
+        question_type = request.POST.get('question_types', None)
+
+    if not batch_id:
+        batch_id = request.POST.get('batch_id', None)
+
+    questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
 
     if not questions.exists():
         messages.error(request, 'There are no questions associated with this batch yet.')
     all_questions = questions.exclude(subquestion=True)
 
     question_rules_for_batch = {}
-    for question in all_questions:
-        question_rules_for_batch[question] = question.rules_for_batch(batch)
+
+    if batch:
+        for question in all_questions:
+            question_rules_for_batch[question] = question.rules_for_batch(batch)
 
     context = {'questions': all_questions, 'request': request, 'batch': batch,
-               'rules_for_batch': question_rules_for_batch}
+               'question_filter_form': question_filter_form, 'rules_for_batch': question_rules_for_batch}
     return render(request, 'questions/index.html', context)
 
 
@@ -60,8 +101,25 @@ def filter_by_group_and_module(request, batch_id, group_id, module_id):
 
 @permission_required('auth.can_view_batches')
 def list_all_questions(request):
-    questions = Question.objects.filter(subquestion=False)
-    context = {'questions': questions, 'request': request, 'rules_for_batch': {}}
+    question_filter_form = QuestionFilterForm()
+    group_id = None
+    module_id = None
+    question_type = None
+    batch_id = request.GET.get('batch_id', None)
+
+    if request.method == "POST":
+        question_filter_form = QuestionFilterForm(data=request.POST)
+        group_id = request.POST.get('groups', None)
+        module_id = request.POST.get('modules', None)
+        question_type = request.POST.get('question_types', None)
+        batch_id = request.POST.get('batch_id', None)
+
+    if batch_id == 'null':
+        batch_id = None
+    questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
+
+    context = {'questions': questions, 'request': request, 'question_filter_form': question_filter_form,
+               'rules_for_batch': {}}
     return render(request, 'questions/index.html', context)
 
 

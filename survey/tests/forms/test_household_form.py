@@ -55,15 +55,3 @@ class HouseholdFormTest(TestCase):
         self.assertFalse(household_form.is_valid())
         message = "Household with this Household Unique Identification already exists."
         self.assertEquals(household_form.errors['uid'], [message])
-
-    def test_raises_cannot_change_uid_validation_error_if_different_uid_is_entered_for_instance(self):
-        investigator = Investigator.objects.create(name="test", backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(uid=1, investigator=investigator)
-
-        form_data = {
-            'uid': 2
-        }
-        household_form = HouseholdForm(data=form_data, instance=household, is_edit=True)
-        self.assertFalse(household_form.is_valid())
-        message = "Household Unique Identification cannot be modified."
-        self.assertEquals(household_form.errors['uid'], [message])

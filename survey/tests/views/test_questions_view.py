@@ -3,6 +3,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from mock import patch
 from survey.forms.logic import LogicForm
+from survey.forms.question_filter import QuestionFilterForm
 from survey.models import AnswerRule, QuestionModule
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
@@ -10,7 +11,7 @@ from survey.models.question import Question, QuestionOption
 from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
 from survey.models.householdgroups import HouseholdMemberGroup
-from survey.views.questions import _rule_exists
+from survey.views.questions import _rule_exists, _set_filter_condition_based_on_group, _set_filter_condition_based_on_module, _set_filter_condition_based_on_answer_type, _set_filter_condition_based_on_batch_id, _get_questions_based_on_filter
 
 
 class QuestionsViews(BaseTest):
@@ -33,6 +34,132 @@ class QuestionsViews(BaseTest):
                                                   module=self.module)
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
+
+    def test_set_filter_condition_based_on_group(self):
+        filter_condition = {}
+        updated_filter_condition = _set_filter_condition_based_on_group('All', filter_condition)
+        self.assertIsNone(updated_filter_condition.get('group__id', None))
+
+        updated_filter_condition = _set_filter_condition_based_on_group('2', filter_condition)
+        self.assertEqual('2', updated_filter_condition.get('group__id', None))
+
+    def test_set_filter_condition_based_on_module(self):
+        filter_condition = {}
+        updated_filter_condition = _set_filter_condition_based_on_module('All', filter_condition)
+        self.assertIsNone(updated_filter_condition.get('module__id', None))
+
+        updated_filter_condition = _set_filter_condition_based_on_module('2', filter_condition)
+        self.assertEqual('2', updated_filter_condition.get('module__id', None))
+
+    def test_set_filter_condition_based_on_answer_type(self):
+        filter_condition = {}
+        updated_filter_condition = _set_filter_condition_based_on_answer_type('All', filter_condition)
+        self.assertIsNone(updated_filter_condition.get('answer_type', None))
+
+        updated_filter_condition = _set_filter_condition_based_on_answer_type('2', filter_condition)
+        self.assertEqual('2', updated_filter_condition.get('answer_type', None))
+
+    def test_set_filter_condition_based_on_batch_id(self):
+        batch = Batch.objects.create(name="Batch F")
+        filter_condition = {}
+        updated_filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, None)
+        self.assertIsNone(updated_filter_condition.get('batches', None))
+
+        updated_filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, batch.id)
+        self.assertEqual(batch, updated_filter_condition.get('batches', None))
+
+    def test_get_questions_based_on_filter_should_return_all_questions_if_batch_is_none_and_all_other_keys_are_all_or_none(self):
+        question_3 = Question.objects.create(text="How many members are there in this household?",
+                                                  answer_type=Question.NUMBER, order=1,
+                                                  module=QuestionModule.objects.create(name="Economics"))
+        questions = _get_questions_based_on_filter(None, 'All', 'All', 'All')
+
+        all_questions = [self.question_1, self.question_2, question_3]
+
+        [self.assertIn(question, questions) for question in all_questions]
+
+    def test_get_questions_based_on_filter_should_return_module_specific_questions_if_batch_is_none_and_module_is_specific(self):
+        question_3 = Question.objects.create(text="How many members are there in this household?",
+                                                  answer_type=Question.NUMBER, order=1,
+                                                  module=QuestionModule.objects.create(name="Economics"))
+        questions = _get_questions_based_on_filter(None, 'All', str(self.module.id), 'All')
+
+        all_questions = [self.question_1, self.question_2]
+
+        [self.assertIn(question, questions) for question in all_questions]
+        self.assertNotIn(question_3, questions)
+
+    def test_get_questions_based_on_filter_should_return_group_specific_questions_if_batch_is_none_and_group_is_specific(self):
+        question_3 = Question.objects.create(text="How many members are there in this household?",
+                                                  answer_type=Question.NUMBER, order=1,
+                                                  module=QuestionModule.objects.create(name="Economics"), group=self.household_member_group)
+        questions = _get_questions_based_on_filter(None, str(self.household_member_group.id), 'All', 'All')
+
+        all_questions = [self.question_1, self.question_2]
+
+        [self.assertNotIn(question, questions) for question in all_questions]
+        self.assertIn(question_3, questions)
+
+    def test_get_questions_based_on_filter_should_return_answer_type_specific_questions_if_batch_is_none_and_answer_type_is_specific(self):
+        question_3 = Question.objects.create(text="How many members are there in this household?",
+                                                  answer_type=Question.MULTICHOICE, order=1,
+                                                  module=QuestionModule.objects.create(name="Economics"), group=self.household_member_group)
+        questions = _get_questions_based_on_filter(None, 'All', 'All', Question.NUMBER)
+
+        all_questions = [self.question_1, self.question_2]
+
+        [self.assertIn(question, questions) for question in all_questions]
+        self.assertNotIn(question_3, questions)
+
+    def test_get_questions_based_on_filter_should_specific_questions_if_where_batch_is_specific_and_the_other_conditions_are_specific(self):
+        new_module = QuestionModule.objects.create(name="Economics")
+        new_batch = Batch.objects.create(name="New Batch")
+        question_3 = Question.objects.create(text="How many members are there in this household?",
+                                                  answer_type=Question.MULTICHOICE, order=1,
+                                                  module=new_module, group=self.household_member_group)
+
+        question_4 = Question.objects.create(text="How many members are there in this household again?",
+                                                  answer_type=Question.MULTICHOICE, order=3,
+                                                  module=new_module, group=self.household_member_group)
+        question_3.batches.add(new_batch)
+
+        questions = _get_questions_based_on_filter(new_batch.id, str(self.household_member_group.id), str(new_module.id), Question.MULTICHOICE)
+
+        all_questions = [self.question_1, self.question_2, question_4]
+
+        [self.assertNotIn(question, questions) for question in all_questions]
+        self.assertIn(question_3, questions)
+
+    def test_get_questions_based_on_filter_should_specific_questions_if_where_batch_is_none_and_the_other_conditions_are_specific(self):
+        new_module = QuestionModule.objects.create(name="Economics")
+        new_batch = Batch.objects.create(name="New Batch")
+        question_3 = Question.objects.create(text="How many members are there in this household?",
+                                                  answer_type=Question.MULTICHOICE, order=1,
+                                                  module=new_module, group=self.household_member_group)
+
+        question_4 = Question.objects.create(text="How many members are there in this household again?",
+                                                  answer_type=Question.MULTICHOICE, order=3,
+                                                  module=new_module, group=self.household_member_group)
+        question_3.batches.add(new_batch)
+
+        questions = _get_questions_based_on_filter(None, str(self.household_member_group.id), str(new_module.id), Question.MULTICHOICE)
+
+        all_questions = [self.question_1, self.question_2]
+
+        [self.assertNotIn(question, questions) for question in all_questions]
+        self.assertIn(question_3, questions)
+        self.assertIn(question_4, questions)
+
+    def test_get_questions_based_on_filter_should_return_batch_specific_questions_if_batch_is_specified(self):
+        question_3 = Question.objects.create(text="How many members are there in this household?",
+                                                  answer_type=Question.NUMBER, order=1,
+                                                  module=QuestionModule.objects.create(name="Economics"))
+        questions = _get_questions_based_on_filter(self.batch.id, 'All', 'All', 'All')
+
+        all_questions = [self.question_1, self.question_2]
+
+        [self.assertIn(question, questions) for question in all_questions]
+        self.assertNotIn(question_3, questions)
 
     def test_get_index_per_batch(self):
         response = self.client.get('/batches/%d/questions/' % self.batch.id)
@@ -157,7 +284,7 @@ class QuestionsViews(BaseTest):
             question.batches.add(self.batch)
 
         response = self.client.get(
-            '/batches/%d/questions/?group_id=%s' % (self.batch.id, self.household_member_group.id))
+            '/batches/%d/questions/?groups=%s' % (self.batch.id, self.household_member_group.id))
 
         questions = response.context["questions"]
 
@@ -185,7 +312,7 @@ class QuestionsViews(BaseTest):
         for question in all_group_questions:
             question.batches.add(self.batch)
 
-        response = self.client.get('/batches/%d/questions/?group_id=%s' % (self.batch.id, 'all'))
+        response = self.client.get('/batches/%d/questions/?groups=%s' % (self.batch.id, 'all'))
 
         questions = response.context["questions"]
 
@@ -437,12 +564,19 @@ class QuestionsViews(BaseTest):
     def test_get_index_all(self):
         sub_question = Question.objects.create(parent=self.question_1, text="Sub Question 2?",
                                                answer_type=Question.NUMBER, subquestion=True, module=self.module)
+        module = QuestionModule.objects.create(name="Education")
+        member_group = HouseholdMemberGroup.objects.create(name="Education", order=0)
+        question_type = ('number', 'Number')
+
         response = self.client.get('/questions/')
+
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions/index.html', templates)
         self.assertIn(self.question_1, response.context['questions'])
         self.assertIn(self.question_2, response.context['questions'])
+        self.assertIsNotNone(response.context['question_filter_form'])
+        self.assertIsInstance(response.context['question_filter_form'], QuestionFilterForm)
         self.assertNotIn(sub_question, response.context['questions'])
         self.assertIsNotNone(response.context['request'])
 
@@ -764,6 +898,8 @@ class LogicViewTest(BaseTest):
         self.assertEqual(2, len(all_question_batch_rules))
         self.assertEqual(2, len(all_question_batch_rules[rule_question]))
         [self.assertIn(rule, all_question_batch_rules[rule_question]) for rule in all_rules]
+        self.assertIsNotNone(response.context['question_filter_form'])
+        self.assertIsInstance(response.context['question_filter_form'], QuestionFilterForm)
 
     def test_views_add_logic_get_has_logic_form_in_context_and_has_success_response(self):
         answer_rule_2 = AnswerRule.objects.create(batch=self.batch, question=self.question,
@@ -1178,6 +1314,7 @@ class DeleteLogicViewsTest(BaseTest):
             '/batches/%s/questions/delete_logic/%d/' % (int(self.batch.id), int(self.answer_rule.id)))
         self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
         self.failIf(AnswerRule.objects.filter(id=self.answer_rule.id))
+
 
 class RemoveQuestionFromBatchTest(BaseTest):
     def setUp(self):

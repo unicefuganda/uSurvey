@@ -27,10 +27,10 @@ class LocationTypeForm(ModelForm):
 
         return a_type
 
-
     class Meta:
         model = LocationType
         exclude = ['slug']
+
 
 class LocationForm(ModelForm):
 
@@ -61,6 +61,3 @@ class LocationForm(ModelForm):
         widgets = {
             'tree_parent': forms.Select(attrs={'class':'chzn-select', 'data-placeholder':'Select or Type District'}),
             }
-
-
-

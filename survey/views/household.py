@@ -49,12 +49,15 @@ def validate_investigator(request, householdform, posted_locations):
         householdform.errors['__all__'] = householdform.error_class([message])
     return investigator, investigator_form
 
-def create_household(householdform, investigator, valid):
+def create_household(householdform, investigator, valid, uid):
     is_valid_household = householdform['household'].is_valid()
+
     if investigator and is_valid_household:
         household = householdform['household'].save(commit=False)
         household.investigator = investigator
         household.location = investigator.location
+        if uid:
+            household.uid = uid
         household.save()
         valid['household'] = True
     return valid
@@ -72,9 +75,9 @@ def delete_created_modelforms(householdform, valid):
     for key in valid.keys():
         householdform[key].instance.delete()
 
-def _process_form(householdform, investigator, request, is_edit=False):
+def _process_form(householdform, investigator, request, is_edit=False, uid=None):
     valid = {}
-    valid = create_household(householdform, investigator, valid)
+    valid = create_household(householdform, investigator, valid, uid)
 
     if not is_edit:
         valid = create_remaining_modelforms(householdform, valid)
@@ -94,19 +97,19 @@ def _process_form(householdform, investigator, request, is_edit=False):
     _add_error_response_message(householdform, request)
     return None
 
-def set_household_form(data=None, is_edit=False, instance=None):
+def set_household_form(uid=None, data=None, is_edit=False, instance=None):
     householdform = {}
     if not is_edit:
         householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
 
-    householdform['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, auto_id='household-%s', label_suffix='')
+    householdform['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid, auto_id='household-%s', label_suffix='')
     return householdform
 
-def create(request, selected_location, instance=None, is_edit=False):
-    householdform = set_household_form(data=request.POST, instance=instance, is_edit=is_edit)
+def create(request, selected_location, instance=None, is_edit=False, uid=None):
+    householdform = set_household_form(uid=uid, data=request.POST, instance=instance, is_edit=is_edit)
     posted_locations = selected_location.get_descendants(include_self=True)
     investigator, investigator_form = validate_investigator(request, householdform['household'], posted_locations)
-    response = _process_form(householdform, investigator, request, is_edit=is_edit)
+    response = _process_form(householdform, investigator, request, is_edit=is_edit, uid=uid)
 
     return response, householdform, investigator, investigator_form
 
@@ -183,6 +186,7 @@ def edit_household(request, household_id):
     household_selected = Household.objects.get(id=household_id)
     selected_location = household_selected.location
     response = None
+    uid = household_selected.uid
     household_form = set_household_form(is_edit=True, instance=household_selected)
     investigators = Investigator.objects.filter(location=selected_location, is_blocked=False)
     investigator_form = {'value': '', 'text': '',
@@ -190,9 +194,11 @@ def edit_household(request, household_id):
                          'error': ''}
 
     if request.method == 'POST':
+        uid = request.POST.get('uid', None)
+
         selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
         response, household_form, investigator, investigator_form = create(request, selected_location,
-                                                                           instance=household_selected, is_edit=True)
+                                                                           instance=household_selected, is_edit=True, uid=uid)
     return response or render(request, 'households/new.html', {'selected_location': selected_location,
                                                                'locations': LocationWidget(selected_location),
                                                                'investigator_form': investigator_form,
@@ -201,4 +207,5 @@ def edit_household(request, household_id):
                                                                'id': "add-household-form",
                                                                'button_label': "Update Household",
                                                                'heading': "Edit Household",
+                                                               'uid': uid,
                                                                'loading_text': "Updating...", 'is_edit': True})
