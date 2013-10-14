@@ -5,6 +5,12 @@ from survey.templatetags.template_tags import *
 
 class TemplateTagsTest(TestCase):
 
+    def test_knows_mobile_number_not_in_field_string(self):
+        self.assertFalse(is_mobile_number(""))
+
+    def test_knows_mobile_number_in_field_string(self):
+        self.assertTrue(is_mobile_number("mobile number : 1234567"))
+
     def test_gets_key_value_from_location_dict(self):
         country_name = 'Uganda'
         district_name = 'Kampala'

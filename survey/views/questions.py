@@ -41,12 +41,18 @@ def index(request, batch_id):
 
 
 @permission_required('auth.can_view_batches')
-def filter_by_group(request, batch_id, group_id):
-    if group_id.lower() != 'all':
+def filter_by_group_and_module(request, batch_id, group_id, module_id):
+    if group_id.lower() != 'all' and module_id.lower() != 'all':
+        questions = Question.objects.filter(group__id=group_id, module__id=module_id)
+    elif group_id.lower() == 'all' and module_id.lower() != 'all':
+        questions = Question.objects.filter(module__id=module_id)
+    elif group_id.lower() != 'all' and module_id.lower() == 'all':
         questions = Question.objects.filter(group__id=group_id)
     else:
         questions = Question.objects.filter()
+
     questions_from_batch = Question.objects.filter(batches__id=batch_id)
+
     questions = questions.exclude(id__in=questions_from_batch).values('id', 'text', 'answer_type').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')

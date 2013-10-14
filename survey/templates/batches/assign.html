@@ -1,24 +1,25 @@
 {% extends 'form.html' %}
 {% block title %}
     Select Questions for {{ batch.survey.name.capitalize }} - {{ batch.name.capitalize }}
-{%  endblock %}
+{% endblock %}
 {% block display_form_fields %}
-    <div class="control-group">
-        <div class="controls">
-            Group Filter
-        </div>
+    <div class="filter-form">
+        <label for="assign_question_group"></label>
+        <span class="add-on">Groups</span>
+        <select name="group" id="assign_question_group">
+            <option value="All">All</option>
+            {% for group in groups %}
+                <option value="{{ group.id }}">{{ group.name }}</option>
+            {% endfor %}
+        </select>
+        <span class="add-on">Modules</span>
+        <select name="group" id="assign_module">
+            <option value="All">All</option>
+            {% for module in modules %}
+                <option value="{{ module.id }}">{{ module.name }}</option>
+            {% endfor %}
+        </select>
     </div>
-    <div class="control-group">
-        <div class="controls">
-            <select name="group" id="assign_question_group">
-                <option value="All">All</option>
-                {% for group in groups %}
-                    <option value="{{ group.id }}">{{ group.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-
     <input type="hidden" value="{{ batch.id }}" id="batch_id">
     {% include 'naked_form.html' with a_form=batch_questions_form %}
 {% endblock %}

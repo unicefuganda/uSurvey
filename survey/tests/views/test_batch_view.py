@@ -2,7 +2,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import PRIME_LOCATION_TYPE
-from survey.models import HouseholdMemberGroup
+from survey.models import HouseholdMemberGroup, QuestionModule
 from survey.models.surveys import Survey
 from survey.models.question import Question
 from survey.models.batch import Batch
@@ -11,7 +11,7 @@ from survey.forms.batch import BatchForm, BatchQuestionsForm
 import json
 
 
-class BatchViews(BaseTest):
+class BatchViewsTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
@@ -138,7 +138,7 @@ class BatchViews(BaseTest):
          response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data={'name':'Batch1', 'description':'description'})
          self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
 
-    def post_add_new_batch_should_add_batch_to_the_survey(self):
+    def test_post_add_new_batch_should_add_batch_to_the_survey(self):
         form_data = {'name': 'Some Batch', 'description': 'some description'}
         self.failIf(Batch.objects.filter(**form_data))
         response = self.client.post('/surveys/%d/batches/new/'%self.survey.id, data=form_data)
@@ -190,20 +190,27 @@ class BatchViews(BaseTest):
 
     def test_assign_question_to_the_batch_should_show_list_of_questions(self):
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)
-        question = Question.objects.create(group=group, text="Haha?")
+        module_1 = QuestionModule.objects.create(name="Education")
+        module_2 = QuestionModule.objects.create(name="Health")
+        question_1 = Question.objects.create(group=group, text="Haha?", module=module_1)
+        question_2 = Question.objects.create(group=group, text="Haha?", module=module_1)
+        question_3 = Question.objects.create(group=group, text="Haha?", module=module_2)
 
         response = self.client.get('/batches/%d/assign_questions/'%(self.batch.id))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('batches/assign.html', templates)
-        self.assertEqual(1, len(response.context['batch_questions_form'].fields['questions']._queryset))
-        self.assertIn(question, response.context['batch_questions_form'].fields['questions']._queryset)
+        self.assertEqual(3, len(response.context['batch_questions_form'].fields['questions']._queryset))
+        self.assertIn(question_1, response.context['batch_questions_form'].fields['questions']._queryset)
+        self.assertIn(question_2, response.context['batch_questions_form'].fields['questions']._queryset)
+        self.assertIn(question_3, response.context['batch_questions_form'].fields['questions']._queryset)
         self.assertEqual(self.batch, response.context['batch'])
         self.assertIsInstance(response.context['batch_questions_form'],BatchQuestionsForm)
         self.assertEqual(response.context['button_label'], 'Save')
         self.assertEqual(response.context['id'], 'assign-question-to-batch-form')
         self.assertEqual(1, len(response.context['groups']))
         self.assertIn(group, response.context['groups'])
+        [self.assertIn(module, response.context['modules']) for module in [module_1, module_2]]
 
     def test_post_assign_questions_to_batch_should_save_questions(self):
         q1=Question.objects.create(text="question1", answer_type=Question.NUMBER)

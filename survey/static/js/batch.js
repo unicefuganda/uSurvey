@@ -58,15 +58,18 @@ jQuery(function($){
   $('#assign_question_group').on('change', function(){
       load_questions_for_batch_and_group();
   });
+  $('#assign_module').on('change', function(){
+      load_questions_for_batch_and_group();
+  });
 
 });
 
 
 function load_questions_for_batch_and_group(){
-    var select_element = $('#assign_question_group'),
+    var group_selected = $('#assign_question_group').val();
+    var module_selected = $('#assign_module').val(),
         batch_id = $("#batch_id").val(),
-        url = '/batches/'+ batch_id +'/questions/groups/'+ select_element.val();
-
+        url = '/batches/'+ batch_id +'/questions/groups/'+ group_selected + '/module/' + module_selected +'/';
     $.getJSON(url, function(data){
         set_display('', false);
         $.each(data, function(){

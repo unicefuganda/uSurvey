@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 
 from survey.investigator_configs import *
-from survey.models import HouseholdMemberGroup, Question
+from survey.models import HouseholdMemberGroup, Question, QuestionModule
 from survey.models.surveys import Survey
 from survey.models.batch import Batch, BatchLocationStatus
 
@@ -44,7 +44,7 @@ def open(request, batch_id):
     other_surveys = batch.other_surveys_with_open_batches_in(location)
 
     if other_surveys.count() > 0:
-        message = "%s has already open batches from survey %s" %(location.name, other_surveys[0].name)
+        message = "%s has already open batches from survey %s" % (location.name, other_surveys[0].name)
         return HttpResponse(json.dumps(message), content_type="application/json")
     else:
         locations = location.get_descendants(include_self=True)
@@ -119,8 +119,10 @@ def assign(request, batch_id):
             success_message = "Questions successfully assigned to batch: %s." % batch.name.capitalize()
             messages.success(request, success_message)
             return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
+    all_modules = QuestionModule.objects.all()
     context = {'batch_questions_form': batch_questions_form, 'batch': batch,
-               'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups}
+               'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,
+               'modules': all_modules}
     return render(request, 'batches/assign.html',
                   context)
 

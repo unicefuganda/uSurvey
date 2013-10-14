@@ -76,7 +76,7 @@ class QuestionsViews(BaseTest):
         self.assert_restricted_permission_for("/questions/new/")
         self.assert_restricted_permission_for('/batches/%d/questions/' % self.batch.id)
         self.assert_restricted_permission_for('/questions/')
-        self.assert_restricted_permission_for('/batches/%d/questions/groups/%d/' % (self.batch.id, member_group.id))
+        self.assert_restricted_permission_for('/batches/%d/questions/groups/%d/module/%s/' % (self.batch.id, member_group.id, self.module.id))
         self.assert_restricted_permission_for('/questions/1/edit/')
         self.assert_restricted_permission_for('/batches/2/questions/1/add_logic/')
         self.assert_restricted_permission_for('/questions/1/sub_questions/new/')
@@ -191,13 +191,13 @@ class QuestionsViews(BaseTest):
 
         [self.assertIn(question, questions) for question in all_group_questions]
 
-    def test_should_retrieve_all_questions_as_data_for_filter_if_all_is_group_id_key(self):
-        group_question = Question.objects.create(text="How many members are there in this household?",
+    def test_should_retrieve_all_questions_in_context_if_selected_group_key_and_module_are_specific_in_request(self):
+        module_group_question = Question.objects.create(text="How many members are there in this household?",
                                                  answer_type=Question.NUMBER, order=1,
                                                  group=self.household_member_group,
                                                  module=self.module)
 
-        group_question_again = Question.objects.create(text="How many women are there in this household?",
+        module_group_question_again = Question.objects.create(text="How many women are there in this household?",
                                                        answer_type=Question.NUMBER, order=2,
                                                        group=self.household_member_group,
                                                        module=self.module)
@@ -207,18 +207,52 @@ class QuestionsViews(BaseTest):
                                                          group=HouseholdMemberGroup.objects.create(name='Age 6-10',
                                                                                                    order=2),
                                                          module=self.module)
+        another_module_question = Question.objects.create(text="What is your name?",
+                                                         answer_type=Question.NUMBER, order=2,
+                                                         group=self.household_member_group,
+                                                         module=QuestionModule.objects.create(name="Economics"))
 
-        all_group_questions = [group_question, group_question_again, another_group_question]
 
-        for question in all_group_questions:
-            question.batches.add(self.batch)
+        all_group_module_questions = [module_group_question, module_group_question_again]
+        all_excluded_questions = [another_group_question, another_module_question]
 
-        response = self.client.get('/batches/%s/questions/groups/%s/' % (self.batch.id, 'all'))
+        response = self.client.get('/batches/%s/questions/groups/%s/module/%s/' % (self.batch.id, self.household_member_group.id, self.module.id))
 
         questions = json.loads(response.content)
 
-        [self.assertNotIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for
-         question in all_group_questions]
+        [self.assertIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for
+         question in all_group_module_questions]
+        [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in
+         all_excluded_questions]
+
+    def test_should_retrieve_all_questions_as_data_for_filter_if_all_is_group_id_key_and_module_id_is_specific(self):
+        module_question = Question.objects.create(text="How many members are there in this household?",
+                                                 answer_type=Question.NUMBER, order=1,
+                                                 group=self.household_member_group,
+                                                 module=self.module)
+
+        module_question_again = Question.objects.create(text="How many women are there in this household?",
+                                                       answer_type=Question.NUMBER, order=2,
+                                                       group=self.household_member_group,
+                                                       module=self.module)
+
+        another_module_question = Question.objects.create(text="What is your name?",
+                                                         answer_type=Question.NUMBER, order=2,
+                                                         group=HouseholdMemberGroup.objects.create(name='Age 6-10',
+                                                                                                   order=2),
+                                                         module=QuestionModule.objects.create(name="Economics"))
+
+        all_module_questions = [module_question, module_question_again]
+        questions_that_should_not_appear_in_response = [another_module_question]
+
+        response = self.client.get('/batches/%s/questions/groups/%s/module/%s/' % (self.batch.id, 'all', self.module.id))
+
+        questions = json.loads(response.content)
+
+        [self.assertIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for
+         question in all_module_questions]
+        [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in
+         questions_that_should_not_appear_in_response]
 
     def test_should_retrieve_group_specific_questions_as_data_for_filter_if_group_id_key(self):
         group_question = Question.objects.create(text="How many members are there in this household?",
@@ -237,12 +271,10 @@ class QuestionsViews(BaseTest):
                                                                                                    order=2),
                                                          module=self.module)
 
-        expected_questions = [group_question]
-        questions_that_should_not_appear_in_response = [group_question_again, another_group_question]
-        for question in questions_that_should_not_appear_in_response:
-            question.batches.add(self.batch)
+        expected_questions = [group_question, group_question_again]
+        questions_that_should_not_appear_in_response = [another_group_question]
 
-        response = self.client.get('/batches/%s/questions/groups/%s/' % (self.batch.id, self.household_member_group.id))
+        response = self.client.get('/batches/%s/questions/groups/%s/module/%s/' % (self.batch.id, self.household_member_group.id, 'all'))
 
         questions = json.loads(response.content)
 
@@ -250,6 +282,64 @@ class QuestionsViews(BaseTest):
          question in expected_questions]
         [self.assertNotIn(dict(text=question.text, id=question.id), questions) for question in
          questions_that_should_not_appear_in_response]
+
+    def test_retrieves_all_questions_data_for_filter_if_module_and_group_key_selected_is_all(self):
+        group_question = Question.objects.create(text="How many members are there in this household?",
+                                                 answer_type=Question.NUMBER, order=1,
+                                                 group=self.household_member_group,
+                                                 module=self.module)
+
+        group_question_again = Question.objects.create(text="How many women are there in this household?",
+                                                       answer_type=Question.NUMBER, order=2,
+                                                       group=self.household_member_group,
+                                                       module=self.module)
+
+        another_group_question = Question.objects.create(text="What is your name?",
+                                                         answer_type=Question.NUMBER, order=2,
+                                                         group=HouseholdMemberGroup.objects.create(name='Age 6-10',
+                                                                                                   order=2),
+                                                         module=self.module)
+
+        all_group_questions = [group_question, group_question_again, another_group_question]
+
+        response = self.client.get('/batches/%s/questions/groups/%s/module/%s/' % (self.batch.id, 'all', 'all'))
+
+        questions = json.loads(response.content)
+
+        [self.assertIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for
+         question in all_group_questions]
+
+    def test_retrieves_all_questions_not_in_batch_for_filter_if_module_and_group_key_selected_is_all(self):
+        group_question = Question.objects.create(text="How many members are there in this household?",
+                                                 answer_type=Question.NUMBER, order=1,
+                                                 group=self.household_member_group,
+                                                 module=self.module)
+
+        group_question_again = Question.objects.create(text="How many women are there in this household?",
+                                                       answer_type=Question.NUMBER, order=2,
+                                                       group=self.household_member_group,
+                                                       module=self.module)
+
+        another_group_question = Question.objects.create(text="What is your name?",
+                                                         answer_type=Question.NUMBER, order=2,
+                                                         group=HouseholdMemberGroup.objects.create(name='Age 6-10',
+                                                                                                   order=2),
+                                                         module=self.module)
+
+        another_group_question.batches.add(self.batch)
+
+        all_group_questions = [group_question, group_question_again]
+        excluded_question = [another_group_question]
+
+        response = self.client.get('/batches/%s/questions/groups/%s/module/%s/' % (self.batch.id, 'all', 'all'))
+
+        questions = json.loads(response.content)
+
+        [self.assertIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for
+         question in all_group_questions]
+        [self.assertNotIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for
+         question in excluded_question]
+
 
     def test_should_save_options_for_multichoice_questions(self):
         form_data = {
@@ -335,7 +425,7 @@ class QuestionsViews(BaseTest):
         question_1 = Question.objects.create(text="question1", answer_type=Question.NUMBER,
                                              group=member_group, module=self.module)
         question_2 = Question.objects.create(text="question2", answer_type=Question.NUMBER, module=self.module)
-        response = self.client.get('/batches/%d/questions/groups/%d/' % (self.batch.id, member_group.id))
+        response = self.client.get('/batches/%d/questions/groups/%d/module/%s/' % (self.batch.id, member_group.id, self.module.id))
         self.failUnlessEqual(response.status_code, 200)
 
         content = json.loads(response.content)
@@ -412,7 +502,7 @@ class QuestionsViews(BaseTest):
         question.batches.add(self.batch)
         question_1 = Question.objects.create(text="some qn1?", group=group, order=2, module=self.module)
         question_2 = Question.objects.create(text="some qn2?", group=group, order=3, module=self.module)
-        response = self.client.get('/batches/%s/questions/groups/%s/' % (self.batch.id, group.id))
+        response = self.client.get('/batches/%s/questions/groups/%s/module/%s/' % (self.batch.id, group.id, 'all'))
         self.assertEqual(response.status_code, 200)
         parsed_response = json.loads(response.content)
         self.assertEqual(2, len(parsed_response))
