@@ -80,7 +80,10 @@ class USSDRegisterHousehold(USSD):
                 self.responseString = response
         else:
             self.select_household(answer)
-            self.render_select_member_or_head()
+            if self.household.get_head():
+                self.render_questions_or_member_selection(answer)
+            else:
+                self.render_select_member_or_head()
 
     def render_select_member_or_head(self):
         self.investigator.set_in_cache('is_selecting_member', True)
@@ -92,7 +95,8 @@ class USSDRegisterHousehold(USSD):
     def render_questions_or_member_selection(self, answer):
         if self.household.get_head():
             self.investigator.set_in_cache('is_head', False)
-            self.responseString = self.render_questions(answer)
+            self.responseString = USSD.MESSAGES['HEAD_REGISTERED']
+            self.responseString += self.render_questions(answer)
 
         else:
             self.render_select_member_or_head()

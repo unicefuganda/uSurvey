@@ -303,7 +303,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.respond(answers['gender'])
 
         response = self.respond('1')
-        first_registration_question = "responseString=%s&action=request" % question_1.text
+        first_registration_question = "responseString=%s%s&action=request" % (USSD.MESSAGES['HEAD_REGISTERED'],question_1.text)
         self.assertEquals(urllib2.unquote(response.content), first_registration_question)
 
     def test_complete_registration_flow(self):
@@ -343,7 +343,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.respond(answers['gender'])
 
         response = self.respond('1')
-        first_registration_question = "responseString=%s&action=request" % question_1.text
+        first_registration_question = "responseString=%s%s&action=request" % (USSD.MESSAGES['HEAD_REGISTERED'],question_1.text)
         self.assertEquals(urllib2.unquote(response.content), first_registration_question)
         self.respond(answers['name'])
         self.respond(answers['age'])
@@ -352,6 +352,31 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         response = self.respond('2')
         ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['WELCOME_TEXT']
         self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
+
+    def test_should_not_give_member_select_screen_if_head_already_registered(self):
+        self.registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+        module = QuestionModule.objects.create(name='Registration')
+
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
+                                             answer_type=Question.TEXT, order=1, group=self.registration_group)
+
+        Question.objects.create(module=module, text="Please Enter the age",
+                                             answer_type=Question.TEXT, order=2, group=self.registration_group)
+
+        Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
+                                             answer_type=Question.NUMBER, order=3, group=self.registration_group)
+        selected_household_id = '2'
+        household = Household.objects.get(uid=selected_household_id)
+        head = HouseholdHead.objects.create(household=household, surname="head_registered",
+                                            date_of_birth=datetime.datetime(1980, 02, 02), male=False)
+
+        self.reset_session()
+        self.register_household()
+        response = self.select_household(selected_household_id)
+
+        first_registration_question = "responseString=%s%s&action=request" % (USSD.MESSAGES['HEAD_REGISTERED'],question_1.text)
+        self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+
 
 
 class FakeRequest(HttpRequest):

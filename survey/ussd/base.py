@@ -22,7 +22,8 @@ class USSDBase(object):
         'RESUME_MESSAGE':"Would you like to to resume with member question?\n1: Yes\n2: No",
         'SELECT_HEAD_OR_MEMBER':'Please select household member to register:\n1: Head\n2: Member',
         'END_REGISTRATION': 'Thank you for registering household member. Would you like to register another member?\n1: Yes\n2: No',
-        'INVESTIGATOR_BLOCKED_MESSAGE': 'Sorry. You are not registered for any surveys.'
+        'INVESTIGATOR_BLOCKED_MESSAGE': 'Sorry. You are not registered for any surveys.',
+        'HEAD_REGISTERED': "Head already registered for this household. Registering members now:\n"
     }
 
     ACTIONS = {
