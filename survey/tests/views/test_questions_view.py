@@ -181,6 +181,18 @@ class QuestionsViews(BaseTest):
         self.assertEqual(self.batch, response.context['batch'])
         self.assertIsNotNone(response.context['request'])
 
+    def test_post_index_per_batch(self):
+        response = self.client.post('/batches/%d/questions/' % self.batch.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('questions/index.html', templates)
+        self.assertIn(self.question_1, response.context['questions'])
+        self.assertIn(self.question_2, response.context['questions'])
+        self.assertIsNotNone(response.context['question_filter_form'])
+        self.assertIsInstance(response.context['question_filter_form'], QuestionFilterForm)
+        self.assertEqual(self.batch, response.context['batch'])
+        self.assertIsNotNone(response.context['request'])
+
     @patch('django.contrib.messages.error')
     def test_no_questions_in_batch(self, mock_error):
         other_batch = Batch.objects.create(order=2, name="Other Batch")
@@ -515,7 +527,6 @@ class QuestionsViews(BaseTest):
         [self.assertNotIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for
          question in excluded_question]
 
-
     def test_should_save_options_for_multichoice_questions(self):
         form_data = {
             'module': self.module.id,
@@ -625,6 +636,22 @@ class QuestionsViews(BaseTest):
         self.assertNotIn(sub_question, response.context['questions'])
         self.assertIsNotNone(response.context['request'])
 
+    def test_post_index_all(self):
+        sub_question = Question.objects.create(parent=self.question_1, text="Sub Question 2?",
+                                               answer_type=Question.NUMBER, subquestion=True, module=self.module)
+
+        response = self.client.post('/questions/')
+
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('questions/index.html', templates)
+        self.assertIn(self.question_1, response.context['questions'])
+        self.assertIn(self.question_2, response.context['questions'])
+        self.assertIsNotNone(response.context['question_filter_form'])
+        self.assertIsInstance(response.context['question_filter_form'], QuestionFilterForm)
+        self.assertNotIn(sub_question, response.context['questions'])
+        self.assertIsNotNone(response.context['request'])
+
     def test_post_index_should_return_questions_matching_posted_keys(self):
         question = Question.objects.create(text="Sub Question 2?", answer_type=Question.NUMBER, module=self.module)
         sub_question = Question.objects.create(parent=question, text="Sub Question 2?",
@@ -642,7 +669,7 @@ class QuestionsViews(BaseTest):
         expected_questions = [question_1, question_2]
         excluded_questions = [sub_question, question]
 
-        filter_form_data = {'groups': member_group.id, 'module': module.id,
+        filter_form_data = {'groups': member_group.id, 'modules': module.id,
                             'question_types': Question.NUMBER, 'batch_id': self.batch.id}
 
         response = self.client.post('/questions/', data=filter_form_data)
@@ -926,7 +953,6 @@ class QuestionsViews(BaseTest):
         success_message = 'Sub question successfully deleted.'
         self.assertIn(success_message, response.cookies['messages'].value)
 
-
 class LogicViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -1031,7 +1057,6 @@ class LogicViewTest(BaseTest):
                                   validate_with_value=1)
         self.assertTrue(_rule_exists(self.question, self.batch, **answer_rule_data))
 
-
     def test_views_saves_answer_rule_on_post_if_all_values_are_selected(self):
         form_data = {'condition': 'EQUALS',
                      'attribute': 'value',
@@ -1126,7 +1151,6 @@ class LogicViewTest(BaseTest):
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_value)
 
-
 class QuestionJsonDataDumpTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -1185,7 +1209,6 @@ class QuestionJsonDataDumpTest(BaseTest):
         self.assertNotIn(dict(id=str(self.question_2.id), text=self.question_2.text), json_response)
         self.assertNotIn(dict(id=str(self.question.id), text=self.question.text), json_response)
 
-
 class AddQuestionFromModalTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -1217,7 +1240,6 @@ class AddQuestionFromModalTest(BaseTest):
         json_response = json.loads(response.content)
         self.assertTrue(json_response)
         self.assertEqual(dict(id=str(sub_question.id), text=sub_question.text), json_response)
-
 
 class AddSubQuestionTest(BaseTest):
     def setUp(self):
@@ -1281,7 +1303,6 @@ class AddSubQuestionTest(BaseTest):
             data=subquestion_form_data)
 
         self.assertRedirects(response, expected_url, 302, 200)
-
 
 class EditSubQuestionTest(BaseTest):
     def setUp(self):
@@ -1364,7 +1385,6 @@ class EditSubQuestionTest(BaseTest):
             '/batches/%s/questions/%s/sub_questions/edit/' % (self.batch.id, self.sub_question.id))
         self.assert_restricted_permission_for('/questions/%d/sub_questions/edit/' % self.sub_question.id)
 
-
 class DeleteLogicViewsTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -1388,7 +1408,6 @@ class DeleteLogicViewsTest(BaseTest):
             '/batches/%s/questions/delete_logic/%d/' % (int(self.batch.id), int(self.answer_rule.id)))
         self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
         self.failIf(AnswerRule.objects.filter(id=self.answer_rule.id))
-
 
 class RemoveQuestionFromBatchTest(BaseTest):
     def setUp(self):
@@ -1466,7 +1485,6 @@ class RemoveQuestionFromBatchTest(BaseTest):
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/batches/%d/questions/%s/remove/' % (self.batch.id, self.question.id))
-
 
 class DeleteSubQuestionFromBatchTest(BaseTest):
     def setUp(self):
