@@ -60,13 +60,6 @@ class Batch(BaseModel):
     def close_for_location(self, location):
         self.open_locations.filter(batch=self).delete()
 
-    def get_next_indicator(self, order, location):
-        indicator = self.indicators.filter(order = order + 1)
-        if indicator:
-            return indicator[0]
-        else:
-            return self.get_indicator_from_next_open_batch(location = location)
-
     def get_next_open_batch(self, order, location):
         next_batch_in_order = Batch.objects.filter(order__gt = order).order_by('order')
 

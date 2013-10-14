@@ -114,8 +114,6 @@ def list_all_questions(request):
         question_type = request.POST.get('question_types', None)
         batch_id = request.POST.get('batch_id', None)
 
-    if batch_id == 'null':
-        batch_id = None
     questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
 
     context = {'questions': questions, 'request': request, 'question_filter_form': question_filter_form,
