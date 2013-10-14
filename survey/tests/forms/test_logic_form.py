@@ -104,7 +104,7 @@ class LogicFormTest(TestCase):
     def test_choices_for_condition_field_does_not_know_equals_option_is_choice_if_not_multichoice(self):
         choices_returned = LogicForm().choices_for_condition_field(is_multichoice=False)
 
-        self.assertEqual(5,len(choices_returned))
+        self.assertEqual(6,len(choices_returned))
         self.assertNotIn(('EQUALS_OPTION', 'EQUALS OPTION'), choices_returned)
 
     def test_condition_field_should_have_equals_option_if_multichoice_question(self):
@@ -119,6 +119,18 @@ class LogicFormTest(TestCase):
         self.assertIn(('EQUALS_OPTION', 'EQUALS OPTION'), logic_form.fields[field].choices)
         self.assertNotIn(('EQUALS', 'EQUALS'), logic_form.fields[field].choices)
 
+    def test_should_not_have_min_and_max_value_fields_if_multichoice_question(self):
+        min_field = 'min_value'
+        max_field = 'max_value'
+        batch = Batch.objects.create(order=1)
+        question_with_option = Question.objects.create(text="Question 1?",
+                                                       answer_type=Question.MULTICHOICE, order=1)
+        question_with_option.batches.add(batch)
+        logic_form = LogicForm(question=question_with_option, batch=batch)
+
+        self.assertNotIn(min_field, logic_form.fields)
+        self.assertNotIn(max_field, logic_form.fields)
+
     def test_condition_field_should_not_have_equals_option_if_not_multichoice_question(self):
         field = 'condition'
         batch = Batch.objects.create(order=1)
@@ -127,7 +139,7 @@ class LogicFormTest(TestCase):
 
         question_without_option.batches.add(batch)
         logic_form = LogicForm(question=question_without_option, batch=batch)
-        self.assertEqual(5, len(logic_form.fields[field].choices))
+        self.assertEqual(6, len(logic_form.fields[field].choices))
         self.assertNotIn(('EQUALS_OPTION', 'EQUALS OPTION'), logic_form.fields[field].choices)
 
     def test_next_question_knows_all_sub_questions_if_data_sent_with_action_ask_subquestion(self):

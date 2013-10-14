@@ -6,4 +6,5 @@ CONDITIONS = {
             'GREATER_THAN_VALUE': '> VALUE',
             'LESS_THAN_QUESTION': '< QUESTION RESPONSE',
             'LESS_THAN_VALUE': '< VALUE',
+            'BETWEEN': 'BETWEEN',
         }

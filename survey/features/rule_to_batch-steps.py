@@ -338,3 +338,12 @@ def when_i_refill_the_form_with_valid_values(step):
 @step(u'And I should see already existing logic for the question')
 def and_i_should_see_already_existing_logic_for_the_question(step):
     world.page.validate_fields_present([world.question.text, "Eligibility Criteria", "Question/Value/Option", "Action"])
+
+@step(u'When I select between from the drop down')
+def when_i_select_between_from_the_drop_down(step):
+    world.page.select('condition', ['BETWEEN'])
+
+@step(u'And I should see two text fields for min and max value')
+def and_i_should_see_two_text_fields_for_min_and_max_value(step):
+    assert world.browser.find_by_css('#id_min_value')
+    assert world.browser.find_by_css('#id_max_value')

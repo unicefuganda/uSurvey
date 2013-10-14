@@ -78,6 +78,24 @@ Feature: Batch related features
     And I should not see option dropdown box and value text box
     And I should see all the action dropdown options
 
+   Scenario: Add Between condition- Javascript
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a batch
+    And I have a member group
+    And I have a module
+    And I have a question
+    And I assign batch to these questions
+    And I visit batches question list page
+    And I click on add logic link
+    Then I should see the add logic page
+    When I select between from the drop down
+    Then I should see attribute field defaulted to value
+    And I should not see question in the attribute
+    And I should see two text fields for min and max value
+    And I should not see option dropdown box and value text box
+
+
   Scenario: add rule ask subquestion to a question
     Given I am logged in as researcher
     And I have a survey

@@ -5,23 +5,47 @@ function disable_field_based_on_value(field, value) {
         field.attr('disabled', 'disabled')
     }
 }
+function hide_between_value_fields() {
+    var min_value_field = $('#id_min_value');
+    var max_value_field = $('#id_max_value');
 
+        min_value_field.hide();
+        min_value_field.attr('disabled', 'disabled');
+        max_value_field.hide();
+        max_value_field.attr('disabled', 'disabled');
+}
+
+function show_between_value_fields(){
+    var min_value_field = $('#id_min_value');
+    var max_value_field = $('#id_max_value');
+
+        min_value_field.show();
+        min_value_field.attr('disabled', false);
+        max_value_field.show();
+        max_value_field.attr('disabled', false);
+}
 function show_or_hide_attribute_fields(attribute_value){
     var validate_with_question_field = $('#id_validate_with_question');
     var value_field = $('#id_value');
 
-    if(attribute_value == 'value'){
-        validate_with_question_field.hide();
-        validate_with_question_field.attr('disabled', 'disabled');
-        value_field.show();
-        value_field.attr('disabled', false);
+    if ($('#id_condition').val() != 'BETWEEN'){
+        hide_between_value_fields()
+        if(attribute_value == 'value'){
+            validate_with_question_field.hide();
+            validate_with_question_field.attr('disabled', 'disabled');
+            value_field.show();
+            value_field.attr('disabled', false);
+        }
+        if(attribute_value == 'validate_with_question')
+        {
+            validate_with_question_field.show();
+            validate_with_question_field.attr('disabled', false);
+            value_field.hide();
+            value_field.attr('disabled', 'disabled');
+        }
     }
-    if(attribute_value == 'validate_with_question')
-    {
-        validate_with_question_field.show();
-        validate_with_question_field.attr('disabled', false);
-        value_field.hide();
-        value_field.attr('disabled', 'disabled');
+    if ($('#id_condition').val() == 'BETWEEN'){
+        show_between_value_fields()
     }
 }
 
@@ -70,13 +94,13 @@ function append_attribute_option(key, value) {
 }
 
 function clear_attribute_dropdown_and_append_right_option(condition_selected){
-    var value_fields = ['GREATER_THAN_VALUE', 'LESS_THAN_VALUE'];
+    var value_fields = ['GREATER_THAN_VALUE', 'LESS_THAN_VALUE', 'BETWEEN'];
     var question_fields = ['GREATER_THAN_QUESTION', 'LESS_THAN_QUESTION'];
+    var value_and_question_conditions = ['EQUALS']
     var value_key = 'value';
     var value_string = 'Value';
     var question_key = 'validate_with_question';
     var question_string = 'Question';
-
     $('#id_attribute').find('option')
         .remove()
         .end();
@@ -89,9 +113,12 @@ function clear_attribute_dropdown_and_append_right_option(condition_selected){
         append_attribute_option(question_key, question_string);
     }
 
-    if(condition_selected == 'EQUALS'){
+    if(value_and_question_conditions.indexOf(condition_selected)!= -1){
         append_attribute_option(value_key, value_string);
         append_attribute_option(question_key, question_string)
+    }
+    if(condition_selected == "BETWEEN"){
+        $("#id_value").hide();
     }
 
 
@@ -143,6 +170,7 @@ jQuery(function($){
     show_or_hide_attribute_fields(attribute.val());
     show_or_hide_next_question(action_value.val());
     $('#add_subquestion').hide();
+    hide_between_value_fields()
 
     condition.on('change', function(){
         clear_attribute_dropdown_and_append_right_option(condition.val());

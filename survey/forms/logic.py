@@ -29,6 +29,8 @@ class LogicForm(forms.Form):
 
             if is_multichoice:
                 del self.fields['value']
+                del self.fields['min_value']
+                del self.fields['max_value']
                 del self.fields['validate_with_question']
 
                 all_options = question.options.all()
@@ -83,6 +85,8 @@ class LogicForm(forms.Form):
     attribute = forms.ChoiceField(label='Attribute', choices=[], widget=forms.Select, required=False)
     option = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=True)
     value = forms.CharField(label='', required=False)
+    min_value = forms.CharField(label='', required=False)
+    max_value = forms.CharField(label='', required=False)
     validate_with_question = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=False)
     action = forms.ChoiceField(label='Then', choices=[], widget=forms.Select, required=True)
     next_question = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=False)
