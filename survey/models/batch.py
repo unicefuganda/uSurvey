@@ -103,6 +103,9 @@ class Batch(BaseModel):
         if next_batch:
             return next_batch.get_next_question(order=0, location=location)
 
+    def is_open(self):
+        return self.open_locations.all()
+
     @classmethod
     def open_ordered_batches(cls, location):
         all_batches = Batch.objects.all().order_by('order')

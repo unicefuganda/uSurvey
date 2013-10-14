@@ -173,10 +173,20 @@ class BatchViews(BaseTest):
         self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_delete_batch(self):
+        self.batch.close_for_location(self.abim)
+        self.assertFalse(self.batch.is_open())
         response = self.client.get('/surveys/%d/batches/%d/delete/'%(self.survey.id, self.batch.id))
         recovered_batch = Batch.objects.filter(id=self.batch.id)
         self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
         self.failIf(recovered_batch)
+
+    def test_should_not_delete_batch_if_open(self):
+        self.batch.open_for_location(self.kampala)
+        response = self.client.get('/surveys/%d/batches/%d/delete/'%(self.survey.id, self.batch.id))
+        recovered_batch = Batch.objects.filter(id=self.batch.id)
+        self.assertRedirects(response, expected_url='/surveys/%d/batches/' %self.survey.id, status_code=302, target_status_code=200, msg_prefix='')
+        self.assertIn("Open Batch cannot be deleted.", response.cookies['messages'].value)
+        self.failUnless(recovered_batch)
 
     def test_assign_question_to_the_batch_should_show_list_of_questions(self):
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)

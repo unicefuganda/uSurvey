@@ -97,8 +97,12 @@ def _add_success_message(request, action_str):
 
 @permission_required('auth.can_view_batches')
 def delete(request, survey_id, batch_id):
-    Batch.objects.get(id=batch_id).delete()
-    _add_success_message(request, 'deleted')
+    batch = Batch.objects.get(id=batch_id)
+    if batch.is_open():
+        messages.error(request,'Open Batch cannot be deleted.')
+    else:
+        batch.delete()
+        _add_success_message(request, 'deleted')
     return HttpResponseRedirect('/surveys/%s/batches/' % survey_id)
 
 

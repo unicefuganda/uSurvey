@@ -21,6 +21,16 @@ class BatchTest(TestCase):
         batch = Batch.objects.create(order=1, name="Batch name")
         self.failUnless(batch.id)
 
+    def test_should_know_if_batch_is_open(self):
+        batch = Batch.objects.create(order=1, name="Batch name")
+        self.assertFalse(batch.is_open())
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        batch.open_for_location(kampala)
+        self.assertTrue(batch.is_open())
+
     def test_should_assign_order_as_0_if_it_is_the_only_batch(self):
         batch = Batch.objects.create(name="Batch name", description='description')
         batch = Batch.objects.get(name='Batch name')
