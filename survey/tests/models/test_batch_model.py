@@ -257,6 +257,37 @@ class BatchLocationStatusTest(TestCase):
         self.assertEqual(batch_2, batch.currently_open_for(kampala))
         self.assertIsNone(batch.currently_open_for(abim))
 
+    def test_knows_whether_can_be_deleted(self):
+        district = LocationType.objects.create(name="District", slug='district')
+        kampala = Location.objects.create(name="Kampala", type=district)
+        survey = Survey.objects.create(name='survey name', description='survey descrpition', type=False,
+                                            sample_size=10)
+        batch = Batch.objects.create(order=1, name="Batch A", survey=survey)
+        investigator = Investigator.objects.create(mobile_number="123456789", name="Rajni", location=kampala)
+        household = Household.objects.create(investigator=investigator, location=investigator.location)
+        member = HouseholdMember.objects.create(surname="haha", date_of_birth=date(1990, 02, 01), household=household)
+        group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        female = GroupCondition.objects.create(attribute="gender", value=True, condition="EQUALS")
+        group.conditions.add(female)
+        module = QuestionModule.objects.create(name="Education")
+        question_1 = Question.objects.create(group=group, text="Haha?", module=module, answer_type=Question.NUMBER,
+                                             order=1)
+        question_2 = Question.objects.create(group=group, text="Haha?", module=module, answer_type=Question.NUMBER,
+                                             order=2)
+        question_3 = Question.objects.create(group=group, text="Haha?", module=module, answer_type=Question.NUMBER,
+                                             order=3)
+
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        question_3.batches.add(batch)
+
+        batch.open_for_location(kampala)
+        investigator.member_answered(question_1, member, 1, batch)
+        investigator.member_answered(question_2, member, 1, batch)
+        investigator.member_answered(question_3, member, 1, batch)
+        batch.close_for_location(kampala)
+        self.assertFalse(batch.can_be_deleted())
+
 class HouseholdBatchCompletionTest(TestCase):
     def test_store(self):
         batch = Batch.objects.create(order=1)

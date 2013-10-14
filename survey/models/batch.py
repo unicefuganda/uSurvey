@@ -106,6 +106,16 @@ class Batch(BaseModel):
     def is_open(self):
         return self.open_locations.all()
 
+    def can_be_deleted(self):
+        if self.is_open():
+            return False
+
+        for question in self.all_questions():
+            answer = question.answer_class().objects.filter(batch=self)
+            if answer:
+                return False
+        return True
+
     @classmethod
     def open_ordered_batches(cls, location):
         all_batches = Batch.objects.all().order_by('order')
