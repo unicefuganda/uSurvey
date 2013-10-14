@@ -22,6 +22,7 @@ class AnswerRule(BaseModel):
                 'EQUALS_OPTION': 'EQUALS_OPTION',
                 'LESS_THAN_QUESTION': 'LESS_THAN_QUESTION',
                 'LESS_THAN_VALUE': 'LESS_THAN_VALUE',
+                'BETWEEN': 'BETWEEN'
     }
     CONDITION_METHODS = {
                 'EQUALS': 'is_equal',
@@ -30,6 +31,7 @@ class AnswerRule(BaseModel):
                 'GREATER_THAN_VALUE': 'greater_than_value',
                 'LESS_THAN_QUESTION': 'less_than_question',
                 'LESS_THAN_VALUE': 'less_than_value',
+                'BETWEEN': 'between'
     }
 
     question = models.ForeignKey(Question, null=True, related_name="rule")
@@ -38,6 +40,8 @@ class AnswerRule(BaseModel):
     condition = models.CharField(max_length=100, blank=False, null=False, choices=CONDITIONS.items())
     next_question = models.ForeignKey(Question, null=True, related_name="parent_question_rules")
     validate_with_value = models.PositiveIntegerField(max_length=2, null=True)
+    validate_with_min_value = models.PositiveIntegerField(max_length=2, null=True)
+    validate_with_max_value = models.PositiveIntegerField(max_length=2, null=True)
     validate_with_question = models.ForeignKey(Question, null=True)
     validate_with_option = models.ForeignKey(QuestionOption, null=True, related_name="answer_rule")
 
@@ -47,6 +51,9 @@ class AnswerRule(BaseModel):
 
     def is_equal(self, answer):
         return self.validate_with_value == answer.answer
+
+    def between(self,answer):
+        return self.validate_with_min_value <= answer.answer <= self.validate_with_max_value
 
     def equals_option(self, answer):
         return self.validate_with_option == answer.answer

@@ -194,3 +194,18 @@ class AnswerRuleTest(TestCase):
         self.assertEqual(next_question, sub_question_1)
         next_question = self.investigator.member_answered(sub_question_1, self.household_member, answer="Some explanation", batch=self.batch)
         self.assertEqual(next_question, question_2)
+
+    def test_should_add_between_condition(self):
+        question_1 = Question.objects.create(text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1, group=self.member_group)
+
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                         condition=AnswerRule.CONDITIONS['BETWEEN'],
+                                         validate_with_min_value=1, validate_with_max_value=10)
+        self.failUnless(rule)
+        self.batch.questions.add(question_1)
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=4, batch=self.batch)
+        self.assertEqual(next_question, question_1)
+
+        next_question = self.investigator.member_answered(question_1, self.household_member, answer=4, batch=self.batch)
+        self.assertIsNone(next_question)
