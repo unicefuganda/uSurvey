@@ -33,7 +33,7 @@
   {% endfor %}
 
 {% endif %}
-{% include "_multiple_options.html" with option_label='Option' id="question-option-template"%}
+{% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
 {% if parent_question %}
 <script type="text/template" id="question-group-template">
     <select id="id_group" name="group">

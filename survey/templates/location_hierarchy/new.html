@@ -6,7 +6,7 @@
 {% block display_form_fields %}
 {% include "naked_form.html" with a_form=hierarchy_form %}
 
-{% include "_multiple_options.html" with option_label='Level' id="option-template"%}
+{% include "_multiple_options.html" with option_label='Level' id="option-template" name='levels'%}
 {% endblock %}
 {% block javascripts %}
     <script src="{{STATIC_URL}}/js/levels.js" type="text/javascript" charset="utf-8"></script>

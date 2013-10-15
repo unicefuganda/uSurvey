@@ -1,8 +1,7 @@
 
 ;
 
-
-jQuery(function($){
+$(function(){
     var $form = $("#hierarchy-form"),
     template = $("#option-template").html(),
     addOptionIcon = '<a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>'
