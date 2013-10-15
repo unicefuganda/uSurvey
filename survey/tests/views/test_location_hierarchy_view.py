@@ -33,3 +33,4 @@ class LocationHierarchyTest(BaseTest):
         response = self.client.get('/add_location_hierarchy/')
         self.assertEqual(200,response.status_code)
         self.assertEqual(response.context['button_label'],"Create Hierarchy")
+        self.assertEqual(response.context['id'],"hierarchy-form")

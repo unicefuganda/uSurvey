@@ -1,10 +1,13 @@
-{% extends "form.html" %}
+{% extends "form.html"%}
 
 {% block title %}
     Create geographical location hierarchy
 {% endblock %}
 {% block display_form_fields %}
-    {{ hierarchy_form }}
-{#{% include "naked_form.html" with form=hierarchy_form %}#}
-{% endblock %}
+{% include "naked_form.html" with a_form=hierarchy_form %}
 
+{% include "_multiple_options.html" with option_label='Level' id="option-template"%}
+{% endblock %}
+{% block javascripts %}
+    <script src="{{STATIC_URL}}/js/levels.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
