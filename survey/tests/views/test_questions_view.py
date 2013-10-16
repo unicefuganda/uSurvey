@@ -1041,7 +1041,7 @@ class LogicViewTest(BaseTest):
                                               action=form_data['action'],
                                               question=self.question, batch=self.batch).count() > 1)
         self.assertEqual(200, response.status_code)
-        error_message = 'Rule on this value with EQUALS condition already exists.'
+        error_message = 'Rule on this value with EQUALS criteria already exists.'
         self.assertIn(error_message, str(response))
 
     def test_knows_rule_exist_when_same_rule_conditions_sent(self):
@@ -1084,6 +1084,37 @@ class LogicViewTest(BaseTest):
         self.assertEqual(form_data['value'], answer_rule.validate_with_value)
         self.assertIsNone(answer_rule.validate_with_question)
         self.assertIsNone(answer_rule.validate_with_option)
+
+    def test_views_saves_answer_rule_for_between_criteria_on_post_if_all_values_are_selected(self):
+        form_data = {'condition': 'BETWEEN',
+                     'attribute': 'value',
+                     'min_value': 0,
+                     'max_value': 10,
+                     'action': 'SKIP_TO',
+                     'next_question': self.question_2.pk}
+
+        response = self.client.post('/batches/%s/questions/%s/add_logic/' % (self.batch.pk, self.question.pk),
+                                    data=form_data)
+        self.assertRedirects(response, '/batches/%s/questions/' % self.batch.pk, status_code=302,
+                             target_status_code=200)
+        success_message = 'Logic successfully added.'
+        self.assertIn(success_message, response.cookies['messages'].value)
+        answer_rules = AnswerRule.objects.filter()
+
+        self.failUnless(answer_rules)
+
+        answer_rule = answer_rules[0]
+
+        self.assertEqual(self.question, answer_rule.question)
+        self.assertEqual(form_data['action'], answer_rule.action)
+        self.assertEqual(form_data['condition'], answer_rule.condition)
+        self.assertEqual(self.question_2, answer_rule.next_question)
+        self.assertEqual(self.batch, answer_rule.batch)
+        self.assertEqual(form_data['min_value'], answer_rule.validate_with_min_value)
+        self.assertEqual(form_data['max_value'], answer_rule.validate_with_max_value)
+        self.assertIsNone(answer_rule.validate_with_question)
+        self.assertIsNone(answer_rule.validate_with_option)
+        self.assertIsNone(answer_rule.validate_with_value)
 
     def test_views_saves_answer_rule_for_sub_question_on_post_if_all_values_are_selected(self):
         sub_question1 = Question.objects.create(text="sub question1", answer_type=Question.NUMBER, subquestion=True,

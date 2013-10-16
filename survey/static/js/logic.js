@@ -5,6 +5,7 @@ function disable_field_based_on_value(field, value) {
         field.attr('disabled', 'disabled')
     }
 }
+
 function hide_between_value_fields() {
     var min_value_field = $('#id_min_value');
     var max_value_field = $('#id_max_value');
@@ -18,15 +19,26 @@ function hide_between_value_fields() {
 function show_between_value_fields(){
     var min_value_field = $('#id_min_value');
     var max_value_field = $('#id_max_value');
+    var validate_with_question_field = $('#id_validate_with_question');
+    var value_field = $('#id_value');
+
 
         min_value_field.show();
         min_value_field.attr('disabled', false);
         max_value_field.show();
         max_value_field.attr('disabled', false);
+
+        validate_with_question_field.hide();
+        validate_with_question_field.attr('disabled', 'disabled');
+        value_field.hide();
+        value_field.attr('disabled', 'disabled');
 }
+
 function show_or_hide_attribute_fields(attribute_value){
     var validate_with_question_field = $('#id_validate_with_question');
     var value_field = $('#id_value');
+
+    hide_between_value_fields();
 
     if ($('#id_condition').val() != 'BETWEEN'){
         hide_between_value_fields()
@@ -170,7 +182,6 @@ jQuery(function($){
     show_or_hide_attribute_fields(attribute.val());
     show_or_hide_next_question(action_value.val());
     $('#add_subquestion').hide();
-    hide_between_value_fields()
 
     condition.on('change', function(){
         clear_attribute_dropdown_and_append_right_option(condition.val());

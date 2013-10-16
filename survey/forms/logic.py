@@ -56,9 +56,55 @@ class LogicForm(forms.Form):
         return sorted(condition_choices.items())
 
     def clean_value(self):
-        if self.cleaned_data['attribute'] == 'value' and len(self.cleaned_data['value'].strip()) == 0:
+        if (self.cleaned_data['attribute'] == 'value') and (self.cleaned_data['condition'] != 'BETWEEN') and len(self.cleaned_data['value'].strip()) == 0:
             raise ValidationError("Field is required.")
         return self.cleaned_data['value']
+
+    def clean_min_value(self):
+        if (self.cleaned_data['condition'] == 'BETWEEN') and len(self.cleaned_data['min_value'].strip()) == 0:
+            raise ValidationError("Field is required.")
+        return self.cleaned_data['min_value']
+
+    def clean_max_value(self):
+        if (self.cleaned_data['condition'] == 'BETWEEN') and len(self.cleaned_data['max_value'].strip()) == 0:
+            raise ValidationError("Field is required.")
+        return self.cleaned_data['max_value']
+
+    def _validate_max_value(self, field_name, rule):
+        if self.data.get('max_value', None) and not rule:
+            rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
+                                             validate_with_min_value__lte=self.data['max_value'],
+                                             validate_with_max_value__gte=self.data['max_value'],
+                                             condition=self.data['condition'])
+            field_name = 'condition %s with max value %s is within existing range that' % (
+              self.data['condition'], self.data['max_value'])
+        return field_name, rule
+
+    def _validate_min_value(self, field_name, rule):
+        if self.data.get('min_value', None):
+            rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
+                                             validate_with_min_value__lte=self.data['min_value'],
+                                             validate_with_max_value__gte=self.data['min_value'],
+                                             condition=self.data['condition'])
+            field_name = 'condition %s with min value %s is within existing range that' % (self.data['condition'], self.data['min_value'])
+        return field_name, rule
+
+    def _validate_min_and_max_range(self, field_name, rule):
+        if self.data.get('max_value', None) and self.data.get('min_value', None) and not rule:
+            rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
+                                             validate_with_min_value__gte=self.data['min_value'],
+                                             validate_with_max_value__lte=self.data['max_value'],
+                                             condition=self.data['condition'])
+            field_name = 'condition %s within range %s - %s' % (self.data['condition'], self.data['min_value'], self.data['max_value'])
+        return field_name, rule
+
+    def _validate_max_greater_than_min(self):
+      minimum_value = self.data.get('min_value', None)
+      maximum_value = self.data.get('max_value', None)
+
+      if minimum_value and maximum_value:
+        return maximum_value > minimum_value
+      return True
 
     def clean(self):
         field_name = ""
@@ -70,15 +116,21 @@ class LogicForm(forms.Form):
         else:
             if self.data.get('value',None):
                 rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_value=self.data['value'], condition=self.data['condition'])
-                field_name = 'value with %s condition' %self.data['condition']
+                field_name = 'value with %s criteria' %self.data['condition']
             elif self.data.get('validate_with_question',None):
                 rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_question=self.data['validate_with_question'], condition=self.data['condition'])
-                field_name = 'question value with %s condition' %self.data['condition']
+                field_name = 'question value with %s criteria' %self.data['condition']
+
+            if not self._validate_max_greater_than_min():
+                raise ValidationError('Logic not created max value must be greater than min value.')
+
+            field_name, rule = self._validate_min_value(field_name, rule)
+            field_name, rule = self._validate_max_value(field_name, rule)
+            field_name, rule = self._validate_min_and_max_range(field_name, rule)
 
         if len(rule)>0:
             raise ValidationError("Rule on this %s already exists." % field_name)
         return self.cleaned_data
-
 
     condition = forms.ChoiceField(label='Eligibility criteria', choices=[], widget=forms.Select,
                                   required=False)

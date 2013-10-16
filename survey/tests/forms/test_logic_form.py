@@ -34,6 +34,126 @@ class LogicFormTest(TestCase):
         self.assertFalse(logic_form.is_valid())
         self.assertIn('Field is required.', logic_form.errors['value'])
 
+    def test_form_is_valid_if_between_condition_is_selected_and_rule_with_range_does_not_exist(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    min_value=1, max_value=9)
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertTrue(logic_form.is_valid())
+
+    def test_form_is_invalid_if_between_condition_is_selected_and_max_value_is_less_than_min_value(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    min_value=6, max_value=3)
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Logic not created max value must be greater than min value.', logic_form.errors['__all__'])
+
+
+    def test_form_has_validation_error_if_between_condition_is_selected_and_min_value_field_is_empty(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    min_value="")
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Field is required.', logic_form.errors['min_value'])
+
+    def test_form_has_validation_error_if_between_condition_is_selected_and_max_value_field_is_empty(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    max_value="")
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Field is required.', logic_form.errors['max_value'])
+
+    def test_form_has_validation_error_if_between_condition_is_selected_and_min_value_field_is_within_range_of_existing_rule(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        rule = AnswerRule.objects.create(question=question_without_option, action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                         condition=AnswerRule.CONDITIONS['BETWEEN'],
+                                         validate_with_min_value=1, validate_with_max_value=10, batch=batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    min_value=3, max_value=12)
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Rule on this condition BETWEEN with min value %s is within existing range that already exists.' %data['min_value'],
+                      logic_form.errors['__all__'])
+
+    def test_form_has_validation_error_if_between_condition_is_selected_and_max_value_field_is_within_range_of_existing_rule(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        rule = AnswerRule.objects.create(question=question_without_option, action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                         condition=AnswerRule.CONDITIONS['BETWEEN'],
+                                         validate_with_min_value=3, validate_with_max_value=10, batch=batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    min_value=1, max_value=8)
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Rule on this condition BETWEEN with max value %s is within existing range that already exists.' %data['max_value'],
+                      logic_form.errors['__all__'])
+
+    def test_form_has_validation_error_if_between_condition_is_selected_and_min_and_max_value_range_includes_range_of_existing_rule(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        rule = AnswerRule.objects.create(question=question_without_option, action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                         condition=AnswerRule.CONDITIONS['BETWEEN'],
+                                         validate_with_min_value=3, validate_with_max_value=8, batch=batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    min_value=1, max_value=10)
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Rule on this condition BETWEEN within range %s - %s already exists.' %(data['min_value'], data['max_value']),
+                      logic_form.errors['__all__'])
+
     def test_does_not_have_option_if_question_does_not_have_options(self):
         field = 'option'
         batch = Batch.objects.create(order=1)

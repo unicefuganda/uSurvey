@@ -190,6 +190,8 @@ def _get_post_values(post_data):
     question_key = post_data.get('validate_with_question', None)
     condition_response = post_data.get('condition', None)
     value_key = post_data.get('value', None)
+    value_min_key = post_data.get('min_value', None)
+    value_max_key = post_data.get('max_value', None)
 
     save_data = {'action': post_data['action'],
                  'condition': condition_response if condition_response else 'EQUALS_OPTION',
@@ -199,6 +201,12 @@ def _get_post_values(post_data):
     }
     if value_key:
         save_data['validate_with_value'] = value_key
+
+    if value_min_key:
+        save_data['validate_with_min_value'] = value_min_key
+
+    if value_max_key:
+        save_data['validate_with_max_value'] = value_max_key
 
     return save_data
 

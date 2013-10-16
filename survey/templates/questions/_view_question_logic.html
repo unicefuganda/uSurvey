@@ -29,8 +29,10 @@
                     {% else %}
                         {% if rule.validate_with_question %}
                             <span class="muted"> Value of:</span>{{ rule.validate_with_question }}
-                        {% else %}
+                        {% elif rule.validate_with_option %}
                             <span class="muted"> Option of:</span>{{ rule.validate_with_option.text }}
+                        {% elif rule.validate_with_min_value %}
+                            <span class="muted"> Value of: </span>{{ rule.validate_with_min_value }}<span class="muted"> and Value of: </span>{{ rule.validate_with_max_value }}
                         {% endif %}
                     {% endif %}
 
