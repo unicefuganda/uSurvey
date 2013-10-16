@@ -37,3 +37,19 @@ class LocationHierarchyFormTest(TestCase):
 
         [self.assertIn((country_option.id, country_option.name), country_choices) for country_option in all_countries]
         self.assertIn((some_country.id, some_country.name), country_choices)
+
+    def test_should_not_be_valid_if_levels_is_blank(self):
+        data = {
+            'country':self.uganda.id,
+            'levels': ''
+        }
+        hierarchy_form = LocationHierarchyForm(data=data)
+        self.assertFalse(hierarchy_form.is_valid())
+
+    def test_should_not_be_valid_if_country_is_blank(self):
+        data = {
+            'country':'',
+            'levels': 'Region'
+        }
+        hierarchy_form = LocationHierarchyForm(data=data)
+        self.assertFalse(hierarchy_form.is_valid())
