@@ -45,7 +45,7 @@ class SurveyViewTest(BaseTest):
         self.assertIn('surveys/new.html', templates)
         self.assertIsInstance(response.context['survey_form'], SurveyForm)
         self.assertIn('add-survey-form', response.context['id'])
-        self.assertIn('Save', response.context['button_label'])
+        self.assertIn('Create', response.context['button_label'])
         self.assertIn('New Survey', response.context['title'])
         self.assertIn('/surveys/new/', response.context['action'])
 

@@ -31,7 +31,7 @@ class HouseholdViewTest(BaseTest):
         self.assertIn('households/new.html', templates)
         self.assertEquals(response.context['action'], '/households/new/')
         self.assertEquals(response.context['id'], 'create-household-form')
-        self.assertEquals(response.context['button_label'], 'Create Household')
+        self.assertEquals(response.context['button_label'], 'Create')
         self.assertEquals(response.context['heading'], 'New Household')
         self.assertEquals(response.context['loading_text'], 'Creating...')
         investigator_form = {'value': '', 'text': '', 'options': Investigator.objects.all(), 'error': ''}
@@ -494,7 +494,7 @@ class EditHouseholdDetailsTest(BaseTest):
         self.assertIn('households/new.html', templates)
         self.assertEquals(response.context['action'], '/households/%s/edit/' % self.household.id)
         self.assertEquals(response.context['id'], 'add-household-form')
-        self.assertEquals(response.context['button_label'], 'Update Household')
+        self.assertEquals(response.context['button_label'], 'Save')
         self.assertEquals(response.context['heading'], 'Edit Household')
         self.assertEquals(response.context['loading_text'], 'Updating...')
         investigator_form = {'value': '', 'text': '', 'options': Investigator.objects.all(), 'error': ''}

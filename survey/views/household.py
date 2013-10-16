@@ -29,6 +29,7 @@ def _add_error_response_message(householdform, request):
             for err in form.non_field_errors():
                 messages.error(request, error_message + str(err))
 
+
 def validate_investigator(request, householdform, posted_locations):
     investigator_form = {'value': '', 'text': '', 'error': '',
                          'options': Investigator.objects.filter(location__in=posted_locations)}
@@ -49,6 +50,7 @@ def validate_investigator(request, householdform, posted_locations):
         householdform.errors['__all__'] = householdform.error_class([message])
     return investigator, investigator_form
 
+
 def create_household(householdform, investigator, valid, uid):
     is_valid_household = householdform['household'].is_valid()
 
@@ -62,6 +64,7 @@ def create_household(householdform, investigator, valid, uid):
         valid['household'] = True
     return valid
 
+
 def create_remaining_modelforms(householdform, valid):
     if valid.get('household', None):
         householdform['householdHead'].instance.household = householdform['household'].instance
@@ -71,9 +74,11 @@ def create_remaining_modelforms(householdform, valid):
             valid['householdHead'] = True
     return valid
 
+
 def delete_created_modelforms(householdform, valid):
     for key in valid.keys():
         householdform[key].instance.delete()
+
 
 def _process_form(householdform, investigator, request, is_edit=False, uid=None):
     valid = {}
@@ -97,13 +102,16 @@ def _process_form(householdform, investigator, request, is_edit=False, uid=None)
     _add_error_response_message(householdform, request)
     return None
 
+
 def set_household_form(uid=None, data=None, is_edit=False, instance=None):
     householdform = {}
     if not is_edit:
         householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
 
-    householdform['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid, auto_id='household-%s', label_suffix='')
+    householdform['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid,
+                                               auto_id='household-%s', label_suffix='')
     return householdform
+
 
 def create(request, selected_location, instance=None, is_edit=False, uid=None):
     householdform = set_household_form(uid=uid, data=request.POST, instance=instance, is_edit=is_edit)
@@ -113,6 +121,7 @@ def create(request, selected_location, instance=None, is_edit=False, uid=None):
 
     return response, householdform, investigator, investigator_form
 
+
 @login_required
 @permission_required('auth.can_view_households')
 def new(request):
@@ -120,16 +129,17 @@ def new(request):
     response = None
     householdform = set_household_form(data=None)
     investigator_form = {'value': '', 'text': '', 'options': '', 'error': ''}
-    month_choices= {'selected_text':'', 'selected_value':''}
-    year_choices= {'selected_text':'', 'selected_value':''}
+    month_choices = {'selected_text': '', 'selected_value': ''}
+    year_choices = {'selected_text': '', 'selected_value': ''}
 
     if request.method == 'POST':
-        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
+        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST,
+                                                                                              'location') else None
         response, householdform, investigator, investigator_form = create(request, selected_location)
-        month_choices={'selected_text':MONTHS[int(request.POST['resident_since_month'])][1],
-                        'selected_value':request.POST['resident_since_month']    }
-        year_choices={'selected_text':request.POST['resident_since_year'],
-                        'selected_value':request.POST['resident_since_year']    }
+        month_choices = {'selected_text': MONTHS[int(request.POST['resident_since_month'])][1],
+                         'selected_value': request.POST['resident_since_month']}
+        year_choices = {'selected_text': request.POST['resident_since_year'],
+                        'selected_value': request.POST['resident_since_year']}
 
     householdHead = householdform['householdHead']
     del householdform['householdHead']
@@ -138,13 +148,17 @@ def new(request):
                                                                'investigator_form': investigator_form,
                                                                'headform': householdHead,
                                                                'householdform': householdform,
-                                                               'months_choices': householdHead.resident_since_month_choices(month_choices),
-                                                               'years_choices': householdHead.resident_since_year_choices(year_choices),
+                                                               'months_choices': householdHead.resident_since_month_choices(
+                                                                   month_choices),
+                                                               'years_choices': householdHead.resident_since_year_choices(
+                                                                   year_choices),
                                                                'action': "/households/new/",
                                                                'heading': "New Household",
                                                                'id': "create-household-form",
-                                                               'button_label': "Create Household",
+                                                               'button_label': "Create",
                                                                'loading_text': "Creating..."})
+
+
 @login_required
 def get_investigators(request):
     location = request.GET['location'] if request.GET.has_key('location') and request.GET['location'] else None
@@ -153,6 +167,7 @@ def get_investigators(request):
     for investigator in investigators:
         investigator_hash[investigator.name] = investigator.id
     return HttpResponse(json.dumps(investigator_hash), content_type="application/json")
+
 
 @permission_required('auth.can_view_households')
 def list_households(request):
@@ -167,7 +182,8 @@ def list_households(request):
         selected_location = Location.objects.get(id=int(params['location']))
         corresponding_locations = selected_location.get_descendants(include_self=True)
         investigators = Investigator.objects.filter(location__in=corresponding_locations)
-        households = Household.objects.filter(investigator__in=investigators).order_by('household_member__householdhead__surname')
+        households = Household.objects.filter(investigator__in=investigators).order_by(
+            'household_member__householdhead__surname')
     households = Household.set_related_locations(households)
     if not households:
         location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'
@@ -196,16 +212,18 @@ def edit_household(request, household_id):
     if request.method == 'POST':
         uid = request.POST.get('uid', None)
 
-        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
+        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST,
+                                                                                              'location') else None
         response, household_form, investigator, investigator_form = create(request, selected_location,
-                                                                           instance=household_selected, is_edit=True, uid=uid)
+                                                                           instance=household_selected, is_edit=True,
+                                                                           uid=uid)
     return response or render(request, 'households/new.html', {'selected_location': selected_location,
                                                                'locations': LocationWidget(selected_location),
                                                                'investigator_form': investigator_form,
                                                                'householdform': household_form,
                                                                'action': "/households/%s/edit/" % household_id,
                                                                'id': "add-household-form",
-                                                               'button_label': "Update Household",
+                                                               'button_label': "Save",
                                                                'heading': "Edit Household",
                                                                'uid': uid,
                                                                'loading_text': "Updating...", 'is_edit': True})

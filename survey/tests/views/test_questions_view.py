@@ -216,7 +216,7 @@ class QuestionsViews(BaseTest):
     def test_question_form_is_in_response_request_context(self):
         response = self.client.get('/questions/new/')
         self.assertIsInstance(response.context['questionform'], QuestionForm)
-        self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['button_label'], 'Create')
         self.assertEqual(response.context['id'], 'add-question-form')
         self.assertEqual(response.context['class'], 'question-form')
 
@@ -684,7 +684,7 @@ class QuestionsViews(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('questions/new.html', templates)
         self.assertIsInstance(response.context['questionform'], QuestionForm)
-        self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['button_label'], 'Create')
         self.assertEqual(response.context['id'], 'add-sub_question-form')
         self.assertEqual(response.context['parent_question'], question)
         self.assertEqual(response.context['heading'], "Add SubQuestion")

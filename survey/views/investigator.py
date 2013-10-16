@@ -59,7 +59,7 @@ def new_investigator(request):
                                                                   'title': 'New Investigator',
                                                                   'id': "create-investigator-form",
                                                                   'class': 'investigator-form',
-                                                                  'button_label': "Create Investigator",
+                                                                  'button_label': "Create",
                                                                   'loading_text': "Creating..."})
 @login_required
 def get_locations(request):

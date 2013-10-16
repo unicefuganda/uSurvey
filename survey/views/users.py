@@ -11,9 +11,11 @@ from survey.forms.users import *
 from survey.models.users import UserProfile
 from survey.views.custom_decorators import permission_required_for_perm_or_current_user
 
+
 def _add_error_messages(userform, request):
     error_message = "User not registered. "
     messages.error(request, error_message + "See errors below.")
+
 
 def _process_form(userform, request, action_success="registered", redirect_url="/users/new/"):
     if userform.is_valid():
@@ -36,7 +38,7 @@ def new(request):
                           'country_phone_code':COUNTRY_PHONE_CODE,
                           'action': "/users/new/",
                           'id': "create-user-form",
-                          'button_label': "Create User",
+                          'button_label': "Create",
                           'loading_text': "Creating...",
                           'title' : 'New User'}
     return response or render(request, 'users/new.html', template_variables)
@@ -74,7 +76,7 @@ def edit(request, user_id):
         response = _process_form(userform, request, 'edited', '/users/'+ str(user_id)+'/edit/')
     context_variables = {'userform': userform,
                         'action' : '/users/'+str(user_id)+'/edit/',
-                        'id': 'edit-user-form', 'button_label' : 'Save Changes',
+                        'id': 'edit-user-form', 'button_label' : 'Save',
                         'loading_text' : 'Saving...',
                         'country_phone_code': COUNTRY_PHONE_CODE,
                         'title': 'Edit User'}

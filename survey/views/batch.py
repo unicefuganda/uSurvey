@@ -70,7 +70,7 @@ def new(request, survey_id):
     return _process_form(request=request, batchform=batchform, action_str='added')
 
 
-def _process_form(request, batchform, action_str='added'):
+def _process_form(request, batchform, action_str='added', btn_label="Create"):
     if request.method == 'POST':
         batchform = BatchForm(data=request.POST, instance=batchform.instance)
         if batchform.is_valid():
@@ -78,17 +78,14 @@ def _process_form(request, batchform, action_str='added'):
             _add_success_message(request, action_str)
             batch_list_url = '/surveys/%s/batches/' % str(batch.survey.id)
             return HttpResponseRedirect(batch_list_url)
-    return render(request, 'batches/new.html', {'batchform': batchform,
-                                                'button_label': 'Save',
-                                                'id': 'add-batch-form',
-                                                'title': 'New Batch'
-    })
+    context = {'batchform': batchform, 'button_label': btn_label, 'id': 'add-batch-form', 'title': 'New Batch'}
+    return render(request, 'batches/new.html', context)
 
 
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id, batch_id):
     batchform = BatchForm(instance=Batch.objects.get(id=batch_id, survey__id=survey_id))
-    return _process_form(request=request, batchform=batchform, action_str='edited')
+    return _process_form(request=request, batchform=batchform, action_str='edited', btn_label="Save")
 
 
 def _add_success_message(request, action_str):

@@ -11,7 +11,7 @@ from survey.forms.surveys import SurveyForm
 def index(request):
     surveys = Survey.objects.all().order_by('created')
     context = {'surveys': surveys, 'request': request,
-               'survey_form':SurveyForm()}
+               'survey_form': SurveyForm()}
     return render(request, 'surveys/index.html',
                   context)
 
@@ -29,7 +29,7 @@ def new(request):
 
     context = {'survey_form': survey_form,
                'title': "New Survey",
-               'button_label': 'Save',
+               'button_label': 'Create',
                'id': 'add-survey-form',
                'action': "/surveys/new/",
                }

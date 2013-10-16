@@ -128,7 +128,7 @@ class BatchViewsTest(BaseTest):
     def test_batch_form_is_in_response_request_context(self):
         response = self.client.get('/surveys/%d/batches/new/' % self.survey.id)
         self.assertIsInstance(response.context['batchform'], BatchForm)
-        self.assertEqual(response.context['button_label'], 'Save')
+        self.assertEqual(response.context['button_label'], 'Create')
         self.assertEqual(response.context['id'], 'add-batch-form')
         self.assertEqual(response.context['title'], 'New Batch')
 

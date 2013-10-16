@@ -41,7 +41,7 @@ class InvestigatorsViewTest(InvestigatorTest):
         self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)
         self.assertEquals(response.context['title'], 'New Investigator')
         self.assertEquals(response.context['id'], 'create-investigator-form')
-        self.assertEquals(response.context['button_label'], 'Create Investigator')
+        self.assertEquals(response.context['button_label'], 'Create')
         self.assertEquals(response.context['loading_text'], 'Creating...')
 
         locations = response.context['locations'].get_widget_data()

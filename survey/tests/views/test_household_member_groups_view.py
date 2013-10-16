@@ -120,7 +120,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertIn(hmg_1, response.context['conditions'])
         self.assertIn(hmg_2, response.context['conditions'])
         self.assertEquals("New Group", response.context['title'])
-        self.assertEquals("Save", response.context['button_label'])
+        self.assertEquals("Create", response.context['button_label'])
         self.assertEquals("add_group_form", response.context['id'])
         self.assertEquals("/groups/new/", response.context['action'])
         self.assertIsInstance(response.context['condition_form'], GroupConditionForm)
@@ -268,7 +268,7 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertIn('household_member_groups/conditions/new.html', templates)
         self.assertIsInstance(response.context['condition_form'], GroupConditionForm)
         self.assertIn('add-condition-to-group-form', response.context['id'])
-        self.assertIn('Save', response.context['button_label'])
+        self.assertIn('Create', response.context['button_label'])
         self.assertIn('New Criteria', response.context['title'])
         self.assertIn('/groups/%d/conditions/new/' % group.id, response.context['action'])
 

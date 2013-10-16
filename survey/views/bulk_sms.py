@@ -27,6 +27,7 @@ def send(request):
         messages.success(request, "Your message has been sent to investigators.")
     return HttpResponseRedirect(reverse('bulk_sms'))
 
+
 def valid_parameters(params, request):
     if not params.has_key('locations'):
         messages.error(request, "Please select a location.")

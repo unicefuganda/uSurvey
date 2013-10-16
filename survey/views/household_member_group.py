@@ -85,7 +85,7 @@ def _process_groupform(request, group_form, action, redirect_url):
 def add_group(request):
     params = request.POST
     response = None
-    group_form = HouseholdMemberGroupForm(initial={'order':HouseholdMemberGroup.max_order()+1})
+    group_form = HouseholdMemberGroupForm(initial={'order': HouseholdMemberGroup.max_order()+1})
 
     if request.method == 'POST':
         group_form = HouseholdMemberGroupForm(params)
@@ -93,7 +93,7 @@ def add_group(request):
     context = {'groups_form': group_form,
                'conditions': GroupCondition.objects.all(),
                'title': "New Group",
-               'button_label': 'Save',
+               'button_label': 'Create',
                'id': 'add_group_form',
                'action': "/groups/new/",
                'condition_form': GroupConditionForm(),
@@ -113,7 +113,7 @@ def details(request, group_id):
 
 
 @permission_required('auth.can_view_household_groups')
-def add_group_condition(request,group_id):
+def add_group_condition(request, group_id):
     condition_form = GroupConditionForm()
     if request.method == 'POST':
         condition_form = GroupConditionForm(data=request.POST)
@@ -130,7 +130,7 @@ def add_group_condition(request,group_id):
                 redirect_url = '/groups/'
             return HttpResponseRedirect(redirect_url)
 
-    context = {'button_label': 'Save',
+    context = {'button_label': 'Create',
                'title': 'New Criteria',
                'id': 'add-condition-to-group-form',
                'action': '/groups/%s/conditions/new/' % group_id,
