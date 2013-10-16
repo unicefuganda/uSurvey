@@ -66,6 +66,13 @@ class USSDTest(USSDBaseTest):
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+    def test_renders_welcome_message_if_investigator_does_not_select_option_one_or_two_from_welcome_screen(self):
+        self.reset_session()
+        response = self.respond('10')
+        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+        response_string = "responseString=%s&action=request" % homepage
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
     def test_no_households(self):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890",
                                                    location=self.investigator.location,

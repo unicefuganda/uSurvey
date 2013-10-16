@@ -1,6 +1,5 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from datetime import date
-import dateutils
 from django.core.exceptions import ObjectDoesNotExist
 from survey.models import Question, HouseholdHead
 from survey.models.households import HouseholdMember
@@ -103,10 +102,12 @@ class USSDRegisterHousehold(USSD):
 
     def render_questions(self, answer):
         all_questions = Question.objects.filter(group__name="REGISTRATION GROUP").order_by('order')
+
         if not self.question:
             self.question = all_questions[0]
         else:
             self.question = self.process_registration_answer(answer)
+
         return self.question.text if self.question else None
 
     def render_registration_options(self, answer):
@@ -114,8 +115,10 @@ class USSDRegisterHousehold(USSD):
             if answer == self.ANSWER['YES']:
                 self.render_questions_or_member_selection(answer)
             if answer == self.ANSWER['NO']:
+
                 self.render_welcome_screen()
             self.set_in_session('HOUSEHOLD_MEMBER', None)
+
         else:
             return self.render_questions(answer)
 
@@ -134,7 +137,7 @@ class USSDRegisterHousehold(USSD):
         return next_question
 
     def get_next_registration_question(self):
-        next_questions = Question.objects.filter(group__name="REGISTRATION GROUP", order__gte=self.question.order + 1)
+        next_questions = Question.objects.filter(group__name="REGISTRATION GROUP", order__gte=self.question.order + 1).order_by('order')
         if next_questions:
             return next_questions[0]
         else:
@@ -163,11 +166,12 @@ class USSDRegisterHousehold(USSD):
             object_to_create = HouseholdHead
         member = object_to_create.objects.create(**member_dict)
 
-        self.set_in_session('HOUSEHOLD_MEMBER',member)
+        self.set_in_session('HOUSEHOLD_MEMBER', member)
 
     def format_age_to_date_of_birth(self, question):
         age = self.REGISTRATION_DICT[question.text]
-        date_of_birth = dateutils.increment(date.today(), years=-int(age))
+        today = date.today()
+        date_of_birth = today.replace(year=(today.year - int(age)))
         return date_of_birth
 
     def format_gender_response(self,question):

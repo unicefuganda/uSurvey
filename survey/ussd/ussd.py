@@ -5,7 +5,6 @@ from survey.ussd.base import USSDBase
 
 
 class USSD(USSDBase):
-
     def __init__(self, investigator, request):
         self.investigator = investigator
         self.request = request.dict()
@@ -33,9 +32,8 @@ class USSD(USSDBase):
         if household_member:
             self.household_member = household_member
 
-
     def set_current_member_is_done(self):
-        if self.household_member:
+        if self.household_member and (self.is_registering_household is False):
             self.current_member_is_done = self.household_member.survey_completed()
 
     def set_is_resuming_survey(self):
@@ -88,7 +86,8 @@ class USSD(USSDBase):
 
     def get_household_list(self):
         page = self.get_from_session('PAGE')
-        self.responseString += "%s\n%s" % (self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page,registered=False))
+        self.responseString += "%s\n%s" % (
+            self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page, registered=False))
 
     def clean_investigator_input(self):
         if self.is_new_request():
