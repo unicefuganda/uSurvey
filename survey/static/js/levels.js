@@ -19,7 +19,7 @@ $(function(){
         assignOptionNumbers();
     }
     function appendAddOptionIcon(element){
-        element.after(addOptionIcon);
+        element.before(addOptionIcon);
     }
     appendAddOptionIcon($("#id_levels").next());
 

@@ -60,3 +60,10 @@ class LocationHierarchyTest(BaseTest):
         self.failUnless(location_type_created)
         location_type_created = LocationType.objects.get(name='District')
         self.failUnless(location_type_created)
+
+    def test_should_not_save_location_types_if_form_invalid_after_post(self):
+        levels_data = {'country': self.uganda.id, 'levels': ''}
+        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        location_types = LocationType.objects.all()
+        self.assertEqual(1, location_types.count())
+        self.assertEqual(1, len(response.context['hierarchy_form'].errors))
