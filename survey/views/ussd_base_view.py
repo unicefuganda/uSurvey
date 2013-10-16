@@ -1,6 +1,7 @@
 from survey.ussd.ussd_survey import USSDSurvey
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
 
+
 class USSDBaseView(object):
 
     ANSWER = {
@@ -9,7 +10,6 @@ class USSDBaseView(object):
         "REGISTER_HOUSEHOLD":"1",
         'TAKE_SURVEY':"2",
     }
-
 
     def __init__(self, investigator, request):
         super(USSDBaseView, self).__init__()
@@ -25,8 +25,6 @@ class USSDBaseView(object):
 
     def is_new_request(self):
         return self.request['response'] == 'false'
-
-
 
     def response(self):
         answer = self.request['ussdRequestString'].strip()

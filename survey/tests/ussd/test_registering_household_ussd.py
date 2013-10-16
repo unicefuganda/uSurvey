@@ -6,7 +6,6 @@ from django.test import Client
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule
-from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
@@ -38,7 +37,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
     def create_household(self, unique_id):
         return Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=unique_id)
 
-    def test_should_show_list_of_households_with_UIds_when_selected_option_to_register_household_and_pagination(self):
+    def test_should_show_list_of_households_with_uids_when_selected_option_to_register_household_and_pagination(self):
         self.reset_session()
         response = self.register_household()
         household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s\n2: Household-%s\n3: Household-%s\n4: Household-%s\n#: Next" % (
@@ -376,7 +375,6 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
         first_registration_question = "responseString=%s%s&action=request" % (USSD.MESSAGES['HEAD_REGISTERED'],question_1.text)
         self.assertEquals(urllib2.unquote(response.content), first_registration_question)
-
 
 
 class FakeRequest(HttpRequest):

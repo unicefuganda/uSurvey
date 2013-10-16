@@ -8,7 +8,7 @@ class USSDSurvey(USSD):
         super(USSDSurvey, self).__init__(investigator, request)
         self.current_member_is_done = False
         self.is_resuming_survey = False
-        self.is_registering_household = True
+        self.is_registering_household = False
         self.set_session()
         self.set_household()
         self.set_household_member()
@@ -230,8 +230,6 @@ class USSDSurvey(USSD):
     def render_select_household(self):
         self.request['ussdRequestString']="00"
         self.take_survey()
-
-
 
     def render_welcome_or_resume(self):
         self.action = self.ACTIONS['REQUEST']
