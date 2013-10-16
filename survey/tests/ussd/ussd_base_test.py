@@ -46,4 +46,3 @@ class USSDBaseTest(TestCase):
         for answer in NumericalAnswer.objects.all():
             answer.created -= datetime.timedelta(minutes=(20), seconds=1)
             answer.save()
-

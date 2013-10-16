@@ -209,6 +209,9 @@ class USSDSurvey(USSD):
     def is_active(self):
         return self.investigator.was_active_within(self.TIMEOUT_MINUTES)
 
+    def can_resume_survey(self, is_registering):
+        return is_registering or self.investigator.has_open_batch()
+
     def process_open_batch(self):
         if self.has_chosen_household_member():
             self.render_survey()
@@ -233,7 +236,7 @@ class USSDSurvey(USSD):
 
     def render_welcome_or_resume(self):
         self.action = self.ACTIONS['REQUEST']
-        if not self.is_active():
+        if not self.is_active() or not self.can_resume_survey(self.is_registering_household):
             self.responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
             self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', None)
         else:

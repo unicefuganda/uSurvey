@@ -2,6 +2,7 @@
 import datetime
 from random import randint
 import urllib2
+from django.http import HttpRequest
 from django.test import TestCase, Client
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
@@ -9,6 +10,7 @@ from survey.models import Investigator, Backend, Household, HouseholdHead, Batch
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
+from survey.ussd.ussd_survey import USSDSurvey
 
 
 class USSDTest(USSDBaseTest):
@@ -39,6 +41,16 @@ class USSDTest(USSDBaseTest):
         self.batch = Batch.objects.create(order=1)
         self.batch.open_for_location(self.investigator.location)
         self.member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
+
+    def test_knows_can_resume_survey_if_investigator_has_open_batches_or_is_registering_households(self):
+        ussd_survey = USSDSurvey(self.investigator, FakeRequest())
+        self.assertTrue(ussd_survey.can_resume_survey(is_registering=False))
+        self.assertTrue(ussd_survey.can_resume_survey(is_registering=True))
+
+        self.batch.close_for_location(self.investigator.location)
+
+        self.assertFalse(ussd_survey.can_resume_survey(is_registering=False))
+        self.assertTrue(ussd_survey.can_resume_survey(is_registering=True))
 
     def test_list_household_members_after_selecting_household(self):
         household_member1 = HouseholdMember.objects.create(household=self.household, surname="abcd", male=False,
@@ -572,3 +584,45 @@ class USSDTest(USSDBaseTest):
 
         self.assertTrue(self.investigator.get_from_cache('IS_REGISTERING_HOUSEHOLD'))
 
+    def test_resume_should_show_welcome_text_if_open_batch_is_closed_on_session_timeout(self):
+        question_1 = Question.objects.create(text="Question 1?",
+                                             answer_type=Question.NUMBER, order=1, group=self.member_group)
+        question_2 = Question.objects.create(text="Question 2?",
+                                             answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+
+        response = self.reset_session()
+        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+        response_string = "responseString=%s&action=request" % homepage
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.take_survey()
+        response = self.select_household()
+
+        members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
+        response_string = "responseString=%s&action=request" % members_list
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.select_household_member("1")
+        response_string = "responseString=%s&action=request" % question_1.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond("1")
+        response_string = "responseString=%s&action=request" % question_2.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.batch.close_for_location(self.investigator.location)
+
+        response = self.reset_session()
+        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+        response_string = "responseString=%s&action=request" % homepage
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+class FakeRequest(HttpRequest):
+
+    def dict(self):
+        obj = self.__dict__
+        obj['transactionId'] = '1234567890'
+        obj['response'] = 'false'
+        return obj
