@@ -32,7 +32,7 @@ class USSDBaseView(object):
             return {'action': self.ussd_survey.ACTIONS['END'],
                     'responseString': self.ussd_survey.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']}
 
-        if not answer and self.is_new_request():
+        if (not answer or answer == '10') and self.is_new_request():
             action, responseString = self.ussd_survey.render_welcome_or_resume()
 
         elif self.is_registering_household is None:
