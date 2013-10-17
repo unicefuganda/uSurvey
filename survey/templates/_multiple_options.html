@@ -5,6 +5,20 @@
             <input type="text" maxlength="100" name={{ name }}>
             <a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>
             <a href="javascript:;" class="add-on btn btn_primary remove-option"><i class="icon-remove"></i></a>
+            {% if extra_fields %}
+                <label class="control-label" for="id_required">required</label>
+                <div class="controls ">
+                 <input id="id_required" name="required" type="checkbox" /> <label class="error"> </label>
+                </div>
+                <label class="control-label" for="id_has_code">has_code</label>
+                <div class="controls ">
+                 <input id="id_has_code" name="has_code" type="checkbox" /> <label class="error"> </label>
+                </div>
+                <label class="control-label" for="id_code">Code</label>
+                <div class="controls ">
+                    <input id="id_code" maxlength="30" name="code" type="text" /> <label class="error"></label>
+                </div>
+            {% endif %}
         </div>
     </div>
 </script>
