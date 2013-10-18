@@ -256,7 +256,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'identifier': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'module': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'module'", 'null': 'True', 'to': "orm['survey.QuestionModule']"}),
+            'module': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'module_question'", 'null': 'True', 'to': "orm['survey.QuestionModule']"}),
             'order': ('django.db.models.fields.PositiveIntegerField', [], {'max_length': '2', 'null': 'True'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': "orm['survey.Question']"}),
             'subquestion': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -265,6 +265,7 @@ class Migration(SchemaMigration):
         'survey.questionmodule': {
             'Meta': {'object_name': 'QuestionModule'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
