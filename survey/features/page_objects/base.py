@@ -102,7 +102,7 @@ class PageObject(object):
         assert self.browser.find_link_by_partial_text("%s" % str(user.get_full_name()))
 
     def click_user_settings(self, user):
-        self.browser.click_link_by_text("%s" % user.get_full_name())
+        self.click_by_css("#drop5")
 
     def assert_user_can_see_profile_and_logout_link(self):
         links = ["Edit Profile", "Change Password", "Logout"]
