@@ -16,6 +16,9 @@
               Module Name
             </th>
               <th>
+              Description
+            </th>
+              <th>
               Actions
             </th>
           </tr>
@@ -25,6 +28,11 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ question_module.name }}</td>
+                {% if question_module.description %}
+                    <td>{{ question_module.description }}</td>
+                {% else %}
+                    <td> -- </td>
+                {% endif %}
                 <td>
                 <div class="btn-group">
                     <a href="#delete_module_{{question_module.id}}" class="btn btn-small" data-toggle="modal" id="delete-question-module_{{question_module.id}}"><i class="icon-trash"></i> Delete</a>

@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
 from survey.models.householdgroups import GroupCondition

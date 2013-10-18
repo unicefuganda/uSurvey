@@ -66,5 +66,6 @@ def when_i_fill_in_valid_values(step):
 @step(u'Then I should see the edited question module')
 def then_i_should_see_the_edited_question_module(step):
     world.page = QuestionModuleList(world.browser)
+    assert not world.page.browser.find_link_by_text(world.health_module.name)
     world.page.is_text_present('Edited Module')
     world.page.see_success_message("Question module", "edited")

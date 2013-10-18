@@ -11,8 +11,8 @@ class QuestionForm(ModelForm):
 
     options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
 
-    def __init__(self,data=None, initial=None, parent_question=None ,instance=None):
-        super(QuestionForm, self).__init__(data=data,initial=initial,instance=instance)
+    def __init__(self,data=None, initial=None, parent_question=None, instance=None):
+        super(QuestionForm, self).__init__(data=data, initial=initial, instance=instance)
         self.fields['answer_type'].choices = list(Question.TYPE_OF_ANSWERS)
         self.fields['module'].choices = map(lambda question_module: (question_module.id, question_module.name), QuestionModule.objects.filter())
 
