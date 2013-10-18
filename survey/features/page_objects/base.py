@@ -181,9 +181,6 @@ class PageObject(object):
         for option in option_list:
             assert not option in self.browser.find_by_name(field_name).first.text
 
-    def fill(self, name, value):
-        self.browser.fill(name, value)
-
     def see_message(self, text):
         assert self.browser.is_text_present(text)
 
