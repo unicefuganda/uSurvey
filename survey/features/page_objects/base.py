@@ -40,8 +40,8 @@ class PageObject(object):
     def submit(self):
         self.browser.find_by_css("form button").first.click()
 
-    def see_username_link(self, username):
-        assert self.browser.find_link_by_text(username)
+    def see_username_link(self):
+        assert self.browser.find_by_css("#drop5")
 
     def see_logout_link(self):
         self.click_by_css('#drop5')
