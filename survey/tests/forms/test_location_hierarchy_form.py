@@ -1,7 +1,9 @@
+from django.forms.formsets import formset_factory
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.forms.location_hierarchy import LocationHierarchyForm
+from survey.forms.location_details import LocationDetailsForm
+from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
 
 
 class LocationHierarchyFormTest(TestCase):
@@ -46,3 +48,16 @@ class LocationHierarchyFormTest(TestCase):
         hierarchy_form = LocationHierarchyForm(data=data)
         self.assertFalse(hierarchy_form.is_valid())
 
+    def test_form_set_has_error_if_has_code_is_on_but_no_code_supplied(self):
+        DetailsFormSet = formset_factory(LocationDetailsForm, formset=BaseArticleFormSet)
+
+        data = {'form-0-levels': 'Region', 'form-MAX_NUM_FORMS': '1000', 'form-0-required': 'on',
+                'form-TOTAL_FORMS': '1', 'form-0-code': '', 'form-INITIAL_FORMS': '0',
+                'form-0-has_code': 'on'}
+
+        details_formset = DetailsFormSet(data,prefix='form')
+        message = "Code cannot be blank if has code is checked."
+
+        self.assertFalse(details_formset.is_valid())
+
+        self.assertIn(message, details_formset.forms[0].errors['code'])

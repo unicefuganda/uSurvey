@@ -20,17 +20,6 @@ class LocationDetailsFormTest(TestCase):
         details_form = LocationDetailsForm(data=data)
         self.assertTrue(details_form.is_valid())
 
-    def test_should_be_invalid_if_code_is_blank_and_has_code_is_true(self):
-        data={
-            'levels': 'Region',
-            'required':True,
-            'has_code':True,
-            'code': ''
-        }
-
-        details_form = LocationDetailsForm(data=data)
-        self.assertFalse(details_form.is_valid())
-
     def test_should_be_invalid_if_levels_is_blank(self):
         data={
             'levels': '',

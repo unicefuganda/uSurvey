@@ -12,6 +12,7 @@ def add(request):
     if request.method == 'POST':
         hierarchy_form = LocationHierarchyForm(request.POST)
         details_formset = DetailsFormSet(request.POST,prefix='form')
+
         if hierarchy_form.is_valid():
             selected_country = Location.objects.get(id=request.POST['country'])
 
