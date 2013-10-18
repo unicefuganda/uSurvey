@@ -12,7 +12,7 @@ class LocationHierarchyFormTest(TestCase):
     def test_knows_the_fields_in_form(self):
         hierarchy_form = LocationHierarchyForm()
 
-        fields = ['country','levels','required', 'has_code', 'code']
+        fields = ['country']
         [self.assertIn(field, hierarchy_form.fields) for field in fields]
 
     def test_should_populate_countries_name(self):
@@ -38,14 +38,6 @@ class LocationHierarchyFormTest(TestCase):
         [self.assertIn((country_option.id, country_option.name), country_choices) for country_option in all_countries]
         self.assertIn((some_country.id, some_country.name), country_choices)
 
-    def test_should_not_be_valid_if_levels_is_blank(self):
-        data = {
-            'country':self.uganda.id,
-            'levels': ''
-        }
-        hierarchy_form = LocationHierarchyForm(data=data)
-        self.assertFalse(hierarchy_form.is_valid())
-
     def test_should_not_be_valid_if_country_is_blank(self):
         data = {
             'country':'',
@@ -54,14 +46,3 @@ class LocationHierarchyFormTest(TestCase):
         hierarchy_form = LocationHierarchyForm(data=data)
         self.assertFalse(hierarchy_form.is_valid())
 
-    def test_should_not_be_invalid_if_code_is_blank_and_has_code_is_true(self):
-        data = {
-            'country':self.uganda.id,
-            'levels': 'Region',
-            'required': 'False',
-            'has_code': 'True',
-            'code': ''
-        }
-        hierarchy_form = LocationHierarchyForm(data=data)
-        self.assertFalse(hierarchy_form.is_valid())
-        self.assertEqual(1, len(hierarchy_form._errors['code']))

@@ -4,11 +4,33 @@
 {% block title %}
     Create geographical location hierarchy
 {% endblock %}
-
 {% block display_form_fields %}
-    {% include "naked_form.html" with a_form=hierarchy_form %}
-    {% include "_multiple_options.html" with option_label='Level' id="option-template" name='levels' extra_fields=True%}
+  <div class="control-group">
+    <label class="control-label" for="id_counrty">Country</label>
+    <div class="controls {{ hierarchy_form.country|is_radio }}">
+      {{hierarchy_form.country}} <label class="error">
+         </label>
+    </div>
+  </div>
+  <table border="0" cellpadding="10" cellspacing="30">
+    <tbody>
+    <th>Levels</th>
+    <th>Required</th>
+    <th>Has Code</th>
+    <th>Code</th>
+    {{details_formset.management_form}}
+    {% for form in details_formset.forms %}
+      <tr>
+        <td>{{ form.levels }}</td>
+        <td>{{ form.required }}</td>
+        <td>{{ form.has_code }}</td>
+        <td>{{ form.code }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
+
 {% block javascripts %}
     <script src="{{STATIC_URL}}/js/levels.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
