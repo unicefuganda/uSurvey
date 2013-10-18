@@ -47,7 +47,7 @@ def edit(request, survey_id):
             if survey_form.is_valid():
                 survey_form.save()
                 messages.success(request, 'Survey successfully edited.')
-                return  HttpResponseRedirect('/surveys/')
+                return HttpResponseRedirect('/surveys/')
 
         context = {'survey_form': survey_form,
                    'title': "Edit Survey",

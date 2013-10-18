@@ -1,5 +1,5 @@
 from lettuce import step, world
-from survey.features.page_objects.question_module import QuestionModuleList, NewQuestionModule
+from survey.features.page_objects.question_module import QuestionModuleList, NewQuestionModule, EditQuestionModulePage
 from survey.models import QuestionModule
 
 
@@ -49,3 +49,22 @@ def when_i_confirm_delete(step):
 @step(u'Then I should see the module was deleted')
 def then_i_should_see_the_module_was_deleted(step):
     world.page.see_success_message("Module", "deleted")
+
+@step(u'And I click edit module')
+def and_i_click_edit_module(step):
+    world.page.click_by_css("#edit-module_%s" % world.health_module.id)
+
+@step(u'I should see a edit module page')
+def i_should_see_a_edit_module_page(step):
+    world.page = EditQuestionModulePage(world.browser, world.health_module)
+    world.page.validate_url()
+
+@step(u'When I fill in valid values')
+def when_i_fill_in_valid_values(step):
+    world.page.fill_valid_values({'name': 'Edited Module'})
+
+@step(u'Then I should see the edited question module')
+def then_i_should_see_the_edited_question_module(step):
+    world.page = QuestionModuleList(world.browser)
+    world.page.is_text_present('Edited Module')
+    world.page.see_success_message("Question module", "edited")

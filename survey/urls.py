@@ -84,6 +84,7 @@ urlpatterns = patterns('',
     url(r'^modules/new/$', 'survey.views.question_module.new', name='new_question_module_page'),
     url(r'^modules/$', 'survey.views.question_module.index', name='question_module_listing_page'),
     url(r'^modules/(?P<module_id>\d+)/delete/$', 'survey.views.question_module.delete', name='delete_question_module_page'),
+    url(r'^modules/(?P<module_id>\d+)/edit/$', 'survey.views.question_module.edit', name='edit_question_module_page'),
 
 )
 

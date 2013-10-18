@@ -21,6 +21,9 @@ class QuestionModuleViewTest(BaseTest):
         self.assertIn('question_module/new.html', templates)
         self.assertIsNotNone(response.context['question_module_form'])
         self.assertIsInstance(response.context['question_module_form'], QuestionModuleForm)
+        self.assertEqual(response.context['heading'], "Edit Module")
+        self.assertEqual(response.context['button-label'], "Save")
+        self.assertEqual(response.context['action'], "/modules/new/")
 
     def test_post_question_module_form_ceates_question_module_and_returns_success(self):
         form_data = {'name': 'Education'}
@@ -40,6 +43,28 @@ class QuestionModuleViewTest(BaseTest):
         self.assertIn('question_module/index.html', templates)
         self.assertIn(health_module, response.context['question_modules'])
         self.assertIn(education_module, response.context['question_modules'])
+
+    def test_get_edit_question_module(self):
+        education_module = QuestionModule.objects.create(name="Education")
+        response = self.client.get('/modules/%s/edit/' % education_module.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('question_module/new.html', templates)
+        self.assertIsNotNone(response.context['question_module_form'])
+        self.assertIsInstance(response.context['question_module_form'], QuestionModuleForm)
+        self.assertEqual(response.context['question_module_form'].instance, education_module)
+        self.assertEqual(response.context['heading'], "Edit Module")
+        self.assertEqual(response.context['button-label'], "Save")
+        self.assertEqual(response.context['action'], "/modules/%s/edit/" % education_module.id)
+
+    def test_post_edit_question_module(self):
+        education_module = QuestionModule.objects.create(name="Eductaion")
+        education_module_form = {'name': 'Education'}
+        response = self.client.post('/modules/%s/edit/' % education_module.id, data=education_module_form)
+        self.failUnless(QuestionModule.objects.filter(id=education_module.id, **education_module_form))
+        self.assertRedirects(response, "/modules/", 302, 200)
+        success_message = "Question module successfully edited."
+        self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_delete_question_module(self):
         QuestionModule.objects.create(name="Health")
