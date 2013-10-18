@@ -77,7 +77,7 @@ def and_i_can_login_that_user_successfully(step):
     logout(world)
     user = User.objects.get(username=world.user_data['username'])
     login(user, world)
-    world.page.see_home_page_and_logout_link(user.get_full_name())
+    world.page.see_home_page_and_logout_link()
 
 
 @step(u'Then I fill an existing mobile number')

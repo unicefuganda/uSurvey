@@ -322,9 +322,9 @@ def and_i_click_delete_condition_link(step):
 
 @step(u'Then I should see a delete condition confirmation modal')
 def then_i_should_see_a_delete_condition_confirmation_modal(step):
-  world.page.see_confirm_delete_message(world.condition_1.__str__())
-  world.page.is_text_present("It is attached to the following groups:")
-  world.page.find_link_by_text(world.group.name)
+    world.page.see_confirm_delete_message(str(world.condition_1))
+    world.page.is_text_present("It is attached to the following groups:")
+    world.page.find_link_by_text(world.group.name)
 
 @step(u'Then I should see that the condition was deleted successfully')
 def then_i_should_see_that_the_condition_was_deleted_successfully(step):

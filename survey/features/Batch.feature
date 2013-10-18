@@ -77,6 +77,7 @@ Feature: Batch related features
     And I have a batch
     And I have 2 questions
     And I visit batches listing page
+    And I click on batch name
     And I click on assign question link
     Then I should see the assign question page of that batch
     When I select some questions

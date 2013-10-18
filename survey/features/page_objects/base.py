@@ -43,8 +43,8 @@ class PageObject(object):
     def see_username_link(self, username):
         assert self.browser.find_link_by_text(username)
 
-    def see_logout_link(self, username):
-        self.browser.find_link_by_text(username).first.click()
+    def see_logout_link(self):
+        self.click_by_css('#drop5')
         assert self.browser.find_link_by_text(" Logout")
 
     def see_the_about_link(self):

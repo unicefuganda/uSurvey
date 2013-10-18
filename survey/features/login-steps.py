@@ -28,7 +28,7 @@ def and_i_login_a_user(step):
 
 @step(u'Then I should see home page and logout link')
 def then_i_should_see_home_page_and_logout_link(step):
-    world.page.see_home_page_and_logout_link(world.user.get_full_name())
+    world.page.see_home_page_and_logout_link()
 
 @step(u'And I am in the home page')
 def and_i_am_in_the_home_page(step):

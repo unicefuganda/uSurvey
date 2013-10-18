@@ -149,7 +149,7 @@ def then_i_should_be_on_the_list_of_questions_under_the_batch_page(step):
 
 @step(u'And I click on assign question link')
 def and_i_click_on_assign_question_link(step):
-    world.page.click_link_by_text(" Select Questions")
+    world.page.click_link_by_text("Select Question")
 
 @step(u'Then I should see the assign question page of that batch')
 def then_i_should_see_the_assign_question_page_of_that_batch(step):

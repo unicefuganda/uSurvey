@@ -45,6 +45,6 @@ class LoginPage(PageObject):
         self.browser.fill_form(details)
         self.submit()
 
-    def see_home_page_and_logout_link(self, full_name):
+    def see_home_page_and_logout_link(self):
         assert self.browser.url == django_url(HomePage.url)
-        self.see_logout_link(full_name)
+        self.see_logout_link()
