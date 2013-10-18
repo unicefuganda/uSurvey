@@ -14,7 +14,7 @@ class QuestionFilterForm(forms.Form):
         group_choices = [('All', 'All')]
         module_choices = [('All', 'All')]
         question_type_choices = [('All', 'All')]
-        map(lambda group: group_choices.append((group.id, group.name)), HouseholdMemberGroup.objects.all())
+        map(lambda group: group_choices.append((group.id, group.name)), HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP'))
         map(lambda question_module: module_choices.append((question_module.id, question_module.name)), QuestionModule.objects.all())
         map(lambda question_type: question_type_choices.append(question_type), list(Question.TYPE_OF_ANSWERS))
 

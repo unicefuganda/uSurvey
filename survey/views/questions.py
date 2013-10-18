@@ -46,7 +46,7 @@ def _get_questions_based_on_filter(batch_id, group_id='All', module_id='All', qu
     filter_condition = _set_filter_condition_based_on_module(module_id, filter_condition)
     filter_condition = _set_filter_condition_based_on_answer_type(question_type, filter_condition)
 
-    return Question.objects.filter(subquestion=False, **filter_condition)
+    return Question.objects.filter(subquestion=False, **filter_condition).exclude(group__name='REGISTRATION GROUP')
 
 
 @permission_required('auth.can_view_batches')

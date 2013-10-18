@@ -127,6 +127,24 @@ class HouseholdMemberGroupTest(TestCase):
 
         self.assertEqual(0, HouseholdMemberGroup.max_order())
 
+    def test_question_knows_de_associate_self_from_group(self):
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        condition.groups.add(member_group)
+
+        Question.objects.create(text="This is a test question", answer_type="multichoice",
+                                                  group=member_group)
+        Question.objects.create(text="Another test question", answer_type="multichoice",
+                                                          group=member_group)
+
+        self.failUnless(member_group.question_group.all())
+        member_group.remove_related_questions()
+
+        self.failIf(member_group.question_group.all())
+        all_questions = Question.objects.filter()
+
+        [self.assertIsNone(question.group) for question in all_questions]
+
     def test_should_return_max_order_of_all_groups(self):
         HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
         HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=7)

@@ -21,7 +21,7 @@ def conditions(request):
 
 @permission_required('auth.can_view_investigators')
 def index(request):
-    groups = HouseholdMemberGroup.objects.all().order_by('order')
+    groups = HouseholdMemberGroup.objects.all().order_by('order').exclude(name='REGISTRATION GROUP')
     return render(request, 'household_member_groups/index.html', {'groups': groups, 'request': request})
 
 
@@ -165,7 +165,9 @@ def edit_group(request, group_id):
 
 @permission_required('auth.can_view_household_groups')
 def delete_group(request, group_id):
-    HouseholdMemberGroup.objects.get(id=group_id).delete()
+    member_group = HouseholdMemberGroup.objects.get(id=group_id)
+    member_group.remove_related_questions()
+    member_group.delete()
     messages.success(request, "Group successfully deleted.")
     return HttpResponseRedirect("/groups/")
 

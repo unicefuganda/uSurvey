@@ -33,11 +33,7 @@ def index(request):
 def delete(request, module_id):
     try:
         module = QuestionModule.objects.get(id=module_id)
-        all_module_questions = Question.objects.filter(module=module)
-        for question in all_module_questions:
-            question.module = None
-            question.save()
-
+        module.remove_related_questions()
         module.delete()
         messages.success(request, "Module successfully deleted.")
     except QuestionModule.DoesNotExist:

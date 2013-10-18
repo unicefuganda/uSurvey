@@ -37,7 +37,7 @@ class Question(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
     subquestion = models.BooleanField(default=False)
     parent = models.ForeignKey("Question", null=True, related_name="children")
-    module = models.ForeignKey("QuestionModule", null=True, related_name="module")
+    module = models.ForeignKey("QuestionModule", null=True, related_name="module_question")
 
     class Meta:
         app_label = 'survey'

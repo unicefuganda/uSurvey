@@ -16,10 +16,12 @@ class HouseholdMemberGroup(BaseModel):
         all_questions = self.all_questions().exclude(order=None)
         return all_questions.order_by('order').reverse()[0] if all_questions else None
 
-
     def maximum_question_order(self):
         all_questions = self.all_questions()
         return all_questions.order_by('order').reverse()[0].order if all_questions else 0
+
+    def remove_related_questions(self):
+        self.question_group.clear()
 
     @classmethod
     def max_order(cls):
@@ -68,4 +70,4 @@ class GroupCondition(BaseModel):
         unique_together = ('value', 'attribute', 'condition')
 
     def __unicode__(self):
-        return "%s > %s > %s" % (self.attribute, self.condition, self.value)
+        return "%s  %s  %s" % (self.attribute, self.condition, self.value)

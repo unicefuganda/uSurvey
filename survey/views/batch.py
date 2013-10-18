@@ -107,7 +107,7 @@ def delete(request, survey_id, batch_id):
 def assign(request, batch_id):
     batch_questions_form = BatchQuestionsForm()
 
-    groups = HouseholdMemberGroup.objects.all()
+    groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')
     batch = Batch.objects.get(id=batch_id)
     if request.method == 'POST':
         batch_question_form = BatchQuestionsForm(data=request.POST, instance=batch)

@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
+from survey.models import QuestionModule
 
 from survey.models.batch import Batch
 from survey.models.backend import Backend

@@ -22,7 +22,7 @@ class BatchForm(ModelForm):
 
 
 class BatchQuestionsForm(ModelForm):
-    questions = forms.ModelMultipleChoiceField(label=u'', queryset=Question.objects.filter(subquestion=False),
+    questions = forms.ModelMultipleChoiceField(label=u'', queryset=Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP'),
                                                widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
 
     class Meta:
@@ -31,7 +31,7 @@ class BatchQuestionsForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(BatchQuestionsForm, self).__init__(*args, **kwargs)
-        self.fields['questions'].queryset = Question.objects.filter(subquestion=False)
+        self.fields['questions'].queryset = Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP')
 
     def save_question_to_batch(self, batch):
         for question in self.cleaned_data['questions']:
