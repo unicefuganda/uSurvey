@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from survey.forms.question_module_form import QuestionModuleForm
-from survey.models import QuestionModule
+from survey.models import QuestionModule, Question
 
 
 @login_required
@@ -30,7 +30,13 @@ def index(request):
 
 def delete(request, module_id):
     try:
-        QuestionModule.objects.get(id=module_id).delete()
+        module = QuestionModule.objects.get(id=module_id)
+        all_module_questions = Question.objects.filter(module=module)
+        for question in all_module_questions:
+            question.module = None
+            question.save()
+
+        module.delete()
         messages.success(request, "Module successfully deleted.")
     except QuestionModule.DoesNotExist:
         messages.success(request, "Module does not exist.")

@@ -74,7 +74,6 @@ def _process_condition_form(request, condition_form):
 
 
 def _process_groupform(request, group_form, action, redirect_url):
-
     if group_form.is_valid() and has_valid_condition(request.POST):
         group_form.save()
         messages.success(request, 'Group successfully %s.' % action)
@@ -85,7 +84,7 @@ def _process_groupform(request, group_form, action, redirect_url):
 def add_group(request):
     params = request.POST
     response = None
-    group_form = HouseholdMemberGroupForm(initial={'order': HouseholdMemberGroup.max_order()+1})
+    group_form = HouseholdMemberGroupForm(initial={'order': HouseholdMemberGroup.max_order() + 1})
 
     if request.method == 'POST':
         group_form = HouseholdMemberGroupForm(params)
@@ -109,7 +108,8 @@ def details(request, group_id):
     if not conditions.exists():
         messages.error(request, "No conditions in this group.")
         return HttpResponseRedirect("/groups/")
-    return render(request, "household_member_groups/conditions/index.html", {'conditions': conditions, 'add_condition_url': 'new_condition_for_group', 'group': group})
+    return render(request, "household_member_groups/conditions/index.html",
+                  {'conditions': conditions, 'add_condition_url': 'new_condition_for_group', 'group': group})
 
 
 @permission_required('auth.can_view_household_groups')
@@ -144,7 +144,8 @@ def edit_group(request, group_id):
     params = request.POST
     response = None
     group = HouseholdMemberGroup.objects.get(id=group_id)
-    group_form = HouseholdMemberGroupForm(instance=group, initial={'conditions':[gp.id for gp in group.conditions.all()]})
+    group_form = HouseholdMemberGroupForm(instance=group,
+                                          initial={'conditions': [gp.id for gp in group.conditions.all()]})
     if request.method == 'POST':
         group_form = HouseholdMemberGroupForm(params, instance=group)
         redirect_url = "/groups/%s/" % group_id
@@ -155,7 +156,7 @@ def edit_group(request, group_id):
                'title': "Edit Group",
                'button_label': 'Save',
                'id': 'add_group_form',
-               'action': "/groups/%s/edit/"%group_id,
+               'action': "/groups/%s/edit/" % group_id,
                'condition_form': GroupConditionForm(),
                'condition_title': "New Criteria"}
 
@@ -164,12 +165,13 @@ def edit_group(request, group_id):
 
 @permission_required('auth.can_view_household_groups')
 def delete_group(request, group_id):
-  HouseholdMemberGroup.objects.get(id=group_id).delete()
-  messages.success(request, "Group successfully deleted.")
-  return HttpResponseRedirect("/groups/")
+    HouseholdMemberGroup.objects.get(id=group_id).delete()
+    messages.success(request, "Group successfully deleted.")
+    return HttpResponseRedirect("/groups/")
+
 
 @permission_required('auth.can_view_household_groups')
 def delete_condition(request, condition_id):
-  GroupCondition.objects.get(id=condition_id).delete()
-  messages.success(request, "Criteria successfully deleted.")
-  return HttpResponseRedirect("/conditions/")
+    GroupCondition.objects.get(id=condition_id).delete()
+    messages.success(request, "Criteria successfully deleted.")
+    return HttpResponseRedirect("/conditions/")
