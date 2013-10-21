@@ -4,6 +4,7 @@ from django.test.testcases import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
+from survey.models import LocationTypeDetails
 
 
 class LocationHierarchyFormTest(TestCase):
@@ -61,3 +62,14 @@ class LocationHierarchyFormTest(TestCase):
         self.assertFalse(details_formset.is_valid())
 
         self.assertIn(message, details_formset.forms[0].errors['code'])
+
+    def test_should_show_used_country_as_available_choices_if_any_otherwise_show_all_countries(self):
+        other_country = Location.objects.create(name="some other country", type=self.uganda.type)
+        LocationTypeDetails.objects.create(required=True,has_code=False, location_type=self.uganda.type, country=self.uganda)
+        hierarchy_form = LocationHierarchyForm()
+
+        field = 'country'
+        country_choices = hierarchy_form.fields[field].choices
+
+        self.assertEqual(1, len(country_choices))
+        self.assertEqual((self.uganda.id, self.uganda.name), country_choices[0])

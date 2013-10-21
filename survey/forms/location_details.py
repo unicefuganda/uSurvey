@@ -8,7 +8,3 @@ class LocationDetailsForm(ModelForm):
     class Meta:
         model = LocationTypeDetails
         fields = ['required', 'has_code', 'code',]
-
-        required = forms.BooleanField(required=False,initial=False,label='required')
-        has_code = forms.BooleanField(required=False,initial=False,label='has code')
-        code = forms.CharField(label= 'Code', max_length=30, required=False)
