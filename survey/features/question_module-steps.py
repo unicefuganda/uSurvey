@@ -15,7 +15,7 @@ def when_i_visit_the_list_questions_modules_page(step):
 
 @step(u'Then I should see the questions modules listed')
 def then_i_should_see_the_questions_modules_listed(step):
-    fields = [world.health_module.name, world.education_module.name, 'Number', 'Module Name', 'Question Module Lists']
+    fields = [world.health_module.name, world.education_module.name, 'Number', 'Module Name', 'Module Lists']
     world.page.validate_fields_present(fields)
 
 @step(u'When I visit the create questions module page')
@@ -31,7 +31,7 @@ def and_i_fill_in_the_question_module_details(step):
 @step(u'Then I should see that the question module on the listing page')
 def then_i_should_see_that_the_question_module_on_the_listing_page(step):
     world.page = QuestionModuleList(browser=world.browser)
-    fields = ['Education', 'Number', 'Module Name', 'Question Module Lists']
+    fields = ['Education', 'Number', 'Module Name', 'Module Lists']
     world.page.validate_fields_present(fields)
 
 @step(u'And I click delete module')

@@ -16,7 +16,6 @@ class USSDSurvey(USSD):
         self.set_is_resuming_survey()
         self.clean_investigator_input()
 
-
     def process_investigator_response(self, batch):
         answer = self.request['ussdRequestString'].strip()
         if not answer:
@@ -47,7 +46,6 @@ class USSDSurvey(USSD):
             self.household = None
             self.render_households_list()
 
-
         self.action = self.ACTIONS['REQUEST']
 
     def end_interview(self, batch):
@@ -71,7 +69,7 @@ class USSDSurvey(USSD):
             self.investigator.clear_interview_caches()
         else:
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE']
-            self.investigator.clear_interview_caches()
+            self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
 
     def render_survey_response(self, batch):
         if not self.question:
@@ -107,8 +105,6 @@ class USSDSurvey(USSD):
         else:
             self.action = self.ACTIONS['END']
             self.responseString = self.MESSAGES['NO_HOUSEHOLDS']
-
-
 
     def select_household_member(self, answer):
         try:
@@ -242,8 +238,6 @@ class USSDSurvey(USSD):
         else:
             self.render_resume_message()
         return self.action, self.responseString
-
-
 
     def behave_like_new_request(self):
         self.request['ussdRequestString'] = ""
