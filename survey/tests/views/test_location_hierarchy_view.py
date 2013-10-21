@@ -120,6 +120,26 @@ class LocationHierarchyTest(BaseTest):
         self.assertIn(region, location_types)
         self.assertIn(self.uganda.type, location_types)
 
+    def test_saving_multiple_location_hierarchy_types(self):
+        levels_data = {'country': self.uganda.id, 'form-0-levels': 'Region',
+                       'form-1-levels': 'Hill', 'form-1-required':'on',
+                       'form-1-has_code':'on', 'form-1-code':'0001',
+                       'form-TOTAL_FORMS': 2,
+                       'form-INITIAL_FORMS': 0}
+        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        location_types = LocationType.objects.all()
+        self.assertEqual(3, location_types.count())
+        region = LocationType.objects.get(name=levels_data['form-0-levels'])
+        self.failUnless(region)
+        hill = LocationType.objects.get(name=levels_data['form-1-levels'])
+        self.failUnless(hill)
+        hill_details = LocationTypeDetails.objects.get(location_type=hill)
+        self.assertEqual(True, hill_details.required)
+        self.assertEqual(True, hill_details.has_code)
+        self.assertEqual(levels_data['form-1-code'], hill_details.code)
+        self.assertEqual(self.uganda, hill_details.country)
+
+
 class UploadLocationsTest(BaseTest):
     def setUp(self):
         self.client = Client()

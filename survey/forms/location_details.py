@@ -8,3 +8,8 @@ class LocationDetailsForm(ModelForm):
     class Meta:
         model = LocationTypeDetails
         fields = ['required', 'has_code', 'code',]
+
+        widgets = {
+            'has_code': forms.CheckboxInput(attrs={'class':'has_code'}),
+            'code': forms.TextInput(attrs={'class':'hide code', 'maxlength':30}),
+        }

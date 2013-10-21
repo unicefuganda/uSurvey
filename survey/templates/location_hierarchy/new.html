@@ -14,21 +14,35 @@
   </div>
   <table border="0" cellpadding="10" cellspacing="30">
     <tbody>
-    <th>Levels</th>
-    <th>Required</th>
-    <th>Has Code</th>
-    <th>Code</th>
     {{details_formset.management_form}}
     {% for form in details_formset.forms %}
       <tr>
+        <td>Level <span class="number"> {{ forloop.counter }}</span></td>
         <td>{{ form.levels }}</td>
-        <td>{{ form.required }}</td>
-        <td>{{ form.has_code }}</td>
+        <td><a href="javascript:;" class="add-on btn btn_primary add-level"><i class="icon-plus"></i></a>
+         <a href="javascript:;" class="add-on btn btn_primary remove-level"><i class="icon-remove"></i></a>
+        </td>
+        <td>{{ form.required }} Required</td>
+        <td>{{ form.has_code }} Has Code</td>
         <td>{{ form.code }}<span style="color: red">{% include "base/field_error.html" with field=form.code %}</span></td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
+
+<script type="text/template" id="add-level-template">
+  <tr>
+    <td>Level <span class="number"> {{ forloop.counter }}</span></td>
+    <td><input  type="text" name="levels" maxlength="50"></td>
+    <td><a href="javascript:;" class="add-on btn btn_primary add-level"><i class="icon-plus"></i></a>
+     <a href="javascript:;" class="add-on btn btn_primary remove-level"><i class="icon-remove"></i></a>
+    </td>
+    <td><input  type="checkbox" name="required"> Required</td>
+    <td><input  class="has_code" type="checkbox" name="has_code"> Has Code</td>
+    <td><input  class="hide code" type="text" name="code" maxlength="30"></td>
+  </tr>
+</script>
+
 {% endblock %}
 
 {% block javascripts %}
