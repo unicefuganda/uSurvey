@@ -159,12 +159,14 @@ class USSDRegisterHousehold(USSD):
                 self.REGISTRATION_DICT[question.text] = self.format_gender_response(question)
             member_dict[member_fields[count]] = self.REGISTRATION_DICT[question.text]
             count += 1
-        member_dict['household'] = self.household
+
         if not self.is_head:
             object_to_create = HouseholdMember
         else:
             object_to_create = HouseholdHead
-        member = object_to_create.objects.create(**member_dict)
+
+        member = object_to_create.objects.create(surname=member_dict['surname'], male=member_dict['male'],
+                                                 date_of_birth=member_dict['date_of_birth'], household=self.household)
 
         self.set_in_session('HOUSEHOLD_MEMBER', member)
 
