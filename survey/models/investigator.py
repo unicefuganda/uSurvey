@@ -83,6 +83,14 @@ class Investigator(BaseModel):
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0]
 
+    def last_registered(self):
+        members = []
+        for household in self.households.all():
+            all_members = household.household_member.all()
+            if all_members:members.append(all_members.latest())
+        if members:
+            return sorted(members, key=lambda x: x.created, reverse=True)[0]
+
     def last_answered_question(self):
         return self.last_answered().question
 
@@ -170,6 +178,16 @@ class Investigator(BaseModel):
     def has_open_batch(self):
         locations = self.location.get_ancestors(include_self=True)
         return BatchLocationStatus.objects.filter(location__in=locations).count() > 0
+
+    def created_member_within(self, minutes):
+        last_member = self.last_registered()
+
+        if not last_member:
+            return False
+
+        last_active = last_member.created
+        timeout = datetime.datetime.utcnow().replace(tzinfo=last_active.tzinfo) - datetime.timedelta(minutes=minutes)
+        return last_active >= timeout
 
     def was_active_within(self, minutes):
         last_answered = self.last_answered()

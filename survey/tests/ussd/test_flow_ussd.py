@@ -3,12 +3,14 @@ import datetime
 from random import randint
 import urllib2
 from django.test import TestCase, Client
+from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdBatchCompletion, QuestionModule
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
+from survey.ussd.ussd_survey import USSDSurvey
 
 
 class USSDTestCompleteFlow(USSDBaseTest):
@@ -34,11 +36,13 @@ class USSDTestCompleteFlow(USSDBaseTest):
             'ussdRequestString': '',
             'response': "false"
         }
+        self.kampala = Location.objects.create(name="Kampala")
+        self.backend = Backend.objects.create(name='test')
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''),
-                                                        location=Location.objects.create(name="Kampala"),
-                                                        backend=Backend.objects.create(name='something'))
+                                                        location=self.kampala,
+                                                        backend=self.backend)
 
         self.head_group = HouseholdMemberGroup.objects.create(name="General", order=0)
         self.condition = GroupCondition.objects.create(value='HEAD', attribute="GENERAL", condition="EQUALS")
@@ -99,7 +103,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
         member_list_2 = "%s\n5: %s\n6: %s\n7: %s\n8: %s\n*: Back" % (
             USSD.MESSAGES['MEMBERS_LIST'], member_4.surname, member_5.surname,
             member_6.surname, member_7.surname)
-        self.reset_session()
+
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         response = self.select_household()
         response_string = "responseString=%s&action=request" % member_list_1
@@ -145,10 +152,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
         household2_member = self.create_household_member("Member 2", self.household_head_2.household)
 
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-
-        response = self.reset_session()
-        response_string = "responseString=%s&action=request" % homepage
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response = self.reset_session()
+            response_string = "responseString=%s&action=request" % homepage
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
         households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (
             USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname,
@@ -248,11 +255,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         self.set_questions_answered_to_twenty_minutes_ago()
 
-        self.ussd_params['response'] = "false"
-        self.ussd_params['ussdRequestString'] = ""
-        self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response = self.reset_session()
 
-        response = self.client.post('/ussd', data=self.ussd_params)
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -349,7 +354,8 @@ class USSDTestCompleteFlow(USSDBaseTest):
     def test_should_ask_to_resume_questions_or_go_back_to_member_list_upon_session_timeout_or_session_cancel(self):
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
 
-        response = self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response = self.reset_session()
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
         self.take_survey()
@@ -380,7 +386,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.household_head_3.batch_completed(self.batch)
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
 
-        response = self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response = self.reset_session()
+
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -407,7 +415,8 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         self.batch.close_for_location(self.investigator.location)
         self.batch_b.open_for_location(self.investigator.location)
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
 
         households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'],
                                                                          self.household_head_1.surname,
@@ -448,4 +457,89 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         response = self.select_household_member()
         response_string = "responseString=%s&action=request" % self.question_1.text
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_ussd_shows_resume_if_investigator_dials_when_all_households_are_complete(self):
+        masaka = Location.objects.create(name="Masaka")
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                             uid='10')
+        household_head = HouseholdHead.objects.create(household=household,
+                                                      surname="Name " + str(randint(1, 9999)),
+                                                      date_of_birth=datetime.date(1980, 9, 1))
+
+        self.batch.open_for_location(investigator.location)
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+        self.ussd_params['msisdn'] = investigator.mobile_number
+        self.take_survey()
+        self.select_household()
+        self.select_household_member()
+
+        self.respond("1")
+        response = self.respond("1")
+
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES[
+            "SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS"]
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.reset_session()
+
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        print 'TESTING FROM HERE'
+        response = self.respond("1")
+
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES[
+        "SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS"]
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        self.reset_session()
+        response = self.respond("2")
+        households_member_list = "%s\n1: %s - (HEAD)*" % (USSD.MESSAGES['MEMBERS_LIST'], household_head.surname)
+        response_string = "responseString=%s&action=request" % households_member_list
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_resume_message_if_investigator_dials_after_completing_registering_a_household(self):
+        masaka = Location.objects.create(name="Masaka")
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                             uid='10')
+        HouseholdHead.objects.create(household=household,
+                                                      surname="Name " + str(randint(1, 9999)),
+                                                      date_of_birth=datetime.date(1980, 9, 1))
+        registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=4)
+        module = QuestionModule.objects.create(name='Registration')
+
+        Question.objects.create(module=module, text="Please Enter the name",
+                                             answer_type=Question.TEXT, order=1, group=registration_group)
+
+        Question.objects.create(module=module, text="Please Enter the age",
+                                answer_type=Question.TEXT, order=2, group=registration_group)
+
+        Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
+                                answer_type=Question.NUMBER, order=3, group=registration_group)
+        selected_household_id = '2'
+        household = Household.objects.get(uid=selected_household_id)
+        HouseholdHead.objects.create(household=household, surname="head_registered",
+                                            date_of_birth=datetime.datetime(1980, 02, 02), male=False)
+
+        self.reset_session()
+        self.ussd_params['msisdn'] = investigator.mobile_number
+        self.register_household()
+        self.select_household()
+        self.respond("Name")
+        self.respond("2")
+        response = self.respond("20")
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+        response = self.reset_session()
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)

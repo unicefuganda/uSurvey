@@ -34,7 +34,6 @@ class USSDBaseView(object):
 
         if (not answer or answer == '10') and self.is_new_request():
             action, responseString = self.ussd_survey.render_welcome_or_resume()
-
         elif self.is_registering_household is None:
             action = self.ussd_survey.ACTIONS['REQUEST']
             responseString =''

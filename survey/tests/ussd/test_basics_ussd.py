@@ -4,6 +4,7 @@ from random import randint
 import urllib2
 from django.http import HttpRequest
 from django.test import TestCase, Client
+from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule
@@ -57,7 +58,10 @@ class USSDTest(USSDBaseTest):
                                                            date_of_birth='1989-02-02')
         household_member2 = HouseholdMember.objects.create(household=self.household, surname="xyz", male=False,
                                                            date_of_birth='1989-02-02')
-        self.reset_session()
+
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         response = self.select_household()
         members_list = "%s\n1: %s - (HEAD)*\n2: %s*\n3: %s*" % (
@@ -67,11 +71,13 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_renders_welcome_message_if_investigator_does_not_select_option_one_or_two_from_welcome_screen(self):
-        self.reset_session()
-        response = self.respond('10')
-        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
-        response_string = "responseString=%s&action=request" % homepage
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
+            response = self.respond('10')
+            homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+            response_string = "responseString=%s&action=request" % homepage
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_no_households(self):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890",
@@ -92,7 +98,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -121,7 +129,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -159,7 +169,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -207,7 +219,9 @@ class USSDTest(USSDBaseTest):
             question.text, option_4.text, option_5.text, option_6.text, back_text, next_text)
         page_3 = "%s\n7: %s\n%s" % (question.text, option_7.text, back_text)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -250,7 +264,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -280,7 +296,9 @@ class USSDTest(USSDBaseTest):
 
         question_1.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
 
@@ -302,7 +320,9 @@ class USSDTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
         question_1.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -325,7 +345,9 @@ class USSDTest(USSDBaseTest):
         option_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
 
@@ -356,7 +378,9 @@ class USSDTest(USSDBaseTest):
         question_2.batches.add(self.batch)
         AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
                                   condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         response = self.select_household("1")
 
@@ -397,7 +421,9 @@ class USSDTest(USSDBaseTest):
 
         self.set_questions_answered_to_twenty_minutes_ago()
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         response = self.select_household("2")
 
@@ -411,7 +437,9 @@ class USSDTest(USSDBaseTest):
         response_string = "responseString=%s&action=request" % question_1.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         response = self.take_survey()
 
         households_list_1 = "%s\n1: %s*\n2: %s" % (
@@ -434,7 +462,10 @@ class USSDTest(USSDBaseTest):
         question_2.batches.add(self.batch)
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
-        self.reset_session()
+
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         response = self.select_household()
         members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
@@ -469,7 +500,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         response = self.select_household()
 
@@ -503,7 +536,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         response = self.select_household()
 
@@ -537,7 +572,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         response = self.select_household()
 
@@ -564,25 +601,29 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_welcome_screen_should_show_message_and_options_for_registration_and_take_survey(self):
-        response = self.reset_session()
-        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
-        response_string = "responseString=%s&action=request" % homepage
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response = self.reset_session()
+            homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+            response_string = "responseString=%s&action=request" % homepage
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_choosing_take_survey_should_render_household_list(self):
-        response = self.reset_session()
-        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
-        response_string = "responseString=%s&action=request" % homepage
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-        response = self.take_survey()
-        households_list_1 = "%s\n1: %s*\n2: %s*" % (
-        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
-        response_string = "responseString=%s&action=request" % households_list_1
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response = self.reset_session()
+            homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+            response_string = "responseString=%s&action=request" % homepage
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+            response = self.take_survey()
+            households_list_1 = "%s\n1: %s*\n2: %s*" % (
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+            response_string = "responseString=%s&action=request" % households_list_1
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_choosing_registering_HH_should_set_cache(self):
-        response = self.reset_session()
         self.investigator = Investigator.objects.get(id=self.investigator.pk)
+        self.batch.close_for_location(self.investigator.location)
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response = self.reset_session()
         homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -599,7 +640,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
-        response = self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response= self.reset_session()
+
         homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)

@@ -1,10 +1,10 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from django.test import TestCase
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
-from survey.models import AnswerRule
+from survey.models import AnswerRule, HouseholdHead
 
 from survey.models.batch import Batch
 from survey.investigator_configs import COUNTRY_PHONE_CODE
@@ -24,13 +24,16 @@ class InvestigatorTest(TestCase):
         self.backend = Backend.objects.create(name='something')
         self.kampala = Location.objects.create(name="Kampala")
         self.investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                  location=self.kampala,
-                                                  backend=self.backend)
+                                                        location=self.kampala,
+                                                        backend=self.backend)
 
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+                                                  uid=0)
 
         self.household_member = HouseholdMember.objects.create(surname="Member",
-                                                               date_of_birth=date(1980, 2, 2), male=False, household=self.household)
+                                                               date_of_birth=date(1980, 2, 2), male=False,
+                                                               household=self.household)
+
     def test_fields(self):
         investigator = Investigator()
         fields = [str(item.attname) for item in investigator._meta.fields]
@@ -197,3 +200,81 @@ class InvestigatorTest(TestCase):
         batch_2.open_for_location(self.investigator.location)
 
         self.assertEqual(batch_1, self.investigator.first_open_batch())
+
+    def test_knows_when_last_registered_member(self):
+        masaka = Location.objects.create(name="Masaka")
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                             uid='10')
+
+        HouseholdHead.objects.create(household=household, surname="head_registered",
+                                     date_of_birth=datetime(1980, 02, 02), male=False)
+        latest_member = HouseholdMember.objects.create(household=household, surname="new member",
+                                                       date_of_birth=datetime(2002, 02, 02), male=False)
+        self.assertEqual(latest_member, investigator.last_registered())
+
+    def test_knows_last_registered_member_is_None_if_no_member_has_been_created_for_investigator_household(self):
+        masaka = Location.objects.create(name="Masaka")
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                             uid='10')
+
+        self.assertIsNone(investigator.last_registered())
+
+    def test_knows_member_was_registered_within_time_out_minutes(self):
+        masaka = Location.objects.create(name="Masaka")
+        TIMEOUT_MINUTES = 5
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                             uid='10')
+
+        HouseholdHead.objects.create(household=household, surname="head_registered",
+                                     date_of_birth=datetime(1980, 02, 02), male=False)
+        HouseholdMember.objects.create(household=household, surname="new member",
+                                        date_of_birth=datetime(2002, 02, 02), male=False)
+
+        self.assertTrue(investigator.created_member_within(TIMEOUT_MINUTES))
+
+    def test_knows_last_member_was_registered_after_time_out_minutes(self):
+        masaka = Location.objects.create(name="Masaka")
+        TIMEOUT_MINUTES = 5
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                             uid='10')
+
+        household_head = HouseholdHead.objects.create(household=household, surname="head_registered",
+                                     date_of_birth=datetime(1980, 02, 02), male=False)
+        household_member = HouseholdMember.objects.create(household=household, surname="new member",
+                                        date_of_birth=datetime(2002, 02, 02), male=False)
+
+        household_head.created -= timedelta(minutes=(TIMEOUT_MINUTES + 2), seconds=1)
+        household_head.save()
+
+        household_member.created -= timedelta(minutes=(TIMEOUT_MINUTES + 2), seconds=1)
+        household_member.save()
+
+        self.assertFalse(investigator.created_member_within(TIMEOUT_MINUTES))
+
+    def test_knows_member_was_registered_within_time_out_minutes_is_false_if_no_member_exists(self):
+        masaka = Location.objects.create(name="Masaka")
+        TIMEOUT_MINUTES = 5
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                             uid='10')
+
+        self.assertFalse(investigator.created_member_within(TIMEOUT_MINUTES))

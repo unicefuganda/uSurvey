@@ -53,7 +53,7 @@ class USSDSurvey(USSD):
 
         if self.investigator.completed_open_surveys():
             self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
-            self.investigator.clear_interview_caches()
+            self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
         elif self.household_member.survey_completed():
             if self.current_member_is_done:
                 self.restart_survey()
@@ -93,8 +93,9 @@ class USSDSurvey(USSD):
         else:
             self.end_interview(current_batch)
 
-    def render_resume_message(self):
+    def render_resume_message(self, is_registering_household):
         self.responseString = self.MESSAGES['RESUME_MESSAGE']
+        self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', is_registering_household)
         self.action = self.ACTIONS['REQUEST']
         self.set_in_session('IS_RESUMING', True)
 
@@ -203,7 +204,7 @@ class USSDSurvey(USSD):
         return False
 
     def is_active(self):
-        return self.investigator.was_active_within(self.TIMEOUT_MINUTES)
+        return self.investigator.was_active_within(self.TIMEOUT_MINUTES) or self.investigator.created_member_within(self.TIMEOUT_MINUTES)
 
     def can_resume_survey(self, is_registering):
         return is_registering or self.investigator.has_open_batch()
@@ -232,11 +233,12 @@ class USSDSurvey(USSD):
 
     def render_welcome_or_resume(self):
         self.action = self.ACTIONS['REQUEST']
+        self.is_registering_household = self.investigator.get_from_cache('IS_REGISTERING_HOUSEHOLD')
         if not self.is_active() or not self.can_resume_survey(self.is_registering_household):
             self.responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
             self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', None)
         else:
-            self.render_resume_message()
+            self.render_resume_message(self.is_registering_household)
         return self.action, self.responseString
 
     def behave_like_new_request(self):

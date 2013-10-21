@@ -5,6 +5,7 @@ from random import randint
 
 from django.test import TestCase
 from django.test.client import Client
+from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import HouseholdMemberGroup, GroupCondition
@@ -17,6 +18,7 @@ from survey.models.investigator import Investigator
 from survey.models.question import Question
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import *
+from survey.ussd.ussd_survey import USSDSurvey
 
 
 class USSDOpenBatchTest(USSDBaseTest):
@@ -113,7 +115,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.batch.open_for_location(self.location)
 
         self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -139,7 +143,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.batch_1.open_for_location(self.location)
 
         self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -178,7 +184,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
 
     def test_with_second_batch_open(self):
         self.batch_1.open_for_location(self.location)
-        self.reset_session()
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()
@@ -196,7 +204,10 @@ class USSDWithMultipleBatches(USSDBaseTest):
 
     def test_with_batch_open_for_parent_location(self):
         self.batch.open_for_location(self.uganda)
-        self.reset_session()
+
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
         self.take_survey()
         self.select_household()
         response = self.select_household_member()

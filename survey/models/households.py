@@ -353,6 +353,7 @@ class HouseholdMember(BaseModel):
 
     class Meta:
         app_label = 'survey'
+        get_latest_by = 'created'
 
 
 class HouseholdHead(HouseholdMember):
