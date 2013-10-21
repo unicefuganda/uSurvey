@@ -41,8 +41,8 @@ def when_i_open_batch_for_a_location(step):
 
 @step(u'Then I should see it is open for that location in db')
 def then_i_should_see_it_is_open_for_that_location_in_db(step):
-    assert BatchLocationStatus.objects.filter(location = world.districts[1]).count() == 1
-    assert BatchLocationStatus.objects.filter(location = world.districts[0]).count() == 0
+    assert BatchLocationStatus.objects.filter(location=world.districts[1]).count() == 1
+    assert BatchLocationStatus.objects.filter(location=world.districts[0]).count() == 0
 
 @step(u'When I close batch for a location')
 def when_i_close_batch_for_a_location(step):
