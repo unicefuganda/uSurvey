@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.forms.formsets import formset_factory
+from django.template.defaultfilters import slugify
 from django.test import Client
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.forms.location_details import LocationDetailsForm
@@ -105,3 +106,13 @@ class LocationHierarchyTest(BaseTest):
         response = self.client.post('/add_location_hierarchy/', data=levels_data)
         location_types = LocationType.objects.all()
         self.assertEqual(1, location_types.count())
+
+    def test_saving_already_existing_location_hierarchy_type(self):
+        levels_data = {'country': self.uganda.id, 'form-0-levels': 'Region', 'form-TOTAL_FORMS': 1,
+                       'form-INITIAL_FORMS': 0}
+        region = LocationType.objects.create(name=levels_data['form-0-levels'], slug =slugify(levels_data['form-0-levels']))
+        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        location_types = LocationType.objects.all()
+        self.assertEqual(2, location_types.count())
+        self.assertIn(region, location_types)
+        self.assertIn(self.uganda.type, location_types)

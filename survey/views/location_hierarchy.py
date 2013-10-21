@@ -18,7 +18,7 @@ def add(request):
 
             if details_formset.is_valid():
                 for form in details_formset.forms:
-                    location_type = LocationType.objects.create(name=form.cleaned_data.get('levels'), slug =slugify(form.cleaned_data.get('levels')))
+                    location_type, status = LocationType.objects.get_or_create(name=form.cleaned_data.get('levels'), slug =slugify(form.cleaned_data.get('levels')))
                     details = form.save(commit=False)
                     details.location_type=location_type
                     details.country = selected_country
