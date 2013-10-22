@@ -59,6 +59,7 @@ class LocationHierarchyTest(BaseTest):
         self.assertEqual(2, location_types.count())
         location_type_created = LocationType.objects.get(name='Region')
         self.failUnless(location_type_created)
+        self.assertIn("Location Hierarchy successfully created.", response.cookies['messages'].value)
 
     def test_should_save_location_types_if_multiple_levels_after_post(self):
         levels_data = {'country': self.uganda.id,

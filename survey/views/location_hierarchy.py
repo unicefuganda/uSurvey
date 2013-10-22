@@ -29,6 +29,7 @@ def add(request):
                     details.location_type=location_type
                     details.country = selected_country
                     details.save()
+                messages.success(request, "Location Hierarchy successfully created.")
                 return HttpResponseRedirect('/')
         else:
             messages.error(request,"levels not saved")

@@ -26,37 +26,50 @@ def and_i_should_see_country_present_in_dropdown(step):
 
 @step(u'And I should see a row for level details field')
 def and_i_should_see_a_row_for_level_details_field(step):
-    world.browser.find_by_name('form-0-levels')
-    world.browser.find_by_name('form-0-required')
-    world.browser.find_by_name('form-0-has_code')
-    world.browser.find_by_name('form-0-code')
+    world.page.see_field_details('Level 1', 'form-0')
 
-@step(u'And I should see a link to add another row')
-def and_i_should_see_a_link_to_add_another_row(step):
-    world.page.find_link_by_text('add another')
-
-@step(u'And I should see a link to remove a row')
-def and_i_should_see_a_link_to_remove_a_row(step):
-    world.page.find_link_by_text('remove')
-
-@step(u'When I click add row link')
+@step(u'When I click add row icon')
 def when_i_click_add_row_link(step):
-    world.page.click_link_by_text('add another')
+    world.page.click_by_css(".icon-plus")
 
 @step(u'Then I should see anther row for levels details field')
 def then_i_should_see_anther_row_for_levels_details_field(step):
-    world.browser.find_by_name('form-1-levels')
-    world.browser.find_by_name('form-1-required')
-    world.browser.find_by_name('form-1-has_code')
-    world.browser.find_by_name('form-1-code')
+    world.page.see_field_details('Level 1', 'form-0')
+    world.page.see_field_details('Level 2', 'form-1')
 
-@step(u'When I click remove row link')
+@step(u'When I click remove row icon')
 def when_i_click_remove_row_link(step):
-    world.browser.find_by_css('.delete-row').last.click()
+    world.browser.find_by_css('.icon-remove').last.click()
 
 @step(u'Then I should see row for levels details field removed')
 def then_i_should_see_row_for_levels_details_field_removed(step):
-    world.page.field_not_present('form-0-levels')
-    world.page.field_not_present('form-0-required')
-    world.page.field_not_present('form-0-has_code')
-    world.page.field_not_present('form-0-code')
+    world.page.see_field_details('Level 1', 'form-0')
+    world.page.see_field_details('Level 2', 'form-1', False)
+
+@step(u'And the code field is hidden')
+def and_the_code_field_is_hidden(step):
+    world.page.is_hidden('form-0-code')
+
+@step(u'When I check has_code field')
+def when_i_check_has_code_field(step):
+    world.page.click_by_css('.has_code')
+
+@step(u'Then code field is shown')
+def then_code_field_is_shown(step):
+    world.page.is_hidden('code', False)
+
+@step(u'When I fill details')
+def when_i_fill_details(step):
+    data = {'country': world.country.id, 'form-0-levels': 'Region',
+            'form-0-levels': 'Hill', 'form-0-required':'on',
+            'form-0-has_code':'on', 'form-0-code':'0001',
+            }
+    world.page.fill_valid_values(data)
+
+@step(u'And I click the create hierarchy button')
+def and_i_click_the_create_hierarchy_button(step):
+    world.page.submit()
+
+@step(u'Then I should see location hierarchy successfully created')
+def then_i_should_see_location_hierarchy_successfully_created(step):
+    world.page.see_success_message('Location Hierarchy', 'created')

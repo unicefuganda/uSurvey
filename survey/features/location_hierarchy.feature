@@ -8,9 +8,13 @@ Feature: Location hierarchy
     And I should see country dropdown
     And I should see country present in dropdown
     And I should see a row for level details field
-    And I should see a link to add another row
-    And I should see a link to remove a row
-    When I click add row link
+    When I click add row icon
     Then I should see anther row for levels details field
-    When I click remove row link
+    When I click remove row icon
     Then I should see row for levels details field removed
+    And the code field is hidden
+    When I check has_code field
+    Then code field is shown
+    When I fill details
+    And I click the create hierarchy button
+    Then I should see location hierarchy successfully created

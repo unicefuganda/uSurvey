@@ -204,3 +204,6 @@ class PageObject(object):
 
     def find_element_by_css(self, selector):
         assert self.browser.find_by_css(selector).first
+
+    def is_hidden(self, field, status=True):
+        assert_equals(status, not self.browser.find_by_css('.hide').first.visible)
