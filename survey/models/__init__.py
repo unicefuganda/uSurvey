@@ -14,28 +14,31 @@ from survey.models.surveys import Survey
 from survey.models.users import UserProfile
 from survey.models.question_module import QuestionModule
 from survey.models.location_type_details import LocationTypeDetails
-__all__= [
-            'Answer',
-            'AnswerRule',
-            'TextAnswer',
-            'NumericalAnswer',
-            'MultiChoiceAnswer',
-            'Backend'
-            'BaseModel',
-            'Batch',
-            'Formula',
-            'HouseholdMemberGroup',
-            'Household',
-            'HouseholdHead',
-            'HouseholdBatchCompletion',
-            'GroupCondition',
-            'Investigator',
-            'LocationAutoComplete',
-            'Question',
-            'QuestionOption',
-            'RandomHouseHoldSelection',
-            'Survey',
-            'UserProfile',
-            'QuestionModule',
-            'LocationTypeDetails'
-        ]
+from survey.models.batch_question_order import BatchQuestionOrder
+
+__all__ = [
+    'Answer',
+    'AnswerRule',
+    'TextAnswer',
+    'NumericalAnswer',
+    'MultiChoiceAnswer',
+    'Backend'
+    'BaseModel',
+    'Batch',
+    'Formula',
+    'HouseholdMemberGroup',
+    'Household',
+    'HouseholdHead',
+    'HouseholdBatchCompletion',
+    'GroupCondition',
+    'Investigator',
+    'LocationAutoComplete',
+    'Question',
+    'QuestionOption',
+    'RandomHouseHoldSelection',
+    'Survey',
+    'UserProfile',
+    'QuestionModule',
+    'LocationTypeDetails',
+    'BatchQuestionOrder'
+]

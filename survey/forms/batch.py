@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+from survey.models import BatchQuestionOrder
 from survey.models.batch import Batch
 
 from survey.models.formula import *
@@ -29,13 +30,15 @@ class BatchQuestionsForm(ModelForm):
         model = Batch
         fields = ['questions']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, batch=None, *args, **kwargs):
         super(BatchQuestionsForm, self).__init__(*args, **kwargs)
-        self.fields['questions'].queryset = Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP')
+        self.fields['questions'].queryset = Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP').exclude(batches=batch)
 
     def save_question_to_batch(self, batch):
         for question in self.cleaned_data['questions']:
             question.save()
+            order = BatchQuestionOrder.next_question_order_for(batch)
+            BatchQuestionOrder.objects.create(question=question, batch=batch, order=order)
             question.batches.add(batch)
 
     def save(self, commit=True, *args, **kwargs):

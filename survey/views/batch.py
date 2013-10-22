@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 
 from survey.investigator_configs import *
-from survey.models import HouseholdMemberGroup, Question, QuestionModule
+from survey.models import HouseholdMemberGroup, Question, QuestionModule, BatchQuestionOrder
 from survey.models.surveys import Survey
 from survey.models.batch import Batch, BatchLocationStatus
 
@@ -105,12 +105,13 @@ def delete(request, survey_id, batch_id):
 
 @permission_required('auth.can_view_batches')
 def assign(request, batch_id):
-    batch_questions_form = BatchQuestionsForm()
+    batch = Batch.objects.get(id=batch_id)
+    batch_questions_form = BatchQuestionsForm(batch=batch)
 
     groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')
     batch = Batch.objects.get(id=batch_id)
     if request.method == 'POST':
-        batch_question_form = BatchQuestionsForm(data=request.POST, instance=batch)
+        batch_question_form = BatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
         if batch_question_form.is_valid():
             batch_question_form.save()
             success_message = "Questions successfully assigned to batch: %s." % batch.name.capitalize()
@@ -123,6 +124,18 @@ def assign(request, batch_id):
     return render(request, 'batches/assign.html',
                   context)
 
+@permission_required('auth.can_view_batches')
+def update_orders(request, batch_id):
+    batch = Batch.objects.get(id=batch_id)
+    new_orders = request.POST.getlist('order_information', None)
+    if new_orders:
+        for new_order in new_orders:
+            BatchQuestionOrder.update_question_order(new_order, batch)
+        success_message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
+        messages.success(request, success_message)
+    else:
+        messages.error(request, 'No questions orders were updated.')
+    return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
 
 @login_required
 def check_name(request, survey_id):

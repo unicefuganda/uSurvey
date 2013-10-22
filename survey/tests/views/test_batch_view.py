@@ -3,7 +3,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import PRIME_LOCATION_TYPE
-from survey.models import HouseholdMemberGroup, QuestionModule, Investigator, GroupCondition
+from survey.models import HouseholdMemberGroup, QuestionModule, Investigator, GroupCondition, BatchQuestionOrder
 from survey.models.households import HouseholdMember, Household
 from survey.models.surveys import Survey
 from survey.models.question import Question
@@ -290,6 +290,9 @@ class BatchViewsTest(BaseTest):
         q2 = Question.objects.create(text="question2", answer_type=Question.TEXT)
         q1.batches.add(batch)
         q2.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(batch=batch, question=q1, order=1)
+        BatchQuestionOrder.objects.create(batch=batch, question=q2, order=2)
 
         sub_question1 = Question.objects.create(text='sub1', answer_type=Question.NUMBER, subquestion=True, parent=q1)
         sub_question2 = Question.objects.create(text='sub2', answer_type=Question.NUMBER, subquestion=True, parent=q1)

@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.logic import LogicForm
 from survey.forms.question_filter import QuestionFilterForm
-from survey.models import AnswerRule, QuestionModule
+from survey.models import AnswerRule, QuestionModule, BatchQuestionOrder
 
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
@@ -48,7 +48,6 @@ def _get_questions_based_on_filter(batch_id, group_id='All', module_id='All', qu
 
     return Question.objects.filter(subquestion=False, **filter_condition).exclude(group__name='REGISTRATION GROUP')
 
-
 @permission_required('auth.can_view_batches')
 def index(request, batch_id):
     batch = None
@@ -72,17 +71,16 @@ def index(request, batch_id):
 
     questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
 
-    if not questions.exists():
+    if not questions:
         messages.error(request, 'There are no questions associated with this batch yet.')
-    all_questions = questions.exclude(subquestion=True)
 
     question_rules_for_batch = {}
 
     if batch:
-        for question in all_questions:
+        for question in questions:
             question_rules_for_batch[question] = question.rules_for_batch(batch)
 
-    context = {'questions': all_questions, 'request': request, 'batch': batch,
+    context = {'questions': questions, 'request': request, 'batch': batch,
                'question_filter_form': question_filter_form, 'rules_for_batch': question_rules_for_batch}
     return render(request, 'questions/index.html', context)
 

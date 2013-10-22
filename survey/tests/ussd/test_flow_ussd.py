@@ -44,11 +44,11 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                                         location=self.kampala,
                                                         backend=self.backend)
 
-        self.head_group = HouseholdMemberGroup.objects.create(name="General", order=0)
+        self.head_group = HouseholdMemberGroup.objects.create(name="General", order=1)
         self.condition = GroupCondition.objects.create(value='HEAD', attribute="GENERAL", condition="EQUALS")
         self.condition.groups.add(self.head_group)
 
-        self.member_group = HouseholdMemberGroup.objects.create(name="Less than 10", order=1)
+        self.member_group = HouseholdMemberGroup.objects.create(name="Less than 10", order=2)
         self.member_condition = GroupCondition.objects.create(value=10, attribute="AGE", condition="LESS_THAN")
         self.member_condition.groups.add(self.member_group)
 
@@ -491,11 +491,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
         response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        print 'TESTING FROM HERE'
         response = self.respond("1")
 
         response_string = "responseString=%s&action=end" % USSD.MESSAGES[
-        "SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS"]
+            "SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS"]
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         self.reset_session()
@@ -513,13 +512,13 @@ class USSDTestCompleteFlow(USSDBaseTest):
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10')
         HouseholdHead.objects.create(household=household,
-                                                      surname="Name " + str(randint(1, 9999)),
-                                                      date_of_birth=datetime.date(1980, 9, 1))
+                                     surname="Name " + str(randint(1, 9999)),
+                                     date_of_birth=datetime.date(1980, 9, 1))
         registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=4)
         module = QuestionModule.objects.create(name='Registration')
 
         Question.objects.create(module=module, text="Please Enter the name",
-                                             answer_type=Question.TEXT, order=1, group=registration_group)
+                                answer_type=Question.TEXT, order=1, group=registration_group)
 
         Question.objects.create(module=module, text="Please Enter the age",
                                 answer_type=Question.TEXT, order=2, group=registration_group)
@@ -529,7 +528,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
         selected_household_id = '2'
         household = Household.objects.get(uid=selected_household_id)
         HouseholdHead.objects.create(household=household, surname="head_registered",
-                                            date_of_birth=datetime.datetime(1980, 02, 02), male=False)
+                                     date_of_birth=datetime.datetime(1980, 02, 02), male=False)
 
         self.reset_session()
         self.ussd_params['msisdn'] = investigator.mobile_number
@@ -542,4 +541,54 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
         response = self.reset_session()
         response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_knows_how_to_get_questions_for_non_head_member(self):
+        masaka = Location.objects.create(name="Masaka")
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                             uid='10')
+        household_head = HouseholdHead.objects.create(household=household,
+                                                      surname="Name " + str(randint(1, 9999)),
+                                                      date_of_birth=datetime.date(1980, 9, 1))
+        household_member = HouseholdMember.objects.create(household=household,
+                                                        surname="Member Name " + str(randint(1, 9999)),
+                                                        date_of_birth=datetime.date(2010, 9, 1))
+
+        another_member_group = HouseholdMemberGroup.objects.create(name="Less than 15", order=3)
+        another_member_condition = GroupCondition.objects.create(value=15, attribute="AGE", condition="LESS_THAN")
+        another_member_condition.groups.add(another_member_group)
+
+        HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+
+        member_question = Question.objects.create(group=self.member_group, text="Member qn", answer_type=Question.NUMBER,order=1)
+        self.batch.questions.add(member_question)
+
+        self.batch.open_for_location(investigator.location)
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+        self.ussd_params['msisdn'] = investigator.mobile_number
+        self.take_survey()
+        self.select_household()
+        self.select_household_member()
+
+        self.respond("1")
+        response = self.respond("1")
+
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES[
+            "MEMBER_SUCCESS_MESSAGE"]
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond("1")
+
+        households_member_list = "%s\n1: %s - (HEAD)*\n2: %s" % (USSD.MESSAGES['MEMBERS_LIST'], household_head.surname, household_member.surname)
+        response_string = "responseString=%s&action=request" % households_member_list
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.select_household_member("2")
+
+        response_string = "responseString=%s&action=request" % self.question_3.text
         self.assertEquals(urllib2.unquote(response.content), response_string)

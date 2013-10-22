@@ -7,8 +7,8 @@ from survey.models.base import BaseModel
 
 class Batch(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
-    name = models.CharField(max_length=100, blank=False,null=True)
-    description = models.CharField(max_length=300,blank=True,null=True)
+    name = models.CharField(max_length=100, blank=False, null=True)
+    description = models.CharField(max_length=300, blank=True, null=True)
     survey = models.ForeignKey(Survey, null=True, related_name="batch")
 
     def save(self, *args, **kwargs):

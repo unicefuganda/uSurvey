@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from mock import patch
 from survey.forms.logic import LogicForm
 from survey.forms.question_filter import QuestionFilterForm
-from survey.models import AnswerRule, QuestionModule
+from survey.models import AnswerRule, QuestionModule, BatchQuestionOrder
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
 
@@ -32,6 +32,9 @@ class QuestionsViews(BaseTest):
         self.question_2 = Question.objects.create(text="How many of them are male?",
                                                   answer_type=Question.NUMBER, order=2,
                                                   module=self.module)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_2, order=2)
+
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
 
@@ -129,6 +132,8 @@ class QuestionsViews(BaseTest):
                                              answer_type=Question.MULTICHOICE, order=3,
                                              module=new_module, group=self.household_member_group)
         question_3.batches.add(new_batch)
+        BatchQuestionOrder.objects.create(batch=new_batch, question=question_3, order=1)
+
 
         questions = _get_questions_based_on_filter(new_batch.id, str(self.household_member_group.id),
                                                    str(new_module.id), Question.MULTICHOICE)
@@ -150,6 +155,8 @@ class QuestionsViews(BaseTest):
                                              answer_type=Question.MULTICHOICE, order=3,
                                              module=new_module, group=self.household_member_group)
         question_3.batches.add(new_batch)
+        BatchQuestionOrder.objects.create(batch=new_batch, question=question_3, order=1)
+
 
         questions = _get_questions_based_on_filter(None, str(self.household_member_group.id), str(new_module.id),
                                                    Question.MULTICHOICE)
@@ -331,11 +338,15 @@ class QuestionsViews(BaseTest):
                                                                                                    order=2),
                                                          module=self.module)
 
+
         all_group_questions = [group_question, group_question_again]
         another_group_questions = [another_group_question]
 
+        order = 1
         for question in [group_question, group_question_again, another_group_question]:
             question.batches.add(self.batch)
+            BatchQuestionOrder.objects.create(batch=self.batch, question=question, order=order)
+            order += 1
 
         filter_form_data = {'groups': self.household_member_group.id, 'module': self.module.id,
                             'question_types': Question.NUMBER, 'batch_id': self.batch.id}
@@ -665,6 +676,8 @@ class QuestionsViews(BaseTest):
                                              answer_type=Question.NUMBER, module=module, group=member_group)
         self.batch.questions.add(question_1)
         self.batch.questions.add(question_2)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         expected_questions = [question_1, question_2]
         excluded_questions = [sub_question, question]
@@ -969,6 +982,10 @@ class LogicViewTest(BaseTest):
         self.question_2 = Question.objects.create(text="Question 2?",
                                                   answer_type=Question.NUMBER, order=2,
                                                   module=self.module)
+
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_2, order=2)
+
         self.question.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
 
@@ -988,7 +1005,7 @@ class LogicViewTest(BaseTest):
         all_questions = response.context['questions']
         self.assertEqual(2, len(all_questions))
         self.assertIn(self.question, all_questions)
-        rule_question = all_questions.get(id=self.question.id)
+        rule_question = Question.objects.get(id=self.question.id)
 
         all_question_batch_rules = response.context['rules_for_batch']
         self.assertEqual(2, len(all_question_batch_rules))

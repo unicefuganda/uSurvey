@@ -53,7 +53,7 @@ class GroupCondition(BaseModel):
     def confirm_male(self, value):
         if str(value) == str(True) or str(value) == str(False):
             return value
-        return  str(value).lower() == "male" or (str(value).lower() == "head" and self.attribute == GroupCondition.GROUP_TYPES['GENERAL'])
+        return str(value).lower() == "male" or (str(value).lower() == "head" and self.attribute == GroupCondition.GROUP_TYPES['GENERAL'])
 
     def matches_condition(self, value):
         if self.condition == GroupCondition.CONDITIONS['EQUALS']:

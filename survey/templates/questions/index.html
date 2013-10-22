@@ -23,7 +23,12 @@
         <br/>
     {% endif %}
 
-    <table class="table table-striped table-bordered table-hover">
+    {% if batch %}
+        <form method="post" accept-charset="utf-8"  action="{% url 'update_question_order_page' batch.id %}">
+        {% csrf_token %}
+    {% endif %}
+
+    <table class="table table-striped table-bordered table-hover" id="questions_table">
         <thead>
         <tr>
             <th class="span8">
@@ -72,6 +77,9 @@
                   </div>
                 {% else %}
                   {{question.text}}
+                {% endif %}
+                {% if batch %}
+                    <input  type="hidden" name="order_information" value="{{ forloop.counter }}-{{ question.id }}"/>
                 {% endif %}
               </td>
               <td>
@@ -136,6 +144,7 @@
                   </div>
                 {% endif %}
               </td>
+
             </tr>
           {% include "base/delete_modal.html" with object_name=question.text id=question.id name="Question" url=question.id|get_url_with_ids:"delete_question_page" %}
           {% if batch %}
@@ -144,9 +153,17 @@
         {% endfor %}
         </tbody>
     </table>
+    {% if batch %}
+        <button type="submit" class="btn btn-primary pull-right" name="save_button">Update Question Order</button>
+        </form>
+    {% endif %}
     {% paginate %}
 {% endblock %}
 
 {% block javascripts %}
+    {% if batch %}
+        <script src="{{STATIC_URL}}js/jquery.tablednd.js" type="text/javascript" charset="utf-8"></script>
+        <script src="{{STATIC_URL}}js/batch_questions.js" type="text/javascript" charset="utf-8"></script>
+    {% endif %}
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

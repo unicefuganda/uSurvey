@@ -213,7 +213,7 @@ class HouseholdMember(BaseModel):
     def get_member_groups(self, order_above=0):
         member_groups = []
         all_groups = HouseholdMemberGroup.objects.all().order_by('order')
-        if order_above:
+        if order_above or (order_above == 0):
             all_groups = all_groups.filter(order__gte=order_above)
 
         for group in all_groups:
