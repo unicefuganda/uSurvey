@@ -11,6 +11,7 @@ from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
 from survey.forms.upload_locations import UploadLocationForm
 from survey.models import LocationTypeDetails
+from survey.views.location_upload_view_helper import UploadLocation
 
 
 def add(request):
@@ -47,8 +48,12 @@ def upload(request):
         file = request.POST.get('file', None)
         if file:
             if file.endswith('.csv'):
-                management.call_command('import_location',file)
-                messages.success(request, 'Locations successfully imported.')
+                uploader = UploadLocation(file)
+                uploaded, message = uploader.upload()
+                if uploaded:
+                    messages.success(request, message)
+                else:
+                    messages.error(request, message)
             else:
                 messages.error(request, 'Only csv file format supported.')
         else:

@@ -191,9 +191,10 @@ class UploadLocationsTest(BaseTest):
         response = self.client.post('/locations/upload/', data=data)
         self.assertIn('File field cannot be empty', response.cookies['messages'].value)
 
-    @patch('django.core.management.call_command')
-    def test_should_give_success_message_if_csv_uploaded(self,mock_import_command):
-        data= {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], u'file': [u'some_file.csv']}
+    @patch('survey.views.location_upload_view_helper.UploadLocation.upload')
+    def test_should_give_success_message_if_csv_uploaded(self, mock_upload):
+        mock_upload.return_value = (True, 'Successfully uploaded')
+        data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], u'file': [u'some_file.csv']}
         response = self.client.post('/locations/upload/', data=data)
-        mock_import_command.assert_called_with('import_location', u'some_file.csv')
-        self.assertIn('Locations successfully imported.', response.cookies['messages'].value)
+        assert mock_upload.called
+        self.assertIn('Successfully uploaded', response.cookies['messages'].value)
