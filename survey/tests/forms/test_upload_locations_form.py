@@ -1,8 +1,5 @@
-import django
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from survey.forms.upload_locations import UploadLocationForm
-from django.test.client import BOUNDARY
 
 
 class UploadLocationFormTest(TestCase):
