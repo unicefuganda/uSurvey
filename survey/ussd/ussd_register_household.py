@@ -37,6 +37,8 @@ class USSDRegisterHousehold(USSD):
     def set_form_in_cache(self):
         if not self.investigator.get_from_cache('registration_dict'):
             self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
+        else:
+            self.REGISTRATION_DICT = self.investigator.get_from_cache('registration_dict')
 
     def set_head_in_cache(self):
         try:
@@ -167,7 +169,6 @@ class USSDRegisterHousehold(USSD):
 
         member = object_to_create.objects.create(surname=member_dict['surname'], male=member_dict['male'],
                                                  date_of_birth=member_dict['date_of_birth'], household=self.household)
-
         self.set_in_session('HOUSEHOLD_MEMBER', member)
 
     def format_age_to_date_of_birth(self, question):
