@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+from lettuce import step, world
+from rapidsms.contrib.locations.models import LocationType
+from survey.features.page_objects.upload_locations import UploadLocationsPage
+from survey.models import LocationTypeDetails
+
+
+@step(u'When I visit upload locations page')
+def and_i_visit_upload_locations_page(step):
+    world.page = UploadLocationsPage(world.browser)
+    world.page.visit()
+
+@step(u'And I have location type and location details objects')
+def and_i_have_location_type_and_location_details_objects(step):
+    world.location_type1 = LocationType.objects.create(name = 'type1',slug='type1')
+    world.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=world.location_type1,country=world.country)
+
+    world.location_type2 = LocationType.objects.create(name = 'type2',slug='type2')
+    world.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=world.location_type2,country=world.country)
+
+@step(u'Then I should see the text message')
+def then_i_should_see_the_text_message(step):
+    world.page.is_text_present('Upload Geographical Locations')
+
+@step(u'And I should see name of the country for which details were added')
+def and_i_should_see_name_of_the_country_for_which_details_were_added(step):
+    world.page.is_text_present(world.country.name)

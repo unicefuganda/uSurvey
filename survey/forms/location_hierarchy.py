@@ -1,7 +1,6 @@
 from django import forms
-from django.forms.formsets import formset_factory, BaseFormSet
+from django.forms.formsets import BaseFormSet
 from rapidsms.contrib.locations.models import Location
-from survey.forms.location_details import LocationDetailsForm
 from survey.models import LocationTypeDetails
 
 
@@ -9,8 +8,8 @@ class BaseArticleFormSet(BaseFormSet):
     def clean(self):
         if any(self.errors):
             return
-        for i in range(0, self.total_form_count()):
-            form = self.forms[i]
+        for form_count in range(0, self.total_form_count()):
+            form = self.forms[form_count]
             has_code = form.cleaned_data.get('has_code',None)
             code = form.cleaned_data.get('code','')
             if has_code:

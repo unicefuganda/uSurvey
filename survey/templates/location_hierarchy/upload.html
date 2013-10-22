@@ -1,0 +1,10 @@
+{% extends "form.html"%}
+{% block title %}
+    Upload Geographical Locations
+{% endblock %}
+{% block pre_form_content %}
+    <p>Country: {{ country_name }}</p>
+{% endblock %}
+{% block display_form_fields %}
+    {% include "naked_form.html" with a_form=upload_form %}
+{% endblock %}

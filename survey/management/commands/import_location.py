@@ -13,7 +13,8 @@ class Command(BaseCommand):
         location_types = []
         for header in headers:
             header = header.strip()
-            location_types.append(LocationType.objects.create(name=header,slug=slugify(header)))
+            location_type, created = LocationType.objects.get_or_create(name=header, slug=slugify(header))
+            location_types.append(location_type)
         for items in csv_file:
             tree_parent = None
             for index, item in enumerate(items):

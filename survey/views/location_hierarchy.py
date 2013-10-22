@@ -1,11 +1,17 @@
 from django.contrib import messages
+from django.core import management
+
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.text import slugify
 from rapidsms.contrib.locations.models import LocationType, Location
+from django.forms.formsets import formset_factory
+
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
-from django.forms.formsets import formset_factory
+from survey.forms.upload_locations import UploadLocationForm
+from survey.models import LocationTypeDetails
+
 
 def add(request):
     DetailsFormSet = formset_factory(LocationDetailsForm, formset=BaseArticleFormSet)
@@ -34,3 +40,21 @@ def add(request):
 
     context = {'hierarchy_form': hierarchy_form, 'button_label': 'Create Hierarchy', 'id': 'hierarchy-form','details_formset':details_formset}
     return render(request,'location_hierarchy/new.html', context)
+
+def upload(request):
+    if request.method == 'POST':
+        file = request.POST.get('file', None)
+        if file:
+            if file.endswith('.csv'):
+                management.call_command('import_location',file)
+                messages.success(request, 'Locations successfully imported.')
+            else:
+                messages.error(request, 'Only csv file format supported.')
+        else:
+            messages.error(request, 'File field cannot be empty')
+        return HttpResponseRedirect('/locations/upload/')
+
+    country_with_location_details_objects = LocationTypeDetails.objects.all()[0].country
+    context = {'button_label': 'Save', 'id': 'upload-locations-form',
+             'country_name': country_with_location_details_objects.name, 'upload_form': UploadLocationForm()}
+    return render(request, 'location_hierarchy/upload.html', context)

@@ -2,9 +2,11 @@ from django.contrib.auth.models import User
 from django.forms.formsets import formset_factory
 from django.template.defaultfilters import slugify
 from django.test import Client
+from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
+from survey.forms.upload_locations import UploadLocationForm
 from survey.models import LocationTypeDetails
 from survey.tests.base_test import BaseTest
 
@@ -107,6 +109,7 @@ class LocationHierarchyTest(BaseTest):
         location_types = LocationType.objects.all()
         self.assertEqual(1, location_types.count())
 
+
     def test_saving_already_existing_location_hierarchy_type(self):
         levels_data = {'country': self.uganda.id, 'form-0-levels': 'Region', 'form-TOTAL_FORMS': 1,
                        'form-INITIAL_FORMS': 0}
@@ -116,3 +119,60 @@ class LocationHierarchyTest(BaseTest):
         self.assertEqual(2, location_types.count())
         self.assertIn(region, location_types)
         self.assertIn(self.uganda.type, location_types)
+
+class UploadLocationsTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_batches')
+        self.assign_permission_to(raj, 'can_view_investigators')
+        self.client.login(username='Rajni', password='I_Rock')
+        country = LocationType.objects.create(name='Country', slug='country')
+        self.uganda = Location.objects.create(name='Uganda', type=country)
+        self.some_other_country = Location.objects.create(name='SomeOtherCountry', type=country)
+        self.location_type1 = LocationType.objects.create(name = 'type1',slug='type1')
+        self.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type1,country=self.uganda)
+
+        self.location_type2 = LocationType.objects.create(name = 'type2',slug='type2')
+        self.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type2,country=self.uganda)
+
+    def test_should_render_success_code(self):
+        response = self.client.get('/locations/upload/')
+        self.assertEqual(200, response.status_code)
+
+    def test_should_render_template(self):
+        response = self.client.get('/locations/upload/')
+        self.assertEqual(200, response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn('location_hierarchy/upload.html', templates)
+
+    def test_should_render_context_data(self):
+        response = self.client.get('/locations/upload/')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.context['button_label'], "Save")
+        self.assertEqual(response.context['id'], "upload-locations-form")
+        self.assertEqual(response.context['country_name'], self.uganda.name)
+        self.assertIsInstance(response.context['upload_form'],UploadLocationForm)
+
+    def test_should_redirect_after_post(self):
+        data={u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], u'file': [u'uganda.txt']}
+        response = self.client.post('/locations/upload/', data=data)
+        self.assertRedirects(response, '/locations/upload/', status_code=302, target_status_code=200, msg_prefix='')
+
+    def test_should_upload_only_csv_file(self):
+        data={u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], u'file': [u'uganda.txt']}
+        response = self.client.post('/locations/upload/', data=data)
+        self.assertIn('Only csv file format supported.', response.cookies['messages'].value)
+
+    def test_should_give_error_message_if_file_not_chosen(self):
+        data={u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], u'file': [u'']}
+        response = self.client.post('/locations/upload/', data=data)
+        self.assertIn('File field cannot be empty', response.cookies['messages'].value)
+
+    @patch('django.core.management.call_command')
+    def test_should_give_success_message_if_csv_uploaded(self,mock_import_command):
+        data= {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], u'file': [u'some_file.csv']}
+        response = self.client.post('/locations/upload/', data=data)
+        mock_import_command.assert_called_with('import_location', u'some_file.csv')
+        self.assertIn('Locations successfully imported.', response.cookies['messages'].value)
