@@ -1,6 +1,6 @@
 from django import forms
 from django.forms.formsets import BaseFormSet
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import LocationTypeDetails
 
 
@@ -24,7 +24,7 @@ class LocationHierarchyForm(forms.Form):
         self.fields['country'] = forms.ChoiceField(label='Country', choices=self.get_country_choices(), widget=forms.Select, required=True)
 
     def get_country_choices(self):
-        existing_country_details = LocationTypeDetails.objects.filter(location_type__name__iexact='country').exclude(country=None)
+        existing_country_details = LocationTypeDetails.objects.exclude(country=None)
         if existing_country_details:
             existing_country = existing_country_details[0].country
             return [(existing_country.id, existing_country.name)]

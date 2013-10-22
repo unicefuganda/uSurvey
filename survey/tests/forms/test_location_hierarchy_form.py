@@ -64,6 +64,7 @@ class LocationHierarchyFormTest(TestCase):
         self.assertIn(message, details_formset.forms[0].errors['code'])
 
     def test_should_show_used_country_as_available_choices_if_any_otherwise_show_all_countries(self):
+        LocationTypeDetails.objects.all().delete()
         other_country = Location.objects.create(name="some other country", type=self.uganda.type)
         LocationTypeDetails.objects.create(required=True,has_code=False, location_type=self.uganda.type, country=self.uganda)
         hierarchy_form = LocationHierarchyForm()
@@ -72,4 +73,5 @@ class LocationHierarchyFormTest(TestCase):
         country_choices = hierarchy_form.fields[field].choices
 
         self.assertEqual(1, len(country_choices))
+        self.assertNotIn((other_country.id, other_country.name),country_choices)
         self.assertEqual((self.uganda.id, self.uganda.name), country_choices[0])
