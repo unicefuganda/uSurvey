@@ -15,11 +15,13 @@ from survey.models.batch import Batch, BatchLocationStatus
 
 class Investigator(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
-    mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=10, unique=True, null=False, blank=False)
+    mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=10,
+                                     unique=True, null=False, blank=False)
     male = models.BooleanField(default=True, verbose_name="Sex")
     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
-                                          blank=False, default='Primary', verbose_name="Highest level of education completed")
+                                          blank=False, default='Primary',
+                                          verbose_name="Highest level of education completed")
     location = models.ForeignKey(Location, null=True)
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
                                 blank=False, default='English', verbose_name="Preferred language of communication")
@@ -28,8 +30,8 @@ class Investigator(BaseModel):
     is_blocked = models.BooleanField(default=False)
 
     HOUSEHOLDS_PER_PAGE = 4
-    PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
-    NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
+    PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings, 'USSD_PAGINATION', None).get('PREVIOUS')
+    NEXT_PAGE_TEXT = "%s: Next" % getattr(settings, 'USSD_PAGINATION', None).get('NEXT')
 
     DEFAULT_CACHED_VALUES = {
         'REANSWER': [],
@@ -37,8 +39,8 @@ class Investigator(BaseModel):
         'CONFIRM_END_INTERVIEW': [],
         'IS_REGISTERING_HOUSEHOLD': None,
         'registration_dict': {},
-        'is_head':None,
-        'is_selecting_member':False
+        'is_head': None,
+        'is_selecting_member': False
     }
 
     def __init__(self, *args, **kwargs):
@@ -49,7 +51,6 @@ class Investigator(BaseModel):
 
     class Meta:
         app_label = 'survey'
-
 
     def has_households(self):
         return self.households.count() > 0
@@ -79,7 +80,7 @@ class Investigator(BaseModel):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
             answer = getattr(self, related_name).all()
-            if answer:answered.append(answer.latest())
+            if answer: answered.append(answer.latest())
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0]
 
@@ -87,7 +88,7 @@ class Investigator(BaseModel):
         members = []
         for household in self.households.all():
             all_members = household.household_member.all()
-            if all_members:members.append(all_members.latest())
+            if all_members: members.append(all_members.latest())
         if members:
             return sorted(members, key=lambda x: x.created, reverse=True)[0]
 
@@ -110,7 +111,6 @@ class Investigator(BaseModel):
                 next_batch = household_member.get_next_batch()
                 next_question = household_member.next_question_in_order(next_batch) if next_batch else None
             return next_question
-
 
         return question
 
@@ -136,16 +136,17 @@ class Investigator(BaseModel):
         questions.append(question)
         self.set_in_cache(label, questions)
 
-    def households_list(self, page=1,registered=False):
+    def households_list(self, page=1, registered=False):
         all_households = list(self.all_households())
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
         households_list = []
         for household in households:
             if not registered:
-                text = "%s: Household-%s" % (all_households.index(household) + 1, household.uid)
+                text = "%s: Household-%s" % (all_households.index(household) + 1, household.random_sample_number)
             else:
-                text = "%s: %s" % (all_households.index(household) + 1, household.get_head().surname)
+                household_head = household.get_head()
+                text = "%s: %s" % (all_households.index(household) + 1, household_head.surname if household_head else ('Household-%s') % household.random_sample_number)
                 if household.completed_currently_open_batches():
                     text += "*"
             households_list.append(text)

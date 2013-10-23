@@ -2,9 +2,11 @@ import random
 from django.db import models
 from rapidsms.router import send
 from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
+from survey.models import Household
 from survey.models.backend import Backend
 from survey.models.base import BaseModel
 from survey.models.investigator import Investigator
+
 
 class RandomHouseHoldSelection(BaseModel):
     mobile_number = models.CharField(max_length=10, unique=True, null=False, blank=False)
@@ -13,7 +15,6 @@ class RandomHouseHoldSelection(BaseModel):
 
     class Meta:
         app_label = 'survey'
-
 
     def generate_new_list(self):
         selected_households = random.sample(list(range(1, self.no_of_households + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
@@ -24,10 +25,25 @@ class RandomHouseHoldSelection(BaseModel):
     def text_message(self):
         return "Dear investigator, these are the selected households: %s" % self.selected_households
 
+    def send_message(self):
+        investigator = Investigator(mobile_number=self.mobile_number)
+        investigator.backend = Backend.objects.all()[0]
+        send(self.text_message(), [investigator])
+
     def generate(self, no_of_households):
         if not self.selected_households:
             self.no_of_households = no_of_households
             self.generate_new_list()
-        investigator = Investigator(mobile_number=self.mobile_number)
-        investigator.backend = Backend.objects.all()[0]
-        send(self.text_message(), [investigator])
+
+        all_selected_households = RandomHouseHoldSelection.objects.filter(mobile_number=self.mobile_number)[0].selected_households
+        all_random_households = all_selected_households.split(',')
+
+        investigator = Investigator.objects.get(mobile_number=self.mobile_number)
+        counter = 0
+
+        for random_household in all_random_households:
+            Household.objects.create(investigator=investigator, location=investigator.location,
+                                     uid=int('%d%d' % (investigator.id, counter)), random_sample_number=random_household)
+            counter += 1
+
+        self.send_message()

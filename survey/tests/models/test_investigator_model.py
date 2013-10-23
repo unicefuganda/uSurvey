@@ -5,6 +5,7 @@ from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
 from survey.models import AnswerRule, HouseholdHead
+from survey.models.random_household_selection import RandomHouseHoldSelection
 
 from survey.models.batch import Batch
 from survey.investigator_configs import COUNTRY_PHONE_CODE
@@ -240,7 +241,7 @@ class InvestigatorTest(TestCase):
         HouseholdHead.objects.create(household=household, surname="head_registered",
                                      date_of_birth=datetime(1980, 02, 02), male=False)
         HouseholdMember.objects.create(household=household, surname="new member",
-                                        date_of_birth=datetime(2002, 02, 02), male=False)
+                                       date_of_birth=datetime(2002, 02, 02), male=False)
 
         self.assertTrue(investigator.created_member_within(TIMEOUT_MINUTES))
 
@@ -255,9 +256,9 @@ class InvestigatorTest(TestCase):
                                              uid='10')
 
         household_head = HouseholdHead.objects.create(household=household, surname="head_registered",
-                                     date_of_birth=datetime(1980, 02, 02), male=False)
+                                                      date_of_birth=datetime(1980, 02, 02), male=False)
         household_member = HouseholdMember.objects.create(household=household, surname="new member",
-                                        date_of_birth=datetime(2002, 02, 02), male=False)
+                                                          date_of_birth=datetime(2002, 02, 02), male=False)
 
         household_head.created -= timedelta(minutes=(TIMEOUT_MINUTES + 2), seconds=1)
         household_head.save()

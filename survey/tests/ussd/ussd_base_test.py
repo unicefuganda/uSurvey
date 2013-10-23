@@ -21,6 +21,16 @@ class USSDBaseTest(TestCase):
         self.ussd_params['ussdRequestString'] = ''
         return self.client.post('/ussd', data=self.ussd_params)
 
+    def select_samples(self):
+        self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
+        self.ussd_params['response'] = 'false'
+        self.ussd_params['ussdRequestString'] = ''
+        self.client.post('/ussd', data=self.ussd_params)
+
+        self.ussd_params['response'] = 'true'
+        self.ussd_params['ussdRequestString'] = '100'
+        return self.client.post('/ussd', data=self.ussd_params)
+
     def register_household(self):
         return self.respond('1')
 

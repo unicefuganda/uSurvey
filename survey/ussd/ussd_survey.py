@@ -1,5 +1,5 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from survey.models import HouseholdHead
+from survey.models import HouseholdHead, RandomHouseHoldSelection
 from survey.ussd.ussd import USSD
 
 

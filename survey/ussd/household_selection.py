@@ -12,6 +12,7 @@ class HouseHoldSelection(USSDBase):
 
     def randomly_select_households(self):
         no_of_households = int(self.request['ussdRequestString'].strip())
+
         if no_of_households >= NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR:
             RandomHouseHoldSelection.objects.get_or_create(mobile_number=self.mobile_number)[0].generate(
                 no_of_households=no_of_households)
