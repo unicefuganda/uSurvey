@@ -15,6 +15,7 @@ class UploadLocation:
         for header in headers:
             header = header.strip()
             location_type = LocationType.objects.filter(name=header, slug=slugify(header))
+
             if not location_type.exists():
                 return False , 'Location type - %s not created' % header
             type = location_type[0]
@@ -30,9 +31,10 @@ class UploadLocation:
             tree_parent = LocationTypeDetails.objects.all()[0].country
             for x_index, cell_value in enumerate(row):
                 try:
-                    if self.REQUIRED_TYPES[headers[x_index]]:
-                        if not cell_value:
+                    if not cell_value:
+                        if self.REQUIRED_TYPES[headers[x_index]]:
                             return False, "Missing data"
+                    else:
                         tree_parent = Location.objects.get_or_create(name=cell_value.strip(), type=location_types[x_index], tree_parent=tree_parent)[0]
                 except IndexError:
                     continue

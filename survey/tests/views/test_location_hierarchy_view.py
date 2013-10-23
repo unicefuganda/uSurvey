@@ -153,11 +153,14 @@ class UploadLocationsTest(BaseTest):
         country = LocationType.objects.create(name='Country', slug='country')
         self.uganda = Location.objects.create(name='Uganda', type=country)
         self.some_other_country = Location.objects.create(name='SomeOtherCountry', type=country)
-        self.location_type1 = LocationType.objects.create(name = 'type1',slug='type1')
+        self.location_type1 = LocationType.objects.create(name = 'Region',slug='region')
         self.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type1,country=self.uganda)
 
-        self.location_type2 = LocationType.objects.create(name = 'type2',slug='type2')
+        self.location_type2 = LocationType.objects.create(name = 'District',slug='district')
         self.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type2,country=self.uganda)
+
+        self.location_type3 = LocationType.objects.create(name = 'County',slug='county')
+        self.location_type_details3 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type3,country=self.uganda)
 
         self.filename = 'uganda.csv'
         self.filedata = [["Region", "District", "County"], ["0","1","2"], ["3","4","5"], ["6","7","8"]]
@@ -202,4 +205,12 @@ class UploadLocationsTest(BaseTest):
          data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], 'file': self.file }
          response = self.client.post('/locations/upload/', data=data)
          assert mock_upload.called
+         self.assertIn('Successfully uploaded', response.cookies['messages'].value)
+
+    def test_should_upload_csv_sucess(self):
+         data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], 'file': self.file }
+         response = self.client.post('/locations/upload/', data=data)
+         types = self.filedata[0]
+         for locations in self.filedata[1:]:
+             [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for index, location_name in enumerate(locations)]
          self.assertIn('Successfully uploaded', response.cookies['messages'].value)
