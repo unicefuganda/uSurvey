@@ -2,12 +2,14 @@ import csv
 from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import LocationTypeDetails
+from survey.services.csv_uploader import CSV_Uploader
 
 
 class UploadLocation:
     def __init__(self,file):
         self.file = file
         self.REQUIRED_TYPES = {}
+        self.csv_uploader = CSV_Uploader(self.file)
 
     def _get_location_type(self, headers, location_types):
         for header in headers:
@@ -34,10 +36,9 @@ class UploadLocation:
         return True, "Successfully uploaded"
 
     def upload(self):
-        with open(self.file, 'rb') as csv_file:
+        with open(self.file.name, 'rb') as csv_file:
             location_types = []
-            reader = csv.reader(csv_file)
-            headers = reader.next()
+            headers,reader = self.csv_uploader.split_content()
             header_exists, message = self._get_location_type(headers, location_types)
             if not header_exists:
                 return False, message

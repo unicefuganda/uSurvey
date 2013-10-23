@@ -183,15 +183,15 @@ class UploadLocationsTest(BaseTest):
         self.assertEqual(response.context['country_name'], self.uganda.name)
         self.assertIsInstance(response.context['upload_form'],UploadLocationForm)
 
-    # def test_should_redirect_after_post(self):
-    #     data={u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a']}
-    #     response = self.client.post('/locations/upload/', data=data, files = {'file':(self.filename, self.file)})
-    #     self.assertRedirects(response, '/locations/upload/', status_code=302, target_status_code=200, msg_prefix='')
+    def test_should_redirect_after_post(self):
+         data={u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'],'file': self.file}
+         response = self.client.post('/locations/upload/', data=data)
+         self.assertRedirects(response, '/locations/upload/', status_code=302, target_status_code=200, msg_prefix='')
 
-    # @patch('survey.views.location_upload_view_helper.UploadLocation.upload')
-    # def test_should_give_success_message_if_csv_uploaded(self, mock_upload):
-    #     mock_upload.return_value = (True, 'Successfully uploaded')
-    #     data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], u'file': [u'some_file.csv']}
-    #     response = self.client.post('/locations/upload/', data=data)
-    #     assert mock_upload.called
-    #     self.assertIn('Successfully uploaded', response.cookies['messages'].value)
+    @patch('survey.views.location_upload_view_helper.UploadLocation.upload')
+    def test_should_give_success_message_if_csv_uploaded(self, mock_upload):
+         mock_upload.return_value = (True, 'Successfully uploaded')
+         data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], 'file': self.file }
+         response = self.client.post('/locations/upload/', data=data)
+         assert mock_upload.called
+         self.assertIn('Successfully uploaded', response.cookies['messages'].value)

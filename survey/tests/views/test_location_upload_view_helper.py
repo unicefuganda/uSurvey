@@ -13,8 +13,8 @@ class LocationUploadHelper(BaseTest):
                 ['region2','district2','county2']]
 
         self.write_to_csv('wb',data)
-        self.uploader = UploadLocation('test.csv')
-
+        file = open('test.csv', 'rb')
+        self.uploader = UploadLocation(file)
         self.region = LocationType.objects.create(name='Region',slug='region')
         self.district = LocationType.objects.create(name='District',slug='district')
         self.county = LocationType.objects.create(name='County',slug='county')
@@ -37,7 +37,8 @@ class LocationUploadHelper(BaseTest):
     def test_should_return_false_if_required_location_type_is_blank(self):
         missing_fields_data=[['region3','','county3']]
         self.write_to_csv('ab', missing_fields_data)
-        self.uploader = UploadLocation('test.csv')
+        file = open('test.csv', 'rb')
+        self.uploader = UploadLocation(file)
         status,message= self.uploader.upload()
         self.assertFalse(status)
         self.assertEqual(message, 'Missing data')

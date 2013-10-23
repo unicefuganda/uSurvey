@@ -48,10 +48,9 @@ def upload(request):
     if request.method == 'POST':
         upload_form = UploadLocationForm(request.POST, request.FILES)
         upload_form.is_valid()
-        print upload_form.errors
         if upload_form.is_valid():
-            # upload_form.upload()
-            messages.success(request, "Locations successfully uploaded.")
+            status, message = upload_form.upload()
+            messages.success(request, message)
             return HttpResponseRedirect('/locations/upload/')
 
     country_with_location_details_objects = LocationTypeDetails.objects.all()[0].country
