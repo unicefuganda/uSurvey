@@ -7,7 +7,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule
+from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule, BatchQuestionOrder
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
@@ -79,16 +79,6 @@ class USSDTest(USSDBaseTest):
             response_string = "responseString=%s&action=request" % homepage
             self.assertEquals(urllib2.unquote(response.content), response_string)
 
-    #def test_no_households(self):
-    #    investigator = Investigator.objects.create(name="investigator name", mobile_number="1234567890",
-    #                                               location=self.investigator.location,
-    #                                               backend=Backend.objects.create(name='something1'))
-    #    self.ussd_params['msisdn'] = investigator.mobile_number
-    #    response = self.client.post('/ussd', data=self.ussd_params)
-    #    response = self.take_survey()
-    #    response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_HOUSEHOLDS']
-    #    self.assertEquals(urllib2.unquote(response.content), response_string)
-
     def test_numerical_questions(self):
         HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
         question_1 = Question.objects.create(text="How many members are there in this household?",
@@ -97,6 +87,8 @@ class USSDTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
@@ -128,6 +120,8 @@ class USSDTest(USSDBaseTest):
                                              answer_type=Question.TEXT, order=2, group=self.member_group)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
@@ -168,6 +162,8 @@ class USSDTest(USSDBaseTest):
 
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
@@ -213,6 +209,8 @@ class USSDTest(USSDBaseTest):
 
         question.batches.add(self.batch)
         question_2.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         page_1 = "%s\n1: %s\n2: %s\n3: %s\n%s" % (question.text, option_1.text, option_2.text, option_3.text, next_text)
         page_2 = "%s\n4: %s\n5: %s\n6: %s\n%s\n%s" % (
@@ -263,6 +261,8 @@ class USSDTest(USSDBaseTest):
                                          validate_with_question=question_1)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
@@ -295,6 +295,7 @@ class USSDTest(USSDBaseTest):
                                              answer_type=Question.TEXT, order=1, group=self.member_group)
 
         question_1.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
@@ -319,6 +320,7 @@ class USSDTest(USSDBaseTest):
         question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
         question_1.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
@@ -342,6 +344,8 @@ class USSDTest(USSDBaseTest):
         question_1 = Question.objects.create(text="This is a question",
                                              answer_type=Question.MULTICHOICE, order=1, group=self.member_group)
         question_1.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+
         option_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
         option_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
 
@@ -376,6 +380,9 @@ class USSDTest(USSDBaseTest):
                                 answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
+
         AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
                                   condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
         with patch.object(USSDSurvey, 'is_active', return_value=False):
@@ -460,6 +467,10 @@ class USSDTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
+
         rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
                                          condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
@@ -500,6 +511,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
+
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
 
@@ -536,6 +550,9 @@ class USSDTest(USSDBaseTest):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
+
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
 
@@ -571,6 +588,9 @@ class USSDTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
@@ -644,6 +664,9 @@ class USSDTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             response= self.reset_session()

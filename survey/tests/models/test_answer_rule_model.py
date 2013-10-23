@@ -2,7 +2,7 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
-from survey.models import Investigator, Backend, HouseholdMemberGroup, GroupCondition, Household, Batch, NumericalAnswer, Question, AnswerRule, QuestionOption, MultiChoiceAnswer
+from survey.models import Investigator, Backend, HouseholdMemberGroup, GroupCondition, Household, Batch, NumericalAnswer, Question, AnswerRule, QuestionOption, MultiChoiceAnswer, BatchQuestionOrder
 from survey.models.households import HouseholdMember
 
 
@@ -33,6 +33,10 @@ class AnswerRuleTest(TestCase):
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+
         next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=self.batch)
         self.assertEqual(next_question, question_2)
 
@@ -57,6 +61,11 @@ class AnswerRuleTest(TestCase):
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
         question_3.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=self.batch, order=3)
+
         next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=self.batch)
         self.assertEqual(next_question, question_2)
 
@@ -79,6 +88,10 @@ class AnswerRuleTest(TestCase):
 
         question_1.batches.add(self.batch)
         question_0.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(question=question_0, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=2)
+
 
         self.investigator.member_answered(question_0, self.household_member, answer=5, batch=self.batch)
 
@@ -103,6 +116,10 @@ class AnswerRuleTest(TestCase):
         question_2.batches.add(self.batch)
         question_3.batches.add(self.batch)
 
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=self.batch, order=3)
+
         rule = AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'],
                                          condition=AnswerRule.CONDITIONS['GREATER_THAN_QUESTION'],
                                          validate_with_question=question_1)
@@ -125,6 +142,10 @@ class AnswerRuleTest(TestCase):
 
         question_1.batches.add(self.batch)
         question_0.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(question=question_0, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=2)
+
 
         AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['REANSWER'],
                                          condition=AnswerRule.CONDITIONS['LESS_THAN_VALUE'], validate_with_value=4)
@@ -153,6 +174,10 @@ class AnswerRuleTest(TestCase):
         question_2.batches.add(self.batch)
         question_3.batches.add(self.batch)
 
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=self.batch, order=3)
+
 
         AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['REANSWER'],
                                          condition=AnswerRule.CONDITIONS['LESS_THAN_QUESTION'],
@@ -178,8 +203,12 @@ class AnswerRuleTest(TestCase):
 
         question_2 = Question.objects.create(text="How many of them are male?",
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
+
+        order = 1
         for question in [question_1, question_2, sub_question_1]:
+            BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=order)
             self.batch.questions.add(question)
+            order += 1
 
         AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
                                          condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
@@ -204,6 +233,8 @@ class AnswerRuleTest(TestCase):
                                          validate_with_min_value=1, validate_with_max_value=10)
         self.failUnless(rule)
         self.batch.questions.add(question_1)
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+
         next_question = self.investigator.member_answered(question_1, self.household_member, answer=4, batch=self.batch)
         self.assertEqual(next_question, question_1)
 

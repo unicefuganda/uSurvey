@@ -1,6 +1,6 @@
 from django.test import TestCase
 from survey.forms.logic import LogicForm
-from survey.models import Question, Batch, QuestionOption, AnswerRule
+from survey.models import Question, Batch, QuestionOption, AnswerRule, BatchQuestionOrder
 
 
 class LogicFormTest(TestCase):
@@ -358,6 +358,11 @@ class LogicFormTest(TestCase):
         question_1.batches.add(batch)
         question_2.batches.add(batch)
         question_3.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
+
         sub_question_1.batches.add(batch)
 
 

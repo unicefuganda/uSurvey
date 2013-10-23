@@ -1,7 +1,7 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion, Batch, QuestionModule
+from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion, Batch, QuestionModule, BatchQuestionOrder
 from survey.models.batch import Batch, BatchLocationStatus
 from survey.models.households import HouseholdMember
 from survey.models.surveys import Survey
@@ -89,6 +89,8 @@ class BatchTest(TestCase):
                                            text="Question 1", answer_type='number',
                                            order=1, subquestion=False, group=member_group)
         question.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question, batch=batch, order=1)
+
 
         HouseholdBatchCompletion.objects.create(householdmember=household_member, batch=batch,
                                                 household=household_member.household)
@@ -126,10 +128,14 @@ class BatchTest(TestCase):
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=member_group)
         question_1.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+
         question_2 = Question.objects.create(identifier="identifier2",
                                              text="Question 2", answer_type='number',
                                              order=2, subquestion=False, group=member_group)
         question_2.batches.add(batch_2)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch_2, order=1)
+
         self.assertTrue(batch.has_unanswered_question(household_member))
         self.assertTrue(batch_2.has_unanswered_question(household_member))
 
@@ -165,6 +171,10 @@ class BatchTest(TestCase):
         question_1.batches.add(batch)
         question_2.batches.add(batch)
         question_3.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
+
 
         batch_groups = [group_1, group_2, group_3]
         self.assertEqual(3, len(batch.get_groups()))
@@ -280,6 +290,11 @@ class BatchLocationStatusTest(TestCase):
         question_1.batches.add(batch)
         question_2.batches.add(batch)
         question_3.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
+
 
         batch.open_for_location(kampala)
         investigator.member_answered(question_1, member, 1, batch)

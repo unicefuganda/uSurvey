@@ -1,7 +1,7 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Batch
+from survey.models import Batch, BatchQuestionOrder
 from survey.models.question import Question
 from survey.models.investigator import Investigator
 from survey.models.backend import Backend
@@ -115,6 +115,8 @@ class HouseholdMemberGroupTest(TestCase):
                                              order=1, subquestion=False, group=member_group)
 
         question_1.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
 
         self.assertEqual(question_1, household_member.next_unanswered_question_in(member_group, batch, 0))
 

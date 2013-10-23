@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdBatchCompletion, QuestionModule
+from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdBatchCompletion, QuestionModule, BatchQuestionOrder
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
@@ -78,8 +78,12 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
         self.question_3.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_2, order=2)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_3, order=3)
 
         self.question_1_b.batches.add(self.batch_b)
+        BatchQuestionOrder.objects.create(batch=self.batch_b, question=self.question_1_b, order=1)
 
     def create_household_member(self, member_name, household):
         return HouseholdMember.objects.create(surname="member %s" % member_name,
@@ -566,6 +570,8 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         member_question = Question.objects.create(group=self.member_group, text="Member qn", answer_type=Question.NUMBER,order=1)
         self.batch.questions.add(member_question)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=member_question, order=4)
+
 
         self.batch.open_for_location(investigator.location)
         with patch.object(USSDSurvey, 'is_active', return_value=False):

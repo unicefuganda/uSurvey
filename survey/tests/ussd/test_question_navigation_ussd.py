@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question
+from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question, BatchQuestionOrder
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd_survey import USSDSurvey
@@ -62,8 +62,11 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
 
         self.question_6 = Question.objects.create(text="Question 6?", answer_type=Question.NUMBER,
                                                   order=2, group=self.female_group)
+        order = 1
         for question in [self.question_1, self.question_2, self.question_3, self.question_4, self.question_5, self.question_6 ]:
+            BatchQuestionOrder.objects.create(batch=self.batch, question=question, order=order)
             question.batches.add(self.batch)
+            order += 1
 
     def select_household(self, household=1):
         self.ussd_params['response'] = "true"

@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Question, HouseholdBatchCompletion, NumericalAnswer, AnswerRule
+from survey.models import Batch, Question, HouseholdBatchCompletion, NumericalAnswer, AnswerRule, BatchQuestionOrder
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import HouseholdMember, Household, HouseholdHead
 from survey.models.backend import Backend
@@ -90,7 +90,6 @@ class HouseholdMemberTest(TestCase):
         self.assertEqual(len(member_groups), 1)
         self.assertIn(member_group_order_2, member_groups)
 
-
     def test_household_member_is_head(self):
         hhold = Household.objects.create(investigator=Investigator(), uid=0)
         household_head = HouseholdHead.objects.create(household=hhold, surname="Name", date_of_birth='1989-02-02')
@@ -153,6 +152,8 @@ class HouseholdMemberTest(TestCase):
         question_2 = Question.objects.create(group=group, text="This is a question", answer_type="number", order=2)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
 
         self.batch.open_for_location(uganda)
 
@@ -190,9 +191,6 @@ class HouseholdMemberTest(TestCase):
         self.assertEqual(2, group_order)
         self.assertEqual(0, question_order)
 
-
-
-
     @patch('survey.models.households.HouseholdMember.get_member_groups')
     def test_knows_next_question_in_order_one_group_after_the_other(self, mock_groups):
         investigator = Investigator.objects.create(name="inv1")
@@ -220,6 +218,11 @@ class HouseholdMemberTest(TestCase):
         question_2.batches.add(batch)
         question_3.batches.add(batch)
         question_4.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
+        BatchQuestionOrder.objects.create(question=question_4, batch=batch, order=4)
 
         mock_groups.return_value = [member_group, member_group_2]
 
@@ -265,6 +268,11 @@ class HouseholdMemberTest(TestCase):
         question_3.batches.add(batch)
         question_4.batches.add(batch)
 
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
+        BatchQuestionOrder.objects.create(question=question_4, batch=batch, order=4)
+
         mock_belongs_to.return_value = True
 
         self.assertEqual(question_1, household_member.next_question_in_order(batch))
@@ -300,6 +308,9 @@ class HouseholdMemberTest(TestCase):
         question_1.batches.add(batch)
         question_2.batches.add(batch)
 
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+
         self.assertTrue(household_member.pending_surveys())
         investigator.member_answered(question_1, household_member, answer=1, batch=batch)
         self.assertTrue(household_member.pending_surveys())
@@ -330,11 +341,13 @@ class HouseholdMemberTest(TestCase):
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=member_group)
         question_1.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
 
         question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
         question_2.batches.add(batch_2)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch_2, order=1)
 
         investigator.member_answered(question_1, household_member, answer=1, batch=batch)
         investigator.member_answered(question_2, household_member, answer=1, batch=batch_2)
@@ -366,11 +379,14 @@ class HouseholdMemberTest(TestCase):
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=member_group)
         question_1.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
 
         question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
         question_2.batches.add(batch_2)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch_2, order=1)
+
         investigator.member_answered(question_1, household_member, answer=1, batch=batch)
 
         self.assertTrue(household_member.has_open_batches())
@@ -406,11 +422,15 @@ class HouseholdMemberTest(TestCase):
 
         question_1.batches.add(batch)
         question_2.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
 
         q = Question.objects.create(identifier="identifier3", text="Question 3",
                                     answer_type='number', order=3,
                                     subquestion=False, group=member_group)
         q.batches.add(batch_2)
+        BatchQuestionOrder.objects.create(question=q, batch=batch_2, order=1)
+
         self.assertEqual(household_member.get_next_batch(), batch)
         investigator.member_answered(question_1, household_member, answer=2, batch=batch)
         self.assertEqual(household_member.get_next_batch(), batch)
@@ -507,7 +527,6 @@ class HouseholdMemberTest(TestCase):
         self.assertTrue(household_member.can_retake_survey(batch_2, 5))
         self.assertFalse(household_member_2.can_retake_survey(batch_2, 5))
 
-
     def test_should_know_householdmember_has_completed_batch(self):
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
@@ -525,6 +544,9 @@ class HouseholdMemberTest(TestCase):
 
         self.batch.questions.add(question_1)
         self.batch.questions.add(question_2)
+        BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+
         self.batch.open_for_location(kampala)
 
         hhold = Household.objects.create(investigator=investigator, uid=0)
@@ -570,6 +592,9 @@ class HouseholdMemberTest(TestCase):
                                              subquestion=False, group=member_group)
         question_1.batches.add(batch)
         question_2.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+
         self.assertEqual(question_1, household_member.next_unanswered_question_in(member_group, batch, 0))
         self.assertEqual(question_2, household_member.next_unanswered_question_in(member_group, batch, 1))
         investigator.member_answered(question=question_1, household_member=household_member, answer=1, batch=batch)
@@ -610,6 +635,10 @@ class HouseholdMemberTest(TestCase):
         question_1.batches.add(batch)
         question_2.batches.add(batch)
         question_3.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
+
         self.assertEqual(question_1, household_member.next_unanswered_question_in(member_group, batch, 0))
         self.assertEqual(question_2, household_member.next_unanswered_question_in(member_group, batch, 1))
         self.assertEqual(question_3, household_member.next_unanswered_question_in(member_group, batch, 2))
@@ -623,7 +652,6 @@ class HouseholdMemberTest(TestCase):
         self.assertEqual(question_1, household_member.next_unanswered_question_in(member_group, batch, 0))
         self.assertEqual(question_2, household_member.next_unanswered_question_in(member_group, batch, 1))
         self.assertEqual(question_3, household_member.next_unanswered_question_in(member_group, batch, 2))
-
 
     def test_knows_member_belongs_to_group_from_a_selected_household_member(self):
         age_value = 6
@@ -837,6 +865,8 @@ class HouseholdMemberTest(TestCase):
         question_1 = Question.objects.create(group=group, text="This is another question", answer_type="number",
                                              order=1)
         question_1.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+
         batch.open_for_location(investigator.location)
         investigator.member_answered(question_1, household_member, 1, batch)
 
@@ -863,6 +893,7 @@ class HouseholdMemberTest(TestCase):
         question_1 = Question.objects.create(group=group, text="This is another question", answer_type="number",
                                              order=1)
         question_1.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
 
         self.assertFalse(household_member.can_retake_survey(None, 5))
         self.assertFalse(household_member.has_open_batches())

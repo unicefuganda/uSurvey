@@ -219,6 +219,10 @@ class BatchViewsTest(BaseTest):
         question_2.batches.add(self.batch)
         question_3.batches.add(self.batch)
 
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_3, order=3)
+
         self.batch.open_for_location(self.kampala)
         investigator.member_answered(question_1, member, 1, self.batch)
         investigator.member_answered(question_2, member, 1, self.batch)
@@ -300,6 +304,10 @@ class BatchViewsTest(BaseTest):
         sub_question1.batches.add(batch)
         sub_question2.batches.add(batch)
         sub_question3.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(batch=batch, question=sub_question1, order=1)
+        BatchQuestionOrder.objects.create(batch=batch, question=sub_question2, order=2)
+        BatchQuestionOrder.objects.create(batch=batch, question=sub_question3, order=3)
 
         response = self.client.get('/batches/%s/questions/' % batch.id)
         self.assertIn(q1, response.context['questions'])

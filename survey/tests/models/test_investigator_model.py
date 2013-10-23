@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
-from survey.models import AnswerRule, HouseholdHead
+from survey.models import AnswerRule, HouseholdHead, BatchQuestionOrder
 from survey.models.random_household_selection import RandomHouseHoldSelection
 
 from survey.models.batch import Batch
@@ -77,6 +77,8 @@ class InvestigatorTest(TestCase):
         question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
         question_1.batches.add(batch)
+        BatchQuestionOrder.objects.create(batch=batch, question=question_1, order=1)
+
         self.investigator.member_answered(question_1, household_member1, answer=34, batch=batch)
         completed_batches = HouseholdBatchCompletion.objects.filter()
 
@@ -96,6 +98,10 @@ class InvestigatorTest(TestCase):
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(batch)
         question_2.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(batch=batch, question=question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=batch, question=question_2, order=2)
+
         self.investigator.member_answered(question_1, household_member1, answer=34, batch=batch)
         completed_batches = HouseholdBatchCompletion.objects.filter()
 
@@ -116,8 +122,12 @@ class InvestigatorTest(TestCase):
         question_3 = Question.objects.create(identifier="identifier1",
                                              text="Question 3", answer_type='number',
                                              order=3, subquestion=False, group=self.member_group)
+        order = 1
         for question in [question_1, question_2, question_3]:
             self.batch.questions.add(question)
+            BatchQuestionOrder.objects.create(batch=self.batch, question=question, order=order)
+            order += 1
+
 
         AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['SKIP_TO'],
                                   condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=1,
@@ -142,9 +152,15 @@ class InvestigatorTest(TestCase):
         question_3 = Question.objects.create(identifier="identifier1",
                                              text="Question 3", answer_type='number',
                                              order=3, subquestion=False, group=self.member_group)
+
+        order = 1
         for question in [question_1, question_2]:
             batch.questions.add(question)
+            BatchQuestionOrder.objects.create(batch=batch, question=question, order=order)
+            order += 1
+
         batch2.questions.add(question_3)
+        BatchQuestionOrder.objects.create(batch=batch2, question=question_3, order=1)
 
         next_question = self.investigator.member_answered(question_2, self.household_member, answer=1, batch=batch)
         self.assertEqual(question_3, next_question)
@@ -170,10 +186,18 @@ class InvestigatorTest(TestCase):
         question_5 = Question.objects.create(identifier="identifier1",
                                              text="Question 5", answer_type='number',
                                              order=5, subquestion=False, group=self.member_group)
+        order = 1
         for question in [question_1, question_2, question_3]:
             batch.questions.add(question)
+            BatchQuestionOrder.objects.create(batch=batch, question=question, order=order)
+            order += 1
+
         batch2.questions.add(question_4)
         batch2.questions.add(question_5)
+
+        BatchQuestionOrder.objects.create(batch=batch2, question=question_4, order=1)
+        BatchQuestionOrder.objects.create(batch=batch2, question=question_5, order=2)
+
 
         next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=batch)
         self.assertEqual(question_2, next_question)

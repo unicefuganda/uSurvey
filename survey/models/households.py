@@ -17,7 +17,7 @@ class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
     location = models.ForeignKey(Location, null=True)
     uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Unique Identification")
-    random_sample_number = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household_random_sample_number")
+    random_sample_number = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Random Sample Number")
 
     MEMBERS_PER_PAGE = 4
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings, 'USSD_PAGINATION', None).get('PREVIOUS')
@@ -255,7 +255,11 @@ class HouseholdMember(BaseModel):
         return len(answer_class.objects.filter(question=question, householdmember=self, batch=batch, is_old=False)) > 0
 
     def next_unanswered_question_in(self, member_group, batch, order):
-        all_questions = member_group.all_questions().filter(batches=batch, order__gte=order).order_by('order')
+        all_questions = []
+        for question in batch.all_questions():
+            if (question.order >= order) and (question.group == member_group):
+                all_questions.append(question)
+
         for question in all_questions:
             if not self.has_answered(question, batch):
                 return question
@@ -338,7 +342,7 @@ class HouseholdMember(BaseModel):
         return False
 
     def has_completed(self, batch):
-        for question in batch.all_questions().order_by('-order'):
+        for question in batch.all_questions():
             if not self.has_answered(question, batch):
                 return False
         return True

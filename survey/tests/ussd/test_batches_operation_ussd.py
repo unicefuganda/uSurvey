@@ -8,7 +8,7 @@ from django.test.client import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import HouseholdMemberGroup, GroupCondition
+from survey.models import HouseholdMemberGroup, GroupCondition, BatchQuestionOrder
 from survey.models.backend import Backend
 from survey.models.household_batch_completion import HouseholdBatchCompletion
 from survey.models.batch import Batch
@@ -90,6 +90,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
 
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_1, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_2, order=2)
+
         self.batch_1 = Batch.objects.create(order=2)
         self.question_3 = Question.objects.create(text="Question 3?", answer_type=Question.NUMBER,
                                                   order=3, group=self.female_group)
@@ -97,6 +100,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
                                                   order=4, group=self.female_group)
         self.question_3.batches.add(self.batch_1)
         self.question_4.batches.add(self.batch_1)
+        BatchQuestionOrder.objects.create(batch=self.batch_1, question=self.question_3, order=1)
+        BatchQuestionOrder.objects.create(batch=self.batch_1, question=self.question_4, order=2)
+
 
     def select_household(self, household=1):
         self.ussd_params['response'] = "true"
@@ -109,7 +115,6 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = member_id
         return self.client.post('/ussd', data=self.ussd_params)
-
 
     def test_with_one_batch_open(self):
         self.batch.open_for_location(self.location)

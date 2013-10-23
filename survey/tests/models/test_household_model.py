@@ -2,7 +2,7 @@ from django.template.defaultfilters import slugify
 from datetime import date, datetime, timedelta
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion, NumericalAnswer
+from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion, NumericalAnswer, BatchQuestionOrder
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -151,7 +151,6 @@ class HouseholdTest(TestCase):
         self.assertEqual(hHead, household.get_head())
         self.assertNotEqual(household_member, household.get_head())
 
-
     def test_should_return_all_households_members(self):
         hhold = Household.objects.create(investigator=Investigator(), uid=0)
         household_head = HouseholdHead.objects.create(household=hhold,surname="Name", date_of_birth='1989-02-02')
@@ -184,6 +183,8 @@ class HouseholdTest(TestCase):
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=member_group)
         question_1.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+
         member_list = [household_head, household_member1, household_member2]
 
         self.assertFalse(hhold.completed_currently_open_batches())
@@ -286,6 +287,10 @@ class HouseholdTest(TestCase):
                                 answer_type=Question.NUMBER, group=self.member_group)
         batch_question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(question=batch_question_1, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+
         self.investigator.member_answered(batch_question_1, self.household_member, 1, self.batch)
         self.assertEqual(batch_question_1.text, self.household_member.last_question_answered().text)
 
@@ -294,6 +299,8 @@ class HouseholdTest(TestCase):
         question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
         question_1.batches.add(batch_1)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch_1, order=1)
+
         batch_1.open_for_location(self.investigator.location)
         self.investigator.member_answered(question_1, self.household_member, 1, batch_1)
         batch_1.close_for_location(self.investigator.location)
@@ -303,6 +310,8 @@ class HouseholdTest(TestCase):
         question_2 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
         question_2.batches.add(batch_2)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch_2, order=1)
+
         batch_2.open_for_location(self.investigator.location)
         self.investigator.member_answered(question_2, self.household_member, 1, batch_2)
 
@@ -322,6 +331,9 @@ class HouseholdTest(TestCase):
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(batch)
         question_2.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+
         self.assertTrue(self.household.has_pending_survey())
 
         self.investigator.member_answered(question_1, self.household_member, 1, batch)
@@ -342,6 +354,9 @@ class HouseholdTest(TestCase):
                                              answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(batch)
         question_2.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+
         self.assertIsNone(self.household.last_question_answered())
         self.assertFalse(self.household.has_completed_batches([batch]))
 

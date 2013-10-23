@@ -42,7 +42,8 @@ class Batch(BaseModel):
         return False
 
     def all_questions(self):
-        return self.questions.all()
+        from survey.models import BatchQuestionOrder
+        return BatchQuestionOrder.get_batch_order_specific_questions(self.id, {})
 
     def open_for_location(self, location):
         all_related_locations = location.get_descendants(include_self=False).all()
