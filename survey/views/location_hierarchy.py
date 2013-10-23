@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import permission_required, login_required
 from django.core import management
 
 from django.http.response import HttpResponseRedirect
@@ -13,7 +14,8 @@ from survey.forms.upload_locations import UploadLocationForm
 from survey.models import LocationTypeDetails
 from survey.views.location_upload_view_helper import UploadLocation
 
-
+@login_required
+@permission_required('auth.can_view_batches')
 def add(request):
     DetailsFormSet = formset_factory(LocationDetailsForm, formset=BaseArticleFormSet)
     if request.method == 'POST':
@@ -43,6 +45,9 @@ def add(request):
     context = {'hierarchy_form': hierarchy_form, 'button_label': 'Create Hierarchy', 'id': 'hierarchy-form','details_formset':details_formset}
     return render(request,'location_hierarchy/new.html', context)
 
+
+@login_required
+@permission_required('auth.can_view_batches')
 def upload(request):
     upload_form = UploadLocationForm()
     if request.method == 'POST':

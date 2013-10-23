@@ -141,6 +141,9 @@ class LocationHierarchyTest(BaseTest):
         self.assertEqual(levels_data['form-1-code'], hill_details.code)
         self.assertEqual(self.uganda, hill_details.country)
 
+    def test_permission_access(self):
+        self.assert_restricted_permission_for('/add_location_hierarchy/')
+
 
 class UploadLocationsTest(BaseTest):
     def setUp(self):
@@ -214,3 +217,6 @@ class UploadLocationsTest(BaseTest):
          for locations in self.filedata[1:]:
              [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for index, location_name in enumerate(locations)]
          self.assertIn('Successfully uploaded', response.cookies['messages'].value)
+
+    def test_permission_access(self):
+        self.assert_restricted_permission_for('/locations/upload/')
