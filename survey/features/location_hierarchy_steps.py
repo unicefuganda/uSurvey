@@ -22,7 +22,7 @@ def and_i_should_see_country_dropdown(step):
 
 @step(u'And I should see country present in dropdown')
 def and_i_should_see_country_present_in_dropdown(step):
-    world.page.see_select_option(['Some Country'],'country')
+    world.page.see_select_option([world.country.name],'country')
 
 @step(u'And I should see a row for level details field')
 def and_i_should_see_a_row_for_level_details_field(step):
