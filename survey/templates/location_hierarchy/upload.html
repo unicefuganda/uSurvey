@@ -3,6 +3,7 @@
     Upload Geographical Locations
 {% endblock %}
 {% block content %}
+    <h3>Upload Geographical Locations</h3>
     <p>Country: {{ country_name }}</p>
     <form enctype="multipart/form-data" method="post" action={% url 'upload_locations' %}>
    {% csrf_token %}
