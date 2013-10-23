@@ -142,10 +142,11 @@ class Investigator(BaseModel):
         households = paginator.page(page)
         households_list = []
         for household in households:
+            household_head = household.get_head()
             if not registered:
-                text = "%s: Household-%s" % (all_households.index(household) + 1, household.random_sample_number)
+                text = "%s: Household-%s" % (all_households.index(household) + 1, household_head.surname if household_head else household.random_sample_number)
             else:
-                household_head = household.get_head()
+
                 text = "%s: %s" % (all_households.index(household) + 1, household_head.surname if household_head else ('Household-%s') % household.random_sample_number)
                 if household.completed_currently_open_batches():
                     text += "*"
