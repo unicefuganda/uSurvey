@@ -1,11 +1,12 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType
 from survey.models import LocationTypeDetails
+from survey.tests.base_test import BaseTest
 from survey.views.location_upload_view_helper import UploadLocation
 import csv
 
 
-class LocationUploadHelper(TestCase):
+class LocationUploadHelper(BaseTest):
     def setUp(self):
         data = [['Region', 'District','County'],
                 ['region1', 'district1','county1'],
@@ -40,8 +41,3 @@ class LocationUploadHelper(TestCase):
         status,message= self.uploader.upload()
         self.assertFalse(status)
         self.assertEqual(message, 'Missing data')
-
-    def write_to_csv(self,mode, data):
-        with open('test.csv', mode) as fp:
-            file = csv.writer(fp, delimiter=',')
-            file.writerows(data)

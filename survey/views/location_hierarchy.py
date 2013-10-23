@@ -44,23 +44,17 @@ def add(request):
     return render(request,'location_hierarchy/new.html', context)
 
 def upload(request):
+    upload_form = UploadLocationForm()
     if request.method == 'POST':
-        file = request.POST.get('file', None)
-        if file:
-            if file.endswith('.csv'):
-                uploader = UploadLocation(file)
-                uploaded, message = uploader.upload()
-                if uploaded:
-                    messages.success(request, message)
-                else:
-                    messages.error(request, message)
-            else:
-                messages.error(request, 'Only csv file format supported.')
-        else:
-            messages.error(request, 'File field cannot be empty')
-        return HttpResponseRedirect('/locations/upload/')
+        upload_form = UploadLocationForm(request.POST, request.FILES)
+        upload_form.is_valid()
+        print upload_form.errors
+        if upload_form.is_valid():
+            # upload_form.upload()
+            messages.success(request, "Locations successfully uploaded.")
+            return HttpResponseRedirect('/locations/upload/')
 
     country_with_location_details_objects = LocationTypeDetails.objects.all()[0].country
     context = {'button_label': 'Save', 'id': 'upload-locations-form',
-             'country_name': country_with_location_details_objects.name, 'upload_form': UploadLocationForm()}
+             'country_name': country_with_location_details_objects.name, 'upload_form': upload_form}
     return render(request, 'location_hierarchy/upload.html', context)

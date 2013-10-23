@@ -1,10 +1,14 @@
-{% extends "form.html"%}
+{% extends 'layout.html' %}
 {% block title %}
     Upload Geographical Locations
 {% endblock %}
-{% block pre_form_content %}
+{% block content %}
     <p>Country: {{ country_name }}</p>
-{% endblock %}
-{% block display_form_fields %}
-    {% include "naked_form.html" with a_form=upload_form %}
+    <form enctype="multipart/form-data" method="post" action={% url 'upload_locations' %}>
+   {% csrf_token %}
+   <table>
+       {{upload_form.as_table}}
+    </table>
+    <input type="submit" value="Submit" id="Save"/>
+    </form>
 {% endblock %}
