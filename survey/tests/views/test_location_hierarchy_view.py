@@ -160,7 +160,7 @@ class UploadLocationsTest(BaseTest):
         self.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type2,country=self.uganda)
 
         self.filename = 'uganda.csv'
-        self.filedata = [["Region", "District", "County"], ["0","1","2"], ["0","1","2"], ["0","1","2"]]
+        self.filedata = [["Region", "District", "County"], ["0","1","2"], ["3","4","5"], ["6","7","8"]]
         self.write_to_csv('wb', self.filedata, self.filename)
         self.file = open(self.filename, 'rb')
 
@@ -182,6 +182,14 @@ class UploadLocationsTest(BaseTest):
         self.assertEqual(response.context['id'], "upload-locations-form")
         self.assertEqual(response.context['country_name'], self.uganda.name)
         self.assertIsInstance(response.context['upload_form'],UploadLocationForm)
+
+    def test_should_render_error_message_if_no_type_and_details_yet(self):
+        LocationType.objects.all().delete()
+        LocationTypeDetails.objects.all().delete()
+        response = self.client.get('/locations/upload/')
+        self.assertEqual(302, response.status_code)
+        self.assertIn('No location hierarchy added yet.', response.cookies['messages'].value)
+
 
     def test_should_redirect_after_post(self):
          data={u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'],'file': self.file}

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from rapidsms.contrib.locations.models import LocationType
+from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import LocationTypeDetails
 from survey.tests.base_test import BaseTest
 from survey.views.location_upload_view_helper import UploadLocation
@@ -8,11 +8,11 @@ import csv
 
 class LocationUploadHelper(BaseTest):
     def setUp(self):
-        data = [['Region', 'District','County'],
+        self.data = [['Region', 'District','County'],
                 ['region1', 'district1','county1'],
                 ['region2','district2','county2']]
 
-        self.write_to_csv('wb',data)
+        self.write_to_csv('wb',self.data)
         file = open('test.csv', 'rb')
         self.uploader = UploadLocation(file)
         self.region = LocationType.objects.create(name='Region',slug='region')
@@ -29,9 +29,18 @@ class LocationUploadHelper(BaseTest):
         self.assertFalse(status)
         self.assertEqual(message, 'Location type - Region not created')
 
+    def test_should_return_false__and_message_if_location_type_details_not_found(self):
+        LocationTypeDetails.objects.all().delete()
+        status,message= self.uploader.upload()
+        self.assertFalse(status)
+        self.assertEqual(message, 'Location type details for Region not found.')
+
     def test_should_return_true_if_location_type_exists(self):
         status,message= self.uploader.upload()
         self.assertTrue(status)
+        types = self.data[0]
+        for locations in self.data[1:]:
+            [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for index, location_name in enumerate(locations)]
         self.assertEqual(message, 'Successfully uploaded')
 
     def test_should_return_false_if_required_location_type_is_blank(self):

@@ -53,7 +53,12 @@ def upload(request):
             messages.success(request, message)
             return HttpResponseRedirect('/locations/upload/')
 
-    country_with_location_details_objects = LocationTypeDetails.objects.all()[0].country
+    details = LocationTypeDetails.objects.all()
+    if not details.exists():
+        messages.error(request, "No location hierarchy added yet.")
+        return HttpResponseRedirect('/locations/upload/')
+
+    country_with_location_details_objects = details[0].country
     context = {'button_label': 'Save', 'id': 'upload-locations-form',
              'country_name': country_with_location_details_objects.name, 'upload_form': upload_form}
     return render(request, 'location_hierarchy/upload.html', context)

@@ -18,8 +18,11 @@ class UploadLocation:
             if not location_type.exists():
                 return False , 'Location type - %s not created' % header
             type = location_type[0]
+            detail = type.details.all()
+            if not detail:
+                return False , 'Location type details for %s not found.'%header
+            self.REQUIRED_TYPES[type.name] = detail[0].required
             location_types.append(type)
-            self.REQUIRED_TYPES[type.name] = type.details.all()[0].required
         return True,''
 
     def _create_locations(self, reader, headers, location_types):
@@ -36,10 +39,9 @@ class UploadLocation:
         return True, "Successfully uploaded"
 
     def upload(self):
-        with open(self.file.name, 'rb') as csv_file:
-            location_types = []
-            headers,reader = self.csv_uploader.split_content()
-            header_exists, message = self._get_location_type(headers, location_types)
-            if not header_exists:
-                return False, message
-            return self._create_locations(reader, headers, location_types)
+        location_types = []
+        headers,reader = self.csv_uploader.split_content()
+        header_exists, message = self._get_location_type(headers, location_types)
+        if not header_exists:
+            return False, message
+        return self._create_locations(reader, headers, location_types)
