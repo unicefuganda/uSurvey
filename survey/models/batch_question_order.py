@@ -15,9 +15,6 @@ class BatchQuestionOrder(BaseModel):
     @classmethod
     def update_question_order(cls, new_order, batch):
         order_question_id = str(new_order).split('-')
-        print '@@@@@@@@@@@!!!!!!!!!!!!!!!!!!'
-        print order_question_id
-        print '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
         question = Question.objects.get(id=order_question_id[1])
         try:
             batch_question_order = BatchQuestionOrder.objects.get(question=question, batch=batch)
@@ -25,3 +22,12 @@ class BatchQuestionOrder(BaseModel):
             batch_question_order.save()
         except BatchQuestionOrder.DoesNotExist:
             BatchQuestionOrder.objects.create(question=question, batch=batch, order=order_question_id[0])
+
+    @classmethod
+    def get_batch_order_specific_questions(cls, batch_id, filter_condition):
+        batch = Batch.objects.get(id=batch_id)
+        batch_question_orders = BatchQuestionOrder.objects.filter(batch=batch, **filter_condition).order_by('order')
+        questions = []
+        for batch_question_order in batch_question_orders:
+            questions.append(batch_question_order.question)
+        return questions

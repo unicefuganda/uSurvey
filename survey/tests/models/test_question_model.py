@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
-from survey.models import QuestionModule
+from survey.models import QuestionModule, BatchQuestionOrder
 
 from survey.models.batch import Batch
 from survey.models.backend import Backend
@@ -132,14 +132,24 @@ class QuestionTest(TestCase):
     def test_question_knows_de_associate_self_from_batch(self):
         batch = Batch.objects.create(order=1, name="Test")
         batch_question = Question.objects.create(text="This is a test question", answer_type="multichoice")
+        another_batch_question = Question.objects.create(text="This is another test question",
+                                                         answer_type=Question.MULTICHOICE)
         batch_question.batches.add(batch)
+        another_batch_question.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(question=batch_question, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=another_batch_question, batch=batch, order=2)
 
         batch_question.de_associate_from(batch)
 
+        batch_question_order = BatchQuestionOrder.objects.filter(batch=batch, question=batch_question)
+        self.failIf(batch_question_order)
         updated_question = Question.objects.filter(text="This is a test question", answer_type="multichoice", batches=batch)
+        self.failIf(updated_question)
 
-        self.assertEqual(0, len(updated_question))
-
+        remaining_batch_order_questions = BatchQuestionOrder.objects.filter(batch=batch, question=another_batch_question)
+        self.failUnless(remaining_batch_order_questions)
+        self.assertEqual(1, remaining_batch_order_questions[0].order)
 
 class QuestionOptionTest(TestCase):
     def setUp(self):

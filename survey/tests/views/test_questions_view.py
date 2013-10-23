@@ -11,7 +11,7 @@ from survey.models.question import Question, QuestionOption
 from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
 from survey.models.householdgroups import HouseholdMemberGroup
-from survey.views.questions import _rule_exists, _set_filter_condition_based_on_group, _set_filter_condition_based_on_module, _set_filter_condition_based_on_answer_type, _set_filter_condition_based_on_batch_id, _get_questions_based_on_filter
+from survey.views.questions import _rule_exists, _set_filter_condition_based_on_group, _set_filter_condition_based_on_module, _set_filter_condition_based_on_answer_type, _set_filter_condition_based_on_batch_id, _get_questions_based_on_filter, _set_filter_condition_for_batch_questions
 
 
 class QuestionsViews(BaseTest):
@@ -62,14 +62,29 @@ class QuestionsViews(BaseTest):
         updated_filter_condition = _set_filter_condition_based_on_answer_type('2', filter_condition)
         self.assertEqual('2', updated_filter_condition.get('answer_type', None))
 
-    def test_set_filter_condition_based_on_batch_id(self):
-        batch = Batch.objects.create(name="Batch F")
+    def test_set_filter_condition_based_on_group_for_batch_questions(self):
         filter_condition = {}
-        updated_filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, None)
-        self.assertIsNone(updated_filter_condition.get('batches', None))
+        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, 'All')
+        self.assertIsNone(updated_filter_condition.get('question__group__id', None))
 
-        updated_filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, batch.id)
-        self.assertEqual(batch, updated_filter_condition.get('batches', None))
+        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, '2')
+        self.assertEqual('2', updated_filter_condition.get('question__group__id', None))
+
+    def test_set_filter_condition_based_on_module_for_batch_questions(self):
+        filter_condition = {}
+        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, module_id='All')
+        self.assertIsNone(updated_filter_condition.get('question__module__id', None))
+
+        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, module_id='2')
+        self.assertEqual('2', updated_filter_condition.get('question__module__id', None))
+
+    def test_set_filter_condition_based_on_answer_type_for_batch_questions(self):
+        filter_condition = {}
+        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, question_type='All')
+        self.assertIsNone(updated_filter_condition.get('question__answer_type', None))
+
+        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, question_type='2')
+        self.assertEqual('2', updated_filter_condition.get('question__answer_type', None))
 
     def test_get_questions_based_on_filter_should_return_all_questions_if_batch_is_none_and_all_other_keys_are_all_or_none(
             self):
@@ -133,7 +148,6 @@ class QuestionsViews(BaseTest):
                                              module=new_module, group=self.household_member_group)
         question_3.batches.add(new_batch)
         BatchQuestionOrder.objects.create(batch=new_batch, question=question_3, order=1)
-
 
         questions = _get_questions_based_on_filter(new_batch.id, str(self.household_member_group.id),
                                                    str(new_module.id), Question.MULTICHOICE)
@@ -309,9 +323,12 @@ class QuestionsViews(BaseTest):
 
         all_group_questions = [group_question, group_question_again]
         another_group_questions = [another_group_question]
+        order = 1
 
         for question in [group_question, group_question_again, another_group_question]:
             question.batches.add(self.batch)
+            BatchQuestionOrder.objects.create(batch=self.batch, question=question, order=order)
+            order += 1
 
         response = self.client.get(
             '/batches/%d/questions/?groups=%s' % (self.batch.id, self.household_member_group.id))
@@ -378,8 +395,12 @@ class QuestionsViews(BaseTest):
                                                          module=self.module)
 
         all_group_questions = [group_question, group_question_again, another_group_question]
+        counter = 1
+
         for question in all_group_questions:
+            BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=counter)
             question.batches.add(self.batch)
+            counter += 1
 
         response = self.client.get('/batches/%d/questions/?groups=%s' % (self.batch.id, 'all'))
 
@@ -1471,6 +1492,9 @@ class RemoveQuestionFromBatchTest(BaseTest):
         self.question.batches.add(self.batch)
         self.question.batches.add(self.batch_2)
 
+        BatchQuestionOrder.objects.create(question=self.question, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=self.question, batch=self.batch_2, order=1)
+
     def test_should_remove_question_from_batch_when_remove_url_is_called(self):
         response = self.client.get('/batches/%s/questions/%s/remove/' % (int(self.batch.id), int(self.question.id)))
         self.assertRedirects(response, '/batches/%s/questions/' % self.batch.id, 302, 200)
@@ -1485,6 +1509,8 @@ class RemoveQuestionFromBatchTest(BaseTest):
     def test_should_delete_all_logic_associated_with_question_and_batch_when_removed_from_batch(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
         question = Question.objects.create(text="some qn?", group=group, order=3)
+        BatchQuestionOrder.objects.create(question=self.question, batch=self.batch, order=1)
+
         answer_rule = AnswerRule.objects.create(batch=self.batch, question=self.question,
                                                 action=AnswerRule.ACTIONS['SKIP_TO'],
                                                 condition=AnswerRule.CONDITIONS['EQUALS'],

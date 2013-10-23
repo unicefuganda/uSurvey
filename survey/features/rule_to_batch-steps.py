@@ -2,12 +2,13 @@ from time import sleep
 from lettuce import *
 from survey.features.page_objects.question import BatchQuestionsListPage
 from survey.features.page_objects.rules import AddLogicToBatchQuestionPage
-from survey.models import Question, AnswerRule
+from survey.models import Question, AnswerRule, BatchQuestionOrder
 from survey.models.question import QuestionOption
 
 
 def save_batch_to_question(question, batch):
     question.batches.add(batch)
+    BatchQuestionOrder.objects.create(question=question, batch=batch, order=1)
 
 
 @step(u'And I have a question')

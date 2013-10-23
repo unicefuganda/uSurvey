@@ -2,7 +2,7 @@ from random import randint
 from time import sleep
 from lettuce import *
 from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage, CreateNewSubQuestionPage, EditQuestionPage
-from survey.models import Batch, QuestionModule
+from survey.models import Batch, QuestionModule, BatchQuestionOrder
 from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
 from survey.models.answer_rule import AnswerRule
@@ -14,6 +14,7 @@ def and_i_have_100_questions_under_the_batch(step):
         q = Question.objects.create(text="some questions %d" % i,
                                     answer_type=Question.NUMBER, order=i)
         q.batches.add(world.batch)
+        BatchQuestionOrder.objects.create(batch=world.batch, question=q, order=i)
 
 
 @step(u'And I visit questions listing page of the batch')
@@ -308,6 +309,8 @@ def and_i_have_a_non_multi_choice_question(step):
                                                           answer_type=Question.NUMBER, order=7,
                                                           group=world.household_member_group)
     world.multi_choice_question.batches.add(world.batch)
+    BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=1)
+
 
 
 @step(u'When I click on the question')
@@ -466,6 +469,7 @@ def and_i_should_see_that_the_logic_was_deleted_successfully(step):
 def and_i_select_multichoice_question_in_batch(step):
     world.batch = Batch.objects.create(order=1, name="Batch A", description='description', survey=world.survey)
     world.multi_choice_question.batches.add(world.batch)
+    BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=1)
 
 
 @step(u'And I have a module')

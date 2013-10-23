@@ -20,33 +20,44 @@ def _set_filter_condition_based_on_group(group_id, filter_condition):
         filter_condition['group__id'] = group_id
     return filter_condition
 
-
 def _set_filter_condition_based_on_module(module_id, filter_condition):
     if module_id and module_id.lower() != 'all':
         filter_condition['module__id'] = module_id
     return filter_condition
-
 
 def _set_filter_condition_based_on_answer_type(answer_type, filter_condition):
     if answer_type and answer_type.lower() != 'all':
         filter_condition['answer_type'] = answer_type
     return filter_condition
 
-
 def _set_filter_condition_based_on_batch_id(filter_condition, batch_id=None):
     if batch_id:
         filter_condition['batches'] = Batch.objects.get(id=batch_id)
     return filter_condition
 
+def _set_filter_condition_for_batch_questions(filter_condition, group_id='All', module_id='All', question_type='All'):
+    if group_id and group_id.lower() != 'all':
+        filter_condition['question__group__id'] = group_id
+
+    if module_id and module_id.lower() != 'all':
+        filter_condition['question__module__id'] = module_id
+
+    if question_type and question_type.lower() != 'all':
+        filter_condition['question__answer_type'] = question_type
+
+    return filter_condition
 
 def _get_questions_based_on_filter(batch_id, group_id='All', module_id='All', question_type='All'):
     filter_condition = {}
-    filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, batch_id)
-    filter_condition = _set_filter_condition_based_on_group(group_id, filter_condition)
-    filter_condition = _set_filter_condition_based_on_module(module_id, filter_condition)
-    filter_condition = _set_filter_condition_based_on_answer_type(question_type, filter_condition)
+    if not batch_id:
+        filter_condition = _set_filter_condition_based_on_group(group_id, filter_condition)
+        filter_condition = _set_filter_condition_based_on_module(module_id, filter_condition)
+        filter_condition = _set_filter_condition_based_on_answer_type(question_type, filter_condition)
 
-    return Question.objects.filter(subquestion=False, **filter_condition).exclude(group__name='REGISTRATION GROUP')
+        return Question.objects.filter(subquestion=False, **filter_condition).exclude(group__name='REGISTRATION GROUP')
+    else:
+        filter_condition = _set_filter_condition_for_batch_questions(filter_condition, group_id, module_id, question_type)
+        return BatchQuestionOrder.get_batch_order_specific_questions(batch_id, filter_condition)
 
 @permission_required('auth.can_view_batches')
 def index(request, batch_id):
@@ -84,7 +95,6 @@ def index(request, batch_id):
                'question_filter_form': question_filter_form, 'rules_for_batch': question_rules_for_batch}
     return render(request, 'questions/index.html', context)
 
-
 @permission_required('auth.can_view_batches')
 def filter_by_group_and_module(request, batch_id, group_id, module_id):
     if group_id.lower() != 'all' and module_id.lower() != 'all':
@@ -101,7 +111,6 @@ def filter_by_group_and_module(request, batch_id, group_id, module_id):
     questions = questions.exclude(id__in=questions_from_batch).values('id', 'text', 'answer_type').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')
-
 
 @permission_required('auth.can_view_batches')
 def list_all_questions(request):
@@ -124,10 +133,8 @@ def list_all_questions(request):
                'rules_for_batch': {}}
     return render(request, 'questions/index.html', context)
 
-
 def _sub_question_hash(sub_question):
     return {'id': str(sub_question.id), 'text': sub_question.text}
-
 
 def __process_sub_question_form(request, questionform, parent_question, action_performed, batch_id=None):
     if questionform.is_valid():
@@ -147,7 +154,6 @@ def __process_sub_question_form(request, questionform, parent_question, action_p
     else:
         messages.error(request, 'Sub question not saved.')
 
-
 @permission_required('auth.can_view_batches')
 def new_subquestion(request, question_id, batch_id=None):
     parent_question = Question.objects.get(pk=question_id)
@@ -165,7 +171,6 @@ def new_subquestion(request, question_id, batch_id=None):
 
     return response or render(request, template_name, context)
 
-
 @permission_required('auth.can_view_batches')
 def edit_subquestion(request, question_id, batch_id=None):
     question = Question.objects.get(pk=question_id)
@@ -180,7 +185,6 @@ def edit_subquestion(request, question_id, batch_id=None):
     template_name = 'questions/new.html'
 
     return response or render(request, template_name, context)
-
 
 def _get_post_values(post_data):
     next_question_key = post_data.get('next_question', None)
@@ -208,10 +212,8 @@ def _get_post_values(post_data):
 
     return save_data
 
-
 def _rule_exists(question, batch, **kwargs):
     return AnswerRule.objects.filter(question=question, batch=batch, **kwargs).count() > 0
-
 
 @permission_required('auth.can_view_batches')
 def add_logic(request, batch_id, question_id):
@@ -237,12 +239,10 @@ def add_logic(request, batch_id, question_id):
                'cancel_url': '/batches/%s/questions/' % batch_id}
     return response or render(request, "questions/logic.html", context)
 
-
 @permission_required('auth.can_view_batches')
 def new(request):
     response, context = _render_question_view(request)
     return response or render(request, 'questions/new.html', context)
-
 
 @permission_required('auth.can_view_batches')
 def edit(request, question_id):
@@ -252,7 +252,6 @@ def edit(request, question_id):
         return HttpResponseRedirect('/questions/')
     response, context = _render_question_view(request, question[0])
     return response or render(request, 'questions/new.html', context)
-
 
 @permission_required('auth.can_view_batches')
 def delete(request, question_id, batch_id=None):
@@ -266,7 +265,6 @@ def delete(request, question_id, batch_id=None):
     question.delete()
     return HttpResponseRedirect(redirect_url)
 
-
 def _process_question_form(request, options, response, instance=None):
     question_form = QuestionForm(data=request.POST, instance=instance)
     action_str = 'edit' if instance else 'add'
@@ -278,7 +276,6 @@ def _process_question_form(request, options, response, instance=None):
         messages.error(request, 'Question was not %sed.' % action_str)
         options = dict(request.POST).get('options', None)
     return response, options, question_form
-
 
 def _render_question_view(request, instance=None):
     question_form = QuestionForm(instance=instance)
@@ -306,22 +303,18 @@ def _render_question_view(request, instance=None):
 
     return response, context
 
-
 def _create_question_hash_response(questions):
     questions_to_display = map(lambda question: {'id': str(question.id), 'text': question.text}, questions)
     return HttpResponse(json.dumps(questions_to_display), mimetype='application/json')
-
 
 def get_questions_for_batch(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
     questions = batch.questions.filter(subquestion=False).exclude(id=question_id)
     return _create_question_hash_response(questions)
 
-
 def get_sub_questions_for_question(request, question_id):
     question = Question.objects.get(id=question_id)
     return _create_question_hash_response(question.get_subquestions())
-
 
 @permission_required('auth.can_view_batches')
 def delete_logic(request, batch_id, answer_rule_id):
@@ -329,7 +322,6 @@ def delete_logic(request, batch_id, answer_rule_id):
     rule.delete()
     messages.success(request, "Logic successfully deleted.")
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
-
 
 @permission_required('auth.can_view_batches')
 def remove(request, batch_id, question_id):

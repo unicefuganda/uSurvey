@@ -22,7 +22,7 @@ class QuestionForm(ModelForm):
             groups = [parent_question.group]
 
         if not parent_question:
-            groups = HouseholdMemberGroup.objects.all()
+            groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')
 
         self.fields['group'].choices = [(group.id, group.name) for group in groups]
         self.parent_question = parent_question

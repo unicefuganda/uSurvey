@@ -120,6 +120,12 @@ class Question(BaseModel):
 
     def de_associate_from(self, batch):
         self.batches.remove(batch)
+        batch_order_object = self.question_batch_order.filter(batch=batch)[0]
+        all_remaining_batch_orders = batch.batch_question_order.all().filter(order__gt=batch_order_object.order)
+        for batch_order in all_remaining_batch_orders:
+            batch_order.order -= 1
+            batch_order.save()
+        batch_order_object.delete()
 
 
 class QuestionOption(BaseModel):
