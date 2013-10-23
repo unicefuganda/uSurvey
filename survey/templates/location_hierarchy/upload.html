@@ -4,12 +4,20 @@
 {% endblock %}
 {% block content %}
     <h3>Upload Geographical Locations</h3>
-    <p>Country: {{ country_name }}</p>
-    <form enctype="multipart/form-data" method="post" action={% url 'upload_locations' %}>
-   {% csrf_token %}
-   <table>
-       {{upload_form.as_table}}
-    </table>
-    <input type="submit" value="Submit" id="Save"/>
+    <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
+        {% csrf_token %}
+        <div class="control-group">
+        <label class="control-label" for="{id_country">Country</label>
+        <div class="controls"><input id="id_country" name="country" type="text" disabled="true" value={{ country_name }}>
+            <span><a href="">Location Input File Format</a></span>
+        </div>
+        </div>
+        {% include "naked_form.html" with a_form=upload_form %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" name="save_button"
+                    data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+            <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
+        </div>
     </form>
+
 {% endblock %}

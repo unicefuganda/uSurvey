@@ -24,4 +24,8 @@ def then_i_should_see_the_text_message(step):
 
 @step(u'And I should see name of the country for which details were added')
 def and_i_should_see_name_of_the_country_for_which_details_were_added(step):
-    world.page.is_text_present(world.country.name)
+    world.page.find_by_css('#id_country',world.country.name)
+
+@step(u'And I should see link for input file format')
+def and_i_should_see_link_for_input_file_format(step):
+    world.page.find_link_by_text("Location Input File Format")

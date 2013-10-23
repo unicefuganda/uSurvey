@@ -5,7 +5,7 @@ from survey.features.page_objects.location_hierarchy import AddLocationHierarchy
 
 @step(u'And I have a country')
 def and_i_have_a_country(step):
-    world.country = Location.objects.create(name='Some Country',type=LocationType.objects.create(name='country',slug='country'))
+    world.country = Location.objects.create(name='SomeCountry',type=LocationType.objects.create(name='country',slug='country'))
 
 @step(u'And I visit add location hierarchy page')
 def and_i_visit_add_location_hierarchy_page(step):

@@ -7,3 +7,4 @@ Feature: Location upload
     When I visit upload locations page
     Then I should see the text message
     And I should see name of the country for which details were added
+    And I should see link for input file format
