@@ -8,8 +8,8 @@ class LocationTypeDetailsTest(BaseTest):
     def test_fields(self):
         location_type_details = LocationTypeDetails()
         fields = [str(item.attname) for item in location_type_details._meta.fields]
-        self.assertEqual(9, len(fields))
-        for field in ['id', 'created', 'modified', 'location_type_id', 'required', 'has_code', 'length_of_code','country_id','order']:
+        self.assertEqual(10, len(fields))
+        for field in ['id', 'created', 'modified', 'location_type_id', 'required', 'has_code', 'length_of_code','country_id','order','code']:
             self.assertIn(field, fields)
 
     def test_store(self):
@@ -42,4 +42,6 @@ class LocationTypeDetailsTest(BaseTest):
         location_type_details = LocationTypeDetails(**data)
         location_type_details.save()
         self.assertEqual(2,location_type_details.order)
+
+
 
