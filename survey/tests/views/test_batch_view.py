@@ -313,3 +313,45 @@ class BatchViewsTest(BaseTest):
         self.assertIn(q1, response.context['questions'])
         self.assertIn(q2, response.context['questions'])
         self.assertNotIn(sub_question1, response.context['questions'])
+
+    def test_updates_batch_orders_when_are_edited(self):
+        batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
+        q1 = Question.objects.create(text="question1", answer_type=Question.NUMBER)
+        q2 = Question.objects.create(text="question2", answer_type=Question.TEXT)
+        q1.batches.add(batch)
+        q2.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(batch=batch, question=q1, order=1)
+        BatchQuestionOrder.objects.create(batch=batch, question=q2, order=2)
+        order_one = 1
+        order_two = 2
+        order_update_form_data = {'order_information': ['%s-%s' % (order_two, q1.id), '%s-%s' % (order_one, q2.id)]}
+
+        response = self.client.post('/batches/%s/update_question_orders/' % batch.id, data=order_update_form_data)
+
+        question_order_1 = BatchQuestionOrder.objects.get(order=order_one)
+        question_order_2 = BatchQuestionOrder.objects.get(order=order_two)
+
+        self.assertEqual(question_order_1.question, q2)
+        self.assertEqual(question_order_2.question, q1)
+
+        self.assertRedirects(response, "/batches/%s/questions/" % batch.id, status_code=302, target_status_code=200)
+        message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
+        self.assertIn(message, response.cookies['messages'].value)
+
+    def test_sends_error_message_if_no_new_orders_are_posted(self):
+        batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
+        q1 = Question.objects.create(text="question1", answer_type=Question.NUMBER)
+        q2 = Question.objects.create(text="question2", answer_type=Question.TEXT)
+        q1.batches.add(batch)
+        q2.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(batch=batch, question=q1, order=1)
+        BatchQuestionOrder.objects.create(batch=batch, question=q2, order=2)
+
+        order_update_form_data = {'order_information': []}
+
+        response = self.client.post('/batches/%s/update_question_orders/' % batch.id, data=order_update_form_data)
+        self.assertRedirects(response, "/batches/%s/questions/" % batch.id, status_code=302, target_status_code=200)
+        error_message = "No questions orders were updated."
+        self.assertIn(error_message, response.cookies['messages'].value)
