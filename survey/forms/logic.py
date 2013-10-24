@@ -115,7 +115,11 @@ class LogicForm(forms.Form):
       maximum_value = self.data.get('max_value', None)
 
       if minimum_value and maximum_value:
-        return int(maximum_value) > int(minimum_value)
+        try:
+            return int(maximum_value) > int(minimum_value)
+        except:
+            pass
+          
       return True
 
     def clean(self):
