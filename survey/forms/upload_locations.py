@@ -1,5 +1,5 @@
 from django import forms
-from survey.views.location_upload_view_helper import UploadLocation
+from survey.services.location_upload import UploadLocation
 
 
 class UploadLocationForm(forms.Form):

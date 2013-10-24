@@ -2,6 +2,12 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rapidsms.contrib.locations.models import Location
+from survey.models import BaseModel
+
+
+class LocationCode(BaseModel):
+    location = models.ForeignKey(Location, null=False, related_name="code")
+    code = models.CharField(max_length=10, null=False, default=0)
 
 
 class LocationAutoComplete(models.Model):

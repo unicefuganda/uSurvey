@@ -211,7 +211,7 @@ class UploadLocationsTest(BaseTest):
          response = self.client.post('/locations/upload/', data=data)
          self.assertRedirects(response, '/locations/upload/', status_code=302, target_status_code=200, msg_prefix='')
 
-    @patch('survey.views.location_upload_view_helper.UploadLocation.upload')
+    @patch('survey.services.location_upload.UploadLocation.upload')
     def test_should_give_success_message_if_csv_uploaded(self, mock_upload):
          mock_upload.return_value = (True, 'Successfully uploaded')
          data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], 'file': self.file }

@@ -18,6 +18,7 @@ class BaseArticleFormSet(BaseFormSet):
                     form._errors["length_of_code"] = form.error_class([message])
                     raise forms.ValidationError(message)
 
+
 class LocationHierarchyForm(forms.Form):
     def __init__(self,data=None):
         super(LocationHierarchyForm, self).__init__(data=data)
@@ -29,4 +30,3 @@ class LocationHierarchyForm(forms.Form):
             existing_country = existing_country_details[0].country
             return [(existing_country.id, existing_country.name)]
         return [(country.id,country.name) for country in Location.objects.filter(type__name__iexact='country')]
-

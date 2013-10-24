@@ -1,8 +1,8 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import LocationTypeDetails
+from survey.services.location_upload import UploadLocation
 from survey.tests.base_test import BaseTest
-from survey.views.location_upload_view_helper import UploadLocation
 import csv
 
 

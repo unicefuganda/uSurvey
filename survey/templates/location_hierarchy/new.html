@@ -24,7 +24,7 @@
         </td>
         <td>{{ form.required }} Required</td>
         <td>{{ form.has_code }} Has Code</td>
-        <td>{{ form.length_of_code }}<span style="color: red">{% include "base/field_error.html" with field=form.length_of_code %}</span></td>
+        <td><input id="id_form-{{ forloop.counter0 }}-length_of_code" class="{% if not  form.length_of_code.errors%}hide {% endif %} code" type="number" placeholder="length of code" name="form-{{ forloop.counter0 }}-length_of_code" maxlength="2"><span style="color: red">{% include "base/field_error.html" with field=form.length_of_code %}</span></td>
       </tr>
     {% endfor %}
     </tbody>
@@ -39,7 +39,7 @@
     </td>
     <td><input  type="checkbox" name="required"> Required</td>
     <td><input  class="has_code" type="checkbox" name="has_code"> Has Code</td>
-    <td><input  class="hide code" type="text" name="code" maxlength="30"></td>
+    <td><input  class="hide code" type="text" name="lenght_of_code" maxlength="30"></td>
   </tr>
 </script>
 

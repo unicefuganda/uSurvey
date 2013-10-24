@@ -14,7 +14,8 @@ Feature: Location hierarchy
     Then I should see row for levels details field removed
     And the code field is hidden
     When I check has_code field
-    Then code field is shown
+    Then length of code field is shown
     When I fill details
     And I click the create hierarchy button
     Then I should see location hierarchy successfully created
+

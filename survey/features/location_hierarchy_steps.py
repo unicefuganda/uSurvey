@@ -54,7 +54,7 @@ def and_the_code_field_is_hidden(step):
 def when_i_check_has_code_field(step):
     world.page.click_by_css('.has_code')
 
-@step(u'Then code field is shown')
+@step(u'Then length of code field is shown')
 def then_code_field_is_shown(step):
     world.page.is_hidden('code', False)
 
@@ -62,9 +62,10 @@ def then_code_field_is_shown(step):
 def when_i_fill_details(step):
     data = {'country': world.country.id, 'form-0-levels': 'Region',
             'form-0-levels': 'Hill', 'form-0-required':'on',
-            'form-0-has_code':'on', 'form-0-length_of_code':2,
+            'form-0-has_code': 'on', 'form-0-length_of_code': 2,
             }
     world.page.fill_valid_values(data)
+    world.page.fill('form-0-length_of_code', '2')
 
 @step(u'And I click the create hierarchy button')
 def and_i_click_the_create_hierarchy_button(step):

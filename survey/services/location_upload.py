@@ -1,9 +1,7 @@
-import csv
 from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import LocationTypeDetails
 from survey.services.csv_uploader import CSV_Uploader
-
 
 class UploadLocation:
     def __init__(self,file):
