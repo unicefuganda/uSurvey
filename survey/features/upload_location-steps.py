@@ -65,6 +65,6 @@ def then_i_should_see_table_of_all_location_types(step):
 
 @step(u'Then Table should collapse')
 def then_table_should_collapse(step):
-    sleep(2)
+    sleep(5)
     world.page.is_text_present(world.location_type1.name,False)
     world.page.is_text_present(world.location_type2.name,False)
