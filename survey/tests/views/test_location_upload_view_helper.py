@@ -51,3 +51,14 @@ class LocationUploadHelper(BaseTest):
         status,message= self.uploader.upload()
         self.assertFalse(status)
         self.assertEqual(message, 'Missing data')
+
+    def test_should_return_false_and_error_message_if_headers_are_not_in_order(self):
+        unordered_data = [['District', 'County','Region'],
+                    ['district1','county1', 'region1'],
+                    ['district2','county2', 'region2']]
+        self.write_to_csv('wb',unordered_data,csvfilename='some_file.csv')
+        file = open('some_file.csv', 'rb')
+        uploader = UploadLocation(file)
+        status,message = uploader.upload()
+        self.assertFalse(status)
+        self.assertEqual(message, 'Location types not in order. Please refer to input file format.')

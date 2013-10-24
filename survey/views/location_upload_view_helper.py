@@ -22,8 +22,12 @@ class UploadLocation:
             detail = type.details.all()
             if not detail:
                 return False , 'Location type details for %s not found.'%header
+
             self.REQUIRED_TYPES[type.name] = detail[0].required
             location_types.append(type)
+        ordered_types = [type.name for type in LocationTypeDetails.get_ordered_types().exclude(name__iexact='country')]
+        if not ordered_types == headers:
+            return False,'Location types not in order. Please refer to input file format.'
         return True,''
 
     def _create_locations(self, reader, headers, location_types):
