@@ -1,7 +1,7 @@
 Feature: Location hierarchy
 
   Scenario: Add location hierarchy
-    Given I am logged in as researcher
+    Given I am logged in as admin
     And I have a country
     And I visit add location hierarchy page
     Then I should see text message

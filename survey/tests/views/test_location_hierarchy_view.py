@@ -17,7 +17,7 @@ class LocationHierarchyTest(BaseTest):
         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
                                         'can_view_batches')
-        self.assign_permission_to(raj, 'can_view_investigators')
+        self.assign_permission_to(raj, 'can_add_location_types')
         self.client.login(username='Rajni', password='I_Rock')
         country = LocationType.objects.create(name='Country', slug='country')
         self.uganda = Location.objects.create(name='Uganda', type=country)
@@ -140,7 +140,8 @@ class LocationHierarchyTest(BaseTest):
         self.assertEqual(levels_data['form-1-code'], hill_details.code)
         self.assertEqual(self.uganda, hill_details.country)
 
-    def test_permission_access(self):
+    def test_assert_restricted_permissions(self):
+        self.assert_login_required('/add_location_hierarchy/')
         self.assert_restricted_permission_for('/add_location_hierarchy/')
 
 
@@ -150,7 +151,7 @@ class UploadLocationsTest(BaseTest):
         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
                                         'can_view_batches')
-        self.assign_permission_to(raj, 'can_view_investigators')
+        self.assign_permission_to(raj, 'can_add_location_types')
         self.client.login(username='Rajni', password='I_Rock')
         country = LocationType.objects.create(name='Country', slug='country')
         self.uganda = Location.objects.create(name='Uganda', type=country)
@@ -223,5 +224,7 @@ class UploadLocationsTest(BaseTest):
              [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for index, location_name in enumerate(locations)]
          self.assertIn('Successfully uploaded', response.cookies['messages'].value)
 
-    def test_permission_access(self):
+
+    def test_assert_restricted_permissions(self):
+        self.assert_login_required('/locations/upload/')
         self.assert_restricted_permission_for('/locations/upload/')

@@ -1,7 +1,7 @@
 Feature: Location upload
 
   Scenario: Upload locations
-    Given I am logged in as researcher
+    Given I am logged in as admin
     And I have a country
     And I have location type and location details objects
     When I visit upload locations page
