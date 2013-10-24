@@ -11,5 +11,5 @@ class LocationDetailsForm(ModelForm):
 
         widgets = {
             'has_code': forms.CheckboxInput(attrs={'class':'has_code'}),
-            'length_of_code': forms.TextInput(attrs={'class':'hide code', 'maxlength':30}),
+            'length_of_code': forms.TextInput(attrs={'class':'hide code', 'maxlength':30,'placeholder':'length of code'}),
         }
