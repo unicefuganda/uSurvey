@@ -11,11 +11,11 @@ class BaseArticleFormSet(BaseFormSet):
         for form_count in range(0, self.total_form_count()):
             form = self.forms[form_count]
             has_code = form.cleaned_data.get('has_code',None)
-            code = form.cleaned_data.get('code','')
+            code = form.cleaned_data.get('length_of_code','')
             if has_code:
                 if not code:
-                    message = "Code cannot be blank if has code is checked."
-                    form._errors["code"] = form.error_class([message])
+                    message = "length of code cannot be blank if has code is checked."
+                    form._errors["length_of_code"] = form.error_class([message])
                     raise forms.ValidationError(message)
 
 class LocationHierarchyForm(forms.Form):

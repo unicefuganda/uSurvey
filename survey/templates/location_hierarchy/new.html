@@ -24,7 +24,7 @@
         </td>
         <td>{{ form.required }} Required</td>
         <td>{{ form.has_code }} Has Code</td>
-        <td>{{ form.code }}<span style="color: red">{% include "base/field_error.html" with field=form.code %}</span></td>
+        <td>{{ form.length_of_code }}<span style="color: red">{% include "base/field_error.html" with field=form.length_of_code %}</span></td>
       </tr>
     {% endfor %}
     </tbody>

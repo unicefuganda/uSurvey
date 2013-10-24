@@ -38,10 +38,10 @@ def and_i_visit_upload_locations_page(step):
 @step(u'And I have location type and location details objects')
 def and_i_have_location_type_and_location_details_objects(step):
     world.location_type1 = LocationType.objects.create(name = 'type1',slug='type1')
-    world.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=world.location_type1,country=world.country)
+    world.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=False,location_type=world.location_type1,country=world.country)
 
     world.location_type2 = LocationType.objects.create(name = 'type2',slug='type2')
-    world.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=world.location_type2,country=world.country)
+    world.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,location_type=world.location_type2,country=world.country)
 
 @step(u'Then I should see the text message')
 def then_i_should_see_the_text_message(step):

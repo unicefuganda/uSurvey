@@ -6,7 +6,7 @@ class LocationDetailsFormTest(TestCase):
     def test_should_know_the_fields(self):
         details_form = LocationDetailsForm()
 
-        fields = ['required', 'has_code', 'code','levels']
+        fields = ['required', 'has_code', 'length_of_code','levels']
         [self.assertIn(field, details_form.fields) for field in fields]
 
     def test_should_be_valid_if_all_fields_given(self):
@@ -14,7 +14,7 @@ class LocationDetailsFormTest(TestCase):
             'levels': 'Region',
             'required':True,
             'has_code':True,
-            'code': 'some_code'
+            'length_of_code': 3
         }
 
         details_form = LocationDetailsForm(data=data)
@@ -25,7 +25,7 @@ class LocationDetailsFormTest(TestCase):
             'levels': '',
             'required':True,
             'has_code':True,
-            'code': 'some_code'
+            'length_of_code': 3
         }
 
         details_form = LocationDetailsForm(data=data)

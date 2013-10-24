@@ -48,7 +48,7 @@ def then_i_should_see_row_for_levels_details_field_removed(step):
 
 @step(u'And the code field is hidden')
 def and_the_code_field_is_hidden(step):
-    world.page.is_hidden('form-0-code')
+    world.page.is_hidden('form-0-length_of_code')
 
 @step(u'When I check has_code field')
 def when_i_check_has_code_field(step):
@@ -62,7 +62,7 @@ def then_code_field_is_shown(step):
 def when_i_fill_details(step):
     data = {'country': world.country.id, 'form-0-levels': 'Region',
             'form-0-levels': 'Hill', 'form-0-required':'on',
-            'form-0-has_code':'on', 'form-0-code':'0001',
+            'form-0-has_code':'on', 'form-0-length_of_code':2,
             }
     world.page.fill_valid_values(data)
 

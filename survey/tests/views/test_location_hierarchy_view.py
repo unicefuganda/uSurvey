@@ -124,7 +124,7 @@ class LocationHierarchyTest(BaseTest):
     def test_saving_multiple_location_hierarchy_types(self):
         levels_data = {'country': self.uganda.id, 'form-0-levels': 'Region',
                        'form-1-levels': 'Hill', 'form-1-required':'on',
-                       'form-1-has_code':'on', 'form-1-code':'0001',
+                       'form-1-has_code':'on', 'form-1-length_of_code':3,
                        'form-TOTAL_FORMS': 2,
                        'form-INITIAL_FORMS': 0}
         response = self.client.post('/add_location_hierarchy/', data=levels_data)
@@ -137,7 +137,7 @@ class LocationHierarchyTest(BaseTest):
         hill_details = LocationTypeDetails.objects.get(location_type=hill)
         self.assertEqual(True, hill_details.required)
         self.assertEqual(True, hill_details.has_code)
-        self.assertEqual(levels_data['form-1-code'], hill_details.code)
+        self.assertEqual(levels_data['form-1-length_of_code'], hill_details.length_of_code)
         self.assertEqual(self.uganda, hill_details.country)
 
     def test_assert_restricted_permissions(self):
@@ -157,13 +157,13 @@ class UploadLocationsTest(BaseTest):
         self.uganda = Location.objects.create(name='Uganda', type=country)
         self.some_other_country = Location.objects.create(name='SomeOtherCountry', type=country)
         self.location_type1 = LocationType.objects.create(name = 'Region',slug='region')
-        self.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type1,country=self.uganda)
+        self.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=False,location_type=self.location_type1,country=self.uganda)
 
         self.location_type2 = LocationType.objects.create(name = 'District',slug='district')
-        self.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type2,country=self.uganda)
+        self.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,location_type=self.location_type2,country=self.uganda)
 
         self.location_type3 = LocationType.objects.create(name = 'County',slug='county')
-        self.location_type_details3 = LocationTypeDetails.objects.create(required=False,has_code=False,code='',location_type=self.location_type3,country=self.uganda)
+        self.location_type_details3 = LocationTypeDetails.objects.create(required=False,has_code=False,location_type=self.location_type3,country=self.uganda)
 
         self.filename = 'uganda.csv'
         self.filedata = [["Region", "District", "County"], ["0","1","2"], ["3","4","5"], ["6","7","8"]]

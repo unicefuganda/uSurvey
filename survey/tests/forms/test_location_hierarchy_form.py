@@ -53,15 +53,15 @@ class LocationHierarchyFormTest(TestCase):
         DetailsFormSet = formset_factory(LocationDetailsForm, formset=BaseArticleFormSet)
 
         data = {'form-0-levels': 'Region', 'form-MAX_NUM_FORMS': '1000', 'form-0-required': 'on',
-                'form-TOTAL_FORMS': '1', 'form-0-code': '', 'form-INITIAL_FORMS': '0',
+                'form-TOTAL_FORMS': '1', 'form-0-length_of_code': '', 'form-INITIAL_FORMS': '0',
                 'form-0-has_code': 'on'}
 
         details_formset = DetailsFormSet(data,prefix='form')
-        message = "Code cannot be blank if has code is checked."
+        message = "length of code cannot be blank if has code is checked."
 
         self.assertFalse(details_formset.is_valid())
 
-        self.assertIn(message, details_formset.forms[0].errors['code'])
+        self.assertIn(message, details_formset.forms[0].errors['length_of_code'])
 
     def test_should_show_used_country_as_available_choices_if_any_otherwise_show_all_countries(self):
         LocationTypeDetails.objects.all().delete()
