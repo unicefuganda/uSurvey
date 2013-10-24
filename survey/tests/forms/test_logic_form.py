@@ -43,7 +43,7 @@ class LogicFormTest(TestCase):
         data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
                     condition=AnswerRule.CONDITIONS['BETWEEN'],
                     attribute = 'value',
-                    min_value=1, max_value=9)
+                    min_value='200', max_value='1000')
 
         logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
         self.assertTrue(logic_form.is_valid())
