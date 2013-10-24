@@ -192,8 +192,11 @@ class UploadLocationsTest(BaseTest):
     def test_should_not_render_country_type_in_location_types_in_context_data(self):
         response = self.client.get('/locations/upload/')
         self.assertEqual(200, response.status_code)
-        [self.assertIn(location_type , response.context['location_types']) for location_type in LocationType.objects.exclude(name__iexact='country')]
-        [self.assertNotIn(location_type , response.context['location_types']) for location_type in LocationType.objects.filter(name__iexact='country')]
+        types = response.context['location_types']
+        self.assertEqual(self.location_type1,types[0])
+        self.assertEqual(self.location_type2,types[1])
+        self.assertEqual(self.location_type3,types[2])
+        [self.assertNotIn(location_type , types) for location_type in LocationType.objects.filter(name__iexact='country')]
 
 
     def test_should_render_error_message_if_no_type_and_details_yet(self):
