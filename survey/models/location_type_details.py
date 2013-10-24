@@ -9,3 +9,8 @@ class LocationTypeDetails(BaseModel):
     code = models.CharField(max_length=30, blank=True, null=True)
     location_type = models.ForeignKey(LocationType, null=False, related_name="details")
     country = models.ForeignKey(Location, null=True, related_name="details")
+    order = models.PositiveIntegerField(unique=True,blank=True,null=True)
+
+    @classmethod
+    def get_ordered_types(cls):
+        return LocationType.objects.all().order_by('details__order')
