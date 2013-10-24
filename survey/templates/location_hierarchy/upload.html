@@ -4,6 +4,7 @@
 {% endblock %}
 {% block content %}
     <h3>Upload Geographical Locations</h3>
+    {% if country_name %}
     <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
         {% csrf_token %}
         <div class="control-group">
@@ -42,5 +43,7 @@
             <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
         </div>
     </form>
-
+    {% else %}
+        <a href="{% url 'add_location_hierarchy' %}" class="btn btn-primary" name="add_hierarchy">Add Hierarchy</a>
+    {% endif %}
 {% endblock %}

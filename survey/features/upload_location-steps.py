@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from lettuce import step, world
 from rapidsms.contrib.locations.models import LocationType
 from survey.features.page_objects.accounts import LoginPage
+from survey.features.page_objects.location_hierarchy import AddLocationHierarchyPage
 from survey.features.page_objects.upload_locations import UploadLocationsPage
 from survey.models import LocationTypeDetails
 
@@ -69,3 +70,20 @@ def then_table_should_collapse(step):
     sleep(3)
     world.page.is_text_present(world.location_type1.name, False)
     world.page.is_text_present(world.location_type2.name, False)
+
+@step(u'Then I should see no hierarchy message')
+def then_i_should_see_no_hierarchy_message(step):
+    world.page.is_text_present('No location hierarchy added yet.')
+
+@step(u'And I should see the button to add hierarchy')
+def and_i_should_see_the_button_to_add_hierarchy(step):
+    world.page.find_by_name('add_hierarchy')
+
+@step(u'When I click on add hierarchy button')
+def when_i_click_on_add_hierarchy_button(step):
+    world.page.click_by_name('add_hierarchy')
+
+@step(u'And I should go to add hierarchy page')
+def and_i_should_go_to_add_hierarchy_page(step):
+    world.page = AddLocationHierarchyPage(world.browser)
+    world.page.validate_url()

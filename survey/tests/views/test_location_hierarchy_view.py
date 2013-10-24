@@ -203,8 +203,8 @@ class UploadLocationsTest(BaseTest):
         LocationType.objects.all().delete()
         LocationTypeDetails.objects.all().delete()
         response = self.client.get('/locations/upload/')
-        self.assertEqual(302, response.status_code)
-        self.assertIn('No location hierarchy added yet.', response.cookies['messages'].value)
+        self.assertEqual(200, response.status_code)
+        self.assertIn('No location hierarchy added yet.', str(response))
 
     def test_should_redirect_after_post(self):
          data={u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'],'file': self.file}

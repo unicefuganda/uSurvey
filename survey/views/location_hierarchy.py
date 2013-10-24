@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
-from django.contrib.auth.decorators import permission_required, login_required
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.text import slugify
@@ -57,10 +56,13 @@ def upload(request):
             messages.success(request, message)
             return HttpResponseRedirect('/locations/upload/')
 
+    context = {'button_label': 'Save', 'id': 'upload-locations-form',
+             'country_name': '', 'upload_form': upload_form,'range':range(3)}
+
     details = LocationTypeDetails.objects.all()
     if not details.exists():
         messages.error(request, "No location hierarchy added yet.")
-        return HttpResponseRedirect('/locations/upload/')
+        return render(request, 'location_hierarchy/upload.html', context)
 
     country_with_location_details_objects = details[0].country
     context = {'button_label': 'Save', 'id': 'upload-locations-form',

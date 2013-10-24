@@ -12,3 +12,12 @@ Feature: Location upload
     Then I should see table of all location types
     When I click on the link for input file format
     Then Table should collapse
+
+  Scenario: Upload locations- when no details object present
+    Given I am logged in as admin
+    And I have a country
+    When I visit upload locations page
+    Then I should see no hierarchy message
+    And I should see the button to add hierarchy
+    When I click on add hierarchy button
+    And I should go to add hierarchy page
