@@ -72,21 +72,33 @@ class LogicForm(forms.Form):
 
     def _validate_max_value(self, field_name, rule):
         if self.data.get('max_value', None) and not rule:
-            rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
+            try:
+                max_value = int(self.data['max_value'])
+                rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
                                              validate_with_min_value__lte=self.data['max_value'],
                                              validate_with_max_value__gte=self.data['max_value'],
                                              condition=self.data['condition'])
-            field_name = 'condition %s with max value %s is within existing range that' % (
-              self.data['condition'], self.data['max_value'])
+                field_name = 'condition %s with max value %s is within existing range that' % (
+                    self.data['condition'], self.data['max_value'])
+            except ValueError:
+                rule = [1]
+                field_name = 'Max value %s invalid, must be an integer.' % (self.data['max_value'])
+
         return field_name, rule
 
     def _validate_min_value(self, field_name, rule):
         if self.data.get('min_value', None):
-            rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
+            try:
+                min_value = int(self.data['min_value'])
+                rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
                                              validate_with_min_value__lte=self.data['min_value'],
                                              validate_with_max_value__gte=self.data['min_value'],
                                              condition=self.data['condition'])
-            field_name = 'condition %s with min value %s is within existing range that' % (self.data['condition'], self.data['min_value'])
+                field_name = 'condition %s with min value %s is within existing range that' % (self.data['condition'], self.data['min_value'])
+            except ValueError:
+                rule = [1]
+                field_name = 'Min value %s invalid, must be an integer.' % (self.data['min_value'])
+
         return field_name, rule
 
     def _validate_min_and_max_range(self, field_name, rule):
@@ -129,6 +141,9 @@ class LogicForm(forms.Form):
             field_name, rule = self._validate_min_and_max_range(field_name, rule)
 
         if len(rule)>0:
+            if rule[0] == 1:
+                raise ValidationError(field_name)
+
             raise ValidationError("Rule on this %s already exists." % field_name)
         return self.cleaned_data
 
