@@ -56,15 +56,16 @@ def and_i_should_see_link_for_input_file_format(step):
 
 @step(u'When I click on the link for input file format')
 def when_i_click_on_the_link_for_input_file_format(step):
+    sleep(3)
     world.page.click_link_by_text("Location Input File Format")
 
 @step(u'Then I should see table of all location types')
 def then_i_should_see_table_of_all_location_types(step):
-    world.page.is_text_present(world.location_type1.name,True)
-    world.page.is_text_present(world.location_type2.name,True)
+    world.page.is_text_present(world.location_type1.name, True)
+    world.page.is_text_present(world.location_type2.name, True)
 
 @step(u'Then Table should collapse')
 def then_table_should_collapse(step):
-    sleep(5)
-    world.page.is_text_present(world.location_type1.name,False)
-    world.page.is_text_present(world.location_type2.name,False)
+    sleep(3)
+    world.page.is_text_present(world.location_type1.name, False)
+    world.page.is_text_present(world.location_type2.name, False)
