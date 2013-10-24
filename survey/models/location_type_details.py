@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import BaseModel
 
@@ -14,3 +15,8 @@ class LocationTypeDetails(BaseModel):
     @classmethod
     def get_ordered_types(cls):
         return LocationType.objects.all().order_by('details__order')
+
+    def save(self, *args, **kwargs):
+        last_order = LocationTypeDetails.objects.aggregate(Max('order'))['order__max']
+        self.order = last_order + 1 if last_order else 1
+        super(LocationTypeDetails, self).save(*args, **kwargs)

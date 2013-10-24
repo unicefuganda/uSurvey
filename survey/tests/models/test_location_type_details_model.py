@@ -19,12 +19,27 @@ class LocationTypeDetailsTest(BaseTest):
 
     def test_should_return_location_type_objects_ordered_by_order(self):
         country = LocationType.objects.create(name='country',slug='country')
-        location_type_details = LocationTypeDetails.objects.create(required=True,has_code=False,location_type=country,order=0)
+        location_type_details = LocationTypeDetails.objects.create(required=True,has_code=False,location_type=country)
         district = LocationType.objects.create(name='district',slug='district')
-        location_type_details_1 = LocationTypeDetails.objects.create(required=True,has_code=False,location_type=district,order=2)
+        location_type_details_1 = LocationTypeDetails.objects.create(required=True,has_code=False,location_type=district)
         county = LocationType.objects.create(name='county',slug='county')
-        location_type_details_1 = LocationTypeDetails.objects.create(required=True,has_code=False,location_type=county,order=1)
+        location_type_details_1 = LocationTypeDetails.objects.create(required=True,has_code=False,location_type=county)
         ordered_types = LocationTypeDetails.get_ordered_types()
         self.assertEqual(country,ordered_types[0])
-        self.assertEqual(county,ordered_types[1])
-        self.assertEqual(district,ordered_types[2])
+        self.assertEqual(district,ordered_types[1])
+        self.assertEqual(county,ordered_types[2])
+
+    def test_should_save_with_auto_incremented_order(self):
+        country = LocationType.objects.create(name='country',slug='country')
+        country_details = LocationTypeDetails.objects.create(required=True,has_code=False,location_type=country)
+        self.assertEqual(1,country_details.order)
+        district = LocationType.objects.create(name='district',slug='district')
+        data = {
+            'required':True,
+            'has_code':False,
+            'location_type': district,
+        }
+        location_type_details = LocationTypeDetails(**data)
+        location_type_details.save()
+        self.assertEqual(2,location_type_details.order)
+
