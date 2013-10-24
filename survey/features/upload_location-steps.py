@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from time import sleep
 from lettuce import step, world
 from rapidsms.contrib.locations.models import LocationType
 from survey.features.page_objects.upload_locations import UploadLocationsPage
@@ -29,3 +30,18 @@ def and_i_should_see_name_of_the_country_for_which_details_were_added(step):
 @step(u'And I should see link for input file format')
 def and_i_should_see_link_for_input_file_format(step):
     world.page.find_link_by_text("Location Input File Format")
+
+@step(u'When I click on the link for input file format')
+def when_i_click_on_the_link_for_input_file_format(step):
+    world.page.click_link_by_text("Location Input File Format")
+
+@step(u'Then I should see table of all location types')
+def then_i_should_see_table_of_all_location_types(step):
+    world.page.is_text_present(world.location_type1.name,True)
+    world.page.is_text_present(world.location_type2.name,True)
+
+@step(u'Then Table should collapse')
+def then_table_should_collapse(step):
+    sleep(2)
+    world.page.is_text_present(world.location_type1.name,False)
+    world.page.is_text_present(world.location_type2.name,False)

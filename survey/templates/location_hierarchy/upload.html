@@ -9,10 +9,33 @@
         <div class="control-group">
         <label class="control-label" for="{id_country">Country</label>
         <div class="controls"><input id="id_country" name="country" type="text" disabled="true" value={{ country_name }}>
-            <span><a href="">Location Input File Format</a></span>
         </div>
         </div>
         {% include "naked_form.html" with a_form=upload_form %}
+        <div><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_table">Location Input File Format</a></div>
+        <div id="collapse_table"  class="accordion-body collapse">
+        <div class="accordion-inner">
+            <table class="table-bordered table">
+                <tr>
+                {% for type in location_types %}
+                    <th>
+                        {{ type.name.capitalize }}
+                    </th>
+                {% endfor %}
+                </tr>
+                {% for row_count in range %}
+                    <tr>
+                    {% for type in location_types %}
+                        <td>
+                            {{ type.name.lower }}{{ row_count }}
+                        </td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+        </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary" name="save_button"
                     data-disabled-text="{{ loading_text }}">{{ button_label }}</button>

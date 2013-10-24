@@ -1,7 +1,6 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import permission_required, login_required
-from django.core import management
 
+from django.contrib.auth.decorators import permission_required, login_required
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.text import slugify
@@ -12,7 +11,6 @@ from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
 from survey.forms.upload_locations import UploadLocationForm
 from survey.models import LocationTypeDetails
-from survey.views.location_upload_view_helper import UploadLocation
 
 @login_required
 @permission_required('auth.can_view_batches')
@@ -65,5 +63,8 @@ def upload(request):
 
     country_with_location_details_objects = details[0].country
     context = {'button_label': 'Save', 'id': 'upload-locations-form',
-             'country_name': country_with_location_details_objects.name, 'upload_form': upload_form}
+             'country_name': country_with_location_details_objects.name, 'upload_form': upload_form,'range':[1,2,3]}
+    location_types = LocationType.objects.exclude(name__iexact='country')
+    if location_types.exists():
+        context.update({'location_types':location_types})
     return render(request, 'location_hierarchy/upload.html', context)

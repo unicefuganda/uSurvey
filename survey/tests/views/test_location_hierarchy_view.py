@@ -9,7 +9,6 @@ from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFo
 from survey.forms.upload_locations import UploadLocationForm
 from survey.models import LocationTypeDetails
 from survey.tests.base_test import BaseTest
-from django.core.files import File
 
 
 class LocationHierarchyTest(BaseTest):
@@ -189,13 +188,19 @@ class UploadLocationsTest(BaseTest):
         self.assertEqual(response.context['country_name'], self.uganda.name)
         self.assertIsInstance(response.context['upload_form'],UploadLocationForm)
 
+    def test_should_not_render_country_type_in_location_types_in_context_data(self):
+        response = self.client.get('/locations/upload/')
+        self.assertEqual(200, response.status_code)
+        [self.assertIn(location_type , response.context['location_types']) for location_type in LocationType.objects.exclude(name__iexact='country')]
+        [self.assertNotIn(location_type , response.context['location_types']) for location_type in LocationType.objects.filter(name__iexact='country')]
+
+
     def test_should_render_error_message_if_no_type_and_details_yet(self):
         LocationType.objects.all().delete()
         LocationTypeDetails.objects.all().delete()
         response = self.client.get('/locations/upload/')
         self.assertEqual(302, response.status_code)
         self.assertIn('No location hierarchy added yet.', response.cookies['messages'].value)
-
 
     def test_should_redirect_after_post(self):
          data={u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'],'file': self.file}
