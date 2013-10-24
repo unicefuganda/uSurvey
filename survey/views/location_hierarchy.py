@@ -64,7 +64,7 @@ def upload(request):
 
     country_with_location_details_objects = details[0].country
     context = {'button_label': 'Save', 'id': 'upload-locations-form',
-             'country_name': country_with_location_details_objects.name, 'upload_form': upload_form,'range':[1,2,3]}
+             'country_name': country_with_location_details_objects.name, 'upload_form': upload_form,'range':range(3)}
     location_types = LocationType.objects.exclude(name__iexact='country')
     if location_types.exists():
         context.update({'location_types':location_types})
