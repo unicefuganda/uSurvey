@@ -118,8 +118,8 @@ class LogicForm(forms.Form):
         try:
             return int(maximum_value) > int(minimum_value)
         except:
-            pass
-          
+            return True
+
       return True
 
     def clean(self):

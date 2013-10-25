@@ -13,12 +13,16 @@ class USSD(USSDBase):
         self.household = None
         self.household_member = None
         self.is_registering_household = True
+        self.has_chosen_retake = False
+        self.has_answered_retake = False
         self.question = None
         self.set_session()
         self.set_household()
         self.set_household_member()
         self.set_current_member_is_done()
         self.set_is_resuming_survey()
+        self.set_has_chosen_retake()
+        self.set_has_answered_retake()
         self.clean_investigator_input()
 
     def set_household(self):
@@ -40,6 +44,20 @@ class USSD(USSDBase):
         try:
             cache_resuming_session = self.get_from_session('IS_RESUMING')
             self.is_resuming_survey = cache_resuming_session
+        except:
+            pass
+
+    def set_has_chosen_retake(self):
+        try:
+            cache_has_chosen_retake_session = self.get_from_session('HAS_CHOSEN_RETAKE')
+            self.has_chosen_retake = cache_has_chosen_retake_session
+        except:
+            pass
+
+    def set_has_answered_retake(self):
+        try:
+            cache_has_answered_retake_session = self.get_from_session('HAS_ANSWERED_RETAKE')
+            self.has_answered_retake = cache_has_answered_retake_session
         except:
             pass
 

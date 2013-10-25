@@ -63,7 +63,6 @@ class LogicFormTest(TestCase):
         self.assertFalse(logic_form.is_valid())
         self.assertIn('Logic not created max value must be greater than min value.', logic_form.errors['__all__'])
 
-
     def test_form_has_validation_error_if_between_condition_is_selected_and_min_value_field_is_empty(self):
         batch = Batch.objects.create(order=1)
         question_without_option = Question.objects.create(text="Question 1?",

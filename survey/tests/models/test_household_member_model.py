@@ -895,7 +895,7 @@ class HouseholdMemberTest(TestCase):
         question_1.batches.add(batch)
         BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
 
-        self.assertFalse(household_member.can_retake_survey(None, 5))
+        self.assertTrue(household_member.can_retake_survey(None, 5))
         self.assertFalse(household_member.has_open_batches())
         self.assertFalse(household_member.has_open_batches())
 

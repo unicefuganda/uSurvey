@@ -162,14 +162,40 @@ class USSDSurvey(USSD):
                 self.behave_like_new_request()
                 self.render_household_or_household_member(answer)
 
+    def render_retake_message(self):
+        self.action = self.ACTIONS['REQUEST']
+        self.responseString = self.MESSAGES['RETAKE_SURVEY']
+        self.set_in_session('HAS_CHOSEN_RETAKE', True)
+
+    def verify_retake_answer(self, answer):
+        self.set_in_session('HAS_CHOSEN_RETAKE', False)
+        if answer == self.ANSWER['YES']:
+            self.request['ussdRequestString'] = ""
+            self.set_in_session('HAS_ANSWERED_RETAKE', True)
+            self.household.mark_past_answers_as_old()
+            self.select_or_render_household_member(self.household.id)
+        else:
+            self.set_in_session('HOUSEHOLD', None)
+            self.set_in_session('HAS_ANSWERED_RETAKE', False)
+            self.household = None
+            self.render_households_list()
+
+    def render_list_for_retake(self, answer):
+        if not self.is_pagination_option(answer):
+            self.set_in_session('PAGE', self.DEFAULT_SESSION_VARIABLES['PAGE'])
+        if self.has_chosen_household_member():
+            self.render_survey()
+        else:
+            self.select_or_render_household_member(answer)
+
     def render_household_or_household_member(self, answer):
         if self.has_chosen_household():
-            if not self.is_pagination_option(answer):
-                self.set_in_session('PAGE', self.DEFAULT_SESSION_VARIABLES['PAGE'])
-            if self.has_chosen_household_member():
-                self.render_survey()
+            if self.household.survey_completed() and not self.has_chosen_retake and not self.is_registering_household and not self.has_answered_retake:
+                self.render_retake_message()
+            elif self.has_chosen_retake and not self.has_answered_retake:
+                self.verify_retake_answer(answer)
             else:
-                self.select_or_render_household_member(answer)
+                self.render_list_for_retake(answer)
         else:
             self.select_or_render_household(answer)
 
@@ -191,7 +217,7 @@ class USSDSurvey(USSD):
             self.action = self.ACTIONS['END']
             self.responseString = self.MESSAGES['NO_HOUSEHOLDS']
         elif not answer and self.is_active():
-            self.render_resume_message()
+            self.render_resume_message(False)
         else:
             self.render_household_or_household_member(answer)
 

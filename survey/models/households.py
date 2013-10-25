@@ -165,6 +165,9 @@ class Household(BaseModel):
             members_list.append(self.NEXT_PAGE_TEXT)
         return "\n".join(members_list)
 
+    def mark_past_answers_as_old(self):
+        for member in self.household_member.all():
+            member.mark_past_answers_as_old()
 
     @classmethod
     def set_related_locations(cls, households):
@@ -300,14 +303,16 @@ class HouseholdMember(BaseModel):
                 return next_group_question
         return None
 
-    def can_retake_survey(self, batch, minutes):
+    def can_retake_survey(self, batch=None, minutes=0):
         if not batch:
-            return False
+            last_batch_completed_by_member = self.completed_member_batches.filter(householdmember=self,
+                                                                              household=self.household).order_by('created').reverse()
+        else:
+            last_batch_completed_by_member = self.completed_member_batches.filter(batch=batch, householdmember=self,
+                                                                              household=self.household).order_by('created').reverse()
 
-        batch_completed_by_member = self.completed_member_batches.filter(batch=batch, householdmember=self,
-                                                                         household=self.household)
-        if batch_completed_by_member:
-            last_batch_completed_time = batch_completed_by_member[0].created
+        if last_batch_completed_by_member:
+            last_batch_completed_time = last_batch_completed_by_member[0].created
 
             elapsed_seconds = (datetime.datetime.utcnow().replace(
                 tzinfo=last_batch_completed_time.tzinfo) - last_batch_completed_time).seconds

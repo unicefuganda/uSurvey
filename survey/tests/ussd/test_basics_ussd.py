@@ -64,10 +64,55 @@ class USSDTest(USSDBaseTest):
 
         self.take_survey()
         response = self.select_household()
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond('1')
+
         members_list = "%s\n1: %s - (HEAD)*\n2: %s*\n3: %s*" % (
             USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, household_member1.surname,
             household_member2.surname)
         response_string = "responseString=%s&action=request" % members_list
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond('1')
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_goes_back_to_household_list_if_investigator_selects_household_and_chooses_not_to_retake_survey(self):
+        household_member1 = HouseholdMember.objects.create(household=self.household, surname="abcd", male=False,
+                                                           date_of_birth='1989-02-02')
+        household_member2 = HouseholdMember.objects.create(household=self.household, surname="xyz", male=False,
+                                                           date_of_birth='1989-02-02')
+
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            self.reset_session()
+
+        self.take_survey()
+        response = self.select_household()
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond('2')
+
+        households_list = "%s\n1: %s*\n2: %s*" % (
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        response_string = "responseString=%s&action=request" % households_list
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond('1')
+        response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond('1')
+        members_list = "%s\n1: %s - (HEAD)*\n2: %s*\n3: %s*" % (
+            USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, household_member1.surname,
+            household_member2.surname)
+        response_string = "responseString=%s&action=request" % members_list
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond('1')
+        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_renders_welcome_message_if_investigator_does_not_select_option_one_or_two_from_welcome_screen(self):

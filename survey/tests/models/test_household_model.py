@@ -377,3 +377,31 @@ class HouseholdTest(TestCase):
         self.assertTrue(self.household.survey_completed())
         self.assertTrue(self.household.has_completed_batches([batch]))
 
+    def test_knows_to_mark_answers_as_old(self):
+        investigator = Investigator.objects.create(name="inv1", location=self.kampala,
+                                                   backend=self.backend)
+        household = Household.objects.create(investigator=investigator, location=self.kampala, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
+                                                          male=False,
+                                                  household=household)
+
+        batch = Batch.objects.create(name="Batch 1", order=1)
+        group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
+        group_condition = GroupCondition.objects.create(attribute="GENDER", condition="EQUALS", value=True)
+        group_condition.groups.add(group)
+
+        question_1 = Question.objects.create(group=group, text="This is another question", answer_type="number",
+                                             order=1)
+        question_1.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+
+        batch.open_for_location(investigator.location)
+        investigator.member_answered(question_1, household_member, 1, batch)
+
+        self.assertFalse(NumericalAnswer.objects.filter(question=question_1)[0].is_old)
+
+        household.mark_past_answers_as_old()
+
+        self.assertTrue(NumericalAnswer.objects.filter(question=question_1)[0].is_old)
+
+
