@@ -260,7 +260,7 @@ class HouseholdMember(BaseModel):
     def next_unanswered_question_in(self, member_group, batch, order):
         all_questions = []
         for question in batch.all_questions():
-            if (question.order >= order) and (question.group == member_group):
+            if (question.question_batch_order.filter(batch=batch)[0].order > order) and (question.group == member_group):
                 all_questions.append(question)
 
         for question in all_questions:
@@ -276,7 +276,7 @@ class HouseholdMember(BaseModel):
         except ObjectDoesNotExist, e:
             return self.next_question_in_order(batch, question)
 
-    def get_next_question_orders(self, last_question_answered):
+    def get_next_question_orders(self, last_question_answered, batch=None):
         group_order = 0
         question_order = 0
         if not last_question_answered:
@@ -286,16 +286,20 @@ class HouseholdMember(BaseModel):
             if last_question_answered.subquestion:
                 last_question_answered = last_question_answered.parent
 
-            if last_question_answered.is_last_question_of_group():
+            if last_question_answered.is_last_question_of_group(batch):
                 group_order = last_question_answered.group.order + 1
             else:
-                question_order = last_question_answered.order
+                if batch:
+                    batch_question_order_filter = last_question_answered.question_batch_order.all().filter(batch=batch)
+                    question_order = batch_question_order_filter[0].order if batch_question_order_filter else 0
+                else:
+                    question_order = last_question_answered.order
                 group_order = last_question_answered.group.order
 
         return group_order, question_order
 
     def next_question_in_order(self, batch, last_question_answered=None):
-        group_order, question_order = self.get_next_question_orders(last_question_answered)
+        group_order, question_order = self.get_next_question_orders(last_question_answered, batch)
 
         for member_group in self.get_member_groups(order_above=group_order):
             next_group_question = self.next_unanswered_question_in(member_group, batch, question_order)

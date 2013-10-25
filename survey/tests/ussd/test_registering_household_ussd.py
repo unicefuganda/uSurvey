@@ -284,7 +284,8 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.respond(answers['gender'])
 
         response = self.respond('2')
-        ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['WELCOME_TEXT']
+        welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+        ask_member_response_string = "responseString=%s&action=request" % welcome_text
         self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
     def test_should_ask_member_question_after_registering_head_if_investigator_responds_with_yes_to_register_other_members(
@@ -362,7 +363,8 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.respond(answers['gender'])
 
         response = self.respond('2')
-        ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['WELCOME_TEXT']
+        welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+        ask_member_response_string = "responseString=%s&action=request" % welcome_text
         self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
     def test_should_not_give_member_select_screen_if_head_already_registered(self):

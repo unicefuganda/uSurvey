@@ -13,6 +13,7 @@ class USSD(USSDBase):
         self.household = None
         self.household_member = None
         self.is_registering_household = True
+        self.is_resuming_survey = False
         self.has_chosen_retake = False
         self.has_answered_retake = False
         self.question = None

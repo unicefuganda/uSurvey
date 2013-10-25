@@ -115,8 +115,8 @@ class Question(BaseModel):
     def rules_for_batch(self, batch):
         return self.rule.all().filter(batch=batch)
 
-    def is_last_question_of_group(self):
-        return self == self.group.last_question()
+    def is_last_question_of_group(self, batch):
+        return self == self.group.last_question(batch)
 
     def de_associate_from(self, batch):
         self.batches.remove(batch)

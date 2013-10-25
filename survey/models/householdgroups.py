@@ -12,9 +12,13 @@ class HouseholdMemberGroup(BaseModel):
     def get_all_conditions(self):
         return self.conditions.all()
 
-    def last_question(self):
+    def last_question(self, batch):
+        if not batch:
+            return None
         all_questions = self.all_questions().exclude(order=None)
-        return all_questions.order_by('order').reverse()[0] if all_questions else None
+        from survey.models import BatchQuestionOrder
+        last_order_in_batch = BatchQuestionOrder.objects.filter(question__in = all_questions, batch=batch).order_by('order')
+        return last_order_in_batch.reverse()[0].question if last_order_in_batch else None
 
     def maximum_question_order(self):
         all_questions = self.all_questions()

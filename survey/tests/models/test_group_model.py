@@ -60,9 +60,14 @@ class HouseholdMemberGroupTest(TestCase):
         question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
+        batch = Batch.objects.create(name='Batch A', order=1)
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=1)
 
-        self.assertEqual(question_2, member_group.last_question())
-        self.assertNotEqual(question_1, member_group.last_question())
+        self.assertEqual(question_1, member_group.last_question(batch))
+        self.assertNotEqual(question_2, member_group.last_question(batch))
 
     def test_knows_all_conditions_belonging_to_group(self):
         age_value = 6
@@ -91,7 +96,7 @@ class HouseholdMemberGroupTest(TestCase):
     def test_last_question_returns_none_if_there_is_no_questions_in_group(self):
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
 
-        self.assertIsNone(member_group.last_question())
+        self.assertIsNone(member_group.last_question(None))
 
     def test_knows_all_group_questions_in_an_open_batches_has_been_answered(self):
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)

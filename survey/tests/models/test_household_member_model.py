@@ -172,22 +172,28 @@ class HouseholdMemberTest(TestCase):
         household_member = HouseholdMember.objects.create(household=hhold, surname="name", male=True,
                                                           date_of_birth=date(1998, 2, 2))
 
+        question.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+
+
         group_order, question_order = household_member.get_next_question_orders(None)
         self.assertEqual(0, group_order)
         self.assertEqual(0, question_order)
 
-        group_order, question_order = household_member.get_next_question_orders(question)
+        group_order, question_order = household_member.get_next_question_orders(question, self.batch)
         self.assertEqual(1, group_order)
         self.assertEqual(1, question_order)
 
-        group_order, question_order = household_member.get_next_question_orders(question_2)
+        group_order, question_order = household_member.get_next_question_orders(question_2, self.batch)
         self.assertEqual(2, group_order)
         self.assertEqual(0, question_order)
 
         subquestion = Question.objects.create(group=group, text="subquestion", answer_type="number", parent=question_2,
                                               subquestion=True)
 
-        group_order, question_order = household_member.get_next_question_orders(subquestion)
+        group_order, question_order = household_member.get_next_question_orders(subquestion, self.batch)
         self.assertEqual(2, group_order)
         self.assertEqual(0, question_order)
 
