@@ -50,5 +50,15 @@ class USSDBaseView(object):
             action, responseString = self.ussd_survey.take_survey()
 
         else:
-            action, responseString = self.ussd_register_household.start(answer)
+            if not self.ussd_survey.is_resuming_survey:
+                action, responseString = self.ussd_register_household.start(answer)
+            else:
+                if answer == USSDSurvey.ANSWER['YES']:
+                    action, responseString = self.ussd_register_household.start("00")
+                    self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
+                else:
+                    action = self.ussd_survey.ACTIONS['REQUEST']
+                    responseString = USSDSurvey.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+                self.ussd_survey.set_in_session('IS_RESUMING', False)
+
         return {'action': action, 'responseString': responseString}

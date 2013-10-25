@@ -536,7 +536,8 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         self.reset_session()
         self.ussd_params['msisdn'] = investigator.mobile_number
-        self.register_household()
+        self.respond('1')
+        response = self.register_household()
         self.select_household()
         self.respond("Name")
         self.respond("2")
