@@ -18,7 +18,7 @@ class UploadLocation:
                 location_type = LocationType.objects.filter(name=header, slug=slugify(header))
 
                 if not location_type.exists():
-                    return False, 'Location type - %s not created' % header
+                    return False, 'Location type - %s not found.' % header
                 type = location_type[0]
                 detail = type.details.all()
                 if not detail:
@@ -30,7 +30,10 @@ class UploadLocation:
                     if index==0 or headers[index-1].replace('Code','') != type.name:
                         return False, '%sCode column should be before %sName column. Please refer to input file format.'%(type.name, type.name)
                     regroup_row.append(2)
-                regroup_row.append(1)
+                else:
+                    if headers[index-1].replace('Code','') == type.name:
+                        return False, '%s has no code. The column %sCode should be removed. Please refer to input file format.'%(type.name, type.name)
+                    regroup_row.append(1)
 
         headers = self.remove_trailing('Name', in_array=headers)
         ordered_types = [type.name for type in LocationTypeDetails.get_ordered_types().exclude(name__iexact='country')]

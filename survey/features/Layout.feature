@@ -7,7 +7,7 @@ Feature: Layout Page feature
     Then I should see group dropdown list
 
   Scenario: Survey Tab
-    Given I am logged in as researcher
+    Given I am logged in as admin
     And I click Survey tab
     Then I should see survey dropdown list
 

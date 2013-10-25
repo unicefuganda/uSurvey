@@ -27,7 +27,7 @@ class LocationUploadHelper(BaseTest):
         LocationTypeDetails.objects.all().delete()
         status, message = self.uploader.upload()
         self.assertFalse(status)
-        self.assertEqual(message, 'Location type - Region not created')
+        self.assertEqual(message, 'Location type - Region not found.')
 
     def test_should_return_false__and_message_if_location_type_details_not_found(self):
         LocationTypeDetails.objects.all().delete()
@@ -122,3 +122,17 @@ class LocationUploadHelper(BaseTest):
         status, message = uploader.upload()
         self.assertFalse(status)
         self.assertEqual('One or more DistrictCode is shorter than the required 3 digits.', message)
+
+    def test_should_return_false_and_error_message_if_not_has_code_but_code_still_supplied(self):
+        data = [['RegionName', 'DistrictCode', 'DistrictName', 'CountyName'],
+                     ['region1', '001', 'district1', 'county1'],
+                     ['region2', '002','district2', 'county2']]
+
+        self.write_to_csv('wb', data)
+        file = open('test.csv', 'rb')
+        uploader = UploadLocation(file)
+
+        status, message = uploader.upload()
+        self.assertFalse(status)
+        self.assertEqual('District has no code. The column DistrictCode should be removed. Please refer to input file format.', message)
+

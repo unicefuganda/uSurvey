@@ -74,8 +74,10 @@
                     <ul aria-labelledby="drop7" role="menu" class="dropdown-menu">
                         <li role="presentation"><a href="{% url 'survey_list_page' %}">List all surveys</a></li>
                         <li role="presentation"><a href="{% url 'new_survey_page' %}">Add a survey</a></li>
-                        <li role="presentation"><a href="{% url 'add_location_hierarchy' %}">Add Location Hierarchy</a></li>
-                        <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
+                        {% if perms.auth.can_view_users %}
+                            <li role="presentation"><a href="{% url 'add_location_hierarchy' %}">Add Location Hierarchy</a></li>
+                            <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
+                        {% endif %}
                     </ul>
                 </li>
             {% endif %}
