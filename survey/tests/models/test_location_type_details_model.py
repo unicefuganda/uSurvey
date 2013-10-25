@@ -46,5 +46,15 @@ class LocationTypeDetailsTest(BaseTest):
         location_type_details.save()
         self.assertEqual(2, location_type_details.order)
 
+    def test_shouldnot_update_order_if_editing(self):
+        district = LocationType.objects.create(name='district', slug='district')
+        detail = LocationTypeDetails.objects.create(required=True, has_code=False,
+                                                                     location_type=district)
 
+        detail2 = LocationTypeDetails.objects.create(required=False, has_code=True,
+                                                                     location_type=district)
 
+        self.assertEquals(1, detail.order)
+        detail.has_code = True
+        detail.save()
+        self.assertEquals(1, detail.order)

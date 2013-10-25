@@ -9,7 +9,6 @@ class LocationCode(BaseModel):
     location = models.ForeignKey(Location, null=False, related_name="code")
     code = models.CharField(max_length=10, null=False, default=0)
 
-
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)

@@ -35,7 +35,7 @@ class BaseTest(TestCase):
             for index in range(len(dict1[key])):
                 self.assertEquals(dict1[key][index], dict2[key][index])
 
-    def write_to_csv(self,mode, data, csvfilename='test.csv'):
+    def write_to_csv(self, mode, data, csvfilename='test.csv'):
         with open(csvfilename, mode) as fp:
             file = csv.writer(fp, delimiter=',')
             file.writerows(data)
