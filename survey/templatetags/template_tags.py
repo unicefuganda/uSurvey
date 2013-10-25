@@ -76,6 +76,11 @@ def add_string(int_1, int_2):
 def condition_text(key):
     value = CONDITIONS.get(key, "")
     return value
+
 @register.filter
 def modulo(num, val):
     return num % val == 0
+
+@register.filter
+def repeat_string(string, times):
+    return string*(times-1)

@@ -198,15 +198,14 @@ class UploadLocationsTest(BaseTest):
         self.assertEqual(response.context['country_name'], self.uganda.name)
         self.assertIsInstance(response.context['upload_form'], UploadLocationForm)
 
-    def test_should_not_render_country_type_in_location_types_in_context_data(self):
+    def test_should_render_location_types_details_by_order_in_context_data(self):
         response = self.client.get('/locations/upload/')
         self.assertEqual(200, response.status_code)
-        types = response.context['location_types']
-        self.assertEqual(self.location_type1, types[0])
-        self.assertEqual(self.location_type2, types[1])
-        self.assertEqual(self.location_type3, types[2])
-        [self.assertNotIn(location_type, types) for location_type in
-         LocationType.objects.filter(name__iexact='country')]
+        types = response.context['location_types_details']
+        self.assertEqual(3, len(types))
+        self.assertEqual(self.location_type_details1, types[0])
+        self.assertEqual(self.location_type_details2, types[1])
+        self.assertEqual(self.location_type_details3, types[2])
 
     def test_should_render_error_message_if_no_type_and_details_yet(self):
         LocationType.objects.all().delete()

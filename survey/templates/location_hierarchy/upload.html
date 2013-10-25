@@ -3,6 +3,7 @@
     Upload Geographical Locations
 {% endblock %}
 {% block content %}
+{% load template_tags %}
     <h3>Upload Geographical Locations</h3>
     {% if country_name %}
     <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
@@ -10,37 +11,61 @@
         <div class="control-group">
         <label class="control-label" for="{id_country">Country</label>
         <div class="controls"><input id="id_country" name="country" type="text" disabled="true" value={{ country_name }}>
-        </div>
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_table">Location Input File Format</a></div>
         </div>
         {% include "naked_form.html" with a_form=upload_form %}
-        <div><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_table">Location Input File Format</a></div>
+
         <div id="collapse_table"  class="accordion-body collapse">
         <div class="accordion-inner">
             <table class="table-bordered table">
                 <tr>
-                {% for type in location_types %}
+                {% for detail in location_types_details %}
+                    {% if detail.has_code %}
+                        <th>
+                            {{ detail.location_type.name.capitalize }}Code
+                        </th>
+                    {% endif %}
+
                     <th>
-                        {{ type.name.capitalize }}
+                        {{ detail.location_type.name.capitalize }}Name
                     </th>
                 {% endfor %}
                 </tr>
                 {% for row_count in range %}
                     <tr>
-                    {% for type in location_types %}
+                    {% for detail in location_types_details %}
+                        {% if detail.has_code %}
+                            <td>
+                                {{ '0'|repeat_string:detail.length_of_code }}{{ row_count }}
+                            </td>
+                        {% endif %}
+
                         <td>
-                            {{ type.name.lower }}{{ row_count }}
+                            {{ detail.location_type.name.lower }}{{ row_count }}
                         </td>
                     {% endfor %}
                     </tr>
                 {% endfor %}
 
             </table>
+
+            <span class="red">Please note:</span>
+            <ul>
+                <li> Column headers have to be exactly as shown above.</li>
+                {% for detail in location_types_details %}
+                    {% if detail.has_code %}
+                        <li>Each <span class="bold">{{ detail.location_type.name.capitalize }} code</span> have to be exactly <span class="bold">{{ detail.length_of_code }} digits</span>.</li>
+                    {% endif %}
+                {% endfor %}
+
         </div>
         </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary" name="save_button"
                     data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
             <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
+            </ul>
+
         </div>
     </form>
     {% else %}

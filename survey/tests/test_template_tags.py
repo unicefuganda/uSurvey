@@ -53,3 +53,8 @@ class TemplateTagsTest(TestCase):
     def test_should_return_concatenated_ints_in_a_single_string(self):    
         self.assertEqual('1, 2', add_string(1,2))
         self.assertEqual('1, 2', add_string('1','2'))
+
+    def test_should_return_repeated_string(self):
+        self.assertEqual('000', repeat_string('0', 4))
+
+

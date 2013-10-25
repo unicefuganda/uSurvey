@@ -38,7 +38,9 @@ def and_i_visit_upload_locations_page(step):
 @step(u'And I have location type and location details objects')
 def and_i_have_location_type_and_location_details_objects(step):
     world.location_type1 = LocationType.objects.create(name = 'type1',slug='type1')
-    world.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=False,location_type=world.location_type1,country=world.country)
+    world.location_type_details1 = LocationTypeDetails.objects.create(required=False,has_code=True,
+                                                                      location_type=world.location_type1,
+                                                                      length_of_code=3, country=world.country)
 
     world.location_type2 = LocationType.objects.create(name = 'type2',slug='type2')
     world.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,location_type=world.location_type2,country=world.country)
@@ -62,14 +64,20 @@ def when_i_click_on_the_link_for_input_file_format(step):
 
 @step(u'Then I should see table of all location types')
 def then_i_should_see_table_of_all_location_types(step):
-    world.page.is_text_present(world.location_type1.name, True)
-    world.page.is_text_present(world.location_type2.name, True)
+    world.page.is_text_present(world.location_type1.name.capitalize() + 'Name', True)
+    world.page.is_text_present(world.location_type2.name.capitalize() + 'Name', True)
+
+@step(u'And Type code should be in front of any type that has code')
+def and_type_code_should_be_in_front_of_any_type_that_has_code(step):
+    world.page.validate_typecode_appear_before_typename(world.location_type1.name,
+                                                        world.location_type_details1.length_of_code)
+    world.page.is_text_present(world.location_type2.name.capitalize() + 'Code', False)
 
 @step(u'Then Table should collapse')
 def then_table_should_collapse(step):
     sleep(3)
-    world.page.is_text_present(world.location_type1.name, False)
-    world.page.is_text_present(world.location_type2.name, False)
+    world.page.is_text_present(world.location_type1.name.capitalize() + 'Name', False)
+    world.page.is_text_present(world.location_type2.name.capitalize() + 'Name', False)
 
 @step(u'Then I should see no hierarchy message')
 def then_i_should_see_no_hierarchy_message(step):

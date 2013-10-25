@@ -10,6 +10,7 @@ Feature: Location upload
     And I should see link for input file format
     When I click on the link for input file format
     Then I should see table of all location types
+    And Type code should be in front of any type that has code
     When I click on the link for input file format
     Then Table should collapse
 
