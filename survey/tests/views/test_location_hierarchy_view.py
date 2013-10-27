@@ -243,7 +243,7 @@ class UploadLocationsTest(BaseTest):
         for locations in data[1:]:
             [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for
              index, location_name in enumerate(locations)]
-        self.assertIn('Successfully uploaded', response.cookies['messages'].value)
+        self.assertIn('Locations successfully uploaded.', response.cookies['messages'].value)
 
     def test_assert_restricted_permissions(self):
         self.assert_login_required('/locations/upload/')

@@ -1,9 +1,11 @@
 import csv
+from random import randint
 from  urllib import quote
 
 from django.test import TestCase
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
+import xlwt
 
 
 class BaseTest(TestCase):
@@ -39,3 +41,15 @@ class BaseTest(TestCase):
         with open(csvfilename, mode) as fp:
             file = csv.writer(fp, delimiter=',')
             file.writerows(data)
+
+    def generate_non_csv_file(self, filename):
+        book = xlwt.Workbook()
+        sheet1 = book.add_sheet("Sheet 1")
+        sheet1.write(0, 0, "RegionName")
+        sheet1.write(0, 1, "DistrictName")
+        sheet1.write(0, 2, "CountyName")
+        size = 3
+        for i in xrange(1, size+1):
+            for j in xrange(size):
+                sheet1.write(i, j, randint(0,100))
+        book.save(filename)

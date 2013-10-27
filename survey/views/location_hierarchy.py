@@ -53,7 +53,8 @@ def upload(request):
         upload_form.is_valid()
         if upload_form.is_valid():
             status, message = upload_form.upload()
-            messages.success(request, message)
+            message_status = messages.SUCCESS if status else messages.ERROR
+            messages.add_message(request, message_status, message)
             return HttpResponseRedirect('/locations/upload/')
 
     context = {'button_label': 'Save', 'id': 'upload-locations-form',
