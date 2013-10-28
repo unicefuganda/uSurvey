@@ -85,7 +85,8 @@ urlpatterns = patterns('',
     url(r'^modules/$', 'survey.views.question_module.index', name='question_module_listing_page'),
     url(r'^modules/(?P<module_id>\d+)/delete/$', 'survey.views.question_module.delete', name='delete_question_module_page'),
     url(r'^modules/(?P<module_id>\d+)/edit/$', 'survey.views.question_module.edit', name='edit_question_module_page'),
-
+    url(r'^indicators/new/$', 'survey.views.indicators.new', name='new_indicator_page'),
+    url(r'^indicators/$', 'survey.views.indicators.index', name='list_indicator_page')
 )
 
 if not settings.PRODUCTION:

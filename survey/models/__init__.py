@@ -15,6 +15,7 @@ from survey.models.users import UserProfile
 from survey.models.question_module import QuestionModule
 from survey.models.location_type_details import LocationTypeDetails
 from survey.models.batch_question_order import BatchQuestionOrder
+from survey.models.indicators import Indicator
 
 
 __all__ = [
@@ -42,5 +43,6 @@ __all__ = [
     'QuestionModule',
     'LocationTypeDetails',
     'BatchQuestionOrder',
-    'LocationCode'
+    'LocationCode',
+    'Indicator'
 ]

@@ -1,0 +1,8 @@
+{% extends 'form.html' %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block display_form_fields %}
+    {% include "naked_form.html" with a_form=indicator_form %}
+{% endblock %}
+
