@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import csv
 from time import sleep
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -8,6 +9,8 @@ from survey.features.page_objects.accounts import LoginPage
 from survey.features.page_objects.location_hierarchy import AddLocationHierarchyPage
 from survey.features.page_objects.upload_locations import UploadLocationsPage
 from survey.models import LocationTypeDetails
+from survey.tests.base_test import BaseTest
+
 
 def set_permissions(group, permissions_codename_list):
     auth_content = ContentType.objects.get_for_model(Permission)
@@ -45,7 +48,7 @@ def and_i_have_location_type_and_location_details_objects(step):
     world.location_type2 = LocationType.objects.create(name = 'type2',slug='type2')
     world.location_type_details2 = LocationTypeDetails.objects.create(required=False,has_code=False,location_type=world.location_type2,country=world.country)
 
-@step(u'Then I should see the text message')
+@step(u'Then I should see the page title')
 def then_i_should_see_the_text_message(step):
     world.page.is_text_present('Upload Geographical Locations')
 
@@ -95,3 +98,27 @@ def when_i_click_on_add_hierarchy_button(step):
 def and_i_should_go_to_add_hierarchy_page(step):
     world.page = AddLocationHierarchyPage(world.browser)
     world.page.validate_url()
+
+@step(u'When I have a csv locations file')
+def when_i_have_a_csv_locations_file(step):
+    data = [[world.location_type1.name+'Code', world.location_type1.name+'Name', world.location_type2.name+'Name'],
+                     ['001', 'district1', 'county1'],
+                     ['003','district2', 'county2']]
+    write_to_csv('wb', data, 'test.csv')
+
+def write_to_csv(mode, data, csvfilename):
+    with open(csvfilename, mode) as fp:
+        file = csv.writer(fp, delimiter=',')
+        file.writerows(data)
+
+@step(u'And I input that file')
+def and_i_input_that_file(step):
+    world.page.input_file('test.csv')
+
+@step(u'And I click the save button')
+def when_i_click_the_save_button(step):
+    world.page.submit()
+
+@step(u'Then I should see locations successfully added')
+def then_i_should_see_locations_successfully_added(step):
+    world.page.see_success_message('Locations', 'uploaded')

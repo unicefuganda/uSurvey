@@ -213,3 +213,6 @@ class PageObject(object):
 
     def click_by_name(self,name):
         self.browser.find_by_name(name).first.click()
+
+    def input_file(self, filename):
+        self.browser.attach_file('file', filename)

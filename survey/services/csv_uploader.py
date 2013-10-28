@@ -11,7 +11,6 @@ class CSV_Uploader:
         all_rows =  self.file.readlines()
         data = all_rows.remove()
         all_rows = self.file.readlines()[0].split('\r')
-        print all_rows
         return [row.split(',') for row in all_rows]
 
     def xsplit_content(self):

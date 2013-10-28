@@ -96,7 +96,6 @@ class LocationUploadHelper(BaseTest):
         types = uploader.remove_trailing('Name', data[0], exclude='Code')
         data_locations = data[1:]
         [locations.pop(1) for locations in data_locations]
-        print data_locations
         for locations in data_locations:
             [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for
              index, location_name in enumerate(locations)]

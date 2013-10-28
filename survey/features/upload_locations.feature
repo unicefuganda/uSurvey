@@ -5,7 +5,7 @@ Feature: Location upload
     And I have a country
     And I have location type and location details objects
     When I visit upload locations page
-    Then I should see the text message
+    Then I should see the page title
     And I should see name of the country for which details were added
     And I should see link for input file format
     When I click on the link for input file format
@@ -13,6 +13,10 @@ Feature: Location upload
     And Type code should be in front of any type that has code
     When I click on the link for input file format
     Then Table should collapse
+    When I have a csv locations file
+    And I input that file
+    And I click the save button
+    Then I should see locations successfully added
 
   Scenario: Upload locations- when no details object present
     Given I am logged in as admin
