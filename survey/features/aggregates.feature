@@ -47,6 +47,6 @@ Feature: Aggregates feature
       And I have locations
       And I have 2 batches with one open
       And I visit district aggregate page
-      Then I should see horizontal location widget till district
+      Then I should see an option to select location hierarchically
       And I should see an option to select batch
       And I should see a get status button

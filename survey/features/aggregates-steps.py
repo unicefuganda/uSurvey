@@ -104,6 +104,3 @@ def and_i_visit_district_aggregate_page(step):
     world.page = SurveyCompletionRatesPage(world.browser)
     world.page.visit()
 
-@step(u'Then I should see horizontal location widget till district')
-def then_i_should_see_horizontal_location_widget_till_district(step):
-    assert False, 'This step must be implemented'
