@@ -172,7 +172,7 @@ class UploadLocationsTest(BaseTest):
                                                                          location_type=self.location_type3,
                                                                          country=self.uganda)
 
-        self.filename = 'uganda.csv'
+        self.filename = 'test_uganda.csv'
         self.filedata = [['RegionName', 'DistrictCode', 'DistrictName', 'CountyName'],
                             ['region1', '001', 'district1', 'county1'],
                             ['region2', '002','district2', 'county2']]

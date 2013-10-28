@@ -38,4 +38,5 @@ def status(request):
 
     content['locations'] = LocationWidget(selected_location)
     content['batches'] = Batch.objects.all()
+    content['action'] = 'aggregates_status'
     return render(request, 'aggregates/status.html', content)

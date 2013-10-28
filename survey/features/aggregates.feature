@@ -41,3 +41,12 @@ Feature: Aggregates feature
       And I have few batches
       And I visit download excel page
       And I select a batch and click export to csv
+
+    Scenario: Region/district completion rates
+      Given I am logged in as researcher
+      And I have locations
+      And I have 2 batches with one open
+      And I visit district aggregate page
+      Then I should see horizontal location widget till district
+      And I should see an option to select batch
+      And I should see a get status button

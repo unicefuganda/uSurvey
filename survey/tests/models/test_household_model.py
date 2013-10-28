@@ -404,4 +404,18 @@ class HouseholdTest(TestCase):
 
         self.assertTrue(NumericalAnswer.objects.filter(question=question_1)[0].is_old)
 
+    def test_should_know_total_households_in_location(self):
+        Household.objects.all().delete()
+        self.abim = Location.objects.create(name='Abim', tree_parent = self.uganda, type = self.city)
+        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
+
+        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
+        investigator_2 = Investigator.objects.create(name='some_inv',mobile_number='123456781',male=True,location=self.kampala_city)
+
+        household_1 = Household.objects.create(investigator = investigator_1,location= self.kampala)
+        household_2 = Household.objects.create(investigator = investigator_2,location= self.kampala_city)
+
+        self.assertEqual(2, Household.total_households_in(self.uganda).count())
+        self.assertIn(household_1, Household.total_households_in(self.uganda))
+        self.assertIn(household_2, Household.total_households_in(self.uganda))
 

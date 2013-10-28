@@ -4,6 +4,7 @@ from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.aggregates import AggregateStatusPage, DownloadExcelPage
+from survey.features.page_objects.survey_completion_rates import SurveyCompletionRatesPage
 from survey.models.batch import Batch
 from survey.models.households import Household
 from survey.models.investigator import Investigator
@@ -97,3 +98,12 @@ def and_i_visit_download_excel_page(step):
 @step(u'And I select a batch and click export to csv')
 def and_i_select_a_batch_and_click_export_to_csv(step):
     world.page.export_to_csv(world.batch)
+
+@step(u'And I visit district aggregate page')
+def and_i_visit_district_aggregate_page(step):
+    world.page = SurveyCompletionRatesPage(world.browser)
+    world.page.visit()
+
+@step(u'Then I should see horizontal location widget till district')
+def then_i_should_see_horizontal_location_widget_till_district(step):
+    assert False, 'This step must be implemented'

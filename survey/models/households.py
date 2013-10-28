@@ -180,6 +180,10 @@ class Household(BaseModel):
         all_households = Household.objects.filter()
         return (all_households.order_by('uid').reverse()[0].uid + 1) if all_households else 1
 
+    @classmethod
+    def total_households_in(self,location):
+        return Household.objects.filter(location__in=location.get_descendants(include_self=True))
+
 
 class HouseholdMember(BaseModel):
     surname = models.CharField(max_length=25, verbose_name="Family Name")

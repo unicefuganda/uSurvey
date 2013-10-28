@@ -3,7 +3,13 @@
   View Aggregates
 {% endblock %}
 {% block content %}
-  <form id="aggregates-form" action="{% url 'aggregates_status' %}" method="get">
+  <form id="aggregates-form" action="{% url action %}" method="get">
+  <label>Survey</label>
+      <select name="survey" id="survey-list-select">
+        {% for survey in surveys %}
+          <option value="{{ survey.id }}" >{{ survey.name }}</option>
+        {% endfor %}
+      </select>
     <div>
       {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
     </div>
