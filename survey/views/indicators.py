@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from survey.forms.indicator import IndicatorForm
+from survey.models import Indicator
+
 
 @permission_required('auth.can_view_batches')
 def new(request):
@@ -20,4 +22,5 @@ def new(request):
 
 @permission_required('auth.can_view_batches')
 def index(request):
-    return render(request, 'indicator/index.html')
+    indicators = Indicator.objects.all()
+    return render(request, 'indicator/index.html', {'indicators': indicators})

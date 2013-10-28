@@ -1,1 +1,41 @@
 {% extends 'layout.html' %}
+{% block title %}
+    Indicator List
+{% endblock %}
+
+{% block content %}
+    <h3>Indicator List</h3>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>
+              Indicator
+            </th>
+            <th>
+              Description
+            </th>
+             <th>
+              Module
+            </th>
+             <th>
+              Measure
+            </th>
+              <th>
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for indicator in indicators %}
+            <tr>
+                <td>{{ indicator.name }}</td>
+                <td>{{ indicator.description }}</td>
+                <td>{{ indicator.module.name }}</td>
+                <td>{{ indicator.measure }}</td>
+                <td>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -10,3 +10,9 @@ Feature: Indicators feature
       And I fill in the indicator details
       And I submit the form
       Then I should see that the indicator was successfully added
+
+    Scenario: List indicators
+      Given I am logged in as researcher
+      And I have two indicators
+      When I visit indicator listing page
+      Then I should see indicators listed

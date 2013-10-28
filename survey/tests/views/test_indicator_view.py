@@ -8,14 +8,14 @@ from survey.tests.base_test import BaseTest
 class IndicatorViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        module = QuestionModule.objects.create(name="Health")
-        batch = Batch.objects.create(name="Health")
+        self.module = QuestionModule.objects.create(name="Health")
+        self.batch = Batch.objects.create(name="Health")
 
-        self.form_data = {'module': module.id,
+        self.form_data = {'module': self.module.id,
                           'name': 'Health',
                           'description': 'some description',
                           'measure': '%',
-                          'batch': batch.id}
+                          'batch': self.batch.id}
 
         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
@@ -45,3 +45,16 @@ class IndicatorViewTest(BaseTest):
     def test_permission_for_question_modules(self):
         self.assert_restricted_permission_for('/indicators/')
         self.assert_restricted_permission_for('/indicators/new/')
+
+    def test_get_indicator_index(self):
+        another_form_data = self.form_data.copy()
+        another_form_data['name'] = 'Education'
+        another_form_data['module'] = self.module
+        another_form_data['batch'] = self.batch
+
+        education_indicator = Indicator.objects.create(**another_form_data)
+        response = self.client.get('/indicators/')
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('indicator/index.html', templates)
+        self.assertIn(education_indicator, response.context['indicators'])
