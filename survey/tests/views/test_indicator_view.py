@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.test import Client
 from survey.forms.indicator import IndicatorForm
-from survey.models import QuestionModule, Batch, Indicator
+from survey.forms.filters import IndicatorFilterForm
+from survey.models import QuestionModule, Batch, Indicator, Survey
 from survey.tests.base_test import BaseTest
 
 
@@ -57,4 +58,38 @@ class IndicatorViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('indicator/index.html', templates)
+        self.assertIsInstance(response.context['indicator_filter_form'], IndicatorFilterForm)
         self.assertIn(education_indicator, response.context['indicators'])
+
+    def test_post_filter_indicators_by_survey(self):
+        survey = Survey.objects.create(name='survey')
+        batch_s = Batch.objects.create(name='batch survey', survey = survey)
+        batch = Batch.objects.create(name='batch s')
+        module = QuestionModule.objects.create(name="module")
+        indicator_s = Indicator.objects.create(name='ITN', module=module, batch=batch_s)
+        indicator = Indicator.objects.create(name='ITN1', module=module, batch=batch)
+
+        response = self.client.post('/indicators/', data={'survey':survey.id, 'batch': 'All'})
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['indicator_filter_form'], IndicatorFilterForm)
+        self.assertEqual(1, len(response.context['indicators']))
+        self.assertIn(indicator_s, response.context['indicators'])
+        self.assertNotIn(indicator, response.context['indicators'])
+
+    def test_post_filter_indicators_by_batch(self):
+        survey = Survey.objects.create(name='survey')
+        batch_s = Batch.objects.create(name='batch survey', survey = survey)
+        batch_s2 = Batch.objects.create(name='batch survey 2', survey = survey)
+        batch = Batch.objects.create(name='batch s')
+        module = QuestionModule.objects.create(name="module")
+        indicator_s = Indicator.objects.create(name='ITN', module=module, batch=batch_s)
+        indicator_s2 = Indicator.objects.create(name='ITNs2', module=module, batch=batch_s2)
+        indicator = Indicator.objects.create(name='ITN1', module=module, batch=batch)
+
+        response = self.client.post('/indicators/', data={'survey':survey.id, 'batch': batch_s.id})
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertIsInstance(response.context['indicator_filter_form'], IndicatorFilterForm)
+        self.assertEqual(1, len(response.context['indicators']))
+        self.assertIn(indicator_s, response.context['indicators'])
+        self.assertNotIn(indicator_s2, response.context['indicators'])
+        self.assertNotIn(indicator, response.context['indicators'])

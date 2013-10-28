@@ -378,3 +378,38 @@ class BatchViewsTest(BaseTest):
         self.assertRedirects(response, "/batches/%s/questions/" % batch.id, status_code=302, target_status_code=200)
         error_message = "No questions orders were updated."
         self.assertIn(error_message, response.cookies['messages'].value)
+
+    def test_ajax_request_batch_list_under_a_survey(self):
+        survey_1 = Survey.objects.create(name="survey A")
+        survey_2 = Survey.objects.create(name="survey B")
+        batch_1 = Batch.objects.create(name="batch1", order=1, survey=survey_1)
+        batch_2 = Batch.objects.create(name="batch2", order=2, survey=survey_1)
+        response = self.client.get('/surveys/%s/batches/' % survey_1.id, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+        content = json.loads(response.content)
+        self.assertEquals(len(content), 2)
+
+        self.assertEqual(batch_1.id, content[0]['id'])
+        self.assertEqual(batch_1.name, content[0]['name'])
+        self.assertEqual(batch_2.id, content[1]['id'])
+        self.assertEqual(batch_2.name, content[1]['name'])
+
+    def test_ajax_request_batch_list_all(self):
+        Batch.objects.all().delete()
+        batch_1 = Batch.objects.create(name="batch1", order=1)
+        batch_2 = Batch.objects.create(name="batch2", order=2)
+        response = self.client.get('/batches/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+        content = json.loads(response.content)
+        self.assertEquals(len(content), 2)
+
+        self.assertEqual(batch_1.id, content[0]['id'])
+        self.assertEqual(batch_1.name, content[0]['name'])
+        self.assertEqual(batch_2.id, content[1]['id'])
+        self.assertEqual(batch_2.name, content[1]['name'])
+
+    def test_batch_list_all_shows_nothing(self):
+        response = self.client.get('/batches/')
+        self.assertEqual(200, response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn('layout.html', templates)

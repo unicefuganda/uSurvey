@@ -13,6 +13,16 @@ Feature: Indicators feature
 
     Scenario: List indicators
       Given I am logged in as researcher
-      And I have two indicators
+      And I have a survey
+      And I have three batches
+      And I have an indicator not in that survey
+      And I have indicator in each batch
       When I visit indicator listing page
-      Then I should see indicators listed
+      Then I should see all indicators listed
+      When I select a survey
+      And I click on get list
+      Then I should see indicators in that survey
+      When I select a batch
+      And I click on get list
+      Then I should see indicators in that batch
+

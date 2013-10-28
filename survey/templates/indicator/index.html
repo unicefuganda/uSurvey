@@ -5,6 +5,11 @@
 
 {% block content %}
     <h3>Indicator List</h3>
+    <form id="question-filter-form" action="{{ action }}" method="post" class="pull-left padded-bottom">
+    {% csrf_token %}
+        {% include "horizontal_filter_form.html" with a_form=indicator_filter_form%}
+            <button class="btn btn-primary" id="a-indicator-list"> Get List</button>
+    </form>
     <table class="table table-striped table-bordered table-hover">
         <thead>
           <tr>

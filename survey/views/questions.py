@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.logic import LogicForm
-from survey.forms.question_filter import QuestionFilterForm
+from survey.forms.filters import QuestionFilterForm
 from survey.models import AnswerRule, QuestionModule, BatchQuestionOrder
 
 from survey.models.batch import Batch

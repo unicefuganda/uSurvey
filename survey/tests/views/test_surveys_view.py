@@ -1,5 +1,5 @@
+import json
 from django.test.client import Client
-from mock import patch
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location
 from survey.models import Batch, Investigator, Backend

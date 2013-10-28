@@ -3,7 +3,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from mock import patch
 from survey.forms.logic import LogicForm
-from survey.forms.question_filter import QuestionFilterForm
+from survey.forms.filters import QuestionFilterForm
 from survey.models import AnswerRule, QuestionModule, BatchQuestionOrder
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption

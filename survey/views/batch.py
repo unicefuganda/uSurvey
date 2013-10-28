@@ -1,3 +1,4 @@
+from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from rapidsms.contrib.locations.models import Location, LocationType
@@ -18,6 +19,11 @@ import json
 def index(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
     batches = Batch.objects.filter(survey__id=survey_id)
+    if request.is_ajax():
+        batches = batches.values('id', 'name').order_by('name')
+        json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
+        return HttpResponse(json_dump, mimetype='application/json')
+
     context = {'batches': batches, 'survey': survey,
                'request': request, 'batchform': BatchForm(instance=Batch(survey=survey)),
                'action': '/surveys/%s/batches/new/' % survey_id, }
@@ -141,3 +147,11 @@ def update_orders(request, batch_id):
 def check_name(request, survey_id):
     response = Batch.objects.filter(name=request.GET['name'], survey__id=survey_id).exists()
     return HttpResponse(json.dumps(not response), content_type="application/json")
+
+@permission_required('auth.can_view_batches')
+def list_batches(request):
+    if request.is_ajax():
+        batches = Batch.objects.values('id', 'name').order_by('name')
+        json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
+        return HttpResponse(json_dump, mimetype='application/json')
+    return render(request,'layout.html')
