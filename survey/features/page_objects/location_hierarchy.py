@@ -5,7 +5,7 @@ from nose.tools import assert_equals
 class AddLocationHierarchyPage(PageObject):
     def __init__(self, browser):
         super(AddLocationHierarchyPage, self).__init__(browser)
-        self.url = '/add_location_hierarchy/'
+        self.url = '/locations/hierarchy/add/'
 
     def see_field_details(self, level, form, status=True):
         assert_equals(status, self.browser.is_text_present(level))

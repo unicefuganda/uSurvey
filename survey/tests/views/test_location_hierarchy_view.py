@@ -24,22 +24,22 @@ class LocationHierarchyTest(BaseTest):
         self.DetailsFormSet = formset_factory(LocationDetailsForm, formset=BaseArticleFormSet)
 
     def test_should_render_success_code(self):
-        response = self.client.get('/add_location_hierarchy/')
+        response = self.client.get('/locations/hierarchy/add/')
         self.assertEqual(200, response.status_code)
 
     def test_should_render_template(self):
-        response = self.client.get('/add_location_hierarchy/')
+        response = self.client.get('/locations/hierarchy/add/')
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('location_hierarchy/new.html', templates)
 
     def test_should_render_form_instance(self):
-        response = self.client.get('/add_location_hierarchy/')
+        response = self.client.get('/locations/hierarchy/add/')
         self.assertEqual(200, response.status_code)
         self.assertIsInstance(response.context['hierarchy_form'], LocationHierarchyForm)
 
     def test_should_render_context_data(self):
-        response = self.client.get('/add_location_hierarchy/')
+        response = self.client.get('/locations/hierarchy/add/')
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.context['button_label'], "Create Hierarchy")
         self.assertEqual(response.context['id'], "hierarchy-form")
@@ -48,13 +48,13 @@ class LocationHierarchyTest(BaseTest):
     def test_should_redirect_to_home_page_after_post(self):
         levels_data = {'country': self.uganda.id, 'form-0-levels': 'Region', 'form-TOTAL_FORMS': 1,
                        'form-INITIAL_FORMS': 0}
-        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        response = self.client.post('/locations/hierarchy/add/', data=levels_data)
         self.assertRedirects(response, '/', status_code=302, target_status_code=200, msg_prefix='')
 
     def test_should_save_location_type_after_post(self):
         levels_data = {'country': self.uganda.id, 'form-0-levels': 'Region', 'form-TOTAL_FORMS': 1,
                        'form-INITIAL_FORMS': 0}
-        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        response = self.client.post('/locations/hierarchy/add/', data=levels_data)
         location_types = LocationType.objects.all()
         self.assertEqual(2, location_types.count())
         location_type_created = LocationType.objects.get(name='Region')
@@ -69,7 +69,7 @@ class LocationHierarchyTest(BaseTest):
                        'form-INITIAL_FORMS': 0,
         }
 
-        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        response = self.client.post('/locations/hierarchy/add/', data=levels_data)
         location_types = LocationType.objects.all()
         self.assertEqual(3, location_types.count())
         location_type_created = LocationType.objects.get(name='Region')
@@ -87,14 +87,14 @@ class LocationHierarchyTest(BaseTest):
                        'form-INITIAL_FORMS': 0,
         }
 
-        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        response = self.client.post('/locations/hierarchy/add/', data=levels_data)
         location_types = LocationType.objects.all()
         self.assertEqual(1, location_types.count())
 
     def test_should_save_country_on_location_type_details_after_post(self):
         levels_data = {'country': self.uganda.id, 'form-0-levels': 'Region', 'form-TOTAL_FORMS': 1,
                        'form-INITIAL_FORMS': 0}
-        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        response = self.client.post('/locations/hierarchy/add/', data=levels_data)
         location_types = LocationType.objects.all()
         self.assertEqual(2, location_types.count())
         location_type_details = LocationTypeDetails.objects.all()
@@ -106,7 +106,7 @@ class LocationHierarchyTest(BaseTest):
     def test_should_be_invalid_if_country_is_blank_after_post(self):
         levels_data = {'form-0-levels': 'Region', 'form-TOTAL_FORMS': 1,
                        'form-INITIAL_FORMS': 0}
-        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        response = self.client.post('/locations/hierarchy/add/', data=levels_data)
         location_types = LocationType.objects.all()
         self.assertEqual(1, location_types.count())
 
@@ -116,7 +116,7 @@ class LocationHierarchyTest(BaseTest):
                        'form-INITIAL_FORMS': 0}
         region = LocationType.objects.create(name=levels_data['form-0-levels'],
                                              slug=slugify(levels_data['form-0-levels']))
-        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        response = self.client.post('/locations/hierarchy/add/', data=levels_data)
         location_types = LocationType.objects.all()
         self.assertEqual(2, location_types.count())
         self.assertIn(region, location_types)
@@ -128,7 +128,7 @@ class LocationHierarchyTest(BaseTest):
                        'form-1-has_code': 'on', 'form-1-length_of_code': 3,
                        'form-TOTAL_FORMS': 2,
                        'form-INITIAL_FORMS': 0}
-        response = self.client.post('/add_location_hierarchy/', data=levels_data)
+        response = self.client.post('/locations/hierarchy/add/', data=levels_data)
         location_types = LocationType.objects.all()
         self.assertEqual(3, location_types.count())
         region = LocationType.objects.get(name=levels_data['form-0-levels'])
@@ -142,8 +142,8 @@ class LocationHierarchyTest(BaseTest):
         self.assertEqual(self.uganda, hill_details.country)
 
     def test_assert_restricted_permissions(self):
-        self.assert_login_required('/add_location_hierarchy/')
-        self.assert_restricted_permission_for('/add_location_hierarchy/')
+        self.assert_login_required('/locations/hierarchy/add/')
+        self.assert_restricted_permission_for('/locations/hierarchy/add/')
 
 
 class UploadLocationsTest(BaseTest):
@@ -178,7 +178,6 @@ class UploadLocationsTest(BaseTest):
                             ['region2', '002','district2', 'county2']]
         self.write_to_csv('wb', self.filedata, self.filename)
         self.file = open(self.filename, 'rb')
-
 
     def test_should_render_success_code(self):
         response = self.client.get('/locations/upload/')

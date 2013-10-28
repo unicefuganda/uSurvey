@@ -6,7 +6,7 @@ from django.conf import settings
 urlpatterns = patterns('',
     url(r'^$', 'survey.views.home_page.home', name='home_page'),
     url(r'^about/$', 'survey.views.home_page.about', name='about_page'),
-    url(r'^add_location_hierarchy/$', 'survey.views.location_hierarchy.add', name='add_location_hierarchy'),
+    url(r'^locations/hierarchy/add/$', 'survey.views.location_hierarchy.add', name='add_location_hierarchy'),
     url(r'^locations/upload/$', 'survey.views.location_hierarchy.upload', name='upload_locations'),
     url(r'^locations/(?P<location_id>\d+)/children', 'survey.views.locations.children', name='get_location_children'),
     url(r'^investigators/$', 'survey.views.investigator.list_investigators', name="investigators_page"),
