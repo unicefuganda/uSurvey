@@ -49,16 +49,17 @@ def and_i_have_three_batches(step):
 
 @step(u'And I have an indicator not in that survey')
 def and_i_have_an_indicator_not_in_that_survey(step):
-    world.health_module = QuestionModule.objects.create(name="Module")
     world.indicator_3 = Indicator.objects.create(name="indicator name 3", description="rajni indicator 3", measure='Percentage',
-                                         module=world.health_module, batch=world.batch_3)
+                                         module=world.health_module_1, batch=world.batch_3)
 
 @step(u'And I have indicator in each batch')
 def and_i_have_indicator_in_each_batch(step):
     world.indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
-                                         module=world.health_module, batch=world.batch_1)
+                                         module=world.health_module_1, batch=world.batch_1)
+    world.indicator_1b = Indicator.objects.create(name="indicator name with different module", description="rajni indicator 1", measure='Percentage',
+                                         module=world.health_module_2, batch=world.batch_1)
     world.indicator_2 = Indicator.objects.create(name="indicator name 2", description="rajni indicator 2", measure='Percentage',
-                                         module=world.health_module, batch=world.batch_2)
+                                         module=world.health_module_2, batch=world.batch_2)
 
 @step(u'When I select a survey')
 def when_i_select_a_survey(step):
@@ -70,7 +71,7 @@ def and_i_click_on_get_list(step):
 
 @step(u'Then I should see indicators in that survey')
 def then_i_should_see_indicators_in_that_survey(step):
-    world.page.see_indicators([world.indicator_1, world.indicator_2])
+    world.page.see_indicators([world.indicator_1,world.indicator_1b, world.indicator_2])
     world.page.is_text_present(world.indicator_3.name, False)
 
 @step(u'When I select a batch')
@@ -79,6 +80,22 @@ def when_i_select_a_batch(step):
 
 @step(u'Then I should see indicators in that batch')
 def then_i_should_see_indicators_in_that_batch(step):
+    world.page.see_indicators([world.indicator_1, world.indicator_1b])
+    world.page.is_text_present(world.indicator_2.name, False)
+    world.page.is_text_present(world.indicator_3.name, False)
+
+@step(u'And I have two modules')
+def and_i_have_two_modules(step):
+    world.health_module_1 = QuestionModule.objects.create(name="Module")
+    world.health_module_2 = QuestionModule.objects.create(name="Module 2")
+
+@step(u'When I select a module')
+def when_i_select_a_module(step):
+    world.page.select('module', [world.health_module_1.id])
+
+@step(u'Then I should see indicators in that module')
+def then_i_should_see_indicators_in_that_module(step):
     world.page.see_indicators([world.indicator_1])
+    world.page.is_text_present(world.indicator_1b.name, False)
     world.page.is_text_present(world.indicator_2.name, False)
     world.page.is_text_present(world.indicator_3.name, False)

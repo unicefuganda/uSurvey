@@ -15,6 +15,7 @@ Feature: Indicators feature
       Given I am logged in as researcher
       And I have a survey
       And I have three batches
+      And I have two modules
       And I have an indicator not in that survey
       And I have indicator in each batch
       When I visit indicator listing page
@@ -25,4 +26,7 @@ Feature: Indicators feature
       When I select a batch
       And I click on get list
       Then I should see indicators in that batch
+      When I select a module
+      And I click on get list
+      Then I should see indicators in that module
 

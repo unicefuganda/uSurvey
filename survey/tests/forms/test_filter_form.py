@@ -39,6 +39,9 @@ class QuestionFilterFormTest(TestCase):
 class IndicatorFilterFormTest(TestCase):
 
     def setUp(self):
+        self.module_1 = QuestionModule.objects.create(name="Module 1")
+        self.module_2 = QuestionModule.objects.create(name="Module 2")
+        self.module_3 = QuestionModule.objects.create(name="Module 3")
         self.survey = Survey.objects.create(name="Survey A")
         self.survey_2 = Survey.objects.create(name="Survey B")
         self.batch = Batch.objects.create(name="Batch A", survey = self.survey)
@@ -88,3 +91,11 @@ class IndicatorFilterFormTest(TestCase):
 
         self.assertFalse(indicator_filter_form.is_valid())
         self.assertEqual(['Select a valid choice. %s is not one of the available choices.'%data['batch']],indicator_filter_form.errors['batch'])
+
+    def test_form_instance_should_have_all_modules(self):
+        indicator_filter_form = IndicatorFilterForm()
+
+        self.assertEqual(4, len(indicator_filter_form.fields['module'].choices))
+        self.assertIn((self.module_1.id, self.module_1.name), indicator_filter_form.fields['module'].choices)
+        self.assertIn((self.module_2.id, self.module_2.name), indicator_filter_form.fields['module'].choices)
+        self.assertIn((self.module_3.id, self.module_3.name), indicator_filter_form.fields['module'].choices)

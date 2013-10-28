@@ -69,7 +69,7 @@ class IndicatorViewTest(BaseTest):
         indicator_s = Indicator.objects.create(name='ITN', module=module, batch=batch_s)
         indicator = Indicator.objects.create(name='ITN1', module=module, batch=batch)
 
-        response = self.client.post('/indicators/', data={'survey':survey.id, 'batch': 'All'})
+        response = self.client.post('/indicators/', data={'survey':survey.id, 'batch': 'All', 'module': 'All'})
         self.failUnlessEqual(response.status_code, 200)
         self.assertIsInstance(response.context['indicator_filter_form'], IndicatorFilterForm)
         self.assertEqual(1, len(response.context['indicators']))
@@ -86,10 +86,66 @@ class IndicatorViewTest(BaseTest):
         indicator_s2 = Indicator.objects.create(name='ITNs2', module=module, batch=batch_s2)
         indicator = Indicator.objects.create(name='ITN1', module=module, batch=batch)
 
-        response = self.client.post('/indicators/', data={'survey':survey.id, 'batch': batch_s.id})
+        response = self.client.post('/indicators/', data={'survey':survey.id, 'batch': batch_s.id, 'module': 'All'})
         self.failUnlessEqual(response.status_code, 200)
         self.assertIsInstance(response.context['indicator_filter_form'], IndicatorFilterForm)
-        self.assertEqual(1, len(response.context['indicators']))
         self.assertIn(indicator_s, response.context['indicators'])
+        self.assertEqual(1, len(response.context['indicators']))
         self.assertNotIn(indicator_s2, response.context['indicators'])
         self.assertNotIn(indicator, response.context['indicators'])
+
+    def test_should_get_all_indicators_in_a_given_module_when_module_is_given(self):
+
+        survey = Survey.objects.create(name='survey')
+        batch_s = Batch.objects.create(name='batch survey', survey = survey)
+        module = QuestionModule.objects.create(name="module")
+        module_1 = QuestionModule.objects.create(name="module")
+
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
+                                         module=module, batch=batch_s)
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
+                                         module=module_1, batch=batch_s)
+
+        response = self.client.post('/indicators/', data={'survey': 'All', 'batch': 'All', 'module': module.id})
+        print response.context['indicators']
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(1, len(response.context['indicators']))
+        self.assertIn(indicator_1, response.context['indicators'])
+        self.assertNotIn(indicator_2, response.context['indicators'])
+
+    def test_should_get_all_indicators_in_a_given_module_when_module_and_batch_is_given(self):
+
+        survey = Survey.objects.create(name='survey')
+        batch_s = Batch.objects.create(name='batch survey', survey = survey)
+        module = QuestionModule.objects.create(name="module")
+        module_1 = QuestionModule.objects.create(name="module")
+
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
+                                         module=module, batch=batch_s)
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
+                                         module=module_1, batch=batch_s)
+
+        response = self.client.post('/indicators/', data={'survey': 'All', 'batch': batch_s.id, 'module': module.id})
+        print response.context['indicators']
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(1, len(response.context['indicators']))
+        self.assertIn(indicator_1, response.context['indicators'])
+        self.assertNotIn(indicator_2, response.context['indicators'])
+
+    def test_should_get_all_indicators_in_a_given_module_when_all_are_given(self):
+        survey = Survey.objects.create(name='survey')
+        batch_s = Batch.objects.create(name='batch survey', survey=survey)
+        module = QuestionModule.objects.create(name="module")
+        module_1 = QuestionModule.objects.create(name="module")
+
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
+                                         module=module, batch=batch_s)
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
+                                         module=module_1, batch=batch_s)
+
+        response = self.client.post('/indicators/', data={'survey': survey.id, 'batch': batch_s.id, 'module': module.id})
+        print response.context['indicators']
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(1, len(response.context['indicators']))
+        self.assertIn(indicator_1, response.context['indicators'])
+        self.assertNotIn(indicator_2, response.context['indicators'])

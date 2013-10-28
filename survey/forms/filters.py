@@ -26,21 +26,24 @@ class QuestionFilterForm(forms.Form):
 class IndicatorFilterForm(forms.Form):
     survey = forms.ChoiceField(label='Survey', widget=forms.Select(), choices=[])
     batch = forms.ChoiceField(label='Batch', widget=forms.Select(), choices=[])
+    module = forms.ChoiceField(label='Module', widget=forms.Select(), choices=[])
 
     def __init__(self, data=None,initial=None):
         super(IndicatorFilterForm, self).__init__(data=data, initial=initial)
-        all_surveys, all_batches = self.set_survey_and_batch_choices(data)
+        all_surveys, all_batches, all_modules = self.set_all_choices(data)
         self.fields['survey'].choices = all_surveys
         self.fields['batch'].choices = all_batches
+        self.fields['module'].choices = all_modules
 
-    def set_survey_and_batch_choices(self, data=None):
+    def set_all_choices(self, data=None):
         all_batches = [('All', 'All')]
         all_surveys = [('All', 'All')]
+        all_modules = [('All', 'All')]
         batches = Batch.objects.all()
         if data and data.get('survey', None).isdigit():
             batches = batches.filter(survey__id = int(data.get('survey', None)))
-
         map(lambda batch: all_batches.append((batch.id, batch.name)), batches)
         map(lambda survey: all_surveys.append((survey.id, survey.name)), Survey.objects.all())
+        map(lambda module: all_modules.append((module.id, module.name)), QuestionModule.objects.all())
 
-        return all_surveys, all_batches
+        return all_surveys, all_batches, all_modules
