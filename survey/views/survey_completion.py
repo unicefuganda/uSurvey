@@ -31,6 +31,12 @@ def is_valid(params):
         return True
     return False
 
+
+def render_household_details(request,location):
+    context = {'households': _total_households(location),'selected_location':location}
+    return render(request, 'aggregates/household_completion_status.html', context)
+
+
 def show(request):
     selected_location = None
     params = request.GET
@@ -39,7 +45,9 @@ def show(request):
         batch = Batch.objects.get(id=params['batch'])
         selected_location = Location.objects.get(id=params['location']) if params['location'] else None
         locations = selected_location.get_children() if selected_location else Location.objects.all()
-        all_locations = locations if locations else [selected_location]
+        all_locations = locations if locations else None
+        if all_locations is None:
+            return render_household_details(request,selected_location)
         content['total_households'] = {loc: _total_households(loc).count() for loc in all_locations}
         content['completed_households_percent'] = {loc: _percent_completed_households(loc, batch) for loc in
                                                    all_locations}

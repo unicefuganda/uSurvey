@@ -31,3 +31,9 @@ class SurveyCompletionRatesPage(PageObject):
         assert self.browser.is_text_present('Location')
         assert self.browser.is_text_present('Total Household')
         assert self.browser.is_text_present('% Completed')
+
+    def see_houdehold_completion_table(self):
+        assert self.browser.is_text_present('HH Code')
+        assert self.browser.is_text_present('Household Head')
+        assert self.browser.is_text_present('Number of members')
+

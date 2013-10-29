@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}
+  Completion Rates
+{% endblock %}
+{% block content %}
+    <h3>Survey Completion by household in {{ selected_location.type.name }} {{ selected_location.name }}</h3>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>HH Code</th>
+          <th>Household Head</th>
+          <th>Number of members</th>
+        </tr>
+      </thead>
+    {% if households %}
+        <tbody>
+        {% for household in households %}
+            <tr>
+                <td>{{ household.uid }}</td>
+                <td>{{ household.get_head.name }}</td>
+                <td>{{ household.all_members.count }}</td>
+                <td></td>
+            </tr>
+        {% endfor %}
+      </tbody>
+    {% endif %}
+    </table>
+{% endblock %}

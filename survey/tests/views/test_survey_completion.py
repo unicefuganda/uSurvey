@@ -71,14 +71,7 @@ class TestSurveyCompletion(BaseTest):
         self.assertIn(self.abim, response.context['total_households'])
         self.assertIn(self.kampala, response.context['total_households'])
 
-    def test_should_render_location_if_no_children(self):
-        response = self.client.get('/survey_completion/', {'location': str(self.abim.pk), 'batch': str(self.batch.pk)})
-        self.assertIn(self.abim, response.context['total_households'])
-
     def test_should_render_total_number_of_household_under_child_locations(self):
-        response = self.client.get('/survey_completion/', {'location': str(self.abim.pk), 'batch': str(self.batch.pk)})
-        self.assertEqual(0, response.context['total_households'][self.abim])
-
         response = self.client.get('/survey_completion/', {'location': str(self.uganda.pk), 'batch': str(self.batch.pk)})
         self.assertEqual(0, response.context['total_households'][self.abim])
         self.assertEqual(2, response.context['total_households'][self.kampala])
@@ -88,3 +81,14 @@ class TestSurveyCompletion(BaseTest):
         response = self.client.get('/survey_completion/', {'location': str(self.uganda.pk),'batch':str(self.batch.pk)})
         self.assertEqual(0,response.context['completed_households_percent'][self.abim])
         self.assertEqual(50,response.context['completed_households_percent'][self.kampala])
+
+    @patch('survey.views.survey_completion.render_household_details')
+    def test_should_call_households_details_if_lowest_level_selected(self,mock_method):
+        response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        assert mock_method.called
+
+    def test_should_return_household_objects_if_lowest_level_selected(self):
+        response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        self.assertNotIn(self.household_1, response.context['households'])
+        self.assertIn(self.household_2, response.context['households'])
+        self.assertEqual(self.kampala_city,response.context['selected_location'])

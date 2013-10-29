@@ -121,3 +121,24 @@ def when_i_click_on_descendant_name(step):
 def then_i_should_see_status_page_for_that_location(step):
     world.page.see_completion_rates_table()
     world.page.is_text_present(world.kampala_parish.name)
+
+@step(u'And I choose a village and an open batch')
+def and_i_choose_a_village_and_an_open_batch(step):
+    locations = SortedDict()
+    locations['district'] = world.kampala_district.name
+    locations['county'] = world.kampala_county.name
+    locations['subcounty'] = world.kampala_subcounty.name
+    locations['parish'] = world.kampala_parish.name
+    locations['village'] = world.kampala_village.name
+
+    world.page.choose_location(locations)
+    world.page.choose_batch(world.batch_1)
+
+
+@step(u'Then I should see a table for household completion rates')
+def then_i_should_see_a_table_for_household_completion_rates(step):
+    world.page.see_houdehold_completion_table()
+
+@step(u'And I should see household details text')
+def and_i_should_see_household_details_text(step):
+    world.page.is_text_present("Survey Completion by household in %s %s" %(world.kampala_village.type.name, world.kampala_village.name))
