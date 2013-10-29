@@ -50,3 +50,16 @@ Feature: Aggregates feature
       Then I should see an option to select location hierarchically
       And I should see an option to select batch
       And I should see a get status button
+
+    Scenario: Survey completion rates - get with params
+      Given I am logged in as researcher
+      And I have locations
+      And I have 2 batches with one open
+      And I visit district aggregate page
+      And I choose a location and an open batch
+      And I click get status button
+      Then I should see a table for completion rates
+      And I should see descendants in the table
+      When I click on descendant name
+      Then I should see status page for that location
+

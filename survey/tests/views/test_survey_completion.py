@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.test import Client
+from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import Survey, Batch, Investigator, Household
 from survey.tests.base_test import BaseTest
@@ -36,7 +37,7 @@ class TestSurveyCompletion(BaseTest):
     def test_should_render_template(self):
         response = self.client.get('/survey_completion/')
         templates = [template.name for template in response.templates]
-        self.assertIn('aggregates/status.html', templates)
+        self.assertIn('aggregates/completion_status.html', templates)
 
     def test_should_render_context_data(self):
         survey = Survey.objects.create()
@@ -50,9 +51,7 @@ class TestSurveyCompletion(BaseTest):
         self.assertEquals(locations.keys()[0], 'country')
         self.assertEquals(len(locations['country']), 1)
         self.assertEquals(locations['country'][0], self.uganda)
-
         self.assertEquals(len(locations['city']), 0)
-
 
     def test_should_validate_params(self):
         self.assertFalse(is_valid({'location':'2', 'batch':'NOT_A_DIGIT'}))
@@ -62,6 +61,10 @@ class TestSurveyCompletion(BaseTest):
         response = self.client.get('/survey_completion/', {'location':'2', 'batch':'NOT_A_DIGIT'})
         error_message = 'Please select a valid location and batch.'
         self.assertIn(error_message, str(response))
+
+    def test_should_render_context_data_after_selecting_location_and_batch(self):
+        response = self.client.get('/survey_completion/', {'location': str(self.uganda.pk) ,'batch': str(self.batch.pk)})
+        self.assertEqual(self.batch, response.context['selected_batch'])
 
     def test_should_render_location_children_if_location_in_get_params(self):
         response = self.client.get('/survey_completion/', {'location': str(self.uganda.pk) ,'batch': str(self.batch.pk)})

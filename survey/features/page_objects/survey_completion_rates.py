@@ -26,3 +26,8 @@ class SurveyCompletionRatesPage(PageObject):
 
     def choose_batch(self, batch):
         self.browser.select('batch', batch.pk)
+
+    def see_completion_rates_table(self):
+        assert self.browser.is_text_present('Location')
+        assert self.browser.is_text_present('Total Household')
+        assert self.browser.is_text_present('% Completed')

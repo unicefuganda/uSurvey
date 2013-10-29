@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from time import sleep
 from lettuce import *
 from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import *
@@ -103,4 +104,13 @@ def and_i_select_a_batch_and_click_export_to_csv(step):
 def and_i_visit_district_aggregate_page(step):
     world.page = SurveyCompletionRatesPage(world.browser)
     world.page.visit()
+
+@step(u'Then I should see a table for completion rates')
+def then_i_should_see_a_table_for_completion_rates(step):
+    world.page.see_completion_rates_table()
+
+@step(u'And I should see descendants in the table')
+def and_i_should_see_descendants_in_the_table(step):
+    sleep(10)
+    #assert False, 'This step must be implemented'
 

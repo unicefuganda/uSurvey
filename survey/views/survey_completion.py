@@ -27,7 +27,7 @@ def _percent_completed_households(location, batch):
 def is_valid(params):
     if contains_key(params, 'location') and contains_key(params, 'batch'):
         return True
-    if params.has_key('location')  and params['location'] == '':
+    if params.has_key('location') and params['location'] == '' and contains_key(params, 'batch'):
         return True
     return False
 
@@ -43,6 +43,7 @@ def show(request):
         content['total_households'] = {loc: _total_households(loc).count() for loc in all_locations}
         content['completed_households_percent'] = {loc: _percent_completed_households(loc, batch) for loc in
                                                    all_locations}
+        content['selected_batch']= batch
     elif params.has_key('location') or params.has_key('batch'):
         messages.error(request, "Please select a valid location and batch.")
 
@@ -51,4 +52,4 @@ def show(request):
     content['locations'] = LocationWidget(selected_location)
     content['batches'] = Batch.objects.all()
     content['action'] = 'survey_completion_rates'
-    return render(request, 'aggregates/status.html', content)
+    return render(request, 'aggregates/completion_status.html', content)
