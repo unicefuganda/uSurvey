@@ -29,7 +29,7 @@ class NewHouseholdPage(PageObject):
 
         self.browser.fill_form(self.values)
         kampala = Location.objects.get(name="Kampala")
-        kampala_county = Location.objects.get(name="County")
+        kampala_county = Location.objects.get(name="Kampala County")
         kampala_subcounty = Location.objects.get(name="Subcounty")
         kampala_parish = Location.objects.get(name="Parish")
         kampala_village = Location.objects.get(name="Village")

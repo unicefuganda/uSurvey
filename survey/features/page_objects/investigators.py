@@ -22,7 +22,7 @@ class NewInvestigatorPage(PageObject):
     def fill_valid_values(self):
         self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
         kampala = Location.objects.get(name="Kampala")
-        kampala_county = Location.objects.get(name="County")
+        kampala_county = Location.objects.get(name="Kampala County")
         kampala_subcounty = Location.objects.get(name="Subcounty")
         kampala_parish = Location.objects.get(name="Parish")
         kampala_village = Location.objects.get(name="Village")

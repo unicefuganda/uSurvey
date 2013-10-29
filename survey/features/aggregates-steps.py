@@ -111,6 +111,13 @@ def then_i_should_see_a_table_for_completion_rates(step):
 
 @step(u'And I should see descendants in the table')
 def and_i_should_see_descendants_in_the_table(step):
-    sleep(10)
-    #assert False, 'This step must be implemented'
+    world.page.is_text_present(world.kampala_subcounty.name)
 
+@step(u'When I click on descendant name')
+def when_i_click_on_descendant_name(step):
+    world.page.click_link_by_text(world.kampala_subcounty.name)
+
+@step(u'Then I should see status page for that location')
+def then_i_should_see_status_page_for_that_location(step):
+    world.page.see_completion_rates_table()
+    world.page.is_text_present(world.kampala_parish.name)

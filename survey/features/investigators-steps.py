@@ -46,12 +46,12 @@ def and_i_have_locations(step):
     parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
     village = LocationType.objects.create(name="Village", slug=slugify("village"))
 
-    kampala_district = Location.objects.create(name="Kampala", type=district)
-    kampala_county = Location.objects.create(name="County", type=county, tree_parent=kampala_district)
-    kampala_subcounty = Location.objects.create(name="Subcounty", type=subcounty, tree_parent=kampala_county)
-    kampala_parish = Location.objects.create(name="Parish", type=parish, tree_parent=kampala_subcounty)
-    world.kampala_village = Location.objects.create(name="Village", type=village, tree_parent=kampala_parish)
-    world.kampala_county = Location.objects.create(name="Kampala County", type=village, tree_parent=kampala_parish)
+    world.kampala_district = Location.objects.create(name="Kampala", type=district)
+    world.kampala_county = Location.objects.create(name="Kampala County", type=county, tree_parent=world.kampala_district)
+    world.kampala_subcounty = Location.objects.create(name="Subcounty", type=subcounty, tree_parent=world.kampala_county)
+    world.kampala_parish = Location.objects.create(name="Parish", type=parish, tree_parent=world.kampala_subcounty)
+    world.kampala_village = Location.objects.create(name="Village", type=village, tree_parent=world.kampala_parish)
+    world.kampala_county_village = Location.objects.create(name="Kampala County Village", type=village, tree_parent=world.kampala_parish)
 
 
 @step(u'And I visit new investigator page')
