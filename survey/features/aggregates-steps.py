@@ -153,10 +153,9 @@ def and_i_should_see_investigator_details_text(step):
 def and_i_have_an_investigator_and_households(step):
     world.batch = Batch.objects.create()
     world.investigator = Investigator.objects.create(name="some_investigator", mobile_number="123456784", location=world.kampala_village)
-    world.household_1 = Household.objects.create(investigator = world.investigator, uid=101)
-    world.household_2 = Household.objects.create(investigator = world.investigator, uid=102)
-    world.household_1.batch_completed(world.batch)
+    world.household_1 = Household.objects.create(investigator = world.investigator, uid=101, location=world.kampala_village)
+    world.household_2 = Household.objects.create(investigator = world.investigator, uid=102, location=world.kampala_village)
 
 @step(u'And I should see percent completion')
 def and_i_should_see_percent_completion(step):
-    world.page.is_text_present('Percent Completion: %s' %(_percent_completed_households(world.kampala_village, world.batch)))
+    world.page.is_text_present('Percent Completion: 0')

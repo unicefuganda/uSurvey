@@ -169,6 +169,9 @@ class Household(BaseModel):
         for member in self.household_member.all():
             member.mark_past_answers_as_old()
 
+    def members_interviewed(self,batch):
+        return [member for member in self.household_member.all() if member.has_completed(batch)]
+
     @classmethod
     def set_related_locations(cls, households):
         for household in households:

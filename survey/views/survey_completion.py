@@ -32,10 +32,20 @@ def is_valid(params):
     return False
 
 
+def members_interviewed(household, batch):
+    return len(household.members_interviewed(batch))
+
+
 def render_household_details(request,location,batch):
-    investigator = Investigator.objects.get(location=location)
+    context={'selected_location':location,}
+    investigator = Investigator.objects.filter(location=location)
+    if not investigator.exists():
+        messages.error(request, 'Investigator not registered for this location.')
+        return render(request, 'aggregates/household_completion_status.html', context)
     percent_completed = _percent_completed_households(location,batch)
-    context = {'households': _total_households(location),'selected_location':location,'investigator':investigator,'percent_completed':percent_completed}
+    all_households= _total_households(location)
+    households = {household: members_interviewed(household,batch) for household in all_households}
+    context.update({'households': households, 'investigator':investigator[0], 'percent_completed':percent_completed})
     return render(request, 'aggregates/household_completion_status.html', context)
 
 

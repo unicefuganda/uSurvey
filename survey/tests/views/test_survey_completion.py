@@ -1,8 +1,10 @@
+import datetime
 from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Survey, Batch, Investigator, Household
+from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder
+from survey.models.households import HouseholdMember
 from survey.tests.base_test import BaseTest
 from survey.views.survey_completion import is_valid
 
@@ -28,7 +30,7 @@ class TestSurveyCompletion(BaseTest):
 
         self.household_1 = Household.objects.create(investigator = self.investigator_1,location= self.kampala)
         self.household_2 = Household.objects.create(investigator = self.investigator_2,location= self.kampala_city)
-        self.batch = Batch.objects.create()
+        self.batch = Batch.objects.create(order=1,name='somebatch')
 
     def test_should_render_success_status_code_on_GET(self):
         response = self.client.get('/survey_completion/')
@@ -101,3 +103,20 @@ class TestSurveyCompletion(BaseTest):
         self.household_2.batch_completed(self.batch)
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         self.assertEqual(100,response.context['percent_completed'])
+
+    def test_should_show_error_message_if_investigator_not_present_on_lowest_level(self):
+        Investigator.objects.all().delete()
+        response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        error_message = 'Investigator not registered for this location.'
+        self.assertIn(error_message,str(response))
+
+
+    def test_should_render_interviewed_number_of_members_if_lowest_level_selected(self):
+        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
+        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
+        member_1 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
+        member_2 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
+        self.investigator_2.member_answered(question,member_1,1,self.batch)
+        response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        self.assertEqual(1,response.context['households'][self.household_2])

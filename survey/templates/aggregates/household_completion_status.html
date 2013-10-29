@@ -4,6 +4,7 @@
 {% endblock %}
 {% block content %}
     <h3>Survey Completion by household in {{ selected_location.type.name }} {{ selected_location.name }}</h3>
+    {% if households %}
     <p>Investigator: {{ investigator.name }}({{ investigator.mobile_number }})</p>
     <p>Percent Completion: {{ percent_completed }}</p>
 
@@ -13,19 +14,19 @@
           <th>HH Code</th>
           <th>Household Head</th>
           <th>Number of members</th>
+          <th>Total Interviewed</th>
         </tr>
       </thead>
-    {% if households %}
         <tbody>
-        {% for household in households %}
+        {% for household, member_interviewed in households.items %}
             <tr>
                 <td>{{ household.uid }}</td>
                 <td>{{ household.get_head.name }}</td>
                 <td>{{ household.all_members.count }}</td>
-                <td></td>
+                <td>{{ member_interviewed }}</td>
             </tr>
         {% endfor %}
       </tbody>
-    {% endif %}
     </table>
+    {% endif %}
 {% endblock %}

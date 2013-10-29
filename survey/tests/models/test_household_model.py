@@ -419,3 +419,18 @@ class HouseholdTest(TestCase):
         self.assertIn(household_1, Household.total_households_in(self.uganda))
         self.assertIn(household_2, Household.total_households_in(self.uganda))
 
+    def test_should_know_number_of_members_interviewed(self):
+        self.batch = Batch.objects.create(name="BATCH A", order=1)
+        Household.objects.all().delete()
+        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
+
+        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
+
+        household_1 = Household.objects.create(investigator = investigator_1,location=self.kampala)
+        member_1 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
+        member_2 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
+        member_3 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
+
+        member_1.batch_completed(self.batch)
+
+        self.assertIn(member_1, household_1.members_interviewed(self.batch))
