@@ -19,3 +19,12 @@ def and_i_click_questions_tab(step):
 def then_i_should_see_questions_dropdown_list(step):
     reverse_url_links = ["list_all_questions","new_question_page"]
     world.page.see_dropdown(reverse_url_links)
+
+@step(u'And I click Aggregates tab')
+def and_i_click_aggregates_tab(step):
+    world.page.click_tab("Aggregates")
+
+@step(u'Then I should see Aggregates dropdown list')
+def then_i_should_see_aggregates_dropdown_list(step):
+    reverse_url_links = ['aggregates_status','download_excel','list_indicator_page','new_indicator_page']
+    world.page.see_dropdown(reverse_url_links)

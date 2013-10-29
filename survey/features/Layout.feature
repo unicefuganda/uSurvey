@@ -15,3 +15,8 @@ Feature: Layout Page feature
     Given I am logged in as researcher
     And I click Questions tab
     Then I should see Questions dropdown list
+
+  Scenario: Aggregates Tab
+    Given I am logged in as researcher
+    And I click Aggregates tab
+    Then I should see Aggregates dropdown list

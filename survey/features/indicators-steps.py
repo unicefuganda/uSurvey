@@ -99,3 +99,12 @@ def then_i_should_see_indicators_in_that_module(step):
     world.page.is_text_present(world.indicator_1b.name, False)
     world.page.is_text_present(world.indicator_2.name, False)
     world.page.is_text_present(world.indicator_3.name, False)
+
+@step(u'When I click on add indicator button')
+def when_i_click_on_add_indicator_button(step):
+    world.page.click_by_css('#add_indicator')
+
+@step(u'Then I should see add indicator page')
+def then_i_should_see_add_indicator_page(step):
+    world.page = NewIndicatorPage(world.browser)
+    world.page.validate_url()

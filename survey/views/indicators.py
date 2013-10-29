@@ -21,6 +21,7 @@ def new(request):
                   {'indicator_form': indicator_form, 'title': 'Add Indicator', 'button_label': 'Save',
                    'action': '/indicators/new/'})
 
+
 def _process_form(indicator_filter_form, indicators):
     if indicator_filter_form.is_valid():
         survey_id = indicator_filter_form.cleaned_data['survey']

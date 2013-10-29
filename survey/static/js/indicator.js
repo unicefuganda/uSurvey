@@ -1,25 +1,16 @@
 ;
 jQuery(function($){
     var $batch = $("#id_batch");
-    $("#id_survey").on('change', function(){
+    $("#id_filter_survey").on('change', function(){
           $batch.find('option').remove();
-          option = get_first_option();
-          $batch.append(option);
-          var url = get_url($(this).val());
-          $.getJSON(url, function(data){
-               $.each(data, function(){
-                   option = $('<option />').val(this.id).text(this.name);
-                   $batch.append(option);
-                });
-          });
+          $batch.append($('<option />').val('All').text('All'));
+         populate_choices.call(this)
     });
 
-    function get_first_option(){
-        if (window.location.pathname.contains("new")){
-            return '';
-        }
-        return $('<option />').val('All').text('All');
-    }
+    $('#id_survey').on('change', function(){
+        $batch.find('option').remove();
+        populate_choices.call(this);
+    });
 
     function get_url(survey_id){
         if (survey_id == 'All'){
@@ -27,4 +18,14 @@ jQuery(function($){
         }
         return '/surveys/'+ survey_id +'/batches/';
     }
+
+    function populate_choices() {
+        var url = get_url($(this).val());
+        $.getJSON(url, function (data) {
+            $.each(data, function () {
+                $batch.append($('<option />').val(this.id).text(this.name));
+            });
+        });
+    }
+
 });

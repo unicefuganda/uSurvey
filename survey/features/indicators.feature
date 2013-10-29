@@ -29,4 +29,5 @@ Feature: Indicators feature
       When I select a module
       And I click on get list
       Then I should see indicators in that module
-
+      When I click on add indicator button
+      Then I should see add indicator page
