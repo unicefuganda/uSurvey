@@ -76,3 +76,15 @@ Feature: Aggregates feature
       And I should see investigator details text
       And I should see percent completion
 
+    Scenario: Survey Completion - Javascript
+      Given I am logged in as researcher
+      And I have 2 surveys with one batch each
+      And I have locations
+      And I have an investigator and households
+      And I visit district aggregate page
+      When I select survey 2 from survey list
+      Then I should see batch2 in batch list
+      And I should not see batch1 in batch list
+      When I select survey 1 from survey list
+      Then I should see batch1 in batch list
+      And I should not see batch2 in batch list

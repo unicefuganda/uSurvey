@@ -4,25 +4,26 @@
 {% endblock %}
 {% block content %}
   <form id="aggregates-form" action="{% url action %}" method="get">
-  <label>Survey</label>
-      <select name="survey" id="survey-list-select">
+    <div>
+      {% load template_tags %}
+      <label>Survey</label>
+      <select name="survey" id="survey-list-select" name="survey">
         {% for survey in surveys %}
           <option value="{{ survey.id }}" >{{ survey.name }}</option>
         {% endfor %}
       </select>
-    <div>
-      {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
-    </div>
-    <div class="batch-list-container">
-      {% load template_tags %}
+
       <label>Batch</label>
-      <select name="batch" id="batch-list-select">
+      <select name="batch" id="batch-list-select" name="batch">
         {% for batch in batches %}
           <option value="{{ batch.id }}" {{ batch|is_batch_selected:selected_batch }} >{{ batch.name }}</option>
         {% endfor %}
       </select>
-      <button class="btn btn-primary">Get status</button>
     </div>
+     <div>
+        {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
+     </div>
+    <button class="btn btn-primary">Get status</button>
   </form>
   {% if total_households %}
     <table class="table table-striped table-bordered">
@@ -52,4 +53,5 @@
 {% endblock %}
 {% block javascripts %}
   <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}/js/survey_status.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

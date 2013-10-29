@@ -6,6 +6,7 @@ from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.aggregates import AggregateStatusPage, DownloadExcelPage
 from survey.features.page_objects.survey_completion_rates import SurveyCompletionRatesPage
+from survey.models import Survey
 from survey.models.batch import Batch
 from survey.models.households import Household
 from survey.models.investigator import Investigator
@@ -159,3 +160,34 @@ def and_i_have_an_investigator_and_households(step):
 @step(u'And I should see percent completion')
 def and_i_should_see_percent_completion(step):
     world.page.is_text_present('Percent Completion: 0')
+
+@step(u'And I have 2 surveys with one batch each')
+def and_i_have_2_surveys_with_one_batch_each(step):
+    world.survey_1 = Survey.objects.create(name='survey1', sample_size=10)
+    world.survey_2 = Survey.objects.create(name='survey2', sample_size=10)
+    world.batch_1 = Batch.objects.create(name='batch1', order=1, survey= world.survey_1)
+    world.batch_2 = Batch.objects.create(name='batch2', order=1, survey= world.survey_2)
+
+@step(u'When I select survey 2 from survey list')
+def when_i_select_survey_2_from_survey_list(step):
+    world.page.select('survey',[world.survey_2.id])
+
+@step(u'Then I should see batch2 in batch list')
+def then_i_should_see_batch2_in_batch_list(step):
+    world.page.see_select_option([world.batch_2.name],'batch')
+
+@step(u'And I should not see batch1 in batch list')
+def and_i_should_not_see_batch1_in_batch_list(step):
+    world.page.option_not_present([world.batch_1.name],'batch')
+
+@step(u'When I select survey 1 from survey list')
+def when_i_select_survey_1_from_survey_list(step):
+    world.page.select('survey',[world.survey_1.id])
+
+@step(u'Then I should see batch1 in batch list')
+def then_i_should_see_batch1_in_batch_list(step):
+    world.page.see_select_option([world.batch_1.name],'batch')
+
+@step(u'And I should not see batch2 in batch list')
+def and_i_should_not_see_batch2_in_batch_list(step):
+    world.page.option_not_present([world.batch_2.name],'batch')
