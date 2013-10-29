@@ -10,13 +10,15 @@ class IndicatorViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.module = QuestionModule.objects.create(name="Health")
-        self.batch = Batch.objects.create(name="Health")
+        self.survey = Survey.objects.create(name="Health survey")
+        self.batch = Batch.objects.create(name="Health", survey=self.survey)
 
         self.form_data = {'module': self.module.id,
                           'name': 'Health',
                           'description': 'some description',
                           'measure': '%',
-                          'batch': self.batch.id}
+                          'batch': self.batch.id,
+                          'survey':self.survey.id}
 
         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
@@ -35,10 +37,12 @@ class IndicatorViewTest(BaseTest):
         self.assertEqual(response.context['button_label'], "Save")
         self.assertEqual(response.context['action'], "/indicators/new/")
 
-    def test_post_indicator_ceates_an_indicator_and_returns_success(self):
-        self.failIf(Indicator.objects.filter(**self.form_data))
+    def test_post_indicator_creates_an_indicator_and_returns_success(self):
+        data = self.form_data.copy()
+        del data['survey']
+        self.failIf(Indicator.objects.filter(**data))
         response = self.client.post('/indicators/new/', data=self.form_data)
-        self.failUnless(Indicator.objects.filter(**self.form_data))
+        self.failUnless(Indicator.objects.filter(**data))
         self.assertRedirects(response, "/indicators/", 302, 200)
         success_message = "Indicator successfully created."
         self.assertIn(success_message, response.cookies['messages'].value)
@@ -52,6 +56,7 @@ class IndicatorViewTest(BaseTest):
         another_form_data['name'] = 'Education'
         another_form_data['module'] = self.module
         another_form_data['batch'] = self.batch
+        del another_form_data['survey']
 
         education_indicator = Indicator.objects.create(**another_form_data)
         response = self.client.get('/indicators/')
@@ -107,7 +112,6 @@ class IndicatorViewTest(BaseTest):
                                          module=module_1, batch=batch_s)
 
         response = self.client.post('/indicators/', data={'survey': 'All', 'batch': 'All', 'module': module.id})
-        print response.context['indicators']
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(1, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
@@ -126,7 +130,6 @@ class IndicatorViewTest(BaseTest):
                                          module=module_1, batch=batch_s)
 
         response = self.client.post('/indicators/', data={'survey': 'All', 'batch': batch_s.id, 'module': module.id})
-        print response.context['indicators']
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(1, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
@@ -144,7 +147,6 @@ class IndicatorViewTest(BaseTest):
                                          module=module_1, batch=batch_s)
 
         response = self.client.post('/indicators/', data={'survey': survey.id, 'batch': batch_s.id, 'module': module.id})
-        print response.context['indicators']
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(1, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])

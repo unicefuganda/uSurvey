@@ -46,3 +46,7 @@ class SurveyTest(TestCase):
         Batch.objects.create(order=1, survey=survey)
 
         self.assertFalse(survey.is_open())
+
+    def test_unicode_text(self):
+        survey = Survey.objects.create(name="survey name", description="rajni survey")
+        self.assertEqual(survey.name, str(survey))

@@ -8,3 +8,6 @@ class QuestionModule(BaseModel):
 
     def remove_related_questions(self):
         self.module_question.clear()
+
+    def __unicode__(self):
+        return self.name

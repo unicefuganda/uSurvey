@@ -18,3 +18,6 @@ class Survey(BaseModel):
             if batch.open_locations.all():
                 return True
         return False
+
+    def __unicode__(self):
+        return self.name

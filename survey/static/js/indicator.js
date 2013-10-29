@@ -3,7 +3,7 @@ jQuery(function($){
     var $batch = $("#id_batch");
     $("#id_survey").on('change', function(){
           $batch.find('option').remove();
-          option = $('<option />').val('All').text('All');
+          option = get_first_option();
           $batch.append(option);
           var url = get_url($(this).val());
           $.getJSON(url, function(data){
@@ -13,6 +13,13 @@ jQuery(function($){
                 });
           });
     });
+
+    function get_first_option(){
+        if (window.location.pathname.contains("new")){
+            return '';
+        }
+        return $('<option />').val('All').text('All');
+    }
 
     function get_url(survey_id){
         if (survey_id == 'All'){

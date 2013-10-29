@@ -30,3 +30,7 @@ class QuestionModuleTest(BaseTest):
         all_questions = Question.objects.filter()
 
         [self.assertIsNone(question.module) for question in all_questions]
+
+    def test_unicode_text(self):
+        module = QuestionModule.objects.create(name="module name")
+        self.assertEqual(module.name, str(module))
