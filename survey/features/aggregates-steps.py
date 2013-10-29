@@ -11,6 +11,8 @@ from survey.models.households import Household
 from survey.models.investigator import Investigator
 from survey.models.formula import *
 from survey import investigator_configs
+from survey.views.survey_completion import _percent_completed_households
+
 
 @step(u'And I have 2 batches with one open')
 def and_i_have_2_batches_with_one_open(step):
@@ -142,3 +144,19 @@ def then_i_should_see_a_table_for_household_completion_rates(step):
 @step(u'And I should see household details text')
 def and_i_should_see_household_details_text(step):
     world.page.is_text_present("Survey Completion by household in %s %s" %(world.kampala_village.type.name, world.kampala_village.name))
+
+@step(u'And I should see investigator details text')
+def and_i_should_see_investigator_details_text(step):
+    world.page.is_text_present('Investigator: %s(%s)' %(world.investigator.name, world.investigator.mobile_number))
+
+@step(u'And I have an investigator and households')
+def and_i_have_an_investigator_and_households(step):
+    world.batch = Batch.objects.create()
+    world.investigator = Investigator.objects.create(name="some_investigator", mobile_number="123456784", location=world.kampala_village)
+    world.household_1 = Household.objects.create(investigator = world.investigator, uid=101)
+    world.household_2 = Household.objects.create(investigator = world.investigator, uid=102)
+    world.household_1.batch_completed(world.batch)
+
+@step(u'And I should see percent completion')
+def and_i_should_see_percent_completion(step):
+    world.page.is_text_present('Percent Completion: %s' %(_percent_completed_households(world.kampala_village, world.batch)))

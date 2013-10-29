@@ -23,11 +23,11 @@ class TestSurveyCompletion(BaseTest):
         self.kampala = Location.objects.create(name='Kampala', tree_parent = self.uganda, type = self.city)
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
 
-        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456789',male=True,location=self.kampala)
-        investigator_2 = Investigator.objects.create(name='some_inv',mobile_number='123456788',male=True,location=self.kampala_city)
+        self.investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456789',male=True,location=self.kampala)
+        self.investigator_2 = Investigator.objects.create(name='some_inv',mobile_number='123456788',male=True,location=self.kampala_city)
 
-        self.household_1 = Household.objects.create(investigator = investigator_1,location= self.kampala)
-        self.household_2 = Household.objects.create(investigator = investigator_2,location= self.kampala_city)
+        self.household_1 = Household.objects.create(investigator = self.investigator_1,location= self.kampala)
+        self.household_2 = Household.objects.create(investigator = self.investigator_2,location= self.kampala_city)
         self.batch = Batch.objects.create()
 
     def test_should_render_success_status_code_on_GET(self):
@@ -91,4 +91,13 @@ class TestSurveyCompletion(BaseTest):
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         self.assertNotIn(self.household_1, response.context['households'])
         self.assertIn(self.household_2, response.context['households'])
+
+    def test_should_render_context_if_lowest_level_selected(self):
+        response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         self.assertEqual(self.kampala_city,response.context['selected_location'])
+        self.assertEqual(self.investigator_2,response.context['investigator'])
+        self.assertEqual(0,response.context['percent_completed'])
+
+        self.household_2.batch_completed(self.batch)
+        response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        self.assertEqual(100,response.context['percent_completed'])

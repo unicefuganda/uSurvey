@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location
-from survey.models import Batch, Survey, Household
+from survey.models import Batch, Survey, Household, Investigator
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
 
@@ -32,8 +32,10 @@ def is_valid(params):
     return False
 
 
-def render_household_details(request,location):
-    context = {'households': _total_households(location),'selected_location':location}
+def render_household_details(request,location,batch):
+    investigator = Investigator.objects.get(location=location)
+    percent_completed = _percent_completed_households(location,batch)
+    context = {'households': _total_households(location),'selected_location':location,'investigator':investigator,'percent_completed':percent_completed}
     return render(request, 'aggregates/household_completion_status.html', context)
 
 
@@ -47,7 +49,7 @@ def show(request):
         locations = selected_location.get_children() if selected_location else Location.objects.all()
         all_locations = locations if locations else None
         if all_locations is None:
-            return render_household_details(request,selected_location)
+            return render_household_details(request,selected_location,batch)
         content['total_households'] = {loc: _total_households(loc).count() for loc in all_locations}
         content['completed_households_percent'] = {loc: _percent_completed_households(loc, batch) for loc in
                                                    all_locations}

@@ -66,10 +66,13 @@ Feature: Aggregates feature
     Scenario: Survey completion for Lowest level location type
       Given I am logged in as researcher
       And I have locations
+      And I have an investigator and households
       And I have 2 batches with one open
       And I visit district aggregate page
       And I choose a village and an open batch
       And I click get status button
       Then I should see a table for household completion rates
       And I should see household details text
+      And I should see investigator details text
+      And I should see percent completion
 

@@ -4,6 +4,9 @@
 {% endblock %}
 {% block content %}
     <h3>Survey Completion by household in {{ selected_location.type.name }} {{ selected_location.name }}</h3>
+    <p>Investigator: {{ investigator.name }}({{ investigator.mobile_number }})</p>
+    <p>Percent Completion: {{ percent_completed }}</p>
+
     <table class="table table-striped table-bordered">
       <thead>
         <tr>
