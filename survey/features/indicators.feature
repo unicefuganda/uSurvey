@@ -20,6 +20,7 @@ Feature: Indicators feature
       And I have indicator in each batch
       When I visit indicator listing page
       Then I should see all indicators listed
+      And I should see action buttons
       When I select a survey
       And I click on get list
       Then I should see indicators in that survey

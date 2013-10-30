@@ -39,6 +39,12 @@
                 <td>{{ indicator.module.name }}</td>
                 <td>{{ indicator.measure }}</td>
                 <td>
+                    <div class="btn-group">
+                    <a href="" class="btn btn-small" id="edit-indicator_{{ indicator.id }}"><i class="icon-pencil"></i> Edit</a>
+                    <a href="" class="btn btn-small" data-toggle="modal" id="delete-indicator_{{indicator.id}}"><i class="icon-trash"></i> Delete</a>
+                    <a href="" class="btn btn-small" id="add-formula-indicator_{{ indicator.id }}"><i class="icon-wrench"></i> Formula</a>
+                    <a href="" class="btn btn-small" id="analyse-indicator_{{ indicator.id }}"><i class="icon-eye-open"></i> Analysis</a>
+                </div>
                 </td>
             </tr>
         {% endfor %}
