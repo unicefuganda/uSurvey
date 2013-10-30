@@ -72,8 +72,17 @@ def show(request):
     if is_valid(params):
         batch = Batch.objects.get(id=params['batch'])
         selected_location = Location.objects.get(id=params['location']) if params['location'] else None
-        locations = selected_location.get_children() if selected_location else Location.objects.filter(tree_parent__in=Location.objects.filter(type=LocationType.objects.get(name__iexact='country')))
+        tree_parent=None
+        all_high_level_locations=Location.objects.filter(tree_parent=tree_parent)
+
+        country = LocationType.objects.filter(name__iexact='country')
+
+        if country.exists():
+            tree_parent = Location.objects.filter(type=country[0])
+            all_high_level_locations = Location.objects.filter(tree_parent__in=tree_parent)
+        locations = selected_location.get_children() if selected_location else all_high_level_locations
         all_locations = locations if locations else None
+
         if all_locations is None:
             return render_household_details(request,selected_location,batch)
         content['total_households'] = {loc: _total_households(loc).count() for loc in all_locations}
