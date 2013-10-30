@@ -28,6 +28,7 @@ class USSDBaseView(object):
 
     def response(self):
         answer = self.request['ussdRequestString'].strip()
+
         if self.investigator.is_blocked:
             return {'action': self.ussd_survey.ACTIONS['END'],
                     'responseString': self.ussd_survey.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']}
@@ -36,7 +37,7 @@ class USSDBaseView(object):
             action, responseString = self.ussd_survey.render_welcome_or_resume()
         elif self.is_registering_household is None:
             action = self.ussd_survey.ACTIONS['REQUEST']
-            responseString =''
+            responseString = ''
             if answer == self.ANSWER['TAKE_SURVEY']:
                 self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', False)
                 action, responseString = self.ussd_survey.start()
@@ -47,6 +48,7 @@ class USSDBaseView(object):
                 action, responseString = self.ussd_survey.render_welcome_or_resume()
 
         elif not self.is_registering_household:
+            print 'taking survey'
             action, responseString = self.ussd_survey.take_survey()
 
         else:

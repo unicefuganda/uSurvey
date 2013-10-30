@@ -24,12 +24,21 @@ class USSD(USSDBase):
         self.set_is_resuming_survey()
         self.set_has_chosen_retake()
         self.set_has_answered_retake()
+        self.set_can_retake_household()
         self.clean_investigator_input()
 
     def set_household(self):
         household = self.get_from_session('HOUSEHOLD')
         if household:
             self.household = household
+
+    def set_can_retake_household(self):
+        try:
+            can_retake_household = self.get_from_session('CAN_RETAKE_HOUSEHOLD')
+            self.can_retake_household = can_retake_household
+        except:
+            pass
+
 
     def set_household_member(self):
         household_member = self.get_from_session('HOUSEHOLD_MEMBER')

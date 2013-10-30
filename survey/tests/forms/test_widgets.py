@@ -6,5 +6,4 @@ class InlineRadioFieldRendererTest(TestCase):
     def test_render(self):
         pass
         # inline_renderer = InlineRadioFieldRenderer(name='test', value='hoho', attrs='hihi', choices=())
-        #  print inline_renderer.render()
         #  self.assertTrue(False)

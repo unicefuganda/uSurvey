@@ -42,6 +42,8 @@ class USSDBase(object):
         'PAGE': 1,
         'HOUSEHOLD': None,
         'HOUSEHOLD_MEMBER': None,
+        'CAN_RETAKE_HOUSEHOLD': False,
+        'HAS_CHOSEN_RETAKE': False,
     }
 
     HOUSEHOLD_LIST_OPTION = "00"

@@ -7,7 +7,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule, BatchQuestionOrder
+from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule, BatchQuestionOrder, GroupCondition
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
@@ -30,16 +30,18 @@ class USSDTest(USSDBaseTest):
                                                             COUNTRY_PHONE_CODE, ''),
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+                                                  uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname",
-                                                           date_of_birth='1980-09-01')
-        self.household_1 = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=1)
+                                                           date_of_birth=datetime.date(1980, 9, 1))
+        self.household_1 = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+                                                    uid=1)
         self.household_head_1 = HouseholdHead.objects.create(
             household=self.household_1,
-            surname="Name " + str(randint(1, 9999)), date_of_birth='1980-09-01')
+            surname="Name " + str(randint(1, 9999)), date_of_birth=datetime.date(1980, 9, 1))
         self.household_member = HouseholdMember.objects.create(surname="Name 2", household=self.household_1,
-                                                               date_of_birth='2000-02-03')
-        self.batch = Batch.objects.create(order=1)
+                                                               date_of_birth=datetime.date(2000, 2, 3))
+        self.batch = Batch.objects.create(order=1, name="batch test")
         self.batch.open_for_location(self.investigator.location)
         self.member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
 
@@ -75,21 +77,26 @@ class USSDTest(USSDBaseTest):
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        response = self.respond('1')
-        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
     def test_goes_back_to_household_list_if_investigator_selects_household_and_chooses_not_to_retake_survey(self):
-        household_member1 = HouseholdMember.objects.create(household=self.household, surname="abcd", male=False,
-                                                           date_of_birth='1989-02-02')
-        household_member2 = HouseholdMember.objects.create(household=self.household, surname="xyz", male=False,
-                                                           date_of_birth='1989-02-02')
+        HouseholdMember.objects.filter(householdhead=None).delete()
+        head_group = HouseholdMemberGroup.objects.create(name="General", order=1)
+        condition = GroupCondition.objects.create(value='HEAD', attribute="GENERAL", condition="EQUALS")
+        condition.groups.add(head_group)
+
+        question_1 = Question.objects.create(text="How many members are there in this household?",
+                                             answer_type=Question.NUMBER, order=1, group=head_group)
+        question_1.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+        self.batch.open_for_location(self.investigator.location)
+
+        self.investigator.member_answered(question_1, self.household_head, 1, self.batch)
+        self.investigator.member_answered(question_1, self.household_head_1, 1, self.batch)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
             self.reset_session()
 
         self.take_survey()
-        response = self.select_household()
+        response = self.select_household('2')
         response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -105,14 +112,13 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         response = self.respond('1')
-        members_list = "%s\n1: %s - (HEAD)*\n2: %s*\n3: %s*" % (
-            USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, household_member1.surname,
-            household_member2.surname)
+        members_list = "%s\n1: %s - (HEAD)*" % (
+            USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         response = self.respond('1')
-        response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
+        response_string = "responseString=%s&action=request" % question_1.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_renders_welcome_message_if_investigator_does_not_select_option_one_or_two_from_welcome_screen(self):
@@ -158,7 +164,8 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(2, NumericalAnswer.objects.get(investigator=self.investigator, question=question_2).answer)
 
     def test_textual_questions(self):
-        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
+        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household,
+                                                  date_of_birth='1980-02-03')
         question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.TEXT, order=1, group=self.member_group)
         question_2 = Question.objects.create(text="How many of them are male?",
@@ -335,7 +342,8 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_text_invalid_answer(self):
-        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
+        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household,
+                                                  date_of_birth='1980-02-03')
         question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.TEXT, order=1, group=self.member_group)
 
@@ -421,8 +429,8 @@ class USSDTest(USSDBaseTest):
     def test_end_interview_confirmation(self):
         question_1 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2= Question.objects.create(text="How many of them are male?",
-                                answer_type=Question.NUMBER, order=2, group=self.member_group)
+        question_2 = Question.objects.create(text="How many of them are male?",
+                                             answer_type=Question.NUMBER, order=2, group=self.member_group)
         question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
         BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
@@ -484,7 +492,7 @@ class USSDTest(USSDBaseTest):
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        response= self.select_household_member("1")
+        response = self.select_household_member("1")
 
         response_string = "responseString=%s&action=request" % question_1.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -547,7 +555,8 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_should_show_member_completion_message_and_choose_to_go_to_member_list(self):
-        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
+        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household,
+                                                  date_of_birth='1980-02-03')
         question_1 = Question.objects.create(text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
         question_2 = Question.objects.create(text="Question 2?",
@@ -565,7 +574,8 @@ class USSDTest(USSDBaseTest):
         self.take_survey()
         response = self.select_household()
 
-        members_list = "%s\n1: %s - (HEAD)\n2: %s" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
+        members_list = "%s\n1: %s - (HEAD)\n2: %s" % (
+            USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -582,12 +592,14 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         response = self.respond("1")
-        members_list = "%s\n1: %s - (HEAD)*\n2: %s" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
+        members_list = "%s\n1: %s - (HEAD)*\n2: %s" % (
+            USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_should_show_member_completion_message_and_choose_to_go_to_household_list(self):
-        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
+        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household,
+                                                  date_of_birth='1980-02-03')
         question_1 = Question.objects.create(text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)
         question_2 = Question.objects.create(text="Question 2?",
@@ -604,7 +616,8 @@ class USSDTest(USSDBaseTest):
         self.take_survey()
         response = self.select_household()
 
-        members_list = "%s\n1: %s - (HEAD)\n2: %s" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
+        members_list = "%s\n1: %s - (HEAD)\n2: %s" % (
+            USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
         response_string = "responseString=%s&action=request" % members_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -621,7 +634,8 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
         response = self.respond("2")
 
-        households_list_1 = "%s\n1: %s\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list_1 = "%s\n1: %s\n2: %s" % (
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
 
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -660,7 +674,8 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         response = self.respond("2")
-        households_list_1 = "%s\n1: %s*\n2: %s" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list_1 = "%s\n1: %s*\n2: %s" % (
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
 
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -682,7 +697,7 @@ class USSDTest(USSDBaseTest):
             self.assertEquals(urllib2.unquote(response.content), response_string)
             response = self.take_survey()
             households_list_1 = "%s\n1: %s*\n2: %s*" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+                USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
             response_string = "responseString=%s&action=request" % households_list_1
             self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -714,7 +729,7 @@ class USSDTest(USSDBaseTest):
         BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
-            response= self.reset_session()
+            response = self.reset_session()
 
         homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
         response_string = "responseString=%s&action=request" % homepage
@@ -742,8 +757,8 @@ class USSDTest(USSDBaseTest):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
-class FakeRequest(HttpRequest):
 
+class FakeRequest(HttpRequest):
     def dict(self):
         obj = self.__dict__
         obj['transactionId'] = '1234567890'

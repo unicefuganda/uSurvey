@@ -117,10 +117,11 @@ class Household(BaseModel):
     def location_hierarchy(self):
         hierarchy = []
         location = self.location
-        hierarchy.append([location.type.name, location])
-        while location.tree_parent:
-            location = location.tree_parent
+        if location:
             hierarchy.append([location.type.name, location])
+            while location.tree_parent:
+                location = location.tree_parent
+                hierarchy.append([location.type.name, location])
         hierarchy.reverse()
         return SortedDict(hierarchy)
 
@@ -151,7 +152,6 @@ class Household(BaseModel):
         paginator = Paginator(all_members, self.MEMBERS_PER_PAGE)
         page = 1 if paginator.num_pages < page else page
         members = paginator.page(page)
-
         members_list = []
         for member in members:
             name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.surname

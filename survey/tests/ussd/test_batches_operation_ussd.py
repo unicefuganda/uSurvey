@@ -103,19 +103,6 @@ class USSDWithMultipleBatches(USSDBaseTest):
         BatchQuestionOrder.objects.create(batch=self.batch_1, question=self.question_3, order=1)
         BatchQuestionOrder.objects.create(batch=self.batch_1, question=self.question_4, order=2)
 
-
-    def select_household(self, household=1):
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = "00"
-        response = self.client.post('/ussd', data=self.ussd_params)
-        self.ussd_params['ussdRequestString'] = str(household)
-        return self.client.post('/ussd', data=self.ussd_params)
-
-    def select_household_member(self, member_id="1"):
-        self.ussd_params['response'] = "true"
-        self.ussd_params['ussdRequestString'] = member_id
-        return self.client.post('/ussd', data=self.ussd_params)
-
     def test_with_one_batch_open(self):
         self.batch.open_for_location(self.location)
 
