@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import render
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import Batch, Survey, Household, Investigator
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
@@ -56,7 +56,7 @@ def show(request):
     if is_valid(params):
         batch = Batch.objects.get(id=params['batch'])
         selected_location = Location.objects.get(id=params['location']) if params['location'] else None
-        locations = selected_location.get_children() if selected_location else Location.objects.all()
+        locations = selected_location.get_children() if selected_location else Location.objects.filter(tree_parent__in=Location.objects.filter(type=LocationType.objects.get(name__iexact='country')))
         all_locations = locations if locations else None
         if all_locations is None:
             return render_household_details(request,selected_location,batch)
