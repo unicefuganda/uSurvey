@@ -37,4 +37,5 @@ class SurveyCompletionRatesPage(PageObject):
         assert self.browser.is_text_present('Household Head')
         assert self.browser.is_text_present('Number of members')
         assert self.browser.is_text_present('Total Interviewed')
+        assert self.browser.is_text_present('Date Completed')
 

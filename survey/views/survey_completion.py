@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Survey, Household, Investigator
+from survey.models import Batch, Survey, Household, Investigator, HouseholdBatchCompletion
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
 
@@ -40,6 +40,16 @@ def members_interviewed(household, batch):
     return 0
 
 
+def date_interviewed(household):
+    for member in household.household_member.all():
+        if not member.completed_member_batches.all().exists():
+            return
+    ordered_household_batch_completion = HouseholdBatchCompletion.objects.filter(household=household).order_by('created')
+    if ordered_household_batch_completion.exists():
+        return ordered_household_batch_completion[0].created.date()
+    return
+
+
 def render_household_details(request,location,batch):
     context={'selected_location':location,}
     investigator = Investigator.objects.filter(location=location)
@@ -49,7 +59,8 @@ def render_household_details(request,location,batch):
     percent_completed = _percent_completed_households(location,batch)
     all_households= _total_households(location)
     households = {household: members_interviewed(household,batch) for household in all_households}
-    context.update({'households': households, 'investigator':investigator[0], 'percent_completed':percent_completed})
+    date_completed = {household: date_interviewed(household) for household in all_households}
+    context.update({'households': households, 'investigator':investigator[0], 'percent_completed':percent_completed,'date_completed':date_completed})
     return render(request, 'aggregates/household_completion_status.html', context)
 
 @login_required

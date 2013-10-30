@@ -120,3 +120,15 @@ class TestSurveyCompletion(BaseTest):
     def test_restricted_permissions(self):
         self.assert_login_required('/survey_completion/')
         self.assert_restricted_permission_for('/survey_completion/')
+
+    def test_should_return_date_of_completion_of_household_if_lowest_level_selected(self):
+        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
+        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        self.batch.questions.add(question)
+        BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
+        member_1 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
+        member_2 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
+        self.investigator_2.member_answered(question,member_1,1,self.batch)
+        self.investigator_2.member_answered(question,member_2,1,self.batch)
+        response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        self.assertEqual(datetime.date.today(),response.context['date_completed'][self.household_2])

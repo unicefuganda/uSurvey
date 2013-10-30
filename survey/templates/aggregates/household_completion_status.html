@@ -15,15 +15,22 @@
           <th>Household Head</th>
           <th>Number of members</th>
           <th>Total Interviewed</th>
+          <th>Date Completed</th>
         </tr>
       </thead>
         <tbody>
         {% for household, member_interviewed in households.items %}
             <tr>
                 <td>{{ household.uid }}</td>
-                <td>{{ household.get_head.name }}</td>
-                <td>{{ household.all_members.count }}</td>
+                <td>{{ household.get_head.first_name|capfirst }} {{ household.get_head.surname|capfirst }}</td>
+                <td>{% if household.household_members.all %}
+                    {{ household.household_members.all.count }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </td>
                 <td>{{ member_interviewed }}</td>
+                <td>{{ date_completed.household }}</td>
             </tr>
         {% endfor %}
       </tbody>
