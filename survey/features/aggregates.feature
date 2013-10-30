@@ -59,6 +59,7 @@ Feature: Aggregates feature
       And I choose a location and an open batch
       And I click get status button
       Then I should see a table for completion rates
+      And I should see title message
       And I should see descendants in the table
       When I click on descendant name
       Then I should see status page for that location

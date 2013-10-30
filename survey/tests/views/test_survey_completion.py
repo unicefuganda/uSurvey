@@ -114,6 +114,7 @@ class TestSurveyCompletion(BaseTest):
     def test_should_render_interviewed_number_of_members_if_lowest_level_selected(self):
         member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
         question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        self.batch.questions.add(question)
         BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
         member_1 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
         member_2 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))

@@ -170,7 +170,8 @@ class Household(BaseModel):
             member.mark_past_answers_as_old()
 
     def members_interviewed(self,batch):
-        return [member for member in self.household_member.all() if member.has_completed(batch)]
+        if batch.questions.all().exists():
+            return [member for member in self.household_member.all() if member.has_completed(batch)]
 
     @classmethod
     def set_related_locations(cls, households):

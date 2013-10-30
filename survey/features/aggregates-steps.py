@@ -191,3 +191,7 @@ def then_i_should_see_batch1_in_batch_list(step):
 @step(u'And I should not see batch2 in batch list')
 def and_i_should_not_see_batch2_in_batch_list(step):
     world.page.option_not_present([world.batch_2.name],'batch')
+
+@step(u'And I should see title message')
+def and_i_should_see_title_message(step):
+    world.page.is_text_present('Survey Completion by Region/District')

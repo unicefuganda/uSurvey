@@ -33,7 +33,10 @@ def is_valid(params):
 
 
 def members_interviewed(household, batch):
-    return len(household.members_interviewed(batch))
+    interviewed = household.members_interviewed(batch)
+    if interviewed:
+        return len(interviewed)
+    return 0
 
 
 def render_household_details(request,location,batch):

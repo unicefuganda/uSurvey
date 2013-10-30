@@ -422,6 +422,27 @@ class HouseholdTest(TestCase):
     def test_should_know_number_of_members_interviewed(self):
         self.batch = Batch.objects.create(name="BATCH A", order=1)
         Household.objects.all().delete()
+        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
+        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        self.batch.questions.add(question)
+        BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
+
+        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
+
+        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
+
+        household_1 = Household.objects.create(investigator = investigator_1,location=self.kampala)
+        member_1 = HouseholdMember.objects.create(household=household_1,date_of_birth=date(2000,02, 02))
+        member_2 = HouseholdMember.objects.create(household=household_1,date_of_birth=date(2000,02, 02))
+        member_3 = HouseholdMember.objects.create(household=household_1,date_of_birth=date(2000,02, 02))
+
+        investigator_1.member_answered(question,member_1,1,self.batch)
+
+        self.assertIn(member_1, household_1.members_interviewed(self.batch))
+
+    def test_should_return_0_members_interviewed_if_no_question_in_batch(self):
+        self.batch = Batch.objects.create(name="BATCH A", order=1)
+        Household.objects.all().delete()
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
 
         investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
@@ -431,6 +452,4 @@ class HouseholdTest(TestCase):
         member_2 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
         member_3 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
 
-        member_1.batch_completed(self.batch)
-
-        self.assertIn(member_1, household_1.members_interviewed(self.batch))
+        self.assertIsNone(household_1.members_interviewed(self.batch))
