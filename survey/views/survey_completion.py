@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import Batch, Survey, Household, Investigator
@@ -51,7 +52,8 @@ def render_household_details(request,location,batch):
     context.update({'households': households, 'investigator':investigator[0], 'percent_completed':percent_completed})
     return render(request, 'aggregates/household_completion_status.html', context)
 
-
+@login_required
+@permission_required('auth.can_view_aggregates')
 def show(request):
     selected_location = None
     params = request.GET

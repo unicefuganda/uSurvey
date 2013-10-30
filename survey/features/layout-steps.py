@@ -26,5 +26,5 @@ def and_i_click_aggregates_tab(step):
 
 @step(u'Then I should see Aggregates dropdown list')
 def then_i_should_see_aggregates_dropdown_list(step):
-    reverse_url_links = ['aggregates_status','download_excel','list_indicator_page','new_indicator_page']
+    reverse_url_links = ['aggregates_status','download_excel','list_indicator_page','new_indicator_page','survey_completion_rates']
     world.page.see_dropdown(reverse_url_links)

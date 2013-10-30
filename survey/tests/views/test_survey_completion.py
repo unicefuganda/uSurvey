@@ -15,7 +15,7 @@ class TestSurveyCompletion(BaseTest):
         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
                                         'can_view_batches')
-        self.assign_permission_to(raj, 'can_add_location_types')
+        self.assign_permission_to(raj, 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
         self.country = LocationType.objects.create(name = 'Country', slug = 'country')
         self.city = LocationType.objects.create(name = 'City', slug = 'city')
@@ -84,11 +84,6 @@ class TestSurveyCompletion(BaseTest):
         self.assertEqual(0,response.context['completed_households_percent'][self.abim])
         self.assertEqual(50,response.context['completed_households_percent'][self.kampala])
 
-    @patch('survey.views.survey_completion.render_household_details')
-    def test_should_call_households_details_if_lowest_level_selected(self,mock_method):
-        response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        assert mock_method.called
-
     def test_should_return_household_objects_if_lowest_level_selected(self):
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         self.assertNotIn(self.household_1, response.context['households'])
@@ -121,3 +116,7 @@ class TestSurveyCompletion(BaseTest):
         self.investigator_2.member_answered(question,member_1,1,self.batch)
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         self.assertEqual(1,response.context['households'][self.household_2])
+
+    def test_restricted_permissions(self):
+        self.assert_login_required('/survey_completion/')
+        self.assert_restricted_permission_for('/survey_completion/')
