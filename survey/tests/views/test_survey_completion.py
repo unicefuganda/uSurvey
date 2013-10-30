@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder
+from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdBatchCompletion
 from survey.models.households import HouseholdMember
 from survey.tests.base_test import BaseTest
 from survey.views.survey_completion import is_valid
@@ -131,4 +131,5 @@ class TestSurveyCompletion(BaseTest):
         self.investigator_2.member_answered(question,member_1,1,self.batch)
         self.investigator_2.member_answered(question,member_2,1,self.batch)
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        self.assertEqual(datetime.date.today(),response.context['date_completed'][self.household_2])
+        expected = HouseholdBatchCompletion.objects.filter(household=self.household_2).latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
+        self.assertEqual(expected,response.context['date_completed'][self.household_2])

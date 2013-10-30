@@ -46,7 +46,7 @@ def date_interviewed(household):
             return
     ordered_household_batch_completion = HouseholdBatchCompletion.objects.filter(household=household).order_by('created')
     if ordered_household_batch_completion.exists():
-        return ordered_household_batch_completion[0].created.date()
+        return ordered_household_batch_completion[0].created.strftime('%d-%b-%Y %H:%M:%S')
     return
 
 
