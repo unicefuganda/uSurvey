@@ -125,3 +125,6 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         contents = "%s\r\n" % (",".join(row1))
         self.assertEquals(contents, response.content)
 
+    def test_restricted_permission(self):
+        self.assert_login_required('/completed_investigators/download/')
+        self.assert_restricted_permission_for('/completed_investigators/download/')

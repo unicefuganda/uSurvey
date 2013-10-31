@@ -28,6 +28,8 @@ def list(request):
     batches = Batch.objects.order_by('order').all()
     return render(request, 'aggregates/download_excel.html', {'batches': batches})
 
+@login_required
+@permission_required('auth.can_view_aggregates')
 def completed_investigator(request):
     survey = Survey.objects.get(id = request.POST['survey'])
     response = HttpResponse(content_type='text/csv')
