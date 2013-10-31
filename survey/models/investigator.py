@@ -220,10 +220,12 @@ class Investigator(BaseModel):
                 self.households.remove(household)
 
     def completed_survey(self):
-        for household in self.all_households():
-            if not household.survey_completed():
-                return False
-        return True
+        if self.get_open_batch():
+            for household in self.all_households():
+                if not household.survey_completed():
+                    return False
+            return True
+        return False
 
     @classmethod
     def get_summarised_answers_for(self, batch, questions, data):

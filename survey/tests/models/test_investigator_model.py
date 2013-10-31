@@ -310,14 +310,14 @@ class InvestigatorGenerateReport(TestCase):
         district = LocationType.objects.create(name="District", slug=slugify("district"))
         city = LocationType.objects.create(name="City", slug=slugify("city"))
         uganda = Location.objects.create(name="Uganda", type=country)
-        abim = Location.objects.create(name="Abim", type=district, tree_parent=uganda)
-        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=abim)
-        some_city = Location.objects.create(name="SomeCity", type=city, tree_parent=abim)
+        self.abim = Location.objects.create(name="Abim", type=district, tree_parent=uganda)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=self.abim)
+        some_city = Location.objects.create(name="SomeCity", type=city, tree_parent=self.abim)
 
         self.backend = Backend.objects.create(name='something')
         self.survey = Survey.objects.create(name='SurveyA')
         self.batch = Batch.objects.create(order=1,name='somebatch',survey=self.survey)
-        self.batch.open_for_location(abim)
+        self.batch.open_for_location(self.abim)
 
         self.investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
                                                    location=kampala, backend=self.backend)
@@ -356,6 +356,21 @@ class InvestigatorGenerateReport(TestCase):
         self.assertFalse(self.investigator_1.completed_survey())
         self.investigator_1.member_answered(question,member_3,1,self.batch)
         self.assertTrue(self.investigator_1.completed_survey())
+
+    def test_should_return_False_for_has_completed_survey_if_no_open_batch(self):
+        self.batch.close_for_location(self.abim)
+        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
+        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        self.batch.questions.add(question)
+        BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
+        member_1 = HouseholdMember.objects.create(household=self.household_1,date_of_birth= datetime(2000,02, 02))
+        member_2 = HouseholdMember.objects.create(household=self.household_1,date_of_birth= datetime(2000,02, 02))
+        member_3 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime(2000,02, 02))
+        self.investigator_1.member_answered(question,member_1,1,self.batch)
+        self.investigator_1.member_answered(question,member_2,1,self.batch)
+        self.assertFalse(self.investigator_1.completed_survey())
+        self.investigator_1.member_answered(question,member_3,1,self.batch)
+        self.assertFalse(self.investigator_1.completed_survey())
 
 
     def test_should_show_data_only_for_investigators_who_completed_the_survey(self):
