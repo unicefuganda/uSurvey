@@ -334,13 +334,13 @@ class InvestigatorGenerateReport(TestCase):
         data = ['Investigator', 'Phone Number']
         data.extend([loc.name for loc in LocationType.objects.all()])
 
-        response = Investigator.genrate_completion_report()
+        response = Investigator.genrate_completion_report(self.survey)
         self.assertIn(data,response)
 
     def test_should_return_data_when_generate_data_called(self):
         data = [self.investigator_1.name, self.investigator_1.mobile_number]
         data.extend([loc.name for loc in self.investigator_1.location_hierarchy().values()])
-        response = Investigator.genrate_completion_report()
+        response = Investigator.genrate_completion_report(self.survey)
         self.assertIn(data,response)
 
     def test_should_know_if_investigator_has_completed_survey(self):
@@ -353,9 +353,9 @@ class InvestigatorGenerateReport(TestCase):
         member_3 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime(2000,02, 02))
         self.investigator_1.member_answered(question,member_1,1,self.batch)
         self.investigator_1.member_answered(question,member_2,1,self.batch)
-        self.assertFalse(self.investigator_1.completed_survey())
+        self.assertFalse(self.investigator_1.completed_survey(self.survey))
         self.investigator_1.member_answered(question,member_3,1,self.batch)
-        self.assertTrue(self.investigator_1.completed_survey())
+        self.assertTrue(self.investigator_1.completed_survey(self.survey))
 
     def test_should_return_False_for_has_completed_survey_if_no_open_batch(self):
         self.batch.close_for_location(self.abim)
@@ -368,9 +368,9 @@ class InvestigatorGenerateReport(TestCase):
         member_3 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime(2000,02, 02))
         self.investigator_1.member_answered(question,member_1,1,self.batch)
         self.investigator_1.member_answered(question,member_2,1,self.batch)
-        self.assertFalse(self.investigator_1.completed_survey())
+        self.assertFalse(self.investigator_1.completed_survey(self.survey))
         self.investigator_1.member_answered(question,member_3,1,self.batch)
-        self.assertFalse(self.investigator_1.completed_survey())
+        self.assertFalse(self.investigator_1.completed_survey(self.survey))
 
 
     def test_should_show_data_only_for_investigators_who_completed_the_survey(self):
@@ -386,9 +386,9 @@ class InvestigatorGenerateReport(TestCase):
 
         data = [self.investigator_1.name, self.investigator_1.mobile_number]
         data.extend([loc.name for loc in self.investigator_1.location_hierarchy().values()])
-        response = Investigator.genrate_completion_report()
+        response = Investigator.genrate_completion_report(self.survey)
         self.assertNotIn(data, response)
 
         self.investigator_1.member_answered(question,member_3,1,self.batch)
-        response = Investigator.genrate_completion_report()
+        response = Investigator.genrate_completion_report(self.survey)
         self.assertIn(data, response)

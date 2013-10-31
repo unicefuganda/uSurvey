@@ -219,8 +219,12 @@ class Investigator(BaseModel):
             if household.location != self.location:
                 self.households.remove(household)
 
-    def completed_survey(self):
-        if self.get_open_batch():
+    def get_open_batch_for_survey(self,survey):
+        batches = self.get_open_batch()
+        return[batch for batch in batches if batch.survey == survey]
+
+    def completed_survey(self,survey):
+        if self.get_open_batch_for_survey(survey):
             for household in self.all_households():
                 if not household.survey_completed():
                     return False
@@ -248,12 +252,12 @@ class Investigator(BaseModel):
         return Investigator.objects.filter(location__in=locations)
 
     @classmethod
-    def genrate_completion_report(self):
+    def genrate_completion_report(self,survey):
         header = ['Investigator', 'Phone Number']
         header.extend([loc.name for loc in LocationType.objects.all()])
         data = [header]
         for investigator in Investigator.objects.all():
-            if investigator.completed_survey():
+            if investigator.completed_survey(survey):
                 row=[investigator.name,investigator.mobile_number]
                 if investigator.location:
                     row.extend([loc.name for loc in investigator.location_hierarchy().values()])

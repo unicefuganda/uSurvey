@@ -12,6 +12,7 @@ from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 
 from survey.models.question import Question, QuestionOption
+from survey.models.surveys import Survey
 from survey.tests.base_test import BaseTest
 
 
@@ -113,8 +114,9 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_should_have_header_fields_in_download_report(self):
+        survey = Survey.objects.create(name='some survey')
         file_name = "investigator.csv"
-        response = self.client.get('/completed_investigators/download/')
+        response = self.client.post('/completed_investigators/download/',{'survey':survey.id})
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
