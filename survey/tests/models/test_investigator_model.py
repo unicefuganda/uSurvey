@@ -14,6 +14,7 @@ from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.question import Question, NumericalAnswer
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
+from survey.models.surveys import Survey
 
 
 class InvestigatorTest(TestCase):
@@ -302,3 +303,77 @@ class InvestigatorTest(TestCase):
                                              uid='10')
 
         self.assertFalse(investigator.created_member_within(TIMEOUT_MINUTES))
+
+class InvestigatorGenerateReport(TestCase):
+    def setUp(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        district = LocationType.objects.create(name="District", slug=slugify("district"))
+        city = LocationType.objects.create(name="City", slug=slugify("city"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        abim = Location.objects.create(name="Abim", type=district, tree_parent=uganda)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=abim)
+        some_city = Location.objects.create(name="SomeCity", type=city, tree_parent=abim)
+
+        self.backend = Backend.objects.create(name='something')
+        self.survey = Survey.objects.create(name='SurveyA')
+        self.batch = Batch.objects.create(order=1,name='somebatch',survey=self.survey)
+        self.batch.open_for_location(abim)
+
+        self.investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
+                                                   location=kampala, backend=self.backend)
+        self.household_1 = Household.objects.create(investigator = self.investigator_1,location= kampala)
+        self.household_2 = Household.objects.create(investigator = self.investigator_1,location= kampala)
+
+
+        self.investigator_2 = Investigator.objects.create(name="investigator name_2", mobile_number="9876543211",
+                                                   location=some_city, backend=self.backend)
+
+
+    def test_should_return_headers_when_generate_report_called(self):
+        Investigator.objects.all().delete()
+        data = ['Investigator', 'Phone Number']
+        data.extend([loc.name for loc in LocationType.objects.all()])
+
+        response = Investigator.genrate_completion_report()
+        self.assertIn(data,response)
+
+    def test_should_return_data_when_generate_data_called(self):
+        data = [self.investigator_1.name, self.investigator_1.mobile_number]
+        data.extend([loc.name for loc in self.investigator_1.location_hierarchy().values()])
+        response = Investigator.genrate_completion_report()
+        self.assertIn(data,response)
+
+    def test_should_know_if_investigator_has_completed_survey(self):
+        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
+        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        self.batch.questions.add(question)
+        BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
+        member_1 = HouseholdMember.objects.create(household=self.household_1,date_of_birth= datetime(2000,02, 02))
+        member_2 = HouseholdMember.objects.create(household=self.household_1,date_of_birth= datetime(2000,02, 02))
+        member_3 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime(2000,02, 02))
+        self.investigator_1.member_answered(question,member_1,1,self.batch)
+        self.investigator_1.member_answered(question,member_2,1,self.batch)
+        self.assertFalse(self.investigator_1.completed_survey())
+        self.investigator_1.member_answered(question,member_3,1,self.batch)
+        self.assertTrue(self.investigator_1.completed_survey())
+
+
+    def test_should_show_data_only_for_investigators_who_completed_the_survey(self):
+        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
+        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        self.batch.questions.add(question)
+        BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
+        member_1 = HouseholdMember.objects.create(household=self.household_1,date_of_birth= datetime(2000,02, 02))
+        member_2 = HouseholdMember.objects.create(household=self.household_1,date_of_birth= datetime(2000,02, 02))
+        member_3 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime(2000,02, 02))
+        self.investigator_1.member_answered(question,member_1,1,self.batch)
+        self.investigator_1.member_answered(question,member_2,1,self.batch)
+
+        data = [self.investigator_1.name, self.investigator_1.mobile_number]
+        data.extend([loc.name for loc in self.investigator_1.location_hierarchy().values()])
+        response = Investigator.genrate_completion_report()
+        self.assertNotIn(data, response)
+
+        self.investigator_1.member_answered(question,member_3,1,self.batch)
+        response = Investigator.genrate_completion_report()
+        self.assertIn(data, response)

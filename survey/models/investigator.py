@@ -219,6 +219,12 @@ class Investigator(BaseModel):
             if household.location != self.location:
                 self.households.remove(household)
 
+    def completed_survey(self):
+        for household in self.all_households():
+            if not household.survey_completed():
+                return False
+        return True
+
     @classmethod
     def get_summarised_answers_for(self, batch, questions, data):
         for investigator in self.objects.all():
@@ -242,6 +248,12 @@ class Investigator(BaseModel):
     @classmethod
     def genrate_completion_report(self):
         header = ['Investigator', 'Phone Number']
-        header.extend([loc.name for loc in LocationType.objects.exclude(name__iexact='country')])
+        header.extend([loc.name for loc in LocationType.objects.all()])
         data = [header]
+        for investigator in Investigator.objects.all():
+            if investigator.completed_survey():
+                row=[investigator.name,investigator.mobile_number]
+                if investigator.location:
+                    row.extend([loc.name for loc in investigator.location_hierarchy().values()])
+                data.append(row)
         return data

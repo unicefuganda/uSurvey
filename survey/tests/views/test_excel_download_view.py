@@ -119,7 +119,7 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
         row1 = ['Investigator', 'Phone Number']
-        row1.extend([loc.name for loc in LocationType.objects.exclude(name__iexact='country')])
+        row1.extend([loc.name for loc in LocationType.objects.all()])
         contents = "%s\r\n" % (",".join(row1))
         self.assertEquals(contents, response.content)
 
