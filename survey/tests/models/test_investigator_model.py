@@ -5,7 +5,6 @@ from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
 from survey.models import AnswerRule, HouseholdHead, BatchQuestionOrder
-from survey.models.random_household_selection import RandomHouseHoldSelection
 
 from survey.models.batch import Batch
 from survey.investigator_configs import COUNTRY_PHONE_CODE

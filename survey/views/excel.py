@@ -26,3 +26,12 @@ def download(request):
 def list(request):
     batches = Batch.objects.order_by('order').all()
     return render(request, 'aggregates/download_excel.html', {'batches': batches})
+
+def completed_investigator(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="investigator.csv"'
+    data = Investigator.genrate_completion_report()
+    writer = csv.writer(response)
+    for row in data:
+        writer.writerow(row)
+    return response

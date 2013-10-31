@@ -4,7 +4,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User, Group, Permission
 
 from django.contrib.contenttypes.models import ContentType
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import GroupCondition, HouseholdMemberGroup
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household
@@ -97,3 +97,29 @@ class ExcelDownloadViewTest(TestCase):
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/download_spreadsheet')
+
+class ReportForCompletedInvestigatorTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+
+        some_group = Group.objects.create(name='some group')
+        auth_content = ContentType.objects.get_for_model(Permission)
+        permission, out = Permission.objects.get_or_create(codename='can_view_aggregates', content_type=auth_content)
+        some_group.permissions.add(permission)
+        some_group.user_set.add(raj)
+
+        self.client.login(username='Rajni', password='I_Rock')
+
+    def test_should_have_header_fields_in_download_report(self):
+        file_name = "investigator.csv"
+        response = self.client.get('/completed_investigators/download/')
+        self.assertEquals(200, response.status_code)
+        self.assertEquals(response.get('Content-Type'), "text/csv")
+        self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
+        row1 = ['Investigator', 'Phone Number']
+        row1.extend([loc.name for loc in LocationType.objects.exclude(name__iexact='country')])
+        contents = "%s\r\n" % (",".join(row1))
+        self.assertEquals(contents, response.content)
+

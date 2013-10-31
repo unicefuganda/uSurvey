@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.datastructures import SortedDict
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from rapidsms.router import send
 from survey.investigator_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PHONE_CODE
 from survey.models.backend import Backend
@@ -238,3 +238,10 @@ class Investigator(BaseModel):
     def lives_under_location(self, location):
         locations = location.get_descendants(include_self=True)
         return Investigator.objects.filter(location__in=locations)
+
+    @classmethod
+    def genrate_completion_report(self):
+        header = ['Investigator', 'Phone Number']
+        header.extend([loc.name for loc in LocationType.objects.exclude(name__iexact='country')])
+        data = [header]
+        return data
