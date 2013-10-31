@@ -199,7 +199,6 @@ class USSDSurvey(USSD):
             self.select_or_render_household(answer)
 
     def render_households_list(self):
-        print self.has_chosen_retake
         if not self.household:
             page = self.get_from_session('PAGE')
             self.responseString += "%s\n%s" % (

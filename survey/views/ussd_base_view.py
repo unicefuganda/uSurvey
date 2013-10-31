@@ -48,7 +48,6 @@ class USSDBaseView(object):
                 action, responseString = self.ussd_survey.render_welcome_or_resume()
 
         elif not self.is_registering_household:
-            print 'taking survey'
             action, responseString = self.ussd_survey.take_survey()
 
         else:
