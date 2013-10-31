@@ -1,5 +1,6 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from survey.models import HouseholdHead, RandomHouseHoldSelection
+from survey.models import HouseholdHead, RandomHouseHoldSelection, Batch
+from survey.models.households import HouseholdMember
 from survey.ussd.ussd import USSD
 
 
@@ -113,14 +114,14 @@ class USSDSurvey(USSD):
             self.responseString += "INVALID SELECTION: "
 
     def show_member_question(self, household_member):
-        self.household_member = household_member if not household_member.is_head() else HouseholdHead.objects.get(
-            householdmember_ptr_id=household_member.id)
+        self.household_member = household_member
         self.set_in_session('HOUSEHOLD_MEMBER', household_member)
         self.set_in_session('HOUSEHOLD', household_member.household)
         self.behave_like_new_request()
         self.render_survey()
 
     def show_member_list(self, household_member):
+        self.household = household_member.household
         self.set_in_session('HOUSEHOLD', household_member.household)
         self.render_household_members_list()
 
@@ -130,13 +131,14 @@ class USSDSurvey(USSD):
         elif self.ANSWER["NO"] == answer:
             self.show_member_list(household_member)
 
+
     def select_or_render_household(self, answer):
         if self.is_browsing_households_list(answer):
             self.render_households_list()
         else:
             if self.is_resuming_survey:
                 last_answered = self.investigator.last_answered()
-                household_member = last_answered.householdmember
+                household_member = last_answered.householdmember.cast_original_type()
                 self.household = household_member.household
                 self.resume_survey(answer, household_member)
                 self.set_in_session('IS_RESUMING', False)

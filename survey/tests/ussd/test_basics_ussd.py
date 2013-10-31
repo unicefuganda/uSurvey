@@ -36,9 +36,7 @@ class USSDTest(USSDBaseTest):
                                                            date_of_birth=datetime.date(1980, 9, 1))
         self.household_1 = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
                                                     uid=1)
-        self.household_head_1 = HouseholdHead.objects.create(
-            household=self.household_1,
-            surname="Name " + str(randint(1, 9999)), date_of_birth=datetime.date(1980, 9, 1))
+        self.household_head_1 = HouseholdHead.objects.create(household=self.household_1, surname="Name " + str(randint(1, 9999)), date_of_birth=datetime.date(1980, 9, 1))
         self.household_member = HouseholdMember.objects.create(surname="Name 2", household=self.household_1,
                                                                date_of_birth=datetime.date(2000, 2, 3))
         self.batch = Batch.objects.create(order=1, name="batch test")

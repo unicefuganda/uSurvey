@@ -362,6 +362,11 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                                           household=self.household_head_1.household).answer)
 
     def test_should_ask_to_resume_questions_or_go_back_to_member_list_upon_session_timeout_or_session_cancel(self):
+        question_4 = Question.objects.create(text="Question 4",
+                                                  answer_type=Question.NUMBER, order=3, group=self.head_group)
+        question_4.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_4, order=3)
+
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
 
         with patch.object(USSDSurvey, 'is_active', return_value=False):
@@ -371,15 +376,21 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.take_survey()
         self.select_household()
         self.select_household_member()
-
         self.respond("1")
+
         response = self.reset_session()
+
 
         response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         response = self.respond(USSD.ANSWER['YES'])
         response_string = "responseString=%s&action=request" % self.question_2.text
+        batch= Batch.open_ordered_batches(self.household_head_1.get_location())[0]
+        self.assertEquals(urllib2.unquote(response.content), response_string)
+
+        response = self.respond('1')
+        response_string = "responseString=%s&action=request" % question_4.text
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         response = self.reset_session()

@@ -199,6 +199,11 @@ class HouseholdMember(BaseModel):
     def is_head(self):
         return len(HouseholdHead.objects.filter(householdmember_ptr_id=self.id)) > 0
 
+    def cast_original_type(self):
+        head_object = HouseholdHead.objects.filter(householdmember_ptr_id=self.id)
+        return head_object[0] if head_object else self
+
+
     def get_location(self):
         return self.household.location
 
