@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}
+  Download reports
+{% endblock %}
+{% block content %}
+  <h4>
+    Choose survey to get investigators who completed the survey
+  </h4>
+  <form id="download-investigator-form" action="{% url 'download_investigator_excel' %}" method="POST" accept-charset="utf-8">
+    {% csrf_token %}
+    <select name="survey">
+      {% for survey in surveys %}
+        <option value="{{ survey.id }}">{{ survey.name }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-primary">Generate Report</button>
+  </form>
+{% endblock %}

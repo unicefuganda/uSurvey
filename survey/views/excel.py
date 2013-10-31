@@ -39,3 +39,7 @@ def completed_investigator(request):
     for row in data:
         writer.writerow(row)
     return response
+
+def investigator_report(request):
+    surveys = Survey.objects.all()
+    return render(request, 'aggregates/download_investigator.html', {'surveys':surveys})

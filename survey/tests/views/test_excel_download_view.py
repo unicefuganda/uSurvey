@@ -128,3 +128,10 @@ class ReportForCompletedInvestigatorTest(BaseTest):
     def test_restricted_permission(self):
         self.assert_login_required('/completed_investigators/download/')
         self.assert_restricted_permission_for('/completed_investigators/download/')
+
+    def test_should_get_view_for_download(self):
+        response = self.client.get('/investigator_report/')
+        self.assertEqual(200,response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn('aggregates/download_investigator.html', templates)
+        self.assertEquals(len(response.context['surveys']), 0)

@@ -55,3 +55,8 @@ class DownloadExcelPage(PageObject):
     def export_to_csv(self, batch):
         self.browser.select('batch', batch.pk)
         # self.submit()
+
+class InvestigatorReportPage(PageObject):
+    def __init__(self, browser):
+        super(InvestigatorReportPage, self).__init__(browser)
+        self.url = '/investigator_report/'

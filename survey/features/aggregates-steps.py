@@ -4,7 +4,7 @@ from lettuce import *
 from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import *
 
-from survey.features.page_objects.aggregates import AggregateStatusPage, DownloadExcelPage
+from survey.features.page_objects.aggregates import AggregateStatusPage, DownloadExcelPage, InvestigatorReportPage
 from survey.features.page_objects.survey_completion_rates import SurveyCompletionRatesPage
 from survey.models import Survey
 from survey.models.batch import Batch
@@ -195,3 +195,20 @@ def and_i_should_not_see_batch2_in_batch_list(step):
 @step(u'And I should see title message')
 def and_i_should_see_title_message(step):
     world.page.is_text_present('Survey Completion by Region/District')
+
+@step(u'When I visit investigator report page')
+def when_i_visit_investigator_report_page(step):
+    world.page = InvestigatorReportPage(world.browser)
+    world.page.visit()
+
+@step(u'Then I should see title-text message')
+def then_i_should_see_title_text_message(step):
+    world.page.is_text_present('Choose survey to get investigators who completed the survey')
+
+@step(u'And I should see dropdown with two surveys')
+def and_i_should_see_dropdown_with_two_surveys(step):
+    world.page.see_select_option([world.survey_1.name, world.survey_2.name], 'survey')
+
+@step(u'And I should see generate report button')
+def and_i_should_see_generate_report_button(step):
+    assert world.browser.find_by_css("#download-investigator-form")[0].find_by_tag('button')[0].text == "Generate Report"

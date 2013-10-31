@@ -89,3 +89,11 @@ Feature: Aggregates feature
       When I select survey 1 from survey list
       Then I should see batch1 in batch list
       And I should not see batch2 in batch list
+
+    Scenario: Download Investigators Report - GET
+      Given I am logged in as researcher
+      And I have 2 surveys with one batch each
+      When I visit investigator report page
+      Then I should see title-text message
+      And I should see dropdown with two surveys
+      And I should see generate report button
