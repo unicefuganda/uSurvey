@@ -53,10 +53,19 @@
                 <a data-toggle="dropdown" id="drop3" class="dropdown-toggle" role="button" href="#">Aggregates<b class="caret"></b></a>
                 <ul aria-labelledby="drop3" role="menu" class="dropdown-menu">
                   <li role="presentation"><a href="{% url 'aggregates_status' %}">Status</a></li>
-                  <li role="presentation"><a href="{% url 'download_excel' %}">Download Spreadsheets</a></li>
                   <li role="presentation"><a href="{% url 'list_indicator_page' %}">List Indicators</a></li>
                   <li role="presentation"><a href="{% url 'new_indicator_page' %}">Add Indicator</a></li>
                   <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion Rates</a></li>
+                </ul>
+              </li>
+            {% endif %}
+
+            {% if perms.auth.can_view_aggregates %}
+              <li class="dropdown">
+                <a data-toggle="dropdown" id="drop3" class="dropdown-toggle" role="button" href="#">Downloads<b class="caret"></b></a>
+                <ul aria-labelledby="drop3" role="menu" class="dropdown-menu">
+                  <li role="presentation"><a href="{% url 'download_excel' %}">Download Spreadsheets</a></li>
+                  <li role="presentation"><a href="{% url 'investigator_report_page' %}">Mobile Money Sheet</a></li>
                 </ul>
               </li>
             {% endif %}
