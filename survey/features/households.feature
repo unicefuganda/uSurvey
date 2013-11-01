@@ -42,6 +42,8 @@ Feature: Households feature
       And I click households option
       And I select list households
       And I should see the households list paginated
+      When I click add household button
+      Then I should see add household page
 
     Scenario: No households list
       Given I have no households

@@ -6,7 +6,7 @@ from survey.models.investigator import Investigator
 from lettuce.django import django_url
 
 class NewHouseholdPage(PageObject):
-    url = "/households/new"
+    url = "/households/new/"
 
     def valid_page(self):
         fields = ['investigator', 'surname', 'first_name', 'male', 'date_of_birth', 'occupation',
