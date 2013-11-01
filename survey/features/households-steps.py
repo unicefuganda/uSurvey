@@ -156,6 +156,17 @@ def and_i_select_list_households(step):
     world.page.click_link_by_text("List all households")
     world.page = HouseholdsListPage(world.browser)
 
+@step(u'When I click add household button')
+def when_i_click_add_household_button(step):
+    world.page = HouseholdsListPage(world.browser)
+    world.page.visit()
+    world.page.click_by_css("#add-household")
+
+@step(u'Then I should see add household page')
+def then_i_should_see_add_household_page(step):
+    world.page = NewHouseholdPage(world.browser)
+    world.page.validate_url()
+
 @step(u'And then I click on that household ID')
 def and_when_i_click_on_that_household_id(step):
     world.page.click_link_by_text(world.household.uid)
@@ -212,12 +223,3 @@ def when_i_assign_a_new_investigator(step):
 @step(u'Then I should see the investigator was saved successfully')
 def then_i_should_see_the_investigator_was_saved_successfully(step):
     world.page.see_success_message('Household', 'edited')
-
-@step(u'When I click add household button')
-def when_i_click_add_household_button(step):
-    world.page.click_by_css("#add-household")
-
-@step(u'Then I should see add household page')
-def then_i_should_see_add_household_page(step):
-    world.page = NewHouseholdPage(world.browser)
-    world.page.validate_url()

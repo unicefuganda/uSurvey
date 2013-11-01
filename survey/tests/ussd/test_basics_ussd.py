@@ -100,8 +100,10 @@ class USSDTest(USSDBaseTest):
 
         response = self.respond('2')
 
-        households_list = "%s\n1: %s*\n2: %s*" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list = "%s\n1: Household-%s-%s*\n2: Household-%s-%s*" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
+        self.household_head_1.household.random_sample_number, self.household_head_1.surname)
+
         response_string = "responseString=%s&action=request" % households_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -500,8 +502,10 @@ class USSDTest(USSDBaseTest):
 
         response = self.take_survey()
 
-        households_list_1 = "%s\n1: %s*\n2: %s" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list_1 = "%s\n1: Household-%s-%s*\n2: Household-%s-%s" % (
+                USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
+                self.household_head_1.household.random_sample_number, self.household_head_1.surname)
+
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -632,8 +636,9 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
         response = self.respond("2")
 
-        households_list_1 = "%s\n1: %s\n2: %s" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+        households_list_1 = "%s\n1: Household-%s-%s\n2: Household-%s-%s" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
+        self.household_head_1.household.random_sample_number, self.household_head_1.surname)
 
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -672,8 +677,10 @@ class USSDTest(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         response = self.respond("2")
-        households_list_1 = "%s\n1: %s*\n2: %s" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+
+        households_list_1 = "%s\n1: Household-%s-%s*\n2: Household-%s-%s" % (
+        USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
+        self.household_head_1.household.random_sample_number, self.household_head_1.surname)
 
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -694,8 +701,9 @@ class USSDTest(USSDBaseTest):
             response_string = "responseString=%s&action=request" % homepage
             self.assertEquals(urllib2.unquote(response.content), response_string)
             response = self.take_survey()
-            households_list_1 = "%s\n1: %s*\n2: %s*" % (
-                USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.surname, self.household_head_1.surname)
+            households_list_1 = "%s\n1: Household-%s-%s*\n2: Household-%s-%s*" % (
+                USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
+                self.household_head_1.household.random_sample_number, self.household_head_1.surname)
             response_string = "responseString=%s&action=request" % households_list_1
             self.assertEquals(urllib2.unquote(response.content), response_string)
 

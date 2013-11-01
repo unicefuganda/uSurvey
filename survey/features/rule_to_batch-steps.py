@@ -185,7 +185,7 @@ def and_i_should_not_see_option_dropdown_box_and_value_text_box(step):
 
 @step(u'And I should see all the action dropdown options')
 def and_i_should_see_all_the_action_dropdown_options(step):
-    action_options = ['REANSWER', 'END INTERVIEW', 'ASK SUBQUESTION', 'JUMP TO']
+    action_options = ['RECONFIRM', 'END INTERVIEW', 'ASK SUBQUESTION', 'SKIP TO']
     world.page.see_select_option(action_options, 'action')
 
 

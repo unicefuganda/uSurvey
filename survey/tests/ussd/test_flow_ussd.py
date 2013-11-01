@@ -26,6 +26,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.ussd_params['ussdRequestString'] = request_string
         return self.client.post('/ussd', data=self.ussd_params)
 
+
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
@@ -162,14 +163,14 @@ class USSDTestCompleteFlow(USSDBaseTest):
             self.assertEquals(urllib2.unquote(response.content), response_string)
 
         households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname,
-            self.household_head_3.surname, self.household_head_4.surname)
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.hh_string(self.household_head_1), self.hh_string(self.household_head_2),
+            self.hh_string(self.household_head_3), self.hh_string(self.household_head_4))
 
         households_list_2 = "%s\n5: %s\n6: %s\n7: %s\n8: %s\n*: Back\n#: Next" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_5.surname, self.household_head_6.surname,
-            self.household_head_7.surname, self.household_head_8.surname)
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.hh_string(self.household_head_5), self.hh_string(self.household_head_6),
+            self.hh_string(self.household_head_7), self.hh_string(self.household_head_8))
 
-        households_list_3 = "%s\n9: %s\n*: Back" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_9.surname)
+        households_list_3 = "%s\n9: %s\n*: Back" % (USSD.MESSAGES['HOUSEHOLD_LIST'], self.hh_string(self.household_head_9))
 
         response = self.take_survey()
         response_string = "responseString=%s&action=request" % households_list_1
@@ -266,7 +267,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         households_list_1 = "%s\n1: %s\n2: %s" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.hh_string(self.household_head_1), self.hh_string(self.household_head_2))
 
         response = self.take_survey()
         response_string = "responseString=%s&action=request" % households_list_1
@@ -320,7 +321,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         response = self.client.post('/ussd', data=self.ussd_params)
         households_list = "%s\n1: %s\n2: %s*" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname)
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.hh_string(self.household_head_1), self.hh_string(self.household_head_2))
         response_string = "responseString=%s&action=request" % households_list
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -413,8 +414,8 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
         households_list_1 = "%s\n1: %s*\n2: %s\n3: %s*\n4: %s\n#: Next" % (
-            USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head_1.surname, self.household_head_2.surname,
-            self.household_head_3.surname, self.household_head_4.surname)
+            USSD.MESSAGES['HOUSEHOLD_LIST'], self.hh_string(self.household_head_1), self.hh_string(self.household_head_2),
+            self.hh_string(self.household_head_3), self.hh_string(self.household_head_4))
 
         response = self.take_survey()
         response_string = "responseString=%s&action=request" % households_list_1
@@ -439,10 +440,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
             self.reset_session()
 
         households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'],
-                                                                         self.household_head_1.surname,
-                                                                         self.household_head_2.surname,
-                                                                         self.household_head_3.surname,
-                                                                         self.household_head_4.surname)
+                                                                         self.hh_string(self.household_head_1),
+                                                                         self.hh_string(self.household_head_2),
+                                                                         self.hh_string(self.household_head_3),
+                                                                         self.hh_string(self.household_head_4),)
         response = self.take_survey()
         response_string = "responseString=%s&action=request" % households_list_1
         self.assertEquals(urllib2.unquote(response.content), response_string)

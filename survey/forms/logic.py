@@ -9,8 +9,8 @@ class LogicForm(forms.Form):
         super(LogicForm, self).__init__(data=data, initial=initial)
         ACTIONS = {
             'END_INTERVIEW': 'END INTERVIEW',
-            'SKIP_TO': 'JUMP TO',
-            'REANSWER': 'REANSWER',
+            'SKIP_TO': 'SKIP TO',
+            'REANSWER': 'RECONFIRM',
             'ASK_SUBQUESTION': 'ASK SUBQUESTION',
         }
 

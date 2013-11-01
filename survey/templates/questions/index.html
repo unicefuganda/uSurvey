@@ -103,13 +103,11 @@
                     <a class="btn btn-small" href="#delete_question_{{ question.pk }}" data-toggle="modal" id="delete_question"><i class="icon-trash"></i> Delete</a>
                   {% endif %}
                   {% if question.options.all %}
-                    <a class="btn btn-small" href="#view_options_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View options</a>
-                  {% else %}
-                      {% if batch %}
-                            <a class="btn btn-small" href="#view_logic_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View Logic</a>
-                      {% endif %}
+                    <a class="btn btn-small" href="#view_options_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View options{% if rules_for_batch|get_value:question %}/Logic{% endif %}</a>
+                  {% elif rules_for_batch|get_value:question %}
+                        <a class="btn btn-small" href="#view_logic_{{question.id}}" data-toggle="modal"><i class="icon-list"></i>View Logic</a>
                   {% endif %}
-                    
+
                 </div>
 
                 {% if question.options.all %}

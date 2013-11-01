@@ -56,3 +56,6 @@ class USSDBaseTest(TestCase):
         for answer in NumericalAnswer.objects.all():
             answer.created -= datetime.timedelta(minutes=(20), seconds=1)
             answer.save()
+
+    def hh_string(self, household_head):
+        return "Household-%s-%s"%(household_head.household.random_sample_number, household_head.surname)

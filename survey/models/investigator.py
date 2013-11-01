@@ -143,13 +143,10 @@ class Investigator(BaseModel):
         households_list = []
         for household in households:
             household_head = household.get_head()
-            if not registered:
-                text = "%s: Household-%s" % (all_households.index(household) + 1, household_head.surname if household_head else household.random_sample_number)
-            else:
-
-                text = "%s: %s" % (all_households.index(household) + 1, household_head.surname if household_head else ('Household-%s') % household.random_sample_number)
-                if household.completed_currently_open_batches():
-                    text += "*"
+            text = "%s: Household-%s" % (all_households.index(household) + 1,  household.random_sample_number)
+            text = "%s-%s"%(text, household_head.surname) if household_head else text
+            if registered and household.completed_currently_open_batches():
+                text += "*"
             households_list.append(text)
         if households.has_previous():
             households_list.append(self.PREVIOUS_PAGE_TEXT)

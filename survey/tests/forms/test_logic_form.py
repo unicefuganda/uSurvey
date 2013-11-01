@@ -235,9 +235,9 @@ class LogicFormTest(TestCase):
     def test_action_field_has_all_actions_on_load_irrespective_of_question(self):
         field = 'action'
         logic_form = LogicForm()
-        skip_to = ('SKIP_TO', 'JUMP TO')
+        skip_to = ('SKIP_TO', 'SKIP TO')
         end_interview = ('END_INTERVIEW', 'END INTERVIEW')
-        reconfirm = ('REANSWER', 'REANSWER')
+        reconfirm = ('REANSWER', 'RECONFIRM')
         ask_subquestion = ('ASK_SUBQUESTION', 'ASK SUBQUESTION')
 
         all_actions = [skip_to, end_interview, reconfirm, ask_subquestion]
