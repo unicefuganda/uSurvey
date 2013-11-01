@@ -106,7 +106,6 @@ class BatchViewsTest(BaseTest):
         json_response = json.loads(response.content)
         self.assertEqual('', json_response)
 
-
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/surveys/%d/batches/' % self.survey.id)
         self.assert_restricted_permission_for('/surveys/%d/batches/new/' % self.survey.id)
@@ -130,6 +129,7 @@ class BatchViewsTest(BaseTest):
         self.assertIsInstance(response.context['batchform'], BatchForm)
         self.assertEqual(response.context['button_label'], 'Create')
         self.assertEqual(response.context['id'], 'add-batch-form')
+        self.assertEqual(response.context['action'], '/surveys/%d/batches/new/' % self.survey.id)
         self.assertEqual(response.context['title'], 'New Batch')
 
     def test_post_add_new_batch_is_invalid_if_name_field_is_empty(self):
@@ -167,7 +167,8 @@ class BatchViewsTest(BaseTest):
         self.assertIsInstance(response.context['batchform'], BatchForm)
         self.assertEqual(response.context['batchform'].initial['name'], batch.name)
         self.assertEqual(response.context['button_label'], 'Save')
-        self.assertEqual(response.context['id'], 'add-batch-form')
+        self.assertEqual(response.context['action'], '/surveys/%d/batches/%d/edit/' % (self.survey.id, batch.id))
+        self.assertEqual(response.context['id'], 'edit-batch-form')
 
     def test_save_edited_batch(self):
         batch = Batch.objects.create(survey=self.survey, name="batch a", description="batch a description")
@@ -178,7 +179,7 @@ class BatchViewsTest(BaseTest):
         response = self.client.post('/surveys/%d/batches/%d/edit/' % (self.survey.id, batch.id), data=form_data)
         updated_batch = Batch.objects.get(name=form_data['name'])
         self.failUnless(updated_batch)
-        self.failIf(Batch.objects.filter(name=batch.name))
+        self.failIf(Batch.objects.filter(id=batch.id, name=batch.name))
         self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
                              target_status_code=200, msg_prefix='')
 

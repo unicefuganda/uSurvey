@@ -1,4 +1,6 @@
+
 from django.conf.urls import patterns, include, url
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic import TemplateView
 from django.conf import settings
@@ -17,7 +19,7 @@ urlpatterns = patterns('',
     url(r'^investigators/(?P<investigator_id>\d+)/edit/$', 'survey.views.investigator.edit_investigator', name="edit_investigator_page"),
     url(r'^investigators/locations', 'survey.views.investigator.get_locations', name="locations_autocomplete"),
     url(r'^investigators/check_mobile_number', 'survey.views.investigator.check_mobile_number', name="check_mobile_number"),
-    url(r'^ussd/simulator', TemplateView.as_view(template_name="ussd/simulator.html")),
+    url(r'^ussd/simulator', permission_required('auth.can_view_batches')(TemplateView.as_view(template_name="ussd/simulator.html"))),
     url(r'^ussd', 'survey.views.ussd.ussd', name="ussd"),
     url(r'^households/$', 'survey.views.household.list_households', name="list_household_page"),
     url(r'^households/(?P<household_id>\d+)/$', 'survey.views.household.view_household', name="view_household_page"),

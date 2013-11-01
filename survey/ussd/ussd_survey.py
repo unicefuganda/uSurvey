@@ -131,7 +131,6 @@ class USSDSurvey(USSD):
         elif self.ANSWER["NO"] == answer:
             self.show_member_list(household_member)
 
-
     def select_or_render_household(self, answer):
         if self.is_browsing_households_list(answer):
             self.render_households_list()

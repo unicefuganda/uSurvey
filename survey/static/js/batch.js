@@ -41,8 +41,10 @@ jQuery(function($){
     });
   });
 
-  var survey_id = $("#survey_id").val();
-  $('#add-batch-form').validate({
+  var survey_id = $("#survey_id").val(),
+      $add_batch_form = $('#add-batch-form');
+
+  $add_batch_form.validate({
       rules: {
         'name': {required:true, remote:'/surveys/'+ survey_id +'/batches/check_name/'},
         'description':'required'
@@ -54,6 +56,14 @@ jQuery(function($){
       }
 
    });
+
+  $('#edit-batch-form').validate({
+      rules: {
+        'name': 'required',
+        'description':'required'
+      }
+   });
+
 
   $('#assign_question_group').on('change', function(){
       load_questions_for_batch_and_group();

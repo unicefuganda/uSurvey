@@ -1,19 +1,27 @@
 import datetime
 import urllib2
+from django.contrib.auth.models import User
 
-from django.test import TestCase
 from django.test.client import Client
 import mock
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, RandomHouseHoldSelection, Household
+from survey.tests.base_test import BaseTest
 
 from survey.ussd.ussd import USSD
 
 
-class USSDTest(TestCase):
+class USSDTest(BaseTest):
     def setUp(self):
         self.client = Client()
+        User.objects.create_user(username='useless', email='rajni@kant.com',
+                                                           password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_batches')
+        self.assign_permission_to(raj, 'can_view_investigators')
+
+        self.client.login(username='Rajni', password='I_Rock')
         self.ussd_params = {
             'transactionId': 123344,
             'transactionTime': datetime.datetime.now().strftime('%Y%m%dT%H:%M:%S'),
@@ -83,8 +91,10 @@ class USSDTest(TestCase):
             self.client.get('/ussd/', data=self.ussd_params)
             generate_method.assert_called_with(no_of_households=100)
 
-
     def test_sends_not_registered_message_if_investigator_is_not_registered(self):
         response = self.client.get('/ussd/', data=self.ussd_params)
         response_message = "responseString=%s&action=end" % USSD.MESSAGES['USER_NOT_REGISTERED']
         self.assertEquals(urllib2.unquote(response.content), response_message)
+
+    def test_restricted_permission(self):
+        self.assert_restricted_permission_for('/ussd/simulator/')

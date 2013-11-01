@@ -72,26 +72,32 @@ def close(request, batch_id):
 @permission_required('auth.can_view_batches')
 def new(request, survey_id):
     batch = Batch(survey=Survey.objects.get(id=survey_id))
-    batchform = BatchForm(instance=batch)
-    return _process_form(request=request, batchform=batchform, action_str='added')
+    response, batchform = _process_form(request=request, batchform=(BatchForm(instance=batch)), action_str='added')
+
+    context = {'batchform': batchform, 'button_label': "Create", 'id': 'add-batch-form', 'title': 'New Batch',
+               'action': '/surveys/%s/batches/new/' % survey_id}
+    return response or render(request, 'batches/new.html', context)
 
 
-def _process_form(request, batchform, action_str='added', btn_label="Create"):
+def _process_form(request, batchform, action_str='added'):
     if request.method == 'POST':
         batchform = BatchForm(data=request.POST, instance=batchform.instance)
         if batchform.is_valid():
             batch = batchform.save()
             _add_success_message(request, action_str)
             batch_list_url = '/surveys/%s/batches/' % str(batch.survey.id)
-            return HttpResponseRedirect(batch_list_url)
-    context = {'batchform': batchform, 'button_label': btn_label, 'id': 'add-batch-form', 'title': 'New Batch'}
-    return render(request, 'batches/new.html', context)
+            return HttpResponseRedirect(batch_list_url), batchform
+    return None, batchform
 
 
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id, batch_id):
-    batchform = BatchForm(instance=Batch.objects.get(id=batch_id, survey__id=survey_id))
-    return _process_form(request=request, batchform=batchform, action_str='edited', btn_label="Save")
+    batch = Batch.objects.get(id=batch_id, survey__id=survey_id)
+    response, batchform = _process_form(request=request, batchform=(BatchForm(instance=batch)), action_str='edited')
+
+    context = {'batchform': batchform, 'button_label': "Save", 'id': 'edit-batch-form', 'title': 'New Batch',
+               'action': '/surveys/%s/batches/%s/edit/' % (batch.survey.id, batch.id)}
+    return response or render(request, 'batches/new.html', context)
 
 
 def _add_success_message(request, action_str):
@@ -130,6 +136,7 @@ def assign(request, batch_id):
     return render(request, 'batches/assign.html',
                   context)
 
+
 @permission_required('auth.can_view_batches')
 def update_orders(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
@@ -143,10 +150,12 @@ def update_orders(request, batch_id):
         messages.error(request, 'No questions orders were updated.')
     return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
 
+
 @login_required
 def check_name(request, survey_id):
     response = Batch.objects.filter(name=request.GET['name'], survey__id=survey_id).exists()
     return HttpResponse(json.dumps(not response), content_type="application/json")
+
 
 @permission_required('auth.can_view_batches')
 def list_batches(request):
@@ -154,14 +163,14 @@ def list_batches(request):
         batches = Batch.objects.values('id', 'name').order_by('name')
         json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
         return HttpResponse(json_dump, mimetype='application/json')
-    return render(request,'layout.html')
-#
-#def _create_batch_hash_response(batches):
-#    batches_to_display = map(lambda batch: {'id': str(batch.id), 'text': batch.name}, batches)
-#    return HttpResponse(json.dumps(batches_to_display), mimetype='application/json')
-#
-#
-#def list(request,survey_id):
-#    survey = Survey.objects.get(id=survey_id)
-#    batches = Batch.objects.filter(survey__id=survey_id)
-#    return _create_batch_hash_response(batches)
+    return render(request, 'layout.html')
+    #
+    #def _create_batch_hash_response(batches):
+    #    batches_to_display = map(lambda batch: {'id': str(batch.id), 'text': batch.name}, batches)
+    #    return HttpResponse(json.dumps(batches_to_display), mimetype='application/json')
+    #
+    #
+    #def list(request,survey_id):
+    #    survey = Survey.objects.get(id=survey_id)
+    #    batches = Batch.objects.filter(survey__id=survey_id)
+    #    return _create_batch_hash_response(batches)

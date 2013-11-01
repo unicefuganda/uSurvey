@@ -380,7 +380,6 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         response = self.reset_session()
 
-
         response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
         self.assertEquals(urllib2.unquote(response.content), response_string)
 

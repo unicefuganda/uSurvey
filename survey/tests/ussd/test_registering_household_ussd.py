@@ -146,7 +146,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_2 = Question.objects.create(module=module, text="Please Enter the age",
                                              answer_type=Question.TEXT, order=2, group=self.registration_group)
 
-        question_3 = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
+        question_3 = Question.objects.create(module=module, text="Please Enter the gender:\n1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         self.reset_session()

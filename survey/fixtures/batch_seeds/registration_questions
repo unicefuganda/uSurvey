@@ -1,0 +1,23 @@
+from survey.models import HouseholdMemberGroup, QuestionModule, Question
+
+registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+
+module = QuestionModule.objects.create(name='Registration')
+
+Question.objects.create(module=module, text="Please Enter the name",
+                        answer_type=Question.TEXT, order=1, group=registration_group)
+
+Question.objects.create(module=module, text="Please Enter the age",
+                        answer_type=Question.TEXT, order=2, group=registration_group)
+
+Question.objects.create(module=module, text="Please Enter the gender:\n1.Male\n2.Female",
+                        answer_type=Question.NUMBER, order=3, group=registration_group)
+Registration_questions = Question.objects.filter(group=registration_group)
+
+from django.core import serializers
+data = serializers.serialize("json", [registration_group])
+print data
+data = serializers.serialize("json", [module])
+print data
+data = serializers.serialize("json", Registration_questions)
+print data
