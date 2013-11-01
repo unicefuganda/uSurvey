@@ -22,6 +22,9 @@ Feature: Investigators feature
       And I have locations
       And I visit investigators listing page
       And I should see the investigators list paginated
+      When I click add investigator button
+      Then I should see add investigator page
+
 
     Scenario: No investigators list
       Given I have no investigators

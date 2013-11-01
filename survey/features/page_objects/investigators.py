@@ -8,7 +8,7 @@ from lettuce.django import django_url
 
 
 class NewInvestigatorPage(PageObject):
-    url = "/investigators/new"
+    url = "/investigators/new/"
 
     def valid_page(self):
         fields = ['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age', 'backend']

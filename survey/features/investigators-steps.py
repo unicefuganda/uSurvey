@@ -223,3 +223,12 @@ def when_i_confirm_unblock_the_investigator(step):
 @step(u'Then I should see the investigator unblocked successfully')
 def then_i_should_see_the_investigator_unblocked_successfully(step):
     world.page.see_success_message("Investigator", "unblocked")
+
+@step(u'When I click add investigator button')
+def when_i_click_add_household_button(step):
+    world.page.click_by_css("#add-investigator")
+
+@step(u'Then I should see add investigator page')
+def then_i_should_see_add_household_page(step):
+    world.page = NewInvestigatorPage(world.browser)
+    world.page.validate_url()
