@@ -64,10 +64,9 @@ function load_questions_for_filter(){
         batch_id = $("#batch_id").val(),
         url = '/batches/'+ batch_id +'/questions/groups/'+ group_selected + '/module/' + module_selected +'/';
     $.getJSON(url, function(data){
-         $('.ms-selectable').children().children().hide();
+        $('.ms-selectable').children().children().hide();
         $.each(data, function(){
-            var representation = this.text + ": (" + this.answer_type.toUpperCase() + ")"
-             $('.ms-selectable li:contains(' + representation + ')').show();
+             $('#' + this.id + '-selectable').show();
         });
     });
 }
