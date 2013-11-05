@@ -3,7 +3,7 @@ import datetime
 from random import randint
 import urllib2
 from django.http import HttpRequest
-from django.test import TestCase, Client
+from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
