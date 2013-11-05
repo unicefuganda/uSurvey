@@ -763,6 +763,49 @@ class USSDTest(USSDBaseTest):
         response_string = "responseString=%s&action=request" % homepage
         self.assertEquals(urllib2.unquote(response.content), response_string)
 
+    def test_ussd_new_parameter_request_empty_string(self):
+        self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
+        self.ussd_params['response'] = 'false'
+        self.ussd_params['ussdRequestString'] = ''
+
+        with patch.object(USSDSurvey, "is_active", return_value=False):
+            response = self.client.post('/ussd', data=self.ussd_params)
+            homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+            response_string = "responseString=%s&action=request" % homepage
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_ussd_new_parameter_request_short_code_without_application_extension(self):
+        self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
+        self.ussd_params['response'] = 'false'
+        self.ussd_params['ussdRequestString'] = '*257#'
+
+        with patch.object(USSDSurvey, "is_active", return_value=False):
+            response = self.client.post('/ussd', data=self.ussd_params)
+            homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+            response_string = "responseString=%s&action=request" % homepage
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_ussd_new_parameter_request_short_code_with_application_extension(self):
+        self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
+        self.ussd_params['response'] = 'false'
+        self.ussd_params['ussdRequestString'] = '*153*10#'
+        with patch.object(USSDSurvey, "is_active", return_value=False):
+            response = self.client.post('/ussd', data=self.ussd_params)
+            homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+            response_string = "responseString=%s&action=request" % homepage
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_ussd_new_parameter_request_short_code_with_application_code_set_and_application_code_posted(self):
+        self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
+        self.ussd_params['response'] = 'false'
+        self.ussd_params['ussdRequestString'] = '10'
+
+        with patch.object(USSDSurvey, "is_active", return_value=False):
+            response = self.client.post('/ussd', data=self.ussd_params)
+            homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+            response_string = "responseString=%s&action=request" % homepage
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
 
 class FakeRequest(HttpRequest):
     def dict(self):

@@ -1,3 +1,5 @@
+import re
+from survey.investigator_configs import HAS_APPLICATION_CODE, APPLICATION_CODE
 from survey.ussd.ussd_survey import USSDSurvey
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
 
@@ -33,7 +35,7 @@ class USSDBaseView(object):
             return {'action': self.ussd_survey.ACTIONS['END'],
                     'responseString': self.ussd_survey.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']}
 
-        if (not answer or answer == '10') and self.is_new_request():
+        if self.is_new_request_parameter(answer) and self.is_new_request():
             action, responseString = self.ussd_survey.render_welcome_or_resume()
         elif self.is_registering_household is None:
             action = self.ussd_survey.ACTIONS['REQUEST']
@@ -61,5 +63,15 @@ class USSDBaseView(object):
                     action = self.ussd_survey.ACTIONS['REQUEST']
                     responseString = USSDSurvey.MESSAGES['WELCOME_TEXT'] % self.investigator.name
                 self.ussd_survey.set_in_session('IS_RESUMING', False)
-
         return {'action': action, 'responseString': responseString}
+
+    def is_new_request_parameter(self, answer):
+        pattern = re.compile(r'\*\d+\#')
+        match = re.match(pattern, answer)
+
+        matches_short_code = False
+
+        if HAS_APPLICATION_CODE:
+            matches_short_code = (answer == APPLICATION_CODE)
+
+        return not answer or match or matches_short_code
