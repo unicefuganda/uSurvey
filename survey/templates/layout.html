@@ -27,99 +27,65 @@
 
             {% if perms.auth.can_view_investigators %}
               <li class="dropdown">
-                <a data-toggle="dropdown" id="drop1" class="dropdown-toggle" role="button" href="#">Investigators<b class="caret"></b></a>
-                <ul aria-labelledby="drop1" role="menu" class="dropdown-menu">
-                  <li role="presentation"><a href="{% url 'investigators_page' %}">List all investigators</a></li>
-                  <li role="presentation"><a href="{% url 'new_investigator_page' %}">Add an investigator</a></li>
+                <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle" role="button" href="#">Survey Administration<b class="caret"></b></a>
+                <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
+                  <li role="presentation"><a href="{% url 'investigators_page' %}">Investigators</a></li>
+                  <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a></li>
+
                   {% if perms.auth.can_view_batches %}
-                    <li role="presentation"><a href="{% url 'bulk_sms' %}">Notify Investigators</a></li>
+                      <li role="presentation"><a href="{% url 'list_all_questions' %}">Question Bank</a></li>
+                      <li role="presentation"><a href="{% url 'survey_list_page' %}">Surveys</a></li>
+                      <li role="presentation"><a href="{% url 'question_module_listing_page' %}">Modules</a></li>
+                      <li role="presentation"><a href="{% url 'household_member_groups_page' %}">Groups</a></li>
+                      <li role="presentation"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
                   {% endif %}
                 </ul>
               </li>
             {% endif %}
 
-            {% if perms.auth.can_view_households %}
-              <li class="dropdown">
-                <a data-toggle="dropdown" id="drop2" class="dropdown-toggle" role="button" href="#">Households<b class="caret"></b></a>
-                <ul aria-labelledby="drop2" role="menu" class="dropdown-menu">
-                  <li role="presentation"><a href="{% url 'list_household_page' %}">List all households</a></li>
-                  <li role="presentation"><a href="{% url 'new_household_page' %}">Add a household</a></li>
-                </ul>
-              </li>
-            {% endif %}
-
             {% if perms.auth.can_view_aggregates %}
               <li class="dropdown">
-                <a data-toggle="dropdown" id="drop3" class="dropdown-toggle" role="button" href="#">Aggregates<b class="caret"></b></a>
-                <ul aria-labelledby="drop3" role="menu" class="dropdown-menu">
-                  <li role="presentation"><a href="{% url 'aggregates_status' %}">Status</a></li>
-                  <li role="presentation"><a href="{% url 'list_indicator_page' %}">List Indicators</a></li>
-                  <li role="presentation"><a href="{% url 'new_indicator_page' %}">Add Indicator</a></li>
-                  <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion Rates</a></li>
-                </ul>
-              </li>
-            {% endif %}
-
-            {% if perms.auth.can_view_aggregates %}
-              <li class="dropdown">
-                <a data-toggle="dropdown" id="drop3" class="dropdown-toggle" role="button" href="#">Downloads<b class="caret"></b></a>
-                <ul aria-labelledby="drop3" role="menu" class="dropdown-menu">
+                <a data-toggle="dropdown" id="drop-downloads-tab" class="dropdown-toggle" role="button" href="#">Downloads<b class="caret"></b></a>
+                <ul aria-labelledby="drop-downloads-tab" role="menu" class="dropdown-menu">
                   <li role="presentation"><a href="{% url 'download_excel' %}">Download Spreadsheets</a></li>
                   <li role="presentation"><a href="{% url 'investigator_report_page' %}">Mobile Money Sheet</a></li>
                 </ul>
               </li>
             {% endif %}
 
-            {% if perms.auth.can_view_users %}
+            {% if perms.auth.can_view_investigators %}
               <li class="dropdown">
-                <a data-toggle="dropdown" id="drop4" class="dropdown-toggle" role="button" href="#">Users<b class="caret"></b></a>
-                <ul aria-labelledby="drop4" role="menu" class="dropdown-menu">
-                  <li role="presentation"><a href="{% url 'users_index' %}">List all users</a></li>
-                  <li role="presentation"><a href="{% url 'new_user_page' %}">Add a user</a></li>
+                <a data-toggle="dropdown" id="drop-analysis-tab" class="dropdown-toggle" role="button" href="#">Analysis<b class="caret"></b></a>
+                <ul aria-labelledby="drop-analysis-tab" role="menu" class="dropdown-menu">
+                  <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
+
+                  {% if perms.auth.can_view_batches %}
+                      <li role="presentation"><a href="{% url 'list_indicator_page' %}">Indicators</a></li>
+                      <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion Rates</a></li>
+                  {% endif %}
                 </ul>
               </li>
             {% endif %}
 
-            {% if perms.auth.can_view_batches %}
-                <li class="dropdown">
-                    <a data-toggle="dropdown" id="drop7" class="dropdown-toggle" role="button" href="#">Survey<b class="caret"></b></a>
-                    <ul aria-labelledby="drop7" role="menu" class="dropdown-menu">
-                        <li role="presentation"><a href="{% url 'survey_list_page' %}">List all surveys</a></li>
-                        <li role="presentation"><a href="{% url 'new_survey_page' %}">Add a survey</a></li>
-                        {% if perms.auth.can_view_users %}
-                            <li role="presentation"><a href="{% url 'add_location_hierarchy' %}">Add Location Hierarchy</a></li>
-                            <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
+            {% if perms.auth.can_view_users %}
+              <li class="dropdown">
+                <a data-toggle="dropdown" id="drop-settings-tab" class="dropdown-toggle" role="button" href="#">Settings<b class="caret"></b></a>
+                <ul aria-labelledby="drop-settings-tab" role="menu" class="dropdown-menu">
+                    <li role="presentation"><a href="{% url 'users_index' %}">List all users</a></li>
+                    <li role="presentation"><a href="{% url 'add_location_hierarchy' %}">Add Location Hierarchy</a></li>
+                    <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
+                </ul>
+              </li>
             {% endif %}
-            {% if perms.auth.can_view_batches %}
-                <li class="dropdown">
-                    <a data-toggle="dropdown" id="drop8" class="dropdown-toggle" role="button" href="#">Question Bank<b class="caret"></b></a>
-                    <ul aria-labelledby="drop7" role="menu" class="dropdown-menu">
-                        <li role="presentation"><a href="{% url 'list_all_questions' %}">List all questions</a></li>
-                        <li role="presentation"><a href="{% url 'new_question_page' %}">Add a question</a></li>
-                        <li role="presentation"><a href="{% url 'new_question_module_page' %}">Add a module</a></li>
-                        <li role="presentation"><a href="{% url 'question_module_listing_page' %}">List all modules</a></li>
-                    </ul>
-                </li>
-            {% endif %}
+           </ul>
 
-            {% if perms.auth.can_view_household_groups %}
-                <li class="dropdown">
-                    <a data-toggle="dropdown" id="drop6" class="dropdown-toggle" role="button" href="#">Groups<b class="caret"></b></a>
-                    <ul aria-labelledby="drop6" role="menu" class="dropdown-menu">
-                        <li role="presentation"><a href="{% url 'household_member_groups_page' %}">List all groups</a></li>
-                        <li role="presentation"><a href="{% url 'new_household_member_groups_page' %}">Add a group</a></li>
-                    </ul>
-                </li>
-            {% endif %}
-          </ul>
+        <!-- login/profile link on the right side -->
+
           {% if user.is_authenticated %}
             <ul role="navigation" class="nav pull-right">
               <li class="dropdown">
-                <a data-toggle="dropdown" id="drop5" class="brand dropdown-toggle" role="button" href="#">{{ user.get_full_name }}<b class="caret"></b></a>
-                <ul aria-labelledby="drop5" role="menu" class="dropdown-menu">
+                <a data-toggle="dropdown" id="drop-user-settings" class="brand dropdown-toggle" role="button" href="#">{{ user.get_full_name }}<b class="caret"></b></a>
+                <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
                   <li role="presentation"><a href="{% url 'users_edit' user.id %}"><i class="icon-pencil"></i> Edit Profile</a></li>
                   <li role="presentation"><a href="{% url 'password_change'%}"><i class="icon-pencil"></i> Change Password</a></li>
                   <li role="presentation"><a href="{% url 'logout_page' %}"><i class="icon-off"></i> Logout</a></li>

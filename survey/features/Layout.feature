@@ -1,27 +1,20 @@
 Feature: Layout Page feature
-
-  Scenario: Groups Tab
+  Scenario: Survey Administration Tab
     Given I am logged in as researcher
-    And I visit the new group page
-    When I click Groups tab
-    Then I should see group dropdown list
-
-  Scenario: Survey Tab
-    Given I am logged in as admin
-    And I click Survey tab
-    Then I should see survey dropdown list
-
-  Scenario: Questions Tab
-    Given I am logged in as researcher
-    And I click Questions tab
-    Then I should see Questions dropdown list
-
-  Scenario: Aggregates Tab
-    Given I am logged in as researcher
-    And I click Aggregates tab
-    Then I should see Aggregates dropdown list
+    And I click Survey Administration tab
+    Then I should see survey administration dropdown list
 
   Scenario: Downloads Tab
     Given I am logged in as researcher
-    And I click Downloads Tab
-    Then I should see Downloads dropdown list
+    And I click Downloads tab
+    Then I should see downloads dropdown list
+
+  Scenario: Analysis Tab
+    Given I am logged in as researcher
+    And I click Analysis tab
+    Then I should see analysis dropdown list
+
+  Scenario: Settings Tab
+    Given I am logged in as admin
+    And I click Settings tab
+    Then I should see Settings dropdown list

@@ -39,7 +39,7 @@ Feature: Households feature
       Given I am logged in as researcher
       And I have locations
       And I am in the home page
-      And I click households option
+      And I click Survey Administration tab
       And I select list households
       And I should see the households list paginated
       When I click add household button

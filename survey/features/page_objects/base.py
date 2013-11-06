@@ -41,10 +41,10 @@ class PageObject(object):
         self.browser.find_by_css("form button").first.click()
 
     def see_username_link(self):
-        assert self.browser.find_by_css("#drop5")
+        assert self.browser.find_by_css("#drop-user-settings")
 
     def see_logout_link(self):
-        self.click_by_css('#drop5')
+        self.click_by_css('#drop-user-settings')
         assert self.browser.find_link_by_text(" Logout")
 
     def see_the_about_link(self):
@@ -64,35 +64,31 @@ class PageObject(object):
     def check_data_entry_allowed_tabs(self):
         assert self.browser.find_link_by_text('About')
         assert self.browser.find_link_by_text('mMICS')
-
-        assert self.browser.find_link_by_text('Households')
-        assert self.browser.find_link_by_text('Investigators')
+        assert self.browser.find_link_by_text('Survey Administration')
+        assert self.browser.find_link_by_text('Analysis')
 
     def check_researcher_allowed_tabs(self):
         self.check_data_entry_allowed_tabs()
-        assert self.browser.find_link_by_text('Survey')
-        assert self.browser.find_link_by_text('Aggregates')
+        assert self.browser.find_link_by_text('Downloads')
 
     def check_all_tabs(self):
         self.check_researcher_allowed_tabs()
-        assert self.browser.find_link_by_text('Users')
+        assert self.browser.find_link_by_text('Settings')
 
     def check_researcher_not_allowed_tabs(self):
-        assert not self.browser.find_link_by_text('Users')
+        assert not self.browser.find_link_by_text('Settings')
 
     def check_data_entry_not_allowed_tabs(self):
         self.check_researcher_not_allowed_tabs()
-        assert not self.browser.find_link_by_text('Aggregates')
-        assert not self.browser.find_link_by_text('Batches')
+        assert not self.browser.find_link_by_text('Downloads')
 
     def check_anonymous_user_not_allowed_tabs(self):
         self.check_data_entry_not_allowed_tabs()
-        assert not self.browser.find_link_by_text('Investigators')
-        assert not self.browser.find_link_by_text('Households')
+        assert not self.browser.find_link_by_text('Survey Administration')
 
     def check_notify_investigators_drop_down_is_not_present(self):
-        self.browser.click_link_by_text('Investigators')
-        assert not self.browser.find_link_by_text('Notify Investigators')
+        self.browser.click_link_by_text('Survey Administration')
+        assert not self.browser.find_link_by_text('Notifications')
 
     def choose_radio(self, name, value):
         js = "$('input:radio[name=%s][value=%s]').prop('checked', true).change()" % (name, value)
@@ -102,7 +98,7 @@ class PageObject(object):
         assert self.browser.find_link_by_partial_text("%s" % str(user.get_full_name()))
 
     def click_user_settings(self, user):
-        self.click_by_css("#drop5")
+        self.click_by_css("#drop-user-settings")
 
     def assert_user_can_see_profile_and_logout_link(self):
         links = ["Edit Profile", "Change Password", "Logout"]

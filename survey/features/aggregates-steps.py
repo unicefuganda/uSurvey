@@ -150,6 +150,7 @@ def then_i_should_see_a_table_for_household_completion_rates(step):
 def and_i_should_see_household_details_text(step):
     world.page.is_text_present("Survey Completion by household in %s %s" %(world.kampala_village.type.name, world.kampala_village.name))
     world.page.is_text_present("%s" %(world.household_1.uid))
+    world.page.is_text_present("%s" %(world.household_1.household_member.all().count()))
 
 @step(u'And I should see investigator details text')
 def and_i_should_see_investigator_details_text(step):
