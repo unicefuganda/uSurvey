@@ -116,7 +116,7 @@ class ReportForCompletedInvestigatorTest(BaseTest):
     def test_should_have_header_fields_in_download_report(self):
         survey = Survey.objects.create(name='some survey')
         file_name = "investigator.csv"
-        response = self.client.post('/completed_investigators/download/',{'survey':survey.id})
+        response = self.client.post('/investigators/completed/download/',{'survey':survey.id})
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
@@ -126,8 +126,8 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         self.assertEquals(contents, response.content)
 
     def test_restricted_permission(self):
-        self.assert_login_required('/completed_investigators/download/')
-        self.assert_restricted_permission_for('/completed_investigators/download/')
+        self.assert_login_required('/investigators/completed/download/')
+        self.assert_restricted_permission_for('/investigators/completed/download/')
 
     def test_should_get_view_for_download(self):
         response = self.client.get('/investigator_report/')
