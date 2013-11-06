@@ -1,9 +1,11 @@
 import datetime
+import json
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdBatchCompletion
+from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdBatchCompletion, Backend
 from survey.models.households import HouseholdMember
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates
 from survey.tests.base_test import BaseTest
@@ -156,3 +158,97 @@ class TestSurveyCompletion(BaseTest):
         self.assertEqual(1,len(response.context['completion_rates'].interviewed_households()))
         self.assertEqual(self.household_2,response.context['completion_rates'].interviewed_households()[0]['household'])
         self.assertEqual(expected,response.context['completion_rates'].interviewed_households()[0]['date_interviewed'])
+
+
+class HouseholdCompletionJsonViewTest(BaseTest):
+    def setUp(self):
+        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_batches')
+        self.assign_permission_to(raj, 'can_view_aggregates')
+        self.client.login(username='Rajni', password='I_Rock')
+        self.country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        self.district = LocationType.objects.create(name="District", slug=slugify("district"))
+        self.city = LocationType.objects.create(name="City", slug=slugify("city"))
+        self.uganda = Location.objects.create(name="Uganda", type=self.country)
+        self.abim = Location.objects.create(name="Abim", type=self.district, tree_parent=self.uganda)
+        self.kampala = Location.objects.create(name="Kampala", type=self.city, tree_parent=self.abim)
+
+        self.zombo = Location.objects.create(name="Zombo", type=self.district, tree_parent=self.uganda)
+        self.apachi = Location.objects.create(name="Apachi", type=self.city, tree_parent=self.zombo)
+
+        self.backend = Backend.objects.create(name='something')
+        self.survey = Survey.objects.create(name='SurveyA')
+        self.batch = Batch.objects.create(order=1, name='somebatch', survey=self.survey)
+        self.batch_2 = Batch.objects.create(order=2, name='somebatch 2', survey=self.survey)
+
+        self.batch.open_for_location(self.abim)
+        self.batch.open_for_location(self.zombo)
+
+        self.batch_2.open_for_location(self.abim)
+        self.batch_2.open_for_location(self.zombo)
+
+        self.investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
+                                                          location=self.kampala, backend=self.backend)
+
+        self.investigator_2 = Investigator.objects.create(name="investigator name_2", mobile_number="9876543330",
+                                                          location=self.apachi, backend=self.backend)
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
+        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
+        self.household_3 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
+        self.household_4 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
+
+    def test_knows_completion_rates_for_location_type(self):
+        household_1_member = HouseholdMember.objects.create(household=self.household_1,
+                                                            date_of_birth=datetime.date(1980, 05, 01))
+        household_2_member = HouseholdMember.objects.create(household=self.household_2,
+                                                            date_of_birth=datetime.date(1980, 05, 01))
+        household_3_member = HouseholdMember.objects.create(household=self.household_3,
+                                                            date_of_birth=datetime.date(1980, 05, 01))
+        household_4_member = HouseholdMember.objects.create(household=self.household_4, date_of_birth=datetime.date(1980, 05, 01))
+
+        HouseholdBatchCompletion.objects.create(household=self.household_1, householdmember=household_1_member,
+                                                batch=self.batch,
+                                                investigator=self.investigator_1)
+
+        HouseholdBatchCompletion.objects.create(household=self.household_2, householdmember=household_2_member,
+                                                batch=self.batch,
+                                                investigator=self.investigator_1)
+
+        HouseholdBatchCompletion.objects.create(household=self.household_3, householdmember=household_3_member,
+                                                batch=self.batch,
+                                                investigator=self.investigator_1)
+
+        HouseholdBatchCompletion.objects.create(household=self.household_3, householdmember=household_4_member,
+                                                batch=self.batch,
+                                                investigator=self.investigator_1)
+
+        self.household_5 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
+        self.household_6 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
+        self.household_7 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
+        self.household_8 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
+
+        household_5_member = HouseholdMember.objects.create(household=self.household_5,
+                                                            date_of_birth=datetime.date(1980, 05, 01))
+        household_6_member = HouseholdMember.objects.create(household=self.household_6,
+                                                            date_of_birth=datetime.date(1980, 05, 01))
+
+        HouseholdMember.objects.create(household=self.household_7, date_of_birth=datetime.date(1980, 05, 01))
+        HouseholdMember.objects.create(household=self.household_8, date_of_birth=datetime.date(1980, 05, 01))
+
+        HouseholdBatchCompletion.objects.create(household=self.household_1, householdmember=household_5_member,
+                                                batch=self.batch,
+                                                investigator=self.investigator_2)
+        HouseholdBatchCompletion.objects.create(household=self.household_2, householdmember=household_6_member,
+                                                batch=self.batch,
+                                                investigator=self.investigator_2)
+
+        response = self.client.get('/survey/%s/completion/json/' % self.survey.pk)
+        self.assertEqual(response.status_code, 200)
+        completion_rates = json.loads(response.content)
+        self.assertEqual(completion_rates[self.zombo.name], 25.0)
+        self.assertEqual(completion_rates[self.abim.name], 50.0)
+
+    def test_restricted_permissions_for_completion_rates(self):
+        self.assert_login_required('/survey/%s/completion/json/' % self.survey.pk)
+        self.assert_restricted_permission_for('/survey/%s/completion/json/' % self.survey.pk)

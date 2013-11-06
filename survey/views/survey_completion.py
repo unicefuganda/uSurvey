@@ -1,9 +1,12 @@
+import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import HttpResponse
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import Batch, Survey, Investigator
-from survey.services.completion_rates_calculator import BatchLocationCompletionRates, BatchHighLevelLocationsCompletionRates
+from survey.services.completion_rates_calculator import BatchLocationCompletionRates, BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
 
@@ -45,6 +48,7 @@ def show(request):
     if is_valid(params):
         batch = Batch.objects.get(id=params['batch'])
         location_id = params['location']
+        high_level_locations = []
 
         if not location_id:
             high_level_locations = __get_parent_level_locations()
@@ -66,3 +70,13 @@ def show(request):
     content['batches'] = Batch.objects.all()
     content['action'] = 'survey_completion_rates'
     return render(request, 'aggregates/completion_status.html', content)
+
+
+@login_required
+@permission_required('auth.can_view_aggregates')
+def completion_json(request, survey_id):
+    survey = Survey.objects.get(id=survey_id)
+    location_type = LocationType.objects.get(name='District')
+    completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
+    json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
+    return HttpResponse(json_dump, mimetype='application/json')

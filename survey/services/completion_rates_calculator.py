@@ -1,3 +1,4 @@
+from rapidsms.contrib.locations.models import Location
 from survey.models import Household
 
 
@@ -30,9 +31,6 @@ class BatchLocationCompletionRates(BatchCompletionRates):
         all_households = self.all_households
         completed_households = filter(lambda household: household.has_completed_batch(self.batch), all_households)
         return self.calculate_percent(len(completed_households), all_households.count())
-        #
-        # percent = super(BatchLocationCompletionRates, self).percentage_completed(self.all_households)
-        # return percent
 
     def interviewed_households(self):
         _interviewed_households=[]
@@ -59,3 +57,22 @@ class BatchHighLevelLocationsCompletionRates(BatchCompletionRates):
             _completion_rates.append(attribute)
 
         return _completion_rates
+
+
+class BatchSurveyCompletionRates:
+    def __init__(self, location_type):
+        self.location_type = location_type
+        self.locations = Location.objects.filter(type=location_type)
+
+    def get_completion_formatted_for_json(self, survey):
+        all_batches = survey.batch.all()
+        completion_rates_dict = {}
+
+        number_of_batches = len(all_batches)
+
+        for location in self.locations:
+            percent_completed = 0.0
+            percent_completed = reduce(lambda percent_completed, rate: percent_completed + rate,
+                                       map(lambda batch: BatchLocationCompletionRates(batch, location).percent_completed_households(), all_batches))
+            completion_rates_dict[location.name] = percent_completed/number_of_batches
+        return completion_rates_dict
