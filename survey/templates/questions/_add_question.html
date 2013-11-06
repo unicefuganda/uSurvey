@@ -11,7 +11,7 @@
     {% include "naked_form.html" with a_form=questionform %}
      <div class="form-actions">
          <button type="submit" class="btn btn-primary" name="save_sub_question_button" id="modal_sub_question_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
-         <a href="javascript:window.history.back()" class="btn btn-primary" name="cancel_button">Cancel</a>
+         <button  data-dismiss="modal" class="btn btn-primary" name="cancel_button">Cancel</button>
      </div>
 
  </form>

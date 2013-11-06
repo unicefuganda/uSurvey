@@ -53,6 +53,9 @@ Feature: Users feature
       And I have 100 users
       And I visit the users list page
       Then I should see a list of users
+      When I click add user button
+      Then I should see add user page
+
       
     Scenario: Edit a user
       Given I am logged in as a superuser

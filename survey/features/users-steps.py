@@ -208,3 +208,14 @@ def then_i_should_see_the_groups_field(step):
 def and_i_select_edit_action(step):
     world.page.click_link_by_text(" Edit Profile")
     world.page = UsersDetailsPage(world.browser)
+
+@step(u'When I click add user button')
+def when_i_click_add_user_button(step):
+    world.page = UsersListPage(world.browser)
+    world.page.visit()
+    world.page.click_by_css("#add-user")
+
+@step(u'Then I should see add user page')
+def then_i_should_see_add_user_page(step):
+    world.page = NewUserPage(world.browser)
+    world.page.validate_url()
