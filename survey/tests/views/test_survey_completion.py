@@ -134,6 +134,7 @@ class TestSurveyCompletion(BaseTest):
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
 
         self.assertEqual(1,len(response.context['completion_rates'].interviewed_households()))
+        self.assertEqual(self.household_2,response.context['completion_rates'].interviewed_households()[0]['household'])
         self.assertEqual(1,response.context['completion_rates'].interviewed_households()[0]['number_of_member_interviewed'])
 
     def test_restricted_permissions(self):
@@ -153,4 +154,5 @@ class TestSurveyCompletion(BaseTest):
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         expected = HouseholdBatchCompletion.objects.filter(household=self.household_2).latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
         self.assertEqual(1,len(response.context['completion_rates'].interviewed_households()))
+        self.assertEqual(self.household_2,response.context['completion_rates'].interviewed_households()[0]['household'])
         self.assertEqual(expected,response.context['completion_rates'].interviewed_households()[0]['date_interviewed'])

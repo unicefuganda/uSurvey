@@ -25,7 +25,7 @@
                 <td>{{ interviewed.household.get_head.surname.capitalize }}</td>
                 <td>{{ interviewed.household.household_members.all.count }}</td>
                 <td>{{ interviewed.number_of_member_interviewed }}</td>
-                <td>{{ interviewed.date_interviewed }}</td>
+                <td>{{ interviewed.date_interviewed|default_if_none:'--' }}</td>
             </tr>
         {% endfor %}
       </tbody>

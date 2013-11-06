@@ -69,6 +69,7 @@ Feature: Aggregates feature
       And I have locations
       And I have an investigator and households
       And I have 2 batches with one open
+      And one household has completed that open batch
       And I visit district aggregate page
       And I choose a village and an open batch
       And I click get status button

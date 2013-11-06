@@ -179,10 +179,13 @@ class Household(BaseModel):
             return [completed_batch.householdmember for completed_batch in self.completed_batches.filter(batch=batch).exclude(householdmember=None)]
         return []
 
+    def has_members(self):
+        return self.household_member.all().count()>0
+
     def date_interviewed_for(self, batch):
-        if not self.has_completed_batch(batch):
-            return
-        return self.completed_batches.latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
+        if self.has_completed_batch(batch) and self.has_members():
+            return self.completed_batches.latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
+        return None
 
     @classmethod
     def set_related_locations(cls, households):

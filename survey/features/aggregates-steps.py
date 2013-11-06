@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from time import sleep
+import datetime
 from lettuce import *
 from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import *
@@ -8,7 +9,7 @@ from survey.features.page_objects.aggregates import AggregateStatusPage, Downloa
 from survey.features.page_objects.survey_completion_rates import SurveyCompletionRatesPage
 from survey.models import Survey
 from survey.models.batch import Batch
-from survey.models.households import Household
+from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.formula import *
 from survey import investigator_configs
@@ -21,6 +22,10 @@ def and_i_have_2_batches_with_one_open(step):
     world.kampala_county = Location.objects.get(name = "Kampala County")
     world.someother_county = Location.objects.create(name = "Some County", tree_parent = world.kampala_county.tree_parent)
     world.batch_1.open_for_location(world.kampala_county.tree_parent)
+
+@step(u'And one household has completed that open batch')
+def and_one_household_has_completed_that_open_batch(step):
+    world.household_1.completed_batches.get_or_create(batch=world.batch_1)
 
 @step(u'And I visit aggregate status page')
 def and_i_visit_aggregate_status_page(step):
@@ -144,6 +149,7 @@ def then_i_should_see_a_table_for_household_completion_rates(step):
 @step(u'And I should see household details text')
 def and_i_should_see_household_details_text(step):
     world.page.is_text_present("Survey Completion by household in %s %s" %(world.kampala_village.type.name, world.kampala_village.name))
+    world.page.is_text_present("%s" %(world.household_1.uid))
 
 @step(u'And I should see investigator details text')
 def and_i_should_see_investigator_details_text(step):
@@ -155,10 +161,12 @@ def and_i_have_an_investigator_and_households(step):
     world.investigator = Investigator.objects.create(name="some_investigator", mobile_number="123456784", location=world.kampala_village)
     world.household_1 = Household.objects.create(investigator = world.investigator, uid=101, location=world.kampala_village)
     world.household_2 = Household.objects.create(investigator = world.investigator, uid=102, location=world.kampala_village)
+    world.member_2 = HouseholdMember.objects.create(household=world.household_2,date_of_birth= datetime.datetime(2000,02, 02))
+
 
 @step(u'And I should see percent completion')
 def and_i_should_see_percent_completion(step):
-    world.page.is_text_present('Percent Completion: 100')
+    world.page.is_text_present('Percent Completion: 50')
 
 @step(u'And I have 2 surveys with one batch each')
 def and_i_have_2_surveys_with_one_batch_each(step):

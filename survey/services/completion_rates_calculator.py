@@ -37,11 +37,9 @@ class BatchLocationCompletionRates(BatchCompletionRates):
     def interviewed_households(self):
         _interviewed_households=[]
         for household in self.all_households:
-            attributes= {
-                'household':household,
-                'date_interviewed':household.date_interviewed_for(self.batch),
-                'number_of_member_interviewed':len(household.members_interviewed(self.batch)),
-            }
+            attributes= {'household':household,
+                         'date_interviewed':household.date_interviewed_for(self.batch),
+                         'number_of_member_interviewed':len(household.members_interviewed(self.batch)),}
             _interviewed_households.append(attributes)
         return _interviewed_households
 
