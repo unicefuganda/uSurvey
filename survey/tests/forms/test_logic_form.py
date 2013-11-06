@@ -109,6 +109,22 @@ class LogicFormTest(TestCase):
         self.assertIn('Min value %s invalid, must be an integer.' % data['min_value'],
                       logic_form.errors['__all__'])
 
+    def test_form_has_validation_error_if_between_condition_is_selected_and_min_value_field_is_negative(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    min_value="-1")
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Min value %s invalid, must be greater than zero.' % data['min_value'],
+                      logic_form.errors['__all__'])
+
     def test_form_has_validation_error_if_between_condition_is_selected_and_max_value_field_is_alpha_numeric(self):
         batch = Batch.objects.create(order=1)
         question_without_option = Question.objects.create(text="Question 1?",
@@ -123,6 +139,22 @@ class LogicFormTest(TestCase):
         logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
         self.assertFalse(logic_form.is_valid())
         self.assertIn('Max value %s invalid, must be an integer.' % data['max_value'],
+                      logic_form.errors['__all__'])
+
+    def test_form_has_validation_error_if_between_condition_is_selected_and_max_value_field_is_negative(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    max_value="-1")
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertIn('Max value %s invalid, must be greater than zero.' % data['max_value'],
                       logic_form.errors['__all__'])
 
     def test_form_has_validation_error_if_between_condition_is_selected_and_min_value_field_is_within_range_of_existing_rule(self):

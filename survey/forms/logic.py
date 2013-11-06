@@ -74,12 +74,16 @@ class LogicForm(forms.Form):
         if self.data.get('max_value', None) and not rule:
             try:
                 max_value = int(self.data['max_value'])
-                rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
+                if max_value < 0:
+                    rule = [1]
+                    field_name = 'Max value %s invalid, must be greater than zero.' % (self.data['max_value'])
+                else:
+                    rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
                                              validate_with_min_value__lte=self.data['max_value'],
                                              validate_with_max_value__gte=self.data['max_value'],
                                              condition=self.data['condition'])
-                field_name = 'condition %s with max value %s is within existing range that' % (
-                    self.data['condition'], self.data['max_value'])
+                    field_name = 'condition %s with max value %s is within existing range that' % (
+                        self.data['condition'], self.data['max_value'])
             except ValueError:
                 rule = [1]
                 field_name = 'Max value %s invalid, must be an integer.' % (self.data['max_value'])
@@ -90,11 +94,15 @@ class LogicForm(forms.Form):
         if self.data.get('min_value', None):
             try:
                 min_value = int(self.data['min_value'])
-                rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
+                if min_value < 0:
+                    rule = [1]
+                    field_name = 'Min value %s invalid, must be greater than zero.' % (self.data['min_value'])
+                else:
+                    rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
                                              validate_with_min_value__lte=self.data['min_value'],
                                              validate_with_max_value__gte=self.data['min_value'],
                                              condition=self.data['condition'])
-                field_name = 'condition %s with min value %s is within existing range that' % (self.data['condition'], self.data['min_value'])
+                    field_name = 'condition %s with min value %s is within existing range that' % (self.data['condition'], self.data['min_value'])
             except ValueError:
                 rule = [1]
                 field_name = 'Min value %s invalid, must be an integer.' % (self.data['min_value'])
