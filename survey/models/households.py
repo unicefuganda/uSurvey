@@ -1,16 +1,18 @@
 import datetime
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import Location
+from django.conf import settings
+from django.core.paginator import Paginator
+
 from survey.investigator_configs import LEVEL_OF_EDUCATION, MONTHS
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
 from survey.models.investigator import Investigator
-from django.conf import settings
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
-from django.core.paginator import Paginator
 
 
 class Household(BaseModel):
@@ -69,7 +71,10 @@ class Household(BaseModel):
                 getattr(self, related_name).filter(question__in=questions).delete()
 
     def has_completed_batch(self, batch):
-        return self.completed_batches.filter(batch=batch).count() > 0
+        for member in self.household_member.all():
+            if not member.completed_member_batches.filter(batch=batch):
+                return False
+        return True
 
     def has_completed_batches(self, batches):
         return self.completed_batches.filter(batch__in=batches).count() == len(batches)
@@ -171,7 +176,13 @@ class Household(BaseModel):
 
     def members_interviewed(self,batch):
         if batch.questions.all().exists():
-            return [member for member in self.household_member.all() if member.has_completed(batch)]
+            return [completed_batch.householdmember for completed_batch in self.completed_batches.filter(batch=batch).exclude(householdmember=None)]
+        return []
+
+    def date_interviewed_for(self, batch):
+        if not self.has_completed_batch(batch):
+            return
+        return self.completed_batches.latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
 
     @classmethod
     def set_related_locations(cls, households):
@@ -185,7 +196,7 @@ class Household(BaseModel):
         return (all_households.order_by('uid').reverse()[0].uid + 1) if all_households else 1
 
     @classmethod
-    def total_households_in(self,location):
+    def all_households_in(self,location):
         return Household.objects.filter(location__in=location.get_descendants(include_self=True))
 
 

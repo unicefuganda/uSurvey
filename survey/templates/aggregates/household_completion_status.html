@@ -4,9 +4,9 @@
 {% endblock %}
 {% block content %}
     <h3>Survey Completion by household in {{ selected_location.type.name }} {{ selected_location.name }}</h3>
-    {% if households %}
+    {% if completion_rates %}
     <p>Investigator: {{ investigator.name }}({{ investigator.mobile_number }})</p>
-    <p>Percent Completion: {{ percent_completed }}</p>
+    <p>Percent Completion: {{ completion_rates.percent_completed_households }}</p>
 
     <table class="table table-striped table-bordered">
       <thead>
@@ -19,18 +19,13 @@
         </tr>
       </thead>
         <tbody>
-        {% for household, member_interviewed in households.items %}
+        {% for interviewed in completion_rates.interviewed_households %}
             <tr>
-                <td>{{ household.uid }}</td>
-                <td>{{ household.get_head.first_name|capfirst }} {{ household.get_head.surname|capfirst }}</td>
-                <td>{% if household.household_members.all %}
-                    {{ household.household_members.all.count }}
-                    {% else %}
-                        0
-                    {% endif %}
-                </td>
-                <td>{{ member_interviewed }}</td>
-                <td>{{ date_completed.household }}</td>
+                <td>{{ interviewed.household.uid }}</td>
+                <td>{{ interviewed.household.get_head.surname.capitalize }}</td>
+                <td>{{ interviewed.household.household_members.all.count }}</td>
+                <td>{{ interviewed.number_of_member_interviewed }}</td>
+                <td>{{ interviewed.date_interviewed }}</td>
             </tr>
         {% endfor %}
       </tbody>

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion, Batch, QuestionModule, BatchQuestionOrder
@@ -321,10 +321,12 @@ class HouseholdBatchCompletionTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
+        member = HouseholdMember.objects.create(household=household, date_of_birth=date(2011,1,11))
 
         self.assertFalse(household.has_completed_batch(batch))
 
         household.batch_completed(batch)
+        member.batch_completed(batch)
 
         self.assertTrue(household.has_completed_batch(batch))
 

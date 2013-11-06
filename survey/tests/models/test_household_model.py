@@ -415,9 +415,9 @@ class HouseholdTest(TestCase):
         household_1 = Household.objects.create(investigator = investigator_1,location= self.kampala)
         household_2 = Household.objects.create(investigator = investigator_2,location= self.kampala_city)
 
-        self.assertEqual(2, Household.total_households_in(self.uganda).count())
-        self.assertIn(household_1, Household.total_households_in(self.uganda))
-        self.assertIn(household_2, Household.total_households_in(self.uganda))
+        self.assertEqual(2, Household.all_households_in(self.uganda).count())
+        self.assertIn(household_1, Household.all_households_in(self.uganda))
+        self.assertIn(household_2, Household.all_households_in(self.uganda))
 
     def test_should_know_number_of_members_interviewed(self):
         self.batch = Batch.objects.create(name="BATCH A", order=1)
@@ -452,4 +452,4 @@ class HouseholdTest(TestCase):
         member_2 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
         member_3 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
 
-        self.assertIsNone(household_1.members_interviewed(self.batch))
+        self.assertEqual(0, len(household_1.members_interviewed(self.batch)))

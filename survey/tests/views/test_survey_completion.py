@@ -5,6 +5,7 @@ from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdBatchCompletion
 from survey.models.households import HouseholdMember
+from survey.services.completion_rates_calculator import BatchLocationCompletionRates
 from survey.tests.base_test import BaseTest
 from survey.views.survey_completion import is_valid
 
@@ -30,6 +31,9 @@ class TestSurveyCompletion(BaseTest):
 
         self.household_1 = Household.objects.create(investigator = self.investigator_1,location= self.kampala)
         self.household_2 = Household.objects.create(investigator = self.investigator_2,location= self.kampala_city)
+        self.member_1 = HouseholdMember.objects.create(household=self.household_1, date_of_birth=datetime.date(1980, 05, 01))
+        self.member_2 = HouseholdMember.objects.create(household=self.household_2, date_of_birth=datetime.date(1980, 05, 3))
+
         self.batch = Batch.objects.create(order=1,name='somebatch')
 
     def test_should_render_success_status_code_on_GET(self):
@@ -70,41 +74,54 @@ class TestSurveyCompletion(BaseTest):
 
     def test_should_render_location_children_if_location_in_get_params(self):
         response = self.client.get('/survey_completion/', {'location': str(self.uganda.pk) ,'batch': str(self.batch.pk)})
-        self.assertIn(self.abim, response.context['total_households'])
-        self.assertIn(self.kampala, response.context['total_households'])
+        self.assertEqual(2, len(response.context['completion_rates'].attributes()))
+        index_of_abim = 0
+        index_of_kampala = 1
+
+        self.assertEqual(self.abim, response.context['completion_rates'].attributes()[index_of_abim]['location'])
+        self.assertEqual(self.kampala, response.context['completion_rates'].attributes()[index_of_kampala]['location'])
 
     def test_should_render_total_number_of_household_under_child_locations(self):
         response = self.client.get('/survey_completion/', {'location': str(self.uganda.pk), 'batch': str(self.batch.pk)})
-        self.assertEqual(0, response.context['total_households'][self.abim])
-        self.assertEqual(2, response.context['total_households'][self.kampala])
+        self.assertEqual(2, len(response.context['completion_rates'].attributes()))
+        index_of_abim = 0
+        index_of_kampala = 1
+
+        self.assertEqual(0, response.context['completion_rates'].attributes()[index_of_abim]['total_households'])
+        self.assertEqual(2, response.context['completion_rates'].attributes()[index_of_kampala]['total_households'])
 
     def test_should_render_household_completion_percentage_in_child_locations(self):
-        self.household_1.batch_completed(self.batch)
+        self.batch.completed_households.create(householdmember=self.member_1)
         response = self.client.get('/survey_completion/', {'location': str(self.uganda.pk),'batch':str(self.batch.pk)})
-        self.assertEqual(0,response.context['completed_households_percent'][self.abim])
-        self.assertEqual(50,response.context['completed_households_percent'][self.kampala])
+        self.assertEqual(2, len(response.context['completion_rates'].attributes()))
+        index_of_abim = 0
+        index_of_kampala = 1
+
+        self.assertEqual(0,response.context['completion_rates'].attributes()[index_of_abim]['completed_households_percent'])
+        self.assertEqual(50,response.context['completion_rates'].attributes()[index_of_kampala]['completed_households_percent'])
 
     def test_should_return_household_objects_if_lowest_level_selected(self):
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        self.assertNotIn(self.household_1, response.context['households'])
-        self.assertIn(self.household_2, response.context['households'])
+        self.assertEqual(1, len(response.context['completion_rates'].interviewed_households()))
+        self.assertEqual(self.household_2, response.context['completion_rates'].interviewed_households()[0]['household'])
 
     def test_should_render_context_if_lowest_level_selected(self):
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         self.assertEqual(self.kampala_city,response.context['selected_location'])
         self.assertEqual(self.investigator_2,response.context['investigator'])
-        self.assertEqual(0,response.context['percent_completed'])
+        self.assertIsInstance(response.context['completion_rates'], BatchLocationCompletionRates)
 
-        self.household_2.batch_completed(self.batch)
+        self.assertEqual(0,response.context['completion_rates'].percent_completed_households())
+
+        self.batch.completed_households.create(householdmember=self.member_2)
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        self.assertEqual(100,response.context['percent_completed'])
+        self.assertEqual(100,response.context['completion_rates'].percent_completed_households())
 
     def test_should_show_error_message_if_investigator_not_present_on_lowest_level(self):
         Investigator.objects.all().delete()
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         error_message = 'Investigator not registered for this location.'
         self.assertIn(error_message,str(response))
-
 
     def test_should_render_interviewed_number_of_members_if_lowest_level_selected(self):
         member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
@@ -115,7 +132,9 @@ class TestSurveyCompletion(BaseTest):
         member_2 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
         self.investigator_2.member_answered(question,member_1,1,self.batch)
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        self.assertEqual(1,response.context['households'][self.household_2])
+
+        self.assertEqual(1,len(response.context['completion_rates'].interviewed_households()))
+        self.assertEqual(1,response.context['completion_rates'].interviewed_households()[0]['number_of_member_interviewed'])
 
     def test_restricted_permissions(self):
         self.assert_login_required('/survey_completion/')
@@ -128,8 +147,10 @@ class TestSurveyCompletion(BaseTest):
         BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
         member_1 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
         member_2 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
+        self.investigator_2.member_answered(question,self.member_2,1,self.batch)
         self.investigator_2.member_answered(question,member_1,1,self.batch)
         self.investigator_2.member_answered(question,member_2,1,self.batch)
         response = self.client.get('/survey_completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
         expected = HouseholdBatchCompletion.objects.filter(household=self.household_2).latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
-        self.assertEqual(expected,response.context['date_completed'][self.household_2])
+        self.assertEqual(1,len(response.context['completion_rates'].interviewed_households()))
+        self.assertEqual(expected,response.context['completion_rates'].interviewed_households()[0]['date_interviewed'])

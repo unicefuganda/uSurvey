@@ -12,7 +12,6 @@ from survey.models.households import Household
 from survey.models.investigator import Investigator
 from survey.models.formula import *
 from survey import investigator_configs
-from survey.views.survey_completion import _percent_completed_households
 
 
 @step(u'And I have 2 batches with one open')
@@ -159,7 +158,7 @@ def and_i_have_an_investigator_and_households(step):
 
 @step(u'And I should see percent completion')
 def and_i_should_see_percent_completion(step):
-    world.page.is_text_present('Percent Completion: 0')
+    world.page.is_text_present('Percent Completion: 100')
 
 @step(u'And I have 2 surveys with one batch each')
 def and_i_have_2_surveys_with_one_batch_each(step):
