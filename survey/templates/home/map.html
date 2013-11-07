@@ -45,41 +45,14 @@ function get_class_color(rate_value)
     return "q" + rate_value + "-9";
 }
 
-function get_rate_color(rate)
-{
-    final_rate = 0;
-
-    if (typeof(rate) == "undefined"){
-        return 5;
-        }
-    rate = parseInt(rate);
-
-    if (rate >=0 && rate<20){
-        final_rate = 0;
-    }
-
-    if (rate >=20 && rate <= 40)
-    {
-        final_rate = 1;
-    }
-
-    if (rate >40 && rate <= 60)
-    {
-        final_rate = 2;
-    }
-
-    if (rate >60 && rate <= 80)
-    {
-        final_rate = 3;
-    }
-
-    if (rate >80 && rate <= 100)
-    {
-        final_rate = 4;
-
-    }
-
-    return final_rate;
+function get_rate_color(rate){
+    if (typeof(rate) == "undefined") return 5;
+    if (rate >= 0 && rate< 20) return 0
+    if (rate >= 20 && rate <= 40) return 1
+    if (rate > 40 && rate <= 60) return 2;
+    if (rate > 60 && rate <= 80) return 3;
+    if (rate > 80 && rate <= 100) return 4;
+    return 0;
 }
 
 function ready(error, geoJson, completionRates) {
