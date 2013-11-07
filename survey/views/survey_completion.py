@@ -72,8 +72,6 @@ def show(request):
     return render(request, 'aggregates/completion_status.html', content)
 
 
-@login_required
-@permission_required('auth.can_view_aggregates')
 def completion_json(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
     location_type = LocationType.objects.get(name='District')

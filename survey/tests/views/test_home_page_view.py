@@ -1,9 +1,5 @@
-import json
-
 from django.test import TestCase
 from django.test.client import Client
-from mock import *
-from survey.views.home_page import *
 
 
 class HomepageViewTest(TestCase):
@@ -21,3 +17,9 @@ class HomepageViewTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('home/about.html', templates)
+
+    def test_map_page(self):
+        response = self.client.get('/home/completion/')
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('home/map.html', templates)
