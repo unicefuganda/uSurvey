@@ -11,14 +11,18 @@ from survey.models.investigator import Investigator
 class RandomHouseHoldSelection(BaseModel):
     mobile_number = models.CharField(max_length=10, unique=True, null=False, blank=False)
     no_of_households = models.PositiveIntegerField(null=True)
-    selected_households = models.CharField(max_length=100, blank=False, null=False)
+    selected_households = models.CharField(max_length=510, blank=False, null=False)
+    survey = models.ForeignKey("Survey", null=True, related_name="random_household")
 
     class Meta:
         app_label = 'survey'
 
-    def generate_new_list(self):
-        selected_households = random.sample(list(range(1, self.no_of_households + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
-        selected_households.sort()
+    def generate_new_list(self, survey):
+        if survey.has_sampling:
+            selected_households = random.sample(list(range(1, self.no_of_households + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
+            selected_households.sort()
+        else:
+            selected_households = range(1, self.no_of_households + 1)
         self.selected_households = ",".join(str(x) for x in selected_households)
         self.save()
 
@@ -30,12 +34,12 @@ class RandomHouseHoldSelection(BaseModel):
         investigator.backend = Backend.objects.all()[0]
         send(self.text_message(), [investigator])
 
-    def generate(self, no_of_households):
+    def generate(self, no_of_households, survey):
         if not self.selected_households:
             self.no_of_households = no_of_households
-            self.generate_new_list()
+            self.generate_new_list(survey)
 
-        all_selected_households = RandomHouseHoldSelection.objects.filter(mobile_number=self.mobile_number)[0].selected_households
+        all_selected_households = RandomHouseHoldSelection.objects.filter(mobile_number=self.mobile_number, survey=survey)[0].selected_households
         all_random_households = all_selected_households.split(',')
 
         investigator = Investigator.objects.get(mobile_number=self.mobile_number)
@@ -46,4 +50,5 @@ class RandomHouseHoldSelection(BaseModel):
                                      uid=int('%d%d' % (investigator.id, counter)), random_sample_number=random_household)
             counter += 1
 
-        self.send_message()
+        if survey.has_sampling:
+            self.send_message()

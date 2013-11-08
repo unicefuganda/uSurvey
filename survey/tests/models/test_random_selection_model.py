@@ -4,7 +4,7 @@ from django.test import TestCase
 from mock import patch
 import mock
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import RandomHouseHoldSelection, Investigator, Backend, Household
+from survey.models import RandomHouseHoldSelection, Investigator, Backend, Household, Survey
 
 
 class RandomHouseHoldSelectionTest(TestCase):
@@ -17,6 +17,7 @@ class RandomHouseHoldSelectionTest(TestCase):
         backend = Backend.objects.create(name="Backend")
         location_type = LocationType.objects.create(name="District", slug="district")
         mobile_number = "123456789"
+        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         investigator = Investigator.objects.create(mobile_number=mobile_number,
                                                    location=Location.objects.create(name="Kampala", type=location_type),
                                                    backend=backend)
@@ -24,9 +25,9 @@ class RandomHouseHoldSelectionTest(TestCase):
         random_households = [1, 3, 4, 7, 9, 13, 20, 28, 39, 70]
 
         with patch.object(random, 'sample', return_value=random_households):
-            random_selection_object = RandomHouseHoldSelection(mobile_number=mobile_number)
+            random_selection_object = RandomHouseHoldSelection(mobile_number=mobile_number, survey=open_survey)
             random_selection_object.send_message = mock.MagicMock()
-            random_selection_object.generate(100)
+            random_selection_object.generate(100, open_survey)
 
         self.assertEqual(len(random_households), len(investigator.households.all()))
         for random_household in random_households:

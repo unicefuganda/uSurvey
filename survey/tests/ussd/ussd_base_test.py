@@ -1,7 +1,8 @@
 from random import randint
 import datetime
+from mock import patch
 from django.test.testcases import TestCase
-from survey.models import NumericalAnswer
+from survey.models import NumericalAnswer, Survey
 
 
 class USSDBaseTest(TestCase):

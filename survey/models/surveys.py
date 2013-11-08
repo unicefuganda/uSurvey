@@ -21,6 +21,13 @@ class Survey(BaseModel):
         return False
 
     @classmethod
+    def currently_open_survey(cls):
+        for survey in Survey.objects.filter():
+            if survey.is_open():
+                return survey
+        return None
+
+    @classmethod
     def save_sample_size(cls, survey_form):
         survey = survey_form.save(commit=False)
         if not survey.has_sampling:

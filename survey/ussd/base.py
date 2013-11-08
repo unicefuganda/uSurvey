@@ -16,6 +16,7 @@ class USSDBase(object):
         'NO_OPEN_BATCH': "Sorry, there are no open surveys currently.",
         'HOUSEHOLDS_COUNT_QUESTION': "How many households have you listed in your segment?",
         'HOUSEHOLD_SELECTION_SMS_MESSAGE': "Thank you. You will receive the household numbers selected for your segment",
+        'HOUSEHOLD_CONFIRMATION_MESSAGE': "Thank you. Houselist for segment is available for member registration.",
         'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s. How many households have you listed in your segment?" % NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR,
         'MEMBER_SUCCESS_MESSAGE': "Thank you. Would you like to proceed to the next Household Member?\n1: Yes\n2: No",
         'HOUSEHOLD_COMPLETION_MESSAGE': "Thank you. You have completed this household. Would you like to retake this household?\n1: Yes\n2: No",

@@ -1,5 +1,6 @@
 import re
 from survey.investigator_configs import HAS_APPLICATION_CODE, APPLICATION_CODE
+from survey.models import Survey
 from survey.ussd.ussd_survey import USSDSurvey
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
 
@@ -37,6 +38,7 @@ class USSDBaseView(object):
 
         if self.is_new_request_parameter(answer) and self.is_new_request():
             action, responseString = self.ussd_survey.render_welcome_or_resume()
+
         elif self.is_registering_household is None:
             action = self.ussd_survey.ACTIONS['REQUEST']
             responseString = ''

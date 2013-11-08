@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question, BatchQuestionOrder
+from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question, BatchQuestionOrder, Survey
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd_survey import USSDSurvey
@@ -37,7 +37,9 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
                                                            date_of_birth=datetime.date(1929, 2, 2))
         self.household_member = HouseholdMember.objects.create(surname="Surnmae", household=self.household,
                                                                date_of_birth=datetime.date(1929, 2, 2), male=False)
-        self.batch = Batch.objects.create(order=1)
+        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+
+        self.batch = Batch.objects.create(order=1, survey=self.open_survey)
 
         self.general_group = HouseholdMemberGroup.objects.create(name="General Group", order=0)
         self.female_group = HouseholdMemberGroup.objects.create(name="Female", order=1)
@@ -99,7 +101,9 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
         return response
 
     def test_knows_to_not_select_the_general_questions_for_household_member(self):
-        self.reset_session()
+        self.batch.open_for_location(self.location)
+        with patch.object(USSDSurvey, 'is_active', return_value=False):
+            response = self.reset_session()
         self.take_survey()
         self.batch.open_for_location(self.location)
         self.select_household()

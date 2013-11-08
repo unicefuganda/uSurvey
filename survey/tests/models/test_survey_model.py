@@ -1,5 +1,5 @@
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.surveys import SurveyForm
 from survey.models import Batch, Investigator, Backend
 from survey.models.surveys import Survey
@@ -80,3 +80,41 @@ class SurveyTest(TestCase):
     def test_unicode_text(self):
         survey = Survey.objects.create(name="survey name", description="rajni survey")
         self.assertEqual(survey.name, str(survey))
+
+    def test_knows_currently_open_survey(self):
+
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+
+        open_survey = Survey.objects.create(name="open survey", description="open survey")
+        closed_survey = Survey.objects.create(name="closed survey", description="closed survey")
+        another_closed_survey = Survey.objects.create(name="another closed survey", description="another closed survey")
+
+        open_batch = Batch.objects.create(order=1, name="Open Batch", survey=open_survey)
+        closed_batch = Batch.objects.create(order=2, name="Closed Batch", survey=closed_survey)
+        another_closed_batch = Batch.objects.create(order=3, name="Another Closed Batch", survey=another_closed_survey)
+
+        open_batch.open_for_location(kampala)
+
+        self.assertEqual(open_survey, Survey.currently_open_survey())
+        self.assertNotEqual(closed_survey, Survey.currently_open_survey())
+        self.assertNotEqual(another_closed_survey, Survey.currently_open_survey())
+
+    def test_returns_none_if_there_is_no_currently_open_survey(self):
+
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+
+        open_survey = Survey.objects.create(name="open survey", description="open survey")
+        closed_survey = Survey.objects.create(name="closed survey", description="closed survey")
+        another_closed_survey = Survey.objects.create(name="another closed survey", description="another closed survey")
+
+        open_batch = Batch.objects.create(order=1, name="Open Batch", survey=open_survey)
+        closed_batch = Batch.objects.create(order=2, name="Closed Batch", survey=closed_survey)
+        another_closed_batch = Batch.objects.create(order=3, name="Another Closed Batch", survey=another_closed_survey)
+
+        self.assertEqual(None, Survey.currently_open_survey())
