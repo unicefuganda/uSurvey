@@ -8,6 +8,7 @@ class Survey(BaseModel):
     description = models.CharField(max_length=300,blank=True,null=True)
     sample_size = models.PositiveIntegerField(max_length=2, null=False, blank=False, default=10, verbose_name="Number of Households per Investigator")
     type = models.BooleanField(default=False)
+    has_sampling = models.BooleanField(default=True)
 
     class Meta:
         app_label = 'survey'
@@ -18,6 +19,14 @@ class Survey(BaseModel):
             if batch.open_locations.all():
                 return True
         return False
+
+    @classmethod
+    def save_sample_size(cls, survey_form):
+        survey = survey_form.save(commit=False)
+        if not survey.has_sampling:
+            survey.sample_size = 0
+        survey.save()
+
 
     def __unicode__(self):
         return self.name

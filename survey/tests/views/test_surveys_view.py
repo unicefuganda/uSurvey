@@ -20,6 +20,7 @@ class SurveyViewTest(BaseTest):
         self.form_data = {
             'name': 'survey rajni',
             'description': 'survey description rajni',
+            'has_sampling': True,
             'sample_size': 10,
             'type': True,
         }
@@ -63,11 +64,25 @@ class SurveyViewTest(BaseTest):
 
     def test_new_should_not_create_survey_on_post_if_survey_with_same_name_exists(self):
         form_data = self.form_data
+
         Survey.objects.create(**form_data)
 
         response = self.client.post('/surveys/new/', data=form_data)
         error_message = "Survey with name %s already exist." % form_data['name']
         self.assertIn(error_message, response.context['survey_form'].errors['name'])
+
+    def test_new_should_have_a_sample_size_of_zero_if_has_sampling_is_false(self):
+        form_data = self.form_data
+        form_data['has_sampling'] = False
+
+        response = self.client.post('/surveys/new/', data=form_data)
+        self.assertRedirects(response, expected_url='/surveys/', status_code=302, target_status_code=200,
+                             msg_prefix='')
+        retrieved_surveys = Survey.objects.filter(name='survey rajni', has_sampling=False)
+
+        self.assertEquals(1, len(retrieved_surveys))
+        self.assertIn('Survey successfully added.', response.cookies['messages'].__str__())
+        self.assertEqual(0, retrieved_surveys[0].sample_size)
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/groups/new/')

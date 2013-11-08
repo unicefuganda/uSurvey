@@ -15,6 +15,7 @@ def index(request):
     return render(request, 'surveys/index.html',
                   context)
 
+
 @permission_required('auth.can_view_batches')
 def new(request):
     response = None
@@ -23,7 +24,7 @@ def new(request):
     if request.method == 'POST':
         survey_form = SurveyForm(request.POST)
         if survey_form.is_valid():
-            survey_form.save()
+            Survey.save_sample_size(survey_form)
             messages.success(request, 'Survey successfully added.')
             response = HttpResponseRedirect('/surveys/')
 
@@ -45,7 +46,7 @@ def edit(request, survey_id):
         if request.method == 'POST':
             survey_form = SurveyForm(instance=survey, data=request.POST)
             if survey_form.is_valid():
-                survey_form.save()
+                Survey.save_sample_size(survey_form)
                 messages.success(request, 'Survey successfully edited.')
                 return HttpResponseRedirect('/surveys/')
 

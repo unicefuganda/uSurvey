@@ -1,5 +1,6 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
+from survey.forms.surveys import SurveyForm
 from survey.models import Batch, Investigator, Backend
 from survey.models.surveys import Survey
 
@@ -9,8 +10,8 @@ class SurveyTest(TestCase):
     def test_fields(self):
         survey = Survey()
         fields = [str(item.attname) for item in survey._meta.fields]
-        self.assertEqual(7, len(fields))
-        for field in ['id', 'created', 'modified', 'name', 'description', 'type', 'sample_size']:
+        self.assertEqual(8, len(fields))
+        for field in ['id', 'created', 'modified', 'name', 'description', 'type', 'has_sampling', 'sample_size']:
             self.assertIn(field, fields)
 
     def test_store(self):
@@ -21,6 +22,7 @@ class SurveyTest(TestCase):
         self.failUnless(survey.modified)
         self.assertFalse(survey.type)
         self.assertEquals(10, survey.sample_size)
+        self.assertTrue(survey.has_sampling)
 
     def test_survey_knows_it_is_open(self):
         self.investigator = Investigator.objects.create(name="investigator name",
@@ -46,6 +48,34 @@ class SurveyTest(TestCase):
         Batch.objects.create(order=1, survey=survey)
 
         self.assertFalse(survey.is_open())
+
+    def test_saves_survey_with_sample_size_from_form_if_has_sampling_is_true(self):
+        form_data = {
+            'name': 'survey rajni',
+            'description': 'survey description rajni',
+            'has_sampling': True,
+            'sample_size': 10,
+            'type': True,
+        }
+        survey_form = SurveyForm(data=form_data)
+        Survey.save_sample_size(survey_form)
+        saved_survey = Survey.objects.filter(name=form_data['name'], has_sampling=form_data['has_sampling'])
+        self.failUnless(saved_survey)
+        self.assertEqual(form_data['sample_size'], saved_survey[0].sample_size)
+
+    def test_saves_survey_with_sample_size_zero_if_has_sampling_is_false(self):
+        form_data = {
+            'name': 'survey rajni',
+            'description': 'survey description rajni',
+            'has_sampling': False,
+            'sample_size': 10,
+            'type': True,
+        }
+        survey_form = SurveyForm(data=form_data)
+        Survey.save_sample_size(survey_form)
+        saved_survey = Survey.objects.filter(name=form_data['name'], has_sampling=form_data['has_sampling'])
+        self.failUnless(saved_survey)
+        self.assertEqual(0, saved_survey[0].sample_size)
 
     def test_unicode_text(self):
         survey = Survey.objects.create(name="survey name", description="rajni survey")
