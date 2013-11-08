@@ -128,3 +128,9 @@ class USSD(USSDBase):
             self.set_in_session('HOUSEHOLD', self.household)
         except (ValueError, IndexError) as e:
             self.responseString += "INVALID SELECTION: "
+
+    def add_question_prefix(self):
+        if self.reanswerable_question():
+            self.responseString += "RECONFIRM: "
+        if self.invalid_answered_question():
+            self.responseString += "INVALID ANSWER: "

@@ -1,5 +1,5 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from datetime import date
+from datetime import date, datetime
 from django.core.exceptions import ObjectDoesNotExist
 from survey.models import Question, HouseholdHead
 from survey.models.households import HouseholdMember
@@ -12,6 +12,8 @@ class USSDRegisterHousehold(USSD):
         'MEMBER': '2'
     }
     REGISTRATION_DICT = {}
+
+    UNKNOWN_AGE = 99
 
     def __init__(self, investigator, request):
         super(USSDRegisterHousehold, self).__init__(investigator, request)
@@ -71,14 +73,14 @@ class USSDRegisterHousehold(USSD):
         return self.action, self.responseString
 
     def register_households(self, answer):
-        if self.is_browsing_households_list(answer):
+        if not self.household and self.is_browsing_households_list(answer):
             self.get_household_list()
         elif self.household:
             if self.is_selecting_member:
                 self.set_head(answer)
             response = self.render_registration_options(answer)
             if not response is None:
-                self.responseString = response
+                self.responseString += response
         else:
             if not self.is_resuming_survey:
                 self.select_household(answer)
@@ -99,6 +101,7 @@ class USSDRegisterHousehold(USSD):
         self.responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
 
     def render_questions_or_member_selection(self, answer):
+
         if self.household.get_head():
             self.investigator.set_in_cache('is_head', False)
             self.responseString = USSD.MESSAGES['HEAD_REGISTERED']
@@ -115,7 +118,10 @@ class USSDRegisterHousehold(USSD):
         else:
             self.question = self.process_registration_answer(answer)
 
-        return self.question.text if self.question else None
+        page = self.get_from_session('PAGE')
+        self.add_question_prefix()
+
+        return self.question.to_ussd(page) if self.question else None
 
     def render_registration_options(self, answer):
         if self.household_member:
@@ -131,9 +137,28 @@ class USSDRegisterHousehold(USSD):
             return self.render_questions(answer)
 
     def process_registration_answer(self, answer):
+        answer = int(answer) if answer.isdigit() else answer
+
+        if not answer:
+            self.investigator.invalid_answer(self.question)
+            return self.question
+
+        if self.question.is_multichoice() and self.is_pagination_option(answer):
+            self.set_current_page(answer)
+            self.investigator.remove_ussd_variable('INVALID_ANSWER', self.question)
+            return self.question
+
         try:
-            next_question = self.question.get_next_question_by_rule(answer, self.investigator)
+            answer_class = self.question.answer_class()
+            if self.question.is_multichoice():
+                answer = self.question.get_option(answer, self.investigator)
+                if not answer:
+                    return self.question
+
+            _answer = answer_class(answer=answer)
+            next_question = self.question.get_next_question_by_rule(_answer, self.investigator)
             if next_question != self.question:
+                next_question.order = self.question.order
                 self.REGISTRATION_DICT[self.question.text] = answer
                 self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
 
@@ -156,24 +181,23 @@ class USSDRegisterHousehold(USSD):
 
     def save_member_object(self):
         member_dict = {}
-        member_fields = ['surname', 'date_of_birth', 'male']
-        all_questions = Question.objects.filter(group__name="REGISTRATION GROUP").order_by('order')
+        name_question = Question.objects.get(text__startswith="Please Enter the name")
+        age_question = Question.objects.get(text__startswith="Please Enter the age")
+        gender_question = Question.objects.get(text__startswith="Please Enter the gender")
 
-        count = 0
-        for question in all_questions:
-            if self.is_age_question(question):
-                self.REGISTRATION_DICT[question.text] = self.format_age_to_date_of_birth(question)
+        member_dict['surname']= self.REGISTRATION_DICT[name_question.text]
+        member_dict['male']= self.format_gender_response(gender_question)
 
-            if self.is_gender_question(question):
-                self.REGISTRATION_DICT[question.text] = self.format_gender_response(question)
-            member_dict[member_fields[count]] = self.REGISTRATION_DICT[question.text]
-            count += 1
-
-        if not self.is_head:
-            object_to_create = HouseholdMember
+        if self.REGISTRATION_DICT[age_question.text] == self.UNKNOWN_AGE:
+            month_of_birth_question = Question.objects.get(text__startswith="Please Enter the month of birth")
+            year_of_birth_question = Question.objects.get(text__startswith="Please Enter the year of birth")
+            member_dict['date_of_birth']= self.get_date_of_birth_from(year_of_birth_question, month_of_birth_question)
         else:
-            object_to_create = HouseholdHead
+            member_dict['date_of_birth'] = self.format_age_to_date_of_birth(age_question)
 
+        print member_dict['date_of_birth']
+
+        object_to_create = HouseholdHead if self.is_head else HouseholdMember
         member = object_to_create.objects.create(surname=member_dict['surname'], male=member_dict['male'],
                                                  date_of_birth=member_dict['date_of_birth'], household=self.household)
         self.set_in_session('HOUSEHOLD_MEMBER', member)
@@ -185,13 +209,10 @@ class USSDRegisterHousehold(USSD):
         return date_of_birth
 
     def format_gender_response(self,question):
-        response = self.REGISTRATION_DICT[question.text]
-        if response == '1':
-            return True
-        return False
+        return self.REGISTRATION_DICT[question.text] == 1
 
-    def is_age_question(self, question):
-        return question.text.lower() == 'please enter the age'
-
-    def is_gender_question(self, question):
-        return question.text.lower().startswith('please enter the gender')
+    def get_date_of_birth_from(self, year_of_birth_question, month_of_birth_question):
+        year = int(self.REGISTRATION_DICT[year_of_birth_question.text])
+        month = self.REGISTRATION_DICT[month_of_birth_question.text].order
+        print  year, month
+        return datetime(year, month, 1)

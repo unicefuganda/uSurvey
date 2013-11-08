@@ -26,12 +26,6 @@ class USSDSurvey(USSD):
         else:
             self.question = self.investigator.member_answered(self.question, self.household_member, answer, batch)
 
-    def add_question_prefix(self):
-        if self.reanswerable_question():
-            self.responseString += "RECONFIRM: "
-        if self.invalid_answered_question():
-            self.responseString += "INVALID ANSWER: "
-
     def restart_survey(self):
         answer = self.request['ussdRequestString'].strip()
         if answer == self.ANSWER['YES']:

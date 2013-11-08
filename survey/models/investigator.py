@@ -136,6 +136,12 @@ class Investigator(BaseModel):
         questions.append(question)
         self.set_in_cache(label, questions)
 
+    def remove_ussd_variable(self, label, question):
+        questions = self.get_from_cache(label)
+        if question in questions:
+            questions.remove(question)
+            self.set_in_cache(label, questions)
+
     def households_list(self, page=1, registered=False):
         all_households = list(self.all_households())
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)

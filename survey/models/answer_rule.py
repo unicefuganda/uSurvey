@@ -53,7 +53,8 @@ class AnswerRule(BaseModel):
         return self.validate_with_value == answer.answer
 
     def between(self,answer):
-        return self.validate_with_min_value <= answer.answer <= self.validate_with_max_value
+        _answer = answer.answer.order if isinstance(answer.answer, QuestionOption) else answer.answer
+        return self.validate_with_min_value <= _answer <= self.validate_with_max_value
 
     def equals_option(self, answer):
         return self.validate_with_option == answer.answer
