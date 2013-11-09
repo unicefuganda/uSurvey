@@ -35,8 +35,8 @@ class HouseholdTest(TestCase):
     def test_fields(self):
         hHead = Household()
         fields = [str(item.attname) for item in hHead._meta.fields]
-        self.assertEqual(len(fields), 7)
-        for field in ['id', 'investigator_id', 'created', 'modified', 'uid', 'location_id', 'random_sample_number']:
+        self.assertEqual(len(fields), 8)
+        for field in ['id', 'investigator_id', 'created', 'modified', 'uid', 'location_id', 'random_sample_number', 'survey_id']:
             self.assertIn(field, fields)
 
     def test_store(self):

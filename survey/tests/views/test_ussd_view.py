@@ -74,7 +74,9 @@ class USSDTest(BaseTest):
             investigator = Investigator.objects.create(name='Investigator 1', mobile_number='776520831', male=True, age=32,
                                                        backend=Backend.objects.create(name="Test"), is_blocked=True)
             Household.objects.create(investigator=investigator, location=investigator.location,
-                                     uid=0, random_sample_number=1)
+                                     uid=0, random_sample_number=1, survey=open_survey)
+            RandomHouseHoldSelection.objects.create(mobile_number='776520831', no_of_households=20,
+                                                    selected_households='1,2,3,4,5,6,7,8,9,10', survey=open_survey)
 
             response_message = "responseString=%s&action=end" % USSD.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']
             response = self.client.get('/ussd', data=self.ussd_params)

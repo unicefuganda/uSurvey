@@ -9,7 +9,7 @@ from survey.models.investigator import Investigator
 
 
 class RandomHouseHoldSelection(BaseModel):
-    mobile_number = models.CharField(max_length=10, unique=True, null=False, blank=False)
+    mobile_number = models.CharField(max_length=10, null=False, blank=False)
     no_of_households = models.PositiveIntegerField(null=True)
     selected_households = models.CharField(max_length=510, blank=False, null=False)
     survey = models.ForeignKey("Survey", null=True, related_name="random_household")
@@ -47,7 +47,8 @@ class RandomHouseHoldSelection(BaseModel):
 
         for random_household in all_random_households:
             Household.objects.create(investigator=investigator, location=investigator.location,
-                                     uid=int('%d%d' % (investigator.id, counter)), random_sample_number=random_household)
+                                     uid=int('%d%d' % (investigator.id, counter)), random_sample_number=random_household,
+                                     survey=survey)
             counter += 1
 
         if survey.has_sampling:

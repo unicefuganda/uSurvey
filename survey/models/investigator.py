@@ -52,8 +52,10 @@ class Investigator(BaseModel):
     class Meta:
         app_label = 'survey'
 
-    def has_households(self):
-        return self.households.count() > 0
+    def has_households(self, survey=None):
+        all_households = self.households.all()
+        survey_households = all_households if survey else all_households.filter(survey=survey)
+        return survey_households.count() > 0
 
     def generate_cache(self):
         if not cache.get(self.cache_key):
@@ -142,8 +144,8 @@ class Investigator(BaseModel):
             questions.remove(question)
             self.set_in_cache(label, questions)
 
-    def households_list(self, page=1, registered=False):
-        all_households = list(self.all_households())
+    def households_list(self, page=1, registered=False, open_survey=None):
+        all_households = list(self.all_households(open_survey))
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
         households_list = []
@@ -160,11 +162,12 @@ class Investigator(BaseModel):
             households_list.append(self.NEXT_PAGE_TEXT)
         return "\n".join(households_list)
 
-    def all_households(self):
-        return self.households.order_by('created').all()
+    def all_households(self, open_survey=None):
+        all_households = self.households.order_by('created').all()
+        return all_households.filter(survey=open_survey) if open_survey else all_households
 
-    def completed_open_surveys(self):
-        for household in self.all_households():
+    def completed_open_surveys(self, open_survey=None):
+        for household in self.all_households(open_survey):
             if not household.completed_currently_open_batches():
                 return False
         return True

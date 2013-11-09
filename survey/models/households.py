@@ -20,6 +20,7 @@ class Household(BaseModel):
     location = models.ForeignKey(Location, null=True)
     uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Unique Identification")
     random_sample_number = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Random Sample Number")
+    survey = models.ForeignKey("Survey", null=True, related_name="survey_household")
 
     MEMBERS_PER_PAGE = 4
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings, 'USSD_PAGINATION', None).get('PREVIOUS')

@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from rapidsms.contrib.locations.models import *
 from survey.forms.householdHead import *
 from survey.forms.household import *
+from survey.models import Survey
 from survey.models.households import Household
 from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
@@ -60,6 +61,7 @@ def create_household(householdform, investigator, valid, uid):
         household.location = investigator.location
         if uid:
             household.uid = uid
+        household.survey = Survey.currently_open_survey()
         household.save()
         valid['household'] = True
     return valid

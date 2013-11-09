@@ -8,7 +8,7 @@ from django.test.client import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import HouseholdMemberGroup, GroupCondition, BatchQuestionOrder, Survey
+from survey.models import HouseholdMemberGroup, GroupCondition, BatchQuestionOrder, Survey, RandomHouseHoldSelection
 from survey.models.backend import Backend
 from survey.models.household_batch_completion import HouseholdBatchCompletion
 from survey.models.batch import Batch
@@ -38,20 +38,23 @@ class USSDOpenBatchTest(USSDBaseTest):
                                                             COUNTRY_PHONE_CODE, ''),
                                                         location=Location.objects.create(name="Kampala"),
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+                                                  survey=self.open_survey, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname",
                                                            date_of_birth='1980-09-01')
         self.household_head_1 = HouseholdHead.objects.create(
-            household=Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=1),
+            household=Household.objects.create(investigator=self.investigator, survey=self.open_survey,
+                                               location=self.investigator.location, uid=1),
             surname="Name " + str(randint(1, 9999)), date_of_birth='1980-09-01')
-        batch = Batch.objects.create(order=1, survey=self.open_survey)
+        Batch.objects.create(order=1, survey=self.open_survey)
 
     def test_closed_batch(self):
-        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            response = self.take_survey()
-            response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
-            self.assertEquals(urllib2.unquote(response.content), response_string)
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                self.reset_session()
+                response = self.take_survey()
+                response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
 
 
 class USSDWithMultipleBatches(USSDBaseTest):
@@ -74,7 +77,10 @@ class USSDWithMultipleBatches(USSDBaseTest):
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''), location=self.location,
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
+        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+                                                  survey=self.open_survey, uid=0)
         self.female_group = HouseholdMemberGroup.objects.create(name="Female", order=1)
         self.condition = GroupCondition.objects.create(value=False, attribute="GENDER", condition="EQUALS")
 
@@ -83,7 +89,6 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.household_head_1 = HouseholdHead.objects.create(
             household=Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=1),
             surname="Name " + str(randint(1, 9999)), date_of_birth='1929-02-02', male=False)
-        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         self.batch = Batch.objects.create(order=1, survey=self.open_survey)
         self.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER,
                                                   order=1, group=self.female_group)
@@ -110,9 +115,104 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.batch.open_for_location(self.location)
 
         self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(USSDSurvey, 'is_active', return_value=False):
+                self.reset_session()
 
-        with patch.object(USSDSurvey, 'is_active', return_value=False):
-            self.reset_session()
+                self.take_survey()
+                self.select_household()
+                response = self.select_household_member()
+                response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond("1")
+                response_string = "responseString=%s&action=request" % self.question_2.to_ussd()
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond("1")
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                self.assertEquals(HouseholdBatchCompletion.objects.count(), 1)
+                household_completed = HouseholdBatchCompletion.objects.latest('id')
+                self.assertEquals(household_completed.household, self.household)
+                self.assertEquals(household_completed.investigator, self.investigator)
+                self.assertEquals(household_completed.batch, self.batch)
+
+    def test_with_two_batch_open(self):
+        self.batch.open_for_location(self.location)
+        self.batch_1.open_for_location(self.location)
+
+        self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(USSDSurvey, 'is_active', return_value=False):
+                self.reset_session()
+
+            self.take_survey()
+            self.select_household()
+            response = self.select_household_member()
+            response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+            response = self.respond("1")
+            response_string = "responseString=%s&action=request" % self.question_2.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+            response = self.respond("1")
+            response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+            self.assertEquals(HouseholdBatchCompletion.objects.count(), 1)
+            household_completed = HouseholdBatchCompletion.objects.latest('id')
+            self.assertEquals(household_completed.household, self.household)
+            self.assertEquals(household_completed.householdmember, self.household_head.get_member())
+            self.assertEquals(household_completed.investigator, self.investigator)
+            self.assertEquals(household_completed.batch, self.batch)
+
+            response = self.respond("1")
+            response_string = "responseString=%s&action=request" % self.question_4.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+            response = self.respond("1")
+            response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+            self.assertEquals(HouseholdBatchCompletion.objects.count(), 2)
+            household_completed = HouseholdBatchCompletion.objects.latest('id')
+            self.assertEquals(household_completed.household, self.household)
+            self.assertEquals(household_completed.householdmember, self.household_head.get_member())
+            self.assertEquals(household_completed.investigator, self.investigator)
+            self.assertEquals(household_completed.batch, self.batch_1)
+
+    def test_with_second_batch_open(self):
+        self.batch_1.open_for_location(self.location)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(USSDSurvey, 'is_active', return_value=False):
+                self.reset_session()
+
+            self.take_survey()
+            self.select_household()
+            response = self.select_household_member()
+
+            response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+            response = self.respond("1")
+            response_string = "responseString=%s&action=request" % self.question_4.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+            response = self.respond("1")
+            response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_with_batch_open_for_parent_location(self):
+        self.batch.open_for_location(self.uganda)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(USSDSurvey, 'is_active', return_value=False):
+                self.reset_session()
 
             self.take_survey()
             self.select_household()
@@ -127,95 +227,5 @@ class USSDWithMultipleBatches(USSDBaseTest):
             response = self.respond("1")
             response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
             self.assertEquals(urllib2.unquote(response.content), response_string)
-
-            self.assertEquals(HouseholdBatchCompletion.objects.count(), 1)
-            household_completed = HouseholdBatchCompletion.objects.latest('id')
-            self.assertEquals(household_completed.household, self.household)
-            self.assertEquals(household_completed.investigator, self.investigator)
-            self.assertEquals(household_completed.batch, self.batch)
-
-    def test_with_two_batch_open(self):
-        self.batch.open_for_location(self.location)
-        self.batch_1.open_for_location(self.location)
-
-        self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
-        with patch.object(USSDSurvey, 'is_active', return_value=False):
-            self.reset_session()
-
-        self.take_survey()
-        self.select_household()
-        response = self.select_household_member()
-        response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        response = self.respond("1")
-        response_string = "responseString=%s&action=request" % self.question_2.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        response = self.respond("1")
-        response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        self.assertEquals(HouseholdBatchCompletion.objects.count(), 1)
-        household_completed = HouseholdBatchCompletion.objects.latest('id')
-        self.assertEquals(household_completed.household, self.household)
-        self.assertEquals(household_completed.householdmember, self.household_head.get_member())
-        self.assertEquals(household_completed.investigator, self.investigator)
-        self.assertEquals(household_completed.batch, self.batch)
-
-        response = self.respond("1")
-        response_string = "responseString=%s&action=request" % self.question_4.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        response = self.respond("1")
-        response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        self.assertEquals(HouseholdBatchCompletion.objects.count(), 2)
-        household_completed = HouseholdBatchCompletion.objects.latest('id')
-        self.assertEquals(household_completed.household, self.household)
-        self.assertEquals(household_completed.householdmember, self.household_head.get_member())
-        self.assertEquals(household_completed.investigator, self.investigator)
-        self.assertEquals(household_completed.batch, self.batch_1)
-
-    def test_with_second_batch_open(self):
-        self.batch_1.open_for_location(self.location)
-        with patch.object(USSDSurvey, 'is_active', return_value=False):
-            self.reset_session()
-
-        self.take_survey()
-        self.select_household()
-        response = self.select_household_member()
-
-        response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        response = self.respond("1")
-        response_string = "responseString=%s&action=request" % self.question_4.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        response = self.respond("1")
-        response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-    def test_with_batch_open_for_parent_location(self):
-        self.batch.open_for_location(self.uganda)
-
-        with patch.object(USSDSurvey, 'is_active', return_value=False):
-            self.reset_session()
-
-        self.take_survey()
-        self.select_household()
-        response = self.select_household_member()
-        response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        response = self.respond("1")
-        response_string = "responseString=%s&action=request" % self.question_2.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
-
-        response = self.respond("1")
-        response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
-        self.assertEquals(urllib2.unquote(response.content), response_string)
 
 

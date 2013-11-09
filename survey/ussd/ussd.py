@@ -1,6 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from django.conf import settings
 from django.core.cache import cache
+from survey.models import Survey
 from survey.ussd.base import USSDBase
 
 
@@ -113,9 +114,11 @@ class USSD(USSDBase):
         return self.question_present_in_cache('INVALID_ANSWER')
 
     def get_household_list(self):
+        open_survey = Survey.currently_open_survey()
         page = self.get_from_session('PAGE')
         self.responseString += "%s\n%s" % (
-            self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page, registered=False))
+            self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page, registered=False,
+                                                                               open_survey=open_survey))
 
     def clean_investigator_input(self):
         if self.is_new_request():

@@ -8,7 +8,7 @@ from rapidsms.contrib.locations.models import Location
 
 from django.http.request import HttpRequest
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule, AnswerRule, QuestionOption, Survey
+from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule, AnswerRule, QuestionOption, Survey, RandomHouseHoldSelection
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
 
@@ -42,38 +42,40 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def create_household(self, unique_id):
         return Household.objects.create(investigator=self.investigator, location=self.investigator.location,
-                                        uid=unique_id, random_sample_number=unique_id)
+                                        uid=unique_id, random_sample_number=unique_id, survey=self.open_survey)
 
     def test_should_show_list_of_households_with_uids_when_selected_option_to_register_household_and_pagination(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            response = self.register_household()
-            household_list = USSD.MESSAGES[
-                                 'HOUSEHOLD_LIST'] + "\n1: Household-%s\n2: Household-%s\n3: Household-%s\n4: Household-%s\n#: Next" % (
-                                 self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                response = self.register_household()
+                household_list = USSD.MESSAGES[
+                                     'HOUSEHOLD_LIST'] + "\n1: Household-%s\n2: Household-%s\n3: Household-%s\n4: Household-%s\n#: Next" % (
+                                     self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
 
-            first_page_HH_list = "responseString=%s&action=request" % (household_list)
-            self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
+                first_page_HH_list = "responseString=%s&action=request" % (household_list)
+                self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
 
-            response = self.respond("#")
+                response = self.respond("#")
 
-            household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: Household-%s\n*: Back" % (self.household5.uid)
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: Household-%s\n*: Back" % (self.household5.uid)
 
-            response_string = "responseString=%s&action=request" % (household_list)
-            self.assertEquals(urllib2.unquote(response.content), response_string)
+                response_string = "responseString=%s&action=request" % (household_list)
+                self.assertEquals(urllib2.unquote(response.content), response_string)
 
-            response = self.respond("*")
-            self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
+                response = self.respond("*")
+                self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
 
     def test_should_ask_for_head_or_member_after_selecting_household(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
 
-            response = self.select_household("2")
+                response = self.select_household("2")
 
-            ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
-            self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
+                ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+                self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
     def test_should_render_first_registration_question_when_selected_member_for_registration(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
@@ -85,12 +87,13 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            self.select_household("2")
-            response = self.respond('2')
-            first_registration_question = "responseString=%s&action=request" % question_1.text
-            self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                self.select_household("2")
+                response = self.respond('2')
+                first_registration_question = "responseString=%s&action=request" % question_1.text
+                self.assertEquals(urllib2.unquote(response.content), first_registration_question)
 
     def test_should_render_next_registration_question_when_answered_one(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
@@ -103,13 +106,14 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            self.select_household("2")
-            self.respond('2')
-            response = self.respond('Dummy name')
-            next_registration_question = "responseString=%s&action=request" % question_2.text
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                self.select_household("2")
+                self.respond('2')
+                response = self.respond('Dummy name')
+                next_registration_question = "responseString=%s&action=request" % question_2.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
     def test_should_render_third_registration_question_when_answered_two(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
@@ -127,16 +131,15 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            self.select_household("2")
-            self.respond('2')
-            self.respond('Dummy name')
-            response = self.respond("32")
-            next_registration_question = "responseString=%s&action=request" % question_3.text
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
-
-
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                self.select_household("2")
+                self.respond('2')
+                self.respond('Dummy name')
+                response = self.respond("32")
+                next_registration_question = "responseString=%s&action=request" % question_3.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
     def test_should_save_member_if_all_questions_answered(self):
         answers = {'name': 'dummy name',
@@ -157,23 +160,24 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_3 = Question.objects.create(module=module, text="Please Enter the gender:\n1.Male\n2.Female",
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
-        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('2')
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            response = self.respond(answers['gender'])
-            end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
-            self.assertEquals(urllib2.unquote(response.content), end_registration_text)
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('2')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                response = self.respond(answers['gender'])
+                end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
+                self.assertEquals(urllib2.unquote(response.content), end_registration_text)
 
-            selected_household = Household.objects.get(uid=selected_household_id)
-            self.assertEqual(1, selected_household.household_member.count())
-            member = selected_household.household_member.all()[0]
-            self.assertEqual(member.surname, answers['name'])
-            self.assertEqual(member.male, False)
+                selected_household = Household.objects.get(uid=selected_household_id)
+                self.assertEqual(1, selected_household.household_member.count())
+                member = selected_household.household_member.all()[0]
+                self.assertEqual(member.surname, answers['name'])
+                self.assertEqual(member.male, False)
 
     def test_should_render_date_of_birth_registration_question_if_age_question_answer_is_empty_and_saves_member_when_all_questions_answered(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
@@ -225,34 +229,34 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
            'year':'2001',
            'gender': '2',
         }
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('2')
-            self.respond(answers['name'])
-            response = self.respond(answers['age'])
-            MONTHS_OPTION_PAGE_1="\n1: January\n2: February\n3: March\n#: Next"
-            next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_1)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
-            response = self.respond(answers['month'])
-            next_registration_question = "responseString=%s&action=request" % year.text
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
-            response = self.respond(answers['year'])
-            next_registration_question = "responseString=%s&action=request" % question_3.text
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
-            response = self.respond(answers['gender'])
-            end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
-            self.assertEquals(urllib2.unquote(response.content), end_registration_text)
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('2')
+                self.respond(answers['name'])
+                response = self.respond(answers['age'])
+                MONTHS_OPTION_PAGE_1="\n1: January\n2: February\n3: March\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_1)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond(answers['month'])
+                next_registration_question = "responseString=%s&action=request" % year.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond(answers['year'])
+                next_registration_question = "responseString=%s&action=request" % question_3.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond(answers['gender'])
+                end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
+                self.assertEquals(urllib2.unquote(response.content), end_registration_text)
 
-            selected_household = Household.objects.get(uid=selected_household_id)
-            self.assertEqual(1, selected_household.household_member.count())
-            member = selected_household.household_member.all()[0]
-            self.assertEqual(member.surname, answers['name'])
-            self.assertEqual(member.male, False)
-            self.assertEqual(member.date_of_birth, datetime.date(int(answers['year']), int(answers['month']), 1))
+                selected_household = Household.objects.get(uid=selected_household_id)
+                self.assertEqual(1, selected_household.household_member.count())
+                member = selected_household.household_member.all()[0]
+                self.assertEqual(member.surname, answers['name'])
+                self.assertEqual(member.male, False)
+                self.assertEqual(member.date_of_birth, datetime.date(int(answers['year']), int(answers['month']), 1))
 
     def test_invalid_month_of_birth_renders_invalid_selection_and_a_subsequent_valid_answer_render_year_of_birth(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
@@ -306,50 +310,48 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
            'gender': '2',
         }
 
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('2')
-            self.respond(answers['name'])
-            response = self.respond(answers['age'])
-            MONTHS_OPTION_PAGE_1="\n1: January\n2: February\n3: March\n#: Next"
-            next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_1)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('2')
+                self.respond(answers['name'])
+                response = self.respond(answers['age'])
+                MONTHS_OPTION_PAGE_1="\n1: January\n2: February\n3: March\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_1)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond(answers['month'])
-            next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_1)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond(answers['month'])
+                next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_1)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            another_invalid_month ='bla&bli**blo#@!'
-            response = self.respond(another_invalid_month)
-            next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_1)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                another_invalid_month ='bla&bli**blo#@!'
+                response = self.respond(another_invalid_month)
+                next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_1)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            valid_month = '2'
-            response = self.respond(valid_month)
-            next_registration_question = "responseString=%s&action=request" % year.text
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                valid_month = '2'
+                response = self.respond(valid_month)
+                next_registration_question = "responseString=%s&action=request" % year.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond(answers['year'])
-            next_registration_question = "responseString=%s&action=request" % question_3.text
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
-
-
-            response = self.respond(answers['gender'])
-            end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
-            self.assertEquals(urllib2.unquote(response.content), end_registration_text)
-
-            selected_household = Household.objects.get(uid=selected_household_id)
-            self.assertEqual(1, selected_household.household_member.count())
-            member = selected_household.household_member.all()[0]
-            self.assertEqual(member.surname, answers['name'])
-            self.assertEqual(member.male, False)
-            self.assertEqual(member.date_of_birth, datetime.date(int(answers['year']), int(valid_month), 1))
+                response = self.respond(answers['year'])
+                next_registration_question = "responseString=%s&action=request" % question_3.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
 
+                response = self.respond(answers['gender'])
+                end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
+                self.assertEquals(urllib2.unquote(response.content), end_registration_text)
+
+                selected_household = Household.objects.get(uid=selected_household_id)
+                self.assertEqual(1, selected_household.household_member.count())
+                member = selected_household.household_member.all()[0]
+                self.assertEqual(member.surname, answers['name'])
+                self.assertEqual(member.male, False)
+                self.assertEqual(member.date_of_birth, datetime.date(int(answers['year']), int(valid_month), 1))
 
     def test_month_of_birth_paginations_and_invalid_month_integration(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
@@ -401,79 +403,79 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
            'year':'2001',
            'gender': '2',
         }
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('2')
-            self.respond(answers['name'])
-            response = self.respond(answers['age'])
-            MONTHS_OPTION_PAGE_1="\n1: January\n2: February\n3: March\n#: Next"
-            next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_1)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            invalid_month ='bla&bli**blo#@!'
-            response = self.respond(invalid_month)
-            next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_1)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('2')
+                self.respond(answers['name'])
+                response = self.respond(answers['age'])
+                MONTHS_OPTION_PAGE_1="\n1: January\n2: February\n3: March\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_1)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond('#')
-            MONTHS_OPTION_PAGE_2="\n4: April\n5: May\n6: June\n*: Back\n#: Next"
-            next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_2)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                invalid_month ='bla&bli**blo#@!'
+                response = self.respond(invalid_month)
+                next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_1)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond(invalid_month)
-            next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_2)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond('#')
+                MONTHS_OPTION_PAGE_2="\n4: April\n5: May\n6: June\n*: Back\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_2)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond('#')
-            MONTHS_OPTION_PAGE_3="\n7: July\n8: August\n9: September\n*: Back\n#: Next"
-            next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_3)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond(invalid_month)
+                next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_2)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond(invalid_month)
-            MONTHS_OPTION_PAGE_3="\n7: July\n8: August\n9: September\n*: Back\n#: Next"
-            next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_3)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond('#')
+                MONTHS_OPTION_PAGE_3="\n7: July\n8: August\n9: September\n*: Back\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_3)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond('#')
-            MONTHS_OPTION_PAGE_4="\n10: October\n11: November\n12: December\n*: Back"
-            next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_4)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond(invalid_month)
+                MONTHS_OPTION_PAGE_3="\n7: July\n8: August\n9: September\n*: Back\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_3)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond('*')
-            MONTHS_OPTION_PAGE_3="\n7: July\n8: August\n9: September\n*: Back\n#: Next"
-            next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_3)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond('#')
+                MONTHS_OPTION_PAGE_4="\n10: October\n11: November\n12: December\n*: Back"
+                next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_4)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond(invalid_month)
-            MONTHS_OPTION_PAGE_3="\n7: July\n8: August\n9: September\n*: Back\n#: Next"
-            next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_3)
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond('*')
+                MONTHS_OPTION_PAGE_3="\n7: July\n8: August\n9: September\n*: Back\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % (month.text + MONTHS_OPTION_PAGE_3)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            valid_month = '8'
-            response = self.respond(valid_month)
-            next_registration_question = "responseString=%s&action=request" % year.text
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                response = self.respond(invalid_month)
+                MONTHS_OPTION_PAGE_3="\n7: July\n8: August\n9: September\n*: Back\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % ("INVALID ANSWER: " + month.text + MONTHS_OPTION_PAGE_3)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
-            response = self.respond(answers['year'])
-            next_registration_question = "responseString=%s&action=request" % question_3.text
-            self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+                valid_month = '8'
+                response = self.respond(valid_month)
+                next_registration_question = "responseString=%s&action=request" % year.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+
+                response = self.respond(answers['year'])
+                next_registration_question = "responseString=%s&action=request" % question_3.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
 
 
-            response = self.respond(answers['gender'])
-            end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
-            self.assertEquals(urllib2.unquote(response.content), end_registration_text)
+                response = self.respond(answers['gender'])
+                end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
+                self.assertEquals(urllib2.unquote(response.content), end_registration_text)
 
-            selected_household = Household.objects.get(uid=selected_household_id)
-            self.assertEqual(1, selected_household.household_member.count())
-            member = selected_household.household_member.all()[0]
-            self.assertEqual(member.surname, answers['name'])
-            self.assertEqual(member.male, False)
-            self.assertEqual(member.date_of_birth, datetime.date(int(answers['year']), int(valid_month), 1))
-
+                selected_household = Household.objects.get(uid=selected_household_id)
+                self.assertEqual(1, selected_household.household_member.count())
+                member = selected_household.household_member.all()[0]
+                self.assertEqual(member.surname, answers['name'])
+                self.assertEqual(member.male, False)
+                self.assertEqual(member.date_of_birth, datetime.date(int(answers['year']), int(valid_month), 1))
 
     def test_should_save_household_head_object(self):
         answers = {'name': 'dummy name',
@@ -495,22 +497,23 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('1')
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            response = self.respond(answers['gender'])
-            end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
-            self.assertEquals(urllib2.unquote(response.content), end_registration_text)
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('1')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                response = self.respond(answers['gender'])
+                end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
+                self.assertEquals(urllib2.unquote(response.content), end_registration_text)
 
-            selected_household = Household.objects.get(uid=selected_household_id)
-            self.assertIsNotNone(selected_household.get_head())
-            head = selected_household.get_head()
-            self.assertEqual(head.surname, answers['name'])
-            self.assertTrue(head.male)
+                selected_household = Household.objects.get(uid=selected_household_id)
+                self.assertIsNotNone(selected_household.get_head())
+                head = selected_household.get_head()
+                self.assertEqual(head.surname, answers['name'])
+                self.assertTrue(head.male)
 
     def test_should_go_back_to_member_or_head_screen_when_a_member_registered(self):
         answers = {'name': 'dummy name',
@@ -532,20 +535,20 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            HouseholdHead.objects.all().delete()
-            self.respond('2')
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['gender'])
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                HouseholdHead.objects.all().delete()
+                self.respond('2')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['gender'])
 
-            response = self.respond('1')
-            ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
-            self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
-
+                response = self.respond('1')
+                ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+                self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
     def test_should_go_back_to_welcome_screen_if_responds_no_after_registering_a_member(self):
         answers = {'name': 'dummy name',
@@ -565,19 +568,20 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                              answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('1')
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['gender'])
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('1')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['gender'])
 
-            response = self.respond('2')
-            welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-            ask_member_response_string = "responseString=%s&action=request" % welcome_text
-            self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
+                response = self.respond('2')
+                welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+                ask_member_response_string = "responseString=%s&action=request" % welcome_text
+                self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
     def test_should_ask_member_question_after_registering_head_if_investigator_responds_with_yes_to_register_other_members(
             self):
@@ -598,19 +602,20 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                 answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('1')
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['gender'])
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('1')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['gender'])
 
-            response = self.respond('1')
-            first_registration_question = "responseString=%s%s&action=request" % (
-                USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
-            self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+                response = self.respond('1')
+                first_registration_question = "responseString=%s%s&action=request" % (
+                    USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
+                self.assertEquals(urllib2.unquote(response.content), first_registration_question)
 
     def test_complete_registration_flow_with_valid_age(self):
         answers = {'name': 'dummy name',
@@ -630,37 +635,38 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                 answer_type=Question.NUMBER, order=3, group=self.registration_group)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('2')
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['gender'])
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('2')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['gender'])
 
-            response = self.respond('1')
-            select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
-            self.assertEquals(urllib2.unquote(response.content), select_head_or_member)
-            response = self.respond('1')
-            first_registration_question = "responseString=%s&action=request" % question_1.text
-            self.assertEquals(urllib2.unquote(response.content), first_registration_question)
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['gender'])
+                response = self.respond('1')
+                select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+                self.assertEquals(urllib2.unquote(response.content), select_head_or_member)
+                response = self.respond('1')
+                first_registration_question = "responseString=%s&action=request" % question_1.text
+                self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['gender'])
 
-            response = self.respond('1')
-            first_registration_question = "responseString=%s%s&action=request" % (
-                USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
-            self.assertEquals(urllib2.unquote(response.content), first_registration_question)
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['gender'])
+                response = self.respond('1')
+                first_registration_question = "responseString=%s%s&action=request" % (
+                    USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
+                self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['gender'])
 
-            response = self.respond('2')
-            welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-            ask_member_response_string = "responseString=%s&action=request" % welcome_text
-            self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
+                response = self.respond('2')
+                welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+                ask_member_response_string = "responseString=%s&action=request" % welcome_text
+                self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
 
     def test_complete_registration_flow_with_invalid_age_and_months_and_year_of_birth_asked(self):
@@ -713,45 +719,45 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
            'year':'2001',
            'gender': '1',
         }
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            self.reset_session()
-            self.register_household()
-            selected_household_id = '2'
-            self.select_household(selected_household_id)
-            self.respond('2')
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['month'])
-            self.respond(answers['year'])
-            self.respond(answers['gender'])
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('2')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['month'])
+                self.respond(answers['year'])
+                self.respond(answers['gender'])
 
-            response = self.respond('1')
-            select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
-            self.assertEquals(urllib2.unquote(response.content), select_head_or_member)
-            response = self.respond('1')
-            first_registration_question = "responseString=%s&action=request" % question_1.text
-            self.assertEquals(urllib2.unquote(response.content), first_registration_question)
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['month'])
-            self.respond(answers['year'])
-            self.respond(answers['gender'])
+                response = self.respond('1')
+                select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+                self.assertEquals(urllib2.unquote(response.content), select_head_or_member)
+                response = self.respond('1')
+                first_registration_question = "responseString=%s&action=request" % question_1.text
+                self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['month'])
+                self.respond(answers['year'])
+                self.respond(answers['gender'])
 
-            response = self.respond('1')
-            first_registration_question = "responseString=%s%s&action=request" % (
-                USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
-            self.assertEquals(urllib2.unquote(response.content), first_registration_question)
-            self.respond(answers['name'])
-            self.respond(answers['age'])
-            self.respond(answers['month'])
-            self.respond(answers['year'])
-            self.respond(answers['gender'])
+                response = self.respond('1')
+                first_registration_question = "responseString=%s%s&action=request" % (
+                    USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
+                self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['month'])
+                self.respond(answers['year'])
+                self.respond(answers['gender'])
 
-            response = self.respond('2')
-            welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-            ask_member_response_string = "responseString=%s&action=request" % welcome_text
-            self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
+                response = self.respond('2')
+                welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+                ask_member_response_string = "responseString=%s&action=request" % welcome_text
+                self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
     def test_should_not_give_member_select_screen_if_head_already_registered(self):
         self.registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
@@ -771,13 +777,14 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                             date_of_birth=datetime.datetime(1980, 02, 02), male=False)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            self.reset_session()
-            self.register_household()
-            response = self.select_household(selected_household_id)
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                response = self.select_household(selected_household_id)
 
-            first_registration_question = "responseString=%s%s&action=request" % (
-                USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
-            self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+                first_registration_question = "responseString=%s%s&action=request" % (
+                    USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
+                self.assertEquals(urllib2.unquote(response.content), first_registration_question)
 
 
 class FakeRequest(HttpRequest):

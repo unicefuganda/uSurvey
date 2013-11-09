@@ -15,7 +15,7 @@ def _render_survey_or_selection(investigator, mobile_number, open_survey, params
     random_household_selection = RandomHouseHoldSelection.objects.filter(mobile_number=mobile_number,
                                                                          survey=open_survey)
 
-    if random_household_selection or investigator.households.all():
+    if random_household_selection and investigator.households.all():
         response = USSDBaseView(investigator, params).response()
     else:
         response = HouseHoldSelection(mobile_number, params).response(open_survey)

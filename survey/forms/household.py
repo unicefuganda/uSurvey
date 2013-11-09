@@ -6,7 +6,7 @@ from survey.models.households import Household
 class HouseholdForm(ModelForm):
     class Meta:
         model = Household
-        exclude = ['investigator', 'location']
+        exclude = ['investigator', 'location', 'survey']
 
     def __init__(self, is_edit=False, uid=None,  *args, **kwargs):
         super(HouseholdForm, self).__init__(*args, **kwargs)

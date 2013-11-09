@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question, BatchQuestionOrder, Survey
+from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question, BatchQuestionOrder, Survey, RandomHouseHoldSelection
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd_survey import USSDSurvey
@@ -84,15 +84,16 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
 
     def test_knows_to_select_the_first_general_question_for_household_head(self):
         self.batch.open_for_location(self.location)
-        with patch.object(USSDSurvey, 'is_active', return_value=False):
-            self.reset_session()
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(USSDSurvey, 'is_active', return_value=False):
+                self.reset_session()
 
-        self.take_survey()
-        self.select_household()
+            self.take_survey()
+            self.select_household()
 
-        response = self.select_household_member()
-        response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response = self.select_household_member()
+            response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def answer_ussd_question(self, answer):
         self.ussd_params['response'] = "true"
@@ -102,53 +103,55 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
 
     def test_knows_to_not_select_the_general_questions_for_household_member(self):
         self.batch.open_for_location(self.location)
-        with patch.object(USSDSurvey, 'is_active', return_value=False):
-            response = self.reset_session()
-        self.take_survey()
-        self.batch.open_for_location(self.location)
-        self.select_household()
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(USSDSurvey, 'is_active', return_value=False):
+                response = self.reset_session()
+            self.take_survey()
+            self.batch.open_for_location(self.location)
+            self.select_household()
 
-        response = self.select_household_member("2")
-        response_string = "responseString=%s&action=request" % self.question_5.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response = self.select_household_member("2")
+            response_string = "responseString=%s&action=request" % self.question_5.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        response = self.answer_ussd_question("1")
-        response_string = "responseString=%s&action=request" % self.question_6.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response = self.answer_ussd_question("1")
+            response_string = "responseString=%s&action=request" % self.question_6.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_head_knows_how_to_get_questions_in_other_groups_when_general_questions_are_done(self):
         self.batch.open_for_location(self.location)
-        with patch.object(USSDSurvey, 'is_active', return_value=False):
-            self.reset_session()
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(USSDSurvey, 'is_active', return_value=False):
+                self.reset_session()
 
-        self.take_survey()
-        self.select_household()
+            self.take_survey()
+            self.select_household()
 
-        response = self.select_household_member()
-        response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response = self.select_household_member()
+            response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        response = self.answer_ussd_question("1")
+            response = self.answer_ussd_question("1")
 
-        response_string = "responseString=%s&action=request" % self.question_2.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response_string = "responseString=%s&action=request" % self.question_2.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        response = self.answer_ussd_question("1")
+            response = self.answer_ussd_question("1")
 
-        response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        response = self.answer_ussd_question("1")
+            response = self.answer_ussd_question("1")
 
-        response_string = "responseString=%s&action=request" % self.question_4.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response_string = "responseString=%s&action=request" % self.question_4.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        response = self.answer_ussd_question("1")
+            response = self.answer_ussd_question("1")
 
-        response_string = "responseString=%s&action=request" % self.question_5.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response_string = "responseString=%s&action=request" % self.question_5.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
 
-        response = self.answer_ussd_question("1")
+            response = self.answer_ussd_question("1")
 
-        response_string = "responseString=%s&action=request" % self.question_6.to_ussd()
-        self.assertEquals(urllib2.unquote(response.content), response_string)
+            response_string = "responseString=%s&action=request" % self.question_6.to_ussd()
+            self.assertEquals(urllib2.unquote(response.content), response_string)
