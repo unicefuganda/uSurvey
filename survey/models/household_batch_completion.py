@@ -1,10 +1,11 @@
 from django.db.models import Count
 from rapidsms.contrib.locations.models import Location
+from django.db import models
+
 from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
 from survey.models.investigator import Investigator
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
-from django.db import models
 from survey.models.households import Household, HouseholdMember
 
 
@@ -15,8 +16,9 @@ class HouseholdBatchCompletion(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="completed_batches")
 
     @classmethod
-    def households_status(cls, investigators, batch):
-        households = Household.objects.filter(investigator__in=investigators)
+    def households_status(cls, investigators, batch, survey=None):
+        all_investigator_households = Household.objects.filter(investigator__in=investigators)
+        households = all_investigator_households if not survey else all_investigator_households.filter(survey=survey)
         completed = batch.completed_households.filter(household__in=households).count()
         pending = households.count() - completed
         return {'completed': completed, 'pending': pending}
@@ -38,8 +40,8 @@ class HouseholdBatchCompletion(BaseModel):
 
 
     @classmethod
-    def status_of_batch(cls, batch, location):
+    def status_of_batch(cls, batch, location, survey=None):
         locations = location.get_descendants(include_self=True) if location else Location.objects.all()
         investigators = Investigator.objects.filter(location__in=locations)
-        return cls.households_status(investigators, batch), cls.clusters_status(investigators, batch), \
+        return cls.households_status(investigators, batch, survey), cls.clusters_status(investigators, batch), \
                cls.pending_investigators(investigators, batch)

@@ -12,8 +12,8 @@ class BatchCompletionRates:
         except ZeroDivisionError:
             return 0
 
-    def percent_completed_households(self, location):
-        all_households = Household.all_households_in(location)
+    def percent_completed_households(self, location, survey):
+        all_households = Household.all_households_in(location, survey)
         return self.percentage_completed(all_households)
 
     def percentage_completed(self, all_households):
@@ -25,7 +25,7 @@ class BatchLocationCompletionRates(BatchCompletionRates):
     def __init__(self, batch, location):
         self.batch = batch
         self.location = location
-        self.all_households = Household.all_households_in(self.location)
+        self.all_households = Household.all_households_in(self.location, batch.survey)
 
     def percent_completed_households(self):
         all_households = self.all_households
@@ -52,8 +52,8 @@ class BatchHighLevelLocationsCompletionRates(BatchCompletionRates):
         for location in self.locations:
             attribute ={}
             attribute['location'] = location
-            attribute['total_households'] = Household.all_households_in(location).count()
-            attribute['completed_households_percent'] = self.percent_completed_households(location)
+            attribute['total_households'] = Household.all_households_in(location, self.batch.survey).count()
+            attribute['completed_households_percent'] = self.percent_completed_households(location, self.batch.survey)
             _completion_rates.append(attribute)
 
         return _completion_rates

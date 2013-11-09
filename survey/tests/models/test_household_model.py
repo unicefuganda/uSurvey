@@ -2,7 +2,7 @@ from django.template.defaultfilters import slugify
 from datetime import date, datetime, timedelta
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion, NumericalAnswer, BatchQuestionOrder
+from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion, NumericalAnswer, BatchQuestionOrder, Survey
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -405,6 +405,7 @@ class HouseholdTest(TestCase):
         self.assertTrue(NumericalAnswer.objects.filter(question=question_1)[0].is_old)
 
     def test_should_know_total_households_in_location(self):
+        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         Household.objects.all().delete()
         self.abim = Location.objects.create(name='Abim', tree_parent = self.uganda, type = self.city)
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
@@ -412,12 +413,12 @@ class HouseholdTest(TestCase):
         investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
         investigator_2 = Investigator.objects.create(name='some_inv',mobile_number='123456781',male=True,location=self.kampala_city)
 
-        household_1 = Household.objects.create(investigator = investigator_1,location= self.kampala)
-        household_2 = Household.objects.create(investigator = investigator_2,location= self.kampala_city)
+        household_1 = Household.objects.create(investigator = investigator_1,location= self.kampala, survey=open_survey)
+        household_2 = Household.objects.create(investigator = investigator_2,location= self.kampala_city, survey=open_survey)
 
-        self.assertEqual(2, Household.all_households_in(self.uganda).count())
-        self.assertIn(household_1, Household.all_households_in(self.uganda))
-        self.assertIn(household_2, Household.all_households_in(self.uganda))
+        self.assertEqual(2, Household.all_households_in(self.uganda, open_survey).count())
+        self.assertIn(household_1, Household.all_households_in(self.uganda, open_survey))
+        self.assertIn(household_2, Household.all_households_in(self.uganda, open_survey))
 
     def test_should_know_number_of_members_interviewed(self):
         self.batch = Batch.objects.create(name="BATCH A", order=1)

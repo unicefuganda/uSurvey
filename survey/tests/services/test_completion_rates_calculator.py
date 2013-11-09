@@ -23,9 +23,13 @@ class BatchCompletionRatesTest(BaseTest):
         self.investigator_2 = Investigator.objects.create(name='some_inv', mobile_number='123456788', male=True,
                                                           location=self.kampala_city)
 
-        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala_city)
-        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala_city)
-        self.batch = Batch.objects.create(order=1, name='somebatch')
+        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala_city,
+                                                    survey=self.open_survey)
+        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala_city,
+                                                    survey=self.open_survey)
+
+        self.batch = Batch.objects.create(order=1, name='somebatch', survey=self.open_survey)
         self.member_1 = HouseholdMember.objects.create(household=self.household_1, date_of_birth=date(1980, 05, 01))
         self.member_2 = HouseholdMember.objects.create(household=self.household_2, date_of_birth=date(1980, 05, 3))
 
@@ -46,17 +50,19 @@ class BatchCompletionRatesTest(BaseTest):
         completion_rate = BatchCompletionRates(self.batch)
         self.batch.completed_households.create(householdmember=self.member_1)
         self.assertEqual(50, completion_rate.percentage_completed(
-            Household.all_households_in(self.investigator_1.location)))
+            Household.all_households_in(self.investigator_1.location, self.open_survey)))
         self.batch.completed_households.create(householdmember=self.member_2)
         self.assertEqual(100, completion_rate.percentage_completed(
-            Household.all_households_in(self.investigator_1.location)))
+            Household.all_households_in(self.investigator_1.location, self.open_survey)))
 
     def test_percent_completed_households(self):
         completion_rate = BatchCompletionRates(self.batch)
         self.batch.completed_households.create(householdmember=self.member_1)
-        self.assertEqual(50, completion_rate.percent_completed_households(self.investigator_1.location))
+        self.assertEqual(50, completion_rate.percent_completed_households(self.investigator_1.location,
+                                                                          self.open_survey))
         self.batch.completed_households.create(householdmember=self.member_2)
-        self.assertEqual(100, completion_rate.percent_completed_households(self.investigator_1.location))
+        self.assertEqual(100, completion_rate.percent_completed_households(self.investigator_1.location,
+                                                                           self.open_survey))
 
     def test_interviewed_households(self):
         completion_rate = BatchLocationCompletionRates(self.batch, self.investigator_1.location)
@@ -99,21 +105,26 @@ class BatchCompletionRatesTest(BaseTest):
         investigator_3 = Investigator.objects.create(name='some_inv_2', mobile_number='123456787', male=True,
                                                      location=masaka)
 
-        household_3 = Household.objects.create(investigator=investigator_3, location=masaka)
+        household_3 = Household.objects.create(investigator=investigator_3, location=masaka,
+                                               survey=self.open_survey)
         member_3 = HouseholdMember.objects.create(household=household_3, date_of_birth=date(1980, 05, 01))
+        mock_percent.side_effect = [self.kampala_city.id, self.open_survey] # return value only needed to change with locations
 
-        mock_percent.side_effect = lambda location: location.id # return value only needed to change with locations
-
-        completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [self.kampala_city, masaka])
+        completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [self.kampala_city])
         completions = completion_rate.attributes()
-        self.assertEqual(2, len(completions))
-        index_of_kampala_city = [index for index, completion in enumerate(completions) if
-                                 completions[index]['location'] == self.kampala_city]
-        completion_1 = completions[index_of_kampala_city[0]]
+        self.assertEqual(1, len(completions))
+
+        completion_1 = completions[0]
         self.assertEqual(2, completion_1['total_households'])
         self.assertEqual(self.kampala_city.id, completion_1['completed_households_percent'])
 
         completions.remove(completion_1)
+        mock_percent.side_effect = [masaka.id, self.open_survey] # return value only needed to change with locations
+        completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [masaka])
+
+        completions = completion_rate.attributes()
+        self.assertEqual(1, len(completions))
+
         completion_2 = completions[0]
         self.assertEqual(1, completion_2['total_households'])
         self.assertEqual(masaka.id, completion_2['completed_households_percent'])
@@ -169,12 +180,17 @@ class HouseholdCompletionJsonService(BaseTest):
 
         self.investigator_2 = Investigator.objects.create(name="investigator name_2", mobile_number="9876543330",
                                                           location=self.apachi, backend=self.backend)
-        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
-        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
-        self.household_3 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
-        self.household_4 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                    survey=self.survey)
+        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                    survey=self.survey)
+        self.household_3 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                    survey=self.survey)
+        self.household_4 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                    survey=self.survey)
 
     def test_knows_completion_rates_for_location_type(self):
+
         household_1_member = HouseholdMember.objects.create(household=self.household_1,
                                                             date_of_birth=date(1980, 05, 01))
         household_2_member = HouseholdMember.objects.create(household=self.household_2,
@@ -199,10 +215,14 @@ class HouseholdCompletionJsonService(BaseTest):
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
-        self.household_5 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
-        self.household_6 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
-        self.household_7 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
-        self.household_8 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
+        self.household_5 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+                                                    survey=self.survey)
+        self.household_6 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+                                                    survey=self.survey)
+        self.household_7 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+                                                    survey=self.survey)
+        self.household_8 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+                                                    survey=self.survey)
 
         household_5_member = HouseholdMember.objects.create(household=self.household_5,
                                                             date_of_birth=date(1980, 05, 01))

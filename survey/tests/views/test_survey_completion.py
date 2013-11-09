@@ -193,10 +193,14 @@ class HouseholdCompletionJsonViewTest(BaseTest):
 
         self.investigator_2 = Investigator.objects.create(name="investigator name_2", mobile_number="9876543330",
                                                           location=self.apachi, backend=self.backend)
-        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
-        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
-        self.household_3 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
-        self.household_4 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                    survey=self.survey)
+        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                    survey=self.survey)
+        self.household_3 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                    survey=self.survey)
+        self.household_4 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                    survey=self.survey)
 
     def test_knows_completion_rates_for_location_type(self):
         household_1_member = HouseholdMember.objects.create(household=self.household_1,
@@ -223,10 +227,14 @@ class HouseholdCompletionJsonViewTest(BaseTest):
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
-        self.household_5 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
-        self.household_6 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
-        self.household_7 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
-        self.household_8 = Household.objects.create(investigator=self.investigator_2, location=self.apachi)
+        self.household_5 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+                                                    survey=self.survey)
+        self.household_6 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+                                                    survey=self.survey)
+        self.household_7 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+                                                    survey=self.survey)
+        self.household_8 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+                                                    survey=self.survey)
 
         household_5_member = HouseholdMember.objects.create(household=self.household_5,
                                                             date_of_birth=datetime.date(1980, 05, 01))
