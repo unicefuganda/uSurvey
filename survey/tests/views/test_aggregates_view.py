@@ -137,6 +137,10 @@ class AggregatesPageTest(BaseTest):
         self.assertFalse(is_valid({'location':'NOT_A_DIGIT', 'batch':'1'}))
         self.assertFalse(is_valid({'location':'1'}))
 
+    def test_error_message_if_invalid_location(self):
+        response = self.client.get('/aggregates/status', {'location': 'NOT_A_DIGIT', 'batch': 'NOT_A_DIGIT'})
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertIn('Please select a valid location and batch.', response.content)
+
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/status')
-        # self.assert_restricted_permission_for('/households/')
