@@ -25,6 +25,12 @@ class SurveyForm(ModelForm):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if Survey.objects.filter(name=name):
+        survey = Survey.objects.filter(name=name)
+        instance_id = self.instance.id
+
+        if not instance_id and survey:
             raise ValidationError("Survey with name %s already exist." % name)
+        elif instance_id and survey and survey[0].id != instance_id:
+            raise ValidationError("Survey with name %s already exist." % name)
+
         return self.cleaned_data['name']

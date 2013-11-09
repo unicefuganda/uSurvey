@@ -195,8 +195,6 @@ class USSDRegisterHousehold(USSD):
         else:
             member_dict['date_of_birth'] = self.format_age_to_date_of_birth(age_question)
 
-        print member_dict['date_of_birth']
-
         object_to_create = HouseholdHead if self.is_head else HouseholdMember
         member = object_to_create.objects.create(surname=member_dict['surname'], male=member_dict['male'],
                                                  date_of_birth=member_dict['date_of_birth'], household=self.household)
@@ -214,5 +212,4 @@ class USSDRegisterHousehold(USSD):
     def get_date_of_birth_from(self, year_of_birth_question, month_of_birth_question):
         year = int(self.REGISTRATION_DICT[year_of_birth_question.text])
         month = self.REGISTRATION_DICT[month_of_birth_question.text].order
-        print  year, month
         return datetime(year, month, 1)

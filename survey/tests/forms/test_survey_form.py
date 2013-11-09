@@ -27,6 +27,37 @@ class SurveyFormTest(TestCase):
         survey_form = SurveyForm(data=form_data)
         self.assertTrue(survey_form.is_valid())
 
+    def test_should_be_valid_if_editing_with_same_name(self):
+        form_data = {'name': 'xyz',
+                     'description': 'survey description',
+                     'has_sampling': True,
+                     'sample_size': 10,
+                     'type': True,
+        }
+
+        survey = Survey.objects.create(**form_data)
+
+        survey_form = SurveyForm(instance=survey, data=form_data)
+        self.assertTrue(survey_form.is_valid())
+
+    def test_should_be_invalid_if_editing_with_the_name_of_another_survey(self):
+        form_data = {'name': 'xyz',
+                     'description': 'survey description',
+                     'has_sampling': True,
+                     'sample_size': 10,
+                     'type': True,
+        }
+
+        survey = Survey.objects.create(**form_data)
+
+        form_data['name'] = 'Survey 1'
+        form_data['description'] = 'Survey 1 details'
+        another_survey = Survey.objects.create(**form_data)
+
+        survey_form = SurveyForm(instance=survey, data=form_data)
+        self.assertFalse(survey_form.is_valid())
+        self.assertIn("Survey with name %s already exist." % form_data['name'], survey_form.errors['name'])
+
     def test_should_be_valid_if_has_sampling_is_false_and_sample_size_is_blank(self):
         form_data = {'name': 'xyz',
                      'description': 'survey description',
@@ -38,7 +69,6 @@ class SurveyFormTest(TestCase):
         survey_form = SurveyForm(data=form_data)
         is_valid = survey_form.is_valid()
 
-        print survey_form.errors
         self.assertTrue(is_valid)
 
     def test_should_be_invalid_if_has_sampling_is_true_and_sample_size_is_not_provided(self):
