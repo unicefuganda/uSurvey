@@ -43,14 +43,23 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_set_is_selecting_member_for_register_household(self):
         with patch.object(Investigator, 'get_from_cache') as get_from_cache:
-            USSDRegisterHousehold.REGISTRATION_DICT = {}
-            exception = KeyError()
-            get_from_cache.side_effect = exception
-            ussd_register_household = USSDRegisterHousehold(self.investigator, FakeRequest())
+                USSDRegisterHousehold.REGISTRATION_DICT = {}
+                exception = KeyError()
+                get_from_cache.side_effect = exception
+                ussd_register_household = USSDRegisterHousehold(self.investigator, FakeRequest())
 
         self.assertEqual({}, ussd_register_household.REGISTRATION_DICT)
         self.assertFalse(self.investigator.get_from_cache('is_selecting_member'))
         self.assertIsNone(ussd_register_household.is_head)
+
+        with patch.object(USSD, 'get_from_session') as get_from_session:
+            exception = KeyError()
+            get_from_session.side_effect = exception
+            ussd_register_household.set_can_retake_household()
+            self.assertFalse(ussd_register_household.can_retake_household)
+
+            ussd_register_household.set_has_chosen_retake()
+            self.assertFalse(ussd_register_household.has_chosen_retake)
 
     def test_register_households_knows_household_from_cache_if_resuming(self):
         with patch.object(USSD, 'get_from_session', return_value=True):

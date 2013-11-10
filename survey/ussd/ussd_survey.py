@@ -38,7 +38,7 @@ class USSDSurvey(USSD):
             self.set_in_session('HOUSEHOLD', None)
             self.set_in_session('HOUSEHOLD_MEMBER', None)
             self.household = None
-            self.render_households_list()
+            self.render_households_list(Survey.currently_open_survey())
 
         self.action = self.ACTIONS['REQUEST']
 

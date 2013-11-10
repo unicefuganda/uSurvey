@@ -47,6 +47,7 @@ class USSD(USSDBase):
         if household_member:
             self.household_member = household_member
 
+
     def set_current_member_is_done(self):
         if self.household_member and (self.is_registering_household is False):
             self.current_member_is_done = self.household_member.survey_completed()
