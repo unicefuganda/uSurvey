@@ -38,6 +38,14 @@ class QuestionsViews(BaseTest):
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
 
+    def test_set_filter_condition_based_on_batch_id_specified(self):
+        filter_condition = {}
+        updated_filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, None)
+        self.assertIsNone(updated_filter_condition.get('batches', None))
+
+        updated_filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, self.batch.id)
+        self.assertEqual(self.batch, updated_filter_condition.get('batches', None))
+
     def test_set_filter_condition_based_on_group(self):
         filter_condition = {}
         updated_filter_condition = _set_filter_condition_based_on_group('All', filter_condition)

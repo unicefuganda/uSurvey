@@ -2,7 +2,7 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
-from survey.models import Investigator, Backend, HouseholdMemberGroup, GroupCondition, Household, Batch, NumericalAnswer, Question, AnswerRule, QuestionOption, MultiChoiceAnswer, BatchQuestionOrder
+from survey.models import Investigator, Backend, HouseholdMemberGroup, GroupCondition, Household, Batch, NumericalAnswer, Question, AnswerRule, QuestionOption, MultiChoiceAnswer, BatchQuestionOrder, Answer
 from survey.models.households import HouseholdMember
 
 
@@ -240,3 +240,16 @@ class AnswerRuleTest(TestCase):
 
         next_question = self.investigator.member_answered(question_1, self.household_member, answer=4, batch=self.batch)
         self.assertIsNone(next_question)
+
+    def test_end_interview_is_none_if_answer_rule_already_applied_and_same_answer(self):
+        question_1 = Question.objects.create(text="Question 1?",
+                                             answer_type=Question.NUMBER, order=10, group=self.member_group)
+
+        rule = AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                                         condition=AnswerRule.CONDITIONS['LESS_THAN_VALUE'],
+                                         validate_with_value=10)
+        answer = NumericalAnswer.objects.create(investigator=self.investigator, household=self.household,
+                                       householdmember=self.household_member, question=question_1, batch=self.batch,
+                                       rule_applied=rule, is_old=False, answer=2)
+
+        self.assertIsNone(rule.end_interview(self.investigator, answer))

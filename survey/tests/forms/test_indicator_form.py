@@ -34,7 +34,7 @@ class IndicatorFormTest(TestCase):
         form_data['batch'] = new_batch.id
         indicator_form = IndicatorForm(form_data)
         self.assertFalse(indicator_form.is_valid())
-        self.assertEqual(["Batch %s is does not belong to the selected Survey."% (new_batch.name)], indicator_form.errors['batch'])
+        self.assertEqual(["Batch %s does not belong to the selected Survey."% (new_batch.name)], indicator_form.errors['batch'])
 
     def test_survey_should_not_be_empty(self):
         form_data = self.form_data.copy()

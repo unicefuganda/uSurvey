@@ -77,9 +77,6 @@ def index(request, batch_id):
         module_id = request.POST.get('modules', None)
         question_type = request.POST.get('question_types', None)
 
-    if not batch_id:
-        batch_id = request.POST.get('batch_id', None)
-
     questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
 
     if not questions:

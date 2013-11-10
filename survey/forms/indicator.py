@@ -19,7 +19,7 @@ class IndicatorForm(ModelForm):
         survey = self.cleaned_data.get('survey', None)
 
         if batch.survey != survey:
-            message = "Batch %s is does not belong to the selected Survey."% (batch.name)
+            message = "Batch %s does not belong to the selected Survey."% (batch.name)
             self._errors['batch'] = self.error_class([message])
             del self.cleaned_data['batch']
         return self.cleaned_data

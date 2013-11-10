@@ -41,6 +41,18 @@ class IndicatorViewTest(BaseTest):
         data = self.form_data.copy()
         del data['survey']
         self.failIf(Indicator.objects.filter(**data))
+
+        another_survey = Survey.objects.create(name="Education survey")
+        data['survey'] = another_survey.id
+        response = self.client.post('/indicators/new/', data=data)
+
+        error_message = "Indicator was not created."
+        self.assertIn(error_message, response.content)
+
+    def test_post_indicator_fails_and_returns_error_message(self):
+        data = self.form_data.copy()
+        del data['survey']
+        self.failIf(Indicator.objects.filter(**data))
         response = self.client.post('/indicators/new/', data=self.form_data)
         self.failUnless(Indicator.objects.filter(**data))
         self.assertRedirects(response, "/indicators/", 302, 200)
