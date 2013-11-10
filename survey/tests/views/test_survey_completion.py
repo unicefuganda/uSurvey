@@ -61,6 +61,25 @@ class TestSurveyCompletion(BaseTest):
         self.assertEquals(locations['country'][0], self.uganda)
         self.assertEquals(len(locations['city']), 0)
 
+    def test_validates_when_location_is_present_in_parameters_and_parameters_contains_batch_key(self):
+        self.assertTrue(is_valid({'location':'', 'batch':'1'}))
+
+    def test_show_retrieves_high_level_completion_rates_if_no_location_is_provided(self):
+        response = self.client.get('/surveys/completion/', {'location':'', 'batch': str(self.batch.pk)})
+        self.assertEqual(self.batch, response.context['selected_batch'])
+        self.assertIn(self.abim, response.context['completion_rates'].locations)
+        self.assertIn(self.kampala, response.context['completion_rates'].locations)
+
+    def test_knows_to_retrieve_completion_for_locations_that_have_no_tree_parent_if_country_type_does_not_exist(self):
+        LocationType.objects.filter(name__iexact='country').delete()
+
+        location_with_no_parent = Location.objects.create(name='Abim', type = self.city)
+        another_location_with_no_parent = Location.objects.create(name='Kampala', type = self.city)
+        response = self.client.get('/surveys/completion/', {'location':'', 'batch': str(self.batch.pk)})
+        self.assertEqual(self.batch, response.context['selected_batch'])
+        self.assertIn(location_with_no_parent, response.context['completion_rates'].locations)
+        self.assertIn(another_location_with_no_parent, response.context['completion_rates'].locations)
+
     def test_should_validate_params(self):
         self.assertFalse(is_valid({'location':'2', 'batch':'NOT_A_DIGIT'}))
         self.assertFalse(is_valid({'location':'2', 'batch':''}))
@@ -256,3 +275,7 @@ class HouseholdCompletionJsonViewTest(BaseTest):
         completion_rates = json.loads(response.content)
         self.assertEqual(completion_rates[self.zombo.name], 25.0)
         self.assertEqual(completion_rates[self.abim.name], 50.0)
+
+    def test_restricted_permissions(self):
+        self.assert_login_required('/survey/1/completion/json/')
+        self.assert_restricted_permission_for('/survey/1/completion/json/')
