@@ -76,6 +76,41 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
                 self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
+    def test_should_ask_show_welcome_text_if_resuming_and_no_is_chosen(self):
+        answers = {'name': 'dummy name',
+                   'age': '10',
+                   'gender': '1'
+        }
+        module = QuestionModule.objects.create(name='Registration')
+        self.registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
+                                             answer_type=Question.TEXT, order=1, group=self.registration_group)
+
+        Question.objects.create(module=module, text="Please Enter the age",
+                                answer_type=Question.TEXT, order=2, group=self.registration_group)
+
+        Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
+                                answer_type=Question.NUMBER, order=3, group=self.registration_group)
+
+        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+
+                self.select_household("2")
+                self.respond('2')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['gender'])
+
+                self.reset_session()
+                response = self.respond('2')
+
+                homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+                response_string = "responseString=%s&action=request" % homepage
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
     def test_should_render_first_registration_question_when_selected_member_for_registration(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
                                                                                           order=0)
@@ -666,7 +701,6 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 welcome_text = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
                 ask_member_response_string = "responseString=%s&action=request" % welcome_text
                 self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
-
 
     def test_complete_registration_flow_with_invalid_age_and_months_and_year_of_birth_asked(self):
         self.registration_group = self.member_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",

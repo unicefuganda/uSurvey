@@ -1,6 +1,5 @@
 import re
 from survey.investigator_configs import HAS_APPLICATION_CODE, APPLICATION_CODE
-from survey.models import Survey
 from survey.ussd.ussd_survey import USSDSurvey
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
 
