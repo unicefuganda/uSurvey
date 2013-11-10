@@ -1,6 +1,7 @@
 from random import randint
 import datetime
 import urllib2
+from django.http import HttpRequest
 
 from django.test import Client
 from mock import patch
@@ -10,6 +11,7 @@ from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule, AnswerRule, QuestionOption, Survey, RandomHouseHoldSelection
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
+from survey.ussd.ussd_register_household import USSDRegisterHousehold
 
 
 class USSDRegisteringHouseholdTest(USSDBaseTest):
@@ -38,6 +40,37 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.household3 = self.create_household(3)
         self.household4 = self.create_household(4)
         self.household5 = self.create_household(5)
+
+    def test_set_is_selecting_member_for_register_household(self):
+        with patch.object(Investigator, 'get_from_cache') as get_from_cache:
+            USSDRegisterHousehold.REGISTRATION_DICT = {}
+            exception = KeyError()
+            get_from_cache.side_effect = exception
+            ussd_register_household = USSDRegisterHousehold(self.investigator, FakeRequest())
+
+        self.assertEqual({}, ussd_register_household.REGISTRATION_DICT)
+        self.assertFalse(self.investigator.get_from_cache('is_selecting_member'))
+        self.assertIsNone(ussd_register_household.is_head)
+
+    def test_register_households_knows_household_from_cache_if_resuming(self):
+        with patch.object(USSD, 'get_from_session', return_value=True):
+            ussd_register_household = USSDRegisterHousehold(self.investigator, FakeRequest())
+            ussd_register_household.household = None
+            with patch.object(Investigator, 'get_from_cache', return_value=self.household1):
+                ussd_register_household.register_households('1')
+
+        self.assertEqual(ussd_register_household.household, self.household1)
+
+    def test_process_registration_with_invalid_answer(self):
+        module = QuestionModule.objects.create(name='Registration')
+        registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=0)
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
+                                             answer_type=Question.TEXT, order=1, group=registration_group)
+
+        ussd_register_household = USSDRegisterHousehold(self.investigator, FakeRequest())
+        ussd_register_household.question = question_1
+
+        self.assertEqual(question_1, ussd_register_household.process_registration_answer(''))
 
     def create_household(self, unique_id):
         return Household.objects.create(investigator=self.investigator, location=self.investigator.location,
@@ -818,3 +851,10 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 first_registration_question = "responseString=%s%s&action=request" % (
                     USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
                 self.assertEquals(urllib2.unquote(response.content), first_registration_question)
+
+class FakeRequest(HttpRequest):
+    def dict(self):
+        obj = self.__dict__
+        obj['transactionId'] = '1234567890'
+        obj['response'] = 'false'
+        return obj

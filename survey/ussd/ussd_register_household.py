@@ -37,10 +37,13 @@ class USSDRegisterHousehold(USSD):
             pass
 
     def set_form_in_cache(self):
-        if not self.investigator.get_from_cache('registration_dict'):
-            self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
-        else:
-            self.REGISTRATION_DICT = self.investigator.get_from_cache('registration_dict')
+        try:
+            if not self.investigator.get_from_cache('registration_dict'):
+                self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
+            else:
+                self.REGISTRATION_DICT = self.investigator.get_from_cache('registration_dict')
+        except KeyError:
+            pass
 
     def set_head_in_cache(self):
         try:
