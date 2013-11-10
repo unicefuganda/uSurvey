@@ -119,16 +119,16 @@ class LogicForm(forms.Form):
         return field_name, rule
 
     def _validate_max_greater_than_min(self):
-      minimum_value = self.data.get('min_value', None)
-      maximum_value = self.data.get('max_value', None)
+        minimum_value = self.data.get('min_value', None)
+        maximum_value = self.data.get('max_value', None)
 
-      if minimum_value and maximum_value:
-        try:
-            return int(maximum_value) > int(minimum_value)
-        except:
-            return True
+        if minimum_value and maximum_value:
+            try:
+                return int(maximum_value) > int(minimum_value)
+            except:
+                return True
 
-      return True
+        return True
 
     def clean(self):
         field_name = ""

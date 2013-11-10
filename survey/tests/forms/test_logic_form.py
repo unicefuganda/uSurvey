@@ -63,6 +63,21 @@ class LogicFormTest(TestCase):
         self.assertFalse(logic_form.is_valid())
         self.assertIn('Logic not created max value must be greater than min value.', logic_form.errors['__all__'])
 
+    def test_form_returns_true_for_validate_max_greater_than_min_if_non_integer_type_is_input_as_values(self):
+        batch = Batch.objects.create(order=1)
+        question_without_option = Question.objects.create(text="Question 1?",
+                                                          answer_type=Question.NUMBER, order=1)
+        question_without_option.batches.add(batch)
+
+        data = dict(action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                    condition=AnswerRule.CONDITIONS['BETWEEN'],
+                    attribute = 'value',
+                    min_value='Not Digit', max_value='Not digit')
+
+        logic_form = LogicForm(question=question_without_option, data=data, batch=batch)
+        self.assertFalse(logic_form.is_valid())
+        self.assertTrue(logic_form._validate_max_greater_than_min())
+
     def test_form_has_validation_error_if_between_condition_is_selected_and_min_value_field_is_empty(self):
         batch = Batch.objects.create(order=1)
         question_without_option = Question.objects.create(text="Question 1?",
