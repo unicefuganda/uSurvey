@@ -95,6 +95,7 @@ def add_group(request):
                'button_label': 'Create',
                'id': 'add_group_form',
                'action': "/groups/new/",
+               'cancel_url': '/groups/',
                'condition_form': GroupConditionForm(),
                'condition_title': "New Eligibility Criteria"}
 

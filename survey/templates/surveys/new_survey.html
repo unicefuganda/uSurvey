@@ -6,6 +6,10 @@
   {% include "naked_form.html" with a_form=survey_form %}
   <div class="form-actions">
     <button type="submit" class="btn btn-primary" name="save_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
-    <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
+        {% if cancel_url %}
+            <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button">Cancel</a>
+        {% else %}
+            <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
+        {% endif %}
   </div>
 </form>

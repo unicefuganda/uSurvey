@@ -41,7 +41,8 @@ def add(request):
         hierarchy_form = LocationHierarchyForm()
         details_formset = DetailsFormSet()
 
-    context = {'hierarchy_form': hierarchy_form, 'button_label': 'Create Hierarchy', 'id': 'hierarchy-form','details_formset':details_formset}
+    context = {'hierarchy_form': hierarchy_form, 'button_label': 'Create Hierarchy', 'id': 'hierarchy-form',
+               'details_formset':details_formset, 'cancel_url':'/'}
     return render(request,'location_hierarchy/new.html', context)
 
 @login_required

@@ -18,8 +18,8 @@ def new(request):
             return HttpResponseRedirect("/indicators/")
         messages.error(request, "Indicator was not created.")
     return render(request, 'indicator/new.html',
-                  {'indicator_form': indicator_form, 'title': 'Add Indicator', 'button_label': 'Save',
-                   'action': '/indicators/new/'})
+                  {'indicator_form': indicator_form, 'title': 'Add Indicator', 'button_label': 'Create',
+                   'cancel_url':'/indicators/', 'action': '/indicators/new/'})
 
 
 def _process_form(indicator_filter_form, indicators):

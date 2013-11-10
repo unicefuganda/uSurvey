@@ -34,7 +34,7 @@ class IndicatorViewTest(BaseTest):
         self.assertIsNotNone(response.context['indicator_form'])
         self.assertIsInstance(response.context['indicator_form'], IndicatorForm)
         self.assertEqual(response.context['title'], "Add Indicator")
-        self.assertEqual(response.context['button_label'], "Save")
+        self.assertEqual(response.context['button_label'], "Create")
         self.assertEqual(response.context['action'], "/indicators/new/")
 
     def test_post_indicator_creates_an_indicator_and_returns_success(self):

@@ -160,7 +160,8 @@ def new_subquestion(request, question_id, batch_id=None):
         questionform = QuestionForm(request.POST, parent_question=parent_question)
         response = __process_sub_question_form(request, questionform, parent_question, 'added', batch_id)
     context = {'questionform': questionform, 'button_label': 'Create', 'id': 'add-sub_question-form',
-               'parent_question': parent_question, 'class': 'question-form', 'heading': 'Add SubQuestion'}
+               'cancel_url': '/questions/', 'parent_question': parent_question, 'class': 'question-form',
+               'heading': 'Add SubQuestion'}
 
     template_name = 'questions/new.html'
     if request.is_ajax():
@@ -177,7 +178,8 @@ def edit_subquestion(request, question_id, batch_id=None):
         questionform = QuestionForm(request.POST, instance=question)
         response = __process_sub_question_form(request, questionform, question.parent, 'edited', batch_id)
     context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form',
-               'parent_question': question.parent, 'class': 'question-form', 'heading': 'Edit Subquestion'}
+               'cancel_url': '/questions/', 'parent_question': question.parent, 'class': 'question-form',
+               'heading': 'Edit Subquestion'}
 
     template_name = 'questions/new.html'
 
@@ -291,6 +293,7 @@ def _render_question_view(request, instance=None):
                'id': 'add-question-form',
                'request': request,
                'class': 'question-form',
+               'cancel_url': '/questions/',
                'questionform': question_form}
 
     if options:

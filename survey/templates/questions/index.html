@@ -19,9 +19,9 @@
         </h3>
         {% include "questions/_question_filter_form.html" with action="/questions/" %}
         <a href="{% url 'new_question_page' %}" class="btn btn_primary pull-right" id="add_question">Create New Question</a>
-        <br class="clear"/>
-        <br/>
     {% endif %}
+    <br class="clear"/>
+    <br/>
 
     {% if batch %}
         <form method="post" accept-charset="utf-8"  action="{% url 'update_question_order_page' batch.id %}">

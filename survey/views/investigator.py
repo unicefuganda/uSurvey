@@ -60,6 +60,7 @@ def new_investigator(request):
                                                                   'id': "create-investigator-form",
                                                                   'class': 'investigator-form',
                                                                   'button_label': "Create",
+                                                                  'cancel_url': '/investigators/',
                                                                   'loading_text': "Creating..."})
 @login_required
 def get_locations(request):
@@ -118,6 +119,7 @@ def edit_investigator(request, investigator_id):
                 'id': 'edit-investigator-form',
                 'class': 'investigator-form',
                 'button_label': 'Save',
+                'cancel_url': '/investigators/',
                 'loading_text': 'Saving...',
                 'form': investigator_form,
                 'locations': LocationWidget(investigator.location)}

@@ -10,7 +10,7 @@ from survey.forms.surveys import SurveyForm
 @permission_required('auth.can_view_batches')
 def index(request):
     surveys = Survey.objects.all().order_by('created')
-    context = {'surveys': surveys, 'request': request,
+    context = {'surveys': surveys, 'request': request, 'cancel_url': '/surveys/',
                'survey_form': SurveyForm()}
     return render(request, 'surveys/index.html',
                   context)
@@ -33,10 +33,10 @@ def new(request):
                'button_label': 'Create',
                'id': 'add-survey-form',
                'action': "/surveys/new/",
+               'cancel_url': '/surveys/',
                }
 
     return response or render(request, 'surveys/new.html', context)
-
 
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id):
@@ -54,13 +54,13 @@ def edit(request, survey_id):
                    'title': "Edit Survey",
                    'button_label': 'Save',
                    'id': 'edit-survey-form',
+                   'cancel_url': '/surveys/',
                    'action': '/surveys/%s/edit/' %survey_id
                    }
         return render(request, 'surveys/new.html', context)
     except ObjectDoesNotExist:
         messages.error(request, "Survey does not exist.")
         return HttpResponseRedirect('/surveys/')
-
 
 @permission_required('auth.can_view_batches')
 def delete(request, survey_id):
