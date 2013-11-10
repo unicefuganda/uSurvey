@@ -6,7 +6,6 @@ from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 
-from django.http.request import HttpRequest
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule, AnswerRule, QuestionOption, Survey, RandomHouseHoldSelection
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
@@ -785,11 +784,3 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 first_registration_question = "responseString=%s%s&action=request" % (
                     USSD.MESSAGES['HEAD_REGISTERED'], question_1.text)
                 self.assertEquals(urllib2.unquote(response.content), first_registration_question)
-
-
-class FakeRequest(HttpRequest):
-    def dict(self):
-        obj = self.__dict__
-        obj['transactionId'] = '1234567890'
-        obj['response'] = 'false'
-        return obj
