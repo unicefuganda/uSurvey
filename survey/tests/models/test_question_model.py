@@ -46,6 +46,30 @@ class QuestionTest(TestCase):
         self.assertEqual(questions[0], question_1)
         self.assertEqual(questions[1], question_2)
 
+    def test_get_next_question_in_batch(self):
+        kampala = Location.objects.create(name="Kampala")
+        question_2 = Question.objects.create(text="This is a question", answer_type="number", order=2)
+        question_1 = Question.objects.create(text="This is another question", answer_type="number",
+                                             order=1)
+        self.batch.open_for_location(kampala)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+
+        self.assertEqual(question_2, question_1.next_question(kampala))
+
+    def test_get_next_question_in_batch_if_sub_question_is_provided(self):
+        kampala = Location.objects.create(name="Kampala")
+        question_2 = Question.objects.create(text="This is a question", answer_type="number", order=2)
+        question_1 = Question.objects.create(text="This is another question", answer_type="number",
+                                             order=1)
+        sub_question_1 = Question.objects.create(text="This is another question", answer_type="number",
+                                                 parent=question_1, subquestion=True)
+        self.batch.open_for_location(kampala)
+        question_1.batches.add(self.batch)
+        question_2.batches.add(self.batch)
+
+        self.assertEqual(question_2, sub_question_1.next_question(kampala))
+
     def test_cannot_save_subquestion_if_order_given(self):
         question_2 = Question.objects.create(text="This is a question", answer_type="number", order=2)
         subquestion = Question(text="Specify others", answer_type=Question.TEXT, subquestion=True, parent=question_2,

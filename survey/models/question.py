@@ -100,7 +100,8 @@ class Question(BaseModel):
 
     def next_question(self, location, member=None):
         order = self.parent.order if self.subquestion else self.order
-        return self.batch.get_next_question(order, location=location)
+        batch = self.parent.batches.all()[0] if self.subquestion else self.batches.all()[0]
+        return batch.get_next_question(order, location=location)
 
     def to_ussd(self, page=1):
         if self.answer_type == self.MULTICHOICE:
