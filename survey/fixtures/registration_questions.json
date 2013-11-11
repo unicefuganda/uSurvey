@@ -44,7 +44,7 @@
             "group": 12,
             "parent": null,
             "created": "2013-11-01T10:11:15.339Z",
-            "text": "Please Enter the age",
+            "text": "Please Enter the age\n(enter 99 if not known)",
             "modified": "2013-11-01T10:11:15.340Z",
             "module": 11,
             "subquestion": false,
@@ -55,6 +55,199 @@
     },
     {
         "pk": 82,
+        "model": "survey.question",
+        "fields": {
+            "batches": [],
+            "group": 12,
+            "parent": 81,
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "Please Enter the month of birth",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "module": 11,
+            "subquestion": true,
+            "answer_type": "multichoice",
+            "identifier": null,
+            "order": null
+        }
+    },
+    {
+        "pk": 1,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "January",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 1
+        }
+    },
+    {
+        "pk": 2,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "February",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 2
+        }
+    },
+    {
+        "pk": 3,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "March",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 3
+        }
+    },
+    {
+        "pk": 4,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "April",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 4
+        }
+    },
+    {
+        "pk": 5,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "May",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 5
+        }
+    },
+    {
+        "pk": 6,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "June",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 6
+        }
+    },
+    {
+        "pk": 7,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "July",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 7
+        }
+    },
+    {
+        "pk": 8,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "August",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 8
+        }
+    },
+    {
+        "pk": 9,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "September",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 9
+        }
+    },
+    {
+        "pk": 10,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "October",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 10
+        }
+    },
+    {
+        "pk": 11,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "November",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 11
+        }
+    },
+    {
+        "pk": 12,
+        "model": "survey.questionoption",
+        "fields": {
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "December",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "question": 82,
+            "order": 12
+        }
+    },
+    {
+        "pk": 83,
+        "model": "survey.question",
+        "fields": {
+            "batches": [],
+            "group": 12,
+            "parent": 81,
+            "created": "2013-11-01T10:11:15.339Z",
+            "text": "Please Enter the year of birth",
+            "modified": "2013-11-01T10:11:15.340Z",
+            "module": 11,
+            "subquestion": true,
+            "answer_type": "number",
+            "identifier": null,
+            "order": null
+        }
+    },
+    {
+        "pk": 1,
+        "model": "survey.answerrule",
+        "fields": {
+            "question": 81,
+            "action": "ASK_SUBQUESTION",
+            "condition": "EQUALS",
+            "created": "2013-11-01T10:11:15.339Z",
+            "validate_with_value": 99,
+            "modified": "2013-11-01T10:11:15.340Z",
+            "next_question": 82
+        }
+    },
+    {
+        "pk": 2,
+        "model": "survey.answerrule",
+        "fields": {
+            "question": 82,
+            "action": "ASK_SUBQUESTION",
+            "condition": "BETWEEN",
+            "created": "2013-11-01T10:11:15.339Z",
+            "validate_with_min_value": 1,
+            "validate_with_max_value": 12,
+            "modified": "2013-11-01T10:11:15.340Z",
+            "next_question": 83
+        }
+    },
+    {
+        "pk": 84,
         "model": "survey.question",
         "fields": {
             "batches": [],
@@ -70,3 +263,4 @@
             "order": 3
         }
     }
+]

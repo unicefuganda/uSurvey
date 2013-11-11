@@ -133,6 +133,7 @@ class USSDRegisterHousehold(USSD):
                 self.render_questions_or_member_selection(answer)
             if answer == self.ANSWER['NO']:
                 self.investigator.clear_interview_caches()
+                self.set_in_session('HOUSEHOLD', None)
                 self.render_welcome_screen()
             self.set_in_session('HOUSEHOLD_MEMBER', None)
 
