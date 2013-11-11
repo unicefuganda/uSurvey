@@ -64,8 +64,11 @@ class QuestionForm(ModelForm):
 
         if self.parent_question:
             duplicate_sub_question = self.parent_question.get_subquestions().filter(text__iexact=text)
-            if duplicate_sub_question.exists():
+            has_instance_id_different = (self.instance.id and self.instance.id != duplicate_sub_question[0].id)
+
+            if duplicate_sub_question.exists() and (not self.instance.id or has_instance_id_different):
                 self._errors['text'] = self.error_class(["Sub question for this question with this text already exists."])
+                del self.cleaned_data['text']
 
         return self.cleaned_data
 

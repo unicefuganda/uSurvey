@@ -165,3 +165,24 @@ class QuestionFormTest(TestCase):
 
         question_form = QuestionForm(form_data)
         self.assertFalse(question_form.is_valid())
+
+    def test_form_is_invalid_if_trying_to_add_duplicate_subquestion_under_question(self):
+        question = Question.objects.create(text="Question 1?",
+                                                answer_type=Question.NUMBER, order=1,group=self.household_member_group)
+
+        sub_question_data = {'text': 'Subquestion 1?',
+                             'answer_type':Question.NUMBER,
+                             'group': self.household_member_group,
+                             'subquestion': True,
+                             'parent': question}
+
+        sub_question = Question.objects.create(**sub_question_data)
+        error_message = 'Sub question for this question with this text already exists.'
+
+        sub_question_data['group'] = self.household_member_group.id
+        question_form = QuestionForm(parent_question=question, data=sub_question_data)
+        is_valid = question_form.is_valid()
+        self.assertFalse(is_valid)
+        self.assertIn(error_message, question_form.errors['text'])
+
+
