@@ -219,6 +219,16 @@ class Investigator(BaseModel):
         hierarchy.reverse()
         return SortedDict(hierarchy)
 
+    def locations_in_hierarchy(self):
+        hierarchy = []
+        location = self.location
+        hierarchy.append(location)
+        while location.tree_parent:
+            location = location.tree_parent
+            hierarchy.append(location)
+        hierarchy.reverse()
+        return hierarchy
+
     def remove_invalid_households(self):
         all_households = self.households.all()
         for household in all_households:
@@ -236,6 +246,18 @@ class Investigator(BaseModel):
                     return False
             return True
         return False
+
+    def get_household_code(self):
+        household_code = ""
+        location_hierarchy = self.locations_in_hierarchy()
+        for location in location_hierarchy:
+            all_locations = location.code.all()
+
+            location_code = all_locations[0] if all_locations else None
+            if location_code:
+                household_code += location_code.code
+        return household_code
+
 
     @classmethod
     def get_summarised_answers_for(self, batch, questions, data):

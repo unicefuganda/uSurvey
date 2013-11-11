@@ -31,4 +31,6 @@ class RandomHouseHoldSelectionTest(TestCase):
 
         self.assertEqual(len(random_households), len(investigator.households.all()))
         for random_household in random_households:
-            self.assertIn(Household.objects.get(random_sample_number=random_household), investigator.households.all())
+            household = Household.objects.get(random_sample_number=random_household)
+            self.assertIn(household, investigator.households.all())
+            self.assertEqual(household.household_code, (investigator.get_household_code() + str(household.uid)))

@@ -21,6 +21,7 @@ class Household(BaseModel):
     uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Unique Identification")
     random_sample_number = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Random Sample Number")
     survey = models.ForeignKey("Survey", null=True, related_name="survey_household")
+    household_code = models.CharField(max_length=100, null=True, verbose_name="Household Code")
 
     MEMBERS_PER_PAGE = 4
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings, 'USSD_PAGINATION', None).get('PREVIOUS')
@@ -195,12 +196,12 @@ class Household(BaseModel):
         return households
 
     @classmethod
-    def next_uid(cls):
-        all_households = Household.objects.filter()
+    def next_uid(cls, survey=None):
+        all_households = Household.objects.filter(survey=survey) if survey else Household.objects.filter()
         return (all_households.order_by('uid').reverse()[0].uid + 1) if all_households else 1
 
     @classmethod
-    def all_households_in(self,location,survey):
+    def all_households_in(self, location, survey):
         return Household.objects.filter(location__in=location.get_descendants(include_self=True), survey=survey)
 
 

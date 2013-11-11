@@ -43,13 +43,13 @@ class RandomHouseHoldSelection(BaseModel):
         all_random_households = all_selected_households.split(',')
 
         investigator = Investigator.objects.get(mobile_number=self.mobile_number)
-        counter = 0
 
         for random_household in all_random_households:
+            uid = Household.next_uid(survey)
+            household_code_value = investigator.get_household_code() + str(uid)
             Household.objects.create(investigator=investigator, location=investigator.location,
-                                     uid=int('%d%d' % (investigator.id, counter)), random_sample_number=random_household,
-                                     survey=survey)
-            counter += 1
+                                     uid=uid, random_sample_number=random_household,
+                                     survey=survey, household_code=household_code_value)
 
         if survey.has_sampling:
             self.send_message()

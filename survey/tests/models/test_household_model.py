@@ -1,6 +1,7 @@
 from django.template.defaultfilters import slugify
 from datetime import date, datetime, timedelta
 from django.test import TestCase
+from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion, NumericalAnswer, BatchQuestionOrder, Survey
 from survey.models.households import Household, HouseholdHead, HouseholdMember
@@ -35,8 +36,9 @@ class HouseholdTest(TestCase):
     def test_fields(self):
         hHead = Household()
         fields = [str(item.attname) for item in hHead._meta.fields]
-        self.assertEqual(len(fields), 8)
-        for field in ['id', 'investigator_id', 'created', 'modified', 'uid', 'location_id', 'random_sample_number', 'survey_id']:
+        self.assertEqual(len(fields), 9)
+        for field in ['id', 'investigator_id', 'created', 'modified', 'uid', 'location_id', 'random_sample_number',
+                      'survey_id', 'household_code']:
             self.assertIn(field, fields)
 
     def test_store(self):
@@ -50,6 +52,16 @@ class HouseholdTest(TestCase):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", backend=Backend.objects.create(name='something1'))
         Household.objects.create(investigator=investigator, uid=101)
         self.assertEqual(102, Household.next_uid())
+
+    def test_knows_next_uid_for_households_if_survey_is_open_is_survey_dependent(self):
+        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
+            investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", backend=Backend.objects.create(name='something1'))
+            Household.objects.create(investigator=investigator, survey=open_survey, uid=101)
+            Household.objects.create(investigator=investigator, survey=open_survey, uid=102)
+            Household.objects.create(investigator=investigator, uid=103)
+
+            self.assertEqual(103, Household.next_uid(open_survey))
 
     def test_should_know_household_related_location_to_village_level(self):
         district = LocationType.objects.create(name="District", slug=slugify("district"))

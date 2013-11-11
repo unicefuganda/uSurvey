@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
-from survey.models import Survey
 
 
-class Migration(DataMigration):
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        open_survey = Survey.currently_open_survey()
-        if open_survey:
-            for household in orm["survey.household"].objects.all():
-                household.survey_id = open_survey.id
-                household.save()
+        # Adding field 'Household.household_code'
+        db.add_column(u'survey_household', 'household_code',
+                      self.gf('django.db.models.fields.CharField')(max_length=100, null=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
-        for household in orm["survey.household"].objects.all():
-            household.survey = None
-            household.save()
+        # Deleting field 'Household.household_code'
+        db.delete_column(u'survey_household', 'household_code')
+
 
     models = {
         u'auth.group': {
@@ -153,6 +152,7 @@ class Migration(DataMigration):
         'survey.household': {
             'Meta': {'object_name': 'Household'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'household_code': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'households'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'location': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['locations.Location']", 'null': 'True'}),
@@ -357,4 +357,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['survey']
-    symmetrical = True

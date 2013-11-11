@@ -54,14 +54,19 @@ def validate_investigator(request, householdform, posted_locations):
 
 def create_household(householdform, investigator, valid, uid):
     is_valid_household = householdform['household'].is_valid()
+    open_survey = Survey.currently_open_survey()
+
 
     if investigator and is_valid_household:
         household = householdform['household'].save(commit=False)
         household.investigator = investigator
         household.location = investigator.location
+        household.household_code = investigator.get_household_code() + str(Household.next_uid(open_survey))
         if uid:
             household.uid = uid
-        household.survey = Survey.currently_open_survey()
+            household.household_code = investigator.get_household_code() + str(uid)
+
+        household.survey = open_survey
         household.save()
         valid['household'] = True
     return valid
@@ -110,8 +115,10 @@ def set_household_form(uid=None, data=None, is_edit=False, instance=None):
     if not is_edit:
         householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
 
+    open_survey = Survey.currently_open_survey()
+
     householdform['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid,
-                                               auto_id='household-%s', label_suffix='')
+                                               survey=open_survey, auto_id='household-%s', label_suffix='')
     return householdform
 
 
@@ -129,6 +136,7 @@ def create(request, selected_location, instance=None, is_edit=False, uid=None):
 def new(request):
     selected_location = None
     response = None
+
     householdform = set_household_form(data=None)
     investigator_form = {'value': '', 'text': '', 'options': '', 'error': ''}
     month_choices = {'selected_text': '', 'selected_value': ''}

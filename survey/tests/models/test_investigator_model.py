@@ -1,10 +1,11 @@
 from datetime import date, datetime, timedelta
 
 from django.test import TestCase
+from mock import patch
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
-from survey.models import AnswerRule, HouseholdHead, BatchQuestionOrder
+from survey.models import AnswerRule, HouseholdHead, BatchQuestionOrder, LocationCode
 
 from survey.models.batch import Batch
 from survey.investigator_configs import COUNTRY_PHONE_CODE
@@ -15,6 +16,7 @@ from survey.models.investigator import Investigator
 from survey.models.question import Question, NumericalAnswer
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.surveys import Survey
+
 
 
 class InvestigatorTest(TestCase):
@@ -53,6 +55,36 @@ class InvestigatorTest(TestCase):
         self.assertEqual(investigator.identity, COUNTRY_PHONE_CODE + investigator.mobile_number)
         self.assertEqual(investigator.weights, 30.99)
 
+    def test_investigator_knows_how_to_get_household_code(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        city = LocationType.objects.create(name="City", slug=slugify("city"))
+        subcounty = LocationType.objects.create(name="Subcounty", slug=slugify("subcounty"))
+        parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
+        village = LocationType.objects.create(name="Village", slug=slugify("village"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        abim = Location.objects.create(name="Abim", type=subcounty, tree_parent=kampala)
+        kololo = Location.objects.create(name="Kololo", type=parish, tree_parent=abim)
+        village = Location.objects.create(name="Village", type=village, tree_parent=kololo)
+
+        uganda_code_value = '01'
+        kampala_code_value = '00001'
+        kololo_code_value = '00001'
+        village_code_value = '00001'
+
+        LocationCode.objects.create(location=uganda, code=uganda_code_value)
+        LocationCode.objects.create(location=kampala, code=kampala_code_value)
+        LocationCode.objects.create(location=kololo, code=kololo_code_value)
+        LocationCode.objects.create(location=village, code=village_code_value)
+
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
+                                                   location=village, backend=self.backend)
+
+        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
+            household_code_value = uganda_code_value + kampala_code_value + kololo_code_value + village_code_value
+            self.assertEqual(household_code_value, investigator.get_household_code())
+
     def test_mobile_number_is_unique(self):
         self.failUnlessRaises(IntegrityError, Investigator.objects.create, mobile_number="123456789")
 
@@ -68,6 +100,15 @@ class InvestigatorTest(TestCase):
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
                                                    location=kampala, backend=self.backend)
         self.assertEquals(investigator.location_hierarchy(), {'Country': uganda, 'City': kampala})
+
+    def test_locations_in_hierarchy(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        city = LocationType.objects.create(name="City", slug=slugify("city"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
+                                                   location=kampala, backend=self.backend)
+        self.assertEquals(investigator.locations_in_hierarchy(), [uganda, kampala])
 
     def test_saves_household_member_answer_and_batch_is_complete(self):
         household_member1 = HouseholdMember.objects.create(household=self.household, surname="abcd", male=True,

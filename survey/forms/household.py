@@ -6,14 +6,14 @@ from survey.models.households import Household
 class HouseholdForm(ModelForm):
     class Meta:
         model = Household
-        exclude = ['investigator', 'location', 'survey']
+        exclude = ['investigator', 'location', 'survey', 'household_code']
 
-    def __init__(self, is_edit=False, uid=None,  *args, **kwargs):
+    def __init__(self, is_edit=False, uid=None,  survey=None, *args, **kwargs):
         super(HouseholdForm, self).__init__(*args, **kwargs)
         self.is_editing = is_edit
 
         if not self.is_editing:
-            self.fields['uid'].initial = Household.next_uid()
+            self.fields['uid'].initial = Household.next_uid(survey)
         else:
             self.fields['uid'].initial = self.instance.uid
             self.fields['uid'].widget.attrs['disabled'] = 'disabled'

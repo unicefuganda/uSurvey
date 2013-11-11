@@ -195,6 +195,9 @@ class HouseholdViewTest(BaseTest):
             'time_measure': 'Years',
             'uid': '2',
         }
+
+        household_code = investigator.get_household_code() + str(Household.next_uid())
+
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(uid=form_data['uid'])
         self.failIf(hHead)
@@ -214,6 +217,7 @@ class HouseholdViewTest(BaseTest):
         self.assertEqual(hHead.male, False)
         self.assertEqual(household.investigator, investigator)
         self.assertEqual(household.location, investigator.location)
+        self.assertEqual(household.household_code, household_code)
         self.assertEqual(hHead.household, household)
 
         investigator.location = burundi
