@@ -10,9 +10,13 @@
     <link rel="stylesheet" href="{{STATIC_URL}}chosen/chosen.css" />
     <link rel="stylesheet" href="{{STATIC_URL}}multi-select/multi-select.css" />
     <link rel="stylesheet" href="{{STATIC_URL}}bootstrap-switch/bootstrap-switch.css" />
+
+    {% block extra_css %}{% endblock %}
+
     <link rel="stylesheet/less" type="text/css" href="{{STATIC_URL}}css/application.less" />
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/smoothness/jquery-ui.css" />
     <script src="{{STATIC_URL}}js/less.js" type="text/javascript" charset="utf-8"></script>
+
   </head>
   <body>
     <header class="container">

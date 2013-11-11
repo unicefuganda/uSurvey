@@ -1,15 +1,35 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-.q0-9 { fill:rgb(158,202,225); }
-.q1-9 { fill:rgb(107,174,214); }
-.q2-9 { fill:rgb(66,146,198); }
-.q3-9 { fill:rgb(33,113,181); }
-.q4-9 { fill:rgb(8,48,107); }
-.q5-9 { fill:rgb(255,0,0); }
-</style>
-<body>
-<script src="{{STATIC_URL}}js/lib/d3.v3.min.js"></script>
-<script src="{{ STATIC_URL }}js/lib/queue.v1.min.js"></script>
-<script src="{{ STATIC_URL }}js/lib/topojson.v1.min.js"></script>
-<script src="{{ STATIC_URL }}js/map.js"></script>
+{% extends "layout.html" %}
+{% block extra_css %}
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+    <style>
+      #completion_map { height: 1280px; }
+      .info {
+            width: 250px;
+            height: 100px;
+            padding: 10px;
+            font: 16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            }
+      .info h1 {
+            margin: 0 0 5px;
+            color: #777;
+            font: 20px Arial, Helvetica, sans-serif !important;
+      }
+    </style>
+
+{% endblock %}
+{% block title %}
+  Home
+{% endblock %}
+{% block content %}
+<div id="completion_map" >
+
+</div>
+{% endblock%}
+{% block javascripts %}
+    <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+    <script src="{{ STATIC_URL }}js/maps.js" charset="utf-8"></script>
+{% endblock %}
