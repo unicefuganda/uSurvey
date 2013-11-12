@@ -3,6 +3,8 @@
     Completion Rates
 {% endblock %}
 {% block content %}
+   {% load pagination_tags %}
+
     <h3>Survey Completion by Region/District</h3>
   <form id="aggregates-form" action="{% url action %}" method="get">
     <div>
@@ -27,6 +29,8 @@
     <button class="btn btn-primary">Get status</button>
   </form>
   {% if completion_rates %}
+    {% autopaginate completion_rates.attributes 50 %}
+
     <table class="table table-striped table-bordered">
       <thead>
         <tr>
@@ -48,6 +52,8 @@
       {% endfor %}
       </tbody>
     </table>
+
+    {% paginate %}
 {% endif %}
 {% endblock %}
 {% block javascripts %}

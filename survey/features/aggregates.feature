@@ -51,6 +51,14 @@ Feature: Aggregates feature
       And I should see an option to select batch
       And I should see a get status button
 
+    Scenario: Region/district completion rates -- pagination
+      Given I am logged in as researcher
+      And I have 100 locations
+      And I have one batch open in those locations
+      And I visit district aggregate page
+      And I click get status button
+      Then I should see district completion table paginated
+
     Scenario: Survey completion rates - get with params
       Given I am logged in as researcher
       And I have locations

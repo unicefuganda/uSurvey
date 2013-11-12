@@ -220,3 +220,21 @@ def and_i_should_see_dropdown_with_two_surveys(step):
 @step(u'And I should see generate report button')
 def and_i_should_see_generate_report_button(step):
     assert world.browser.find_by_css("#download-investigator-form")[0].find_by_tag('button')[0].text == "Generate Report"
+
+@step(u'And I have 100 locations')
+def and_i_have_100_locations(step):
+    country = LocationType.objects.create(name="Country", slug="country")
+    district = LocationType.objects.create(name="District", slug="district")
+    world.uganda = Location.objects.create(name="uganda", type=country)
+
+    for i in xrange(100):
+        Location.objects.create(name="name"+str(i), tree_parent=world.uganda, type=district)
+
+@step(u'Then I should see district completion table paginated')
+def then_i_should_see_district_completion_table_paginated(step):
+    world.page.validate_pagination()
+
+@step(u'And I have one batch open in those locations')
+def and_i_have_one_batch_open_in_those_locations(step):
+    world.batch_12 = Batch.objects.create(order = 12, name = "Batch A")
+    world.batch_12.open_for_location(world.uganda)

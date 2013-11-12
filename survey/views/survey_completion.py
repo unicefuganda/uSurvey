@@ -69,6 +69,7 @@ def show(request):
     content['locations'] = LocationWidget(selected_location)
     content['batches'] = Batch.objects.all()
     content['action'] = 'survey_completion_rates'
+    content['request'] = request
     return render(request, 'aggregates/completion_status.html', content)
 
 

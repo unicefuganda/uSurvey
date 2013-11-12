@@ -69,6 +69,7 @@ class TestSurveyCompletion(BaseTest):
         self.assertEqual(self.batch, response.context['selected_batch'])
         self.assertIn(self.abim, response.context['completion_rates'].locations)
         self.assertIn(self.kampala, response.context['completion_rates'].locations)
+        self.assertIsNotNone(response.context['request'])
 
     def test_knows_to_retrieve_completion_for_locations_that_have_no_tree_parent_if_country_type_does_not_exist(self):
         LocationType.objects.filter(name__iexact='country').delete()
@@ -79,6 +80,7 @@ class TestSurveyCompletion(BaseTest):
         self.assertEqual(self.batch, response.context['selected_batch'])
         self.assertIn(location_with_no_parent, response.context['completion_rates'].locations)
         self.assertIn(another_location_with_no_parent, response.context['completion_rates'].locations)
+        self.assertIsNotNone(response.context['request'])
 
     def test_should_validate_params(self):
         self.assertFalse(is_valid({'location':'2', 'batch':'NOT_A_DIGIT'}))
