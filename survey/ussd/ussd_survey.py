@@ -228,7 +228,7 @@ class USSDSurvey(USSD):
 
     def is_active(self):
         return self.investigator.was_active_within(self.TIMEOUT_MINUTES) or self.investigator.created_member_within(
-            self.TIMEOUT_MINUTES)
+            self.TIMEOUT_MINUTES, Survey.currently_open_survey())
 
     def can_resume_survey(self, is_registering):
         return is_registering or self.investigator.has_open_batch()

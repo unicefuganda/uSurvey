@@ -32,12 +32,13 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''), location=self.location,
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=0)
+        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+                                                  survey=self.open_survey, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, male=False, surname="Surname",
                                                            date_of_birth=datetime.date(1929, 2, 2))
         self.household_member = HouseholdMember.objects.create(surname="Surnmae", household=self.household,
                                                                date_of_birth=datetime.date(1929, 2, 2), male=False)
-        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
 
         self.batch = Batch.objects.create(order=1, survey=self.open_survey)
 

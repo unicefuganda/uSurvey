@@ -187,10 +187,13 @@ class Investigator(BaseModel):
         locations = self.location.get_ancestors(include_self=True)
         return BatchLocationStatus.objects.filter(location__in=locations).count() > 0
 
-    def created_member_within(self, minutes):
+    def created_member_within(self, minutes, open_survey=None):
         last_member = self.last_registered()
 
         if not last_member:
+            return False
+
+        if last_member.household.survey != open_survey:
             return False
 
         last_active = last_member.created

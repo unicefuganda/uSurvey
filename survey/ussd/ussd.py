@@ -128,7 +128,7 @@ class USSD(USSDBase):
     def select_household(self, answer):
         try:
             answer = int(answer)
-            self.household = self.investigator.all_households()[answer - 1]
+            self.household = self.investigator.all_households(Survey.currently_open_survey())[answer - 1]
             self.set_in_session('HOUSEHOLD', self.household)
         except (ValueError, IndexError) as e:
             self.responseString += "INVALID SELECTION: "

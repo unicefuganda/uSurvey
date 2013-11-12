@@ -95,7 +95,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                               household=household)
 
     def test_household_member_list_paginates(self):
-        household = Household.objects.get(uid=0)
+        household = Household.objects.get(uid=0, survey=self.open_survey_1)
         member_1 = self.create_household_member("1", household)
         member_2 = self.create_household_member("2", household)
         member_3 = self.create_household_member("3", household)
@@ -112,9 +112,8 @@ class USSDTestCompleteFlow(USSDBaseTest):
             USSD.MESSAGES['MEMBERS_LIST'], member_4.surname, member_5.surname,
             member_6.surname, member_7.surname)
 
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
-            with patch.object(Survey, "currently_open_survey", return_value=open_survey):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
@@ -504,7 +503,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                                    location=masaka,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
-                                             uid='10')
+                                             uid='10', survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,
                                                       surname="Name " + str(randint(1, 9999)),
                                                       date_of_birth=datetime.date(1980, 9, 1))
@@ -553,7 +552,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                                    backend=self.backend)
         investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
-                                             uid='10')
+                                             uid='10', survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,
                                                       surname="Name " + str(randint(1, 9999)),
                                                       date_of_birth=datetime.date(1980, 9, 1))
@@ -597,7 +596,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                                    location=masaka,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
-                                             uid='10')
+                                             uid='10', survey=self.open_survey_1)
         HouseholdHead.objects.create(household=household,
                                      surname="Name " + str(randint(1, 9999)),
                                      date_of_birth=datetime.date(1980, 9, 1))
@@ -649,7 +648,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                                    location=masaka,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
-                                             uid='10')
+                                             uid='10', survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,
                                                       surname="Name " + str(randint(1, 9999)),
                                                       date_of_birth=datetime.date(1980, 9, 1))
@@ -701,7 +700,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
     def test_retaking_of_household_member_with_in_5min_session_marks_only_that_members_responses_as_old(self):
         Household.objects.all().delete()
         household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
-                                             uid=88)
+                                             uid=88, survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,
                                                       surname="Head 001",
                                                       date_of_birth=datetime.date(1980, 9, 1))

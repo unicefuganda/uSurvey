@@ -310,6 +310,26 @@ class InvestigatorTest(TestCase):
 
         self.assertTrue(investigator.created_member_within(TIMEOUT_MINUTES))
 
+    def test_knows_member_was_registered_within_time_out_minutes_but_in_different_survey_which_is_not_open(self):
+        masaka = Location.objects.create(name="Masaka")
+        TIMEOUT_MINUTES = 5
+        investigator = Investigator.objects.create(name="Another investigator",
+                                                   mobile_number='779432679',
+                                                   location=masaka,
+                                                   backend=self.backend)
+        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        closed_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+
+        household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                         uid='10', survey=closed_survey)
+
+        HouseholdHead.objects.create(household=household, surname="head_registered",
+                                 date_of_birth=datetime(1980, 02, 02), male=False)
+        HouseholdMember.objects.create(household=household, surname="new member",
+                                   date_of_birth=datetime(2002, 02, 02), male=False)
+        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
+            self.assertFalse(investigator.created_member_within(TIMEOUT_MINUTES, open_survey))
+
     def test_knows_last_member_was_registered_after_time_out_minutes(self):
         masaka = Location.objects.create(name="Masaka")
         TIMEOUT_MINUTES = 5
