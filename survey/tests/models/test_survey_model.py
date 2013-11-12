@@ -118,3 +118,37 @@ class SurveyTest(TestCase):
         another_closed_batch = Batch.objects.create(order=3, name="Another Closed Batch", survey=another_closed_survey)
 
         self.assertEqual(None, Survey.currently_open_survey())
+
+    def test__survey_knows_is_currently_open_for_location(self):
+
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        masaka = Location.objects.create(name="masaka", type=district, tree_parent=uganda)
+        wakiso = Location.objects.create(name="wakiso", type=district, tree_parent=uganda)
+
+        open_survey = Survey.objects.create(name="open survey", description="open survey")
+
+        open_batch = Batch.objects.create(order=1, name="Open Batch", survey=open_survey)
+        open_batch_2 = Batch.objects.create(order=2, name="Open Batch 2", survey=open_survey)
+        open_batch.open_for_location(kampala)
+        open_batch_2.open_for_location(masaka)
+        self.assertTrue(open_survey.is_open_for(kampala))
+        self.assertTrue(open_survey.is_open_for(masaka))
+        self.assertFalse(open_survey.is_open_for(wakiso))
+
+    def test_survey_knows_opened_for_parent_means_opened_for_children(self):
+
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        masaka = Location.objects.create(name="masaka", type=district, tree_parent=uganda)
+
+        open_survey = Survey.objects.create(name="open survey", description="open survey")
+
+        open_batch = Batch.objects.create(order=1, name="Open Batch", survey=open_survey)
+        open_batch.open_for_location(uganda)
+        self.assertTrue(open_survey.is_open_for(kampala))
+        self.assertTrue(open_survey.is_open_for(masaka))

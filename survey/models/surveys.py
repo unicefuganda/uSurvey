@@ -20,6 +20,13 @@ class Survey(BaseModel):
                 return True
         return False
 
+    def is_open_for(self, location):
+        all_batches = self.batch.all()
+        for batch in all_batches:
+            if batch.is_open_for(location):
+                return True
+        return False
+
     @classmethod
     def currently_open_survey(cls):
         for survey in Survey.objects.filter():

@@ -242,3 +242,15 @@ class HouseholdCompletionJsonService(BaseTest):
         district_level_completion = BatchSurveyCompletionRates(self.district)
         expected_completion = {self.zombo.name: 25.0, self.abim.name: 50.0}
         self.assertEqual(district_level_completion.get_completion_formatted_for_json(self.survey), expected_completion)
+
+    def test_returns_minus_one_when_no_batch_is_open_in_the_location(self):
+        kisoro = Location.objects.create(name='Kisoro', type=self.district)
+
+        survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        batch = Batch.objects.create(order=1, name='B', survey=survey)
+        batch.open_for_location(self.abim)
+
+        with patch.object(BatchLocationCompletionRates, 'percent_completed_households', return_value=10):
+            completion = BatchSurveyCompletionRates(self.district)
+            self.assertEqual(-1, completion.get_completion_formatted_for_json(survey)[kisoro.name])
+            self.assertNotEqual(0, completion.get_completion_formatted_for_json(survey)[self.abim.name])

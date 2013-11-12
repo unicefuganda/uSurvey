@@ -1,5 +1,5 @@
 from django.test import TestCase
-from survey.forms.filters import QuestionFilterForm, IndicatorFilterForm
+from survey.forms.filters import QuestionFilterForm, IndicatorFilterForm, SurveyCompletionFilterForm
 from survey.models import Question, QuestionModule, HouseholdMemberGroup, Indicator, Batch, Survey
 
 
