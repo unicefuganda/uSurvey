@@ -1,7 +1,7 @@
+from lettuce import *
+
 from survey.features.page_objects.accounts import LogoutPage
 from survey.features.page_objects.root import AboutPage
-from rapidsms.contrib.locations.models import *
-from lettuce import *
 
 
 @step(u'Given I am not logged in')
