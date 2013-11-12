@@ -10,7 +10,7 @@ from survey.forms.surveys import SurveyForm
 @permission_required('auth.can_view_batches')
 def index(request):
     surveys = Survey.objects.all().order_by('created')
-    context = {'surveys': surveys, 'request': request, 'cancel_url': '/surveys/',
+    context = {'surveys': surveys, 'request': request,
                'survey_form': SurveyForm()}
     return render(request, 'surveys/index.html',
                   context)

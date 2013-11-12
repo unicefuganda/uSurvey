@@ -75,7 +75,7 @@ def new(request, survey_id):
     response, batchform = _process_form(request=request, batchform=(BatchForm(instance=batch)), action_str='added')
 
     context = {'batchform': batchform, 'button_label': "Create", 'id': 'add-batch-form', 'title': 'New Batch',
-               'action': '/surveys/%s/batches/new/' % survey_id}
+               'action': '/surveys/%s/batches/new/' % survey_id, 'cancel_url': '/surveys/'}
     return response or render(request, 'batches/new.html', context)
 
 

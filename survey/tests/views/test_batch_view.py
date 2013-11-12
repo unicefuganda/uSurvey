@@ -131,6 +131,7 @@ class BatchViewsTest(BaseTest):
         self.assertEqual(response.context['id'], 'add-batch-form')
         self.assertEqual(response.context['action'], '/surveys/%d/batches/new/' % self.survey.id)
         self.assertEqual(response.context['title'], 'New Batch')
+        self.assertEqual(response.context['cancel_url'], '/surveys/')
 
     def test_post_add_new_batch_is_invalid_if_name_field_is_empty(self):
         response = self.client.post('/surveys/%d/batches/new/' % self.survey.id, data={'name': '', 'description': ''})

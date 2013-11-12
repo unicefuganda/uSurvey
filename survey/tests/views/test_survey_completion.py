@@ -275,7 +275,3 @@ class HouseholdCompletionJsonViewTest(BaseTest):
         completion_rates = json.loads(response.content)
         self.assertEqual(completion_rates[self.zombo.name], 25.0)
         self.assertEqual(completion_rates[self.abim.name], 50.0)
-
-    def test_restricted_permissions(self):
-        self.assert_login_required('/survey/1/completion/json/')
-        self.assert_restricted_permission_for('/survey/1/completion/json/')
