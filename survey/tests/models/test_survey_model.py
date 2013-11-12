@@ -37,6 +37,34 @@ class SurveyTest(TestCase):
 
         self.assertTrue(survey.is_open())
 
+    def test_survey_knows_it_is_open_for_investigator_location_if_provided(self):
+        self.investigator = Investigator.objects.create(name="investigator name",
+                                                        mobile_number='123456789',
+                                                        location=Location.objects.create(name="Kampala"),
+                                                        backend=Backend.objects.create(name='something'))
+
+        survey = Survey.objects.create(name="survey name", description="rajni survey")
+        batch = Batch.objects.create(order=1, survey=survey)
+
+        investigator_location = self.investigator.location
+        batch.open_for_location(investigator_location)
+
+        self.assertTrue(survey.is_open(investigator_location))
+
+    def test_survey_knows_it_is_not_open_for_investigator_location_if_provided(self):
+        self.investigator = Investigator.objects.create(name="investigator name",
+                                                        mobile_number='123456789',
+                                                        location=Location.objects.create(name="Kampala"),
+                                                        backend=Backend.objects.create(name='something'))
+
+        survey = Survey.objects.create(name="survey name", description="rajni survey")
+        batch = Batch.objects.create(order=1, survey=survey)
+
+        not_investigator_location = Location.objects.create(name="Abim")
+        batch.open_for_location(not_investigator_location)
+
+        self.assertFalse(survey.is_open(self.investigator.location))
+
     def test_survey_knows_it_is_closed(self):
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number='123456789',

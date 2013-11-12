@@ -13,10 +13,12 @@ class Survey(BaseModel):
     class Meta:
         app_label = 'survey'
 
-    def is_open(self):
+    def is_open(self, location=None):
         all_batches = self.batch.all()
         for batch in all_batches:
-            if batch.open_locations.all():
+            batch_open_locations = batch.open_locations.all()
+            all_locations = batch_open_locations.filter(location=location) if location else batch_open_locations
+            if all_locations:
                 return True
         return False
 
@@ -28,9 +30,9 @@ class Survey(BaseModel):
         return False
 
     @classmethod
-    def currently_open_survey(cls):
+    def currently_open_survey(cls, location=None):
         for survey in Survey.objects.filter():
-            if survey.is_open():
+            if survey.is_open(location):
                 return survey
         return None
 
