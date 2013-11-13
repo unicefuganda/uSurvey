@@ -12,7 +12,6 @@ function get_survey_batches(val) {
     });
 }
 jQuery(function($){
-  get_survey_batches($("#survey-list-select").val());
   $("#survey-list-select").on('change',function(){
       get_survey_batches($(this).val());
   });

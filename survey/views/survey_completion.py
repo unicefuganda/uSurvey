@@ -44,7 +44,13 @@ def __get_parent_level_locations():
 def show(request):
     selected_location = None
     params = request.GET
-    content = {'selected_batch': None}
+    content = {'selected_batch': None,
+               'surveys': Survey.objects.all(),
+               'locations': LocationWidget(selected_location),
+               'batches': Batch.objects.all(),
+               'action': 'survey_completion_rates',
+               'request': request,}
+
     if is_valid(params):
         batch = Batch.objects.get(id=params['batch'])
         location_id = params['location']
@@ -62,14 +68,11 @@ def show(request):
 
         content['completion_rates'] = BatchHighLevelLocationsCompletionRates(batch, high_level_locations)
         content['selected_batch'] = batch
+        content['batches'] = content['batches'].filter(survey=batch.survey)
+
     elif params.has_key('location') or params.has_key('batch'):
         messages.error(request, "Please select a valid location and batch.")
 
-    content['surveys'] = Survey.objects.all()
-    content['locations'] = LocationWidget(selected_location)
-    content['batches'] = Batch.objects.all()
-    content['action'] = 'survey_completion_rates'
-    content['request'] = request
     return render(request, 'aggregates/completion_status.html', content)
 
 

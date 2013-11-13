@@ -84,3 +84,11 @@ def modulo(num, val):
 @register.filter
 def repeat_string(string, times):
     return string*(times-1)
+
+@register.filter
+def is_survey_selected_given(survey, selected_batch):
+    if not selected_batch or not selected_batch.survey:
+        return None
+
+    if survey == selected_batch.survey:
+        return "selected='selected'"

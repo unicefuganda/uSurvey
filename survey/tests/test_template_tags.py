@@ -1,5 +1,6 @@
 from datetime import date
 from django.test import TestCase
+from survey.models import Batch, Survey
 from survey.templatetags.template_tags import *
 
 
@@ -57,4 +58,21 @@ class TemplateTagsTest(TestCase):
     def test_should_return_repeated_string(self):
         self.assertEqual('000', repeat_string('0', 4))
 
+    def test_should_return_selected_for_selected_batch(self):
+        survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        batch = Batch.objects.create(name="open survey", survey=survey)
+        self.assertEqual("selected='selected'", is_survey_selected_given(survey, batch))
 
+    def test_should_return_none_for_selected_batch(self):
+        survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        batch = Batch.objects.create(name="Batch not belonging to survey")
+        self.assertIsNone(is_survey_selected_given(survey, batch))
+
+    def test_should_return_none_if_selected_batch_has_no_survey(self):
+        survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        batch = Batch.objects.create(name="Batch not belonging to survey")
+        self.assertIsNone(is_survey_selected_given(survey, batch))
+
+    def test_should_return_none_when_selected_batch_is_none(self):
+        survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        self.assertIsNone(is_survey_selected_given(survey, None))

@@ -12,7 +12,7 @@
       <label>Survey</label>
       <select name="survey" id="survey-list-select" name="survey">
         {% for survey in surveys %}
-          <option value="{{ survey.id }}" >{{ survey.name }}</option>
+          <option value="{{ survey.id }}" {{ survey|is_survey_selected_given:selected_batch }} >{{ survey.name }}</option>
         {% endfor %}
       </select>
 
