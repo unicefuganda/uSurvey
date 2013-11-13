@@ -213,11 +213,10 @@ class USSDSurvey(USSD):
     def render_homepage(self):
         open_survey = Survey.currently_open_survey(self.investigator.location)
         answer = self.request['ussdRequestString'].strip()
+
         if not self.investigator.has_households(survey=open_survey):
             self.action = self.ACTIONS['END']
             self.responseString = self.MESSAGES['NO_HOUSEHOLDS']
-        elif not answer and self.is_active():
-            self.render_resume_message(False)
         else:
             self.render_household_or_household_member(answer, open_survey)
 

@@ -410,6 +410,33 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
+    def test_renders_no_households_message_if_investigator_is_in_open_survey_location_but_has_no_households(self):
+        entebbe = Location.objects.create(name="Entebbe")
+        another_open_survey = Survey.objects.create(name="another open survey", description="open survey", has_sampling=True)
+
+        investigator = Investigator.objects.create(name="new investigator",
+                                                        mobile_number='123406489',
+                                                        location=entebbe,
+                                                        backend=self.backend)
+
+        Household.objects.create(investigator=investigator, location=investigator.location,
+                                                  uid=16, survey=self.open_survey_1)
+
+        location_batch = Batch.objects.create(name="Batch B", order=6, survey=another_open_survey)
+        location_batch.open_for_location(entebbe)
+        homepage = USSD.MESSAGES['WELCOME_TEXT'] % investigator.name
+
+        with patch.object(Investigator.objects, "get", return_value=investigator):
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                with patch.object(USSDSurvey, 'is_active', return_value=False):
+                    response = self.reset_session()
+                    response_string = "responseString=%s&action=request" % homepage
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+                    response = self.take_survey()
+
+                    response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_HOUSEHOLDS']
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+
     def test_should_show_household_list_if_resuming_survey_and_last_answered_question_was_more_than_timeout(self):
         question_4 = Question.objects.create(text="Question 4",
                                                   answer_type=Question.NUMBER, order=3, group=self.head_group)

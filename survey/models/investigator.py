@@ -54,7 +54,7 @@ class Investigator(BaseModel):
 
     def has_households(self, survey=None):
         all_households = self.households.all()
-        survey_households = all_households if survey else all_households.filter(survey=survey)
+        survey_households = all_households.filter(survey=survey) if survey else all_households
         return survey_households.count() > 0
 
     def generate_cache(self):
