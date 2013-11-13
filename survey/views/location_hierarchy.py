@@ -9,8 +9,9 @@ from django.forms.formsets import formset_factory
 
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
-from survey.forms.upload_locations import UploadLocationForm
+from survey.forms.upload_locations import UploadCSVFileForm
 from survey.models import LocationTypeDetails
+from survey.services.location_upload import UploadLocation
 
 
 @login_required
@@ -48,9 +49,9 @@ def add(request):
 @login_required
 @permission_required('auth.can_add_location_types')
 def upload(request):
-    upload_form = UploadLocationForm()
+    upload_form = UploadCSVFileForm(UploadLocation)
     if request.method == 'POST':
-        upload_form = UploadLocationForm(request.POST, request.FILES)
+        upload_form = UploadCSVFileForm(UploadLocation, request.POST, request.FILES)
         upload_form.is_valid()
         if upload_form.is_valid():
             status, message = upload_form.upload()

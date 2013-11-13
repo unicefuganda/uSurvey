@@ -1,9 +1,11 @@
 from django import forms
-from survey.services.location_upload import UploadLocation
 
-
-class UploadLocationForm(forms.Form):
+class UploadCSVFileForm(forms.Form):
     file = forms.FileField(label='Location Input File', required=True)
+
+    def __init__(self, uploader, *args, **kwargs):
+        super (UploadCSVFileForm, self).__init__(*args, **kwargs)
+        self.uploader = uploader
 
     def clean_file(self):
         file = self.cleaned_data['file']
@@ -15,5 +17,5 @@ class UploadLocationForm(forms.Form):
 
     def upload(self):
         file = self.cleaned_data['file']
-        uploader = UploadLocation(file)
+        uploader = self.uploader(file)
         return uploader.upload()
