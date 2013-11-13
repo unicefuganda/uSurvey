@@ -13,7 +13,7 @@ class USSDBase(object):
         'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
         'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
         'NO_HOUSEHOLDS': "Sorry, you have no households registered.",
-        'NO_OPEN_BATCH': "Sorry, there are no open surveys currently.",
+        'NO_OPEN_BATCH': "Sorry, currently there are no open surveys.",
         'HOUSEHOLDS_COUNT_QUESTION': "How many households have you listed in your Enumeration Area?",
         'HOUSEHOLD_SELECTION_SMS_MESSAGE': "Thank you. You will receive the household numbers selected for your Enumeration Area",
         'HOUSEHOLD_CONFIRMATION_MESSAGE': "Thank you. Houselist for Enumeration Area is available for member registration.",
