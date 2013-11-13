@@ -131,9 +131,12 @@ class USSDSurvey(USSD):
         else:
             if self.is_resuming_survey:
                 last_answered = self.investigator.last_answered()
-                household_member = last_answered.householdmember.cast_original_type()
-                self.household = household_member.household
-                self.resume_survey(answer, household_member)
+                if self.investigator.was_active_within(self.TIMEOUT_MINUTES):
+                    household_member = last_answered.householdmember.cast_original_type()
+                    self.household = household_member.household
+                    self.resume_survey(answer, household_member)
+                else:
+                    self.render_households_list(survey)
                 self.set_in_session('IS_RESUMING', False)
             else:
                 self.select_household(answer)

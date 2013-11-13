@@ -410,6 +410,63 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
+    def test_should_show_household_list_if_resuming_survey_and_last_answered_question_was_more_than_timeout(self):
+        question_4 = Question.objects.create(text="Question 4",
+                                                  answer_type=Question.NUMBER, order=3, group=self.head_group)
+        question_4.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_4, order=3)
+
+        homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
+                with patch.object(USSDSurvey, 'is_active', return_value=False):
+                    response = self.reset_session()
+                response_string = "responseString=%s&action=request" % homepage
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+                self.take_survey()
+                self.select_household()
+                self.select_household_member()
+                self.respond("1")
+
+                response = self.reset_session()
+
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    response = self.respond(USSD.ANSWER['YES'])
+                    households_list_1 = "%s\n1: %s\n2: %s\n3: %s\n4: %s\n#: Next" % (USSD.MESSAGES['HOUSEHOLD_LIST'],
+                                                                                 self.hh_string(self.household_head_1),
+                                                                                 self.hh_string(self.household_head_2),
+                                                                                 self.hh_string(self.household_head_3),
+                                                                                 self.hh_string(self.household_head_4),)
+                    response_string = "responseString=%s&action=request" % households_list_1
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                    self.respond('2')
+                    self.reset_session()
+                    response = self.respond(USSD.ANSWER['YES'])
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                    self.reset_session()
+                    response = self.respond(USSD.ANSWER['NO'])
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                    self.reset_session()
+                    response = self.respond(USSD.ANSWER['YES'])
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                    self.respond('1')
+                    batch= Batch.open_ordered_batches(self.household_head_1.get_location())[0]
+
+                    response = self.respond('1')
+                    response_string = "responseString=%s&action=request" % self.question_2.text
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                    response = self.respond('1')
+                    response_string = "responseString=%s&action=request" % question_4.text
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+
     def test_show_completion_star_next_to_household_head_name(self):
         self.household_head_1.batch_completed(self.batch)
         self.household_head_3.batch_completed(self.batch)
