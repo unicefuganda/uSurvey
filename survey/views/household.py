@@ -54,13 +54,12 @@ def validate_investigator(request, householdform, posted_locations):
 
 def create_household(householdform, investigator, valid, uid):
     is_valid_household = householdform['household'].is_valid()
-    open_survey = Survey.currently_open_survey()
-
 
     if investigator and is_valid_household:
         household = householdform['household'].save(commit=False)
         household.investigator = investigator
         household.location = investigator.location
+        open_survey = Survey.currently_open_survey(investigator.location)
         household.household_code = investigator.get_household_code() + str(Household.next_uid(open_survey))
         if uid:
             household.uid = uid

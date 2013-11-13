@@ -115,7 +115,7 @@ class USSD(USSDBase):
         return self.question_present_in_cache('INVALID_ANSWER')
 
     def get_household_list(self):
-        open_survey = Survey.currently_open_survey()
+        open_survey = Survey.currently_open_survey(self.investigator.location)
         page = self.get_from_session('PAGE')
         self.responseString += "%s\n%s" % (
             self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page, registered=False,
@@ -128,7 +128,7 @@ class USSD(USSDBase):
     def select_household(self, answer):
         try:
             answer = int(answer)
-            self.household = self.investigator.all_households(Survey.currently_open_survey())[answer - 1]
+            self.household = self.investigator.all_households(Survey.currently_open_survey(self.investigator.location))[answer - 1]
             self.set_in_session('HOUSEHOLD', self.household)
         except (ValueError, IndexError) as e:
             self.responseString += "INVALID SELECTION: "

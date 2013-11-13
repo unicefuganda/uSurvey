@@ -8,7 +8,7 @@ from mock import patch
 from rapidsms.contrib.locations.models import Location
 
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule, AnswerRule, QuestionOption, Survey, RandomHouseHoldSelection
+from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule, AnswerRule, QuestionOption, Survey, RandomHouseHoldSelection, Batch
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
@@ -26,9 +26,12 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
             'response': "false"
         }
         self.backend = Backend.objects.create(name='something')
+        self.another_open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
 
         self.kampala = Location.objects.create(name="Kampala")
+        self.entebbe = Location.objects.create(name="Entebbe")
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''),
@@ -106,6 +109,33 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
                 response = self.respond("*")
                 self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
+
+    def test_should_show_list_of_households_when_another_survey_open_in_different_location(self):
+        batch = Batch.objects.create(order=7, name="Batch name", survey=self.another_open_survey)
+        batch.open_for_location(self.entebbe)
+
+        batch_2 = Batch.objects.create(order=8, name="Another Batch", survey=self.open_survey)
+        batch_2.open_for_location(self.kampala)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            self.reset_session()
+            response = self.register_household()
+            household_list = USSD.MESSAGES[
+                                 'HOUSEHOLD_LIST'] + "\n1: Household-%s\n2: Household-%s\n3: Household-%s\n4: Household-%s\n#: Next" % (
+                                 self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
+
+            first_page_HH_list = "responseString=%s&action=request" % (household_list)
+            self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
+
+            response = self.respond("#")
+
+            household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: Household-%s\n*: Back" % (self.household5.uid)
+
+            response_string = "responseString=%s&action=request" % (household_list)
+            self.assertEquals(urllib2.unquote(response.content), response_string)
+
+            response = self.respond("*")
+            self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
 
     def test_should_ask_for_head_or_member_after_selecting_household(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):

@@ -38,7 +38,7 @@ class USSDSurvey(USSD):
             self.set_in_session('HOUSEHOLD', None)
             self.set_in_session('HOUSEHOLD_MEMBER', None)
             self.household = None
-            self.render_households_list(Survey.currently_open_survey())
+            self.render_households_list(Survey.currently_open_survey(self.investigator.location))
 
         self.action = self.ACTIONS['REQUEST']
 
@@ -208,7 +208,7 @@ class USSDSurvey(USSD):
         self.responseString += "%s\n%s" % (self.MESSAGES['MEMBERS_LIST'], self.household.members_list(page))
 
     def render_homepage(self):
-        open_survey = Survey.currently_open_survey()
+        open_survey = Survey.currently_open_survey(self.investigator.location)
         answer = self.request['ussdRequestString'].strip()
         if not self.investigator.has_households(survey=open_survey):
             self.action = self.ACTIONS['END']
@@ -228,7 +228,7 @@ class USSDSurvey(USSD):
 
     def is_active(self):
         return self.investigator.was_active_within(self.TIMEOUT_MINUTES) or self.investigator.created_member_within(
-            self.TIMEOUT_MINUTES, Survey.currently_open_survey())
+            self.TIMEOUT_MINUTES, Survey.currently_open_survey(self.investigator.location))
 
     def can_resume_survey(self, is_registering):
         return is_registering or self.investigator.has_open_batch()
