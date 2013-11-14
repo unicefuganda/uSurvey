@@ -41,6 +41,7 @@ class BaseTest(TestCase):
         with open(csvfilename, mode) as fp:
             file = csv.writer(fp, delimiter=',')
             file.writerows(data)
+            fp.close()
 
     def generate_non_csv_file(self, filename):
         book = xlwt.Workbook()

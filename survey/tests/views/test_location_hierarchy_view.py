@@ -6,7 +6,7 @@ from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
-from survey.forms.upload_locations import UploadCSVFileForm
+from survey.forms.upload_locations import UploadLocationsForm
 from survey.models import LocationTypeDetails
 from survey.tests.base_test import BaseTest
 
@@ -195,7 +195,7 @@ class UploadLocationsTest(BaseTest):
         self.assertEqual(response.context['button_label'], "Save")
         self.assertEqual(response.context['id'], "upload-locations-form")
         self.assertEqual(response.context['country_name'], self.uganda.name)
-        self.assertIsInstance(response.context['upload_form'], UploadCSVFileForm)
+        self.assertIsInstance(response.context['upload_form'], UploadLocationsForm)
 
     def test_should_render_location_types_details_by_order_in_context_data(self):
         response = self.client.get('/locations/upload/')

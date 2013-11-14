@@ -1,6 +1,6 @@
 import os
 from django.core.files import File
-from survey.services.csv_uploader import CSV_Uploader
+from survey.services.csv_uploader import CSVUploader
 from survey.tests.base_test import BaseTest
 
 
@@ -22,6 +22,6 @@ class CSVUploaderTest(BaseTest):
     def test_read_headers_and_data(self):
         self.generate_csv_file(self.filename)
         file = File(open(self.filename, 'rb'))
-        headers, data = CSV_Uploader(file).split_content()
+        headers, data = CSVUploader(file).split_content()
         self.assertEqual(self.headers, headers)
         self.assertEqual(self.data, data)

@@ -1,14 +1,14 @@
 from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import LocationTypeDetails, LocationCode
-from survey.services.csv_uploader import CSV_Uploader
+from survey.services.csv_uploader import CSVUploader
 
 
 class UploadLocation:
     def __init__(self, file):
         self.file = file
         self.REQUIRED_TYPES = {}
-        self.csv_uploader = CSV_Uploader(self.file)
+        self.csv_uploader = CSVUploader(self.file)
 
     def _get_location_type(self, headers, regroup_headers_row):
         location_types = []
