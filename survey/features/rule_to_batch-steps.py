@@ -217,7 +217,7 @@ def then_i_should_see_add_subquestion_button(step):
 
 @step(u'When I click add subquestion button')
 def when_i_click_add_subquestion_button(step):
-    world.page.click_modal_link("#add_sub_question_modal")
+    world.page.click_link_by_partial_href("#add_sub_question_modal")
 
 
 @step(u'Then I should see a modal for add subquestion')

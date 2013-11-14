@@ -7,7 +7,7 @@ from lettuce import step, world
 from rapidsms.contrib.locations.models import LocationType
 from survey.features.page_objects.accounts import LoginPage
 from survey.features.page_objects.location_hierarchy import AddLocationHierarchyPage
-from survey.features.page_objects.upload_locations import UploadLocationsPage
+from survey.features.page_objects.uploads import UploadLocationsPage
 from survey.models import LocationTypeDetails
 from survey.tests.base_test import BaseTest
 
@@ -63,7 +63,7 @@ def and_i_should_see_link_for_input_file_format(step):
 @step(u'When I click on the link for input file format')
 def when_i_click_on_the_link_for_input_file_format(step):
     sleep(3)
-    world.page.click_link_by_text("Location Input File Format")
+    world.page.click_link_by_partial_href('#collapse_table')
 
 @step(u'Then I should see table of all location types')
 def then_i_should_see_table_of_all_location_types(step):
@@ -105,6 +105,7 @@ def when_i_have_a_csv_locations_file(step):
                      ['001', 'district1', 'county1'],
                      ['003','district2', 'county2']]
     write_to_csv('wb', data, 'test.csv')
+
 
 def write_to_csv(mode, data, csvfilename):
     with open(csvfilename, mode) as fp:

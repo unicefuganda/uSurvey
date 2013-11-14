@@ -136,9 +136,10 @@ class PageObject(object):
             script = "$('%s').multiSelect('select', '%s')" % (field_id, item.pk)
             self.browser.execute_script(script)
 
-    def validate_fields_present(self, fields):
+    def validate_fields_present(self, fields, status=True):
         for field in fields:
-            assert self.browser.is_text_present(field)
+            self.is_text_present(field, status)
+
 
     def select_date(self, field_id):
         script = "$('%s').focus()" % field_id
@@ -160,7 +161,7 @@ class PageObject(object):
     def click_by_css(self, css_selector):
         self.browser.find_by_css(css_selector).first.click()
 
-    def click_modal_link(self, modal_id):
+    def click_link_by_partial_href(self, modal_id):
         self.browser.click_link_by_partial_href(modal_id)
 
     def click_button(self, name):

@@ -14,8 +14,15 @@
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_table">Location Input File Format</a></div>
         </div>
         {% include "naked_form.html" with a_form=upload_form %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" name="save_button"
+                    data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+            <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
+            </ul>
 
-        <div id="collapse_table"  class="accordion-body collapse">
+        </div>
+    </form>
+    <div id="collapse_table"  class="accordion-body collapse">
         <div class="accordion-inner">
             <table class="table-bordered table">
                 <tr>
@@ -57,17 +64,10 @@
                         <li>Each <span class="bold">{{ detail.location_type.name.capitalize }} code</span> have to be exactly <span class="bold">{{ detail.length_of_code }} digits</span>.</li>
                     {% endif %}
                 {% endfor %}
-
-        </div>
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary" name="save_button"
-                    data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
-            <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
             </ul>
-
         </div>
-    </form>
+    </div>
+
     {% else %}
         <a href="{% url 'add_location_hierarchy' %}" class="btn btn-primary" name="add_hierarchy">Add Hierarchy</a>
     {% endif %}

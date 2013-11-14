@@ -199,7 +199,7 @@ def and_another_question_which_does_not(step):
 
 @step(u'And I click add batch modal button')
 def and_i_click_add_batch_modal_button(step):
-    world.page.click_modal_link("#new_batch")
+    world.page.click_link_by_partial_href("#new_batch")
 
 @step(u'Then I should see the add batch modal')
 def then_i_should_see_the_add_batch_modal(step):

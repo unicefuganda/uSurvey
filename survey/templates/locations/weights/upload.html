@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+{% block title %}
+    Upload Location Weights
+{% endblock %}
+{% block content %}
+{% load template_tags %}
+    <h3>Upload Location Weights</h3>
+    <form action="{{ action }}" enctype="multipart/form-data" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
+        {% csrf_token %}
+        {% include "naked_form.html" with a_form=upload_form %}
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_table">Input File Layout</a></div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" name="save_button"
+                    data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+            <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
+            </ul>
+
+        </div>
+    </form>
+
+    <div id="collapse_table"  class="accordion-body collapse">
+        <div class="accordion-inner">
+            <table class="table-bordered table">
+                <tr>
+                {% for type in location_types %}
+                    <th>
+                        {{ type.name.capitalize }}Name
+                    </th>
+                {% endfor %}
+
+                    <th>
+                        Selection Probability
+                    </th>
+
+                </tr>
+                {% for row_count in range %}
+                    <tr>
+                    {% for type in location_types %}
+                        <td>
+                            {{ type.name.lower }}{{ row_count }}
+                        </td>
+                    {% endfor %}
+                        <td>
+                            0.{{ row_count }}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+
+            </table>
+
+            <span class="red">Please note:</span>
+            <ul>
+                <li> Column headers have to be exactly as shown above.</li>
+                <li> Selection Probability has to be a number.</li>
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

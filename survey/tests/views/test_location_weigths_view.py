@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.upload_locations import UploadWeightsForm
 from survey.models import LocationWeight, Survey
 from survey.tests.base_test import BaseTest
@@ -39,9 +39,12 @@ class UploadWeightsTest(BaseTest):
         self.assertIn('locations/weights/upload.html', templates)
 
     def test_should_render_context_data(self):
+        type = LocationType.objects.create(name="country", slug="country")
         response = self.client.get('/locations/weights/upload/')
         self.assertEqual(response.context['button_label'], "Upload")
         self.assertEqual(response.context['id'], "upload-location-weights-form")
+        self.assertEqual(len(response.context['location_types']), 1)
+        self.assertIn(type, response.context['location_types'])
         self.assertIsInstance(response.context['upload_form'], UploadWeightsForm)
 
     def test_should_redirect_after_post(self):

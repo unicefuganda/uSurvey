@@ -35,6 +35,8 @@ class UploadWeightsForm(UploadCSVFileForm):
 
     def __init__(self,  *args, **kwargs):
         super(UploadWeightsForm, self).__init__(UploadLocationWeights, *args, **kwargs)
+        self.fields.keyOrder = ['survey', 'file']
+        self.fields['file'].label = 'Location weights file'
 
     def upload(self):
         _file = self.cleaned_data['file']

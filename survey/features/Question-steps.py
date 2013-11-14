@@ -170,7 +170,7 @@ def and_i_have_a_multichoice_question(step):
 
 @step(u'And I click on view options link')
 def and_i_click_on_view_options_link(step):
-    world.page.click_modal_link("#view_options_%d" % world.multi_choice_question.id)
+    world.page.click_link_by_partial_href("#view_options_%d" % world.multi_choice_question.id)
 
 
 @step(u'Then I should see the question options in a modal')
@@ -279,7 +279,7 @@ def then_i_should_see_the_question_successfully_edited(step):
 
 @step(u'And I click on delete question link')
 def and_i_click_on_delete_question_link(step):
-    world.page.click_modal_link("#delete_question_%d" % world.multi_choice_question.id)
+    world.page.click_link_by_partial_href("#delete_question_%d" % world.multi_choice_question.id)
 
 
 @step(u'Then I should see a delete question confirmation modal')
@@ -360,7 +360,7 @@ def and_i_have_a_rule_on_value_with_that_subquestion(step):
 
 @step(u'And I click on view logic link')
 def and_i_click_on_view_logic_link(step):
-    world.page.click_modal_link("#view_logic_%d" % world.multi_choice_question.id)
+    world.page.click_link_by_partial_href("#view_logic_%d" % world.multi_choice_question.id)
 
 
 @step(u'Then I should see the logic in a modal')
