@@ -8,7 +8,7 @@ class USSDBase(object):
         'BATCH_5_MIN_TIMEDOUT_MESSAGE': "This batch is already completed and 5 minutes have passed. You may no longer retake it.",
         'USER_NOT_REGISTERED': "Sorry, your mobile number is not registered for any surveys.",
         'WELCOME_TEXT': "Welcome %s to the survey.\n1: Register households\n2: Take survey",
-        'HOUSEHOLD_LIST': "Please select a household from the list",
+        'HOUSEHOLD_LIST': "Please enter household from the list or enter the sequence number",
         'MEMBERS_LIST': "Please select a member from the list",
         'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
         'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
@@ -21,7 +21,7 @@ class USSDBase(object):
         'MEMBER_SUCCESS_MESSAGE': "Thank you. Would you like to proceed to the next Household Member?\n1: Yes\n2: No",
         'HOUSEHOLD_COMPLETION_MESSAGE': "Thank you. You have completed this household. Would you like to retake this household?\n1: Yes\n2: No",
         'RESUME_MESSAGE': "Would you like to to resume with member question?\n1: Yes\n2: No",
-        'SELECT_HEAD_OR_MEMBER': 'Please select household member to register:\n1: Head\n2: Member',
+        'SELECT_HEAD_OR_MEMBER': 'Household %s, please select household member to register:\n1: Head\n2: Member',
         'END_REGISTRATION': 'Thank you for registering household member. Would you like to register another member?\n1: Yes\n2: No',
         'INVESTIGATOR_BLOCKED_MESSAGE': 'Sorry. You are not registered for any surveys.',
         'HEAD_REGISTERED': "Head already registered for this household. Registering members now:\n"

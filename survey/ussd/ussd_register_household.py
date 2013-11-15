@@ -98,7 +98,7 @@ class USSDRegisterHousehold(USSD):
 
     def render_select_member_or_head(self):
         self.investigator.set_in_cache('is_selecting_member', True)
-        self.responseString = self.MESSAGES['SELECT_HEAD_OR_MEMBER']
+        self.responseString = self.MESSAGES['SELECT_HEAD_OR_MEMBER'] % str(self.household.random_sample_number)
 
     def render_welcome_screen(self):
         self.responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name

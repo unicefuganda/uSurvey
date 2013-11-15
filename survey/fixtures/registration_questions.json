@@ -44,7 +44,7 @@
             "group": 12,
             "parent": null,
             "created": "2013-11-01T10:11:15.339Z",
-            "text": "Please Enter the age\n(enter 99 if not known)",
+            "text": "Please Enter the age\n(enter 0 if not known)",
             "modified": "2013-11-01T10:11:15.340Z",
             "module": 11,
             "subquestion": false,
@@ -227,7 +227,7 @@
             "action": "ASK_SUBQUESTION",
             "condition": "EQUALS",
             "created": "2013-11-01T10:11:15.339Z",
-            "validate_with_value": 99,
+            "validate_with_value": 0,
             "modified": "2013-11-01T10:11:15.340Z",
             "next_question": 82
         }

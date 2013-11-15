@@ -63,7 +63,11 @@
     </dd>
 </dl>
 <div class="offset3">
-    <a href="javascript:window.history.back()" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
+    {% if cancel_url %}
+        <a href="{{cancel_url}}" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
+    {% else %}
+        <a href="javascript:window.history.back()" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
+    {% endif %}
     {% include 'investigators/_action_button.html' with button_size="" investigator=investigator %}
 </div>
 {% endblock %}

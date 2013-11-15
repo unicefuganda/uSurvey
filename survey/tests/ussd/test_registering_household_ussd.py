@@ -145,7 +145,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
                 response = self.select_household("2")
 
-                ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+                ask_member_response_string = "responseString=%s&action=request" \
+                                             % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER'] % \
+                                             self.household2.random_sample_number
                 self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
     def test_should_ask_show_welcome_text_if_resuming_and_no_is_chosen(self):
@@ -653,7 +655,8 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 self.respond(answers['gender'])
 
                 response = self.respond('1')
-                ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+                ask_member_response_string = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER'] \
+                                             % self.household2.random_sample_number
                 self.assertEquals(urllib2.unquote(response.content), ask_member_response_string)
 
     def test_should_go_back_to_welcome_screen_if_responds_no_after_registering_a_member(self):
@@ -752,7 +755,8 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 self.respond(answers['gender'])
 
                 response = self.respond('1')
-                select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+                select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER'] % \
+                                        self.household2.random_sample_number
                 self.assertEquals(urllib2.unquote(response.content), select_head_or_member)
                 response = self.respond('1')
                 first_registration_question = "responseString=%s&action=request" % question_1.text
@@ -838,7 +842,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 self.respond(answers['gender'])
 
                 response = self.respond('1')
-                select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER']
+                select_head_or_member = "responseString=%s&action=request" % USSD.MESSAGES['SELECT_HEAD_OR_MEMBER'] % \
+                                        self.household2.random_sample_number
+
                 self.assertEquals(urllib2.unquote(response.content), select_head_or_member)
                 response = self.respond('1')
                 first_registration_question = "responseString=%s&action=request" % question_1.text

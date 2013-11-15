@@ -13,6 +13,9 @@ class SurveyForm(ModelForm):
             'description': forms.Textarea(attrs={"rows": 4, "cols": 50})
         }
 
+    has_sampling = forms.BooleanField(label="Enable Sampling", required=False, initial=True)
+
+
     def clean(self):
         cleaned_data = self.cleaned_data
 

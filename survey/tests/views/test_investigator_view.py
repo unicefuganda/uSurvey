@@ -121,6 +121,7 @@ class InvestigatorsViewTest(InvestigatorTest):
         self.assertTrue(investigator.male)
         self.assertEqual(investigator.location, uganda)
         self.assertEqual(len(investigator.households.all()), 0)
+        self.assertRedirects(response, '/investigators/', 302, 200)
 
     @patch('django.contrib.messages.error')
     def test_create_investigators_failure(self, mock_messages_error):
@@ -249,6 +250,7 @@ class ViewInvestigatorDetailsPage(InvestigatorTest):
         templates = [template.name for template in response.templates]
         self.assertIn('investigators/show.html', templates)
         self.assertEquals(response.context['investigator'], investigator)
+        self.assertEquals(response.context['cancel_url'], '/investigators/')
         self.assert_restricted_permission_for('/investigators/' + str(investigator.id) +'/')
 
 
@@ -270,6 +272,7 @@ class EditInvestigatorPage(InvestigatorTest):
         self.assertEquals(response.context['button_label'], 'Save')
         self.assertEquals(response.context['loading_text'], 'Saving...')
         self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)
+        self.assertEquals(response.context['cancel_url'], '/investigators/')
         self.assertIsInstance(response.context['form'], InvestigatorForm)
         locations = response.context['locations'].get_widget_data()
         self.assertEqual(len(locations),2)
@@ -311,6 +314,7 @@ class EditInvestigatorPage(InvestigatorTest):
 
         self.assertTrue(investigator.male)
         self.assertEqual(investigator.location, uganda)
+        self.assertRedirects(response, '/investigators/', 302, 200)
 
 class BlockInvestigatorTest(InvestigatorTest):
     def setUp(self):

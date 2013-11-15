@@ -62,6 +62,7 @@ def new_investigator(request):
                                                                   'button_label': "Create",
                                                                   'cancel_url': '/investigators/',
                                                                   'loading_text': "Creating..."})
+
 @login_required
 def get_locations(request):
     tree_parent = request.GET['parent'] if request.GET.has_key('parent') and request.GET['parent'].isdigit() else None
@@ -100,7 +101,7 @@ def check_mobile_number(request):
 @permission_required('auth.can_view_investigators')
 def show_investigator(request, investigator_id):
     investigator = Investigator.objects.get(id=investigator_id)
-    return render(request, 'investigators/show.html', {'investigator': investigator})
+    return render(request, 'investigators/show.html', {'investigator': investigator, 'cancel_url': '/investigators/'})
 
 @permission_required('auth.can_view_investigators')
 def edit_investigator(request, investigator_id):
@@ -110,7 +111,7 @@ def edit_investigator(request, investigator_id):
     if request.method == 'POST':
         investigator_form = InvestigatorForm(data=request.POST, instance=investigator)
         action_text = "edited."
-        redirect_url = "/investigators/%s" % investigator_id
+        redirect_url = "/investigators/"
         response = _process_form(investigator_form, request, action_text, redirect_url)
 
     context = { 'action': '/investigators/' + str(investigator_id) + '/edit/',

@@ -7,7 +7,7 @@ module = QuestionModule.objects.create(name='Registration')
 Question.objects.create(module=module, text="Please Enter the name",
                         answer_type=Question.TEXT, order=1, group=registration_group)
 
-question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=registration_group)
 
 month = Question.objects.create(module=module, text="Please Enter the month of birth",
@@ -32,7 +32,7 @@ year = Question.objects.create(module=module, text="Please Enter the year of bir
                                         subquestion=True, parent=question_2)
 
 AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
-                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=99,
+                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0,
                                   next_question=month)
 
 AnswerRule.objects.create(question=month, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],

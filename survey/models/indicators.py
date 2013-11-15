@@ -5,7 +5,7 @@ from survey.models.question_module import QuestionModule
 
 class Indicator(BaseModel):
     MEASURE_CHOICES = (('%', 'Percentage'),
-                       ('Number', 'Number'))
+                       ('Number', 'Count'))
     module = models.ForeignKey(QuestionModule, null=False, related_name='indicator')
     name = models.CharField(max_length=255, null=False)
     description = models.TextField(null=True)

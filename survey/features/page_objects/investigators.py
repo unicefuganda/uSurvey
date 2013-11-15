@@ -19,6 +19,9 @@ class NewInvestigatorPage(PageObject):
     def get_investigator_values(self):
         return self.values
 
+    def validate_detail_page_url(self):
+        assert self.browser.url == django_url(self.url)
+
     def fill_valid_values(self):
         self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
         kampala = Location.objects.get(name="Kampala")
@@ -65,6 +68,12 @@ class InvestigatorsListPage(PageObject):
 
     def see_confirm_block_message(self, confirmation_type, investigator):
         self.is_text_present("Confirm: Are you sure you want to %s investigator %s" % (confirmation_type, investigator.name))
+
+    def validate_successful_edited_message(self):
+        self.is_text_present("Investigator successfully edited.")
+
+    def validate_page_url(self):
+        assert self.browser.url == django_url(self.url)
 
 
 class FilteredInvestigatorsListPage(InvestigatorsListPage):

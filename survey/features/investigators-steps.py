@@ -179,10 +179,10 @@ def and_i_change_name_of_investigator(step):
 def and_i_click_on_save(step):
     world.page.submit()
 
-@step(u'Then I should go back to investigator details page')
-def then_i_should_go_back_to_investigator_details_page(step):
-    world.page = InvestigatorDetailsPage(world.browser, world.investigator)
-    world.page.validate_detail_page_url()
+@step(u'Then I should go back to investigator listing page')
+def then_i_should_go_back_to_investigator_listing_page(step):
+    world.page = InvestigatorsListPage(world.browser)
+    world.page.validate_page_url()
 
 @step(u'And I should see name of investigator updated')
 def and_i_should_see_name_of_investigator_updated(step):
