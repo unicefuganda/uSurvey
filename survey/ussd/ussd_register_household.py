@@ -75,6 +75,18 @@ class USSDRegisterHousehold(USSD):
         self.set_in_session('QUESTION', self.question)
         return self.action, self.responseString
 
+    def render_questions_based_on_head_selection(self, answer):
+        if self.household.get_head():
+            self.render_questions_or_member_selection(answer)
+        else:
+            self.render_select_member_or_head()
+
+    def validate_house_selection(self):
+        if self.is_invalid_response():
+            self.get_household_list()
+        else:
+            self.investigator.set_in_cache('HOUSEHOLD', self.household)
+
     def register_households(self, answer):
         if not self.household and self.is_browsing_households_list(answer):
             self.get_household_list()
@@ -87,14 +99,13 @@ class USSDRegisterHousehold(USSD):
         else:
             if not self.is_resuming_survey:
                 self.select_household(answer)
-                self.investigator.set_in_cache('HOUSEHOLD', self.household)
+                self.validate_house_selection()
             else:
                 self.household = self.investigator.get_from_cache('HOUSEHOLD')
 
-            if self.household.get_head():
-                self.render_questions_or_member_selection(answer)
-            else:
-                self.render_select_member_or_head()
+            if self.household:
+                self.render_questions_based_on_head_selection(answer)
+
 
     def render_select_member_or_head(self):
         self.investigator.set_in_cache('is_selecting_member', True)

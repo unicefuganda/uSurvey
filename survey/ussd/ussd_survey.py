@@ -271,9 +271,6 @@ class USSDSurvey(USSD):
         self.request['ussdRequestString'] = ""
         self.request['response'] = 'false'
 
-    def is_invalid_response(self):
-        return "INVALID SELECTION: " in self.responseString
-
     @classmethod
     def investigator_not_registered_response(self):
         return {'action': self.ACTIONS['END'], 'responseString': self.MESSAGES['USER_NOT_REGISTERED']}

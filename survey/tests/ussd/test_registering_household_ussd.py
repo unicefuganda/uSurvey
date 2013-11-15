@@ -110,6 +110,24 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 response = self.respond("*")
                 self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
 
+    def test_should_show_invalid_selection_if_wrong_household_option_selected(self):
+        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                response = self.register_household()
+                household_list = USSD.MESSAGES[
+                                     'HOUSEHOLD_LIST'] + "\n1: Household-%s\n2: Household-%s\n3: Household-%s\n4: Household-%s\n#: Next" % (
+                                     self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
+
+                first_page_HH_list = "responseString=%s&action=request" % (household_list)
+                self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
+
+
+                response = self.respond("70")
+                household_list = "INVALID SELECTION: "+ household_list
+                first_page_HH_list = "responseString=%s&action=request" % household_list
+                self.assertEquals(urllib2.unquote(response.content), first_page_HH_list)
+
     def test_should_show_list_of_households_when_another_survey_open_in_different_location(self):
         batch = Batch.objects.create(order=7, name="Batch name", survey=self.another_open_survey)
         batch.open_for_location(self.entebbe)

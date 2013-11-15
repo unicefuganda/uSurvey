@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
+from survey.forms.widgets import InlineRadioSelect
 from survey.models.surveys import Survey
 
 
@@ -9,8 +10,8 @@ class SurveyForm(ModelForm):
         model = Survey
         fields = ['name', 'description', 'type', 'has_sampling', 'sample_size']
         widgets = {
-            'type': forms.RadioSelect(choices=[(True, 'Aggregate'), ( False, 'Roster')]),
-            'description': forms.Textarea(attrs={"rows": 4, "cols": 50})
+            'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
+            'type': InlineRadioSelect(choices=((True, 'Aggregate'), (False, 'Roster'))),
         }
 
     has_sampling = forms.BooleanField(label="Enable Sampling", required=False, initial=True)

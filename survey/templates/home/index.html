@@ -17,6 +17,14 @@
 </select>
 </form>
 {% endblock%}
+
+{% block footer %}
+    <footer class="container">
+        <hr style="margin-bottom: 2px;" />
+        <div class="text-center pull-right"><img src="{{STATIC_URL}}logo/unicef_logo.gif" alt="UNICEF LOGO" height="70" width="70" style="margin-right: 10px">Copyright(c) UNICEF 2013</div>
+    </footer>
+{% endblock %}
+
 {% block javascripts %}
     <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
     <script src="{{ STATIC_URL }}js/maps.js" charset="utf-8"></script>

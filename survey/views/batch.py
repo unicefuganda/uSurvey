@@ -118,6 +118,12 @@ def delete(request, survey_id, batch_id):
 @permission_required('auth.can_view_batches')
 def assign(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
+
+    if batch.is_open():
+        error_message = "Questions cannot be assigned to open batch: %s." % batch.name.capitalize()
+        messages.error(request, error_message)
+        return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
+
     batch_questions_form = BatchQuestionsForm(batch=batch)
 
     groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')

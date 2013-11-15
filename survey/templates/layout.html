@@ -88,7 +88,7 @@
           {% if user.is_authenticated %}
             <ul role="navigation" class="nav pull-right">
               <li class="dropdown">
-                <a data-toggle="dropdown" id="drop-user-settings" class="brand dropdown-toggle" role="button" href="#">{{ user.get_full_name }}<b class="caret"></b></a>
+                <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle" role="button" href="#">Logged in as: {{ user.get_full_name }}<b class="caret"></b></a>
                 <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
                   <li role="presentation"><a href="{% url 'users_edit' user.id %}"><i class="icon-pencil"></i> Edit Profile</a></li>
                   <li role="presentation"><a href="{% url 'password_change'%}"><i class="icon-pencil"></i> Change Password</a></li>
@@ -98,7 +98,9 @@
             </ul>
           {% else %}
             <ul role="navigation" class="nav pull-right">
-              <a class="right brand" href="{% url 'login_page' %}">login</a>
+            <li>
+              <a class="dropdown-toggle" role="button" href="{% url 'login_page' %}">Login</a>
+            </li>
             </ul>
           {% endif %}
 
@@ -124,6 +126,9 @@
       {% endblock %}
      </div>
     </div>
+    {% block footer %}
+    {% endblock %}
+
     <script src="{{STATIC_URL}}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}/js/highcharts.js" type="text/javascript" charset="utf-8"></script>
@@ -150,4 +155,5 @@
     {% block javascripts %}
     {% endblock %}
   </body>
+
 </html>

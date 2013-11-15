@@ -11,7 +11,9 @@
             {{ batch.name.capitalize }} Questions
         </h3>
         {% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" %}
-        <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary pull-right" id="add_question">Select Question</a>
+        {% if not batch.is_open %}
+            <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary pull-right" id="add_question">Select Question</a>
+        {% endif %}
         <input type="hidden" value="{{ batch.id }}" id="batch_id">
     {% else %}
         <h3>

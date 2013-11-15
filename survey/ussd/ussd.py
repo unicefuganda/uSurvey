@@ -133,6 +133,9 @@ class USSD(USSDBase):
         except (ValueError, IndexError) as e:
             self.responseString += "INVALID SELECTION: "
 
+    def is_invalid_response(self):
+        return "INVALID SELECTION: " in self.responseString
+
     def add_question_prefix(self):
         if self.reanswerable_question():
             self.responseString += "RECONFIRM: "

@@ -59,7 +59,7 @@ class PageObject(object):
     def check_anonymous_user_allowed_tabs(self):
         assert self.browser.find_link_by_text('About')
         assert self.browser.find_link_by_text('mMICS')
-        assert self.browser.find_link_by_text('login')
+        assert self.browser.find_link_by_text('Login')
 
     def check_data_entry_allowed_tabs(self):
         assert self.browser.find_link_by_text('About')

@@ -94,6 +94,20 @@ class BatchViewsTest(BaseTest):
         json_response = json.loads(response.content)
         self.assertEqual(open_batch_error_message, json_response)
 
+    def test_open_batch_does_not_allow_questions_to_be_assigned(self):
+        another_survey = Survey.objects.create(name='survey name 2', description='survey descrpition 2', type=False,
+                                               sample_size=10)
+        another_batch = Batch.objects.create(order=1, name="Batch A", survey=another_survey)
+        another_batch.open_for_location(self.kampala)
+
+        self.assertTrue(another_batch.is_open_for(self.kampala))
+
+        response = self.client.get('/batches/' + str(another_batch.pk) + "/assign_questions/")
+
+        self.assertRedirects(response, "/batches/%s/questions/" % str(another_batch.pk), 302, 200)
+        self.assertIn("Questions cannot be assigned to open batch: %s." % another_batch.name.capitalize(),
+                      response.cookies['messages'].value)
+
     def test_close_batch_for_location(self):
         for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
             self.batch.open_for_location(loc)
@@ -245,6 +259,8 @@ class BatchViewsTest(BaseTest):
         question_2 = Question.objects.create(group=group, text="Haha?", module=module_1)
         question_3 = Question.objects.create(group=group, text="Haha?", module=module_2)
 
+        self.batch.close_for_location(self.abim)
+
         response = self.client.get('/batches/%d/assign_questions/' % (self.batch.id))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -267,6 +283,8 @@ class BatchViewsTest(BaseTest):
         form_data = {
             'questions': [q1.id, q2.id],
         }
+        self.batch.close_for_location(self.abim)
+
         self.failIf(self.batch.all_questions())
         response = self.client.post('/batches/%d/assign_questions/' % (self.batch.id), data=form_data)
         self.assertRedirects(response, expected_url='batches/%d/questions/' % self.batch.id, status_code=302,

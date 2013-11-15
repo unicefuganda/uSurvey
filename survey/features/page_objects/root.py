@@ -10,7 +10,7 @@ class HomePage(PageObject):
     url = "/"
 
     def click_the_login_link(self):
-        self.browser.click_link_by_text('login')
+        self.browser.click_link_by_text('Login')
 
     def see_under_construction(self):
         self.is_text_present('Under Construction')
