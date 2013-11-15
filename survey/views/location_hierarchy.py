@@ -9,7 +9,7 @@ from django.forms.formsets import formset_factory
 
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
-from survey.forms.upload_locations import UploadCSVFileForm, UploadLocationsForm
+from survey.forms.upload_csv_file import UploadCSVFileForm, UploadLocationsForm
 from survey.models import LocationTypeDetails
 from survey.services.location_upload import UploadLocation
 

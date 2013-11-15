@@ -144,6 +144,8 @@ INSTALLED_APPS = (
     'survey',
     'rapidsms.backends.database',
     'rapidsms.contrib.httptester',
+    'celery',
+    'djcelery',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -207,3 +209,4 @@ from localsettings import *
 #     from survey.models import Backend
 #     for backend in INSTALLED_BACKENDS.keys():
 #         Backend.objects.get_or_create(name=backend)
+

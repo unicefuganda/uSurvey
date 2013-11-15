@@ -12,6 +12,7 @@ from survey.models.locations import LocationAutoComplete, LocationCode
 from survey.models.question import Question, QuestionOption, NumericalAnswer, TextAnswer, MultiChoiceAnswer, Answer
 from survey.models.random_household_selection import RandomHouseHoldSelection
 from survey.models.surveys import Survey
+from survey.models.upload_error_logs import UploadErrorLog
 from survey.models.users import UserProfile
 from survey.models.question_module import QuestionModule
 from survey.models.location_type_details import LocationTypeDetails
@@ -45,5 +46,6 @@ __all__ = [
     'BatchQuestionOrder',
     'LocationCode',
     'Indicator',
-    'LocationWeight'
+    'LocationWeight',
+    'UploadErrorLog'
 ]

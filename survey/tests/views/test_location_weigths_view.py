@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.forms.upload_locations import UploadWeightsForm
+from survey.forms.upload_csv_file import UploadWeightsForm
 from survey.models import LocationWeight, Survey
 from survey.tests.base_test import BaseTest
 
@@ -54,13 +54,12 @@ class UploadWeightsTest(BaseTest):
         self.assertRedirects(response, '/locations/weights/upload/', status_code=302, target_status_code=200, msg_prefix='')
 
     @patch('survey.services.location_weights_upload.UploadLocationWeights.upload')
-    def test_should_give_success_message_if_csv_uploaded(self, mock_upload):
-        mock_upload.return_value = (True, 'Successfully uploaded')
+    def test_should_give_uploading_message(self, mock_upload):
         data = {'file': self.file,
                 'survey': self.survey.id}
         response = self.client.post('/locations/weights/upload/', data=data)
         assert mock_upload.called
-        self.assertIn('Successfully uploaded', response.cookies['messages'].value)
+        self.assertIn('Upload in progress. This could take a while.', response.cookies['messages'].value)
 
     def test_should_upload_csv_sucess(self):
         data = {'file': self.file,
@@ -72,7 +71,6 @@ class UploadWeightsTest(BaseTest):
             self.failUnless(LocationWeight.objects.filter(location=location, selection_probability=row[-1]))
             parents_names = location.get_ancestors().values_list('name', flat=True)
             [self.assertIn(location_name, parents_names) for location_name in row[0:-2]]
-        self.assertIn('Location weights successfully uploaded.', response.cookies['messages'].value)
 
     def test_upload_csv_failure_if_selection_probability_is_NaN(self):
         filedata = [['RegionName', 'DistrictName', 'CountyName', 'Selection Probability'],
@@ -87,11 +85,12 @@ class UploadWeightsTest(BaseTest):
         row = filedata[1]
         location = Location.objects.get(name=row[-2], tree_parent__name=row[-3])
         LocationWeight.objects.filter(location=location).delete()
-
         response = self.client.post('/locations/weights/upload/', data=data)
-
         self.failIf(LocationWeight.objects.filter(location=location))
-        self.assertIn('Location weights not uploaded. Selection probability must be a number.', response.cookies['messages'].value)
+
+        location = Location.objects.get(name="county2", tree_parent__name="district2")
+        self.failUnless(LocationWeight.objects.filter(location=location, selection_probability=0.1))
+
 
     def test_assert_restricted_permissions(self):
         self.assert_login_required('/locations/weights/upload/')

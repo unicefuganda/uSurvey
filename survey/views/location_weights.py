@@ -1,11 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 
-from django.http.response import HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import LocationType
 
-from survey.forms.upload_locations import UploadWeightsForm
+from survey.forms.upload_csv_file import UploadWeightsForm
+from survey.tasks import upload_task
 
 
 @login_required
@@ -15,12 +16,13 @@ def upload(request):
     if request.method == 'POST':
         upload_form = UploadWeightsForm(request.POST, request.FILES)
         if upload_form.is_valid():
-            status, message = upload_form.upload()
-            message_status = messages.SUCCESS if status else messages.ERROR
-            messages.add_message(request, message_status, message)
+            upload_task.delay(upload_form)
+            messages.warning(request, "Upload in progress. This could take a while.")
             return HttpResponseRedirect('/locations/weights/upload/')
 
     context = {'button_label': 'Upload', 'id': 'upload-location-weights-form',
                'upload_form': upload_form, 'location_types': LocationType.objects.all(), 'range': range(3)}
 
     return render(request, 'locations/weights/upload.html', context)
+
+

@@ -23,6 +23,7 @@ CACHES = {
 }
 
 if ('test' in sys.argv) or ('harvest' in sys.argv):
+    TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
     LETTUCE_SERVER_PORT = 7000
     CACHES = {
         'default': {

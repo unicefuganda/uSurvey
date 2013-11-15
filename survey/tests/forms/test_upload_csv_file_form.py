@@ -4,7 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from survey.models import Survey
 
 from survey.services.location_upload import UploadLocation
-from survey.forms.upload_locations import UploadCSVFileForm, UploadWeightsForm
+from survey.forms.upload_csv_file import UploadCSVFileForm, UploadWeightsForm
 from survey.tests.base_test import BaseTest
 
 
@@ -36,6 +36,7 @@ class UploadCSVFileFormTest(BaseTest):
         upload_location_form = UploadCSVFileForm(UploadLocation, {}, {'file':SimpleUploadedFile(self.filename, file.read())})
         self.assertEqual(False, upload_location_form.is_valid())
         self.assertIn('The file extension should be .csv.', upload_location_form.errors['file'])
+
 
 class UploadLocationWeightsFormTest(BaseTest):
     def setUp(self):

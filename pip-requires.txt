@@ -19,3 +19,4 @@ git+git://github.com/InviteBox/django-live-profiler.git
 newrelic==1.13.1.31
 dateutils
 xlwt
+django-celery

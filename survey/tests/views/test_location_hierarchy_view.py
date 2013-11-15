@@ -6,7 +6,7 @@ from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
-from survey.forms.upload_locations import UploadLocationsForm
+from survey.forms.upload_csv_file import UploadLocationsForm
 from survey.models import LocationTypeDetails
 from survey.tests.base_test import BaseTest
 

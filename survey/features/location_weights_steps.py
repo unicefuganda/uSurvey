@@ -49,9 +49,9 @@ def write_to_csv(mode, data, csvfilename):
         file = csv.writer(fp, delimiter=',')
         file.writerows(data)
 
-@step(u'Then I should see location weights successfully added')
+@step(u'Then I should see location weights upload is in progress')
 def then_i_should_see_location_weights_successfully_added(step):
-    world.page.see_success_message('Location weights', 'uploaded')
+    world.page.is_text_present('Upload in progress. This could take a while.')
 
 @step(u'Then said weight layout should collapse')
 def then_said_weight_layout_should_collapse(step):

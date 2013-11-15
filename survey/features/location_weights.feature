@@ -14,4 +14,4 @@ Feature: Location Weights upload
     And I input that file
     And I select a survey
     And I click the save button
-    Then I should see location weights successfully added
+    Then I should see location weights upload is in progress
