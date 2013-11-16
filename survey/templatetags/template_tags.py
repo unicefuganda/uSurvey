@@ -6,10 +6,6 @@ from survey.models.helper_constants import CONDITIONS
 register = template.Library()
 
 @register.filter
-def is_mobile_number(field):
-  return 'mobile number' in field.lower()
-
-@register.filter
 def is_location_selected(locations_data, location):
     if locations_data.has_location_selected(location):
         return "selected='selected'"
