@@ -6,6 +6,12 @@ from survey.templatetags.template_tags import *
 
 class TemplateTagsTest(TestCase):
 
+    def test_modulo_understands_number_is_modulo_of_another(self):
+        self.assertTrue(modulo(4, 2))
+
+    def test_modulo_understands_number_is_not_modulo_of_another(self):
+        self.assertFalse(modulo(4, 3))
+
     def test_knows_mobile_number_not_in_field_string(self):
         self.assertFalse(is_mobile_number(""))
 
