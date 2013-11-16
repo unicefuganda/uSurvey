@@ -4,6 +4,8 @@ from rapidsms.contrib.locations.models import Location
 from survey.models import LocationWeight, UploadErrorLog
 from survey.services.csv_uploader import CSVUploader
 
+from survey.investigator_configs import UPLOAD_ERROR_LOG_EXPIRY
+
 
 class UploadLocationWeights:
     MODEL = 'WEIGHTS'
@@ -14,14 +16,15 @@ class UploadLocationWeights:
         self.clean_db()
 
     def clean_db(self):
-        one_month_before_today = datetime.utcnow().replace(tzinfo=utc) - timedelta(days=30)
+        one_month_before_today = datetime.utcnow().replace(tzinfo=utc) - timedelta(days=UPLOAD_ERROR_LOG_EXPIRY)
         all_entries_before_one_month = UploadErrorLog.objects.filter(model=self.MODEL, created__lte=one_month_before_today)
         all_entries_before_one_month.delete()
 
     @classmethod
-    def parents_locations_match(cls, location, parents):
-        check = [parent_name in location.get_ancestors().values_list('name', flat=True) for parent_name in parents]
-        return check.count(True) == len(parents)
+    def parents_locations_match(cls, location, given_parents):
+        location_parents = location.get_ancestors().values_list('name', flat=True)
+        check = [parent_name in location_parents for parent_name in given_parents]
+        return check.count(True) == len(given_parents)
 
     def log_error(self, row_number, error):
         UploadErrorLog.objects.create(model=self.MODEL, filename=self.file.name, row_number=row_number, error=error)

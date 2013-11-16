@@ -209,4 +209,3 @@ from localsettings import *
 #     from survey.models import Backend
 #     for backend in INSTALLED_BACKENDS.keys():
 #         Backend.objects.get_or_create(name=backend)
-
