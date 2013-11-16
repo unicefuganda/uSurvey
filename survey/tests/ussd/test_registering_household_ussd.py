@@ -314,7 +314,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         month = Question.objects.create(module=module, text="Please Enter the month of birth",
@@ -338,7 +338,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                         subquestion=True, parent=question_2)
 
         AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
-                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=99,
+                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0,
                                   next_question=month)
 
         AnswerRule.objects.create(question=month, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
@@ -350,7 +350,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
         answers = {
             'name': 'dummy name',
-           'age': '99',
+           'age': '0',
            'month':'4',
            'year':'2001',
            'gender': '2',
@@ -393,7 +393,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         month = Question.objects.create(module=module, text="Please Enter the month of birth",
@@ -417,7 +417,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                         subquestion=True, parent=question_2)
 
         AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
-                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=99,
+                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0,
                                   next_question=month)
 
         AnswerRule.objects.create(question=month, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
@@ -430,7 +430,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         invalid_month_of_birth = '40'
         answers = {
             'name': 'dummy name',
-           'age': '99',
+           'age': '0',
            'month':invalid_month_of_birth,
            'year':'2001',
            'gender': '2',
@@ -488,7 +488,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         month = Question.objects.create(module=module, text="Please Enter the month of birth",
@@ -512,7 +512,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                         subquestion=True, parent=question_2)
 
         AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
-                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=99,
+                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0,
                                   next_question=month)
 
         AnswerRule.objects.create(question=month, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
@@ -524,7 +524,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
         answers = {
             'name': 'dummy name',
-           'age': '99',
+           'age': '0',
            'month':'4',
            'year':'2001',
            'gender': '2',
@@ -805,7 +805,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         month = Question.objects.create(module=module, text="Please Enter the month of birth",
@@ -829,7 +829,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                         subquestion=True, parent=question_2)
 
         AnswerRule.objects.create(question=question_2, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
-                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=99,
+                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0,
                                   next_question=month)
 
         AnswerRule.objects.create(question=month, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
@@ -841,7 +841,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
         answers = {
             'name': 'dummy name',
-           'age': '99',
+           'age': '0',
            'month':'3',
            'year':'2001',
            'gender': '1',

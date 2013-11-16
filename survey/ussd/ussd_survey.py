@@ -44,17 +44,15 @@ class USSDSurvey(USSD):
 
     def end_interview(self, batch):
         self.action = self.ACTIONS['END']
+
         if self.household_member.survey_completed():
-            if self.current_member_is_done:
-                self.restart_survey()
-            else:
-                self.action = self.ACTIONS['REQUEST']
-                self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
-                self.set_in_session('HOUSEHOLD', self.household)
-                self.responseString = USSD.MESSAGES['MEMBER_SUCCESS_MESSAGE'] if not self.household.completed_currently_open_batches() else \
-                                      USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
-                self.set_in_session('HOUSEHOLD_MEMBER', None)
-                self.set_in_session('CAN_RETAKE_HOUSEHOLD', True)
+            self.action = self.ACTIONS['REQUEST']
+            self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
+            self.set_in_session('HOUSEHOLD', self.household)
+            self.responseString = USSD.MESSAGES['MEMBER_SUCCESS_MESSAGE'] if not self.household.completed_currently_open_batches() else \
+                                  USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
+            self.set_in_session('HOUSEHOLD_MEMBER', None)
+            self.set_in_session('CAN_RETAKE_HOUSEHOLD', True)
 
         elif self.household_member.last_question_answered() and \
                 not self.household_member.can_retake_survey(batch=batch, minutes=self.TIMEOUT_MINUTES):

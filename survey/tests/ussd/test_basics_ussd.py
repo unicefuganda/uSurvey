@@ -626,52 +626,6 @@ class USSDTest(USSDBaseTest):
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
-    def test_should_show_member_completion_message_and_choose_to_go_to_household_list(self):
-        member_2 = HouseholdMember.objects.create(surname="Name 2", household=self.household,
-                                                  date_of_birth='1980-02-03')
-        question_1 = Question.objects.create(text="Question 1?",
-                                             answer_type=Question.NUMBER, order=1, group=self.member_group)
-        question_2 = Question.objects.create(text="Question 2?",
-                                             answer_type=Question.NUMBER, order=2, group=self.member_group)
-        question_1.batches.add(self.batch)
-        question_2.batches.add(self.batch)
-
-        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
-        BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
-
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
-            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-                with patch.object(USSDSurvey, 'is_active', return_value=False):
-                    self.reset_session()
-
-                self.take_survey()
-                response = self.select_household()
-
-                members_list = "%s\n1: %s - (HEAD)\n2: %s" % (
-                    USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
-                response_string = "responseString=%s&action=request" % members_list
-                self.assertEquals(urllib2.unquote(response.content), response_string)
-
-                response = self.select_household_member("1")
-                response_string = "responseString=%s&action=request" % question_1.text
-                self.assertEquals(urllib2.unquote(response.content), response_string)
-
-                response = self.respond("1")
-                response_string = "responseString=%s&action=request" % question_2.text
-                self.assertEquals(urllib2.unquote(response.content), response_string)
-
-                response = self.respond("2")
-                response_string = "responseString=%s&action=request" % USSD.MESSAGES['MEMBER_SUCCESS_MESSAGE']
-                self.assertEquals(urllib2.unquote(response.content), response_string)
-                response = self.respond("2")
-
-                households_list_1 = "%s\n1: Household-%s-%s\n2: Household-%s-%s" % (
-                USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
-                self.household_head_1.household.random_sample_number, self.household_head_1.surname)
-
-                response_string = "responseString=%s&action=request" % households_list_1
-                self.assertEquals(urllib2.unquote(response.content), response_string)
-
     def test_should_show_thank_you_message_on_completion_of_all_members_questions(self):
         question_1 = Question.objects.create(text="Question 1?",
                                              answer_type=Question.NUMBER, order=1, group=self.member_group)

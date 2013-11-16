@@ -13,7 +13,7 @@ class USSDRegisterHousehold(USSD):
     }
     REGISTRATION_DICT = {}
 
-    UNKNOWN_AGE = 99
+    UNKNOWN_AGE = 0
 
     def __init__(self, investigator, request):
         super(USSDRegisterHousehold, self).__init__(investigator, request)
@@ -154,7 +154,7 @@ class USSDRegisterHousehold(USSD):
     def process_registration_answer(self, answer):
         answer = int(answer) if answer.isdigit() else answer
 
-        if not answer:
+        if not answer and answer!=0:
             self.investigator.invalid_answer(self.question)
             return self.question
 
