@@ -1,16 +1,15 @@
 from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import LocationTypeDetails, LocationCode
-from survey.services.csv_uploader import CSVUploader
+from survey.services.csv_uploader import UploadService
 
 
-class UploadLocation:
+class UploadLocation(UploadService):
     MODEL = 'LOCATIONS'
 
     def __init__(self, file):
-        self.file = file
+        super(UploadLocation, self).__init__(file)
         self.REQUIRED_TYPES = {}
-        self.csv_uploader = CSVUploader(self.file)
 
     def _get_location_type(self, headers, regroup_headers_row):
         location_types = []
@@ -64,9 +63,6 @@ class UploadLocation:
                 except IndexError:
                     continue
         return True, "Locations successfully uploaded."
-
-    def remove_trailing(self,  name, in_array, exclude):
-        return [header.replace(name,'') for header in in_array if not header.endswith(exclude)]
 
     def regroup_with_code(self, row, group_size):
         new_row = []

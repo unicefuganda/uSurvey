@@ -30,7 +30,7 @@ class CSVUploader:
         self.file.seek(FIRST_LINE)
 
 
-class UploadService:
+class UploadService(object):
     MODEL = None
 
     def __init__(self, _file):
