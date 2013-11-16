@@ -117,6 +117,7 @@ class LocationWeightUploadHelper(BaseTest):
         self.failUnless(LocationWeight.objects.filter(location__name=data[1][2], selection_probability=data[1][3]))
 
     def test_not_csv_file(self):
+        LocationWeight.objects.all().delete()
         self.filename = 'not_csv.xls'
         self.generate_non_csv_file(self.filename)
         file = open(self.filename,'rb')
@@ -124,4 +125,5 @@ class LocationWeightUploadHelper(BaseTest):
 
         uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(model=self.uploader.MODEL, filename=self.filename)
-        self.failUnless(error_log.filter(error='Location weights not uploaded. %s is not a csv file.' % self.filename))
+        self.failUnless(error_log.filter(error='Location weights not uploaded. %s is not a valid csv file.' % self.filename))
+        self.failIf(LocationWeight.objects.all())

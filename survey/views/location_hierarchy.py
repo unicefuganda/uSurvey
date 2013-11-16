@@ -1,18 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-
-from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.text import slugify
 from rapidsms.contrib.locations.models import LocationType, Location
 from django.forms.formsets import formset_factory
 
+from django.http.response import HttpResponseRedirect
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
-from survey.forms.upload_csv_file import UploadCSVFileForm, UploadLocationsForm
+from survey.forms.upload_csv_file import UploadLocationsForm
 from survey.models import LocationTypeDetails
-from survey.services.location_upload import UploadLocation
-
+from survey.tasks import upload_task
 
 @login_required
 @permission_required('auth.can_add_location_types')
@@ -53,10 +51,10 @@ def upload(request):
     if request.method == 'POST':
         upload_form = UploadLocationsForm(request.POST, request.FILES)
         if upload_form.is_valid():
-            status, message = upload_form.upload()
-            message_status = messages.SUCCESS if status else messages.ERROR
-            messages.add_message(request, message_status, message)
+            upload_task.delay(upload_form)
+            messages.warning(request, "Upload in progress. This could take a while.")
             return HttpResponseRedirect('/locations/upload/')
+        messages.error(request, 'Locations not uploaded. %s'%upload_form.errors['__all__'].as_text().replace('*',''))
 
     context = {'button_label': 'Save', 'id': 'upload-locations-form',
              'country_name': '', 'upload_form': upload_form,'range':range(3)}

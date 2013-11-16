@@ -16,7 +16,7 @@ Feature: Location upload
     When I have a csv locations file
     And I input that file
     And I click the save button
-    Then I should see locations successfully added
+    Then I should see locations uploads processing
 
   Scenario: Upload locations- when no details object present
     Given I am logged in as admin

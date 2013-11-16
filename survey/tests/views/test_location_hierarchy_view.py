@@ -7,7 +7,7 @@ from rapidsms.contrib.locations.models import LocationType, Location
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
 from survey.forms.upload_csv_file import UploadLocationsForm
-from survey.models import LocationTypeDetails
+from survey.models import LocationTypeDetails, LocationCode
 from survey.tests.base_test import BaseTest
 
 
@@ -214,35 +214,52 @@ class UploadLocationsTest(BaseTest):
         self.assertIn('No location hierarchy added yet.', str(response))
 
     def test_should_redirect_after_post(self):
-        data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], 'file': self.file}
+        data = {'file': self.file}
         response = self.client.post('/locations/upload/', data=data)
         self.assertRedirects(response, '/locations/upload/', status_code=302, target_status_code=200, msg_prefix='')
 
     @patch('survey.services.location_upload.UploadLocation.upload')
     def test_should_give_success_message_if_csv_uploaded(self, mock_upload):
         mock_upload.return_value = (True, 'Successfully uploaded')
-        data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], 'file': self.file}
+        data = {'file': self.file}
         response = self.client.post('/locations/upload/', data=data)
         assert mock_upload.called
-        self.assertIn('Successfully uploaded', response.cookies['messages'].value)
+        self.assertIn('Upload in progress. This could take a while.', response.cookies['messages'].value)
 
     def remove_code_column(self, data):
         index_of_Code = data[0].index('DistrictCode')
-        for row in data:
-            row.remove(row[index_of_Code])
-        return data
+        codes = [row.pop(index_of_Code) for row in data]
+        return data, codes[1:]
 
     def test_should_upload_csv_sucess(self):
-        data = {u'save_button': [u''], u'csrfmiddlewaretoken': [u'db932acf6e42fabb23ad545c71751b0a'], 'file': self.file}
+        data = {'file': self.file}
         response = self.client.post('/locations/upload/', data=data)
 
-        data = self.remove_code_column(self.filedata)
+        data, codes = self.remove_code_column(self.filedata)
         types = [type_name.replace('Name', '') for type_name in data[0]]
 
         for locations in data[1:]:
             [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for
              index, location_name in enumerate(locations)]
-        self.assertIn('Locations successfully uploaded.', response.cookies['messages'].value)
+        [self.failUnless(LocationCode.objects.filter(code=code)) for code in codes]
+
+        self.assertIn('Upload in progress. This could take a while.', response.cookies['messages'].value)
+
+    def test_upload_failure(self):
+        LocationType.objects.all().delete()
+
+        data = {'file': self.file}
+        response = self.client.post('/locations/upload/', data=data)
+
+        data, codes = self.remove_code_column(self.filedata)
+        types = [type_name.replace('Name', '') for type_name in data[0]]
+
+        for locations in data[1:]:
+            [self.failIf(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for
+             index, location_name in enumerate(locations)]
+        [self.failIf(LocationCode.objects.filter(code=code)) for code in codes]
+
+        self.assertIn('Locations not uploaded.  Location type - Region not found.', str(response))
 
     def test_assert_restricted_permissions(self):
         self.assert_login_required('/locations/upload/')

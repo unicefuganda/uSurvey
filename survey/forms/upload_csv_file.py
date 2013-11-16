@@ -18,14 +18,13 @@ class UploadCSVFileForm(forms.Form):
     def clean_file(self):
         _file = self.cleaned_data['file']
         if self._is_not_csv(_file):
-            message = '%s is not a csv file.'%_file.name
+            message = '%s is not a valid csv file.'%_file.name
             self._errors['file'] = self.error_class([message])
             del self.cleaned_data['file']
         return _file
 
     def _is_not_csv(self, _file):
         return '\0' in _file.read()
-
 
     def upload(self):
         _file = self.cleaned_data['file']
@@ -70,10 +69,10 @@ class UploadLocationsForm(UploadCSVFileForm):
 
     def clean_has_code(self, type, location_detail, headers, index):
         if location_detail.has_code:
-            if index==0 or headers[index-1].replace('Code','') != type.name:
+            if index == 0 or headers[index-1].replace('Code', '') != type.name:
                 raise ValidationError('%sCode column should be before %sName column. Please refer to input file format.'%(type.name, type.name))
         else:
-            if headers[index-1].replace('Code','') == type.name:
+            if headers[index-1].replace('Code', '') == type.name:
                 raise ValidationError('%s has no code. The column %sCode should be removed. Please refer to input file format.'%(type.name, type.name))
 
     def clean_headers_location_type_order(self, headers):
@@ -81,6 +80,7 @@ class UploadLocationsForm(UploadCSVFileForm):
         ordered_types = [type.name for type in LocationTypeDetails.get_ordered_types().exclude(name__iexact='country')]
         if not ordered_types == headers:
             raise ValidationError('Location types not in order. Please refer to input file format.')
+
 
 class UploadWeightsForm(UploadCSVFileForm):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)

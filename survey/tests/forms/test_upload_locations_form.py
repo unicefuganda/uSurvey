@@ -95,7 +95,7 @@ class UploadLocationsFormTest(BaseTest):
         self.assertIn('DistrictCode column should be before DistrictName column. Please refer to input file format.',
                       upload_location_form.non_field_errors())
 
-    def test_should_return_false_and_error_message_if_not_has_code_but_code_still_supplied(self):
+    def test_invalid_if_not_has_code_but_code_still_supplied(self):
         data = [['RegionName', 'DistrictCode', 'DistrictName', 'CountyName'],
                      ['region1', '001', 'district1', 'county1'],
                      ['region2', '002','district2', 'county2']]

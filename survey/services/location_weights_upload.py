@@ -42,5 +42,6 @@ class UploadLocationWeights(UploadService):
         cleaned_headers = self.remove_trailing('Name', in_array=headers)
         if not cleaned_headers:
             UploadErrorLog.objects.create(model=self.MODEL, filename=self.file.name,
-                                          error='Location weights not uploaded. %s is not a csv file.' % self.file.name)
-        self.create_locations_weights(reader, cleaned_headers, survey)
+                                          error='Location weights not uploaded. %s is not a valid csv file.' % self.file.name)
+        else:
+            self.create_locations_weights(reader, cleaned_headers, survey)

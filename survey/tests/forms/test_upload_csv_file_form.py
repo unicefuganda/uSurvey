@@ -34,6 +34,6 @@ class UploadCSVFileFormTest(BaseTest):
         file = open(self.filename,'rb')
         upload_location_form = UploadCSVFileForm(UploadLocation, {}, {'file':SimpleUploadedFile(self.filename, file.read())})
         self.assertEqual(False, upload_location_form.is_valid())
-        self.assertIn('%s is not a csv file.'%self.filename, upload_location_form.errors['file'])
+        self.assertIn('%s is not a valid csv file.'%self.filename, upload_location_form.errors['file'])
 
 

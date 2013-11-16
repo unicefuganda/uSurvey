@@ -120,6 +120,6 @@ def and_i_input_that_file(step):
 def when_i_click_the_save_button(step):
     world.page.submit()
 
-@step(u'Then I should see locations successfully added')
+@step(u'Then I should see locations uploads processing')
 def then_i_should_see_locations_successfully_added(step):
-    world.page.see_success_message('Locations', 'uploaded')
+    world.page.is_text_present("Upload in progress. This could take a while.")
