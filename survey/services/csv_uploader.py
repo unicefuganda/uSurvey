@@ -16,6 +16,9 @@ class CSVUploader:
     def file_is_not_csv(self):
         return '\0' in self.file.read()
 
+    def headers(self):
+        return csv.reader(self.file).next()
+
     def split_content(self):
         if self.file_is_not_csv():
             return [], []
