@@ -74,10 +74,6 @@ class LocationUploadHelper(BaseTest):
         self.assertEqual([[1, 2], [3, 4], [5, 6], [7, 8]], self.uploader.regroup_with_code(a, [2, 2, 2, 2]))
         self.assertEqual([[1], [2, 3, 4], [5, 6], [7], [8]], self.uploader.regroup_with_code(a, [1, 3, 2, 1, 1]))
 
-    def test_remove_trailing_name_in_headers(self):
-        headers = ['heheName', 'somethingCode', 'hahaName', 'blablaCode', 'hihihi', 'hohoho']
-        self.assertEqual(['hehe', 'haha', 'hihihi', 'hohoho'], self.uploader.remove_trailing('Name', in_array=headers, exclude='Code'))
-
     def test_has_code_success(self):
         district = LocationTypeDetails.objects.get(location_type=self.district, required=True)
         district.has_code = True

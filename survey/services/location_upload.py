@@ -5,6 +5,8 @@ from survey.services.csv_uploader import CSVUploader
 
 
 class UploadLocation:
+    MODEL = 'LOCATIONS'
+
     def __init__(self, file):
         self.file = file
         self.REQUIRED_TYPES = {}

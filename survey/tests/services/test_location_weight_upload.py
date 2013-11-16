@@ -1,5 +1,4 @@
 import os
-from datetime import datetime, timedelta
 from rapidsms.contrib.locations.models import Location
 from survey.models import Survey, UploadErrorLog, LocationWeight
 from survey.services.location_weights_upload import UploadLocationWeights
@@ -116,24 +115,6 @@ class LocationWeightUploadHelper(BaseTest):
         self.failIf(error_log.filter(row_number=1, error='Selection probability must be a number.'))
 
         self.failUnless(LocationWeight.objects.filter(location__name=data[1][2], selection_probability=data[1][3]))
-
-    def test_deletes_one_month_old_error_logs_every_time_an_instance_is_created(self):
-        UploadErrorLog.objects.all().delete()
-        error_location = UploadErrorLog.objects.create(model='LOCATION', filename=self.filename, error="Some errors location")
-        error_now = UploadErrorLog.objects.create(model=self.uploader.MODEL, filename=self.filename, error="Some errors now")
-        two_months_old_error_log = UploadErrorLog.objects.create(model=self.uploader.MODEL, filename=self.filename, error="Some different errors")
-        two_months_old_error_log.created = datetime.utcnow().replace(tzinfo=utc) - timedelta(days=31)
-        two_months_old_error_log.save()
-
-        UploadLocationWeights(open(self.filename, 'rb'))
-
-        two_months_old_error_log = UploadErrorLog.objects.filter(model=self.uploader.MODEL, filename=self.filename, error="Some different errors")
-        self.failIf(two_months_old_error_log)
-
-        error_location = UploadErrorLog.objects.filter(model='LOCATION', filename=self.filename, error="Some errors location")
-        self.failUnless(error_location)
-        error_now = UploadErrorLog.objects.filter(model=self.uploader.MODEL, filename=self.filename, error="Some errors now")
-        self.failUnless(error_now)
 
     def test_not_csv_file(self):
         self.filename = 'not_csv.xls'

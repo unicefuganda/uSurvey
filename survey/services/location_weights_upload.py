@@ -1,24 +1,12 @@
-from datetime import datetime, timedelta
-from django.utils.timezone import utc
 from rapidsms.contrib.locations.models import Location
+
+from django.utils.timezone import utc
 from survey.models import LocationWeight, UploadErrorLog
-from survey.services.csv_uploader import CSVUploader
-
-from survey.investigator_configs import UPLOAD_ERROR_LOG_EXPIRY
+from survey.services.csv_uploader import UploadService
 
 
-class UploadLocationWeights:
+class UploadLocationWeights(UploadService):
     MODEL = 'WEIGHTS'
-
-    def __init__(self, _file):
-        self.file = _file
-        self.csv_uploader = CSVUploader(self.file)
-        self.clean_db()
-
-    def clean_db(self):
-        one_month_before_today = datetime.utcnow().replace(tzinfo=utc) - timedelta(days=UPLOAD_ERROR_LOG_EXPIRY)
-        all_entries_before_one_month = UploadErrorLog.objects.filter(model=self.MODEL, created__lte=one_month_before_today)
-        all_entries_before_one_month.delete()
 
     @classmethod
     def parents_locations_match(cls, location, given_parents):
@@ -26,14 +14,11 @@ class UploadLocationWeights:
         check = [parent_name in location_parents for parent_name in given_parents]
         return check.count(True) == len(given_parents)
 
-    def log_error(self, row_number, error):
-        UploadErrorLog.objects.create(model=self.MODEL, filename=self.file.name, row_number=row_number, error=error)
-
     def check_location_errors(self, index, row, headers):
         lowest_location = row[-2]
         location = Location.objects.filter(name=lowest_location, tree_parent__name__iexact=row[-3].lower())
         if not location.exists():
-            self.log_error(index+1, 'There is no %s with name: %s, in %s.' % (headers[-2], row[-2], row[-3]))
+            self.log_error(index+1, 'There is no %s with name: %s, in %s.' % (headers[-2].lower(), row[-2], row[-3]))
             return
         if not self.parents_locations_match(location[0], row[:-3]):
             self.log_error(index+1, 'The location hierarchy %s does not exist.' % ((' >> '.join(row[:-1]))))
@@ -51,10 +36,6 @@ class UploadLocationWeights:
             location = self.check_location_errors(index, row, headers)
             if location:
                 self.save_weight(index, row, location, survey)
-
-    @staticmethod
-    def remove_trailing(name, in_array):
-        return [header.replace(name, '').lower() for header in in_array]
 
     def upload(self, survey):
         headers, reader = self.csv_uploader.split_content()
