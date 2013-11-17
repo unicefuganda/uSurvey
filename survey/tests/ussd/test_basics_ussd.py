@@ -192,15 +192,6 @@ class USSDTest(USSDBaseTest):
         self.assertEqual(USSDSurvey.ACTIONS['REQUEST'], ussd_survey.action)
         self.assertEqual(households_list, ussd_survey.responseString)
 
-    def test_ussd_render_welcome_text_if_investigator_has_households(self):
-        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
-        welcome_message = "%s\n%s: Households list" % (homepage, USSD.HOUSEHOLD_LIST_OPTION)
-        ussd_survey = USSDSurvey(self.investigator, FakeRequest())
-        ussd_survey.render_welcome_text()
-
-        self.assertEqual(USSDSurvey.ACTIONS['REQUEST'], ussd_survey.action)
-        self.assertEqual(welcome_message, ussd_survey.responseString)
-
     def test_ussd_render_welcome_text_if_investigator_has_no_households(self):
         household_message = "Sorry, you have no households registered."
         new_investigator = Investigator.objects.create(name="new investigator",
@@ -212,6 +203,53 @@ class USSDTest(USSDBaseTest):
 
         self.assertEqual(USSDSurvey.ACTIONS['END'], ussd_survey.action)
         self.assertEqual(household_message, ussd_survey.responseString)
+
+    def test_end_interview_if_batch_questions_answered_more_than_time_out_minutes_ago(self):
+        request = FakeRequest()
+        request['ussdRequestString'] = 1
+        session_string = "SESSION-%s-%s" % ('1234567890', USSDSurvey.__name__)
+        session = cache.get(session_string)
+        session['HOUSEHOLD'] = self.household_1
+        session['HOUSEHOLD_MEMBER'] = self.household_member
+        cache.set(session_string, session)
+
+        ussd_survey = USSDSurvey(self.investigator, request)
+        ussd_survey.request['ussdRequestString'] = '1'
+
+        with patch.object(HouseholdMember, 'survey_completed', return_value=False):
+            with patch.object(HouseholdMember, 'last_question_answered', return_value=[1]):
+                with patch.object(HouseholdMember, 'can_retake_survey', return_value=False):
+                    ussd_survey.end_interview(self.batch)
+                    self.assertEqual(USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE'], ussd_survey.responseString)
+                    self.assertEqual(USSD.ACTIONS['END'], ussd_survey.action)
+
+    def test_end_interview_if_batch_questions_answered_within_time_out_minutes_ago(self):
+        request = FakeRequest()
+        request['ussdRequestString'] = 1
+        session_string = "SESSION-%s-%s" % ('1234567890', USSDSurvey.__name__)
+        session = cache.get(session_string)
+        session['HOUSEHOLD'] = self.household_1
+        session['PAGE'] = '1'
+        session['HOUSEHOLD_MEMBER'] = self.household_member
+        cache.set(session_string, session)
+
+        ussd_survey = USSDSurvey(self.investigator, request)
+        ussd_survey.request['ussdRequestString'] = '1'
+
+        with patch.object(HouseholdMember, 'survey_completed', return_value=False):
+            with patch.object(HouseholdMember, 'can_retake_survey', return_value=True):
+                ussd_survey.end_interview(self.batch)
+                self.assertEqual(USSD.MESSAGES['SUCCESS_MESSAGE'], ussd_survey.responseString)
+                self.assertEqual(USSD.ACTIONS['END'], ussd_survey.action)
+
+    def test_ussd_render_welcome_text_if_investigator_has_households(self):
+        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+        welcome_message = "%s\n%s: Households list" % (homepage, USSD.HOUSEHOLD_LIST_OPTION)
+        ussd_survey = USSDSurvey(self.investigator, FakeRequest())
+        ussd_survey.render_welcome_text()
+
+        self.assertEqual(USSDSurvey.ACTIONS['REQUEST'], ussd_survey.action)
+        self.assertEqual(welcome_message, ussd_survey.responseString)
 
     def test_renders_welcome_message_if_investigator_does_not_select_option_one_or_two_from_welcome_screen(self):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
