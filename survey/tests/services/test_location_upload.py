@@ -1,4 +1,5 @@
 import os
+from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models import LocationTypeDetails
 from survey.services.location_upload import UploadLocation
@@ -110,6 +111,28 @@ class LocationUploadHelper(BaseTest):
         status, message = self.uploader.upload()
         self.assertFalse(status)
         self.assertEqual(message, 'Locations not uploaded. DistrictCode column should be before DistrictName column. Please refer to input file format.')
+
+    def test_should_continue_if_index_error(self):
+        district = LocationTypeDetails.objects.get(location_type=self.district, required=True)
+        district.has_code = True
+        district.length_of_code = 3
+        district.save()
+
+        #LocationType.objects.all().delete()
+        data = [['RegionName', 'DistrictCode', 'DistrictName', 'CountyName'],
+                     ['region1', '001', 'district1', 'county1'],
+                     ['region2', '003','district2', 'county2']]
+
+        self.write_to_csv('wb', data)
+        file = open('test.csv', 'rb')
+
+        file_information = [['100','100', '001', '12312'], ['200', '200'], ['100', '100', '002', '2003']]
+        with patch.object(UploadLocation, '_get_location_type', return_value=[[self.region], "Success"]):
+            with patch.object(UploadLocation, 'regroup_with_code', return_value=file_information):
+                uploader = UploadLocation(file)
+                status, message = uploader.upload()
+                self.assertTrue(status)
+                self.assertEqual('Locations successfully uploaded.', message)
 
     def test_should_return_false_and_error_message_if_length_of_code_is_not_matched(self):
         district = LocationTypeDetails.objects.get(location_type=self.district, required=True)
