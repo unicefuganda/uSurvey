@@ -223,6 +223,21 @@ class USSDTest(USSDBaseTest):
                     self.assertEqual(USSD.MESSAGES['BATCH_5_MIN_TIMEDOUT_MESSAGE'], ussd_survey.responseString)
                     self.assertEqual(USSD.ACTIONS['END'], ussd_survey.action)
 
+    def test_render_household_list_should_behave_like_new_request_if_no_household_selected(self):
+        request = FakeRequest()
+        session_string = "SESSION-%s-%s" % ('1234567890', USSDSurvey.__name__)
+        session = {}
+        session['HOUSEHOLD'] = self.household_1
+        session['HOUSEHOLD_MEMBER'] = self.household_member
+        session['PAGE'] = '1'
+        cache.set(session_string, session)
+
+        ussd_survey = USSDSurvey(self.investigator, request)
+        ussd_survey.render_households_list(self.open_survey)
+
+        self.assertEqual(USSD.ACTIONS['REQUEST'], ussd_survey.action)
+        self.assertEqual(USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE'], ussd_survey.responseString)
+
     def test_end_interview_if_batch_questions_answered_within_time_out_minutes_ago(self):
         request = FakeRequest()
         request['ussdRequestString'] = 1
