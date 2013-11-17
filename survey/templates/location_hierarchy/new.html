@@ -18,7 +18,7 @@
     {% for form in details_formset.forms %}
       <tr>
         <td>Level <span class="number"> {{ forloop.counter }}</span></td>
-        <td>{{ form.levels }}</td>
+        <td>{{ form.levels }}<span style="color: red">{% include "base/field_error.html" with field=form.levels %}</span></td>
         <td><a href="javascript:;" class="add-on btn btn_primary add-level"><i class="icon-plus"></i></a>
          <a href="javascript:;" class="add-on btn btn_primary remove-level"><i class="icon-remove"></i></a>
         </td>

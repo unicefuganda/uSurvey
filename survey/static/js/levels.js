@@ -30,6 +30,12 @@ $(function(){
         toggleCodeField();
     }
 
+    function show_has_code_fields(){
+        var $hascode = $(".has_code");
+        var $code_field = $hascode.parents("tr").find(".code");
+        $hascode.is(':checked') ? $code_field.show() : $code_field.hide();
+    }
+
     $form.on("click", ".add-level", function(){
         $(this).parents("tr").after(template);
         AdjustLevelAndNames();
@@ -48,6 +54,7 @@ $(function(){
     }
 
     toggleCodeField();
+    show_has_code_fields();
 
 });
 

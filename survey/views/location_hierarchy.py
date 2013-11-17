@@ -29,7 +29,7 @@ def add(request):
                 for form in details_formset.forms:
                     location_type, status = LocationType.objects.get_or_create(name=form.cleaned_data.get('levels'), slug =slugify(form.cleaned_data.get('levels')))
                     details = form.save(commit=False)
-                    details.location_type=location_type
+                    details.location_type = location_type
                     details.country = selected_country
                     details.save()
                 messages.success(request, "Location Hierarchy successfully created.")
