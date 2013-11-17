@@ -208,7 +208,7 @@ class USSDTest(USSDBaseTest):
         request = FakeRequest()
         request['ussdRequestString'] = 1
         session_string = "SESSION-%s-%s" % ('1234567890', USSDSurvey.__name__)
-        session = cache.get(session_string)
+        session = {}
         session['HOUSEHOLD'] = self.household_1
         session['HOUSEHOLD_MEMBER'] = self.household_member
         cache.set(session_string, session)
@@ -227,7 +227,7 @@ class USSDTest(USSDBaseTest):
         request = FakeRequest()
         request['ussdRequestString'] = 1
         session_string = "SESSION-%s-%s" % ('1234567890', USSDSurvey.__name__)
-        session = cache.get(session_string)
+        session = {}
         session['HOUSEHOLD'] = self.household_1
         session['PAGE'] = '1'
         session['HOUSEHOLD_MEMBER'] = self.household_member
