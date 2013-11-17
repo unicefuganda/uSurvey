@@ -2,6 +2,7 @@
 import datetime
 from random import randint
 import urllib2
+from django.core.cache import cache
 from django.http import HttpRequest
 from django.test import Client
 from mock import patch
@@ -112,6 +113,7 @@ class USSDTest(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
                 response = self.respond('1')
+
                 response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -124,6 +126,92 @@ class USSDTest(USSDBaseTest):
                 response = self.respond('1')
                 response_string = "responseString=%s&action=request" % question_1.text
                 self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_ussd_restart_survey_option_yes_with_household_set(self):
+        request = FakeRequest()
+        request['ussdRequestString'] = 1
+        session_string = "SESSION-%s-%s" % ('1234567890', USSDSurvey.__name__)
+        session = cache.get(session_string)
+        session['HOUSEHOLD'] = self.household_1
+        cache.set(session_string, session)
+
+        members_list = "%s\n1: %s - (HEAD)*\n2: %s*" % (
+                    USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, self.household_member.surname)
+
+        ussd_survey = USSDSurvey(self.investigator, request)
+        ussd_survey.request['ussdRequestString'] = '1'
+
+
+        ussd_survey.restart_survey()
+
+        self.assertEqual(USSDSurvey.ACTIONS['REQUEST'], ussd_survey.action)
+        self.assertEqual(members_list, ussd_survey.responseString)
+
+    def test_ussd_restart_survey_option_yes_with_household_member_set(self):
+        request = FakeRequest()
+        request['ussdRequestString'] = 1
+        session_string = "SESSION-%s-%s" % ('1234567890', USSDSurvey.__name__)
+        session = cache.get(session_string)
+        session['HOUSEHOLD'] = self.household_1
+        session['HOUSEHOLD_MEMBER'] = self.household_member
+        cache.set(session_string, session)
+
+        restart_message = "Thank you. You have completed this household. Would you like to retake this household?\n1: Yes\n2: No"
+
+        ussd_survey = USSDSurvey(self.investigator, request)
+        ussd_survey.request['ussdRequestString'] = '1'
+
+
+        ussd_survey.restart_survey()
+
+        self.assertEqual(USSDSurvey.ACTIONS['REQUEST'], ussd_survey.action)
+        self.assertEqual(restart_message, ussd_survey.responseString)
+
+    def test_ussd_restart_survey_option_no(self):
+        request = FakeRequest()
+        request['ussdRequestString'] = 1
+        session_string = "SESSION-%s-%s" % ('1234567890', USSDSurvey.__name__)
+        session = cache.get(session_string)
+        session['HOUSEHOLD'] = self.household_1
+        session['HOUSEHOLD_MEMBER'] = self.household_member
+        cache.set(session_string, session)
+
+        households_list = "%s\n1: Household-%s-%s*\n2: Household-%s-%s*" % (
+                USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
+                self.household_head_1.household.random_sample_number, self.household_head_1.surname)
+
+        ussd_survey = USSDSurvey(self.investigator, request)
+        ussd_survey.request['ussdRequestString'] = '2'
+
+
+        ussd_survey.restart_survey()
+
+        self.assertIsNone(ussd_survey.get_from_session('HOUSEHOLD'))
+        self.assertIsNone(ussd_survey.get_from_session('HOUSEHOLD_MEMBER'))
+        self.assertIsNone(ussd_survey.household)
+        self.assertEqual(USSDSurvey.ACTIONS['REQUEST'], ussd_survey.action)
+        self.assertEqual(households_list, ussd_survey.responseString)
+
+    def test_ussd_render_welcome_text_if_investigator_has_households(self):
+        homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+        welcome_message = "%s\n%s: Households list" % (homepage, USSD.HOUSEHOLD_LIST_OPTION)
+        ussd_survey = USSDSurvey(self.investigator, FakeRequest())
+        ussd_survey.render_welcome_text()
+
+        self.assertEqual(USSDSurvey.ACTIONS['REQUEST'], ussd_survey.action)
+        self.assertEqual(welcome_message, ussd_survey.responseString)
+
+    def test_ussd_render_welcome_text_if_investigator_has_no_households(self):
+        household_message = "Sorry, you have no households registered."
+        new_investigator = Investigator.objects.create(name="new investigator",
+                                                        mobile_number="001122334",
+                                                        location=Location.objects.create(name="Entebbe"),
+                                                        backend=Backend.objects.create(name='another'))
+        ussd_survey = USSDSurvey(new_investigator, FakeRequest())
+        ussd_survey.render_welcome_text()
+
+        self.assertEqual(USSDSurvey.ACTIONS['END'], ussd_survey.action)
+        self.assertEqual(household_message, ussd_survey.responseString)
 
     def test_renders_welcome_message_if_investigator_does_not_select_option_one_or_two_from_welcome_screen(self):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
@@ -815,4 +903,9 @@ class FakeRequest(HttpRequest):
         obj = self.__dict__
         obj['transactionId'] = '1234567890'
         obj['response'] = 'false'
+        return obj
+
+    def __setitem__(self, key, value):
+        obj = self.__dict__
+        obj[key] = value
         return obj
