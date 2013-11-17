@@ -16,6 +16,11 @@ class USSDBaseTest(TestCase):
             'response': "false"
         }
 
+    def test_ussd_parameters_set_up(self):
+        self.assertEqual('false', self.ussd_params['response'])
+        self.assertEqual('', self.ussd_params['ussdRequestString'])
+        self.assertEqual('130', self.ussd_params['ussdServiceCode'])
+
     def reset_session(self):
         self.ussd_params['transactionId'] = "123344" + str(randint(1, 99999))
         self.ussd_params['response'] = 'false'
