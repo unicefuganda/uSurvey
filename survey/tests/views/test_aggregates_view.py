@@ -1,12 +1,6 @@
 from django.test.client import Client
 from django.contrib.auth.models import User
 
-from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models.batch import Batch
-from survey.models.households import Household
-from survey.models.backend import Backend
-from survey.models.investigator import Investigator
-from survey import investigator_configs
 from survey.views.aggregates import *
 from survey.tests.base_test import BaseTest
 
@@ -17,113 +11,6 @@ class AggregatesPageTest(BaseTest):
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
-        
-
-    def test_get_page(self):
-        country = LocationType.objects.create(name = 'Country', slug = 'country')
-        city = LocationType.objects.create(name = 'City', slug = 'city')
-
-        uganda = Location.objects.create(name='Uganda', type = country)
-        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = city)
-        kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = city)
-        kampala_city = Location.objects.create(name='Kampala City', tree_parent = kampala, type = city)
-
-        response = self.client.get('/aggregates/status')
-        self.failUnlessEqual(response.status_code, 200)
-        templates = [template.name for template in response.templates]
-        self.assertIn('aggregates/status.html', templates)
-        self.assertEquals(len(response.context['batches']), 0)
-        locations = response.context['locations'].get_widget_data()
-        self.assertEquals(len(locations.keys()), 2)
-        self.assertEquals(locations.keys()[0], 'country')
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
-
-        self.assertEquals(len(locations['city']), 0)
-
-    def test_get_aggregates_for_a_batch(self):
-        country = LocationType.objects.create(name = 'Country', slug = 'country')
-        city = LocationType.objects.create(name = 'City', slug = 'city')
-        village = LocationType.objects.create(name = 'Village', slug = 'village')
-
-        uganda = Location.objects.create(name='Uganda', type = country)
-        kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = city)
-        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = city)
-        kampala_city = Location.objects.create(name='Kampala Village', tree_parent = kampala, type = village)
-
-        batch = Batch.objects.create(order=1)
-        batch_2 = Batch.objects.create(order=1)
-
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=kampala_city, backend = Backend.objects.create(name='something'))
-        count = 1
-        while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
-            household = Household.objects.create(investigator = investigator, uid=count)
-            household.batch_completed(batch_2)
-            count += 1
-
-        old_count = count
-
-        response = self.client.get('/aggregates/status', {'location': str(kampala.pk), 'batch': str(batch.pk)})
-        self.failUnlessEqual(response.status_code, 200)
-        self.assertEquals(len(response.context['batches']), 2)
-        self.assertEquals(response.context['batches'][0], batch)
-        self.assertEquals(response.context['batches'][1], batch_2)
-        self.assertEquals(response.context['selected_location'], kampala)
-        self.assertEquals(response.context['selected_batch'], batch)
-        self.assertEquals(response.context['households'], {'completed': 0, 'pending': 10})
-        self.assertEquals(response.context['clusters'], {'completed': 0, 'pending': 1})
-        self.assertEquals(len(response.context['investigators']), 1)
-        self.assertEquals(response.context['investigators'][0], investigator)
-
-        locations = response.context['locations'].get_widget_data()
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
-
-        self.assertEquals(len(locations['city']), 2)
-        self.assertEquals(locations['city'][0], abim)
-        self.assertEquals(locations['city'][1], kampala)
-
-        self.assertEquals(len(locations['village']), 1)
-        self.assertEquals(locations['village'][0], kampala_city)
-
-        investigator_2 = Investigator.objects.create(name="investigator name", mobile_number="1234", location=kampala_city, backend = Backend.objects.create(name='something1'))
-        count = 1
-        while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
-            household = Household.objects.create(investigator = investigator_2, uid = old_count + count)
-            household.batch_completed(batch)
-            count += 1
-        old_count = old_count + count
-
-        response = self.client.get('/aggregates/status', {'location': str(kampala.pk), 'batch': str(batch.pk)})
-        self.failUnlessEqual(response.status_code, 200)
-        self.assertEquals(response.context['selected_location'], kampala)
-        self.assertEquals(response.context['selected_batch'], batch)
-        self.assertEquals(response.context['households'], {'completed': 10, 'pending': 10})
-        self.assertEquals(response.context['clusters'], {'completed': 1, 'pending': 1})
-        self.assertEquals(len(response.context['investigators']), 1)
-        self.assertEquals(response.context['investigators'][0], investigator)
-
-        investigator_3 = Investigator.objects.create(name="investigator name", mobile_number="12345", location=abim, backend = Backend.objects.create(name='something2'))
-        count = 1
-        while(count <= investigator_configs.NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR):
-            household = Household.objects.create(investigator = investigator_3,  uid = old_count + count)
-            household.batch_completed(batch)
-            count += 1
-
-        old_count = old_count + count
-
-        investigator_4 = Investigator.objects.create(name="investigator name", mobile_number="123456", location=abim, backend = Backend.objects.create(name='something4'))
-        Household.objects.create(investigator = investigator_4, uid = old_count).batch_completed(batch)
-
-        response = self.client.get('/aggregates/status', {'location': str(kampala.pk), 'batch': str(batch.pk)})
-        self.failUnlessEqual(response.status_code, 200)
-        self.assertEquals(response.context['selected_location'], kampala)
-        self.assertEquals(response.context['selected_batch'], batch)
-        self.assertEquals(response.context['households'], {'completed': 10, 'pending': 10})
-        self.assertEquals(response.context['clusters'], {'completed': 1, 'pending': 1})
-        self.assertEquals(len(response.context['investigators']), 1)
-        self.assertEquals(response.context['investigators'][0], investigator)
-
 
     def test_is_valid_params(self):
         self.assertTrue(is_valid({'location':'1', 'batch':'2'}))
@@ -136,11 +23,3 @@ class AggregatesPageTest(BaseTest):
         self.assertFalse(is_valid({'location':'2', 'batch':'NOT_A_DIGIT'}))
         self.assertFalse(is_valid({'location':'NOT_A_DIGIT', 'batch':'1'}))
         self.assertFalse(is_valid({'location':'1'}))
-
-    def test_error_message_if_invalid_location(self):
-        response = self.client.get('/aggregates/status', {'location': 'NOT_A_DIGIT', 'batch': 'NOT_A_DIGIT'})
-        self.failUnlessEqual(response.status_code, 200)
-        self.assertIn('Please select a valid location and batch.', response.content)
-
-    def test_restricted_permssion(self):
-        self.assert_restricted_permission_for('/aggregates/status')

@@ -1,6 +1,6 @@
 import csv
 from random import randint
-from  urllib import quote
+from urllib import quote
 
 from django.test import TestCase
 from django.contrib.auth.models import Group, Permission

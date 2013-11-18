@@ -2,7 +2,7 @@ from datetime import date, datetime
 from django.template.defaultfilters import slugify
 from mock import patch
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Investigator, Household, Question, Backend, Survey, HouseholdBatchCompletion
+from survey.models import Batch, Investigator, Household, Question, Backend, Survey, HouseholdMemberBatchCompletion
 from survey.models.households import HouseholdMember
 from survey.services.completion_rates_calculator import BatchCompletionRates, BatchLocationCompletionRates, BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.tests.base_test import BaseTest
@@ -199,19 +199,19 @@ class HouseholdCompletionJsonService(BaseTest):
                                                             date_of_birth=date(1980, 05, 01))
         household_4_member = HouseholdMember.objects.create(household=self.household_4, date_of_birth=date(1980, 05, 01))
 
-        HouseholdBatchCompletion.objects.create(household=self.household_1, householdmember=household_1_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_1, householdmember=household_1_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
-        HouseholdBatchCompletion.objects.create(household=self.household_2, householdmember=household_2_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_2, householdmember=household_2_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
-        HouseholdBatchCompletion.objects.create(household=self.household_3, householdmember=household_3_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_3, householdmember=household_3_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
-        HouseholdBatchCompletion.objects.create(household=self.household_3, householdmember=household_4_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_3, householdmember=household_4_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
@@ -232,10 +232,10 @@ class HouseholdCompletionJsonService(BaseTest):
         HouseholdMember.objects.create(household=self.household_7, date_of_birth=date(1980, 05, 01))
         HouseholdMember.objects.create(household=self.household_8, date_of_birth=date(1980, 05, 01))
 
-        HouseholdBatchCompletion.objects.create(household=self.household_1, householdmember=household_5_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_1, householdmember=household_5_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_2)
-        HouseholdBatchCompletion.objects.create(household=self.household_2, householdmember=household_6_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_2, householdmember=household_6_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_2)
 

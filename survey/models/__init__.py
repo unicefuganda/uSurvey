@@ -3,7 +3,7 @@ from survey.models.backend import Backend
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
 from survey.models.formula import Formula
-from survey.models.household_batch_completion import HouseholdBatchCompletion
+from survey.models.household_batch_completion import HouseholdMemberBatchCompletion, HouseholdMemberBatchCompletion
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import Household, HouseholdHead
 from survey.models.investigator import Investigator
@@ -32,7 +32,7 @@ __all__ = [
     'HouseholdMemberGroup',
     'Household',
     'HouseholdHead',
-    'HouseholdBatchCompletion',
+    'HouseholdMemberBatchCompletion',
     'GroupCondition',
     'Investigator',
     'LocationAutoComplete',
@@ -47,5 +47,6 @@ __all__ = [
     'LocationCode',
     'Indicator',
     'LocationWeight',
-    'UploadErrorLog'
+    'UploadErrorLog',
+    'HouseholdMemberBatchCompletion',
 ]

@@ -144,7 +144,6 @@ INSTALLED_APPS = (
     'survey',
     'rapidsms.backends.database',
     'rapidsms.contrib.httptester',
-    'celery',
     'djcelery',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',

@@ -10,7 +10,7 @@ from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import HouseholdMemberGroup, GroupCondition, BatchQuestionOrder, Survey, RandomHouseHoldSelection
 from survey.models.backend import Backend
-from survey.models.household_batch_completion import HouseholdBatchCompletion
+from survey.models.household_batch_completion import HouseholdMemberBatchCompletion
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household
 from survey.models.investigator import Investigator
@@ -114,7 +114,7 @@ class USSDWithMultipleBatches(USSDBaseTest):
     def test_with_one_batch_open(self):
         self.batch.open_for_location(self.location)
 
-        self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
+        self.assertEquals(HouseholdMemberBatchCompletion.objects.count(), 0)
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
@@ -133,8 +133,8 @@ class USSDWithMultipleBatches(USSDBaseTest):
                 response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
-                self.assertEquals(HouseholdBatchCompletion.objects.count(), 1)
-                household_completed = HouseholdBatchCompletion.objects.latest('id')
+                self.assertEquals(HouseholdMemberBatchCompletion.objects.count(), 1)
+                household_completed = HouseholdMemberBatchCompletion.objects.latest('id')
                 self.assertEquals(household_completed.household, self.household)
                 self.assertEquals(household_completed.investigator, self.investigator)
                 self.assertEquals(household_completed.batch, self.batch)
@@ -143,7 +143,7 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.batch.open_for_location(self.location)
         self.batch_1.open_for_location(self.location)
 
-        self.assertEquals(HouseholdBatchCompletion.objects.count(), 0)
+        self.assertEquals(HouseholdMemberBatchCompletion.objects.count(), 0)
 
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
@@ -163,8 +163,8 @@ class USSDWithMultipleBatches(USSDBaseTest):
             response_string = "responseString=%s&action=request" % self.question_3.to_ussd()
             self.assertEquals(urllib2.unquote(response.content), response_string)
 
-            self.assertEquals(HouseholdBatchCompletion.objects.count(), 1)
-            household_completed = HouseholdBatchCompletion.objects.latest('id')
+            self.assertEquals(HouseholdMemberBatchCompletion.objects.count(), 1)
+            household_completed = HouseholdMemberBatchCompletion.objects.latest('id')
             self.assertEquals(household_completed.household, self.household)
             self.assertEquals(household_completed.householdmember, self.household_head.get_member())
             self.assertEquals(household_completed.investigator, self.investigator)
@@ -178,8 +178,8 @@ class USSDWithMultipleBatches(USSDBaseTest):
             response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
             self.assertEquals(urllib2.unquote(response.content), response_string)
 
-            self.assertEquals(HouseholdBatchCompletion.objects.count(), 2)
-            household_completed = HouseholdBatchCompletion.objects.latest('id')
+            self.assertEquals(HouseholdMemberBatchCompletion.objects.count(), 2)
+            household_completed = HouseholdMemberBatchCompletion.objects.latest('id')
             self.assertEquals(household_completed.household, self.household)
             self.assertEquals(household_completed.householdmember, self.household_head.get_member())
             self.assertEquals(household_completed.investigator, self.investigator)

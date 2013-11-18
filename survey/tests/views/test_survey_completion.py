@@ -5,7 +5,7 @@ from django.template.defaultfilters import slugify
 from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdBatchCompletion, Backend
+from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdMemberBatchCompletion, Backend
 from survey.models.households import HouseholdMember
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates
 from survey.tests.base_test import BaseTest
@@ -175,7 +175,7 @@ class TestSurveyCompletion(BaseTest):
         self.investigator_2.member_answered(question,member_1,1,self.batch)
         self.investigator_2.member_answered(question,member_2,1,self.batch)
         response = self.client.get('/surveys/completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        expected = HouseholdBatchCompletion.objects.filter(household=self.household_2).latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
+        expected = HouseholdMemberBatchCompletion.objects.filter(household=self.household_2).latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
         self.assertEqual(1,len(response.context['completion_rates'].interviewed_households()))
         self.assertEqual(self.household_2,response.context['completion_rates'].interviewed_households()[0]['household'])
         self.assertEqual(expected,response.context['completion_rates'].interviewed_households()[0]['date_interviewed'])
@@ -232,19 +232,19 @@ class HouseholdCompletionJsonViewTest(BaseTest):
                                                             date_of_birth=datetime.date(1980, 05, 01))
         household_4_member = HouseholdMember.objects.create(household=self.household_4, date_of_birth=datetime.date(1980, 05, 01))
 
-        HouseholdBatchCompletion.objects.create(household=self.household_1, householdmember=household_1_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_1, householdmember=household_1_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
-        HouseholdBatchCompletion.objects.create(household=self.household_2, householdmember=household_2_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_2, householdmember=household_2_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
-        HouseholdBatchCompletion.objects.create(household=self.household_3, householdmember=household_3_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_3, householdmember=household_3_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
-        HouseholdBatchCompletion.objects.create(household=self.household_3, householdmember=household_4_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_3, householdmember=household_4_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_1)
 
@@ -265,10 +265,10 @@ class HouseholdCompletionJsonViewTest(BaseTest):
         HouseholdMember.objects.create(household=self.household_7, date_of_birth=datetime.date(1980, 05, 01))
         HouseholdMember.objects.create(household=self.household_8, date_of_birth=datetime.date(1980, 05, 01))
 
-        HouseholdBatchCompletion.objects.create(household=self.household_1, householdmember=household_5_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_1, householdmember=household_5_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_2)
-        HouseholdBatchCompletion.objects.create(household=self.household_2, householdmember=household_6_member,
+        HouseholdMemberBatchCompletion.objects.create(household=self.household_2, householdmember=household_6_member,
                                                 batch=self.batch,
                                                 investigator=self.investigator_2)
 

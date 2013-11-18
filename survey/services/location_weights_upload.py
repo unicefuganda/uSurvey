@@ -29,7 +29,7 @@ class UploadLocationWeights(UploadService):
         try:
             LocationWeight.objects.create(location=location[0], selection_probability=float(row[-1]), survey=survey)
         except ValueError, e:
-            self.log_error(index+1,'Selection probability must be a number.')
+            self.log_error(index+1, 'Selection probability must be a number.')
 
     def create_locations_weights(self, reader, headers, survey):
         for index, row in enumerate(reader):

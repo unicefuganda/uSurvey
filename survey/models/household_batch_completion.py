@@ -9,7 +9,7 @@ from survey.models.batch import Batch
 from survey.models.households import Household, HouseholdMember
 
 
-class HouseholdBatchCompletion(BaseModel):
+class HouseholdMemberBatchCompletion(BaseModel):
     household = models.ForeignKey(Household, null=True, related_name="completed_batches")
     householdmember = models.ForeignKey(HouseholdMember, null=True, related_name="completed_member_batches")
     batch = models.ForeignKey(Batch, null=True, related_name="completed_households")
@@ -45,3 +45,9 @@ class HouseholdBatchCompletion(BaseModel):
         investigators = Investigator.objects.filter(location__in=locations)
         return cls.households_status(investigators, batch, survey), cls.clusters_status(investigators, batch), \
                cls.pending_investigators(investigators, batch)
+
+
+class HouseholdBatchCompletion(BaseModel):
+    household = models.ForeignKey(Household, null=True, related_name="batch_completion_batches")
+    batch = models.ForeignKey(Batch, null=True, related_name="batch_completion_households")
+    investigator = models.ForeignKey(Investigator, null=True)

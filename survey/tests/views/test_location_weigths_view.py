@@ -3,7 +3,7 @@ from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.upload_csv_file import UploadWeightsForm
-from survey.models import LocationWeight, Survey
+from survey.models import LocationWeight, Survey, UploadErrorLog
 from survey.tests.base_test import BaseTest
 
 
@@ -91,7 +91,72 @@ class UploadWeightsTest(BaseTest):
         location = Location.objects.get(name="county2", tree_parent__name="district2")
         self.failUnless(LocationWeight.objects.filter(location=location, selection_probability=0.1))
 
-
     def test_assert_restricted_permissions(self):
         self.assert_login_required('/locations/weights/upload/')
         self.assert_restricted_permission_for('/locations/weights/upload/')
+
+    def test_should_get_list_and_returns_success_with_template(self):
+        region_type = LocationType.objects.create(name="region1", slug="region1")
+        country = LocationType.objects.create(name="Country", slug="country")
+        district_type = LocationType.objects.create(name="district1", slug='district1')
+        county_type = LocationType.objects.create(name="county1", slug='county1')
+
+        region = Location.objects.create(name="region1")
+        district = Location.objects.create(name="district1", tree_parent=region)
+        county = Location.objects.create(name="county1", tree_parent=district)
+
+        region1 = Location.objects.create(name="region2")
+        district1 = Location.objects.create(name="district2", tree_parent=region1)
+        county1 = Location.objects.create(name="county2", tree_parent=district1)
+        location_weight_1 = LocationWeight.objects.create(location=county, selection_probability=0.1, survey=self.survey)
+        location_weight_2 = LocationWeight.objects.create(location=county1, selection_probability=0.2, survey=self.survey)
+
+        response = self.client.get('/locations/weights/')
+        self.assertEqual(200, response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn('locations/weights/index.html', templates)
+
+        self.assertIn(location_weight_1, response.context['location_weights'])
+        self.assertIn(location_weight_2, response.context['location_weights'])
+        expected_location_types = [region_type, district_type, county_type]
+        [self.assertIn(_type, response.context['location_types']) for _type in expected_location_types]
+        self.assertNotIn(country, response.context['location_types'])
+
+class UploadWeightsErrorLogTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
+                                        'can_view_batches')
+        self.client.login(username='Rajni', password='I_Rock')
+
+        region = Location.objects.create(name="region1")
+        district = Location.objects.create(name="district1", tree_parent=region)
+        Location.objects.create(name="county1", tree_parent=district)
+
+        region = Location.objects.create(name="region2")
+        district = Location.objects.create(name="district2", tree_parent=region)
+        Location.objects.create(name="county2", tree_parent=district)
+
+        self.filename = 'test_uganda.csv'
+        self.filedata = [['RegionName', 'DistrictName', 'CountyName', 'Selection Probability'],
+                            ['region1',  'district1', 'county1', '0.01'],
+                            ['region2', 'district2', 'county2', '0.1']]
+        self.write_to_csv('wb', self.filedata, self.filename)
+        self.file = open(self.filename, 'rb')
+
+        self.survey = Survey.objects.create(name="Survey")
+
+    def test_should_get_list_and_returns_success_with_template(self):
+        error_log = UploadErrorLog.objects.create(model="WEIGHTS", error="Some error", filename="Some file", row_number=1)
+        error_log_1 = UploadErrorLog.objects.create(model="LOCATION", error="Some error", filename="Some file", row_number=25)
+        error_log_2 = UploadErrorLog.objects.create(model="WEIGHTS", error="Some error_2", filename="Some file", row_number=25)
+        response = self.client.get('/locations/weights/error_logs/')
+        self.assertEqual(200, response.status_code)
+        templates = [template.name for template in response.templates]
+        self.assertIn('locations/weights/error_logs.html', templates)
+
+        expected_errors = [error_log, error_log_2]
+        [self.assertIn(error, response.context['error_logs']) for error in expected_errors]
+        self.assertNotIn(error_log_1, response.context['error_logs'])
+        self.assertIsNotNone(response.context['request'])

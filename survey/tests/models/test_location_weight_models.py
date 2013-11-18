@@ -1,4 +1,4 @@
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import Survey
 from survey.models.location_weight import LocationWeight
 from survey.tests.base_test import BaseTest

@@ -15,3 +15,13 @@ Feature: Location Weights upload
     And I select a survey
     And I click the save button
     Then I should see location weights upload is in progress
+
+  Scenario: List locations weights
+    Given I am logged in as researcher
+    And I have a survey
+    And I have some locations with weights
+    And I have error logs from location weights upload
+    And I visit the list location weights page
+    Then I should see the locations weights
+    When i click the view error logs link
+    Then I should see the error logs from previous the month

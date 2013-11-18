@@ -27,3 +27,11 @@ class UploadWeightsPage(PageObject):
         collapse_element = self.browser.find_by_css(".collapse")
         assert len(collapse_element) == 1
         assert not 'in' in collapse_element.first['class']
+
+
+class ListLocationWeightsPage(PageObject):
+    url = "/locations/weights/"
+
+
+class ListLocationWeightsErrorLogPage(PageObject):
+    url = "/locations/weights/error_logs/"

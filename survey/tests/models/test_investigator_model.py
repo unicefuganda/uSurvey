@@ -9,7 +9,7 @@ from survey.models import AnswerRule, HouseholdHead, BatchQuestionOrder, Locatio
 
 from survey.models.batch import Batch
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models.household_batch_completion import HouseholdBatchCompletion
+from survey.models.household_batch_completion import HouseholdMemberBatchCompletion
 from survey.models.backend import Backend
 from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
@@ -121,7 +121,7 @@ class InvestigatorTest(TestCase):
         BatchQuestionOrder.objects.create(batch=batch, question=question_1, order=1)
 
         self.investigator.member_answered(question_1, household_member1, answer=34, batch=batch)
-        completed_batches = HouseholdBatchCompletion.objects.filter()
+        completed_batches = HouseholdMemberBatchCompletion.objects.filter()
 
         self.assertEqual(self.investigator.last_answered_question(), question_1)
         self.assertEqual(len(completed_batches), 1)
@@ -144,7 +144,7 @@ class InvestigatorTest(TestCase):
         BatchQuestionOrder.objects.create(batch=batch, question=question_2, order=2)
 
         self.investigator.member_answered(question_1, household_member1, answer=34, batch=batch)
-        completed_batches = HouseholdBatchCompletion.objects.filter()
+        completed_batches = HouseholdMemberBatchCompletion.objects.filter()
 
         self.assertEqual(self.investigator.last_answered_question(), question_1)
         self.assertEqual(len(completed_batches), 0)

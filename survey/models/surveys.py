@@ -4,14 +4,11 @@ from survey.models.base import BaseModel
 
 
 class Survey(BaseModel):
-    name = models.CharField(max_length=100, blank=False,null=True)
-    description = models.CharField(max_length=300,blank=True,null=True)
+    name = models.CharField(max_length=100, blank=False, null=True)
+    description = models.CharField(max_length=300, blank=True, null=True)
     sample_size = models.PositiveIntegerField(max_length=2, null=False, blank=False, default=10, verbose_name="Number of Households in EA/Village")
     type = models.BooleanField(default=False)
     has_sampling = models.BooleanField(default=True)
-
-    class Meta:
-        app_label = 'survey'
 
     def is_open(self, location=None):
         all_batches = self.batch.all()
@@ -29,6 +26,12 @@ class Survey(BaseModel):
                 return True
         return False
 
+    def get_total_respondents(self):
+        completed_households = 0
+        for batch in self.batch.all():
+            completed_households += batch.batch_completion_households.all().count()
+        return completed_households
+
     @classmethod
     def currently_open_survey(cls, location=None):
         for survey in Survey.objects.filter():
@@ -42,7 +45,6 @@ class Survey(BaseModel):
         if not survey.has_sampling:
             survey.sample_size = 0
         survey.save()
-
 
     def __unicode__(self):
         return self.name

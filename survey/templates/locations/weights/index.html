@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% block title %}
+    Location Weights
+{% endblock %}
+
+{% block content %}
+<h3>Location Weights</h3>
+    <a class="btn pull-right" href="{% url 'weights_error_logs_page' %}" id="view_error_log">Error logs from previous upload</a>
+<table class="table-bordered table">
+    <tr>
+    {% for type in location_types %}
+        <th>
+            {{ type.name.capitalize }}
+        </th>
+    {% endfor %}
+        <th>
+            Selection Probability
+        </th>
+        <th>
+            Total listed (L)
+        </th>
+        <th>
+            Actual Interviewed (A)
+        </th>
+        <th>
+            Weight 1/(A/L)
+        </th>
+        <th>
+            Actions
+        </th>
+    </tr>
+    {% for weight in location_weights %}
+        <tr>
+        {% for location in weight.location.get_ancestors %}
+            <td>{{ location.name }}</td>
+        {% endfor %}
+
+            <td>
+                {{ weight.location }}
+            </td>
+            <td>
+                {{ weight.selection_probability }}
+            </td>
+            <td>
+                {{ weight.survey.sample_size }}
+            </td>
+            <td>
+                {{ weight.survey.get_total_respondents }}
+            </td>
+            <td>
+
+            </td>
+            <td>
+                <div class="btn-group">
+                    <a href="" class="btn"><i class="icon-pencil"></i> Edit</a>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}

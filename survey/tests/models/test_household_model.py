@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 from django.test import TestCase
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdBatchCompletion, NumericalAnswer, BatchQuestionOrder, Survey
+from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, NumericalAnswer, BatchQuestionOrder, Survey
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -206,8 +206,8 @@ class HouseholdTest(TestCase):
         self.assertFalse(hhold.completed_currently_open_batches())
         investigator.member_answered(question_1, household_head, answer=1, batch=batch)
         self.assertTrue(hhold.completed_currently_open_batches())
-        self.assertEqual(3, HouseholdBatchCompletion.objects.filter(batch=batch).count())
-        [self.assertEqual(1, HouseholdBatchCompletion.objects.filter(batch=batch, householdmember=member).count()) for member in member_list]
+        self.assertEqual(3, HouseholdMemberBatchCompletion.objects.filter(batch=batch).count())
+        [self.assertEqual(1, HouseholdMemberBatchCompletion.objects.filter(batch=batch, householdmember=member).count()) for member in member_list]
 
     def test_household_knows_survey_can_be_retaken(self):
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
@@ -231,58 +231,58 @@ class HouseholdTest(TestCase):
         batch.open_for_location(investigator.location)
         batch_2.open_for_location(investigator.location)
 
-        HouseholdBatchCompletion.objects.create(batch=batch, householdmember=household_member,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
                                                 investigator=investigator, household=household_member.household)
 
-        HouseholdBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
                                                 investigator=investigator, household=household_member.household)
 
-        HouseholdBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
                                                 investigator=investigator, household=household_member.household)
 
-        HouseholdBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
                                                 investigator=investigator, household=household_member.household)
 
         self.assertTrue(household.can_retake_survey(batch, 5))
         self.assertTrue(household.can_retake_survey(batch_2, 5))
 
-        HouseholdBatchCompletion.objects.all().delete()
+        HouseholdMemberBatchCompletion.objects.all().delete()
 
         ten_minutes_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(minutes=10)
 
-        HouseholdBatchCompletion.objects.create(batch=batch, householdmember=household_member,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
                                                 investigator=investigator, household=household_member.household,
                                                 created=ten_minutes_ago)
 
-        HouseholdBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
                                                 investigator=investigator, household=household_member.household,
                                                 created=ten_minutes_ago)
 
-        HouseholdBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
                                                 investigator=investigator, household=household_member.household)
 
-        HouseholdBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
                                                 investigator=investigator, household=household_member.household)
         self.assertFalse(household.can_retake_survey(batch, 5))
         self.assertTrue(household.can_retake_survey(batch_2, 5))
 
-        HouseholdBatchCompletion.objects.all().delete()
+        HouseholdMemberBatchCompletion.objects.all().delete()
 
         three_minutes_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(minutes=3)
 
-        HouseholdBatchCompletion.objects.create(batch=batch, householdmember=household_member,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
                                                 investigator=investigator, household=household_member.household,
                                                 created=ten_minutes_ago)
 
-        HouseholdBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
                                                 investigator=investigator, household=household_member.household,
                                                 created=three_minutes_ago)
 
-        HouseholdBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
                                                 investigator=investigator, household=household_member.household,
                                                 created=three_minutes_ago)
 
-        HouseholdBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
+        HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
                                                 investigator=investigator, household=household_member.household,
                                                 created=ten_minutes_ago)
         self.assertTrue(household.can_retake_survey(batch, 5))

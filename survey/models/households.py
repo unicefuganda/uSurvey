@@ -82,7 +82,7 @@ class Household(BaseModel):
         return self.completed_batches.filter(batch__in=batches).count() == len(batches)
 
     def batch_completed(self, batch):
-        return self.completed_batches.get_or_create(household=self, investigator=self.investigator, batch=batch)
+        return self.batch_completion_batches.get_or_create(household=self, investigator=self.investigator, batch=batch)
 
     def batch_reopen(self, batch):
         self.completed_batches.filter(household=self).delete()
@@ -182,7 +182,7 @@ class Household(BaseModel):
         return []
 
     def has_members(self):
-        return self.household_member.all().count()>0
+        return self.household_member.all().count() > 0
 
     def date_interviewed_for(self, batch):
         if self.has_completed_batch(batch) and self.has_members():
@@ -201,7 +201,7 @@ class Household(BaseModel):
         return (all_households.order_by('uid').reverse()[0].uid + 1) if all_households else 1
 
     @classmethod
-    def all_households_in(self, location, survey):
+    def all_households_in(cls, location, survey):
         return Household.objects.filter(location__in=location.get_descendants(include_self=True), survey=survey)
 
 
@@ -218,7 +218,6 @@ class HouseholdMember(BaseModel):
     def cast_original_type(self):
         head_object = HouseholdHead.objects.filter(householdmember_ptr_id=self.id)
         return head_object[0] if head_object else self
-
 
     def get_location(self):
         return self.household.location

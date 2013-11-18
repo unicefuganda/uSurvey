@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdBatchCompletion, Batch, QuestionModule, BatchQuestionOrder
+from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdMemberBatchCompletion, Batch, QuestionModule, BatchQuestionOrder
 from survey.models.batch import Batch, BatchLocationStatus
 from survey.models.households import HouseholdMember
 from survey.models.surveys import Survey
@@ -92,7 +92,7 @@ class BatchTest(TestCase):
         BatchQuestionOrder.objects.create(question=question, batch=batch, order=1)
 
 
-        HouseholdBatchCompletion.objects.create(householdmember=household_member, batch=batch,
+        HouseholdMemberBatchCompletion.objects.create(householdmember=household_member, batch=batch,
                                                 household=household_member.household)
 
         self.assertIsNone(household_member.get_next_batch())
@@ -303,6 +303,7 @@ class BatchLocationStatusTest(TestCase):
         batch.close_for_location(kampala)
         self.assertFalse(batch.can_be_deleted())
 
+
 class HouseholdBatchCompletionTest(TestCase):
     def test_store(self):
         batch = Batch.objects.create(order=1)
@@ -311,7 +312,7 @@ class HouseholdBatchCompletionTest(TestCase):
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
 
-        batch_completion = HouseholdBatchCompletion.objects.create(household=household, investigator=investigator,
+        batch_completion = HouseholdMemberBatchCompletion.objects.create(household=household, investigator=investigator,
                                                                    batch=batch)
         self.failUnless(batch_completion.id)
 

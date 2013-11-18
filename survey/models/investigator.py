@@ -189,13 +189,10 @@ class Investigator(BaseModel):
 
     def created_member_within(self, minutes, open_survey=None):
         last_member = self.last_registered()
-
         if not last_member:
             return False
-
         if last_member.household.survey != open_survey:
             return False
-
         last_active = last_member.created
         timeout = datetime.datetime.utcnow().replace(tzinfo=last_active.tzinfo) - datetime.timedelta(minutes=minutes)
         return last_active >= timeout

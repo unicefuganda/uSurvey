@@ -49,8 +49,10 @@ class USSDSurvey(USSD):
             self.action = self.ACTIONS['REQUEST']
             self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
             self.set_in_session('HOUSEHOLD', self.household)
-            self.responseString = USSD.MESSAGES['MEMBER_SUCCESS_MESSAGE'] if not self.household.completed_currently_open_batches() else \
-                                  USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
+            self.responseString = USSD.MESSAGES['MEMBER_SUCCESS_MESSAGE']
+            if self.household.completed_currently_open_batches():
+                self.responseString = USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
+                self.household.batch_completed(batch)
             self.set_in_session('HOUSEHOLD_MEMBER', None)
             self.set_in_session('CAN_RETAKE_HOUSEHOLD', True)
 

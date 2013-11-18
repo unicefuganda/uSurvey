@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
 from rapidsms.contrib.locations.models import Location
-from survey.models import HouseholdBatchCompletion, Survey
+from survey.models import HouseholdMemberBatchCompletion, Survey
 from survey.models.batch import Batch
 
 from survey.views.location_widget import LocationWidget
@@ -27,7 +27,7 @@ def status(request):
         selected_location = Location.objects.get(id=params['location']) if params['location'] else None
         batch = Batch.objects.get(id=params['batch'])
         open_survey = Survey.currently_open_survey()
-        households_status, cluster_status, pending_investigators = HouseholdBatchCompletion.status_of_batch(batch, selected_location, open_survey)
+        households_status, cluster_status, pending_investigators = HouseholdMemberBatchCompletion.status_of_batch(batch, selected_location, open_survey)
         content = { 'selected_location': selected_location,
                     'selected_batch': batch,
                     'households': households_status,
