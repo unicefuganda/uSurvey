@@ -35,14 +35,6 @@ Feature: Login feature
     And I login a user
     Then I should see new household page with logout link
 
-  Scenario: Login from aggregate status page
-    Given I have a user
-    And I have locations
-    And I have 2 batches with one open
-    And I visit aggregate status page
-    And I login a user
-    Then I should see aggregate status page with logout link
-
   Scenario: Login from download excel report page
     Given I have a user
     And I have few batches
