@@ -4,7 +4,24 @@
 {% endblock %}
 
 {% block content %}
+{% load template_tags %}
 <h3>Location Weights</h3>
+   <form id="aggregates-form" action="{% url action %}" method="get">
+    <div>
+      {% load template_tags %}
+      <label>Survey</label>
+      <select name="survey" id="survey-list-select" name="survey">
+        {% for survey in surveys %}
+          <option value="{{ survey.id }}" {{ survey|is_selected:selected_survey }} >{{ survey.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+     <div>
+        {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
+     </div>
+    <button class="btn btn-primary" id="get_list">Get List</button>
+  </form>
+
     <a class="btn pull-right" href="{% url 'weights_error_logs_page' %}" id="view_error_log">Error logs from previous upload</a>
 <table class="table-bordered table">
     <tr>

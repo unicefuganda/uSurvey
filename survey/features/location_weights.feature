@@ -25,3 +25,15 @@ Feature: Location Weights upload
     Then I should see the locations weights
     When i click the view error logs link
     Then I should see the error logs from previous the month
+
+  Scenario: Filter list locations weights
+    Given I am logged in as researcher
+    And I have two surveys
+    And I have a number of locations and weights in each survey
+    And I visit the list location weights page
+    And I select one survey
+    And I click get list
+    Then I should see the location weights in that survey
+    When I select a location
+    And I click get list
+    Then I should see the weights for that location and survey

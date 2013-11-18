@@ -19,7 +19,7 @@
       <label>Batch</label>
       <select name="batch" id="batch-list-select" name="batch">
         {% for batch in batches %}
-          <option value="{{ batch.id }}" {{ batch|is_batch_selected:selected_batch }} >{{ batch.name }}</option>
+          <option value="{{ batch.id }}" {{ batch|is_selected:selected_batch }} >{{ batch.name }}</option>
         {% endfor %}
       </select>
     </div>

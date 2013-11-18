@@ -11,13 +11,9 @@ def is_location_selected(locations_data, location):
         return "selected='selected'"
 
 @register.filter
-def is_batch_selected(batch, selected_batch):
+def is_selected(batch, selected_batch):
     if batch == selected_batch:
         return "selected='selected'"
-
-@register.filter
-def pending_households(investigator, batch):
-    return investigator.pending_households_for(batch)
 
 @register.filter
 def is_batch_open_for_location(open_locations, location):

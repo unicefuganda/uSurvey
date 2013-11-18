@@ -3,11 +3,13 @@ from django.contrib.auth.decorators import permission_required, login_required
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from rapidsms.contrib.locations.models import LocationType
+from rapidsms.contrib.locations.models import LocationType, Location
 
 from survey.forms.upload_csv_file import UploadWeightsForm
-from survey.models import LocationWeight, LocationTypeDetails, UploadErrorLog
+from survey.models import LocationWeight, LocationTypeDetails, UploadErrorLog, Survey
 from survey.tasks import upload_task
+from survey.views.location_widget import LocationWidget
+from survey.views.views_helper import contains_key
 
 
 @login_required
@@ -29,12 +31,25 @@ def upload(request):
 
 def list_weights(request):
     location_weights = LocationWeight.objects.all()
+    surveys = Survey.objects.all()
+    survey = None
+    selected_location = None
+    params = request.GET
+    if contains_key(params, 'survey'):
+        survey = Survey.objects.get(id=params['survey'])
+        location_weights = location_weights.filter(survey=survey)
+    if contains_key(params, 'location'):
+        selected_location = Location.objects.get(id=params['location'])
+        location_weights = location_weights.filter(location=selected_location)
 
     location_types = LocationTypeDetails.get_ordered_types().exclude(name__contains="Country")
     context = {'location_weights': location_weights,
-               'location_types': location_types}
+               'location_types': location_types,
+               'location_data': LocationWidget(selected_location),
+               'surveys':surveys,
+               'selected_survey':survey,
+               'action':'list_weights_page'}
     return render(request, 'locations/weights/index.html', context)
-
 
 def error_logs(request):
     location_weights_error_logs = UploadErrorLog.objects.filter(model='WEIGHTS')
