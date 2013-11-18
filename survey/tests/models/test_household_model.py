@@ -466,3 +466,12 @@ class HouseholdTest(TestCase):
         member_3 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
 
         self.assertEqual(0, len(household_1.members_interviewed(self.batch)))
+
+    def test_should_create_batch_completion_entry(self):
+        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
+        HH = Household.objects.create(uid='123', investigator=investigator_1, location=self.kampala)
+        batch = Batch.objects.create(name="batch hoho")
+        HH.batch_completed(batch)
+        self.assertEqual(1, HH.batch_completion_batches.filter(batch=batch, investigator=investigator_1).count())
+        HH.batch_completed(None)
+        self.assertEqual(1, HH.batch_completion_batches.filter(batch=batch, investigator=investigator_1).count())

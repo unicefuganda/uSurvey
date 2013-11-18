@@ -26,7 +26,6 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.ussd_params['ussdRequestString'] = request_string
         return self.client.post('/ussd', data=self.ussd_params)
 
-
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
@@ -608,6 +607,11 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
+                batch_completion = household_head.household.batch_completion_batches.all()
+                self.assertEqual(1, batch_completion.count())
+                self.assertEqual(self.batch, batch_completion[0].batch)
+
+
                 response = self.respond(USSD.ANSWER['NO'])
                 response_string = "responseString=%s&action=end" % USSD.MESSAGES[
                     "SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS"]
@@ -622,6 +626,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
                 response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                batch_completion = household_head.household.batch_completion_batches.all()
+                self.assertEqual(1, batch_completion.count())
+                self.assertEqual(self.batch, batch_completion[0].batch)
 
                 response = self.respond(USSD.ANSWER['NO'])
                 response_string = "responseString=%s&action=end" % USSD.MESSAGES[

@@ -82,7 +82,8 @@ class Household(BaseModel):
         return self.completed_batches.filter(batch__in=batches).count() == len(batches)
 
     def batch_completed(self, batch):
-        return self.batch_completion_batches.get_or_create(household=self, investigator=self.investigator, batch=batch)
+        if batch:
+            self.batch_completion_batches.get_or_create(household=self, investigator=self.investigator, batch=batch)
 
     def batch_reopen(self, batch):
         self.completed_batches.filter(household=self).delete()
