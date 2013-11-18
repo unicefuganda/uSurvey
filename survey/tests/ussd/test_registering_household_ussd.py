@@ -210,7 +210,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
         question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
-        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
@@ -228,7 +228,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
         question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
-        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
@@ -250,7 +250,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         question_3 = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
@@ -280,7 +280,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         question_1 = Question.objects.create(module=module, text="Please Enter the name",
                                              answer_type=Question.TEXT, order=1, group=self.registration_group)
 
-        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 99 if not known)",
+        question_2 = Question.objects.create(module=module, text="Please Enter the age\n(enter 0 if not known)",
                                              answer_type=Question.NUMBER, order=2, group=self.registration_group)
 
         question_3 = Question.objects.create(module=module, text="Please Enter the gender:\n1.Male\n2.Female",

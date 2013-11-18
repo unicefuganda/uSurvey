@@ -7,7 +7,7 @@ class FormulaShowPage(PageObject):
     def __init__(self, browser, formula):
         self.browser = browser
         self.formula = formula
-        self.url = "/batches/%s/formulae/%s/" % (self.formula.batch.pk, self.formula.pk)
+        self.url = "/batches/%s/formulae/%s/" % (self.formula.indicator.batch.pk, self.formula.pk)
 
     def choose_location(self, location):
         self.fill_in_with_js('$("#location-%s")' % location.type.slug, location.id)

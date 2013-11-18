@@ -10,7 +10,7 @@
           'yAxis-text': 'Percentage',
           'xAxis-categories': {{ computed_value|multi_choice_options|safe }},
           'series': [{
-              name: '{{ formula.name }}',
+              name: '{{ formula.indicator.name }}',
               data: {{ computed_value|get_values }}
           }]
       }
@@ -41,7 +41,7 @@
           'yAxis-text': 'Percentage',
           'xAxis-categories': {{ computed_value|multi_choice_options|safe }},
           'series': [{
-              name: '{{ formula.name }}',
+              name: '{{ formula.indicator.name }}',
               data: {{ computed_value|get_values }}
           }]
       }

@@ -26,16 +26,8 @@ class FormulaTest(TestCase):
                                               household=household)
 
     def test_store(self):
-        formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2,
-                                         batch=self.batch)
+        formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2)
         self.failUnless(formula.id)
-
-    def test_validation(self):
-        batch_2 = Batch.objects.create(order=2)
-        question_3 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1)
-        question_3.batches.add(batch_2)
-        formula = Formula(name="Name", numerator=self.question_1, denominator=question_3, batch=self.batch)
-        self.assertRaises(ValidationError, formula.save)
 
     def test_compute_numerical_answers(self):
         uganda = Location.objects.create(name="Uganda")
@@ -57,8 +49,7 @@ class FormulaTest(TestCase):
         member_3 = self.create_household_member(household_3)
         member_4 = self.create_household_member(household_4)
 
-        formula = Formula.objects.create(name="Name", numerator=self.question_1, denominator=self.question_2,
-                                         batch=self.batch)
+        formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2)
         investigator.member_answered(self.question_1, member_1, 20, self.batch)
         investigator.member_answered(self.question_2, member_1, 200, self.batch)
         investigator.member_answered(self.question_1, member_2, 10, self.batch)
@@ -104,7 +95,7 @@ class FormulaTest(TestCase):
 
         self.question_3.batches.add(self.batch)
 
-        formula = Formula.objects.create(name="Name", numerator=self.question_3, denominator=self.question_1, batch=self.batch)
+        formula = Formula.objects.create(numerator=self.question_3, denominator=self.question_1)
 
         investigator.member_answered(self.question_1, member_1, 20, batch=self.batch)
         investigator.member_answered(self.question_3, member_1, 1, batch=self.batch)

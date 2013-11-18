@@ -5,7 +5,7 @@ register = template.Library()
 
 @register.filter
 def title_for_barchart(formula, locations):
-    title = "%s for %s" % (formula.name, title_for_location_type(locations))
+    title = "%s for %s" % (formula.indicator.name, title_for_location_type(locations))
     return title
 
 @register.filter

@@ -1,0 +1,16 @@
+{% extends 'form.html' %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block display_form_fields %}
+    {% include "naked_form.html" with a_form=formula_form %}
+{% endblock %}
+
+{% block non_form_content %}
+    <h4>Existing Formula</h4>
+    {% if indicator.is_percentage_indicator %}
+        {% include 'formula/_view_existing_formula_percentage.html' %}
+    {% else %}
+        {% include 'formula/_view_existing_formula_count.html' %}
+    {% endif %}
+{% endblock %}

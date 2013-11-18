@@ -1,31 +1,19 @@
 from django.db import models
 from django.db.models import Sum
-from django.core.exceptions import ValidationError
 
 from survey.models.base import BaseModel
-from survey.models.batch import Batch
 from survey.models.investigator import Investigator
 from survey.models.question import Question
 
 
 class Formula(BaseModel):
-    name = models.CharField(max_length=50, unique=True, blank=False)
-    numerator = models.ForeignKey(Question, blank=False, related_name="as_numerator")
-    denominator = models.ForeignKey(Question, blank=False, related_name="as_denominator")
-    batch = models.ForeignKey(Batch, null=True, related_name="formula")
+    numerator = models.ForeignKey(Question, null=True, related_name="as_numerator")
+    denominator = models.ForeignKey(Question, null=True, related_name="as_denominator")
+    count = models.ForeignKey(Question, null=True, related_name="as_count")
+    indicator = models.ForeignKey("Indicator", null=True, related_name="formula")
 
     class Meta:
         app_label = 'survey'
-
-    def clean(self, *args, **kwargs):
-        message = self.batch.name if self.batch else 'the same batch'
-        if self.batch and not (
-                    self.batch in self.numerator.batches.all() and self.batch in self.denominator.batches.all()):
-            raise ValidationError('Numerator and Denominator must belong to %s.' % message)
-
-    def save(self, *args, **kwargs):
-        self.clean(*args, **kwargs)
-        super(Formula, self).save(*args, **kwargs)
 
     def compute_for_location(self, location):
         investigators = Investigator.lives_under_location(location)

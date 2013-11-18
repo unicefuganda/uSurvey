@@ -96,7 +96,9 @@ urlpatterns = patterns('',
     url(r'^modules/(?P<module_id>\d+)/delete/$', 'survey.views.question_module.delete', name='delete_question_module_page'),
     url(r'^modules/(?P<module_id>\d+)/edit/$', 'survey.views.question_module.edit', name='edit_question_module_page'),
     url(r'^indicators/new/$', 'survey.views.indicators.new', name='new_indicator_page'),
-    url(r'^indicators/$', 'survey.views.indicators.index', name='list_indicator_page')
+    url(r'^indicators/$', 'survey.views.indicators.index', name='list_indicator_page'),
+    url(r'^indicators/(?P<indicator_id>\d+)/formula/new/$', 'survey.views.formula.new', name='add_formula_page'),
+    url(r'^indicators/(?P<indicator_id>\d+)/formula/(?P<formula_id>\d+)/delete/', 'survey.views.formula.delete', name='delete_indicator_formula_page')
 )
 
 if not settings.PRODUCTION:

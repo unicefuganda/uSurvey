@@ -4,7 +4,7 @@ from lettuce import *
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.batches import FormulaShowPage
-from survey.models import GroupCondition, HouseholdMemberGroup
+from survey.models import GroupCondition, HouseholdMemberGroup, Indicator, QuestionModule
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.backend import Backend
@@ -31,6 +31,8 @@ def and_i_have_investigators_completed_batches(step):
     condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
     condition.groups.add(member_group)
 
+    module = QuestionModule.objects.create(name="Education", description="Education Module")
+
     investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.village_1, backend = backend, weights = 0.3)
     household_1 = Household.objects.create(investigator=investigator, uid=6)
     household_2 = Household.objects.create(investigator=investigator, uid=7)
@@ -49,9 +51,9 @@ def and_i_have_investigators_completed_batches(step):
     household_member_6 = create_household_member(household_6)
 
     world.batch = Batch.objects.create(order=1)
-    world.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1, group=member_group)
-    world.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER, order=2, group=member_group)
-    world.question_3 = Question.objects.create(text="This is a question", answer_type=Question.MULTICHOICE, order=3, group=member_group)
+    world.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1, group=member_group, module=module)
+    world.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER, order=2, group=member_group, module=module)
+    world.question_3 = Question.objects.create(text="This is a question", answer_type=Question.MULTICHOICE, order=3, group=member_group, module=module)
     world.question_1.batches.add(world.batch)
     world.question_2.batches.add(world.batch)
     world.question_3.batches.add(world.batch)
@@ -59,8 +61,9 @@ def and_i_have_investigators_completed_batches(step):
     option_1 = QuestionOption.objects.create(question=world.question_3, text="OPTION 2", order=1)
     option_2 = QuestionOption.objects.create(question=world.question_3, text="OPTION 1", order=2)
 
-    world.formula_1 = Formula.objects.create(name="Name", numerator=world.question_1, denominator=world.question_2, batch=world.batch)
-    world.formula_2 = Formula.objects.create(name="Name 1", numerator=world.question_3, denominator=world.question_1, batch=world.batch)
+    world.indicator = Indicator.objects.create(module=module, name='Indicator 1', measure=Indicator.MEASURE_CHOICES[0][0], batch=world.batch)
+    world.formula_1 = Formula.objects.create(numerator=world.question_1, denominator=world.question_2, indicator=world.indicator)
+    world.formula_2 = Formula.objects.create(numerator=world.question_3, denominator=world.question_1, indicator=world.indicator)
 
     investigator.member_answered(world.question_1, household_member_1, 20, world.batch)
     investigator.member_answered(world.question_2, household_member_1, 20, world.batch)

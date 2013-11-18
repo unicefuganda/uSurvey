@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% load chart_template_tags %}
 {% block title %}
-  {{ formula.name }}
+  {{ formula.indicator.name }}
 {% endblock %}
 {% block content %}
 <h3>
-    {{ formula.name }}
+    {{ formula.indicator.name }}
 </h3>
-<form id="results-location-widget" action="{% url 'formula_show_page' formula.batch.pk formula.pk %}" method="get" accept-charset="utf-8">
+<form id="results-location-widget" action="{% url 'formula_show_page' batch_id formula.pk %}" method="get" accept-charset="utf-8">
     {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
     <button class="btn btn-primary"> Show results</button>
 </form>

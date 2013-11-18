@@ -13,7 +13,7 @@ class IndicatorTest(TestCase):
     def test_store(self):
         health_module = QuestionModule.objects.create(name="Health")
         batch = Batch.objects.create(name="Batch")
-        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='percentage',
+        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
                                              module=health_module, batch=batch)
         self.failUnless(indicator.id)
         self.failUnless(indicator.created)
@@ -22,3 +22,18 @@ class IndicatorTest(TestCase):
         self.failUnless(indicator.measure)
         self.failUnless(indicator.batch)
         self.failUnless(indicator.module)
+
+    def test_knows_is_a_percentage_indicator(self):
+        health_module = QuestionModule.objects.create(name="Health")
+        batch = Batch.objects.create(name="Batch")
+        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
+                                             module=health_module, batch=batch)
+        self.assertTrue(indicator.is_percentage_indicator())
+
+    def test_knows_is_not_a_percentage_indicator(self):
+        health_module = QuestionModule.objects.create(name="Health")
+        batch = Batch.objects.create(name="Batch")
+        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Count',
+                                             module=health_module, batch=batch)
+        self.assertFalse(indicator.is_percentage_indicator())
+

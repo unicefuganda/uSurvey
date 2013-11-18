@@ -1,0 +1,32 @@
+{% load template_tags %}
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>
+                Numerator
+            </th>
+            <th>
+                Denominator
+            </th>
+            <th>
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if existing_formula %}
+        {% for existing_formulae in existing_formula %}
+            <tr>
+                <td>{{ existing_formulae.numerator.text }}</td>
+                <td>{{ existing_formulae.denominator.text }}</td>
+                <td>
+                    <a class="btn btn-small" data-toggle="modal" href="#delete_formula_{{existing_formulae.id}}"><i class="icon-trash" id="delete-icon-{{existing_formulae.id}}"></i></a>
+                </td>
+            {% include "base/delete_modal.html" with object_name="" id=existing_formulae.id name="Formula" url=indicator.id|add_string:existing_formulae.id|get_url_with_ids:"delete_indicator_formula_page" %}
+
+            </tr>
+        {% endfor %}
+    {% endif %}
+
+    </tbody>
+</table>

@@ -2,7 +2,7 @@ from datetime import date
 from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.models import User
-from survey.models import HouseholdMemberGroup, GroupCondition
+from survey.models import HouseholdMemberGroup, GroupCondition, QuestionModule, Indicator
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.backend import Backend
@@ -25,12 +25,16 @@ class NumericalFormulaResults(BaseTest):
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
 
+        module = QuestionModule.objects.create(name='Education', description='Educational Module')
+        indicator = Indicator.objects.create(name='Test Indicator', measure=Indicator.MEASURE_CHOICES[0][1],
+                                             module=module, description="Indicator 1")
+
         self.batch = Batch.objects.create(order=1)
         self.question_1 = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1, group=self.member_group)
         self.question_2 = Question.objects.create(text="Question 2?", answer_type=Question.NUMBER, order=2, group=self.member_group)
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
-        self.formula_1 = Formula.objects.create(name="Formula 1", numerator=self.question_1, denominator=self.question_2, batch=self.batch)
+        self.formula_1 = Formula.objects.create(numerator=self.question_1, denominator=self.question_2, indicator=indicator)
 
         district = LocationType.objects.create(name = 'District', slug = 'district')
         village = LocationType.objects.create(name = 'Village', slug = 'village')
@@ -128,7 +132,11 @@ class MultichoiceResults(BaseTest):
         self.option_1 = QuestionOption.objects.create(question=self.question_3, text="OPTION 2", order=1)
         self.option_2 = QuestionOption.objects.create(question=self.question_3, text="OPTION 1", order=2)
 
-        self.formula = Formula.objects.create(name="Name", numerator=self.question_3, denominator=self.question_1, batch=self.batch)
+        module = QuestionModule.objects.create(name='Education', description='Educational Module')
+        indicator = Indicator.objects.create(name='Test Indicator', measure=Indicator.MEASURE_CHOICES[0][1],
+                                             module=module, description="Indicator 1")
+
+        self.formula = Formula.objects.create(numerator=self.question_3, denominator=self.question_1, indicator=indicator)
 
         district = LocationType.objects.create(name = 'District', slug = 'district')
         village = LocationType.objects.create(name = 'Village', slug = 'village')
@@ -210,4 +218,3 @@ class MultichoiceResults(BaseTest):
         
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for("/batches/%s/formulae/%s/?location=%s" % (self.batch.pk, self.formula.pk, self.kampala.pk))
-        
