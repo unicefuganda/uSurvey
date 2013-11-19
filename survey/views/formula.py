@@ -9,6 +9,7 @@ from survey.models.formula import Formula
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
 
+
 @login_required
 @permission_required('auth.can_view_aggregates')
 def show(request, batch_id, formula_id):
@@ -24,15 +25,15 @@ def show(request, batch_id, formula_id):
         hierarchial_data = formula.compute_for_next_location_type_in_the_hierarchy(current_location=selected_location)
         weights = formula.weight_for_location(selected_location)
         household_data = formula.compute_for_households_in_location(selected_location)
-    return render(request, 'formula/show.html', {   'request': request,
-                                                    'locations': LocationWidget(selected_location),
-                                                    'computed_value': computed_value,
-                                                    'hierarchial_data': hierarchial_data,
-                                                    'household_data': household_data,
-                                                    'weights': weights,
-                                                    'formula': formula,
-                                                    'batch_id': batch_id,
-                                                })
+    return render(request, 'formula/show.html', {'request': request,
+                                                 'locations': LocationWidget(selected_location),
+                                                 'computed_value': computed_value,
+                                                 'hierarchial_data': hierarchial_data,
+                                                 'household_data': household_data,
+                                                 'weights': weights,
+                                                 'formula': formula,
+                                                 'batch_id': batch_id})
+
 
 def _process_new_request(request, formula_form, new_formula_url, indicator):
     if formula_form.is_valid():
@@ -47,6 +48,7 @@ def _process_new_request(request, formula_form, new_formula_url, indicator):
         success_message = "Formula successfully added to indicator %s." % indicator.name
         messages.success(request, success_message)
         return HttpResponseRedirect(new_formula_url)
+
 
 def new(request, indicator_id):
     try:
@@ -68,6 +70,7 @@ def new(request, indicator_id):
         error_message = "The indicator requested does not exist."
         messages.error(request, error_message)
         return HttpResponseRedirect("/indicators/")
+
 
 def delete(request, indicator_id, formula_id):
     try:

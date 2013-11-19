@@ -205,10 +205,6 @@ class Investigator(BaseModel):
         timeout = datetime.datetime.utcnow().replace(tzinfo=last_active.tzinfo) - datetime.timedelta(minutes=minutes)
         return last_active >= timeout
 
-    def pending_households_for(self, batch):
-        completed = batch.completed_households.filter(investigator=self).count()
-        return self.households.count() - completed
-
     def location_hierarchy(self):
         hierarchy = []
         location = self.location

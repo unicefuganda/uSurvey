@@ -4,7 +4,9 @@ from survey.models import Survey, Batch, QuestionModule, Indicator, Formula, Hou
 from survey.tests.base_test import BaseTest
 from django.test.client import Client
 
-class BatchViewsTest(BaseTest):
+
+class IndicatorFormulaViewsTest(BaseTest):
+
     def setUp(self):
         self.client = Client()
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com',
@@ -107,4 +109,3 @@ class BatchViewsTest(BaseTest):
         redirect_url = '/indicators/%s/formula/new/' % self.indicator.id
         self.assertIn("Formula for indicator does not exist.", response.cookies['messages'].value)
         self.assertRedirects(response, redirect_url, 302, 200)
-

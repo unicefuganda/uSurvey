@@ -55,7 +55,6 @@ class FormulaFormTest(TestCase):
         [self.assertIn(field, formula_form.fields) for field in fields]
         [self.assertNotIn(field, formula_form.fields) for field in deleted_fields]
 
-
     def test_should_have_only_questions_for_batch_in_numerator_and_denominator_for_percentage_indicator_in_module(self):
         formula_form = FormulaForm(indicator=self.percentage_indicator)
 
@@ -66,7 +65,6 @@ class FormulaFormTest(TestCase):
 
         [self.assertIn((question.id, question.text), formula_form.fields['denominator'].choices) for question in all_batch_questions]
         [self.assertNotIn((question.id, question.text), formula_form.fields['denominator'].choices) for question in questions_not_in_batch]
-
 
     def test_should_have_only_questions_for_batch_in_count_for_count_indicator(self):
         formula_form = FormulaForm(indicator=self.count_indicator)
