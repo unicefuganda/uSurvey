@@ -5,7 +5,7 @@ from django.template.defaultfilters import slugify
 from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdMemberBatchCompletion, Backend
+from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdMemberBatchCompletion, Backend, LocationTypeDetails
 from survey.models.households import HouseholdMember
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates
 from survey.tests.base_test import BaseTest
@@ -21,9 +21,13 @@ class TestSurveyCompletion(BaseTest):
         self.assign_permission_to(raj, 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
         self.country = LocationType.objects.create(name = 'Country', slug = 'country')
+        self.region = LocationType.objects.create(name = 'Region', slug = 'region')
         self.city = LocationType.objects.create(name = 'City', slug = 'city')
 
-        self.uganda = Location.objects.create(name='Uganda', type = self.country)
+        self.africa = Location.objects.create(name='Africa', type = self.country)
+        LocationTypeDetails.objects.create(country=self.africa, location_type=self.country)
+
+        self.uganda = Location.objects.create(name='Uganda', type = self.region, tree_parent=self.africa)
         self.abim = Location.objects.create(name='Abim', tree_parent = self.uganda, type = self.city)
         self.kampala = Location.objects.create(name='Kampala', tree_parent = self.uganda, type = self.city)
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
@@ -56,9 +60,9 @@ class TestSurveyCompletion(BaseTest):
         self.assertIn('survey_completion_rates',response.context['action'])
         locations = response.context['locations'].get_widget_data()
         self.assertEquals(len(locations.keys()), 2)
-        self.assertEquals(locations.keys()[0], 'country')
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], self.uganda)
+        self.assertEquals(locations.keys()[0], 'region')
+        self.assertEquals(len(locations['region']), 1)
+        self.assertEquals(locations['region'][0], self.uganda)
         self.assertEquals(len(locations['city']), 0)
 
     def test_validates_when_location_is_present_in_parameters_and_parameters_contains_batch_key(self):
@@ -67,8 +71,7 @@ class TestSurveyCompletion(BaseTest):
     def test_show_retrieves_high_level_completion_rates_if_no_location_is_provided(self):
         response = self.client.get('/surveys/completion/', {'location':'', 'batch': str(self.batch.pk)})
         self.assertEqual(self.batch, response.context['selected_batch'])
-        self.assertIn(self.abim, response.context['completion_rates'].locations)
-        self.assertIn(self.kampala, response.context['completion_rates'].locations)
+        self.assertIn(self.uganda, response.context['completion_rates'].locations)
         self.assertIsNotNone(response.context['request'])
 
     def test_knows_to_retrieve_completion_for_locations_that_have_no_tree_parent_if_country_type_does_not_exist(self):

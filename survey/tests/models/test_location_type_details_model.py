@@ -1,4 +1,4 @@
-from rapidsms.contrib.locations.models import LocationType
+from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.location_type_details import LocationTypeDetails
 from survey.tests.base_test import BaseTest
 
@@ -58,3 +58,12 @@ class LocationTypeDetailsTest(BaseTest):
         detail.has_code = True
         detail.save()
         self.assertEquals(1, detail.order)
+
+    def test_should_return_the_country_in_use(self):
+        self.assertIsNone(LocationTypeDetails.the_country())
+
+        uganda = Location.objects.create(name="Uganda")
+        a_type = LocationType.objects.create(name="country", slug="country")
+        LocationTypeDetails.objects.create(location_type=a_type, country=uganda)
+
+        self.assertEqual(uganda, LocationTypeDetails.the_country())

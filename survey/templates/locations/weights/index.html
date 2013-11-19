@@ -51,11 +51,13 @@
     {% for weight in location_weights %}
         <tr>
         {% for location in weight.location.get_ancestors %}
-            <td>{{ location.name }}</td>
+            {% if not forloop.first %}
+                <td>{{ location.name }}</td>
+            {% endif %}
         {% endfor %}
 
             <td>
-                {{ weight.location }}
+                {{ weight.location.name }}
             </td>
             <td>
                 {{ weight.selection_probability }}
@@ -75,8 +77,8 @@
                 </div>
             </td>
         </tr>
-        {% paginate %}
     {% endfor %}
+    </table>
+{% paginate %}
 
-</table>
 {% endblock %}

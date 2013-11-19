@@ -6,7 +6,7 @@ from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.models import User
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Backend, Household
+from survey.models import Backend, Household, LocationTypeDetails
 from survey.models.investigator import Investigator
 
 from survey.tests.base_test import BaseTest
@@ -26,11 +26,14 @@ class InvestigatorTest(BaseTest):
 class InvestigatorsViewTest(InvestigatorTest):
     def test_new(self):
         country = LocationType.objects.create(name = 'Country', slug = 'country')
+        district = LocationType.objects.create(name = 'District', slug = 'district')
         city = LocationType.objects.create(name = 'City', slug = 'city')
 
         uganda = Location.objects.create(name='Uganda', type = country)
-        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = city)
-        kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = city)
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+        kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = district)
+        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = district)
         kampala_city = Location.objects.create(name='Kampala City', tree_parent = kampala, type = city)
 
         response = self.client.get('/investigators/new/')
@@ -46,9 +49,10 @@ class InvestigatorsViewTest(InvestigatorTest):
 
         locations = response.context['locations'].get_widget_data()
         self.assertEquals(len(locations.keys()), 2)
-        self.assertEquals(locations.keys()[0], 'country')
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
+        self.assertEquals(locations.keys()[0], 'district')
+        self.assertEquals(len(locations['district']), 2)
+        self.assertEquals(locations['district'][1], kampala)
+        self.assertEquals(locations['district'][0], abim)
 
         self.assertEquals(len(locations['city']), 0)
 
@@ -127,6 +131,11 @@ class InvestigatorsViewTest(InvestigatorTest):
     def test_create_investigators_failure(self, mock_messages_error):
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
+        district = LocationType.objects.create(name='district', slug='district')
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
+
         backend = Backend.objects.create(name='something')
         form_data = {
             'name': 'Rajini',
@@ -136,7 +145,7 @@ class InvestigatorsViewTest(InvestigatorTest):
             'level_of_education': 'Nursery',
             'language': 'Luganda',
             'country': uganda.id,
-            'location': uganda.id,
+            'location': kampala.id,
             'backend': backend.id,
             'confirm_mobile_number': '987654321',
         }
@@ -149,7 +158,7 @@ class InvestigatorsViewTest(InvestigatorTest):
         investigator = Investigator.objects.filter(name=form_data['name'])
         assert mock_messages_error.called
 
-        form_data['location']=uganda.id
+        form_data['location']=kampala.id
         form_data['confirm_mobile_number']='123456789' # not the same as mobile number, causing non-field error
         response = self.client.post('/investigators/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 200) # ensure redirection to list investigator page
@@ -161,7 +170,12 @@ class InvestigatorsViewTest(InvestigatorTest):
     def test_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda, backend = Backend.objects.create(name='something'))
+        district = LocationType.objects.create(name='district', slug='district')
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
+
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=kampala, backend = Backend.objects.create(name='something'))
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -172,14 +186,19 @@ class InvestigatorsViewTest(InvestigatorTest):
         self.assertNotEqual(None, response.context['request'])
 
         locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
+        self.assertEquals(len(locations['district']), 1)
+        self.assertEquals(locations['district'][0], kampala)
 
     @patch('django.contrib.messages.error')
     def test_list_investigators_no_investigators(self, mock_error_message):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.filter(location=uganda).delete()
+        district = LocationType.objects.create(name='district', slug='district')
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
+
+        investigator = Investigator.objects.filter(location=kampala).delete()
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -188,16 +207,18 @@ class InvestigatorsViewTest(InvestigatorTest):
         self.assertEqual(len(response.context['investigators']), 0)
 
         locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
+        self.assertEquals(len(locations['district']), 1)
+        self.assertEquals(locations['district'][0], kampala)
 
         assert mock_error_message.called_once_with('There are  no investigators currently registered  for this location.')
 
     def test_filter_list_investigators(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
+        region = LocationType.objects.create(name="region", slug=slugify("region"))
         district = LocationType.objects.create(name="district", slug=slugify("district"))
 
-        uganda = Location.objects.create(name="Uganda", type=country)
+        africa = Location.objects.create(name="Uganda", type=country)
+        uganda = Location.objects.create(name="Uganda", type=region, tree_parent=africa)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
         bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
 
@@ -215,8 +236,8 @@ class InvestigatorsViewTest(InvestigatorTest):
             self.assertIn(investigator, response.context['investigators'])
 
         locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
+        self.assertEquals(len(locations['region']), 1)
+        self.assertEquals(locations['region'][0], uganda)
 
         self.assertEquals(len(locations['district']), 1)
         self.assertEquals(locations['district'][0], kampala)
@@ -259,7 +280,10 @@ class EditInvestigatorPage(InvestigatorTest):
     def test_edit(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
         city = LocationType.objects.create(name="City", slug=slugify("city"))
+
         uganda = Location.objects.create(name="Uganda", type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
         investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
         response = self.client.get('/investigators/' + str(investigator.id) + '/edit/')
@@ -275,7 +299,7 @@ class EditInvestigatorPage(InvestigatorTest):
         self.assertEquals(response.context['cancel_url'], '/investigators/')
         self.assertIsInstance(response.context['form'], InvestigatorForm)
         locations = response.context['locations'].get_widget_data()
-        self.assertEqual(len(locations),2)
+        self.assertEqual(len(locations),1)
         self.assert_restricted_permission_for('/investigators/' + str(investigator.id) +'/edit/')
 
     def test_edit_post(self):

@@ -8,6 +8,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models import LocationTypeDetails
 from survey.models.households import HouseholdMember, HouseholdHead, Household
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -224,15 +225,17 @@ class HouseholdViewTest(BaseTest):
         investigator.save()
         self.assertEqual(household.location, uganda)
 
-
     def test_create_households_unsuccessful(self):
-
         country = LocationType.objects.create(name='country', slug='country')
+        district = LocationType.objects.create(name='district', slug='district')
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=kampala,
                                                    backend=Backend.objects.create(name='something'))
         form_data = {
-            'location': uganda.id,
+            'location': kampala.id,
             'investigator': investigator.id,
             'surname': 'Rajini',
             'first_name': 'Kant',
@@ -255,7 +258,7 @@ class HouseholdViewTest(BaseTest):
 
         response = self.client.post('/households/new/', data=form_with_invalid_data)
         self.failUnlessEqual(response.status_code, 200)
-        self.assertEquals(response.context['selected_location'], uganda)
+        self.assertEquals(response.context['selected_location'], kampala)
 
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(uid=form_data['uid'])
@@ -265,10 +268,13 @@ class HouseholdViewTest(BaseTest):
     def test_create_households_unsuccessful_with_non_field_errors(self):
 
         country = LocationType.objects.create(name='country', slug='country')
+        district = LocationType.objects.create(name='district', slug='district')
         uganda = Location.objects.create(name="Uganda", type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
 
+        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
         form_data = {
-            'location': uganda.id,
+            'location': kampala.id,
             'surname': 'Rajini',
             'first_name': 'Kant',
             'male': 'False',
@@ -294,7 +300,12 @@ class HouseholdViewTest(BaseTest):
     def test_listing_households(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+        district = LocationType.objects.create(name='district', slug='district')
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=kampala,
                                                    backend=Backend.objects.create(name='something'))
         household_a = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
         household_b = Household.objects.create(investigator=investigator, location=investigator.location, uid=1)
@@ -317,15 +328,20 @@ class HouseholdViewTest(BaseTest):
         self.assertEqual(household_c, response.context['households'][2])
 
         locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
+        self.assertEquals(len(locations['district']), 1)
+        self.assertEquals(locations['district'][0], kampala)
 
 
     @patch('django.contrib.messages.error')
     def test_listing_no_households(self, mock_error_message):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+        district = LocationType.objects.create(name='district', slug='district')
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=kampala,
                                                    backend=Backend.objects.create(name='something'))
         Household.objects.filter(investigator=investigator).delete()
         response = self.client.get('/households/')
@@ -336,15 +352,19 @@ class HouseholdViewTest(BaseTest):
         self.assertEqual(len(response.context['households']), 0)
 
         locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
+        self.assertEquals(len(locations['district']), 1)
+        self.assertEquals(locations['district'][0], kampala)
 
     def test_filter_list_investigators(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        region = LocationType.objects.create(name="Region", slug=slugify("region"))
         district = LocationType.objects.create(name="District", slug=slugify("district"))
         county = LocationType.objects.create(name="County", slug=slugify("county"))
 
-        uganda = Location.objects.create(name="Uganda", type=country)
+        africa = Location.objects.create(name="Africa", type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=country)
+
+        uganda = Location.objects.create(name="Uganda", type=region, tree_parent=africa)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
         bukoto = Location.objects.create(name="Bukoto", type=county, tree_parent=kampala)
 
@@ -369,8 +389,8 @@ class HouseholdViewTest(BaseTest):
             self.assertIn(household, response.context['households'])
 
         locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['country']), 1)
-        self.assertEquals(locations['country'][0], uganda)
+        self.assertEquals(len(locations['region']), 1)
+        self.assertEquals(locations['region'][0], uganda)
 
         self.assertEquals(len(locations['district']), 1)
         self.assertEquals(locations['district'][0], kampala)

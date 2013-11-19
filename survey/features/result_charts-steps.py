@@ -4,7 +4,7 @@ from lettuce import *
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.batches import FormulaShowPage
-from survey.models import GroupCondition, HouseholdMemberGroup, Indicator, QuestionModule
+from survey.models import GroupCondition, HouseholdMemberGroup, Indicator, QuestionModule, LocationTypeDetails
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.backend import Backend
@@ -17,10 +17,13 @@ def create_household_member(household):
 
 @step(u'And I have hierarchical locations with district and village')
 def and_i_have_hierarchical_locations_with_district_and_village(step):
+    country = LocationType.objects.create(name = 'Country', slug = 'country')
     district = LocationType.objects.create(name = 'District', slug = 'district')
     village = LocationType.objects.create(name = 'Village', slug = 'village')
 
-    world.kampala = Location.objects.create(name='Kampala', type = district)
+    world.uganda = Location.objects.create(name='Uganda', type = country)
+    LocationTypeDetails.objects.create(country=world.uganda, location_type=country)
+    world.kampala = Location.objects.create(name='Kampala', type = district, tree_parent=world.uganda)
     world.village_1 = Location.objects.create(name='Village 1', type = village, tree_parent = world.kampala)
     world.village_2 = Location.objects.create(name='Village 2', type = village, tree_parent = world.kampala)
 

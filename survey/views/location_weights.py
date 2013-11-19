@@ -42,7 +42,7 @@ def list_weights(request):
         selected_location = Location.objects.get(id=params['location'])
         location_weights = location_weights.filter(location=selected_location)
 
-    location_types = LocationTypeDetails.get_ordered_types().exclude(name__contains="Country")
+    location_types = LocationTypeDetails.get_ordered_types().exclude(name__iexact="country")
     context = {'location_weights': location_weights,
                'location_types': location_types,
                'location_data': LocationWidget(selected_location),

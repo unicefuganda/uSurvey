@@ -24,3 +24,10 @@ class LocationTypeDetails(BaseModel):
         if not self.order:
             self.order = last_order + 1
         super(LocationTypeDetails, self).save(*args, **kwargs)
+
+    @classmethod
+    def the_country(cls):
+        all_types_details = LocationTypeDetails.objects.all().exclude(country=None)
+        if all_types_details.exists():
+            return all_types_details[0].country
+        return None

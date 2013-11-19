@@ -2,7 +2,7 @@ from datetime import date
 from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.models import User
-from survey.models import HouseholdMemberGroup, GroupCondition, QuestionModule, Indicator
+from survey.models import HouseholdMemberGroup, GroupCondition, QuestionModule, Indicator, LocationTypeDetails
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.backend import Backend
@@ -35,11 +35,13 @@ class NumericalFormulaResults(BaseTest):
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
         self.formula_1 = Formula.objects.create(numerator=self.question_1, denominator=self.question_2, indicator=indicator)
+        country = LocationType.objects.create(name='Country', slug='country')
+        self.uganda = Location.objects.create(name='Country', type=country)
+        country_type_details = LocationTypeDetails.objects.create(country=self.uganda, location_type=country)
+        district = LocationType.objects.create(name = 'District', slug='district')
+        village = LocationType.objects.create(name = 'Village', slug='village')
 
-        district = LocationType.objects.create(name = 'District', slug = 'district')
-        village = LocationType.objects.create(name = 'Village', slug = 'village')
-
-        self.kampala = Location.objects.create(name='Kampala', type = district)
+        self.kampala = Location.objects.create(name='Kampala', type = district, tree_parent=self.uganda)
         self.village_1 = Location.objects.create(name='Village 1', type = village, tree_parent = self.kampala)
         self.village_2 = Location.objects.create(name='Village 2', type = village, tree_parent = self.kampala)
 
@@ -137,11 +139,14 @@ class MultichoiceResults(BaseTest):
                                              module=module, description="Indicator 1")
 
         self.formula = Formula.objects.create(numerator=self.question_3, denominator=self.question_1, indicator=indicator)
+        country = LocationType.objects.create(name='Country', slug='country')
+        self.uganda = Location.objects.create(name='Country', type=country)
+        country_type_details = LocationTypeDetails.objects.create(country=self.uganda, location_type=country)
 
         district = LocationType.objects.create(name = 'District', slug = 'district')
         village = LocationType.objects.create(name = 'Village', slug = 'village')
 
-        self.kampala = Location.objects.create(name='Kampala', type = district)
+        self.kampala = Location.objects.create(name='Kampala', type = district, tree_parent=self.uganda)
         self.village_1 = Location.objects.create(name='Village 1', type = village, tree_parent = self.kampala)
         self.village_2 = Location.objects.create(name='Village 2', type = village, tree_parent = self.kampala)
 

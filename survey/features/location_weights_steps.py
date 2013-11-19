@@ -3,22 +3,26 @@ from time import sleep
 from lettuce import step, world
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.features.page_objects.uploads import UploadWeightsPage, ListLocationWeightsPage, ListLocationWeightsErrorLogPage
-from survey.models import LocationWeight, UploadErrorLog, Survey
+from survey.models import LocationWeight, UploadErrorLog, Survey, LocationTypeDetails
 
 
 @step(u'And I have some locations to add weights')
 def and_i_have_a_locations(step):
-    LocationType.objects.create(name="region1", slug="region1")
-    LocationType.objects.create(name="district1", slug='district1')
-    LocationType.objects.create(name="county1", slug='county1')
+    country = LocationType.objects.create(name='Country', slug='country')
+    uganda = Location.objects.create(name="Uganda", type=country)
+    LocationTypeDetails.objects.create(country=uganda, location_type=country)
 
-    region = Location.objects.create(name="region1")
-    district = Location.objects.create(name="district1", tree_parent=region)
-    Location.objects.create(name="county1", tree_parent=district)
+    region_type = LocationType.objects.create(name="region1", slug="region1")
+    district_type = LocationType.objects.create(name="district1", slug='district1')
+    county_type = LocationType.objects.create(name="county1", slug='county1')
 
-    region = Location.objects.create(name="region2")
-    district = Location.objects.create(name="district2", tree_parent=region)
-    Location.objects.create(name="county2", tree_parent=district)
+    region = Location.objects.create(name="region1", type=region_type, tree_parent=uganda)
+    district = Location.objects.create(name="district1", tree_parent=region, type=district_type)
+    Location.objects.create(name="county1", tree_parent=district, type=county_type)
+
+    region = Location.objects.create(name="region2", tree_parent=uganda, type=region_type)
+    district = Location.objects.create(name="district2", tree_parent=region, type=district_type)
+    Location.objects.create(name="county2", tree_parent=district, type=county_type)
 
 
 @step(u'When I visit upload locations weights page')
@@ -70,15 +74,19 @@ def then_said_weight_layout_should_collapse(step):
 
 @step(u'And I have some locations with weights')
 def and_i_have_some_locations_to_with_weights(step):
+    country = LocationType.objects.create(name="Country", slug="country")
+    uganda = Location.objects.create(name="Uganda", type=country)
+    LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
     reqion_type = LocationType.objects.create(name="region1", slug="region1")
     district_type = LocationType.objects.create(name="district1", slug='district1')
     county_type = LocationType.objects.create(name="county1", slug='county1')
 
-    region = Location.objects.create(name="region1", type=reqion_type)
+    region = Location.objects.create(name="region1", type=reqion_type, tree_parent=uganda)
     district = Location.objects.create(name="district1", tree_parent=region, type=district_type)
     county = Location.objects.create(name="county1", tree_parent=district, type=county_type)
 
-    region = Location.objects.create(name="region2", type=reqion_type)
+    region = Location.objects.create(name="region2", type=reqion_type, tree_parent=uganda)
     district = Location.objects.create(name="district2", tree_parent=region, type=district_type)
     county1 = Location.objects.create(name="county2", tree_parent=district, type=county_type)
     world.weight_1 = LocationWeight.objects.create(location=county, selection_probability=0.1, survey=world.survey)
@@ -130,9 +138,13 @@ def and_i_select_one_survey(step):
 
 @step(u'And I have a number of locations and weights in each survey')
 def and_i_have_a_number_of_locations_and_weights_in_each_survey(step):
+    country = LocationType.objects.create(name='Country', slug='country')
+    uganda = Location.objects.create(name="Uganda", type=country)
+    LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
     county = LocationType.objects.create(name="County", slug="county")
-    world.county1 = Location.objects.create(name="county1", type=county)
-    world.county2 = Location.objects.create(name="county2", type=county)
+    world.county1 = Location.objects.create(name="county1", type=county, tree_parent=uganda)
+    world.county2 = Location.objects.create(name="county2", type=county, tree_parent=uganda)
     world.weight_1 = LocationWeight.objects.create(location=world.county1, selection_probability=0.1, survey=world.survey_1)
     world.weight_2 = LocationWeight.objects.create(location=world.county2, selection_probability=0.2, survey=world.survey_2)
     world.weight_3 = LocationWeight.objects.create(location=world.county1, selection_probability=0.22, survey=world.survey_2)
