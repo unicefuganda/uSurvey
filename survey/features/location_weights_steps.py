@@ -173,3 +173,34 @@ def then_i_should_see_the_weights_for_that_location_and_survey(step):
                         str(world.weight_3.survey.get_total_respondents()), str(world.weight_3.survey.sample_size)]
     world.page.validate_fields_present(weight_3_details)
 
+@step(u'When I click the upload weights link')
+def when_i_click_the_upload_weights_link(step):
+    world.page.click_by_css('#upload_weights')
+
+@step(u'Then I should see upload weights page')
+def then_i_should_see_upload_weights_page(step):
+    world.page = UploadWeightsPage(world.browser)
+    world.page.validate_url()
+
+@step(u'And I have some 100 locations with weights')
+def and_i_have_some_100_locations_with_weights(step):
+    country = LocationType.objects.create(name="Country", slug="country")
+    uganda = Location.objects.create(name="Uganda", type=country)
+    LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+    reqion_type = LocationType.objects.create(name="region1", slug="region1")
+    district_type = LocationType.objects.create(name="district1", slug='district1')
+    county_type = LocationType.objects.create(name="county1", slug='county1')
+
+    region = Location.objects.create(name="region1", type=reqion_type, tree_parent=uganda)
+    district = Location.objects.create(name="district1", tree_parent=region, type=district_type)
+    county = Location.objects.create(name="county1", tree_parent=district, type=county_type)
+
+    for i in xrange(100):
+        location = Location.objects.create(name=str(i), tree_parent=district, type=county_type)
+        LocationWeight.objects.create(location=location, selection_probability=i/100.0, survey=world.survey)
+
+
+@step(u'Then I see locations weights paginated')
+def then_i_see_locations_weights_paginated(step):
+    world.page.validate_pagination()

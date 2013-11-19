@@ -66,6 +66,7 @@
                   {% if perms.auth.can_view_batches %}
                       <li role="presentation"><a href="{% url 'list_indicator_page' %}">Indicators</a></li>
                       <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion Rates</a></li>
+                      <li role="presentation"><a href="{% url 'list_weights_page' %}">Location Weights</a></li>
                   {% endif %}
                 </ul>
               </li>

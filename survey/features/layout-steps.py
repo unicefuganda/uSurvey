@@ -26,7 +26,7 @@ def and_i_click_analysis_tab(step):
 
 @step(u'Then I should see analysis dropdown list')
 def then_i_should_see_analysis_dropdown_list(step):
-    reverse_url_links = ["simulator_page","list_indicator_page","survey_completion_rates"]
+    reverse_url_links = ["simulator_page","list_indicator_page","survey_completion_rates", "list_weights_page"]
     world.page.see_dropdown(reverse_url_links)
 
 @step(u'And I click Settings tab')

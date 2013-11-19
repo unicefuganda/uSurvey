@@ -28,7 +28,8 @@ def upload(request):
 
     return render(request, 'locations/weights/upload.html', context)
 
-
+@login_required
+@permission_required('auth.can_view_batches')
 def list_weights(request):
     location_weights = LocationWeight.objects.all()
     surveys = Survey.objects.all()
@@ -52,7 +53,7 @@ def list_weights(request):
                'request': request}
     return render(request, 'locations/weights/index.html', context)
 
-
+@permission_required('auth.can_view_batches')
 def error_logs(request):
     location_weights_error_logs = UploadErrorLog.objects.filter(model='WEIGHTS')
     context = {'error_logs': location_weights_error_logs, 'request': request}

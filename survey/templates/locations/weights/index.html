@@ -24,7 +24,12 @@
     <button class="btn btn-primary" id="get_list">Get List</button>
   </form>
 
-    <a class="btn pull-right" href="{% url 'weights_error_logs_page' %}" id="view_error_log">Error logs from previous upload</a>
+    <div class="btn-group pull-right">
+        <a class="btn" href="{% url 'upload_weights' %}" id="upload_weights"><i class="icon icon-upload"></i> Upload weights</a>
+        <a class="btn btn-danger" href="{% url 'weights_error_logs_page' %}" id="view_error_log">Error logs</a>
+    </div>
+    <br class="clear"/> <br/>
+
 <table class="table-bordered table">
     <tr>
     {% for type in location_types %}

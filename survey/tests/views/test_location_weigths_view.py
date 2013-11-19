@@ -227,3 +227,8 @@ class UploadWeightsErrorLogTest(BaseTest):
         [self.assertIn(error, response.context['error_logs']) for error in expected_errors]
         self.assertNotIn(error_log_1, response.context['error_logs'])
         self.assertIsNotNone(response.context['request'])
+
+    def test_assert_restricted_permissions(self):
+        self.assert_login_required('/locations/weights/')
+        self.assert_restricted_permission_for('/locations/weights/')
+        self.assert_restricted_permission_for('/locations/weights/error_logs/')
