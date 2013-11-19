@@ -128,6 +128,7 @@ class UploadWeightsTest(BaseTest):
         self.assertEqual(1, len(response.context['surveys']))
         self.assertIn(self.survey, response.context['surveys'])
         self.assertIsNone(response.context['selected_survey'])
+        self.assertIsNotNone(response.context['request'])
 
     def test_filter_list_weights_by_location(self):
         district = Location.objects.create(name="district1", type=self.district_type)
@@ -166,7 +167,6 @@ class UploadWeightsTest(BaseTest):
         self.assertIn(hoho_survey, response.context['surveys'])
 
         self.assertIn('list_weights_page', response.context['action'])
-
 
     def test_filter_list_weights_by_location_and_survey(self):
         hoho_survey = Survey.objects.create(name="what hohoho")

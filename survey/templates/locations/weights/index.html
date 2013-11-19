@@ -5,6 +5,8 @@
 
 {% block content %}
 {% load template_tags %}
+{% load pagination_tags %}
+{% autopaginate location_weights 50 %}
 <h3>Location Weights</h3>
    <form id="aggregates-form" action="{% url action %}" method="get">
     <div>
@@ -73,6 +75,7 @@
                 </div>
             </td>
         </tr>
+        {% paginate %}
     {% endfor %}
 
 </table>

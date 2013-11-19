@@ -46,10 +46,12 @@ def list_weights(request):
     context = {'location_weights': location_weights,
                'location_types': location_types,
                'location_data': LocationWidget(selected_location),
-               'surveys':surveys,
-               'selected_survey':survey,
-               'action':'list_weights_page'}
+               'surveys': surveys,
+               'selected_survey': survey,
+               'action': 'list_weights_page',
+               'request': request}
     return render(request, 'locations/weights/index.html', context)
+
 
 def error_logs(request):
     location_weights_error_logs = UploadErrorLog.objects.filter(model='WEIGHTS')
