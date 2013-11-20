@@ -7,7 +7,7 @@ jQuery(function($){
         'age': 'required',
         'surname':'required',
         'first_name':'required',
-        'occupation':'required',
+        'occupation':'required'
       },
       messages: {
         'age':{ number: 'Please enter a valid number. No space or special charcters.'},

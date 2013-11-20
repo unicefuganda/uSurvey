@@ -1,8 +1,5 @@
-from django.db.models import Count
-from rapidsms.contrib.locations.models import Location
 from django.db import models
 
-from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
 from survey.models.investigator import Investigator
 from survey.models.base import BaseModel
 from survey.models.batch import Batch

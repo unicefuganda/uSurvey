@@ -1,5 +1,6 @@
 import csv
 from time import sleep
+import datetime
 from lettuce import step, world
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.features.page_objects.uploads import UploadWeightsPage, ListLocationWeightsPage, ListLocationWeightsErrorLogPage
@@ -200,7 +201,42 @@ def and_i_have_some_100_locations_with_weights(step):
         location = Location.objects.create(name=str(i), tree_parent=district, type=county_type)
         LocationWeight.objects.create(location=location, selection_probability=i/100.0, survey=world.survey)
 
-
 @step(u'Then I see locations weights paginated')
 def then_i_see_locations_weights_paginated(step):
     world.page.validate_pagination()
+
+@step(u'And I have some error logs for upload weights')
+def and_i_have_some_error_logs_for_upload_weights(step):
+    world.error_log = UploadErrorLog.objects.create(model="WEIGHTS", filename="some_file.csv", error="Some error")
+    world.error_log2 = UploadErrorLog.objects.create(model="WEIGHTS", filename="some_file_1.csv", error="Some error two")
+    world.error_log3 = UploadErrorLog.objects.create(model="LOCATION", filename="some_file_2.csv", error="Some error three")
+
+    world.timedelta = datetime.timedelta(days=4)
+    world.error_log2.created += world.timedelta
+    world.error_log2.save()
+
+@step(u'And I visit the weights error logs page')
+def and_i_visit_the_weights_error_logs_page(step):
+    world.page = ListLocationWeightsErrorLogPage(world.browser)
+    world.page.visit()
+
+@step(u'Then I should see all error logs')
+def then_i_should_see_all_error_logs(step):
+    world.page.validate_fields_present([world.error_log.filename, world.error_log.error])
+    world.page.validate_fields_present([world.error_log2.filename, world.error_log2.error])
+    world.page.validate_fields_present([world.error_log3.filename, world.error_log3.error], False)
+
+@step(u'When I select from and to dates')
+def when_i_select_from_and_to_dates(step):
+    dates={'from_date':world.error_log.created.strftime('%Y-%m-%d'),
+           'to_date': world.error_log.created.strftime('%Y-%m-%d')}
+    world.page.fill_valid_values(dates)
+
+@step(u'Then I should see only error logs between those dates')
+def then_i_should_see_only_error_logs_between_those_dates(step):
+    world.page.validate_fields_present([world.error_log.filename, world.error_log.error])
+    world.page.validate_fields_present([world.error_log2.filename, world.error_log2.error], False)
+
+@step(u'And I click the filter link')
+def and_i_click_the_filter_link(step):
+    world.page.click_by_css('#get_logs')

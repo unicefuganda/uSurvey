@@ -47,3 +47,12 @@ Feature: Location Weights upload
     When I select a location
     And I click get list
     Then I should see the weights for that location and survey
+
+  Scenario: List and filter upload weights error logs
+    Given I am logged in as researcher
+    And I have some error logs for upload weights
+    And I visit the weights error logs page
+    Then I should see all error logs
+    When I select from and to dates
+    And I click the filter link
+    Then I should see only error logs between those dates

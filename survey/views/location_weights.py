@@ -1,3 +1,5 @@
+from datetime import datetime
+from django.utils.timezone import utc
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 
@@ -10,6 +12,7 @@ from survey.models import LocationWeight, LocationTypeDetails, UploadErrorLog, S
 from survey.tasks import upload_task
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
+
 
 
 @login_required
@@ -56,6 +59,18 @@ def list_weights(request):
 @permission_required('auth.can_view_batches')
 def error_logs(request):
     location_weights_error_logs = UploadErrorLog.objects.filter(model='WEIGHTS')
-    context = {'error_logs': location_weights_error_logs, 'request': request}
+    today = datetime.now().replace(tzinfo=utc).strftime('%Y-%m-%d')
+    selected_from_date = today
+    selected_to_date = today
+    params = request.GET
+    if params.get('from_date', None) and params.get('to_date', None):
+        selected_from_date = datetime.strptime(params['from_date']+ " 00:00", '%Y-%m-%d %H:%M').replace(tzinfo=utc)
+        selected_to_date = datetime.strptime(params['to_date']+ " 23:59", '%Y-%m-%d %H:%M').replace(tzinfo=utc)
+
+        location_weights_error_logs = location_weights_error_logs.filter(created__range=[selected_from_date,
+                                                                                         selected_to_date])
+
+    context = {'error_logs': location_weights_error_logs, 'request': request,
+               'selected_from_date':selected_from_date, 'selected_to_date':selected_to_date}
 
     return render(request, 'locations/weights/error_logs.html', context)

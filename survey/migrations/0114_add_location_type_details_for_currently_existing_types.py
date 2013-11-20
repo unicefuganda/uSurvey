@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
@@ -10,10 +10,11 @@ from survey.models import LocationTypeDetails
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        types = orm["locations.locationtype"].objects.all()
+        types = LocationType.objects.all()
         the_country = LocationTypeDetails.the_country()
-        for index, type in enumerate(types):
+        for index, type_ in enumerate(types):
             if not LocationTypeDetails.objects.filter(location_type=type).exists():
+                type(type)
                 LocationTypeDetails.objects.get_or_create(required=True, location_type=type, country=the_country)
 
         if the_country:

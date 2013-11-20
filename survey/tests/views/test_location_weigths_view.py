@@ -1,3 +1,4 @@
+import datetime
 from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
@@ -6,6 +7,7 @@ from survey.forms.upload_csv_file import UploadWeightsForm
 from survey.models import LocationWeight, Survey, UploadErrorLog
 from survey.tests.base_test import BaseTest
 from survey.views.location_widget import LocationWidget
+from django.utils.timezone import utc
 
 
 class UploadWeightsTest(BaseTest):
@@ -227,6 +229,30 @@ class UploadWeightsErrorLogTest(BaseTest):
         [self.assertIn(error, response.context['error_logs']) for error in expected_errors]
         self.assertNotIn(error_log_1, response.context['error_logs'])
         self.assertIsNotNone(response.context['request'])
+
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        self.assertEqual(today, response.context['selected_from_date'])
+        self.assertEqual(today, response.context['selected_to_date'])
+
+
+    def test_should_filter_to_and_from_dates(self):
+        error_log = UploadErrorLog.objects.create(model="WEIGHTS", error="Some error", filename="Some file", row_number=1)
+        error_log_1 = UploadErrorLog.objects.create(model="LOCATION", error="Some error", filename="Some file", row_number=25)
+        error_log_2 = UploadErrorLog.objects.create(model="WEIGHTS", error="Some error_2", filename="Some file", row_number=25)
+
+        error_log_2.created = error_log_2.created.replace(tzinfo=utc) + datetime.timedelta(days=4)
+        error_log_2.save()
+
+        error_log_created = error_log.created.strftime('%Y-%m-%d')
+
+        response = self.client.get('/locations/weights/error_logs/?from_date=%s&to_date=%s'%(error_log_created, error_log_created))
+        self.assertEqual(200, response.status_code)
+
+
+        self.assertEqual(1, response.context['error_logs'].count())
+        self.assertIn(error_log, response.context['error_logs'])
+        self.assertEqual(error_log.created.replace(hour=0, minute=0, second=0, microsecond=0), response.context['selected_from_date'])
+        self.assertEqual(error_log.created.replace(hour=23, minute=59, second=0, microsecond=0), response.context['selected_to_date'])
 
     def test_assert_restricted_permissions(self):
         self.assert_login_required('/locations/weights/')
