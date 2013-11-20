@@ -14,9 +14,7 @@ class FormulaForm(ModelForm):
         super(FormulaForm, self).__init__(*args, **kwargs)
 
         self.indicator = indicator
-        self.fields['numerator_options'].label = ""
         self.fields['denominator'].label = ""
-        self.fields['denominator_options'].label = ""
         self.fields['count'].label = ""
         self.fields['groups'].label = ""
 

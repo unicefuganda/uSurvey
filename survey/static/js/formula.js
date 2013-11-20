@@ -21,7 +21,7 @@ function show_or_hide_based_on_denominator_type(denominator_type_value) {
          show_field(group_field);
          hide_field(denominator_field);
          hide_field(count_field);
-         hide_field(denominator_option_field);
+         hide_option_field_and_clear_field(denominator_option_field);
     }
     else {
          hide_field(group_field);
@@ -34,18 +34,25 @@ function show_or_hide_based_on_denominator_type(denominator_type_value) {
 
 function show_option_field_and_fill_field(option_field, options)
 {
+    var option_field_label = $("label[for='"+option_field.attr('id')+"']");
+
     option_field.find('option').remove().end();
     $.each(options, function(key, value){
         option_field.append("<option value=" + value['id'] + ">" + value['text'] + "</option>");
     });
 
-    show_field(option_field)
+    show_field(option_field);
+    option_field_label.show();
+    option_field_label.parent('.control-group').show();
 }
 
 function hide_option_field_and_clear_field(option_field)
 {
+    var option_field_label = $("label[for='"+option_field.attr('id')+"']");
     option_field.find('option').remove().end();
-    hide_field(option_field)
+    hide_field(option_field);
+    option_field_label.hide();
+    option_field_label.parent('.control-group').hide()
 }
 
 function show_or_hide_options_based_on_field_question_type(question_field, options_field) {
