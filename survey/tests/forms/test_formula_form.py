@@ -119,6 +119,18 @@ class FormulaFormTest(TestCase):
 
         formula_form = FormulaForm(indicator=self.count_indicator, data=form_data)
         self.assertFalse(formula_form.is_valid())
+        self.assertIn('Formula already exist for indicator %s.' % self.count_indicator.name, formula_form.errors['__all__'])
+
+    def test_should_not_be_valid_if_percentage_indicator_and_formula_with_same_groups_exists(self):
+
+        form_data = {'numerator': self.question_1.id,
+                     'groups': self.group.id,
+                     'denominator_type': 'GROUP'}
+
+        Formula.objects.create(numerator=self.question_1, groups=self.group, indicator=self.percentage_indicator)
+
+        formula_form = FormulaForm(indicator=self.percentage_indicator, data=form_data)
+        self.assertFalse(formula_form.is_valid())
         self.assertIn('Formula already exist for indicator %s.' % self.percentage_indicator.name, formula_form.errors['__all__'])
 
     def test_should_be_valid_if_count_indicator_and_formula_with_same_count_questions_does_not_exist(self):
