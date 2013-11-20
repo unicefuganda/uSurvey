@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from survey.forms.indicator import IndicatorForm
 from survey.forms.filters import IndicatorFilterForm
-from survey.models import Indicator, Survey
+from survey.models import Indicator, Survey, Formula
 
 
 @permission_required('auth.can_view_batches')
@@ -49,3 +49,12 @@ def index(request):
 
     return render(request, 'indicator/index.html',
                   {'indicators': indicators, 'indicator_filter_form': indicator_filter_form})
+
+
+@permission_required('auth.can_view_batches')
+def delete(request, indicator_id):
+    indicator = Indicator.objects.get(id=indicator_id)
+    Formula.objects.filter(indicator=indicator).delete()
+    indicator.delete()
+    messages.success(request, 'Indicator successfully deleted.')
+    return HttpResponseRedirect('/indicators/')

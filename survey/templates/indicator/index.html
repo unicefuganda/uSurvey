@@ -2,7 +2,7 @@
 {% block title %}
     Indicator List
 {% endblock %}
-
+{% load template_tags %}
 {% block content %}
     <h3>Indicator List</h3>
     <form id="question-filter-form" action="{{ action }}" method="post" class="pull-left padded-bottom">
@@ -41,12 +41,13 @@
                 <td>{{ indicator.module.name }}</td>
                 <td>{{ indicator.measure }}</td>
                 <td>
-                    <div class="btn-group">
+                <div class="btn-group">
                     <a href="" class="btn btn-small" id="edit-indicator_{{ indicator.id }}"><i class="icon-pencil"></i> Edit</a>
-                    <a href="" class="btn btn-small" data-toggle="modal" id="delete-indicator_{{indicator.id}}"><i class="icon-trash"></i> Delete</a>
+                    <a href="#delete_indicator_{{indicator.id}}" class="btn btn-small" data-toggle="modal" id="delete-indicator_{{indicator.id}}"><i class="icon-trash"></i> Delete</a>
                     <a href="{% url 'add_formula_page' indicator.id %}" class="btn btn-small" id="add-formula-indicator_{{ indicator.id }}"><i class="icon-wrench"></i> Formula</a>
                     <a href="" class="btn btn-small" id="analyse-indicator_{{ indicator.id }}"><i class="icon-eye-open"></i> Analysis</a>
                 </div>
+                {% include "base/delete_modal.html" with object_name=indicator.name id=indicator.id name="Indicator" url=indicator.id|get_url_with_ids:"delete_indicator_page" %}
                 </td>
             </tr>
         {% endfor %}

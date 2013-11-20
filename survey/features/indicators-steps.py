@@ -135,3 +135,20 @@ def when_i_click_on_add_indicator_button(step):
 def then_i_should_see_add_indicator_page(step):
     world.page = NewIndicatorPage(world.browser)
     world.page.validate_url()
+
+@step(u'And I click the delete indicator link')
+def and_i_click_the_delete_indicator_link(step):
+    world.page.click_by_css("#delete-indicator_%s" % world.indicator_1.id)
+
+@step(u'Then I should see confirm indicator batch')
+def then_i_should_see_confirm_indicator_batch(step):
+    world.page.see_confirm_delete_message(world.indicator_1.name)
+
+@step(u'Then I should go back to indicator listing page')
+def then_i_should_go_back_to_indicator_listing_page(step):
+    world.page = ListIndicatorPage(world.browser)
+    world.page.validate_url()
+
+@step(u'And I should see the indicator successfully deleted')
+def and_i_should_see_the_indicator_successfully_deleted(step):
+    world.page.see_success_message("Indicator", "deleted")

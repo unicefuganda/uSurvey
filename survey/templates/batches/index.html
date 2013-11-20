@@ -42,7 +42,6 @@
               <a class="btn btn-small" href="{% url 'batch_show_page' survey.id batch.pk %}"><i class="icon-lock"></i> Open/Close</a>
             </div>
               {% include "base/delete_modal.html" with object_name=batch.name id=batch.id name="Batch" url=survey.id|add_string:batch.id|get_url_with_ids:"delete_batch" %}
-            </div>
           </td>
         </tr>
       {% endfor %}

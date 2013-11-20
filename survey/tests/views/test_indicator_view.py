@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import Client
 from survey.forms.indicator import IndicatorForm
 from survey.forms.filters import IndicatorFilterForm
-from survey.models import QuestionModule, Batch, Indicator, Survey
+from survey.models import QuestionModule, Batch, Indicator, Survey, Formula, Question
 from survey.tests.base_test import BaseTest
 
 
@@ -18,7 +18,7 @@ class IndicatorViewTest(BaseTest):
                           'description': 'some description',
                           'measure': '%',
                           'batch': self.batch.id,
-                          'survey':self.survey.id}
+                          'survey': self.survey.id}
 
         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
@@ -80,13 +80,13 @@ class IndicatorViewTest(BaseTest):
 
     def test_post_filter_indicators_by_survey(self):
         survey = Survey.objects.create(name='survey')
-        batch_s = Batch.objects.create(name='batch survey', survey = survey)
+        batch_s = Batch.objects.create(name='batch survey', survey=survey)
         batch = Batch.objects.create(name='batch s')
         module = QuestionModule.objects.create(name="module")
         indicator_s = Indicator.objects.create(name='ITN', module=module, batch=batch_s)
         indicator = Indicator.objects.create(name='ITN1', module=module, batch=batch)
 
-        response = self.client.post('/indicators/', data={'survey':survey.id, 'batch': 'All', 'module': 'All'})
+        response = self.client.post('/indicators/', data={'survey': survey.id, 'batch': 'All', 'module': 'All'})
         self.failUnlessEqual(response.status_code, 200)
         self.assertIsInstance(response.context['indicator_filter_form'], IndicatorFilterForm)
         self.assertEqual(1, len(response.context['indicators']))
@@ -95,15 +95,15 @@ class IndicatorViewTest(BaseTest):
 
     def test_post_filter_indicators_by_batch(self):
         survey = Survey.objects.create(name='survey')
-        batch_s = Batch.objects.create(name='batch survey', survey = survey)
-        batch_s2 = Batch.objects.create(name='batch survey 2', survey = survey)
+        batch_s = Batch.objects.create(name='batch survey', survey=survey)
+        batch_s2 = Batch.objects.create(name='batch survey 2', survey=survey)
         batch = Batch.objects.create(name='batch s')
         module = QuestionModule.objects.create(name="module")
         indicator_s = Indicator.objects.create(name='ITN', module=module, batch=batch_s)
         indicator_s2 = Indicator.objects.create(name='ITNs2', module=module, batch=batch_s2)
         indicator = Indicator.objects.create(name='ITN1', module=module, batch=batch)
 
-        response = self.client.post('/indicators/', data={'survey':survey.id, 'batch': batch_s.id, 'module': 'All'})
+        response = self.client.post('/indicators/', data={'survey': survey.id, 'batch': batch_s.id, 'module': 'All'})
         self.failUnlessEqual(response.status_code, 200)
         self.assertIsInstance(response.context['indicator_filter_form'], IndicatorFilterForm)
         self.assertIn(indicator_s, response.context['indicators'])
@@ -112,16 +112,17 @@ class IndicatorViewTest(BaseTest):
         self.assertNotIn(indicator, response.context['indicators'])
 
     def test_should_get_all_indicators_in_a_given_module_when_module_is_given(self):
-
         survey = Survey.objects.create(name='survey')
-        batch_s = Batch.objects.create(name='batch survey', survey = survey)
+        batch_s = Batch.objects.create(name='batch survey', survey=survey)
         module = QuestionModule.objects.create(name="module")
         module_1 = QuestionModule.objects.create(name="module")
 
-        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
-                                         module=module, batch=batch_s)
-        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
-                                         module=module_1, batch=batch_s)
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module, batch=batch_s)
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module_1, batch=batch_s)
 
         response = self.client.post('/indicators/', data={'survey': 'All', 'batch': 'All', 'module': module.id})
         self.failUnlessEqual(response.status_code, 200)
@@ -130,16 +131,17 @@ class IndicatorViewTest(BaseTest):
         self.assertNotIn(indicator_2, response.context['indicators'])
 
     def test_should_get_all_indicators_in_a_given_module_when_module_and_batch_is_given(self):
-
         survey = Survey.objects.create(name='survey')
-        batch_s = Batch.objects.create(name='batch survey', survey = survey)
+        batch_s = Batch.objects.create(name='batch survey', survey=survey)
         module = QuestionModule.objects.create(name="module")
         module_1 = QuestionModule.objects.create(name="module")
 
-        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
-                                         module=module, batch=batch_s)
-        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
-                                         module=module_1, batch=batch_s)
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module, batch=batch_s)
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module_1, batch=batch_s)
 
         response = self.client.post('/indicators/', data={'survey': 'All', 'batch': batch_s.id, 'module': module.id})
         self.failUnlessEqual(response.status_code, 200)
@@ -153,13 +155,54 @@ class IndicatorViewTest(BaseTest):
         module = QuestionModule.objects.create(name="module")
         module_1 = QuestionModule.objects.create(name="module")
 
-        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
-                                         module=module, batch=batch_s)
-        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1", measure='Percentage',
-                                         module=module_1, batch=batch_s)
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module, batch=batch_s)
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module_1, batch=batch_s)
 
-        response = self.client.post('/indicators/', data={'survey': survey.id, 'batch': batch_s.id, 'module': module.id})
+        response = self.client.post('/indicators/',
+                                    data={'survey': survey.id, 'batch': batch_s.id, 'module': module.id})
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(1, len(response.context['indicators']))
         self.assertIn(indicator_1, response.context['indicators'])
         self.assertNotIn(indicator_2, response.context['indicators'])
+
+    def test_delete_indicator(self):
+        survey = Survey.objects.create(name='survey')
+        batch_s = Batch.objects.create(name='batch survey', survey=survey)
+        module = QuestionModule.objects.create(name="module")
+        module_1 = QuestionModule.objects.create(name="module")
+
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module, batch=batch_s)
+        indicator_2 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module_1, batch=batch_s)
+
+        response = self.client.get('/indicators/%d/delete/' % indicator_1.id)
+        recovered_indicator = Indicator.objects.filter(id=indicator_1.id)
+        self.assertRedirects(response, expected_url='/indicators/', status_code=302,
+                             target_status_code=200, msg_prefix='')
+        self.assertIn('Indicator successfully deleted.', response.cookies['messages'].value)
+        self.failIf(recovered_indicator)
+        self.failUnless(Indicator.objects.get(id=indicator_2.id))
+
+    def test_should_not_delete_indicator_with_a_formula(self):
+        survey = Survey.objects.create(name='survey')
+        batch_s = Batch.objects.create(name='batch survey', survey=survey)
+        module = QuestionModule.objects.create(name="module")
+        indicator_1 = Indicator.objects.create(name="indicator name 1", description="rajni indicator 1",
+                                               measure='Percentage',
+                                               module=module, batch=batch_s)
+
+        indicators_formula = Formula.objects.create(indicator=indicator_1, count=Question.objects.create(text="Question", answer_type=Question.MULTICHOICE))
+        response = self.client.get('/indicators/%s/delete/' % indicator_1.id)
+        self.failIf(Indicator.objects.filter(id=indicator_1.id))
+        self.failIf(Formula.objects.filter(id=indicators_formula.id))
+        self.assertIn('Indicator successfully deleted.', response.cookies['messages'].value)
+
+    def test_restricted_perms_to_delete_indicator(self):
+        self.assert_restricted_permission_for('/indicators/1/delete/')

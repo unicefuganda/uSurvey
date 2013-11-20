@@ -170,13 +170,3 @@ def list_batches(request):
         json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
         return HttpResponse(json_dump, mimetype='application/json')
     return render(request, 'layout.html')
-    #
-    #def _create_batch_hash_response(batches):
-    #    batches_to_display = map(lambda batch: {'id': str(batch.id), 'text': batch.name}, batches)
-    #    return HttpResponse(json.dumps(batches_to_display), mimetype='application/json')
-    #
-    #
-    #def list(request,survey_id):
-    #    survey = Survey.objects.get(id=survey_id)
-    #    batches = Batch.objects.filter(survey__id=survey_id)
-    #    return _create_batch_hash_response(batches)

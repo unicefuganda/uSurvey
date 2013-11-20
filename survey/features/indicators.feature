@@ -32,3 +32,13 @@ Feature: Indicators feature
       Then I should see indicators in that module
       When I click on add indicator button
       Then I should see add indicator page
+
+  Scenario: Delete Indicator
+    Given I am logged in as researcher
+    And I have two indicators
+    When I visit indicator listing page
+    And I click the delete indicator link
+    Then I should see confirm indicator batch
+    And if I click yes
+    Then I should go back to indicator listing page
+    And I should see the indicator successfully deleted
