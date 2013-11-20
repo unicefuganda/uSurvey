@@ -3,7 +3,7 @@
     <thead>
         <tr>
             <th>
-                Count
+                Count / Group
             </th>
             <th>
                 Actions
@@ -14,7 +14,11 @@
     {% if existing_formula %}
         {% for existing_formulae in existing_formula %}
             <tr>
-                <td>{{ existing_formulae.numerator.text }}</td>
+                {% if existing_formulae.count %}
+                    <td><span class="muted"> Response of:</span> {{ existing_formulae.count.text }} </td>
+                {% else %}
+                    <td><span class="muted"> Group:</span> {{ existing_formulae.groups.name }} </td>
+                {% endif %}
                 <td>
                     <a class="btn btn-small" data-toggle="modal" href="#delete_formula_{{existing_formulae.id}}"><i class="icon-trash" id="delete-icon-{{existing_formulae.id}}"></i></a>
                 </td>

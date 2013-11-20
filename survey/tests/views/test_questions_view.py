@@ -567,6 +567,43 @@ class QuestionsViews(BaseTest):
         [self.assertNotIn(dict(text=question.text, id=question.id, answer_type=question.answer_type), questions) for
          question in excluded_question]
 
+    def test_knows_question_is_multichoice_and_returns_in_the_context_value_true(self):
+        group_question = Question.objects.create(text="How many members are there in this household?",
+                                                 answer_type=Question.MULTICHOICE, order=1,
+                                                 group=self.household_member_group,
+                                                 module=self.module)
+        option_1 = QuestionOption.objects.create(question=group_question, text="Option 1", order=1)
+        option_2 = QuestionOption.objects.create(question=group_question, text="Option 2", order=2)
+        option_3 = QuestionOption.objects.create(question=group_question, text="Option 3", order=3)
+
+        all_options = [option_1, option_2, option_3]
+        response = self.client.get('/questions/%s/is_multichoice/' % group_question.id)
+        response_string = json.loads(response.content)
+
+        self.assertTrue(response_string[0]['is_multichoice'])
+
+        [self.assertIn({'id': option.id, 'text': option.text}, response_string[0]['question_options']) for option in all_options]
+
+    def test_knows_question_is_not_multichoice_and_returns_in_the_context_value_false(self):
+        group_question = Question.objects.create(text="How many members are there in this household?",
+                                                 answer_type=Question.NUMBER, order=1,
+                                                 group=self.household_member_group,
+                                                 module=self.module)
+
+        response = self.client.get('/questions/%s/is_multichoice/' % group_question.id)
+        response_string = json.loads(response.content)
+
+        self.assertFalse(response_string[0]['is_multichoice'])
+        self.assertEqual([], response_string[0]['question_options'])
+
+    def test_knows_in_existent_question_returns_in_the_context_value_false(self):
+        non_existent_id = 100
+        response = self.client.get('/questions/%s/is_multichoice/' % non_existent_id)
+        response_string = json.loads(response.content)
+
+        self.assertFalse(response_string[0]['is_multichoice'])
+        self.assertEqual([], response_string[0]['question_options'])
+
     def test_should_save_options_for_multichoice_questions(self):
         form_data = {
             'module': self.module.id,

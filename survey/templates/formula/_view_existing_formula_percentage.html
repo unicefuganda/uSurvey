@@ -6,7 +6,7 @@
                 Numerator
             </th>
             <th>
-                Denominator
+                Denominator / Group
             </th>
             <th>
                 Actions
@@ -17,8 +17,12 @@
     {% if existing_formula %}
         {% for existing_formulae in existing_formula %}
             <tr>
-                <td>{{ existing_formulae.numerator.text }}</td>
-                <td>{{ existing_formulae.denominator.text }}</td>
+                <td><span class="muted"> Response of:</span> {{ existing_formulae.numerator.text }}</td>
+                {% if existing_formulae.denominator %}
+                    <td><span class="muted"> Response of:</span> {{ existing_formulae.denominator.text }}</td>
+                {% else %}
+                    <td><span class="muted"> Group:</span> {{ existing_formulae.groups.name }}</td>
+                {% endif %}
                 <td>
                     <a class="btn btn-small" data-toggle="modal" href="#delete_formula_{{existing_formulae.id}}"><i class="icon-trash" id="delete-icon-{{existing_formulae.id}}"></i></a>
                 </td>

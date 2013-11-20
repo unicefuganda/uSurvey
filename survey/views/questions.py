@@ -243,6 +243,24 @@ def new(request):
     response, context = _render_question_view(request)
     return response or render(request, 'questions/new.html', context)
 
+def is_multichoice(request, question_id):
+    is_multichoice_type = False
+    question_options = []
+
+    try:
+        question = Question.objects.get(id=question_id)
+        is_multichoice_type = question.is_multichoice()
+        if is_multichoice_type:
+            all_options = question.options.all().order_by('order')
+            for option in all_options:
+                question_options.append({'id': option.id, 'text': option.text})
+
+    except Question.DoesNotExist:
+        pass
+
+    is_multichoice_question = [{'is_multichoice': is_multichoice_type, 'question_options': question_options}]
+    return HttpResponse(json.dumps(is_multichoice_question), mimetype='application/json')
+
 @permission_required('auth.can_view_batches')
 def edit(request, question_id):
     question = Question.objects.filter(id=question_id)

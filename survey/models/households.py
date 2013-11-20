@@ -145,7 +145,8 @@ class Household(BaseModel):
 
     def all_members(self):
         household_members = list(self.household_member.order_by('surname').filter(householdhead=None))
-        household_members.insert(0, self.get_head())
+        if self.get_head():
+            household_members.insert(0, self.get_head())
         return household_members
 
     def completed_currently_open_batches(self):
@@ -189,6 +190,13 @@ class Household(BaseModel):
         if self.has_completed_batch(batch) and self.has_members():
             return self.completed_batches.latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
         return None
+
+    def members_belonging_to_group(self, member_group):
+        members_in_group = []
+        for member in self.all_members():
+            if member.belongs_to(member_group):
+                members_in_group.append(member)
+        return members_in_group
 
     @classmethod
     def set_related_locations(cls, households):

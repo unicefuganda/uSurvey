@@ -25,26 +25,30 @@ def show(request, batch_id, formula_id):
         hierarchial_data = formula.compute_for_next_location_type_in_the_hierarchy(current_location=selected_location)
         weights = formula.weight_for_location(selected_location)
         household_data = formula.compute_for_households_in_location(selected_location)
-    return render(request, 'formula/show.html', {'request': request,
-                                                 'locations': LocationWidget(selected_location),
-                                                 'computed_value': computed_value,
-                                                 'hierarchial_data': hierarchial_data,
-                                                 'household_data': household_data,
-                                                 'weights': weights,
-                                                 'formula': formula,
-                                                 'batch_id': batch_id})
+    return render(request, 'formula/show.html', {'request': request, 'locations': LocationWidget(selected_location),
+                                                 'computed_value': computed_value, 'hierarchial_data': hierarchial_data,
+                                                 'household_data': household_data, 'weights': weights,
+                                                 'formula': formula, 'batch_id': batch_id})
 
 
 def _process_new_request(request, formula_form, new_formula_url, indicator):
     if formula_form.is_valid():
-        if indicator.is_percentage_indicator():
-            denominator_question = formula_form.cleaned_data['denominator']
-            numerator_question = formula_form.cleaned_data['numerator']
-            Formula.objects.create(numerator=numerator_question, denominator=denominator_question, indicator=indicator)
-        else:
-            count_question = formula_form.cleaned_data['count']
-            Formula.objects.create(count=count_question, indicator=indicator)
+        denominator_question_options = formula_form.cleaned_data.get('denominator_options', None)
+        groups = formula_form.cleaned_data.get('groups', None)
 
+        if indicator.is_percentage_indicator():
+            denominator_question = formula_form.cleaned_data.get('denominator', None)
+            numerator_question = formula_form.cleaned_data.get('numerator', None)
+            numerator_question_options = formula_form.cleaned_data.get('numerator_options', None)
+
+            formula = Formula.objects.create(numerator=numerator_question, denominator=denominator_question,
+                                             indicator=indicator, groups=groups)
+            formula.save_numerator_options(numerator_question_options)
+        else:
+            count_question = formula_form.cleaned_data.get('count', None)
+            formula = Formula.objects.create(count=count_question, groups=groups, indicator=indicator)
+
+        formula.save_denominator_options(denominator_question_options)
         success_message = "Formula successfully added to indicator %s." % indicator.name
         messages.success(request, success_message)
         return HttpResponseRedirect(new_formula_url)

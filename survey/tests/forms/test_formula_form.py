@@ -10,16 +10,16 @@ class FormulaFormTest(TestCase):
         self.module = QuestionModule.objects.create(name='Education', description='Educational Module')
         another_module = QuestionModule.objects.create(name='Health', description='Health Module')
 
-        group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        self.group = HouseholdMemberGroup.objects.create(name="Females", order=1)
 
-        self.question_1 = Question.objects.create(group=group, text="Question 1?", module=self.module, answer_type=Question.NUMBER,
-                                             order=1)
-        self.question_2 = Question.objects.create(group=group, text="Question 2?", module=self.module, answer_type=Question.NUMBER,
-                                             order=2)
-        self.question_3 = Question.objects.create(group=group, text="Question 3?", module=self.module, answer_type=Question.NUMBER,
-                                             order=3)
-        self.question_4 = Question.objects.create(group=group, text="Question 4?", module=another_module, answer_type=Question.NUMBER,
-                                             order=3)
+        self.question_1 = Question.objects.create(group=self.group, text="Question 1?", module=self.module,
+                                                  answer_type=Question.NUMBER, order=1)
+        self.question_2 = Question.objects.create(group=self.group, text="Question 2?", module=self.module,
+                                                  answer_type=Question.NUMBER, order=2)
+        self.question_3 = Question.objects.create(group=self.group, text="Question 3?", module=self.module,
+                                                  answer_type=Question.NUMBER, order=3)
+        self.question_4 = Question.objects.create(group=self.group, text="Question 4?", module=another_module,
+                                                  answer_type=Question.NUMBER, order=3)
         self.batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
 
         self.question_1.batches.add(self.batch)
@@ -39,7 +39,7 @@ class FormulaFormTest(TestCase):
 
         formula_form = FormulaForm(indicator=self.percentage_indicator)
 
-        fields = ['numerator', 'denominator']
+        fields = ['numerator', 'numerator_options', 'denominator_type', 'groups','denominator', 'denominator_options']
         deleted_fields = ['count']
 
         [self.assertIn(field, formula_form.fields) for field in fields]
@@ -49,8 +49,8 @@ class FormulaFormTest(TestCase):
 
         formula_form = FormulaForm(indicator=self.count_indicator)
 
-        fields = ['count']
-        deleted_fields = ['numerator', 'denominator']
+        fields = ['count', 'denominator_type', 'groups', 'denominator_options']
+        deleted_fields = ['numerator', 'numerator_options', 'denominator']
 
         [self.assertIn(field, formula_form.fields) for field in fields]
         [self.assertNotIn(field, formula_form.fields) for field in deleted_fields]
@@ -60,6 +60,9 @@ class FormulaFormTest(TestCase):
 
         all_batch_questions = [self.question_1, self.question_2]
         questions_not_in_batch = [self.question_3, self.question_4]
+
+        self.assertIn((self.group.id, self.group.name), formula_form.fields['groups'].choices)
+
         [self.assertIn((question.id, question.text), formula_form.fields['numerator'].choices) for question in all_batch_questions]
         [self.assertNotIn((question.id, question.text), formula_form.fields['numerator'].choices) for question in questions_not_in_batch]
 
@@ -77,10 +80,11 @@ class FormulaFormTest(TestCase):
     def test_should_not_be_valid_if_percentage_indicator_and_formula_with_same_numerator_and_denominator_exists(self):
 
         form_data = {'numerator': self.question_1.id,
-                     'denominator': self.question_2.id}
+                     'denominator': self.question_2.id,
+                     'denominator_type': 'QUESTION'}
 
         Formula.objects.create(numerator=self.question_1, denominator=self.question_2,
-                                                       indicator=self.percentage_indicator)
+                               indicator=self.percentage_indicator)
 
         formula_form = FormulaForm(indicator=self.percentage_indicator, data=form_data)
         self.assertFalse(formula_form.is_valid())
@@ -88,14 +92,16 @@ class FormulaFormTest(TestCase):
 
     def test_valid_if_percentage_indicator_and_formula_with_same_numerator_and_denominator_does_not_exists(self):
         form_data = {'numerator': self.question_1.id,
-                     'denominator': self.question_2.id}
+                     'denominator': self.question_2.id,
+                     'denominator_type': 'QUESTION'}
 
         formula_form = FormulaForm(indicator=self.percentage_indicator, data=form_data)
         self.assertTrue(formula_form.is_valid())
 
     def test_should_not_be_valid_if_count_indicator_and_formula_with_same_count_questions_exists(self):
 
-        form_data = {'count': self.question_1.id}
+        form_data = {'count': self.question_1.id,
+                     'denominator_type': 'QUESTION'}
 
         Formula.objects.create(count=self.question_1, indicator=self.count_indicator)
 
@@ -104,7 +110,8 @@ class FormulaFormTest(TestCase):
         self.assertIn('Formula already exist for indicator %s.' % self.percentage_indicator.name, formula_form.errors['__all__'])
 
     def test_should_be_valid_if_count_indicator_and_formula_with_same_count_questions_does_not_exist(self):
-        form_data = {'count': self.question_1.id}
+        form_data = {'count': self.question_1.id,
+                     'denominator_type': 'QUESTION'}
 
         formula_form = FormulaForm(indicator=self.count_indicator, data=form_data)
         self.assertTrue(formula_form.is_valid())

@@ -1,9 +1,23 @@
 {% extends 'form.html' %}
+{% load template_tags %}
 {% block title %}
     {{ title }}
 {% endblock %}
 {% block display_form_fields %}
-    {% include "naked_form.html" with a_form=formula_form %}
+    {% for field in formula_form.visible_fields %}
+        {% if field.label != '' %}
+            {% if forloop.counter > 1 %}
+                </div>
+                </div>
+            {% endif %}
+            <div class="control-group">
+            <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
+            <div class="controls {{ field|is_radio }}">
+        {% endif %}
+        {% include 'shared/_standard_field.html' with field=field %}
+    {% endfor %}
+    </div>
+    </div>
 {% endblock %}
 
 {% block non_form_content %}
@@ -13,4 +27,8 @@
     {% else %}
         {% include 'formula/_view_existing_formula_count.html' %}
     {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}js/formula.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
