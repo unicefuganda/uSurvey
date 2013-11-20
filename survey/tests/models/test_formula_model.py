@@ -159,12 +159,21 @@ class FormulaTest(TestCase):
         member_4 = self.create_household_member(household_4)
 
         another_formula = Formula.objects.create(numerator=multi_choice_question, denominator=multi_choice_question)
+        another_formula_count = Formula.objects.create(numerator=multi_choice_question, count=multi_choice_question)
+        formula_denominator = Formula.objects.create(numerator=multi_choice_question, denominator=self.question_1)
 
         [another_formula.numerator_options.add(option) for option in formula_numerator_options]
         [another_formula.denominator_options.add(option) for option in formula_denominator_options]
 
+        [another_formula_count.numerator_options.add(option) for option in formula_numerator_options]
+        [another_formula_count.denominator_options.add(option) for option in formula_denominator_options]
+
+        [formula_denominator.numerator_options.add(option) for option in formula_numerator_options]
+
         investigator.member_answered(multi_choice_question, member_1, 1, self.batch)
         investigator.member_answered(multi_choice_question, member_2, 2, self.batch)
+        investigator.member_answered(self.question_1, member_1, 10, self.batch)
+        investigator.member_answered(self.question_1, member_2, 40, self.batch)
 
         investigator_1.member_answered(multi_choice_question, member_3, 3, self.batch)
         investigator_1.member_answered(multi_choice_question, member_4, 4, self.batch)
@@ -179,12 +188,17 @@ class FormulaTest(TestCase):
         self.assertEqual(investigator_multi_choice_numerator, another_formula.numerator_computation(investigator,
                                                                                                     multi_choice_question))
         self.assertEqual(expected_answer, another_formula.compute_for_household_with_sub_options(survey, investigator))
+        self.assertEqual(expected_answer, another_formula_count.compute_for_household_with_sub_options(survey, investigator))
 
 
         expected_answer = investigator_1_multi_choice_numerator/investigator_1_denominator_expected
         self.assertEqual(investigator_1_multi_choice_numerator, another_formula.numerator_computation(investigator_1,
                                                                                                     multi_choice_question))
         self.assertEqual(expected_answer, another_formula.compute_for_household_with_sub_options(survey, investigator_1))
+        self.assertEqual(expected_answer, another_formula_count.compute_for_household_with_sub_options(survey, investigator_1))
+
+        expected_answer = investigator_multi_choice_numerator/(10+40)
+        self.assertEqual(expected_answer, formula_denominator.compute_for_household_with_sub_options(survey, investigator))
 
     def test_compute_numerical_answers(self):
         uganda = Location.objects.create(name="Uganda")
