@@ -20,3 +20,4 @@ newrelic==1.13.1.31
 dateutils
 xlwt
 django-celery
+selenium==2.35.0

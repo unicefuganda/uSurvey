@@ -12,9 +12,8 @@ class Migration(DataMigration):
     def forwards(self, orm):
         types = LocationType.objects.all()
         the_country = LocationTypeDetails.the_country()
-        for index, type_ in enumerate(types):
+        for index, type in enumerate(types):
             if not LocationTypeDetails.objects.filter(location_type=type).exists():
-                type(type)
                 LocationTypeDetails.objects.get_or_create(required=True, location_type=type, country=the_country)
 
         if the_country:
