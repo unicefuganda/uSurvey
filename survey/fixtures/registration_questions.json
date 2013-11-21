@@ -48,7 +48,7 @@
             "modified": "2013-11-01T10:11:15.340Z",
             "module": 11,
             "subquestion": false,
-            "answer_type": "text",
+            "answer_type": "number",
             "identifier": null,
             "order": 2
         }
