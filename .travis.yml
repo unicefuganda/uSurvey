@@ -19,7 +19,11 @@ before_install:
   - ls phantomjs-1.9.1-linux-i686
   - ls phantomjs-1.9.1-linux-i686/bin
   - sudo rm -rf /usr/local/phantomjs
-  - sudo ln -s phantomjs-1.9.1-linux-i686/bin/phantomjs /usr/local/phantomjs
+  - sudo mv phantomjs-1.9.1-linux-i686 /usr/local/phantomjs
+  - ls /usr/local
+  - ls /usr/local/phantomjs
+  - ls /usr/local/phantomjs/bin
+  - ./usr/local/phantomjs/bin/phantomjs --version
   - phantomjs --version
 
 # command to install dependencies
