@@ -48,7 +48,6 @@ class AnswerRule(BaseModel):
     class Meta:
         app_label = 'survey'
 
-
     def is_equal(self, answer):
         return self.validate_with_value == answer.answer
 

@@ -43,4 +43,5 @@ testsettings.py
 investigator_configs.py
 *.csv
 .DS_STORE
+tags
 */**/.DS_STORE

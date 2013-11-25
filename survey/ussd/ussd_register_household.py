@@ -106,7 +106,6 @@ class USSDRegisterHousehold(USSD):
             if self.household:
                 self.render_questions_based_on_head_selection(answer)
 
-
     def render_select_member_or_head(self):
         self.investigator.set_in_cache('is_selecting_member', True)
         self.responseString = self.MESSAGES['SELECT_HEAD_OR_MEMBER'] % str(self.household.random_sample_number)
@@ -134,7 +133,6 @@ class USSDRegisterHousehold(USSD):
 
         page = self.get_from_session('PAGE')
         self.add_question_prefix()
-
         return self.question.to_ussd(page) if self.question else None
 
     def render_registration_options(self, answer):
@@ -154,7 +152,7 @@ class USSDRegisterHousehold(USSD):
     def process_registration_answer(self, answer):
         answer = int(answer) if answer.isdigit() else answer
 
-        if not answer and answer!=0:
+        if not answer and answer != 0:
             self.investigator.invalid_answer(self.question)
             return self.question
 
@@ -162,6 +160,11 @@ class USSDRegisterHousehold(USSD):
             self.set_current_page(answer)
             self.investigator.remove_ussd_variable('INVALID_ANSWER', self.question)
             return self.question
+
+        age_question = Question.objects.get(text__startswith="Please Enter the age")
+        if self.is_year_question_answered() and not self.age_validates(answer):
+            self.investigator.invalid_answer(age_question)
+            return age_question
 
         try:
             answer_class = self.question.answer_class()
@@ -185,7 +188,8 @@ class USSDRegisterHousehold(USSD):
         return next_question
 
     def get_next_registration_question(self):
-        next_questions = Question.objects.filter(group__name="REGISTRATION GROUP", order__gte=self.question.order + 1).order_by('order')
+        next_questions = Question.objects.filter(group__name="REGISTRATION GROUP",
+                                                 order__gte=self.question.order + 1).order_by('order')
         if next_questions:
             return next_questions[0]
         else:
@@ -200,13 +204,13 @@ class USSDRegisterHousehold(USSD):
         age_question = Question.objects.get(text__startswith="Please Enter the age")
         gender_question = Question.objects.get(text__startswith="Please Enter the gender")
 
-        member_dict['surname']= self.REGISTRATION_DICT[name_question.text]
-        member_dict['male']= self.format_gender_response(gender_question)
+        member_dict['surname'] = self.REGISTRATION_DICT[name_question.text]
+        member_dict['male'] = self.format_gender_response(gender_question)
 
         if self.REGISTRATION_DICT[age_question.text] == self.UNKNOWN_AGE:
             month_of_birth_question = Question.objects.get(text__startswith="Please Enter the month of birth")
             year_of_birth_question = Question.objects.get(text__startswith="Please Enter the year of birth")
-            member_dict['date_of_birth']= self.get_date_of_birth_from(year_of_birth_question, month_of_birth_question)
+            member_dict['date_of_birth'] = self.get_date_of_birth_from(year_of_birth_question, month_of_birth_question)
         else:
             member_dict['date_of_birth'] = self.format_age_to_date_of_birth(age_question)
 
@@ -221,10 +225,19 @@ class USSDRegisterHousehold(USSD):
         date_of_birth = today.replace(year=(today.year - int(age)))
         return date_of_birth
 
-    def format_gender_response(self,question):
+    def format_gender_response(self, question):
         return self.REGISTRATION_DICT[question.text] == 1
 
     def get_date_of_birth_from(self, year_of_birth_question, month_of_birth_question):
         year = int(self.REGISTRATION_DICT[year_of_birth_question.text])
         month = self.REGISTRATION_DICT[month_of_birth_question.text].order
         return datetime(year, month, 1)
+
+    def is_year_question_answered(self):
+        return "year of birth" in self.question.text
+
+    def age_validates(self, answer):
+        age_question = Question.objects.get(text__startswith="Please Enter the age")
+        given_age = self.REGISTRATION_DICT[age_question.text]
+        inferred_year_of_birth = date.today().year - int(given_age)
+        return inferred_year_of_birth == int(answer)
