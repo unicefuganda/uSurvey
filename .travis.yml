@@ -18,6 +18,9 @@ before_install:
   - tar xjf phantomjs-1.9.1-linux-i686.tar.bz2
   - sudo rm -rf /usr/local/phantomjs
   - sudo mv phantomjs-1.9.1-linux-i686 /usr/local/phantomjs
+  - sudo ln -fs /usr/local/phantomjs/bin/phantomjs /usr/local/bin/phantomjs
+  - export PATH=/usr/local/phantomjs/bin:$PATH
+  - phantomjs --version
 
 # command to install dependencies
 install:
