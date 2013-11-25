@@ -23,7 +23,7 @@ before_install:
   - ls /usr/local
   - ls /usr/local/phantomjs
   - ls /usr/local/phantomjs/bin
-  - ./usr/local/phantomjs/bin/phantomjs --version
+  - ls /usr/local/phantomjs/bin/phantomjs
   - phantomjs --version
 
 # command to install dependencies
