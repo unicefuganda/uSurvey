@@ -15,7 +15,6 @@ env:
 # fix travis phantomjs to 1.9.1
 before_install:
   - sudo rm -rf `which phantomjs`
-  - phantomjs --version
   - wget https://phantomjs.googlecode.com/files/phantomjs-1.9.1-linux-i686.tar.bz2
   - tar xjf phantomjs-1.9.1-linux-i686.tar.bz2
   - sudo ln -fs `pwd`/phantomjs-1.9.1-linux-i686/bin/phantomjs /usr/local/bin/phantomjs
