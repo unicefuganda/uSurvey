@@ -12,7 +12,7 @@ from survey.models.answer_rule import AnswerRule
 def and_i_have_100_questions_under_the_batch(step):
     for i in xrange(100):
         q = Question.objects.create(text="some questions %d" % i,
-                                    answer_type=Question.NUMBER, order=i)
+                                    answer_type=Question.NUMBER, identifier='ID %d' % i, order=i)
         q.batches.add(world.batch)
         BatchQuestionOrder.objects.create(batch=world.batch, question=q, order=i)
 
@@ -55,7 +55,8 @@ def then_i_should_see_a_add_question_page(step):
 def when_i_fill_the_details_for_add_question_form(step):
     data = {'module': world.module.id,
             'text': 'hritik  question',
-            'answer_type': Question.NUMBER}
+            'answer_type': Question.NUMBER,
+            'identifier': 'ID 1'}
 
     world.page.fill_valid_values(data)
 
@@ -84,7 +85,7 @@ def and_i_visit_add_new_question_page_of_the_batch(step):
 
 @step(u'And I fill the details for question')
 def and_i_fill_the_details_for_question(step):
-    world.page.fill_valid_values({'module': world.module.id, 'text': 'hritik  question'})
+    world.page.fill_valid_values({'identifier': 'ID 1', 'module': world.module.id, 'text': 'hritik  question'})
     world.page.select('group', [world.household_member_group.pk])
 
 
@@ -132,7 +133,7 @@ def and_i_fill_an_option_question(step):
 @step(u'And I have more than 50 questions')
 def and_i_have_100_questions(step):
     for i in xrange(100):
-        Question.objects.create(text="some questions %d" % i, answer_type=Question.NUMBER, order=i)
+        Question.objects.create(text="some questions %d" % i, answer_type=Question.NUMBER, identifier='ID %d' % i, order=i)
 
 
 @step(u'And I visit questions list page')
@@ -162,7 +163,7 @@ def and_i_visit_create_new_question_page(step):
 def and_i_have_a_multichoice_question(step):
     world.multi_choice_question = Question.objects.create(module=world.module, text="Are these insecticide?",
                                                           answer_type=Question.MULTICHOICE, order=6,
-                                                          group=world.household_member_group)
+                                                          group=world.household_member_group, identifier='ID 1')
     world.option1 = QuestionOption.objects.create(question=world.multi_choice_question, text="Yes", order=1)
     world.option2 = QuestionOption.objects.create(question=world.multi_choice_question, text="No", order=2)
     world.option3 = QuestionOption.objects.create(question=world.multi_choice_question, text="Dont Know", order=3)
@@ -202,7 +203,7 @@ def then_i_should_go_to_add_subquestion_page(step):
 
 @step(u'When I fill in subquestion details')
 def when_i_fill_in_subquestion_details(step):
-    world.page.fill_valid_values({'module': world.module.id, 'text': 'hritik  question'})
+    world.page.fill_valid_values({'module': world.module.id, 'text': 'hritik  question', 'identifier': 'ID 1'})
     world.page.select('group', [world.household_member_group.pk])
     world.page.select('answer_type', [Question.NUMBER])
 
@@ -295,7 +296,7 @@ def then_i_should_see_that_the_question_was_deleted_successfully(step):
 @step(u'And I have a sub question for that question')
 def and_i_have_a_sub_question_for_that_question(step):
     world.sub_question = Question.objects.create(module=world.module, parent=world.multi_choice_question, text="Sub Question 2?",
-                                                 answer_type=Question.NUMBER, subquestion=True)
+                                                 answer_type=Question.NUMBER, subquestion=True, identifier='ID 1')
 
 
 @step(u'Then I should not see the sub question')
@@ -307,7 +308,7 @@ def then_i_should_not_see_the_sub_question(step):
 def and_i_have_a_non_multi_choice_question(step):
     world.multi_choice_question = Question.objects.create(module=world.module, text="Are these insecticide?",
                                                           answer_type=Question.NUMBER, order=7,
-                                                          group=world.household_member_group)
+                                                          group=world.household_member_group, identifier='ID 1')
     world.multi_choice_question.batches.add(world.batch)
     BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=1)
 
@@ -335,12 +336,12 @@ def and_i_have_a_rule_linking_one_option_with_that_subquestion(step):
 @step(u'And I have a subquestion under that question')
 def and_i_have_a_subquestion_under_that_question(step):
     world.sub_question = Question.objects.create(module=world.module, subquestion=True, parent=world.multi_choice_question,
-                                                 text="this is a subquestion")
+                                                 text="this is a subquestion", identifier='ID 1')
 
 
 @step(u'When I fill in duplicate subquestion details')
 def when_i_fill_in_duplicate_subquestion_details(step):
-    world.page.fill_valid_values({'module': world.module.id, 'text': world.sub_question.text})
+    world.page.fill_valid_values({'module': world.module.id,'identifier': 'ID 1', 'text': world.sub_question.text})
     world.page.select('group', [world.household_member_group.pk])
     world.page.select('answer_type', [Question.NUMBER])
 
@@ -381,6 +382,7 @@ def when_i_click_delete_logic_icon(step):
 
 @step(u'And I click confirm delete')
 def and_i_click_confirm_delete(step):
+    world.page.browser.execute_script('document.getElementById("body").innerHTML = "<p>Hello world!</p>"')
     world.page.click_by_css('#delete-logic-%s' % world.answer_rule.id)
 
 
@@ -425,45 +427,40 @@ def and_i_click_edit_sub_question_link(step):
     sleep(3)
     world.page.click_by_css("#edit_subquestion_%s" % world.sub_question.id)
 
-
 @step(u'Then I see the sub question form with values')
 def then_i_see_the_sub_question_form_with_values(step):
     world.form = {'module': 'Module',
                   'text': 'Text',
                   'group': 'Group',
+                  'identifier': 'ID 1',
                   'answer_type': 'Answer type'}
 
     form_values = {'module': world.module.id, 'text': world.sub_question.text,
-                   'group': world.multi_choice_question.group.id,
+                   'group': world.multi_choice_question.group.id, 'identifier': 'ID 1',
                    'answer_type': world.sub_question.answer_type}
     world.page.validate_form_present(world.form)
     world.page.validate_form_values(form_values)
 
-
 @step(u'When I fill in edited sub question details')
 def when_i_fill_in_edited_sub_question_details(step):
-    world.edited_sub_question_details = {'module': world.module.id, 'text': 'edited question',
+    world.edited_sub_question_details = {'module': world.module.id, 'text': 'edited question', 'identifier': 'ID 1',
                                          'group': world.multi_choice_question.group.id
     }
     world.page.see_select_option(['Number'], 'answer_type')
     world.page.fill_valid_values(world.edited_sub_question_details)
 
-
 @step(u'Then I should see the sub question successfully edited')
 def then_i_should_see_the_sub_question_successfully_edited(step):
     world.page.see_success_message("Sub question", "edited")
-
 
 @step(u'And I click delete question rule')
 def and_i_click_delete_question_rule(step):
     sleep(2)
     world.page.click_by_css('#delete-icon-%s' % world.answer_rule.id)
 
-
 @step(u'And I should see that the logic was deleted successfully')
 def and_i_should_see_that_the_logic_was_deleted_successfully(step):
     world.page.see_success_message("Logic", "deleted")
-
 
 @step(u'And I select multichoice question in batch')
 def and_i_select_multichoice_question_in_batch(step):

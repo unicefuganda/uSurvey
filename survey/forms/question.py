@@ -29,7 +29,7 @@ class QuestionForm(ModelForm):
 
     class Meta:
         model = Question
-        fields =['module', 'text', 'group', 'answer_type']
+        fields =['module', 'text', 'identifier', 'group', 'answer_type']
 
         widgets ={
             'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"}),

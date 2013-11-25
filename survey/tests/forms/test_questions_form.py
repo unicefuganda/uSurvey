@@ -15,6 +15,7 @@ class QuestionFormTest(TestCase):
                         'batch': self.batch.id,
                         'text': 'whaat?',
                         'answer_type': Question.NUMBER,
+                        'identifier': 'ID 1',
                         'options':"some option text",
                         'group' : self.household_member_group.id,
                         'module' : self.question_module.id
@@ -109,26 +110,27 @@ class QuestionFormTest(TestCase):
         self.assertEquals(0, question.options.all().count())
 
     def test_form_should_not_be_valid_for_subquestion_if_same_subquestion_already_exist(self):
-       question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1,group=self.household_member_group)
-       sub_question = Question.objects.create(text="this is a sub question", answer_type=Question.NUMBER,
-                                               subquestion=True, parent=question,group=self.household_member_group)
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
+                                           group=self.household_member_group, identifier='Q1')
+        sub_question = Question.objects.create(text="this is a sub question", answer_type=Question.NUMBER,
+                                               subquestion=True, parent=question, group=self.household_member_group,
+                                               identifier='Q2')
 
-       question.batches.add(self.batch)
-       sub_question.batches.add(self.batch)
+        question.batches.add(self.batch)
+        sub_question.batches.add(self.batch)
 
-       form_data = self.form_data.copy()
-       form_data['text'] = sub_question.text
-       form_data['answer_type'] = sub_question.answer_type
-       del form_data['options']
-       question_form = QuestionForm(data=form_data, parent_question=sub_question.parent)
-       self.assertFalse(question_form.is_valid())
-       message= "Sub question for this question with this text already exists."
-       self.assertIn(message, question_form.errors.values()[0])
+        form_data = self.form_data.copy()
+        form_data['text'] = sub_question.text
+        form_data['answer_type'] = sub_question.answer_type
+        del form_data['options']
+        question_form = QuestionForm(data=form_data, parent_question=sub_question.parent)
+        self.assertFalse(question_form.is_valid())
+        message= "Sub question for this question with this text already exists."
+        self.assertIn(message, question_form.errors.values()[0])
 
     def test_form_has_parent_groups_only_if_parent_question_is_supplied(self):
-        question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1,group=self.household_member_group)
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
+                                           group=self.household_member_group, identifier='Q1')
 
         another_member_group = HouseholdMemberGroup.objects.create(name='Age 6-7', order=2)
 
@@ -138,8 +140,7 @@ class QuestionFormTest(TestCase):
         self.assertNotIn((another_member_group.id, another_member_group.name), question_form.fields['group'].choices)
 
     def test_form_has_no_groups_only_if_parent_question_has_no_group_and_is_supplied(self):
-        question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1)
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1, identifier='Q1')
 
         another_member_group = HouseholdMemberGroup.objects.create(name='Age 6-7', order=2)
 
@@ -149,8 +150,8 @@ class QuestionFormTest(TestCase):
         self.assertNotIn((another_member_group.id, another_member_group.name), question_form.fields['group'].choices)
 
     def test_form_has_all_groups_only_if_no_parent_question_is_supplied(self):
-        question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1,group=self.household_member_group)
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
+                                           group=self.household_member_group, identifier='Q1')
 
         another_member_group = HouseholdMemberGroup.objects.create(name='Age 6-7', order=2)
 
@@ -167,12 +168,13 @@ class QuestionFormTest(TestCase):
         self.assertFalse(question_form.is_valid())
 
     def test_form_is_invalid_if_trying_to_add_duplicate_subquestion_under_question(self):
-        question = Question.objects.create(text="Question 1?",
-                                                answer_type=Question.NUMBER, order=1,group=self.household_member_group)
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
+                                           group=self.household_member_group, identifier='Q1')
 
         sub_question_data = {'text': 'Subquestion 1?',
                              'answer_type':Question.NUMBER,
                              'group': self.household_member_group,
+                             'identifier': 'ID 1',
                              'subquestion': True,
                              'parent': question}
 

@@ -140,7 +140,6 @@ class PageObject(object):
         for field in fields:
             self.is_text_present(field, status)
 
-
     def select_date(self, field_id):
         script = "$('%s').focus()" % field_id
         self.browser.execute_script(script)

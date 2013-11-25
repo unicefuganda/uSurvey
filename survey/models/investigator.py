@@ -256,12 +256,21 @@ class Investigator(BaseModel):
 
 
     @classmethod
-    def get_summarised_answers_for(self, batch, questions, data):
+    def get_summarised_answers_for(self, questions, data):
         for investigator in self.objects.all():
             for household in investigator.households.all():
-                answers = [investigator.location.name, household.get_head().surname]
-                answers = answers + household.answers_for(questions)
-                data.append(answers)
+                for member in household.all_members():
+                    member_gender = 'Male' if member.male else "Female"
+                    household_location = household.location
+                    household_locations = household_location.get_ancestors(include_self=True)
+                    answers = []
+                    for location in household_locations:
+                        answers.append(location.name)
+
+                    answers = answers + [household.household_code, member.surname, str(member.date_of_birth),
+                                         member_gender]
+                    answers = answers + member.answers_for(questions)
+                    data.append(answers)
 
     @classmethod
     def sms_investigators_in_locations(self, locations, text):

@@ -334,3 +334,49 @@ class HouseholdBatchCompletionTest(TestCase):
         household.batch_reopen(batch)
 
         self.assertFalse(household.has_completed_batch(batch))
+
+class BatchExportReportTest(TestCase):
+    def test_knows_headers_for_batch_with_questions(self):
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', slug='district')
+        county = LocationType.objects.create(name='County', slug='county')
+        subcounty = LocationType.objects.create(name='Subcounty', slug='subcounty')
+        parish = LocationType.objects.create(name='Parish', slug='parish')
+        village = LocationType.objects.create(name='Village', slug='village')
+        survey = Survey.objects.create(name='survey name', description='survey descrpition', type=False,
+                                            sample_size=10)
+        kampala = Location.objects.create(name="Kampala", type=district)
+
+        batch = Batch.objects.create(order=1, name="Batch A", survey=survey)
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, location=kampala, survey=survey, uid=0,
+                                             household_code='00010001')
+        member = HouseholdMember.objects.create(household=household, surname="Member 1", date_of_birth=date(2011, 1, 11))
+
+
+        group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        module = QuestionModule.objects.create(name="Education")
+        question_1 = Question.objects.create(group=group, text="Question 1", module=module, answer_type=Question.NUMBER,
+                                             order=1, identifier='Q1')
+        question_2 = Question.objects.create(group=group, text="Question 2", module=module, answer_type=Question.MULTICHOICE,
+                                             order=2, identifier='Q2')
+        question_3 = Question.objects.create(group=group, text="Question 3", module=module, answer_type=Question.NUMBER,
+                                             order=3, identifier='Q3')
+
+        question_1.batches.add(batch)
+        question_2.batches.add(batch)
+        question_3.batches.add(batch)
+
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+        BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
+        BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
+
+        header_structure = [country.name, district.name, county.name, subcounty.name, parish.name, village.name,
+                            'Household ID', 'Name', 'Date of Birth', 'Gender', question_1.identifier,
+                            question_2.identifier, '', question_3.identifier]
+        expected_questions = [question_1, question_2, question_3]
+
+        batch_questions, headers = batch.set_report_headers()
+        self.assertEqual(header_structure, headers)
+        self.assertEqual(expected_questions, batch_questions)

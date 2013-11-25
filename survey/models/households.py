@@ -402,6 +402,23 @@ class HouseholdMember(BaseModel):
                 answer.is_old = True
                 answer.save()
 
+    def answers_for(self, questions):
+        answers = []
+        for question in questions:
+            answer_class = question.answer_class()
+            answer = answer_class.objects.filter(question=question, householdmember=self)
+            if answer:
+                answer = answer[0]
+                if question.is_multichoice():
+                    option = answer.answer
+                    answers.append(option.order)
+                    answers.append(option.text)
+                else:
+                    answers.append(answer.answer)
+            else:
+                answers.append('')
+        return answers
+
     class Meta:
         app_label = 'survey'
         get_latest_by = 'created'

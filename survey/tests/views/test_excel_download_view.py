@@ -5,7 +5,7 @@ from django.contrib.auth.models import User, Group, Permission
 
 from django.contrib.contenttypes.models import ContentType
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import GroupCondition, HouseholdMemberGroup
+from survey.models import GroupCondition, HouseholdMemberGroup, BatchQuestionOrder
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household
 from survey.models.backend import Backend
@@ -37,8 +37,17 @@ class ExcelDownloadTest(BaseTest):
 
         self.question_3 = Question.objects.create(text="How many of them are male?", answer_type=Question.TEXT, order=3, identifier="QUESTION_3", group=self.member_group)
         self.question_3.batches.add(self.batch)
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=Location.objects.create(name="Kampala"), backend = Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, uid=0)
+
+        BatchQuestionOrder.objects.create(question=self.question_1, batch=self.batch, order=1)
+        BatchQuestionOrder.objects.create(question=self.question_2, batch=self.batch, order=2)
+        BatchQuestionOrder.objects.create(question=self.question_3, batch=self.batch, order=3)
+
+        location_type = LocationType.objects.create(name='Location', slug='location')
+        kampala = Location.objects.create(name="Kampala", type=location_type)
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=kampala,
+                                                        backend = Backend.objects.create(name='something'))
+        self.household = Household.objects.create(investigator=self.investigator, uid=0, household_code='00010001',
+                                                  location=kampala)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname", date_of_birth=date(2000, 9, 1))
 
         self.investigator.member_answered(self.question_1, self.household_head, answer=1, batch=self.batch)
@@ -49,16 +58,16 @@ class ExcelDownloadTest(BaseTest):
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         self.client.login(username='Rajni', password='I_Rock')
 
-
     def test_downloaded_excel_file(self):
         file_name = "%s.csv" % self.batch.name
         response = self.client.post('/aggregates/spreadsheet_report', data={'batch': self.batch.pk})
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
+        household_id = self.household.household_code
 
-        row1 = ['Location', 'Household Head Name', 'QUESTION_1', 'QUESTION_2', '', 'QUESTION_3']
-        row2 = ['Kampala',  'Surname',             '1',            '1',            'OPTION 1', 'ANSWER']
+        row1 = ['Location', 'Household ID', 'Name', 'Date of Birth', 'Gender', 'QUESTION_1', 'QUESTION_2', '', 'QUESTION_3']
+        row2 = ['Kampala', household_id, 'Surname', '2000-09-01',     'Male',      '1',       '1', 'OPTION 1',  'ANSWER']
 
         contents = "%s\r\n%s\r\n" % (",".join(row1), ",".join(row2))
 

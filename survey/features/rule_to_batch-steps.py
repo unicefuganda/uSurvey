@@ -14,7 +14,7 @@ def save_batch_to_question(question, batch):
 @step(u'And I have a question')
 def and_i_have_a_question(step):
     world.question = Question.objects.create(text="question1", answer_type=Question.NUMBER, order=1,
-                                             group=world.household_member_group, module=world.module)
+                                             group=world.household_member_group, module=world.module, identifier='ID 1')
 
 
 @step(u'And I assign batch to these questions')
@@ -192,9 +192,9 @@ def and_i_should_see_all_the_action_dropdown_options(step):
 @step(u'And I have two subquestions for this question')
 def and_i_have_two_subquestions_for_this_question(step):
     world.sub_question1 = Question.objects.create(text="sub question1", answer_type=Question.NUMBER, subquestion=True,
-                                                  parent=world.question)
+                                                  parent=world.question, identifier='ID 2')
     world.sub_question2 = Question.objects.create(text="sub question2", answer_type=Question.NUMBER, subquestion=True,
-                                                  parent=world.question)
+                                                  parent=world.question, identifier='ID 3')
     world.sub_question1.batches.add(world.batch)
     world.sub_question2.batches.add(world.batch)
 
@@ -228,7 +228,8 @@ def then_i_should_see_a_modal_for_add_subquestion(step):
 @step(u'When I fill the subquestion details')
 def when_i_fill_the_subquestion_details(step):
     world.data = {'text': 'hritik question',
-                  'answer_type': Question.NUMBER}
+                  'answer_type': Question.NUMBER,
+                  'identifier': 'ID 4'}
 
     world.page.fill_valid_values(world.data)
 
@@ -309,15 +310,15 @@ def and_i_should_see_question_in_the_attribute(step):
 @step(u'And I have a subquestion under this question')
 def and_i_have_a_subquestion_under_this_question(step):
     world.sub_question = Question.objects.create(subquestion=True, parent=world.question,
-                                                 text="this is a subquestion")
+                                                 text="this is a subquestion", identifier='ID 4')
 
 
 @step(u'When I fill the  duplicate subquestion details')
 def when_i_fill_the_duplicate_subquestion_details(step):
-    world.page.fill_valid_values({'text': world.sub_question.text})
+    world.page.fill_valid_values({'text': world.sub_question.text,
+                                  'identifier': world.sub_question.identifier})
     world.page.select('group', [world.household_member_group.pk])
     world.page.select('answer_type', [Question.NUMBER])
-
 
 @step(u'And I should see error on the form text field')
 def and_i_should_see_error_on_the_form_text_field(step):
@@ -330,6 +331,7 @@ def when_i_refill_the_form_with_valid_values(step):
     world.data = {
         'text': world.sub_question.text + "edited text",
         'answer_type': Question.NUMBER,
+        'identifier': 'ID 5',
         'group': world.household_member_group.pk
     }
     world.page.fill_valid_values({'text': world.data['text']})
