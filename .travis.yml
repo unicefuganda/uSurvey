@@ -17,7 +17,7 @@ before_install:
   - wget http://phantomjs.googlecode.com/files/phantomjs-1.9.1-linux-x86_64.tar.bz2
   - tar xjf phantomjs-1.9.1-linux-x86_64.tar.bz2
   - sudo rm -rf /usr/local/phantomjs
-  - sudo ln -fs  phantomjs-1.9.1-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+  - sudo mv  phantomjs-1.9.1-linux-x86_64 /usr/local/phantomjs
   - which phantomjs
   - phantomjs --version
 
