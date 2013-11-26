@@ -177,7 +177,6 @@ class HouseholdMemberTest(TestCase):
         BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
         BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
 
-
         group_order, question_order = household_member.get_next_question_orders(None)
         self.assertEqual(0, group_order)
         self.assertEqual(0, question_order)
@@ -470,16 +469,16 @@ class HouseholdMemberTest(TestCase):
         batch_2.open_for_location(investigator.location)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         self.assertTrue(household_member.can_retake_survey(batch, 5))
         self.assertTrue(household_member.can_retake_survey(batch_2, 5))
@@ -491,18 +490,18 @@ class HouseholdMemberTest(TestCase):
         ten_minutes_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(minutes=20)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household,
-                                                created=ten_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=ten_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household,
-                                                created=ten_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=ten_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
         self.assertFalse(household_member.can_retake_survey(batch, 5))
         self.assertFalse(household_member_2.can_retake_survey(batch, 5))
         self.assertTrue(household_member.can_retake_survey(batch_2, 5))
@@ -513,20 +512,20 @@ class HouseholdMemberTest(TestCase):
         three_minutes_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(minutes=3)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household,
-                                                created=ten_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=ten_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household,
-                                                created=three_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=three_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household,
-                                                created=three_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=three_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household,
-                                                created=ten_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=ten_minutes_ago)
 
         self.assertFalse(household_member.can_retake_survey(batch, 5))
         self.assertTrue(household_member_2.can_retake_survey(batch, 5))
@@ -861,7 +860,7 @@ class HouseholdMemberTest(TestCase):
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                           male=False,
-                                                  household=household)
+                                                          household=household)
 
         batch = Batch.objects.create(name="Batch 1", order=1)
         group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
@@ -890,7 +889,7 @@ class HouseholdMemberTest(TestCase):
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                           male=False,
-                                                  household=household)
+                                                          household=household)
         batch = Batch.objects.create(name="Batch 1", order=1)
         group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
         group_condition = GroupCondition.objects.create(attribute="GENDER", condition="EQUALS", value=True)
@@ -920,7 +919,7 @@ class HouseholdMemberTest(TestCase):
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
-                                                  household=household)
+                                                          household=household)
         self.assertEqual(10, household_member.get_age())
 
     def test_year_of_birth_when_known(self):
@@ -932,7 +931,7 @@ class HouseholdMemberTest(TestCase):
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
-                                                  household=household)
+                                                          household=household)
         self.assertEqual(2003, household_member.get_year_of_birth())
 
     def test_year_of_birth_when_not_known(self):
@@ -944,7 +943,7 @@ class HouseholdMemberTest(TestCase):
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
-                                                  household=household)
+                                                          household=household)
         UnknownDOBAttribute.objects.create(household_member=household_member, type='YEAR')
         self.assertEqual(99, household_member.get_year_of_birth())
 
@@ -957,7 +956,7 @@ class HouseholdMemberTest(TestCase):
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
-                                                  household=household)
+                                                          household=household)
         self.assertEqual(8, household_member.get_month_of_birth())
 
     def test_month_of_birth_when_not_known(self):
@@ -969,7 +968,7 @@ class HouseholdMemberTest(TestCase):
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
-                                                  household=household)
+                                                          household=household)
         UnknownDOBAttribute.objects.create(household_member=household_member, type='MONTH')
         self.assertEqual(99, household_member.get_month_of_birth())
 

@@ -136,6 +136,4 @@ class Batch(BaseModel):
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")
     location = models.ForeignKey(Location, null=True, related_name="open_batches")
-
-    class Meta:
-        app_label = 'survey'
+    non_response = models.BooleanField(null=False, default=False)

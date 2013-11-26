@@ -199,6 +199,7 @@ class BatchLocationStatusTest(TestCase):
         kampala = Location.objects.create(name="Kampala")
         batch_location_status = BatchLocationStatus.objects.create(batch=batch_1, location=kampala)
         self.failUnless(batch_location_status.id)
+        self.assertFalse(batch_location_status.non_response)
 
     def test_open_and_close_for_location(self):
         batch_1 = Batch.objects.create(order=1)
