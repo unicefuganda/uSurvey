@@ -335,6 +335,7 @@ class HouseholdBatchCompletionTest(TestCase):
 
         self.assertFalse(household.has_completed_batch(batch))
 
+
 class BatchExportReportTest(TestCase):
     def test_knows_headers_for_batch_with_questions(self):
         country = LocationType.objects.create(name='Country', slug='country')
@@ -373,7 +374,7 @@ class BatchExportReportTest(TestCase):
         BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
 
         header_structure = [country.name, district.name, county.name, subcounty.name, parish.name, village.name,
-                            'Household ID', 'Name', 'Date of Birth', 'Gender', question_1.identifier,
+                            'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender', question_1.identifier,
                             question_2.identifier, '', question_3.identifier]
         expected_questions = [question_1, question_2, question_3]
 

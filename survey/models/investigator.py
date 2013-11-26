@@ -267,25 +267,26 @@ class Investigator(BaseModel):
                     for location in household_locations:
                         answers.append(location.name)
 
-                    answers = answers + [household.household_code, member.surname, str(member.date_of_birth),
+                    answers = answers + [household.household_code, member.surname, str(int(member.get_age())),
+                                         str(member.get_month_of_birth()), str(member.get_year_of_birth()),
                                          member_gender]
                     answers = answers + member.answers_for(questions)
                     data.append(answers)
 
     @classmethod
-    def sms_investigators_in_locations(self, locations, text):
+    def sms_investigators_in_locations(cls, locations, text):
         investigators = []
         for location in locations:
             investigators.extend(Investigator.lives_under_location(location))
         send(text, investigators)
 
     @classmethod
-    def lives_under_location(self, location):
+    def lives_under_location(cls, location):
         locations = location.get_descendants(include_self=True)
         return Investigator.objects.filter(location__in=locations)
 
     @classmethod
-    def genrate_completion_report(self,survey):
+    def genrate_completion_report(cls, survey):
         header = ['Investigator', 'Phone Number']
         header.extend([loc.name for loc in LocationType.objects.all()])
         data = [header]

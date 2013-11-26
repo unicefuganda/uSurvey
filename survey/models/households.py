@@ -267,6 +267,18 @@ class HouseholdMember(BaseModel):
         days_in_year = 365.2425
         return int((datetime.date.today() - self.date_of_birth).days / days_in_year)
 
+    def get_dob_attribute(self, type_):
+        unknown_attribute = self.unknown_dob_attribute.filter(type=type_)
+        if unknown_attribute.exists():
+            return 99
+        return getattr(self.date_of_birth, type_.lower())
+
+    def get_year_of_birth(self):
+        return self.get_dob_attribute('YEAR')
+
+    def get_month_of_birth(self):
+        return self.get_dob_attribute('MONTH')
+
     def get_next_batch(self):
         open_ordered_batches = Batch.open_ordered_batches(self.get_location())
 

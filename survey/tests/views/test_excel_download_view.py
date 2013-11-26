@@ -5,9 +5,9 @@ from django.contrib.auth.models import User, Group, Permission
 
 from django.contrib.contenttypes.models import ContentType
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import GroupCondition, HouseholdMemberGroup, BatchQuestionOrder
+from survey.models import GroupCondition, HouseholdMemberGroup, BatchQuestionOrder, UnknownDOBAttribute
 from survey.models.batch import Batch
-from survey.models.households import HouseholdHead, Household
+from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 
@@ -66,17 +66,38 @@ class ExcelDownloadTest(BaseTest):
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
         household_id = self.household.household_code
 
-        row1 = ['Location', 'Household ID', 'Name', 'Date of Birth', 'Gender', 'QUESTION_1', 'QUESTION_2', '', 'QUESTION_3']
-        row2 = ['Kampala', household_id, 'Surname', '2000-09-01',     'Male',      '1',       '1', 'OPTION 1',  'ANSWER']
+        row1 = ['Location', 'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender', 'QUESTION_1', 'QUESTION_2', '', 'QUESTION_3']
+        row2 = ['Kampala', household_id, 'Surname', '13', '9',  '2000',   'Male',      '1',       '1', 'OPTION 1',  'ANSWER']
 
         contents = "%s\r\n%s\r\n" % (",".join(row1), ",".join(row2))
+
+        self.assertEquals(contents, response.content)
+
+    def test_downloaded_excel_file_with_unknown_year_and_month_of_birth(self):
+        file_name = "%s.csv" % self.batch.name
+        member = HouseholdMember.objects.create(household=self.household, surname="someone", date_of_birth=date(2000, 9, 1))
+        UnknownDOBAttribute.objects.create(household_member=member, type="YEAR")
+        UnknownDOBAttribute.objects.create(household_member=member, type="MONTH")
+
+        response = self.client.post('/aggregates/spreadsheet_report', data={'batch': self.batch.pk})
+        self.assertEquals(200, response.status_code)
+        self.assertEquals(response.get('Content-Type'), "text/csv")
+        self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
+        household_id = self.household.household_code
+
+        row1 = ['Location', 'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender', 'QUESTION_1', 'QUESTION_2', '', 'QUESTION_3']
+        row2 = ['Kampala', household_id, 'Surname', '13', '9',  '2000',   'Male',      '1',       '1', 'OPTION 1',  'ANSWER']
+        row3 = ['Kampala', household_id, 'someone', '13', '99',  '99',   'Male', '', '', '']
+
+        contents = "%s\r\n%s\r\n%s\r\n" % (",".join(row1), ",".join(row2), ",".join(row3))
 
         self.assertEquals(contents, response.content)
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/spreadsheet_report')
 
-class ExcelDownloadViewTest(TestCase):
+
+class ExcelDownloadViewTest(BaseTest):
 
     def test_get(self):
         client = Client()
@@ -96,14 +117,6 @@ class ExcelDownloadViewTest(TestCase):
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/download_excel.html', templates)
         self.assertEquals(len(response.context['batches']), 0)
-
-    def assert_restricted_permission_for(self, url):
-        self.client.logout()
-
-        self.client.login(username='useless', password='I_Suck')
-        response = self.client.get(url)
-
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%url, status_code=302, target_status_code=200, msg_prefix='')
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/download_spreadsheet')

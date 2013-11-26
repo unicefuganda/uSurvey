@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, AnswerRule, BatchQuestionOrder
+from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, AnswerRule, BatchQuestionOrder, UnknownDOBAttribute
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import HouseholdMember, Household, HouseholdHead
 from survey.models.backend import Backend
@@ -910,3 +910,66 @@ class HouseholdMemberTest(TestCase):
         investigator.member_answered(question_1, household_member, 1, batch)
 
         self.assertTrue(household_member.all_questions_answered([question_1], batch))
+
+    def test_get_age(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
+                                                          male=False,
+                                                  household=household)
+        self.assertEqual(10, household_member.get_age())
+
+    def test_year_of_birth_when_known(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
+                                                          male=False,
+                                                  household=household)
+        self.assertEqual(2003, household_member.get_year_of_birth())
+
+    def test_year_of_birth_when_not_known(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
+                                                          male=False,
+                                                  household=household)
+        UnknownDOBAttribute.objects.create(household_member=household_member, type='YEAR')
+        self.assertEqual(99, household_member.get_year_of_birth())
+
+    def test_month_of_birth_when_known(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
+                                                          male=False,
+                                                  household=household)
+        self.assertEqual(8, household_member.get_month_of_birth())
+
+    def test_month_of_birth_when_not_known(self):
+        country = LocationType.objects.create(name="Country", slug="country")
+
+        uganda = Location.objects.create(name="Uganda", type=country)
+        investigator = Investigator.objects.create(name="inv1", location=uganda,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
+                                                          male=False,
+                                                  household=household)
+        UnknownDOBAttribute.objects.create(household_member=household_member, type='MONTH')
+        self.assertEqual(99, household_member.get_month_of_birth())
+

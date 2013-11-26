@@ -73,7 +73,7 @@ class Batch(BaseModel):
         batch_questions = self.all_questions()
 
         location_types = LocationType.objects.filter()
-        other_headers = ['Household ID', 'Name', 'Date of Birth', 'Gender']
+        other_headers = ['Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender']
         for location_type in location_types:
             header.append(location_type.name)
 
