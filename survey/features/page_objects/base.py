@@ -185,7 +185,7 @@ class PageObject(object):
 
     def validate_form_present(self, form):
         for key in form.keys():
-            assert self.browser.find_by_name(key)
+            assert self.browser.find_by_name(key).first
             self.is_text_present(form[key])
 
     def validate_form_values(self, form_values):

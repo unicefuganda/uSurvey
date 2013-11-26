@@ -382,7 +382,6 @@ def when_i_click_delete_logic_icon(step):
 
 @step(u'And I click confirm delete')
 def and_i_click_confirm_delete(step):
-    world.page.browser.execute_script('document.getElementById("body").innerHTML = "<p>Hello world!</p>"')
     world.page.click_by_css('#delete-logic-%s' % world.answer_rule.id)
 
 
@@ -432,18 +431,18 @@ def then_i_see_the_sub_question_form_with_values(step):
     world.form = {'module': 'Module',
                   'text': 'Text',
                   'group': 'Group',
-                  'identifier': 'ID 1',
                   'answer_type': 'Answer type'}
 
     form_values = {'module': world.module.id, 'text': world.sub_question.text,
-                   'group': world.multi_choice_question.group.id, 'identifier': 'ID 1',
+                   'group': world.multi_choice_question.group.id,
+                   'identifier': 'ID 1',
                    'answer_type': world.sub_question.answer_type}
     world.page.validate_form_present(world.form)
     world.page.validate_form_values(form_values)
 
 @step(u'When I fill in edited sub question details')
 def when_i_fill_in_edited_sub_question_details(step):
-    world.edited_sub_question_details = {'module': world.module.id, 'text': 'edited question', 'identifier': 'ID 1',
+    world.edited_sub_question_details = {'identifier': 'ID 1', 'module': world.module.id, 'text': 'edited question',
                                          'group': world.multi_choice_question.group.id
     }
     world.page.see_select_option(['Number'], 'answer_type')
