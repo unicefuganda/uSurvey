@@ -52,6 +52,16 @@ class Batch(BaseModel):
 
         return self.open_locations.get_or_create(batch=self, location=location)
 
+    def activate_non_response_for(self, location, status=True):
+        all_related_locations = location.get_descendants(include_self=True).all()
+        for related_location in all_related_locations:
+            batch_location_status = self.open_locations.get_or_create(batch=self, location=related_location)[0]
+            batch_location_status.non_response = status
+            batch_location_status.save()
+
+    def deactivate_non_response_for(self, location):
+        self.activate_non_response_for(location, False)
+
     def is_closed_for(self, location):
         return self.open_locations.filter(location=location).count() == 0
 

@@ -304,6 +304,48 @@ class BatchLocationStatusTest(TestCase):
         batch.close_for_location(kampala)
         self.assertFalse(batch.can_be_deleted())
 
+    def test_activate_non_response_for_location(self):
+        batch = Batch.objects.create(order=1)
+        kampala = Location.objects.create(name="Kampala")
+        bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
+        abim = Location.objects.create(name="Abim")
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+                                                     backend=Backend.objects.create(name='something'))
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+                                                     backend=Backend.objects.create(name='something1'))
+
+        self.assertEqual(len(investigator_1.get_open_batch()), 0)
+        self.assertEqual(len(investigator_2.get_open_batch()), 0)
+
+        batch.open_for_location(kampala)
+
+        batch.activate_non_response_for(kampala)
+
+        self.assertEqual(1, batch.open_locations.filter(non_response=True, location=kampala).count())
+        self.assertEqual(1, batch.open_locations.filter(non_response=True, location=bukoto).count())
+
+    def test_de_activate_non_response_for_location(self):
+        batch = Batch.objects.create(order=1)
+        kampala = Location.objects.create(name="Kampala")
+        bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
+        abim = Location.objects.create(name="Abim")
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+                                                     backend=Backend.objects.create(name='something'))
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+                                                     backend=Backend.objects.create(name='something1'))
+
+        self.assertEqual(len(investigator_1.get_open_batch()), 0)
+        self.assertEqual(len(investigator_2.get_open_batch()), 0)
+
+        batch.activate_non_response_for(kampala)
+
+        batch.deactivate_non_response_for(kampala)
+
+        self.assertEqual(0, batch.open_locations.filter(non_response=True, location=kampala).count())
+        self.assertEqual(0, batch.open_locations.filter(non_response=True, location=bukoto).count())
+        self.assertEqual(1, batch.open_locations.filter(non_response=False, location=kampala).count())
+        self.assertEqual(1, batch.open_locations.filter(non_response=False, location=bukoto).count())
+
 
 class HouseholdBatchCompletionTest(TestCase):
     def test_store(self):
