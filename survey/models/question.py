@@ -97,7 +97,6 @@ class Question(BaseModel):
 
         raise ObjectDoesNotExist
 
-
     def next_question(self, location, member=None):
         order = self.parent.order if self.subquestion else self.order
         batch = self.parent.batches.all()[0] if self.subquestion else self.batches.all()[0]

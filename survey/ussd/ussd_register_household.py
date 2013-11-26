@@ -1,7 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from datetime import date, datetime
 from django.core.exceptions import ObjectDoesNotExist
-from survey.models import Question, HouseholdHead
+from survey.models import Question, HouseholdHead, UnknownDOBAttribute
 from survey.models.households import HouseholdMember
 from survey.ussd.ussd import USSD
 
@@ -13,7 +13,7 @@ class USSDRegisterHousehold(USSD):
     }
     REGISTRATION_DICT = {}
 
-    UNKNOWN_AGE = 0
+    UNKNOWN = 99
 
     def __init__(self, investigator, request):
         super(USSDRegisterHousehold, self).__init__(investigator, request)
@@ -151,7 +151,6 @@ class USSDRegisterHousehold(USSD):
 
     def process_registration_answer(self, answer):
         answer = int(answer) if answer.isdigit() else answer
-
         if not answer and answer != 0:
             self.investigator.invalid_answer(self.question)
             return self.question
@@ -162,6 +161,7 @@ class USSDRegisterHousehold(USSD):
             return self.question
 
         age_question = Question.objects.get(text__startswith="Please Enter the age")
+
         if self.is_year_question_answered() and not self.age_validates(answer):
             self.investigator.invalid_answer(age_question)
             return age_question
@@ -198,46 +198,62 @@ class USSDRegisterHousehold(USSD):
             self.investigator.set_in_cache('HOUSEHOLD', self.household)
             self.responseString = USSD.MESSAGES['END_REGISTRATION']
 
-    def save_member_object(self):
+    def process_member_attributes(self):
         member_dict = {}
         name_question = Question.objects.get(text__startswith="Please Enter the name")
         age_question = Question.objects.get(text__startswith="Please Enter the age")
         gender_question = Question.objects.get(text__startswith="Please Enter the gender")
+        month_of_birth_question = Question.objects.get(text__startswith="Please Enter the month of birth")
+        month_of_birth = self.REGISTRATION_DICT[month_of_birth_question.text].order
 
         member_dict['surname'] = self.REGISTRATION_DICT[name_question.text]
         member_dict['male'] = self.format_gender_response(gender_question)
+        member_dict['date_of_birth'] = self.format_age_to_date_of_birth(age_question, month_of_birth)
 
-        if self.REGISTRATION_DICT[age_question.text] == self.UNKNOWN_AGE:
-            month_of_birth_question = Question.objects.get(text__startswith="Please Enter the month of birth")
-            year_of_birth_question = Question.objects.get(text__startswith="Please Enter the year of birth")
-            member_dict['date_of_birth'] = self.get_date_of_birth_from(year_of_birth_question, month_of_birth_question)
-        else:
-            member_dict['date_of_birth'] = self.format_age_to_date_of_birth(age_question)
+        year_of_birth_question = Question.objects.get(text__startswith="Please Enter the year of birth")
+        year_of_birth = self.REGISTRATION_DICT[year_of_birth_question.text]
+        attributes = {'MONTH': month_of_birth,
+                      'YEAR': year_of_birth}
 
-        object_to_create = HouseholdHead if self.is_head else HouseholdMember
-        member = object_to_create.objects.create(surname=member_dict['surname'], male=member_dict['male'],
-                                                 date_of_birth=member_dict['date_of_birth'], household=self.household)
+        return member_dict, attributes
+
+    def save_member_object(self):
+        member_dict, unknown_attributes = self.process_member_attributes()
+        member = self.save_member(member_dict)
+        self.save_unknown_dob_attributes(member, unknown_attributes)
         self.set_in_session('HOUSEHOLD_MEMBER', member)
 
-    def format_age_to_date_of_birth(self, question):
-        age = self.REGISTRATION_DICT[question.text]
+    def save_unknown_dob_attributes(self, member, unknown_attributes):
+        for type_, attribute in unknown_attributes.items():
+            self.save_attribute(type_, attribute, member)
+
+    def save_attribute(self, type_, attribute, member):
+        if attribute == self.UNKNOWN:
+            UnknownDOBAttribute.objects.create(household_member=member, type=type_)
+
+    def save_member(self, member_dict):
+        object_to_create = HouseholdHead if self.is_head else HouseholdMember
+        return object_to_create.objects.create(surname=member_dict['surname'], male=member_dict['male'],
+                                               date_of_birth=member_dict['date_of_birth'], household=self.household)
+
+    def format_age_to_date_of_birth(self, age_question, month_of_birth):
+        age = self.REGISTRATION_DICT[age_question.text]
         today = date.today()
         date_of_birth = today.replace(year=(today.year - int(age)))
+        if month_of_birth != self.UNKNOWN:
+            date_of_birth = date_of_birth.replace(month=int(month_of_birth))
         return date_of_birth
 
     def format_gender_response(self, question):
         return self.REGISTRATION_DICT[question.text] == 1
 
-    def get_date_of_birth_from(self, year_of_birth_question, month_of_birth_question):
-        year = int(self.REGISTRATION_DICT[year_of_birth_question.text])
-        month = self.REGISTRATION_DICT[month_of_birth_question.text].order
-        return datetime(year, month, 1)
-
     def is_year_question_answered(self):
         return "year of birth" in self.question.text
 
     def age_validates(self, answer):
-        age_question = Question.objects.get(text__startswith="Please Enter the age")
-        given_age = self.REGISTRATION_DICT[age_question.text]
-        inferred_year_of_birth = date.today().year - int(given_age)
-        return inferred_year_of_birth == int(answer)
+        if answer != self.UNKNOWN:
+            age_question = Question.objects.get(text__startswith="Please Enter the age")
+            given_age = self.REGISTRATION_DICT[age_question.text]
+            inferred_year_of_birth = date.today().year - int(given_age)
+            return inferred_year_of_birth == int(answer)
+        return True

@@ -428,16 +428,11 @@ def and_i_click_edit_sub_question_link(step):
 
 @step(u'Then I see the sub question form with values')
 def then_i_see_the_sub_question_form_with_values(step):
-    world.form = {'module': 'Module',
-                  'text': 'Text',
-                  'group': 'Group',
-                  'answer_type': 'Answer type'}
 
     form_values = {'module': world.module.id, 'text': world.sub_question.text,
                    'group': world.multi_choice_question.group.id,
                    'identifier': 'ID 1',
                    'answer_type': world.sub_question.answer_type}
-    world.page.validate_form_present(world.form)
     world.page.validate_form_values(form_values)
 
 @step(u'When I fill in edited sub question details')

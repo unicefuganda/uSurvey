@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdMemberBatchCompletion, QuestionModule, BatchQuestionOrder, Survey, RandomHouseHoldSelection
+from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdMemberBatchCompletion, QuestionModule, BatchQuestionOrder, Survey, RandomHouseHoldSelection, QuestionOption
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
@@ -692,17 +692,35 @@ class USSDTestCompleteFlow(USSDBaseTest):
         HouseholdHead.objects.create(household=household,
                                      surname="Name " + str(randint(1, 9999)),
                                      date_of_birth=datetime.date(1980, 9, 1))
-        registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP", order=4)
+        self.registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
+                                                                                          order=0)
         module = QuestionModule.objects.create(name='Registration')
+        self.question_1 = Question.objects.create(module=module, text="Please Enter the name",
+                                answer_type=Question.TEXT, order=1, group=self.registration_group)
+        self.age_question = Question.objects.create(module=module, text="Please Enter the age",
+                                answer_type=Question.NUMBER, order=2, group=self.registration_group)
+        self.month_question = Question.objects.create(module=module, text="Please Enter the month of birth",
+                                                 answer_type=Question.MULTICHOICE, order=3,
+                                                 group=self.registration_group)
+        QuestionOption.objects.create(question=self.month_question, text="January", order=1)
+        QuestionOption.objects.create(question=self.month_question, text="February", order=2)
+        QuestionOption.objects.create(question=self.month_question, text="March", order=3)
+        QuestionOption.objects.create(question=self.month_question, text="April", order=4)
+        QuestionOption.objects.create(question=self.month_question, text="May", order=5)
+        QuestionOption.objects.create(question=self.month_question, text="June", order=6)
+        QuestionOption.objects.create(question=self.month_question, text="July", order=7)
+        QuestionOption.objects.create(question=self.month_question, text="August", order=8)
+        QuestionOption.objects.create(question=self.month_question, text="September", order=9)
+        QuestionOption.objects.create(question=self.month_question, text="October", order=10)
+        QuestionOption.objects.create(question=self.month_question, text="November", order=11)
+        QuestionOption.objects.create(question=self.month_question, text="December", order=12)
+        QuestionOption.objects.create(question=self.month_question, text="DONT KNOW", order=99)
 
-        Question.objects.create(module=module, text="Please Enter the name",
-                                answer_type=Question.TEXT, order=1, group=registration_group)
+        self.year_question = Question.objects.create(module=module, text="Please Enter the year of birth",
+                                                answer_type=Question.NUMBER, order=4, group=self.registration_group)
+        self.gender_question = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
+                                                  answer_type=Question.NUMBER, order=5, group=self.registration_group)
 
-        Question.objects.create(module=module, text="Please Enter the age",
-                                answer_type=Question.TEXT, order=2, group=registration_group)
-
-        Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
-                                answer_type=Question.NUMBER, order=3, group=registration_group)
         selected_household_id = '2'
         household = Household.objects.get(uid=selected_household_id)
         HouseholdHead.objects.create(household=household, surname="head_registered",
@@ -717,7 +735,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
                     self.respond('1')
                     self.select_household()
                     self.respond("Name 2")
-                    self.respond("20")
+                    some_age = 20
+                    self.respond(some_age)
+                    self.respond("2")
+                    self.respond(datetime.datetime.now().year - some_age)
                     response = self.respond("1")
 
                 with patch.object(USSDSurvey, 'is_active', return_value=True):
@@ -725,7 +746,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.respond('1')
                 self.select_household()
                 self.respond("Name")
-                self.respond("20")
+                some_age = 20
+                self.respond(some_age)
+                self.respond("2")
+                self.respond(datetime.datetime.now().year - some_age)
                 response = self.respond("2")
                 response_string = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
