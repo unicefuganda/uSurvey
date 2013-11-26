@@ -165,38 +165,46 @@ class USSDRegisterHousehold(USSD):
         if self.is_year_question_answered() and not self.age_validates(answer):
             self.investigator.invalid_answer(age_question)
             return age_question
+        return self.get_next_question(answer)
 
+    def get_next_question(self, answer):
         try:
-            answer_class = self.question.answer_class()
-            if self.question.is_multichoice():
-                answer = self.question.get_option(answer, self.investigator)
-                if not answer:
-                    return self.question
-
-            _answer = answer_class(answer=answer)
-            next_question = self.question.get_next_question_by_rule(_answer, self.investigator)
-            if next_question != self.question:
-                next_question.order = self.question.order
-                self.REGISTRATION_DICT[self.question.text] = answer
-                self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
-
+            next_question = self.next_question_by_rule(answer)
         except ObjectDoesNotExist, e:
-            self.REGISTRATION_DICT[self.question.text] = answer
-            self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
-            next_question = self.get_next_registration_question()
-
+            self.save_in_registration_dict(answer)
+            next_question = self.next_question_by_order()
+        self.save_in_registration_dict(answer)
         return next_question
 
-    def get_next_registration_question(self):
+    def next_question_by_rule(self, answer):
+        answer_class = self.question.answer_class()
+        if self.question.is_multichoice():
+            answer = self.question.get_option(answer, self.investigator)
+            if not answer:
+                return self.question
+        _answer = answer_class(answer=answer)
+        next_question = self.question.get_next_question_by_rule(_answer, self.investigator)
+        if next_question != self.question:
+            next_question.order = self.question.order
+        return next_question
+
+    def next_question_by_order(self):
         next_questions = Question.objects.filter(group__name="REGISTRATION GROUP",
                                                  order__gte=self.question.order + 1).order_by('order')
-        if next_questions:
-            return next_questions[0]
-        else:
-            self.save_member_object()
-            self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
-            self.investigator.set_in_cache('HOUSEHOLD', self.household)
-            self.responseString = USSD.MESSAGES['END_REGISTRATION']
+        if not next_questions:
+            self.save_member_and_clear_cache()
+            return None
+        return next_questions[0]
+
+    def save_in_registration_dict(self, answer):
+        self.REGISTRATION_DICT[self.question.text] = answer
+        self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
+
+    def save_member_and_clear_cache(self):
+        self.save_member_object()
+        self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
+        self.investigator.set_in_cache('HOUSEHOLD', self.household)
+        self.responseString = USSD.MESSAGES['END_REGISTRATION']
 
     def process_member_attributes(self):
         member_dict = {}
@@ -204,7 +212,7 @@ class USSDRegisterHousehold(USSD):
         age_question = Question.objects.get(text__startswith="Please Enter the age")
         gender_question = Question.objects.get(text__startswith="Please Enter the gender")
         month_of_birth_question = Question.objects.get(text__startswith="Please Enter the month of birth")
-        month_of_birth = self.REGISTRATION_DICT[month_of_birth_question.text].order
+        month_of_birth = self.REGISTRATION_DICT[month_of_birth_question.text]
 
         member_dict['surname'] = self.REGISTRATION_DICT[name_question.text]
         member_dict['male'] = self.format_gender_response(gender_question)
