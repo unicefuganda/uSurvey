@@ -98,7 +98,6 @@ class BatchTest(TestCase):
         self.assertIsNone(household_member.get_next_batch())
         self.assertEqual(batch, another_household_member.get_next_batch())
 
-
     def test_knows_has_unanswered_questions_in_member_group(self):
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 5 years", order=1)
         condition = GroupCondition.objects.create(attribute="AGE", value=5, condition="GREATER_THAN")
@@ -174,7 +173,6 @@ class BatchTest(TestCase):
         BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
         BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
         BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
-
 
         batch_groups = [group_1, group_2, group_3]
         self.assertEqual(3, len(batch.get_groups()))
@@ -345,6 +343,27 @@ class BatchLocationStatusTest(TestCase):
         self.assertEqual(0, batch.open_locations.filter(non_response=True, location=bukoto).count())
         self.assertEqual(1, batch.open_locations.filter(non_response=False, location=kampala).count())
         self.assertEqual(1, batch.open_locations.filter(non_response=False, location=bukoto).count())
+
+    def test_knows_is_non_response_is_activate_for_location(self):
+        batch = Batch.objects.create(order=1)
+        kampala = Location.objects.create(name="Kampala")
+        bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
+        abim = Location.objects.create(name="Abim")
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+                                                     backend=Backend.objects.create(name='something'))
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+                                                     backend=Backend.objects.create(name='something1'))
+
+        self.assertEqual(len(investigator_1.get_open_batch()), 0)
+        self.assertEqual(len(investigator_2.get_open_batch()), 0)
+
+        batch.activate_non_response_for(kampala)
+        self.assertTrue(batch.non_response_is_activated_for(kampala))
+        self.assertTrue(batch.non_response_is_activated_for(bukoto))
+
+        batch.deactivate_non_response_for(kampala)
+        self.assertFalse(batch.non_response_is_activated_for(kampala))
+        self.assertFalse(batch.non_response_is_activated_for(bukoto))
 
 
 class HouseholdBatchCompletionTest(TestCase):

@@ -170,3 +170,17 @@ def list_batches(request):
         json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
         return HttpResponse(json_dump, mimetype='application/json')
     return render(request, 'layout.html')
+
+
+def activate_non_response(request, batch_id):
+    batch = Batch.objects.get(id=batch_id)
+    location = Location.objects.get(id=request.POST['location_id'])
+    batch.activate_non_response_for(location)
+    return HttpResponse(json.dumps(""), content_type="application/json")
+
+
+def deactivate_non_response(request, batch_id):
+    batch = Batch.objects.get(id=batch_id)
+    location = Location.objects.get(id=request.POST['location_id'])
+    batch.deactivate_non_response_for(location)
+    return HttpResponse(json.dumps(""), content_type="application/json")

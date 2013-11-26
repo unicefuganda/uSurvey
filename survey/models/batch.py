@@ -62,6 +62,9 @@ class Batch(BaseModel):
     def deactivate_non_response_for(self, location):
         self.activate_non_response_for(location, False)
 
+    def non_response_is_activated_for(self, location):
+        return self.open_locations.filter(location=location, non_response=True).count() > 0
+
     def is_closed_for(self, location):
         return self.open_locations.filter(location=location).count() == 0
 
