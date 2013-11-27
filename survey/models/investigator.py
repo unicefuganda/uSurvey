@@ -38,6 +38,7 @@ class Investigator(BaseModel):
         'INVALID_ANSWER': [],
         'CONFIRM_END_INTERVIEW': [],
         'IS_REGISTERING_HOUSEHOLD': None,
+        'IS_REPORTING_NON_RESPONSE': False,
         'registration_dict': {},
         'is_head': None,
         'is_selecting_member': False
@@ -144,8 +145,16 @@ class Investigator(BaseModel):
             questions.remove(question)
             self.set_in_cache(label, questions)
 
-    def households_list(self, page=1, registered=False, open_survey=None):
+    def filter_non_completed_households(self, all_households):
+        all_completed_households = self.batch_completion_completed_households.all().values_list('household', flat=True)
+        non_completed_households = filter(lambda household: household.id not in all_completed_households, all_households)
+        return non_completed_households
+
+    def households_list(self, page=1, registered=False, open_survey=None, non_response_reporting=False):
         all_households = list(self.all_households(open_survey))
+        if non_response_reporting:
+            all_households = self.filter_non_completed_households(all_households)
+
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
         households_list = []

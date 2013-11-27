@@ -43,6 +43,9 @@ class USSDBaseTest(TestCase):
     def take_survey(self):
         return self.respond("2")
 
+    def report_non_response(self):
+        return self.respond('3')
+
     def select_household(self, household_id="1"):
         self.ussd_params['response'] = "true"
         self.ussd_params['ussdRequestString'] = household_id

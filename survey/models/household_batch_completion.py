@@ -16,4 +16,4 @@ class HouseholdMemberBatchCompletion(BaseModel):
 class HouseholdBatchCompletion(BaseModel):
     household = models.ForeignKey(Household, null=True, related_name="batch_completion_batches")
     batch = models.ForeignKey(Batch, null=True, related_name="batch_completion_households")
-    investigator = models.ForeignKey(Investigator, null=True)
+    investigator = models.ForeignKey(Investigator, null=True, related_name="batch_completion_completed_households")

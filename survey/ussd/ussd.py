@@ -114,12 +114,12 @@ class USSD(USSDBase):
     def invalid_answered_question(self):
         return self.question_present_in_cache('INVALID_ANSWER')
 
-    def get_household_list(self):
+    def get_household_list(self, non_response_reporting=False):
         open_survey = Survey.currently_open_survey(self.investigator.location)
         page = self.get_from_session('PAGE')
         self.responseString += "%s\n%s" % (
             self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page, registered=False,
-                                                                               open_survey=open_survey))
+                                                open_survey=open_survey, non_response_reporting=non_response_reporting))
 
     def clean_investigator_input(self):
         if self.is_new_request():
