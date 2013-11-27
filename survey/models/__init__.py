@@ -1,11 +1,11 @@
 from survey.models.answer_rule import AnswerRule
 from survey.models.backend import Backend
 from survey.models.base import BaseModel
-from survey.models.batch import Batch
+from survey.models.batch import Batch, BatchLocationStatus
 from survey.models.formula import Formula
-from survey.models.household_batch_completion import HouseholdMemberBatchCompletion, HouseholdMemberBatchCompletion
+from survey.models.household_batch_completion import HouseholdMemberBatchCompletion, HouseholdMemberBatchCompletion, HouseholdBatchCompletion
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
-from survey.models.households import Household, HouseholdHead
+from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.location_weight import LocationWeight
 from survey.models.locations import LocationAutoComplete, LocationCode
@@ -26,7 +26,7 @@ __all__ = [
     'TextAnswer',
     'NumericalAnswer',
     'MultiChoiceAnswer',
-    'Backend'
+    'Backend',
     'BaseModel',
     'Batch',
     'Formula',
@@ -51,4 +51,7 @@ __all__ = [
     'UploadErrorLog',
     'HouseholdMemberBatchCompletion',
     'UnknownDOBAttribute',
+    'BatchLocationStatus',
+    'HouseholdMember',
+    'HouseholdBatchCompletion',
 ]

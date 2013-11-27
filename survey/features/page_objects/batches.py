@@ -67,11 +67,19 @@ class BatchShowPage(PageObject):
         assert len(self.browser.find_by_css('input[checked=checked]')) == 0
 
     def open_batch_for(self, location):
-        self.browser.execute_script('$($("input:checkbox")[0]).parent().bootstrapSwitch("toggleState")')
+        self.browser.execute_script('$("#open_close_switch_%s").parent().bootstrapSwitch("toggleState")' % location.id)
         sleep(2)
 
     def close_batch_for(self, location):
-        self.browser.execute_script('$($("input:checkbox")[0]).parent().bootstrapSwitch("toggleState")')
+        self.browser.execute_script('$("#open_close_switch_%s").parent().bootstrapSwitch("toggleState")' % location.id)
+        sleep(2)
+
+    def activate_non_response_for_batch_and(self, location):
+        self.browser.execute_script('$("#activate_non_response_switch_%s").parent().bootstrapSwitch("toggleState")' % location.id)
+        sleep(2)
+
+    def deactivate_non_response_for_batch_and(self, location):
+        self.browser.execute_script('$("#activate_non_response_switch_%s").parent().bootstrapSwitch("toggleState")' % location.id)
         sleep(2)
 
 

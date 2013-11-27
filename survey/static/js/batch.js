@@ -5,14 +5,14 @@ jQuery(function($){
         load_questions_for_filter();
     }
 
-  $('.switch').on('switch-change', function(e, data){
+  $('.switch-open-close').on('switch-change', function(e, data){
     var current_switch = $(this);
     current_switch.parent().find('.error').remove();
     var $el = $(data.el), form;
     if (data.value) {
-      form = $el.parents('tr').find('form.open-for-location-form');
+      form = $el.parents('tr').find('form#open-for-location-form');
     }else{
-      form = $el.parents('tr').find('form.close-for-location-form');
+      form = $el.parents('tr').find('form#close-for-location-form');
     }
     $.post(form.attr('action'), form.serializeArray(), function(data){
         if(data !=''){
@@ -20,6 +20,20 @@ jQuery(function($){
             current_switch.bootstrapSwitch('setActive', false);
             current_switch.after('<span><label class="error">' + data + '</label></span>');
         }
+    });
+  });
+
+  $('.switch-activate-non-response').on('switch-change', function(e, data){
+    var current_switch = $(this);
+    current_switch.parent().find('.error').remove();
+    var $el = $(data.el), form;
+    if (data.value) {
+      form = $el.parents('tr').find('form#activate-non_response-for-location-form');
+    }else{
+      form = $el.parents('tr').find('form#deactivate-non_response-for-location-form');
+    }
+    $.post(form.attr('action'), form.serializeArray(), function(data){
+        if(data !=''){}
     });
   });
 

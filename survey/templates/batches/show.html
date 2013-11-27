@@ -15,6 +15,9 @@
         <th>
           Status
         </th>
+        <th>
+          Non response Status
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -25,18 +28,31 @@
             {{ location.name }}
           </td>
           <td>
-            <form action="{% url 'batch_open_page' batch.pk %}" method="POST" accept-charset="utf-8" class="hide open-for-location-form">
+            <form action="{% url 'batch_open_page' batch.pk %}" method="POST" accept-charset="utf-8" class="hide" id="open-for-location-form">
               {% csrf_token %}
               <input type="text" name="location_id" value="{{ location.pk }}">
             </form>
-            <form action="{% url 'batch_close_page' batch.pk %}" method="POST" accept-charset="utf-8" class="hide close-for-location-form">
+            <form action="{% url 'batch_close_page' batch.pk %}" method="POST" accept-charset="utf-8" class="hide" id="close-for-location-form">
               {% csrf_token %}
               <input type="text" name="location_id" value="{{ location.pk }}">
             </form>
-            <div class="switch" data-on="success" data-off="danger" data-on-label="Open" data-off-label="Close">
+            <div class="switch switch-open-close" data-on="success" data-off="danger" data-on-label="Open" data-off-label="Close">
               <input type="checkbox" id="open_close_switch_{{ location.id }}" {{ open_locations|is_batch_open_for_location:location }} />
             </div>
           </td>
+        <td>
+        <form action="{% url 'activate_non_response_page' batch.pk %}" method="POST" accept-charset="utf-8" class="hide" id="activate-non_response-for-location-form">
+          {% csrf_token %}
+          <input type="text" name="non_response_location_id" value="{{ location.pk }}">
+        </form>
+        <form action="{% url 'deactivate_non_response_page' batch.pk %}" method="POST" accept-charset="utf-8" class="hide" id="deactivate-non_response-for-location-form">
+          {% csrf_token %}
+          <input type="text" name="non_response_location_id" value="{{ location.pk }}">
+        </form>
+        <div class="switch switch-activate-non-response" data-on="success" data-off="danger" data-on-label="On" data-off-label="Off">
+          <input type="checkbox" id="activate_non_response_switch_{{ location.id }}" class="activate"/>
+        </div>
+        </td>
         </tr>
       {% endfor %}
     </tbody>

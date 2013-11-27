@@ -1,6 +1,6 @@
 Feature: Batch related features
 
-  Scenario: Open-Close Batch
+  Scenario: Open-Close and activate and deactivate non-response for batch
     Given I am logged in as researcher
     And I have prime locations
     And I have a survey
@@ -16,6 +16,11 @@ Feature: Batch related features
     When I open batch for a location
     Then I should see an error that another batch from another survey is already open
     And I should not be able to open this batch
+    When I activate non response for batch and location
+    Then I should see it is activated for that location in db
+    When I deactivate non response for batch and location
+    Then I should see it is deactivated for that location in db
+
 
   Scenario: Add new Batch
     Given I am logged in as researcher
