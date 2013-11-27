@@ -151,10 +151,7 @@ class Investigator(BaseModel):
         return non_completed_households
 
     def households_list(self, page=1, registered=False, open_survey=None, non_response_reporting=False):
-        all_households = list(self.all_households(open_survey))
-        if non_response_reporting:
-            all_households = self.filter_non_completed_households(all_households)
-
+        all_households = list(self.all_households(open_survey, non_response_reporting))
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
         households_list = []
@@ -171,9 +168,13 @@ class Investigator(BaseModel):
             households_list.append(self.NEXT_PAGE_TEXT)
         return "\n".join(households_list)
 
-    def all_households(self, open_survey=None):
+    def all_households(self, open_survey=None, non_response_reporting=False):
         all_households = self.households.order_by('created').all()
-        return all_households.filter(survey=open_survey) if open_survey else all_households
+        all_households = all_households.filter(survey=open_survey) if open_survey else all_households
+        if non_response_reporting:
+            all_households = self.filter_non_completed_households(all_households)
+
+        return all_households
 
     def completed_open_surveys(self, open_survey=None):
         for household in self.all_households(open_survey):
