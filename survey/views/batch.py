@@ -175,8 +175,11 @@ def list_batches(request):
 def activate_non_response(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     location = Location.objects.get(id=request.POST['non_response_location_id'])
-    batch.activate_non_response_for(location)
-    return HttpResponse(json.dumps(""), content_type="application/json")
+    if batch.is_open_for(location):
+        batch.activate_non_response_for(location)
+        return HttpResponse(json.dumps(""), content_type="application/json")
+    message = "%s is not open for %s" % (batch.name, location.name)
+    return HttpResponse(json.dumps(message), content_type="application/json")
 
 
 def deactivate_non_response(request, batch_id):

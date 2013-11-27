@@ -17,6 +17,10 @@ Feature: Batch related features
     Then I should see an error that another batch from another survey is already open
     And I should not be able to open this batch
     When I activate non response for batch and location
+    Then I should see message batch is closed that location
+    And I should not be able to activate this batch
+    When I open batch for a different location
+    And I activate non response for that location
     Then I should see it is activated for that location in db
     When I deactivate non response for batch and location
     Then I should see it is deactivated for that location in db

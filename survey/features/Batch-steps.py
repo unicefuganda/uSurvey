@@ -315,16 +315,32 @@ def when_i_activate_non_response_for_batch_and_location(step):
 
 @step(u'Then I should see it is activated for that location in db')
 def then_i_should_see_it_is_activated_for_that_location_in_db(step):
-    assert world.batch.non_response_is_activated_for(world.districts[1]) is True
-    assert world.batch.non_response_is_activated_for(world.districts[0]) is False
+    assert world.batch.non_response_is_activated_for(world.districts[0]) is True
+    assert world.batch.non_response_is_activated_for(world.districts[1]) is False
 
 
 @step(u'When I deactivate non response for batch and location')
 def when_i_deactivate_non_response_for_batch_and_location(step):
-    world.page.deactivate_non_response_for_batch_and(world.districts[1])
+    world.page.deactivate_non_response_for_batch_and(world.districts[0])
 
 
 @step(u'Then I should see it is deactivated for that location in db')
 def then_i_should_see_it_is_deactivated_for_that_location_in_db(step):
     assert world.batch.non_response_is_activated_for(world.districts[0]) is False
     assert world.batch.non_response_is_activated_for(world.districts[1]) is False
+
+@step(u'Then I should see message batch is closed that location')
+def then_i_should_see_message_batch_is_closed_that_location(step):
+    world.page.is_text_present("%s is not open for %s" % (world.batch.name, world.districts[1]))
+
+@step(u'And I should not be able to activate this batch')
+def and_i_should_not_be_able_to_activate_this_batch(step):
+    world.page.is_disabled("open_close_switch_%s" % world.districts[1].id)
+
+@step(u'When I open batch for a different location')
+def when_i_open_batch_for_a_different_location(step):
+    world.batch.open_for_location(world.districts[0])
+
+@step(u'And I activate non response for that location')
+def and_i_activate_non_response_for_that_location(step):
+    world.page.activate_non_response_for_batch_and(world.districts[0])

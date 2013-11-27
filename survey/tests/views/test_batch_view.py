@@ -75,7 +75,19 @@ class BatchViewsTest(BaseTest):
         json_response = json.loads(response.content)
         self.assertEqual('', json_response)
 
-    def test_activate_non_response_for_batch_and_location(self):
+    def test_should_not_activate_non_response_if_batch_is_not_open_for_location(self):
+        self.assertFalse(self.batch.is_open_for(self.kampala))
+        response = self.client.post('/batches/%s/non_response/activate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
+        self.failUnlessEqual(response.status_code, 200)
+
+        for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
+            self.assertFalse(self.batch.non_response_is_activated_for(loc))
+
+        json_response = json.loads(response.content)
+        self.assertEqual('%s is not open for %s'%(self.batch.name, self.kampala.name), json_response)
+
+    def test_should_activate_non_response_only_if_batch_is_already_open_for_location(self):
+        self.batch.open_for_location(self.kampala)
         self.assertFalse(self.batch.non_response_is_activated_for(self.kampala))
         response = self.client.post('/batches/%s/non_response/activate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
         self.failUnlessEqual(response.status_code, 200)

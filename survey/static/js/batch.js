@@ -70,7 +70,7 @@ function toggleStatus(element, forms_ids, data, switch_open_close){
       form = $el.parents('tr').find('form#'+forms_ids[1]);
     }
     $.post(form.attr('action'), form.serializeArray(), function(data){
-        if(data !='' &&  switch_open_close == true) {
+        if(data !='') {
              element.bootstrapSwitch('toggleState');
              element.bootstrapSwitch('setActive', false);
              element.after('<span><label class="error">' + data + '</label></span>');
