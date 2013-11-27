@@ -6,35 +6,11 @@ jQuery(function($){
     }
 
   $('.switch-open-close').on('switch-change', function(e, data){
-    var current_switch = $(this);
-    current_switch.parent().find('.error').remove();
-    var $el = $(data.el), form;
-    if (data.value) {
-      form = $el.parents('tr').find('form#open-for-location-form');
-    }else{
-      form = $el.parents('tr').find('form#close-for-location-form');
-    }
-    $.post(form.attr('action'), form.serializeArray(), function(data){
-        if(data !=''){
-            current_switch.bootstrapSwitch('toggleState');
-            current_switch.bootstrapSwitch('setActive', false);
-            current_switch.after('<span><label class="error">' + data + '</label></span>');
-        }
-    });
+      toggleStatus($(this), ['open-for-location-form', 'close-for-location-form'], data, true)
   });
 
   $('.switch-activate-non-response').on('switch-change', function(e, data){
-    var current_switch = $(this);
-    current_switch.parent().find('.error').remove();
-    var $el = $(data.el), form;
-    if (data.value) {
-      form = $el.parents('tr').find('form#activate-non_response-for-location-form');
-    }else{
-      form = $el.parents('tr').find('form#deactivate-non_response-for-location-form');
-    }
-    $.post(form.attr('action'), form.serializeArray(), function(data){
-        if(data !=''){}
-    });
+        toggleStatus($(this), ['activate-non_response-for-location-form', 'deactivate-non_response-for-location-form'], data, false)
   });
 
   var survey_id = $("#survey_id").val(),
@@ -83,4 +59,22 @@ function load_questions_for_filter(){
              $('#' + this.id + '-selectable').show();
         });
     });
+}
+
+function toggleStatus(element, forms_ids, data, switch_open_close){
+    element.parent().find('.error').remove();
+    var $el = $(data.el), form;
+    if (data.value) {
+      form = $el.parents('tr').find('form#'+forms_ids[0]);
+    }else{
+      form = $el.parents('tr').find('form#'+forms_ids[1]);
+    }
+    $.post(form.attr('action'), form.serializeArray(), function(data){
+        if(data !='' &&  switch_open_close == true) {
+             element.bootstrapSwitch('toggleState');
+             element.bootstrapSwitch('setActive', false);
+             element.after('<span><label class="error">' + data + '</label></span>');
+        }
+    });
+
 }
