@@ -159,7 +159,7 @@ class Investigator(BaseModel):
             household_head = household.get_head()
             text = "%s: Household-%s" % (all_households.index(household) + 1,  household.random_sample_number)
             text = "%s-%s"%(text, household_head.surname) if household_head else text
-            if registered and household.completed_currently_open_batches():
+            if household.has_completed_option_given_(registered, non_response_reporting):
                 text += "*"
             households_list.append(text)
         if households.has_previous():

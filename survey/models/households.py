@@ -198,6 +198,11 @@ class Household(BaseModel):
                 members_in_group.append(member)
         return members_in_group
 
+    def has_completed_option_given_(self, registered, non_response_reporting):
+        open_batch = Batch.currently_open_for(self.location)
+        has_answered_non_response = self.multichoiceanswer.filter(question__group__name="NON_RESPONSE", batch=open_batch)
+        return (registered and self.completed_currently_open_batches()) or (non_response_reporting and has_answered_non_response)
+
     @classmethod
     def set_related_locations(cls, households):
         for household in households:

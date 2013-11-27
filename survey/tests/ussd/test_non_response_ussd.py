@@ -7,13 +7,13 @@ from django.test import Client
 from rapidsms.contrib.locations.models import Location
 
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Backend, Survey, Investigator, Household, Batch, RandomHouseHoldSelection, QuestionModule, HouseholdMemberGroup, QuestionOption, Question, HouseholdHead
+from survey.models import Backend, Survey, Investigator, Household, Batch, RandomHouseHoldSelection, QuestionModule, HouseholdMemberGroup, QuestionOption, Question, HouseholdHead, MultiChoiceAnswer
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
 from survey.ussd.ussd_survey import USSDSurvey
 
 
-class USSDRegisteringHouseholdTest(USSDBaseTest):
+class USSDReportingNonResponseTest(USSDBaseTest):
     def setUp(self):
         self.client = Client()
         self.ussd_params = {
@@ -41,13 +41,13 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.household3 = self.create_household(3)
         self.household4 = self.create_household(4)
 
-        household_head = HouseholdHead.objects.create(surname="Bob", household=self.household1,
-                                                      date_of_birth="1990-9-9")
+        self.household_head = HouseholdHead.objects.create(surname="Bob", household=self.household1,
+                                                           date_of_birth="1990-9-9")
         self.none_response_group = HouseholdMemberGroup.objects.create(name="NON_RESPONSE", order=0)
         module = QuestionModule.objects.create(name='Registration')
         self.non_response_question = Question.objects.create(module=module,
                                                              text="Why did HH-%s-%s not take the survey" %
-                                                                  (self.household1.uid, household_head.surname),
+                                                                  (self.household1.uid, self.household_head.surname),
                                                              answer_type=Question.MULTICHOICE, order=1,
                                                              group=self.none_response_group)
         QuestionOption.objects.create(question=self.non_response_question, text="House closed", order=1)
@@ -158,7 +158,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                     non_response_question = "responseString=%s&action=request" % question_and_options
                     self.assertEquals(urllib2.unquote(response.content), non_response_question)
 
-    def test_paginates_non_response_questions_options(self):
+    def test_paginates_households_non_response_questions_options(self):
         self.batch.activate_non_response_for(self.kampala)
         QuestionOption.objects.create(question=self.non_response_question, text="Reason 5", order=5)
         QuestionOption.objects.create(question=self.non_response_question, text="Reason 6", order=6)
@@ -181,6 +181,16 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                     non_response_question_page_2 = "responseString=%s&action=request" % question_and_options_page_2
                     self.assertEquals(urllib2.unquote(response.content), non_response_question_page_2)
 
+                    invalid_option = '456'
+                    response = self.respond(invalid_option)
+                    invalid_page_2 = "responseString=%s&action=request" %("INVALID ANSWER: " +question_and_options_page_2)
+                    self.assertEquals(urllib2.unquote(response.content), invalid_page_2)
+
+                    invalid_option = 'blabliblofkajf89748u2&^^%%^&*'
+                    response = self.respond(invalid_option)
+                    invalid_page_2 = "responseString=%s&action=request" %("INVALID ANSWER: " +question_and_options_page_2)
+                    self.assertEquals(urllib2.unquote(response.content), invalid_page_2)
+
                     response = self.respond("#")
                     non_response_option_page_3 = "\n7: Reason 7\n8: Reason 8\n*: Back"
                     question_and_options_page_3 = self.non_response_question.text + non_response_option_page_3
@@ -192,3 +202,24 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
                     response = self.respond("*")
                     self.assertEquals(urllib2.unquote(response.content), non_response_question_page_1)
+
+    def test_saves_households_non_response_question_answers_and_show_non_complete_household_list_again_with_stars(self):
+        self.batch.activate_non_response_for(self.kampala)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(USSDSurvey, 'is_active', return_value=False):
+                    self.reset_session()
+                    self.report_non_response()
+                    self.select_household()
+                    response = self.respond("2")
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s" \
+                                                                       "\n3: Household-%s\n4: Household-%s" \
+                                     % (self.household1.uid, self.household_head.surname,
+                                         self.household2.uid, self.household3.uid, self.household4.uid)
+                    first_page_list = "responseString=%s&action=request" % household_list
+                    self.assertEquals(urllib2.unquote(response.content), first_page_list)
+
+                    self.assertEquals(2, MultiChoiceAnswer.objects.get(investigator=self.investigator, batch=self.batch,
+                                                                       question=self.non_response_question,
+                                                                       household=self.household1).answer.order)
