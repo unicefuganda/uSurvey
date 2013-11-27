@@ -3,7 +3,7 @@ from django.core import serializers
 
 registration_group = HouseholdMemberGroup.objects.get_or_create(name="REGISTRATION GROUP", order=0)[0]
 
-module = QuestionModule.objects.get_or_create(name='Registration')[0]
+module = QuestionModule.objects.create(name='Registration')
 
 Question.objects.create(module=module, text="Please Enter the name",
                         answer_type=Question.TEXT, order=1, group=registration_group)
@@ -34,6 +34,7 @@ year = Question.objects.create(module=module, text="Please Enter the year of bir
 Question.objects.create(module=module, text="Please Enter the gender:\n1.Male\n2.Female",
                         answer_type=Question.NUMBER, order=5, group=registration_group)
 Registration_questions = Question.objects.filter(group=registration_group)
+month_options = QuestionOption.objects.filter(question=month)
 
 
 data = serializers.serialize("json", [registration_group])
@@ -41,4 +42,6 @@ print data
 data = serializers.serialize("json", [module])
 print data
 data = serializers.serialize("json", Registration_questions)
+print data
+data = serializers.serialize("json", month_options)
 print data

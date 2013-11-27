@@ -18,7 +18,6 @@ from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.surveys import Survey
 
 
-
 class InvestigatorTest(TestCase):
     def setUp(self):
         self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
@@ -364,6 +363,21 @@ class InvestigatorTest(TestCase):
                                              uid='10')
 
         self.assertFalse(investigator.created_member_within(TIMEOUT_MINUTES))
+
+    def test_investigator_knows_non_response_reporting_is_activated_for_his_location(self):
+        batch = Batch.objects.create(name="hoho")
+
+        batch.activate_non_response_for(self.kampala)
+
+        self.assertTrue(self.investigator.can_report_non_response())
+
+    def test_investigator_knows_non_response_reporting_is_deactivated_for_his_location(self):
+        batch = Batch.objects.create(name="hoho")
+
+        batch.deactivate_non_response_for(self.kampala)
+
+        self.assertFalse(self.investigator.can_report_non_response())
+
 
 class InvestigatorGenerateReport(TestCase):
     def setUp(self):

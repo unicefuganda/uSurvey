@@ -1,8 +1,8 @@
 from random import randint
 import datetime
-from mock import patch
+from django.http import HttpRequest
 from django.test.testcases import TestCase
-from survey.models import NumericalAnswer, Survey
+from survey.models import NumericalAnswer
 
 
 class USSDBaseTest(TestCase):
@@ -64,4 +64,17 @@ class USSDBaseTest(TestCase):
             answer.save()
 
     def hh_string(self, household_head):
-        return "Household-%s-%s"%(household_head.household.random_sample_number, household_head.surname)
+        return "Household-%s-%s" % (household_head.household.random_sample_number, household_head.surname)
+
+
+class FakeRequest(HttpRequest):
+    def dict(self):
+        obj = self.__dict__
+        obj['transactionId'] = '1234567890'
+        obj['response'] = 'false'
+        return obj
+
+    def __setitem__(self, key, value):
+        obj = self.__dict__
+        obj[key] = value
+        return obj

@@ -254,6 +254,9 @@ class Investigator(BaseModel):
                 household_code += location_code.code
         return household_code
 
+    def can_report_non_response(self):
+        return BatchLocationStatus.objects.filter(location=self.location, non_response=True).count() > 0
+
 
     @classmethod
     def get_summarised_answers_for(self, questions, data):

@@ -3,14 +3,13 @@ import datetime
 from random import randint
 import urllib2
 from django.core.cache import cache
-from django.http import HttpRequest
 from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule, BatchQuestionOrder, GroupCondition, Survey, RandomHouseHoldSelection
 from survey.models.households import HouseholdMember
-from survey.tests.ussd.ussd_base_test import USSDBaseTest
+from survey.tests.ussd.ussd_base_test import USSDBaseTest, FakeRequest
 from survey.ussd.ussd import USSD
 from survey.ussd.ussd_survey import USSDSurvey
 
@@ -949,16 +948,3 @@ class USSDTest(USSDBaseTest):
                     homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
                     response_string = "responseString=%s&action=request" % homepage
                     self.assertEquals(urllib2.unquote(response.content), response_string)
-
-
-class FakeRequest(HttpRequest):
-    def dict(self):
-        obj = self.__dict__
-        obj['transactionId'] = '1234567890'
-        obj['response'] = 'false'
-        return obj
-
-    def __setitem__(self, key, value):
-        obj = self.__dict__
-        obj[key] = value
-        return obj

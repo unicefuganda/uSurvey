@@ -74,7 +74,6 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.gender_question = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
                                                   answer_type=Question.NUMBER, order=5, group=self.registration_group)
 
-
     def test_set_is_selecting_member_for_register_household(self):
         with patch.object(Investigator, 'get_from_cache') as get_from_cache:
             USSDRegisterHousehold.REGISTRATION_DICT = {}

@@ -262,6 +262,8 @@ class USSDSurvey(USSD):
         self.is_registering_household = self.investigator.get_from_cache('IS_REGISTERING_HOUSEHOLD')
         if not self.is_active() or not self.can_resume_survey(self.is_registering_household):
             self.responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+            if self.investigator.can_report_non_response():
+                self.responseString += self.MESSAGES['NON_RESPONSE_MENU']
             self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', None)
         else:
             self.render_resume_message(self.is_registering_household)
