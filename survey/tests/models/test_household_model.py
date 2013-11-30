@@ -11,7 +11,6 @@ from django.utils.timezone import utc
 
 
 class HouseholdTest(TestCase):
-
     def setUp(self):
         self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=11)
         self.condition = GroupCondition.objects.create(attribute="AGE", value=4, condition="GREATER_THAN")
@@ -22,13 +21,15 @@ class HouseholdTest(TestCase):
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         self.kampala = Location.objects.create(name="Kampala", type=self.city, tree_parent=self.uganda)
         self.investigator = Investigator.objects.create(name="", mobile_number="123456788",
-                                                  location=self.kampala,
-                                                  backend=self.backend)
+                                                        location=self.kampala,
+                                                        backend=self.backend)
 
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location, uid=100)
+        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+                                                  uid=100)
 
         self.household_member = HouseholdMember.objects.create(surname="Member",
-                                                            date_of_birth=date(1980, 2, 2), male=False, household=self.household)
+                                                               date_of_birth=date(1980, 2, 2), male=False,
+                                                               household=self.household)
 
     def test_location_hierarchy(self):
         self.assertEquals(self.household.location_hierarchy(), {'Country': self.uganda, 'City': self.kampala})
@@ -49,14 +50,16 @@ class HouseholdTest(TestCase):
         self.assertEquals(0, hhold.uid)
 
     def test_knows_next_uid_for_households(self):
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", backend=Backend.objects.create(name='something1'))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321",
+                                                   backend=Backend.objects.create(name='something1'))
         Household.objects.create(investigator=investigator, uid=101)
         self.assertEqual(102, Household.next_uid())
 
     def test_knows_next_uid_for_households_if_survey_is_open_is_survey_dependent(self):
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", backend=Backend.objects.create(name='something1'))
+            investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321",
+                                                       backend=Backend.objects.create(name='something1'))
             Household.objects.create(investigator=investigator, survey=open_survey, uid=101)
             Household.objects.create(investigator=investigator, survey=open_survey, uid=102)
             Household.objects.create(investigator=investigator, uid=103)
@@ -77,11 +80,13 @@ class HouseholdTest(TestCase):
         some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
         some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
 
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
+                                                    location=some_village,
+                                                    backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
-        household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
-
+        household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county',
+                              'Parish': 'Some parish', 'Village': 'Some village'}
         self.assertEqual(household_location, household1.get_related_location())
 
     def test_should_know_how_to_set_household_location_given_a_set_of_households(self):
@@ -98,10 +103,13 @@ class HouseholdTest(TestCase):
         some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
         some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
 
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
+                                                    location=some_village,
+                                                    backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
-        household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
+        household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county',
+                              'Parish': 'Some parish', 'Village': 'Some village'}
 
         households = Household.set_related_locations([household1])
 
@@ -110,7 +118,9 @@ class HouseholdTest(TestCase):
     def test_get_location_for_some_hierarchy_returns_the_name_if_key_exists_in_location_hierarchy_dict(self):
         district = LocationType.objects.create(name="District", slug=slugify("district"))
         kampala_district = Location.objects.create(name="Kampala", type=district)
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=kampala_district, backend=Backend.objects.create(name='something1'))
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
+                                                    location=kampala_district,
+                                                    backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, uid=0)
 
@@ -118,10 +128,13 @@ class HouseholdTest(TestCase):
 
         self.assertEqual(household1._get_related_location_name('District', location_hierarchy), kampala_district.name)
 
-    def test_get_location_for_some_hierarchy_returns_empty_string_if_key_does_not_exist_in_location_hierarchy_dict(self):
+    def test_get_location_for_some_hierarchy_returns_empty_string_if_key_does_not_exist_in_location_hierarchy_dict(
+            self):
         district = LocationType.objects.create(name="District", slug=slugify("district"))
         kampala_district = Location.objects.create(name="Kampala", type=district)
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=kampala_district, backend=Backend.objects.create(name='something1'))
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
+                                                    location=kampala_district,
+                                                    backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, uid=0)
 
@@ -143,17 +156,22 @@ class HouseholdTest(TestCase):
         some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
         some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
 
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
+                                                    location=some_village,
+                                                    backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
-        household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county', 'Parish': 'Some parish', 'Village': 'Some village'}
+        household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county',
+                              'Parish': 'Some parish', 'Village': 'Some village'}
 
         self.assertEqual(household_location, household1.get_related_location())
 
     def test_should_know_who_is_household_head(self):
         village = LocationType.objects.create(name="Village", slug=slugify("village"))
         some_village = Location.objects.create(name="Some village", type=village)
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321",
+                                                   location=some_village,
+                                                   backend=Backend.objects.create(name='something1'))
         household = Household.objects.create(investigator=investigator, uid=0)
         fields_data = dict(surname='xyz', male=True, date_of_birth=date(2013, 05, 01), household=household)
 
@@ -165,9 +183,11 @@ class HouseholdTest(TestCase):
 
     def test_should_return_all_households_members(self):
         hhold = Household.objects.create(investigator=Investigator(), uid=0)
-        household_head = HouseholdHead.objects.create(household=hhold,surname="Name", date_of_birth='1989-02-02')
-        household_member1 = HouseholdMember.objects.create(household=hhold, surname="name", male=False, date_of_birth='1989-02-02')
-        household_member2 = HouseholdMember.objects.create(household=hhold, surname="name1", male=False, date_of_birth='1989-02-02')
+        household_head = HouseholdHead.objects.create(household=hhold, surname="Name", date_of_birth='1989-02-02')
+        household_member1 = HouseholdMember.objects.create(household=hhold, surname="name", male=False,
+                                                           date_of_birth='1989-02-02')
+        household_member2 = HouseholdMember.objects.create(household=hhold, surname="name1", male=False,
+                                                           date_of_birth='1989-02-02')
         all_members = hhold.all_members()
         self.assertTrue(household_head in all_members)
         self.assertTrue(household_member1 in all_members)
@@ -180,9 +200,11 @@ class HouseholdTest(TestCase):
                                                    location=kampala,
                                                    backend=backend)
         hhold = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
-        household_head = HouseholdHead.objects.create(household=hhold,surname="Name", date_of_birth=date(1989, 2, 2))
-        household_member1 = HouseholdMember.objects.create(household=hhold, surname="name2", male=False, date_of_birth=date(1989, 2, 2))
-        household_member2 = HouseholdMember.objects.create(household=hhold, surname="name3", male=False, date_of_birth=date(1989, 2, 2))
+        household_head = HouseholdHead.objects.create(household=hhold, surname="Name", date_of_birth=date(1989, 2, 2))
+        household_member1 = HouseholdMember.objects.create(household=hhold, surname="name2", male=False,
+                                                           date_of_birth=date(1989, 2, 2))
+        household_member2 = HouseholdMember.objects.create(household=hhold, surname="name3", male=False,
+                                                           date_of_birth=date(1989, 2, 2))
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
         condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         condition.groups.add(member_group)
@@ -207,7 +229,8 @@ class HouseholdTest(TestCase):
         investigator.member_answered(question_1, household_head, answer=1, batch=batch)
         self.assertTrue(hhold.completed_currently_open_batches())
         self.assertEqual(3, HouseholdMemberBatchCompletion.objects.filter(batch=batch).count())
-        [self.assertEqual(1, HouseholdMemberBatchCompletion.objects.filter(batch=batch, householdmember=member).count()) for member in member_list]
+        [self.assertEqual(1, HouseholdMemberBatchCompletion.objects.filter(batch=batch, householdmember=member).count())
+         for member in member_list]
 
     def test_household_knows_survey_can_be_retaken(self):
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
@@ -222,9 +245,11 @@ class HouseholdTest(TestCase):
         household = Household.objects.create(investigator=investigator, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
-                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+                                                          date_of_birth=date(1980, 2, 2), male=False,
+                                                          household=household)
         household_member_2 = HouseholdMember.objects.create(surname="Member 2",
-                                                          date_of_birth=date(1980, 2, 2), male=False, household=household)
+                                                            date_of_birth=date(1980, 2, 2), male=False,
+                                                            household=household)
         batch = Batch.objects.create(name="BATCH A", order=1)
         batch_2 = Batch.objects.create(name="BATCH A", order=1)
 
@@ -232,16 +257,16 @@ class HouseholdTest(TestCase):
         batch_2.open_for_location(investigator.location)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         self.assertTrue(household.can_retake_survey(batch, 5))
         self.assertTrue(household.can_retake_survey(batch_2, 5))
@@ -251,18 +276,18 @@ class HouseholdTest(TestCase):
         ten_minutes_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(minutes=10)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household,
-                                                created=ten_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=ten_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household,
-                                                created=ten_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=ten_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household)
+                                                      investigator=investigator, household=household_member.household)
         self.assertFalse(household.can_retake_survey(batch, 5))
         self.assertTrue(household.can_retake_survey(batch_2, 5))
 
@@ -271,20 +296,20 @@ class HouseholdTest(TestCase):
         three_minutes_ago = datetime.utcnow().replace(tzinfo=utc) - timedelta(minutes=3)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household,
-                                                created=ten_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=ten_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household,
-                                                created=three_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=three_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member,
-                                                investigator=investigator, household=household_member.household,
-                                                created=three_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=three_minutes_ago)
 
         HouseholdMemberBatchCompletion.objects.create(batch=batch_2, householdmember=household_member_2,
-                                                investigator=investigator, household=household_member.household,
-                                                created=ten_minutes_ago)
+                                                      investigator=investigator, household=household_member.household,
+                                                      created=ten_minutes_ago)
         self.assertTrue(household.can_retake_survey(batch, 5))
         self.assertTrue(household.can_retake_survey(batch_2, 5))
 
@@ -296,7 +321,7 @@ class HouseholdTest(TestCase):
         batch_question_1 = Question.objects.create(order=1, text="Test question 1",
                                                    answer_type=Question.NUMBER, group=self.member_group)
         question_2 = Question.objects.create(order=2, text="Test question 2",
-                                answer_type=Question.NUMBER, group=self.member_group)
+                                             answer_type=Question.NUMBER, group=self.member_group)
         batch_question_1.batches.add(self.batch)
         question_2.batches.add(self.batch)
 
@@ -395,7 +420,7 @@ class HouseholdTest(TestCase):
         household = Household.objects.create(investigator=investigator, location=self.kampala, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                           male=False,
-                                                  household=household)
+                                                          household=household)
 
         batch = Batch.objects.create(name="Batch 1", order=1)
         group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
@@ -419,14 +444,17 @@ class HouseholdTest(TestCase):
     def test_should_know_total_households_in_location(self):
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         Household.objects.all().delete()
-        self.abim = Location.objects.create(name='Abim', tree_parent = self.uganda, type = self.city)
-        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
+        self.abim = Location.objects.create(name='Abim', tree_parent=self.uganda, type=self.city)
+        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
 
-        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
-        investigator_2 = Investigator.objects.create(name='some_inv',mobile_number='123456781',male=True,location=self.kampala_city)
+        investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456783', male=True,
+                                                     location=self.kampala)
+        investigator_2 = Investigator.objects.create(name='some_inv', mobile_number='123456781', male=True,
+                                                     location=self.kampala_city)
 
-        household_1 = Household.objects.create(investigator = investigator_1,location= self.kampala, survey=open_survey)
-        household_2 = Household.objects.create(investigator = investigator_2,location= self.kampala_city, survey=open_survey)
+        household_1 = Household.objects.create(investigator=investigator_1, location=self.kampala, survey=open_survey)
+        household_2 = Household.objects.create(investigator=investigator_2, location=self.kampala_city,
+                                               survey=open_survey)
 
         self.assertEqual(2, Household.all_households_in(self.uganda, open_survey).count())
         self.assertIn(household_1, Household.all_households_in(self.uganda, open_survey))
@@ -435,43 +463,78 @@ class HouseholdTest(TestCase):
     def test_should_know_number_of_members_interviewed(self):
         self.batch = Batch.objects.create(name="BATCH A", order=1)
         Household.objects.all().delete()
-        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
-        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        member_group = HouseholdMemberGroup.objects.create(name='group1', order=1)
+        question = Question.objects.create(text="some question", answer_type=Question.NUMBER, order=1,
+                                           group=member_group)
         self.batch.questions.add(question)
         BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
 
-        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
+        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
 
-        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
+        investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456783', male=True,
+                                                     location=self.kampala)
 
-        household_1 = Household.objects.create(investigator = investigator_1,location=self.kampala)
-        member_1 = HouseholdMember.objects.create(household=household_1,date_of_birth=date(2000,02, 02))
-        member_2 = HouseholdMember.objects.create(household=household_1,date_of_birth=date(2000,02, 02))
-        member_3 = HouseholdMember.objects.create(household=household_1,date_of_birth=date(2000,02, 02))
+        household_1 = Household.objects.create(investigator=investigator_1, location=self.kampala)
+        member_1 = HouseholdMember.objects.create(household=household_1, date_of_birth=date(2000, 02, 02))
+        member_2 = HouseholdMember.objects.create(household=household_1, date_of_birth=date(2000, 02, 02))
+        member_3 = HouseholdMember.objects.create(household=household_1, date_of_birth=date(2000, 02, 02))
 
-        investigator_1.member_answered(question,member_1,1,self.batch)
+        investigator_1.member_answered(question, member_1, 1, self.batch)
 
         self.assertIn(member_1, household_1.members_interviewed(self.batch))
 
     def test_should_return_0_members_interviewed_if_no_question_in_batch(self):
         self.batch = Batch.objects.create(name="BATCH A", order=1)
         Household.objects.all().delete()
-        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
+        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
 
-        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
+        investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456783', male=True,
+                                                     location=self.kampala)
 
-        household_1 = Household.objects.create(investigator = investigator_1,location=self.kampala)
-        member_1 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
-        member_2 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
-        member_3 = HouseholdMember.objects.create(household=household_1,date_of_birth=datetime(2000,02, 02))
+        household_1 = Household.objects.create(investigator=investigator_1, location=self.kampala)
+        HouseholdMember.objects.create(household=household_1, date_of_birth=datetime(2000, 02, 02))
+        HouseholdMember.objects.create(household=household_1, date_of_birth=datetime(2000, 02, 02))
+        HouseholdMember.objects.create(household=household_1, date_of_birth=datetime(2000, 02, 02))
 
         self.assertEqual(0, len(household_1.members_interviewed(self.batch)))
 
     def test_should_create_batch_completion_entry(self):
-        investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456783',male=True,location=self.kampala)
-        HH = Household.objects.create(uid='123', investigator=investigator_1, location=self.kampala)
+        investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456783', male=True,
+                                                     location=self.kampala)
+        household = Household.objects.create(uid='123', investigator=investigator_1, location=self.kampala)
         batch = Batch.objects.create(name="batch hoho")
-        HH.batch_completed(batch)
-        self.assertEqual(1, HH.batch_completion_batches.filter(batch=batch, investigator=investigator_1).count())
-        HH.batch_completed(None)
-        self.assertEqual(1, HH.batch_completion_batches.filter(batch=batch, investigator=investigator_1).count())
+        household.batch_completed(batch)
+        self.assertEqual(1, household.batch_completion_batches.filter(batch=batch, investigator=investigator_1).count())
+        household.batch_completed(None)
+        self.assertEqual(1, household.batch_completion_batches.filter(batch=batch, investigator=investigator_1).count())
+
+    def test_get_non_complete_members(self):
+        investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456783', male=True,
+                                                     location=self.kampala)
+        household_1 = Household.objects.create(uid='123', investigator=investigator_1, location=self.kampala)
+        member_1 = HouseholdMember.objects.create(surname="Member 1", household=household_1, date_of_birth=datetime(2000, 02, 02))
+        member_2 = HouseholdMember.objects.create(surname="Member 2", household=household_1, date_of_birth=datetime(2000, 02, 02))
+        batch = Batch.objects.create(name="batch hoho")
+
+        HouseholdMemberBatchCompletion.objects.create(household=household_1, householdmember=member_1, batch=batch,
+                                                      investigator=investigator_1)
+
+        self.assertEqual(1, len(household_1.get_non_complete_members()))
+        self.assertIn(member_2, household_1.get_non_complete_members())
+        self.assertNotIn(member_1, household_1.get_non_complete_members())
+
+    def test_knows_some_members_are_not_complete(self):
+        investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456783', male=True,
+                                                     location=self.kampala)
+        household_1 = Household.objects.create(uid='123', investigator=investigator_1, location=self.kampala)
+        member_1 = HouseholdMember.objects.create(surname="Member 1", household=household_1, date_of_birth=datetime(2000, 02, 02))
+        member_2 = HouseholdMember.objects.create(surname="Member 2", household=household_1, date_of_birth=datetime(2000, 02, 02))
+        batch = Batch.objects.create(name="batch hoho")
+
+        HouseholdMemberBatchCompletion.objects.create(household=household_1, householdmember=member_1, batch=batch,
+                                                      investigator=investigator_1)
+        self.assertTrue(household_1.has_some_members_who_completed())
+
+        HouseholdMemberBatchCompletion.objects.create(household=household_1, householdmember=member_2, batch=batch,
+                                                      investigator=investigator_1)
+        self.assertFalse(household_1.has_some_members_who_completed())

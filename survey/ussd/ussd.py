@@ -40,13 +40,11 @@ class USSD(USSDBase):
         except:
             pass
 
-
     def set_household_member(self):
         household_member = self.get_from_session('HOUSEHOLD_MEMBER')
 
         if household_member:
             self.household_member = household_member
-
 
     def set_current_member_is_done(self):
         if self.household_member and (self.is_registering_household is False):
@@ -118,8 +116,9 @@ class USSD(USSDBase):
         open_survey = Survey.currently_open_survey(self.investigator.location)
         page = self.get_from_session('PAGE')
         self.responseString += "%s\n%s" % (
-            self.MESSAGES['HOUSEHOLD_LIST'], self.investigator.households_list(page, registered=False,
-                                                open_survey=open_survey, non_response_reporting=non_response_reporting))
+            self.MESSAGES['HOUSEHOLD_LIST'],
+            self.investigator.households_list(page, registered=False, open_survey=open_survey,
+                                              non_response_reporting=non_response_reporting))
 
     def clean_investigator_input(self):
         if self.is_new_request():
@@ -142,3 +141,9 @@ class USSD(USSDBase):
             self.responseString += "RECONFIRM: "
         if self.invalid_answered_question():
             self.responseString += "INVALID ANSWER: "
+
+    def render_household_members_list(self):
+        page = self.get_from_session('PAGE')
+        self.responseString += "%s\n%s" % \
+                               (self.MESSAGES['MEMBERS_LIST'],
+                                self.household.members_list(page, reporting_non_response=True))

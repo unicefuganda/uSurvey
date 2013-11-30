@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, AnswerRule, BatchQuestionOrder, UnknownDOBAttribute
+from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, AnswerRule, BatchQuestionOrder, UnknownDOBAttribute, MultiChoiceAnswer, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import HouseholdMember, Household, HouseholdHead
 from survey.models.backend import Backend
@@ -972,3 +972,30 @@ class HouseholdMemberTest(TestCase):
         UnknownDOBAttribute.objects.create(household_member=household_member, type='MONTH')
         self.assertEqual(99, household_member.get_month_of_birth())
 
+    def test_knows_has_not_answered_non_response_questions(self):
+        none_response_group = HouseholdMemberGroup.objects.create(name="NON_RESPONSE", order=0)
+        non_response_question = Question.objects.create(text="Why did HH-bob not take the survey",
+                                                        answer_type=Question.MULTICHOICE, order=1,
+                                                        group=none_response_group)
+
+        QuestionOption.objects.create(question=non_response_question, text="House closed", order=1)
+        QuestionOption.objects.create(question=non_response_question, text="Household moved", order=2)
+        QuestionOption.objects.create(question=non_response_question, text="Refused to answer", order=3)
+        QuestionOption.objects.create(question=non_response_question, text="Died", order=4)
+
+        country = LocationType.objects.create(name="Country", slug="country")
+        district = LocationType.objects.create(name="District", slug="district")
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        self.batch.open_for_location(kampala)
+        investigator = Investigator.objects.create(name="inv1", location=kampala,
+                                                   backend=Backend.objects.create(name='something'))
+        household = Household.objects.create(investigator=investigator, uid=0, location=kampala)
+        household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
+                                                          male=False,
+                                                          household=household)
+        self.assertFalse(household_member.has_answered_non_response())
+
+        MultiChoiceAnswer.objects.create(investigator=investigator, batch=self.batch, question=non_response_question,
+                                         householdmember=household_member)
+        self.assertTrue(household_member.has_answered_non_response())

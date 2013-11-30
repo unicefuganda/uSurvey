@@ -737,7 +737,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                     self.respond("Name 2")
                     some_age = 20
                     self.respond(some_age)
-                    self.respond("2")
+                    self.respond("7")
                     self.respond(datetime.datetime.now().year - some_age)
                     response = self.respond("1")
 
@@ -748,7 +748,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.respond("Name")
                 some_age = 20
                 self.respond(some_age)
-                self.respond("2")
+                self.respond("7")
                 self.respond(datetime.datetime.now().year - some_age)
                 response = self.respond("2")
                 response_string = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']

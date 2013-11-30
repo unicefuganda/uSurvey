@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.datastructures import SortedDict
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from django.conf import settings
 from django.core.paginator import Paginator
 
@@ -156,16 +156,19 @@ class Household(BaseModel):
                 return False
         return True
 
-    def members_list(self, page=1):
+    def members_list(self, page=1, reporting_non_response=False):
         all_members = self.all_members()
+        if reporting_non_response:
+            all_members = self.get_non_complete_members()
         paginator = Paginator(all_members, self.MEMBERS_PER_PAGE)
         page = 1 if paginator.num_pages < page else page
         members = paginator.page(page)
         members_list = []
+
         for member in members:
             name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.surname
             text = "%s: %s" % (all_members.index(member) + 1, name)
-            if member.survey_completed():
+            if member.has_completed_survey_options(reporting_non_response):
                 text += "*"
             members_list.append(text)
         if members.has_previous():
@@ -200,8 +203,28 @@ class Household(BaseModel):
 
     def has_completed_option_given_(self, registered, non_response_reporting):
         open_batch = Batch.currently_open_for(self.location)
-        has_answered_non_response = self.multichoiceanswer.filter(question__group__name="NON_RESPONSE", batch=open_batch)
-        return (registered and self.completed_currently_open_batches()) or (non_response_reporting and has_answered_non_response)
+        has_answered_non_response = self.multichoiceanswer.filter(question__group__name="NON_RESPONSE",
+                                                                  batch=open_batch, householdmember=None)
+        return (registered and self.completed_currently_open_batches()) or\
+                    (non_response_reporting and has_answered_non_response)
+
+    def get_non_complete_members(self):
+        all_completed_members = self.completed_batches.all().values_list('householdmember', flat=True)
+        all_household_members = self.all_members()
+        non_completed_members = filter(lambda member: member.id not in all_completed_members, all_household_members)
+        return non_completed_members
+
+    def has_some_members_who_completed(self):
+        return len(self.get_non_complete_members()) > 0 and len(self.get_non_complete_members()) != len(self.all_members())
+
+    def all_members_non_completed(self):
+        return len(self.get_non_complete_members()) == len(self.all_members())
+
+    def has_completed_non_response(self):
+        non_complete_members = self.get_non_complete_members()
+        open_batch = Batch.currently_open_for(self.location)
+        members_completed_non_response = self.multichoiceanswer.filter(question__group__name="NON_RESPONSE", batch=open_batch)
+        return len(non_complete_members) == members_completed_non_response.count()
 
     @classmethod
     def set_related_locations(cls, households):
@@ -435,6 +458,14 @@ class HouseholdMember(BaseModel):
             else:
                 answers.append('')
         return answers
+
+    def has_completed_survey_options(self, reporting_non_response):
+        return (self.survey_completed() and not reporting_non_response)\
+            or (reporting_non_response and self.has_answered_non_response())
+
+    def has_answered_non_response(self):
+        open_batch = Batch.currently_open_for(self.household.location)
+        return self.multichoiceanswer.filter(question__group__name="NON_RESPONSE", batch=open_batch).count() > 0
 
     class Meta:
         app_label = 'survey'

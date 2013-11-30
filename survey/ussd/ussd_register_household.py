@@ -1,5 +1,5 @@
-# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from datetime import date, datetime
+from calendar import monthrange
+from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 from survey.models import Question, HouseholdHead, UnknownDOBAttribute
 from survey.models.households import HouseholdMember
@@ -242,14 +242,17 @@ class USSDRegisterHousehold(USSD):
     def save_member(self, member_dict):
         object_to_create = HouseholdHead if self.is_head else HouseholdMember
         return object_to_create.objects.create(surname=member_dict['surname'], male=member_dict['male'],
-                                               date_of_birth=member_dict['date_of_birth'], household=self.household)
+                                               date_of_birth=str(member_dict['date_of_birth']), household=self.household)
 
     def format_age_to_date_of_birth(self, age_question, month_of_birth):
         age = self.REGISTRATION_DICT[age_question.text]
         today = date.today()
         date_of_birth = today.replace(year=(today.year - int(age)))
         if month_of_birth != self.UNKNOWN:
-            date_of_birth = date_of_birth.replace(month=int(month_of_birth))
+            year = date_of_birth.year
+            month = int(month_of_birth)
+            day = min(today.day, monthrange(year, month)[1])
+            date_of_birth = date(year=year, month=month, day=day)
         return date_of_birth
 
     def format_gender_response(self, question):
