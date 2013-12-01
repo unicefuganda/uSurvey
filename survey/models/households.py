@@ -205,7 +205,7 @@ class Household(BaseModel):
         open_batch = Batch.currently_open_for(self.location)
         has_answered_non_response = self.multichoiceanswer.filter(question__group__name="NON_RESPONSE",
                                                                   batch=open_batch, householdmember=None)
-        return has_answered_non_response
+        return has_answered_non_response.exists()
 
     def has_completed_option_given_(self, registered, non_response_reporting):
         return (registered and self.completed_currently_open_batches()) or\

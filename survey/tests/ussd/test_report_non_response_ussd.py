@@ -10,6 +10,7 @@ from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Backend, Survey, Investigator, Household, Batch, RandomHouseHoldSelection, QuestionModule, HouseholdMemberGroup, QuestionOption, Question, HouseholdHead, MultiChoiceAnswer, HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
+from survey.ussd.ussd_report_non_response import USSDReportNonResponse
 from survey.ussd.ussd_survey import USSDSurvey
 
 
@@ -509,3 +510,129 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     response = self.respond("1")
                     response_string = "responseString=%s&action=request" % USSD.MESSAGES['NON_RESPONSE_COMPLETION']
                     self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_shows_HH_list_with_stars_if_responding_yes_to_non_response_completion_message_transtion_from_HH_non_response_question(self):
+        self.batch.activate_non_response_for(self.kampala)
+        answer_dict = {'investigator': self.investigator, 'question': self.non_response_question,'batch': self.batch}
+        MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
+
+        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                    self.report_non_response()
+                    self.select_household("4")
+                    self.respond("1")
+                    response = self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s*" \
+                                                                       "\n3: Household-%s*\n4: Household-%s-%s*" \
+                                     % (self.household1.uid, self.household_head.surname, self.household2.uid,
+                                        self.household3.uid, self.household4.uid, household_head4.surname)
+                    first_page_list = "responseString=%s&action=request" % household_list
+                    self.assertEquals(urllib2.unquote(response.content), first_page_list)
+
+    def test_shows_HH_list_with_stars_if_responding_yes_to_non_response_completion_message_transtion_from_member_non_response_question(self):
+        self.batch.activate_non_response_for(self.kampala)
+        answer_dict = {'investigator': self.investigator, 'question': self.non_response_question,'batch': self.batch}
+        MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
+
+        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
+        household_member_who_completed = self.create_household_member(name="bob4 good son", household=self.household4, head=False, date_of_birth="1996-9-1")
+        household_member_who_completed.batch_completed(self.batch)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                    self.report_non_response()
+                    self.select_household("4")
+                    self.select_household_member("1")
+                    self.respond("1")
+
+                    response = self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s*" \
+                                                                       "\n3: Household-%s*\n4: Household-%s-%s*" \
+                                     % (self.household1.uid, self.household_head.surname, self.household2.uid,
+                                        self.household3.uid, self.household4.uid, household_head4.surname)
+                    first_page_list = "responseString=%s&action=request" % household_list
+                    self.assertEquals(urllib2.unquote(response.content), first_page_list)
+
+    def test_shows_HH_non_response_questions_after_selecting_HH_transition_from_non_response_completion_message(self):
+        self.batch.activate_non_response_for(self.kampala)
+        answer_dict = {'investigator': self.investigator, 'question': self.non_response_question,'batch': self.batch}
+        MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
+
+        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                    self.report_non_response()
+                    self.select_household("4")
+                    self.respond("1")
+                    self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
+                    response = self.select_household("1")
+                    non_response_option_page = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
+                    question_and_options = self.non_response_question.text%(self.household1.uid, self.household_head.surname) + non_response_option_page
+                    non_response_question = "responseString=%s&action=request" % question_and_options
+                    self.assertEquals(urllib2.unquote(response.content), non_response_question)
+
+    def test_shows_member_non_response_questions_after_selecting_member_transition_from_non_response_completion_message(self):
+        self.batch.activate_non_response_for(self.kampala)
+        answer_dict = {'investigator': self.investigator, 'question': self.non_response_question,'batch': self.batch}
+        MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
+
+        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
+        household_member_who_completed = self.create_household_member(name="bob4 good son", household=self.household4, head=False, date_of_birth="1996-9-1")
+        household_member_who_completed.batch_completed(self.batch)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                    self.report_non_response()
+                    self.select_household("4")
+                    self.select_household_member("1")
+                    self.respond("1")
+                    self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
+                    self.select_household("4")
+                    response = self.select_household_member("1")
+                    non_response_option_page = "\n1: Member Refused\n2: Reason"
+                    question_and_options = self.member_non_response_question.text%household_head4.surname + non_response_option_page
+                    non_response_question = "responseString=%s&action=request" % question_and_options
+                    self.assertEquals(urllib2.unquote(response.content), non_response_question)
+
+    def test_shows_welcome_menu_if_responding_no_to_non_response_completion_message(self):
+        self.batch.activate_non_response_for(self.kampala)
+        answer_dict = {'investigator': self.investigator, 'question': self.non_response_question,'batch': self.batch}
+        MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
+
+        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                    self.report_non_response()
+                    self.select_household("4")
+                    self.respond("1")
+                    response = self.respond(USSD.ANSWER['NO'])
+                    homepage = "Welcome %s to the survey.\n1:" \
+                               " Register households\n2: " \
+                               "Take survey\n3: " \
+                               "Report non-response" % self.investigator.name
+                    response_string = "responseString=%s&action=request" % homepage
+                    self.assertEqual(urllib2.unquote(response.content), response_string)

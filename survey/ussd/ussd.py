@@ -76,6 +76,9 @@ class USSD(USSDBase):
         if not cache.get(self.session_string):
             cache.set(self.session_string, self.DEFAULT_SESSION_VARIABLES)
 
+    def clear_caches(self):
+        cache.delete(self.session_string)
+
     def get_from_session(self, key):
         return cache.get(self.session_string)[key]
 

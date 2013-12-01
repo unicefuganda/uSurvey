@@ -177,7 +177,6 @@ class Investigator(BaseModel):
 
     def completed_non_response_reporting(self, open_survey=None):
         all_households = self.all_households(open_survey=open_survey, non_response_reporting=True)
-        # map(lambda household: group_choices.append((group.id, group.name)), HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP'))
         for household in all_households:
             if not household.has_answered_non_response():
                 return False

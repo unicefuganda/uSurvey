@@ -3,6 +3,8 @@ from survey.ussd.ussd import USSD
 
 
 class USSDReportNonResponse(USSD):
+    ANSWER = {"IS_RETAKING":'1'}
+
     def __init__(self, investigator, request):
         super(USSDReportNonResponse, self).__init__(investigator, request)
         self.question = None
@@ -14,10 +16,21 @@ class USSDReportNonResponse(USSD):
         self.set_question()
         self.currently_open_batch = None
         self.set_currently_open_batch()
+        self.can_retake = False
+        self.set_can_retake()
 
     def set_currently_open_batch(self):
         if self.household:
             self.currently_open_batch = Batch.currently_open_for(self.household.location)
+
+    def set_can_retake(self):
+        try:
+            can_retake = self.get_from_session('CAN_RETAKE')
+            if can_retake:
+                self.can_retake = can_retake
+        except KeyError:
+            pass
+
 
     def set_question(self):
         try:
@@ -28,7 +41,11 @@ class USSDReportNonResponse(USSD):
             pass
 
     def start(self, answer):
-        self.report_non_response(answer)
+        if self.can_retake and answer == self.ANSWER['IS_RETAKING']:
+            self.get_household_list(non_response_reporting=True)
+            self.set_in_session('CAN_RETAKE', False)
+        else:
+            self.report_non_response(answer)
         return self.action, self.responseString
 
     def report_non_response(self, answer):
@@ -153,7 +170,7 @@ class USSDReportNonResponse(USSD):
     def render_household_list_or_completion_message(self):
         if self.investigator.completed_non_response_reporting(open_survey=self.currently_open_batch.survey):
             self.responseString = self.MESSAGES['NON_RESPONSE_COMPLETION']
+            self.set_in_session('CAN_RETAKE', True)
         else:
             self.get_household_list(non_response_reporting=True)
-
 
