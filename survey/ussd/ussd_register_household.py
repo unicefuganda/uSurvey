@@ -1,5 +1,5 @@
 from calendar import monthrange
-from datetime import date
+import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from survey.models import Question, HouseholdHead, UnknownDOBAttribute
 from survey.models.households import HouseholdMember
@@ -246,13 +246,14 @@ class USSDRegisterHousehold(USSD):
 
     def format_age_to_date_of_birth(self, age_question, month_of_birth):
         age = self.REGISTRATION_DICT[age_question.text]
-        today = date.today()
+        today = datetime.date.today()
+        print today
         date_of_birth = today.replace(year=(today.year - int(age)))
         if month_of_birth != self.UNKNOWN:
             year = date_of_birth.year
             month = int(month_of_birth)
             day = min(today.day, monthrange(year, month)[1])
-            date_of_birth = date(year=year, month=month, day=day)
+            date_of_birth = datetime.date(year=year, month=month, day=day)
         return date_of_birth
 
     def format_gender_response(self, question):
@@ -265,6 +266,6 @@ class USSDRegisterHousehold(USSD):
         if answer != self.UNKNOWN:
             age_question = Question.objects.get(text__startswith="Please Enter the age")
             given_age = self.REGISTRATION_DICT[age_question.text]
-            inferred_year_of_birth = date.today().year - int(given_age)
+            inferred_year_of_birth = datetime.date.today().year - int(given_age)
             return inferred_year_of_birth == int(answer)
         return True

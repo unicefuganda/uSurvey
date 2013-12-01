@@ -3,7 +3,7 @@ import datetime
 from django.http import HttpRequest
 from django.test.testcases import TestCase
 from survey.models import NumericalAnswer
-
+from mock import patch
 
 class USSDBaseTest(TestCase):
     def setUp(self):
@@ -68,6 +68,23 @@ class USSDBaseTest(TestCase):
 
     def hh_string(self, household_head):
         return "Household-%s-%s" % (household_head.household.random_sample_number, household_head.surname)
+
+    def mock_date_today(self, target, real_date_class=datetime.date):
+        class DateSubclassMeta(type):
+            @classmethod
+            def __instancecheck__(mcs, obj):
+                return isinstance(obj, real_date_class)
+
+        class BaseMockedDate(real_date_class):
+            @classmethod
+            def today(cls):
+                return target
+
+        # Python2 & Python3 compatible metaclass
+        MockedDate = DateSubclassMeta('date', (BaseMockedDate,), {})
+
+        return patch.object(datetime, 'date', MockedDate)
+
 
 
 class FakeRequest(HttpRequest):

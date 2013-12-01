@@ -468,3 +468,44 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                     self.household2.uid, self.household3.uid, self.household4.uid)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
+
+    def test_shows_non_response_completion_message_upon_completion_of_all_households_when_last_household_has_household_non_response_question(self):
+        self.batch.activate_non_response_for(self.kampala)
+        answer_dict = {'investigator': self.investigator, 'question': self.non_response_question,'batch': self.batch}
+        MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
+
+        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                    self.report_non_response()
+                    self.select_household("4")
+                    response = self.respond("1")
+                    response_string = "responseString=%s&action=request" % USSD.MESSAGES['NON_RESPONSE_COMPLETION']
+                    self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_shows_non_response_completion_message_upon_completion_of_all_households_when_last_household_has_member_non_response_question(self):
+        self.batch.activate_non_response_for(self.kampala)
+        answer_dict = {'investigator': self.investigator, 'question': self.non_response_question,'batch': self.batch}
+        MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
+        MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
+
+        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
+        household_member_who_completed = self.create_household_member(name="bob4 good son", household=self.household4, head=False, date_of_birth="1996-9-1")
+        household_member_who_completed.batch_completed(self.batch)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                    self.report_non_response()
+                    self.select_household("4")
+                    self.select_household_member("1")
+                    response = self.respond("1")
+                    response_string = "responseString=%s&action=request" % USSD.MESSAGES['NON_RESPONSE_COMPLETION']
+                    self.assertEquals(urllib2.unquote(response.content), response_string)

@@ -71,7 +71,7 @@ class USSDReportNonResponse(USSD):
         question_option = self.validate_question_option(answer)
         if question_option:
             self.save_answer_and_clear_question(question_option)
-            self.get_household_list(non_response_reporting=True)
+            self.render_household_list_or_completion_message()
         else:
             self.render_non_response_question(answer)
 
@@ -116,11 +116,14 @@ class USSDReportNonResponse(USSD):
             self.render_member_non_response_question(answer)
         else:
             self.save_answer_and_clear_question(question_option, household=False)
-            if self.household.has_completed_non_response():
-                self.save_answer_and_clear_question(question_option=None, household=True)
-                self.get_household_list(non_response_reporting=True)
-            else:
-                self.render_household_members_list()
+            self.render_members_or_households_or_completion_message()
+
+    def render_members_or_households_or_completion_message(self):
+        if self.household.members_have_completed_non_response(self.currently_open_batch):
+            self.save_answer_and_clear_question(question_option=None, household=True)
+            self.render_household_list_or_completion_message()
+        else:
+            self.render_household_members_list()
 
     def select_member_or_paginate_member_list(self, answer):
         if self.is_pagination_option(answer):
@@ -146,5 +149,11 @@ class USSDReportNonResponse(USSD):
             self.process_non_response_answer(answer)
         else:
             self.render_non_response_question(answer)
+
+    def render_household_list_or_completion_message(self):
+        if self.investigator.completed_non_response_reporting(open_survey=self.currently_open_batch.survey):
+            self.responseString = self.MESSAGES['NON_RESPONSE_COMPLETION']
+        else:
+            self.get_household_list(non_response_reporting=True)
 
 

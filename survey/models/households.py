@@ -201,12 +201,15 @@ class Household(BaseModel):
                 members_in_group.append(member)
         return members_in_group
 
-    def has_completed_option_given_(self, registered, non_response_reporting):
+    def has_answered_non_response(self):
         open_batch = Batch.currently_open_for(self.location)
         has_answered_non_response = self.multichoiceanswer.filter(question__group__name="NON_RESPONSE",
                                                                   batch=open_batch, householdmember=None)
+        return has_answered_non_response
+
+    def has_completed_option_given_(self, registered, non_response_reporting):
         return (registered and self.completed_currently_open_batches()) or\
-                    (non_response_reporting and has_answered_non_response)
+                    (non_response_reporting and self.has_answered_non_response())
 
     def get_non_complete_members(self):
         all_completed_members = self.completed_batches.all().values_list('householdmember', flat=True)
@@ -220,10 +223,9 @@ class Household(BaseModel):
     def all_members_non_completed(self):
         return len(self.get_non_complete_members()) == len(self.all_members())
 
-    def has_completed_non_response(self):
+    def members_have_completed_non_response(self, batch):
         non_complete_members = self.get_non_complete_members()
-        open_batch = Batch.currently_open_for(self.location)
-        members_completed_non_response = self.multichoiceanswer.filter(question__group__name="NON_RESPONSE", batch=open_batch)
+        members_completed_non_response = self.multichoiceanswer.filter(question__group__name="NON_RESPONSE", batch=batch)
         return len(non_complete_members) == members_completed_non_response.count()
 
     @classmethod

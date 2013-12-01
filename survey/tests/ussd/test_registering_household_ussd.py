@@ -13,13 +13,6 @@ from survey.tests.ussd.ussd_base_test import USSDBaseTest, FakeRequest
 from survey.ussd.ussd import USSD
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
 
-
-class MockDate(datetime.date):
-    @classmethod
-    def today(cls):
-        return cls(2013, 2, 29)
-
-
 class USSDRegisteringHouseholdTest(USSDBaseTest):
     def setUp(self):
         self.client = Client()
@@ -691,32 +684,32 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_day_of_birth_should_be_adjusted_to_last_day_of_month_if_it_exceeds_the_number_of_days_in_the_given_month(self):
         some_age = 10
+        feb = '2'
         answers = {'name': 'dummy name',
                    'age': some_age,
                    'gender': '1',
-                   'month': '2',
+                   'month': feb,
                    'year': datetime.datetime.now().year - some_age
             }
-
-        original_date_time = datetime.date
-        datetime.date = MockDate
+        day_not_existing_in_feb = 29
+        not_feb = 11
+        date_this_year_with_day_not_existing_in_feb = datetime.date.today().replace(month=not_feb, day=day_not_existing_in_feb)
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
-                datetime.date = MockDate
-                self.reset_session()
-                self.register_household()
-                selected_household_id = '2'
-                self.select_household(selected_household_id)
-                self.respond('2')
-                self.respond(answers['name'])
-                self.respond(answers['age'])
-                self.respond(answers['month'])
-                self.respond(answers['year'])
-                self.respond(answers['gender'])
-                member = HouseholdMember.objects.filter(surname=answers['name'])
-                self.assertEqual(1, len(member))
-                self.assertEqual(28, member[0].date_of_birth.day)
-        datetime.date = original_date_time
+                with self.mock_date_today(date_this_year_with_day_not_existing_in_feb):
+                    self.reset_session()
+                    self.register_household()
+                    selected_household_id = '2'
+                    self.select_household(selected_household_id)
+                    self.respond('2')
+                    self.respond(answers['name'])
+                    self.respond(answers['age'])
+                    self.respond(answers['month'])
+                    self.respond(answers['year'])
+                    self.respond(answers['gender'])
+                    member = HouseholdMember.objects.filter(surname=answers['name'])
+                    self.assertEqual(1, len(member))
+                    self.assertEqual(28, member[0].date_of_birth.day)
 
     def test_complete_registration_flow_with_valid_age(self):
         some_age = 10

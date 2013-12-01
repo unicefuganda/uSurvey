@@ -173,8 +173,15 @@ class Investigator(BaseModel):
         all_households = all_households.filter(survey=open_survey) if open_survey else all_households
         if non_response_reporting:
             all_households = self.filter_non_completed_households(all_households)
-
         return all_households
+
+    def completed_non_response_reporting(self, open_survey=None):
+        all_households = self.all_households(open_survey=open_survey, non_response_reporting=True)
+        # map(lambda household: group_choices.append((group.id, group.name)), HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP'))
+        for household in all_households:
+            if not household.has_answered_non_response():
+                return False
+        return True
 
     def completed_open_surveys(self, open_survey=None):
         for household in self.all_households(open_survey):
