@@ -26,7 +26,7 @@ class USSDBase(object):
         'INVESTIGATOR_BLOCKED_MESSAGE': 'Sorry. You are not registered for any surveys.',
         'HEAD_REGISTERED': "Head already registered for this household. Registering members now:\n",
         'NON_RESPONSE_MENU': "\n3: Report non-response",
-        'NON_RESPONSE_COMPLETION': "Thank you. You have completed all non-response reporting. Would you like to start again?\n1: Yes\n2: No",
+        'NON_RESPONSE_COMPLETION': "Thank you. You have completed reporting non-responses. Would you like to start again?\n1: Yes\n2: No",
     }
 
     ACTIONS = {

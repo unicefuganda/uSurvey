@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdMemberBatchCompletion, QuestionModule, BatchQuestionOrder, Survey, RandomHouseHoldSelection, QuestionOption
+from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdMemberBatchCompletion, QuestionModule, BatchQuestionOrder, Survey, RandomHouseHoldSelection, QuestionOption, MultiChoiceAnswer
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
