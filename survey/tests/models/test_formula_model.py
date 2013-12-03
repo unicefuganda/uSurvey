@@ -1,13 +1,17 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from datetime import date
-from django.core.exceptions import ValidationError
-from django.test import TestCase
+from random import randint
+
 from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import LocationType
+
 from survey.models import Batch, HouseholdMemberGroup, GroupCondition, Question, Formula, Backend, Investigator, Household, QuestionOption, Survey
+from survey.models import HouseholdHead, Indicator, QuestionModule, Answer
 from survey.models.households import HouseholdMember
+from survey.tests.base_test import BaseTest
 
 
-class FormulaTest(TestCase):
+class FormulaTest(BaseTest):
     def setUp(self):
         self.batch = Batch.objects.create(order=1)
         self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
@@ -24,6 +28,12 @@ class FormulaTest(TestCase):
     def create_household_member(self, household):
         return HouseholdMember.objects.create(surname="Member", date_of_birth=date(1980, 2, 2), male=False,
                                               household=household)
+
+    def create_household_head(self, uid, investigator):
+        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                                  uid=uid)
+        return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
+                                            date_of_birth="1990-02-09")
 
     def test_store(self):
         formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2)
@@ -260,7 +270,7 @@ class FormulaTest(TestCase):
         member_6 = self.create_household_member(household_6)
 
         self.question_3 = Question.objects.create(text="This is a question",
-                                                  answer_type=Question.MULTICHOICE, order=3,group=self.member_group)
+                                                  answer_type=Question.MULTICHOICE, order=3, group=self.member_group)
         option_1 = QuestionOption.objects.create(question=self.question_3, text="OPTION 2", order=1)
         option_2 = QuestionOption.objects.create(question=self.question_3, text="OPTION 1", order=2)
 

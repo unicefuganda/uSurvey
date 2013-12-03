@@ -38,7 +38,7 @@ def household_names(households):
 
 @register.filter
 def get_numerator_denominator_values(households_data, formula):
-    aggregated_data = { formula.numerator.text: [], formula.denominator.text: []}
+    aggregated_data = {formula.numerator.text: [], formula.denominator.text: []}
     for household, answers in households_data.items():
         for question, answer in answers.items():
             aggregated_data[question.text].append(answer)

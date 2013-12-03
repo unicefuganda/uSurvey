@@ -70,10 +70,8 @@ class Formula(BaseModel):
                 Sum('answer'))['answer__sum']
 
     def answer_sum_for_investigator(self, question, investigator):
-        return \
-            question.answer_class().objects.filter(investigator=investigator, question=question).aggregate(
-                Sum('answer'))[
-                'answer__sum']
+        return question.answer_class().objects.filter(investigator=investigator, question=question).\
+            aggregate(Sum('answer'))['answer__sum']
 
     def answer_for_household(self, question, household):
         return question.answer_class().objects.get(household=household, question=question).answer
@@ -148,7 +146,6 @@ class Formula(BaseModel):
         numerator_number = self.numerator_computation(investigator, self.numerator)
         denominator_number = self.denominator_computation(investigator, survey)
         return numerator_number/denominator_number
-
 
     def save_denominator_options(self, question_options):
         for option in question_options:

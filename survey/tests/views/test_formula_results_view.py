@@ -21,8 +21,8 @@ class NumericalFormulaResults(BaseTest):
         self.condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         self.condition.groups.add(self.member_group)
 
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
+        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
 
         module = QuestionModule.objects.create(name='Education', description='Educational Module')
@@ -37,13 +37,13 @@ class NumericalFormulaResults(BaseTest):
         self.formula_1 = Formula.objects.create(numerator=self.question_1, denominator=self.question_2, indicator=indicator)
         country = LocationType.objects.create(name='Country', slug='country')
         self.uganda = Location.objects.create(name='Country', type=country)
-        country_type_details = LocationTypeDetails.objects.create(country=self.uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=country)
         district = LocationType.objects.create(name = 'District', slug='district')
         village = LocationType.objects.create(name = 'Village', slug='village')
 
-        self.kampala = Location.objects.create(name='Kampala', type = district, tree_parent=self.uganda)
-        self.village_1 = Location.objects.create(name='Village 1', type = village, tree_parent = self.kampala)
-        self.village_2 = Location.objects.create(name='Village 2', type = village, tree_parent = self.kampala)
+        self.kampala = Location.objects.create(name='Kampala', type=district, tree_parent=self.uganda)
+        self.village_1 = Location.objects.create(name='Village 1', type=village, tree_parent=self.kampala)
+        self.village_2 = Location.objects.create(name='Village 2', type=village, tree_parent=self.kampala)
 
         backend = Backend.objects.create(name='something')
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.village_1, backend = backend, weights = 0.3)
@@ -112,6 +112,7 @@ class NumericalFormulaResults(BaseTest):
         self.assertEquals(response.context['household_data'][self.household_1][self.formula_1.denominator], 200)
         self.assertEquals(response.context['household_data'][self.household_2][self.formula_1.numerator], 10)
         self.assertEquals(response.context['household_data'][self.household_2][self.formula_1.denominator], 100)
+
 
 class MultichoiceResults(BaseTest):
     def setUp(self):
@@ -187,7 +188,6 @@ class MultichoiceResults(BaseTest):
         for household in Household.objects.all():
             HouseholdHead.objects.create(household=household, surname="Surname %s" % household.pk, date_of_birth='1980-09-01')
 
-
     def create_household_member(self,household):
         return HouseholdMember.objects.create(surname="Member", date_of_birth=date(1980, 2, 2), male=False,
                                               household=household)
@@ -199,10 +199,10 @@ class MultichoiceResults(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('formula/show.html', templates)
         self.assertEquals(type(response.context['locations']), LocationWidget)
-        self.assertEquals(response.context['computed_value'], { self.option_1.text: 27.5, self.option_2.text: 32.5})
+        self.assertEquals(response.context['computed_value'], {self.option_1.text: 27.5, self.option_2.text: 32.5})
         self.assertEquals(len(response.context['hierarchial_data']), 2)
-        self.assertEquals(response.context['hierarchial_data'][self.village_1], { self.option_1.text: 15, self.option_2.text: 15})
-        self.assertEquals(response.context['hierarchial_data'][self.village_2], { self.option_1.text: 40, self.option_2.text: 50})
+        self.assertEquals(response.context['hierarchial_data'][self.village_1], {self.option_1.text: 15, self.option_2.text: 15})
+        self.assertEquals(response.context['hierarchial_data'][self.village_2], {self.option_1.text: 40, self.option_2.text: 50})
 
     def test_get_for_village(self):
         url = "/batches/%s/formulae/%s/?location=%s" % (self.batch.pk, self.formula.pk, self.village_1.pk)
@@ -211,7 +211,7 @@ class MultichoiceResults(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('formula/show.html', templates)
         self.assertEquals(type(response.context['locations']), LocationWidget)
-        self.assertEquals(response.context['computed_value'], { self.option_1.text: 15, self.option_2.text: 15})
+        self.assertEquals(response.context['computed_value'], {self.option_1.text: 15, self.option_2.text: 15})
         self.assertEquals(response.context['weights'], 0.3)
         self.assertEquals(len(response.context['household_data']), 3)
         self.assertEquals(response.context['household_data'][self.household_1][self.formula.numerator], self.option_1)
@@ -220,6 +220,6 @@ class MultichoiceResults(BaseTest):
         self.assertEquals(response.context['household_data'][self.household_2][self.formula.denominator], 10)
         self.assertEquals(response.context['household_data'][self.household_3][self.formula.numerator], self.option_2)
         self.assertEquals(response.context['household_data'][self.household_3][self.formula.denominator], 30)
-        
+
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for("/batches/%s/formulae/%s/?location=%s" % (self.batch.pk, self.formula.pk, self.kampala.pk))
