@@ -146,9 +146,13 @@ class Investigator(BaseModel):
             self.set_in_cache(label, questions)
 
     def filter_non_completed_households(self, all_households):
+        all_households = self._remove_unregistered(all_households)
         all_completed_households = self.batch_completion_completed_households.all().values_list('household', flat=True)
         non_completed_households = filter(lambda household: household.id not in all_completed_households, all_households)
         return non_completed_households
+
+    def _remove_unregistered(self, all_households):
+        return filter(lambda household: household.get_head(), all_households)
 
     def households_list(self, page=1, registered=False, open_survey=None, non_response_reporting=False):
         all_households = list(self.all_households(open_survey, non_response_reporting))

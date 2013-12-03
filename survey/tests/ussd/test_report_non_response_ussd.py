@@ -43,6 +43,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         self.household4 = self.create_household(4)
 
         self.household_head = self.create_household_member(name="Bob", household=self.household1)
+        self.household_head2 = self.create_household_member(name="Bob 2 Head", household=self.household2)
+        self.household_head3 = self.create_household_member(name="Bob 3 Head", household=self.household3)
+        self.household_head4 = self.create_household_member(name="Bob 4 Head", household=self.household4)
 
         self.none_response_group = HouseholdMemberGroup.objects.create(name="NON_RESPONSE", order=0)
         module = QuestionModule.objects.create(name='NON RESPONSE')
@@ -95,10 +98,11 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     response_string = "responseString=%s&action=request" % homepage
                     self.assertEqual(urllib2.unquote(response.content), response_string)
 
-    def test_shows_only_households_that_have_not_completed(self):
+    def test_shows_only_REGISTERED_households_that_have_not_completed(self):
         self.household1.batch_completed(self.batch)
         self.household2.batch_completed(self.batch)
-        self.household3.batch_completed(self.batch)
+
+        self.household_head3.delete()
 
         self.batch.activate_non_response_for(self.kampala)
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
@@ -106,7 +110,8 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
                     response = self.report_non_response()
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s" % self.household4.uid
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" % \
+                    (self.household4.uid, self.household_head4.surname)
                     first_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
 
@@ -118,6 +123,13 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household9 = self.create_household(9)
         household10 = self.create_household(10)
 
+        household_head5 = self.create_household_member(name="Bob 5 Head", household=household5)
+        household_head6 = self.create_household_member(name="Bob 6 Head", household=household6)
+        household_head7 = self.create_household_member(name="Bob 7 Head", household=household7)
+        household_head8 = self.create_household_member(name="Bob 8 Head", household=household8)
+        household_head9 = self.create_household_member(name="Bob 9 Head", household=household9)
+        household_head10 = self.create_household_member(name="Bob 10 Head", household=household10)
+
         self.household1.batch_completed(self.batch)
 
         self.batch.activate_non_response_for(self.kampala)
@@ -126,29 +138,35 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
                     response = self.report_non_response()
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s" \
-                                                                       "\n2: Household-%s" \
-                                                                       "\n3: Household-%s" \
-                                                                       "\n4: Household-%s" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" \
+                                                                       "\n2: Household-%s-%s" \
+                                                                       "\n3: Household-%s-%s" \
+                                                                       "\n4: Household-%s-%s" \
                                                                        "\n#: Next" % (
-                                         self.household2.uid, self.household3.uid, self.household4.uid, household5.uid)
+                                         self.household2.uid, self.household_head2.surname,
+                                         self.household3.uid, self.household_head3.surname,
+                                         self.household4.uid, self.household_head4.surname,
+                                         household5.uid, household_head5.surname)
                     first_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
                     response = self.respond("#")
 
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: Household-%s" \
-                                                                       "\n6: Household-%s" \
-                                                                       "\n7: Household-%s" \
-                                                                       "\n8: Household-%s" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: Household-%s-%s" \
+                                                                       "\n6: Household-%s-%s" \
+                                                                       "\n7: Household-%s-%s" \
+                                                                       "\n8: Household-%s-%s" \
                                                                        "\n*: Back\n#: Next" % (
-                                         household6.uid, household7.uid, household8.uid, household9.uid)
+                                         household6.uid, household_head6.surname,
+                                         household7.uid, household_head7.surname,
+                                         household8.uid, household_head8.surname,
+                                         household9.uid, household_head9.surname)
                     second_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), second_page_list)
 
                     response = self.respond("#")
 
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n9: Household-%s" \
-                                                                       "\n*: Back" % household10.uid
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n9: Household-%s-%s\n*: Back"\
+                                     % (household10.uid, household_head10.surname)
                     last_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), last_page_list)
 
@@ -230,10 +248,12 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 self.report_non_response()
                 self.select_household()
                 response = self.respond("2")
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s" \
-                                                                   "\n3: Household-%s\n4: Household-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s" \
+                                                                   "\n3: Household-%s-%s\n4: Household-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,
-                                    self.household2.uid, self.household3.uid, self.household4.uid)
+                                    self.household2.uid, self.household_head2.surname,
+                                    self.household3.uid, self.household_head3.surname,
+                                    self.household4.uid, self.household_head4.surname)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
 
@@ -463,10 +483,12 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 self.select_household_member("2")
                 response = self.respond("1")
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s" \
-                                                                   "\n3: Household-%s\n4: Household-%s" \
-                                 % (self.household1.uid, self.household_head.surname,
-                                    self.household2.uid, self.household3.uid, self.household4.uid)
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s" \
+                                                                       "\n3: Household-%s-%s\n4: Household-%s-%s" \
+                                     % (self.household1.uid, self.household_head.surname,
+                                        self.household2.uid, self.household_head2.surname,
+                                        self.household3.uid, self.household_head3.surname,
+                                        self.household4.uid, self.household_head4.surname)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
 
@@ -476,8 +498,6 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
-
-        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
 
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
@@ -496,7 +516,6 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
 
-        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
         household_member_who_completed = self.create_household_member(name="bob4 good son", household=self.household4, head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
@@ -518,8 +537,6 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
 
-        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
-
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
@@ -528,10 +545,12 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     self.select_household("4")
                     self.respond("1")
                     response = self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s*" \
-                                                                       "\n3: Household-%s*\n4: Household-%s-%s*" \
-                                     % (self.household1.uid, self.household_head.surname, self.household2.uid,
-                                        self.household3.uid, self.household4.uid, household_head4.surname)
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s*" \
+                                                                       "\n3: Household-%s-%s*\n4: Household-%s-%s*" \
+                                     % (self.household1.uid, self.household_head.surname,
+                                        self.household2.uid, self.household_head2.surname,
+                                        self.household3.uid, self.household_head3.surname,
+                                        self.household4.uid, self.household_head4.surname)
                     first_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
 
@@ -542,7 +561,6 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
 
-        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
         household_member_who_completed = self.create_household_member(name="bob4 good son", household=self.household4, head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
@@ -556,10 +574,12 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     self.respond("1")
 
                     response = self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s*" \
-                                                                       "\n3: Household-%s*\n4: Household-%s-%s*" \
-                                     % (self.household1.uid, self.household_head.surname, self.household2.uid,
-                                        self.household3.uid, self.household4.uid, household_head4.surname)
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s*" \
+                                                                       "\n3: Household-%s-%s*\n4: Household-%s-%s*" \
+                                     % (self.household1.uid, self.household_head.surname,
+                                        self.household2.uid, self.household_head2.surname,
+                                        self.household3.uid, self.household_head3.surname,
+                                        self.household4.uid, self.household_head4.surname)
                     first_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
 
@@ -569,8 +589,6 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
-
-        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
 
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
@@ -593,7 +611,6 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
 
-        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
         household_member_who_completed = self.create_household_member(name="bob4 good son", household=self.household4, head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
@@ -609,7 +626,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     self.select_household("4")
                     response = self.select_household_member("1")
                     non_response_option_page = "\n1: Member Refused\n2: Reason"
-                    question_and_options = self.member_non_response_question.text%household_head4.surname + non_response_option_page
+                    question_and_options = self.member_non_response_question.text%self.household_head4.surname + non_response_option_page
                     non_response_question = "responseString=%s&action=request" % question_and_options
                     self.assertEquals(urllib2.unquote(response.content), non_response_question)
 
@@ -619,8 +636,6 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
-
-        household_head4 = self.create_household_member(name="Bob4", household=self.household4)
 
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
@@ -784,6 +799,14 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household9 = self.create_household(9)
         household10 = self.create_household(10)
 
+        household_head5 = self.create_household_member(name="Bob 5 Head", household=household5)
+        household_head6 = self.create_household_member(name="Bob 6 Head", household=household6)
+        household_head7 = self.create_household_member(name="Bob 7 Head", household=household7)
+        household_head8 = self.create_household_member(name="Bob 8 Head", household=household8)
+        household_head9 = self.create_household_member(name="Bob 9 Head", household=household9)
+        household_head10 = self.create_household_member(name="Bob 10 Head", household=household10)
+
+
         household_member1 = self.create_household_member(name="bob1", household=household7, head=False, date_of_birth="1996-9-9")
         household_member2 = self.create_household_member(name="bob2", household=household7, head=False, date_of_birth="1996-9-10")
         household_member3 = self.create_household_member(name="bob3", household=household7, head=False, date_of_birth="1996-9-11")
@@ -793,7 +816,6 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household_member7 = self.create_household_member(name="bob7", household=household7, head=False, date_of_birth="1996-9-15")
         household_member8 = self.create_household_member(name="bob8", household=household7, head=False, date_of_birth="1996-9-16")
 
-        household_head = self.create_household_member(name="Bob", household=household7)
         household_member_who_completed = self.create_household_member(name="bob good son", household=household7, head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
@@ -817,18 +839,20 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 response = self.report_non_response()
 
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" \
-                                                   "\n2: Household-%s" \
-                                                   "\n3: Household-%s" \
-                                                   "\n4: Household-%s" \
+                                                   "\n2: Household-%s-%s" \
+                                                   "\n3: Household-%s-%s" \
+                                                   "\n4: Household-%s-%s" \
                                                    "\n#: Next" % ( self.household1.uid, self.household_head.surname,
-                     self.household2.uid, self.household3.uid, self.household4.uid)
+                     self.household2.uid, self.household_head2.surname,
+                     self.household3.uid, self.household_head3.surname,
+                     self.household4.uid, self.household_head4.surname)
                 HH_list_page_1 = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), HH_list_page_1)
 
                 self.respond("#")
                 response = self.respond("7")
 
-                households_member_list = (USSD.MESSAGES['MEMBERS_LIST'], household_head.surname,
+                households_member_list = (USSD.MESSAGES['MEMBERS_LIST'], household_head7.surname,
                                           household_member1.surname, household_member2.surname, household_member3.surname)
                 member_list_page_1 = "%s\n1: %s - (HEAD)\n2: %s\n3: %s\n4: %s\n#: Next" % households_member_list
                 formatted_member_list_page_1 = "responseString=%s&action=request" % member_list_page_1
@@ -858,10 +882,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 household_member6.delete()
                 household_member7.delete()
                 household_member8.delete()
-                household_head.delete()
-
-                household_head6 = self.create_household_member(name="Bob HH 6", household=household6)
-
+                household_head7.delete()
 
                 self.respond("#")
                 response = self.respond("5")
