@@ -58,6 +58,7 @@ class USSDReportNonResponse(USSD):
                 self.paginates_or_process_household_question(answer)
         else:
             self.select_household(answer, non_response_reporting=True)
+            self.reset_page()
             self.render_questions_or_select_member()
 
     def render_questions_or_select_member(self, answer=None):
@@ -121,6 +122,7 @@ class USSDReportNonResponse(USSD):
             answer = int(answer)
             self.household_member = self.household.get_non_complete_members()[answer - 1]
             self.set_in_session('HOUSEHOLD_MEMBER', self.household_member)
+            self.reset_page()
             return
         except (ValueError, IndexError) as e:
             self.responseString += "INVALID SELECTION: "
@@ -133,6 +135,7 @@ class USSDReportNonResponse(USSD):
             self.render_member_non_response_question(answer)
         else:
             self.save_answer_and_clear_question(question_option, household=False)
+            self.reset_page()
             self.render_members_or_households_or_completion_message()
 
     def render_members_or_households_or_completion_message(self):
@@ -174,3 +177,5 @@ class USSDReportNonResponse(USSD):
         else:
             self.get_household_list(non_response_reporting=True)
 
+    def reset_page(self):
+        self.set_in_session('PAGE', 1)

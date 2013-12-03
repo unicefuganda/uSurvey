@@ -770,3 +770,106 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     member = self.household2.household_member.all()[0]
                     self.assertEqual(member.surname, answers['name'])
                     self.assertEqual(member.male, True)
+
+    def test_pagination_on_one_side_is_not_inherited_in_pagination_on_other_sides(self):
+        household_member_who_completed = self.create_household_member(name="bob good son", household=self.household1, head=False, date_of_birth="1996-9-1")
+        household_member_who_completed.batch_completed(self.batch)
+
+        self.batch.activate_non_response_for(self.kampala)
+
+        household5 = self.create_household(5)
+        household6 = self.create_household(6)
+        household7 = self.create_household(7)
+        household8 = self.create_household(8)
+        household9 = self.create_household(9)
+        household10 = self.create_household(10)
+
+        household_member1 = self.create_household_member(name="bob1", household=household7, head=False, date_of_birth="1996-9-9")
+        household_member2 = self.create_household_member(name="bob2", household=household7, head=False, date_of_birth="1996-9-10")
+        household_member3 = self.create_household_member(name="bob3", household=household7, head=False, date_of_birth="1996-9-11")
+        household_member4 = self.create_household_member(name="bob4", household=household7, head=False, date_of_birth="1996-9-12")
+        household_member5 = self.create_household_member(name="bob5", household=household7, head=False, date_of_birth="1996-9-13")
+        household_member6 = self.create_household_member(name="bob6", household=household7, head=False, date_of_birth="1996-9-14")
+        household_member7 = self.create_household_member(name="bob7", household=household7, head=False, date_of_birth="1996-9-15")
+        household_member8 = self.create_household_member(name="bob8", household=household7, head=False, date_of_birth="1996-9-16")
+
+        household_head = self.create_household_member(name="Bob", household=household7)
+        household_member_who_completed = self.create_household_member(name="bob good son", household=household7, head=False, date_of_birth="1996-9-1")
+        household_member_who_completed.batch_completed(self.batch)
+
+
+        QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 2", order=3)
+        QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 3", order=4)
+        QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 4", order=5)
+        QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 5", order=6)
+        QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 6", order=7)
+        QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 7", order=8)
+        QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 8", order=9)
+
+        QuestionOption.objects.create(question=self.non_response_question, text="Reason 5", order=5)
+        QuestionOption.objects.create(question=self.non_response_question, text="Reason 6", order=6)
+        QuestionOption.objects.create(question=self.non_response_question, text="Reason 7", order=7)
+        QuestionOption.objects.create(question=self.non_response_question, text="Reason 8", order=8)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                self.reset_session()
+                response = self.report_non_response()
+
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" \
+                                                   "\n2: Household-%s" \
+                                                   "\n3: Household-%s" \
+                                                   "\n4: Household-%s" \
+                                                   "\n#: Next" % ( self.household1.uid, self.household_head.surname,
+                     self.household2.uid, self.household3.uid, self.household4.uid)
+                HH_list_page_1 = "responseString=%s&action=request" % household_list
+                self.assertEquals(urllib2.unquote(response.content), HH_list_page_1)
+
+                self.respond("#")
+                response = self.respond("7")
+
+                households_member_list = (USSD.MESSAGES['MEMBERS_LIST'], household_head.surname,
+                                          household_member1.surname, household_member2.surname, household_member3.surname)
+                member_list_page_1 = "%s\n1: %s - (HEAD)\n2: %s\n3: %s\n4: %s\n#: Next" % households_member_list
+                formatted_member_list_page_1 = "responseString=%s&action=request" % member_list_page_1
+                self.assertEquals(urllib2.unquote(response.content), formatted_member_list_page_1)
+
+                self.respond("#")
+                response = self.respond("5")
+
+                non_response_option_page = "\n1: Member Refused\n2: Reason\n3: Reason 2\n#: Next"
+                question_and_options = self.member_non_response_question.text%household_member4.surname + non_response_option_page
+                non_response_question_page_1 = "responseString=%s&action=request" % question_and_options
+                self.assertEquals(urllib2.unquote(response.content), non_response_question_page_1)
+
+                self.respond("#")
+                response = self.respond("4")
+                self.assertEquals(urllib2.unquote(response.content), formatted_member_list_page_1)
+
+                self.respond("#")
+                response = self.respond("6")
+                question_and_options = self.member_non_response_question.text%household_member5.surname + non_response_option_page
+                non_response_question_page_1 = "responseString=%s&action=request" % question_and_options
+                self.assertEquals(urllib2.unquote(response.content), non_response_question_page_1)
+
+                household_member1.delete()
+                household_member2.delete()
+                household_member3.delete()
+                household_member6.delete()
+                household_member7.delete()
+                household_member8.delete()
+                household_head.delete()
+
+                household_head6 = self.create_household_member(name="Bob HH 6", household=household6)
+
+
+                self.respond("#")
+                response = self.respond("5")
+                self.assertEquals(urllib2.unquote(response.content), HH_list_page_1)
+
+                self.respond("#")
+                response = self.respond("6")
+                non_response_option_page_1 = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
+                question_and_options_page_1 = self.non_response_question.text%(household6.uid, household_head6.surname) + non_response_option_page_1
+                non_response_question_page_1 = "responseString=%s&action=request" % question_and_options_page_1
+                self.assertEquals(urllib2.unquote(response.content), non_response_question_page_1)
