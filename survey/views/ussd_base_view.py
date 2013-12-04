@@ -38,6 +38,8 @@ class USSDBaseView(object):
 
     def response(self):
         answer = self.request['ussdRequestString'].strip()
+        print '*'*100
+        print 'Answer:', answer
         if self.investigator.is_blocked:
             return {'action': self.ussd_survey.ACTIONS['END'],
                     'responseString': self.ussd_survey.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']}
@@ -50,8 +52,13 @@ class USSDBaseView(object):
                 self.ussd_report_non_response.clear_caches()
                 self.investigator.set_in_cache('IS_REPORTING_NON_RESPONSE', False)
                 action, response_string = self.ussd_survey.render_welcome_or_resume()
+            elif self.ussd_survey.is_resuming_survey and answer == self.ANSWER['NO']:
+                action, response_string = self.render_home_page()
+                self.clear_HH_caches()
+                self.ussd_survey.set_in_session('IS_RESUMING', False)
             else:
                 action, response_string = self.ussd_report_non_response.start(answer)
+                self.ussd_survey.set_in_session('IS_RESUMING', False)
 
         elif self.is_registering_household is None:
             if answer == self.ANSWER['TAKE_SURVEY']:
@@ -77,12 +84,13 @@ class USSDBaseView(object):
                     action, response_string = self.ussd_register_household.start("00")
                     self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
                 else:
-                    action = self.ussd_survey.ACTIONS['REQUEST']
-                    response_string = USSDSurvey.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-                    self.investigator.clear_interview_caches()
-                    self.ussd_register_household.set_in_session('HOUSEHOLD', None)
-                    self.ussd_survey.set_in_session('HOUSEHOLD', None)
+                    action, response_string = self.render_home_page()
+                    self.clear_HH_caches()
                 self.ussd_survey.set_in_session('IS_RESUMING', False)
+        print 'Action:', action
+        print 'Response:\n', response_string
+        print '#'*100
+
         return {'action': action, 'responseString': response_string}
 
     def is_new_request_parameter(self, answer):
@@ -95,3 +103,14 @@ class USSDBaseView(object):
             matches_short_code = (answer == APPLICATION_CODE)
 
         return not answer or match or matches_short_code
+
+    def render_home_page(self):
+        action = self.ussd_survey.ACTIONS['REQUEST']
+        response_string = self.ussd_survey.render_menu()
+        return action, response_string
+
+    def clear_HH_caches(self):
+        self.investigator.clear_interview_caches()
+        self.ussd_register_household.set_in_session('HOUSEHOLD', None)
+        self.ussd_survey.set_in_session('HOUSEHOLD', None)
+

@@ -17,6 +17,7 @@ class USSD(USSDBase):
         self.is_resuming_survey = False
         self.has_chosen_retake = False
         self.has_answered_retake = False
+        self.can_retake_household = False
         self.question = None
         self.set_session()
         self.set_household()
@@ -28,48 +29,45 @@ class USSD(USSDBase):
         self.set_can_retake_household()
         self.clean_investigator_input()
 
-    def set_household(self):
-        household = self.get_from_session('HOUSEHOLD')
-        if household:
-            self.household = household
 
-    def set_can_retake_household(self):
+    def set_attribute_from_session(self, key, attribute):
         try:
-            can_retake_household = self.get_from_session('CAN_RETAKE_HOUSEHOLD')
-            self.can_retake_household = can_retake_household
-        except:
+            attr_value = self.get_from_session(key)
+            if attr_value:
+                setattr(self, attribute, attr_value)
+        except KeyError:
             pass
 
-    def set_household_member(self):
-        household_member = self.get_from_session('HOUSEHOLD_MEMBER')
+    def set_from_investigator_cache(self, key, attribute):
+        try:
+            attr_value = self.investigator.get_from_cache(key)
+            if attr_value:
+                setattr(self, attribute, attr_value)
+        except KeyError:
+            pass
 
-        if household_member:
-            self.household_member = household_member
+
+    def set_household(self):
+        self.set_attribute_from_session('HOUSEHOLD', 'household')
+
+    def set_can_retake_household(self):
+        self.set_attribute_from_session('CAN_RETAKE_HOUSEHOLD', 'can_retake_household')
+
+    def set_household_member(self):
+        self.set_attribute_from_session('HOUSEHOLD_MEMBER', 'household_member')
 
     def set_current_member_is_done(self):
         if self.household_member and (self.is_registering_household is False):
             self.current_member_is_done = self.household_member.survey_completed()
 
     def set_is_resuming_survey(self):
-        try:
-            cache_resuming_session = self.get_from_session('IS_RESUMING')
-            self.is_resuming_survey = cache_resuming_session
-        except:
-            pass
+         self.set_attribute_from_session('IS_RESUMING', 'is_resuming_survey')
 
     def set_has_chosen_retake(self):
-        try:
-            cache_has_chosen_retake_session = self.get_from_session('HAS_CHOSEN_RETAKE')
-            self.has_chosen_retake = cache_has_chosen_retake_session
-        except:
-            pass
+        self.set_attribute_from_session('HAS_CHOSEN_RETAKE', 'has_chosen_retake')
 
     def set_has_answered_retake(self):
-        try:
-            cache_has_answered_retake_session = self.get_from_session('HAS_ANSWERED_RETAKE')
-            self.has_answered_retake = cache_has_answered_retake_session
-        except:
-            pass
+        self.set_attribute_from_session('HAS_ANSWERED_RETAKE','has_answered_retake')
 
     def set_session(self):
         self.session_string = "SESSION-%s-%s" % (self.request['transactionId'], self.__class__.__name__)
@@ -86,6 +84,10 @@ class USSD(USSDBase):
         session = cache.get(self.session_string)
         session[key] = value
         cache.set(self.session_string, session)
+
+    def set_investigator_cache(self, key, value):
+        self.investigator.set_in_cache(key, value)
+
 
     def is_pagination_option(self, answer):
         return answer in getattr(settings, 'USSD_PAGINATION', None).values()

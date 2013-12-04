@@ -19,7 +19,6 @@ class LocationWidgetTest(BaseTest):
     def test_gets_second_level_location_ie_below_country_if_no_selected_location_given(self):
         location_widget = LocationWidget(None)
         self.assertNotIn('country', location_widget.get_widget_data().keys())
-        print location_widget.get_widget_data()
         self.assertIn(self.kampala, location_widget.get_widget_data()['district'])
         self.assertEqual([], location_widget.get_widget_data()['city'])
 
@@ -31,7 +30,6 @@ class LocationWidgetTest(BaseTest):
 
     def test_sorted_by_hierachy_removes_country_types(self):
         slugs = LocationType.objects.all().values_list('slug', flat=True)
-        print slugs
         old_data = {}
         for slug in slugs:
             old_data[slug] = 'dummy haha' + str(randint)

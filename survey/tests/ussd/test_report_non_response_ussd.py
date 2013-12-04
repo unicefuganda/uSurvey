@@ -894,3 +894,239 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 question_and_options_page_1 = self.non_response_question.text%(household6.uid, household_head6.surname) + non_response_option_page_1
                 non_response_question_page_1 = "responseString=%s&action=request" % question_and_options_page_1
                 self.assertEquals(urllib2.unquote(response.content), non_response_question_page_1)
+
+
+    def test_resume_from_non_response_to_take_survey(self):
+        self.batch.activate_non_response_for(self.kampala)
+
+        self.household2.delete()
+        self.household3.delete()
+        self.household4.delete()
+
+        head_group = HouseholdMemberGroup.objects.create(name="General", order=1)
+        condition = GroupCondition.objects.create(value='HEAD', attribute="GENERAL", condition="EQUALS")
+        condition.groups.add(head_group)
+
+        question_1 = Question.objects.create(text="Question 1",
+                                                  answer_type=Question.NUMBER, order=0, group=head_group)
+        question_1.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                self.report_non_response()
+                response = self.select_household("1")
+                non_response_option_page = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
+                question_and_options = self.non_response_question.text%(self.household1.uid, self.household_head.surname) + non_response_option_page
+                non_response_question = "responseString=%s&action=request" % question_and_options
+                self.assertEquals(urllib2.unquote(response.content), non_response_question)
+
+                with patch.object(USSDSurvey, "is_active", return_value=True):
+                    response = self.reset_session()
+
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond(USSD.ANSWER['YES'])
+                self.assertEquals(urllib2.unquote(response.content), non_response_question)
+
+                response = self.respond("3")
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['NON_RESPONSE_COMPLETION']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                self.assertEquals(3, MultiChoiceAnswer.objects.get(investigator=self.investigator, batch=self.batch,
+                                                                   question=self.non_response_question,
+                                                                   household=self.household1).answer.order)
+
+                response = self.reset_session()
+
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond(USSD.ANSWER['NO'])
+                homepage = "Welcome %s to the survey.\n"\
+                           "1: Register households\n"\
+                           "2: Take survey\n"\
+                           "3: Report non-response" % self.investigator.name
+                response_string = "responseString=%s&action=request" % homepage
+                self.assertEqual(urllib2.unquote(response.content), response_string)
+
+                response = self.respond(USSD.ANSWER['TAKE_SURVEY'])
+
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s"\
+                                      % (self.household1.uid, self.household_head.surname)
+                first_page_list = "responseString=%s&action=request" % household_list
+                self.assertEquals(urllib2.unquote(response.content), first_page_list)
+
+                response = self.select_household("1")
+                households_member_list = (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
+                expected_screen = "%s\n1: %s - (HEAD)" % households_member_list
+                response_string = "responseString=%s&action=request" % expected_screen
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.select_household_member("1")
+                response_string = "responseString=%s&action=request" % question_1.text
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond("3")
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLD_COMPLETION_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                self.assertEquals(3, NumericalAnswer.objects.get(investigator=self.investigator, question=question_1,
+                                                             household=self.household1).answer)
+
+                response = self.respond(USSD.ANSWER['NO'])
+                response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_resume_from_non_response_to_register_HH(self):
+        self.batch.activate_non_response_for(self.kampala)
+
+        self.household2.delete()
+        self.household3.delete()
+        self.household4.delete()
+
+        registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",
+                                                                      order=1)
+        module = QuestionModule.objects.create(name='Registration')
+        question_1 = Question.objects.create(module=module, text="Please Enter the name",
+                                                  answer_type=Question.TEXT, order=1, group=registration_group)
+        age_question = Question.objects.create(module=module, text="Please Enter the age",
+                                                    answer_type=Question.NUMBER, order=2, group=registration_group)
+        month_question = Question.objects.create(module=module, text="Please Enter the month of birth",
+                                                      answer_type=Question.MULTICHOICE, order=3,
+                                                      group=registration_group)
+        QuestionOption.objects.create(question=month_question, text="January", order=1)
+        QuestionOption.objects.create(question=month_question, text="February", order=2)
+        QuestionOption.objects.create(question=month_question, text="March", order=3)
+        QuestionOption.objects.create(question=month_question, text="April", order=4)
+        QuestionOption.objects.create(question=month_question, text="May", order=5)
+        QuestionOption.objects.create(question=month_question, text="June", order=6)
+        QuestionOption.objects.create(question=month_question, text="July", order=7)
+        QuestionOption.objects.create(question=month_question, text="August", order=8)
+        QuestionOption.objects.create(question=month_question, text="September", order=9)
+        QuestionOption.objects.create(question=month_question, text="October", order=10)
+        QuestionOption.objects.create(question=month_question, text="November", order=11)
+        QuestionOption.objects.create(question=month_question, text="December", order=12)
+        QuestionOption.objects.create(question=month_question, text="DONT KNOW", order=99)
+
+        year_question = Question.objects.create(module=module, text="Please Enter the year of birth",
+                                                     answer_type=Question.NUMBER, order=4, group=registration_group)
+        gender_question = Question.objects.create(module=module, text="Please Enter the gender: 1.Male\n2.Female",
+                                                       answer_type=Question.NUMBER, order=5, group=registration_group)
+
+        some_age = 10
+        answers = {'name': 'dummy name',
+                   'age': some_age,
+                   'gender': '1',
+                   'month': '2',
+                   'year': datetime.datetime.now().year - some_age
+        }
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(Investigator, "was_active_within", return_value=False):
+                    self.reset_session()
+                self.report_non_response()
+                response = self.select_household("1")
+                non_response_option_page = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
+                question_and_options = self.non_response_question.text%(self.household1.uid, self.household_head.surname) + non_response_option_page
+                non_response_question = "responseString=%s&action=request" % question_and_options
+                self.assertEquals(urllib2.unquote(response.content), non_response_question)
+
+                with patch.object(USSDSurvey, "is_active", return_value=True):
+                    response = self.reset_session()
+
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond(USSD.ANSWER['YES'])
+                self.assertEquals(urllib2.unquote(response.content), non_response_question)
+
+                response = self.respond("3")
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['NON_RESPONSE_COMPLETION']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                self.assertEquals(3, MultiChoiceAnswer.objects.get(investigator=self.investigator, batch=self.batch,
+                                                                   question=self.non_response_question,
+                                                                   household=self.household1).answer.order)
+
+                response = self.reset_session()
+
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond(USSD.ANSWER['NO'])
+                homepage = "Welcome %s to the survey.\n"\
+                           "1: Register households\n"\
+                           "2: Take survey\n"\
+                           "3: Report non-response" % self.investigator.name
+                response_string = "responseString=%s&action=request" % homepage
+                self.assertEqual(urllib2.unquote(response.content), response_string)
+
+                self.household2 = self.create_household(2)
+
+                response = self.respond(USSD.ANSWER['REGISTER_HOUSEHOLD'])
+
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s\n2: Household-%s"\
+                                      % (self.household1.uid, self.household_head.surname, self.household2.uid)
+                first_page_list = "responseString=%s&action=request" % household_list
+                self.assertEquals(urllib2.unquote(response.content), first_page_list)
+
+                response = self.select_household("2")
+                select_member_or_head = USSD.MESSAGES['SELECT_HEAD_OR_MEMBER'] % self.household2.uid
+                response_string = "responseString=%s&action=request" % select_member_or_head
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                self.respond('1')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                self.respond(answers['month'])
+                self.respond(answers['year'])
+                response = self.respond(answers['gender'])
+                end_registration_text = "responseString=%s&action=request" % USSD.MESSAGES['END_REGISTRATION']
+                self.assertEquals(urllib2.unquote(response.content), end_registration_text)
+
+                self.assertEqual(1, self.household2.household_member.count())
+                member = self.household2.household_member.all()[0]
+                self.assertEqual(member.surname, answers['name'])
+                self.assertEqual(member.male, True)
+
+    def test_resume_non_response_to_non_response(self):
+        household_member_3_1 = self.create_household_member(name="bob 3 son", household=self.household3, head=False, date_of_birth="1996-9-9")
+        household_member_3_2 = self.create_household_member(name="bob 3 son 2", household=self.household3, head=False, date_of_birth="1996-9-4")
+        household_member_who_completed = self.create_household_member(name="bob 3 good son", household=self.household3, head=False, date_of_birth="1996-9-1")
+        household_member_who_completed.batch_completed(self.batch)
+
+        self.batch.activate_non_response_for(self.kampala)
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                self.reset_session()
+                self.report_non_response()
+                self.select_household("3")
+                self.select_household_member("2")
+                self.respond("1")
+                response = self.select_household_member("3")
+                non_response_option_page = "\n1: Member Refused\n2: Reason"
+                question_and_options = self.member_non_response_question.text%household_member_3_2.surname + non_response_option_page
+                non_response_question = "responseString=%s&action=request" % question_and_options
+                self.assertEquals(urllib2.unquote(response.content), non_response_question)
+
+                with patch.object(USSDSurvey, "is_active", return_value=True):
+                    response = self.reset_session()
+
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond(USSD.ANSWER['YES'])
+                self.assertEquals(urllib2.unquote(response.content), non_response_question)
+
+                response = self.respond("2")
+                households_member_list = (USSD.MESSAGES['MEMBERS_LIST'], self.household_head3.surname,
+                                          household_member_3_1.surname, household_member_3_2.surname)
+                expected_screen_page_1 = "%s\n1: %s - (HEAD)\n2: %s*\n3: %s*" % households_member_list
+                member_list_page_1 = "responseString=%s&action=request" % expected_screen_page_1
+                self.assertEquals(urllib2.unquote(response.content), member_list_page_1)

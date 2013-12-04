@@ -247,7 +247,6 @@ class USSDRegisterHousehold(USSD):
     def format_age_to_date_of_birth(self, age_question, month_of_birth):
         age = self.REGISTRATION_DICT[age_question.text]
         today = datetime.date.today()
-        print today
         date_of_birth = today.replace(year=(today.year - int(age)))
         if month_of_birth != self.UNKNOWN:
             year = date_of_birth.year
