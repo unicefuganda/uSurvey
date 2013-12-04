@@ -75,8 +75,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         return household_member
 
 
-    def test_shows_non_response_menu_if_its_activated(self):
+    def test_shows_non_response_menu_if_its_activated_and_there_are_HH_who_qualify_for_NR_questions(self):
         self.batch.activate_non_response_for(self.kampala)
+        self.investigator.batch_completion_completed_households.all().delete()
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
@@ -90,6 +91,21 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
     def test_does_not_show_non_response_menu_if_its_not_deactivated(self):
         self.batch.deactivate_non_response_for(self.kampala)
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(USSDSurvey, 'is_active', return_value=False):
+                    response = self.reset_session()
+                    homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
+                    response_string = "responseString=%s&action=request" % homepage
+                    self.assertEqual(urllib2.unquote(response.content), response_string)
+
+    def test_does_not_show_non_response_menu_if_no_HH_qualify_for_NR_questions_even_if_activated(self):
+        self.batch.activate_non_response_for(self.kampala)
+        self.household1.batch_completed(self.batch)
+        self.household2.batch_completed(self.batch)
+        self.household3.batch_completed(self.batch)
+        self.household4.batch_completed(self.batch)
+
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):

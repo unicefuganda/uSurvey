@@ -364,8 +364,12 @@ class InvestigatorTest(TestCase):
 
         self.assertFalse(investigator.created_member_within(TIMEOUT_MINUTES))
 
-    def test_investigator_knows_non_response_reporting_is_activated_for_his_location(self):
+    def test_investigator_knows_non_response_reporting_is_activated_for_his_location_if_there_are_HH_who_qualify(self):
         batch = Batch.objects.create(name="hoho")
+
+        household_head = HouseholdHead.objects.create(surname="head", date_of_birth=date(1980, 2, 4), male=False,
+                                                               household=self.household)
+        self.investigator.batch_completion_completed_households.all().delete()
 
         batch.activate_non_response_for(self.kampala)
 
@@ -375,6 +379,12 @@ class InvestigatorTest(TestCase):
         batch = Batch.objects.create(name="hoho")
 
         batch.deactivate_non_response_for(self.kampala)
+
+        self.assertFalse(self.investigator.can_report_non_response())
+
+    def test_investigator_knows_non_response_reporting_is_also_deactivated_for_his_location_if_there_are_no_HH_who_qualify(self):
+        batch = Batch.objects.create(name="hoho")
+        self.household.batch_completed(batch)
 
         self.assertFalse(self.investigator.can_report_non_response())
 

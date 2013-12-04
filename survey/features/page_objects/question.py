@@ -68,6 +68,7 @@ class CreateNewSubQuestionPage(PageObject):
         self.question = question
         self.url = "/questions/%d/sub_questions/new/" % question.id
 
+
 class EditQuestionPage(PageObject):
   
     def __init__(self, browser, question):
