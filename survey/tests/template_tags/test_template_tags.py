@@ -1,5 +1,6 @@
 from datetime import date
 from django.test import TestCase
+from rapidsms.contrib.locations.models import Location
 from survey.models import Batch, Survey
 from survey.templatetags.template_tags import *
 
@@ -82,3 +83,17 @@ class TemplateTagsTest(TestCase):
     def test_should_return_none_when_selected_batch_is_none(self):
         survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         self.assertIsNone(is_survey_selected_given(survey, None))
+
+    def test_knows_batch_is_activated_for_non_response_for_location(self):
+        kampala = Location.objects.create(name="Kampala")
+        Location.objects.create(name="Kampala")
+
+        all_open_locations = Location.objects.all()
+        self.assertEqual("checked='checked'", non_response_is_activefor(all_open_locations, kampala))
+
+    def test_knows_batch_is_not_activated_for_non_response_for_location(self):
+        kampala = Location.objects.create(name="Kampala")
+        Location.objects.create(name="Mbarara")
+
+        all_open_locations = Location.objects.filter(name="Mbarara")
+        self.assertEqual(None, non_response_is_activefor(all_open_locations, kampala))

@@ -365,6 +365,15 @@ class BatchLocationStatusTest(TestCase):
         self.assertFalse(batch.non_response_is_activated_for(kampala))
         self.assertFalse(batch.non_response_is_activated_for(bukoto))
 
+    def test_gets_all_locations_for_which_non_response_is_active(self):
+        batch = Batch.objects.create(order=1)
+        kampala = Location.objects.create(name="Kampala")
+        bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
+        abim = Location.objects.create(name="Abim")
+        batch.activate_non_response_for(abim)
+        self.assertIn(abim, batch.get_non_response_active_locations())
+        [self.assertNotIn(location, batch.get_non_response_active_locations()) for location in [bukoto, kampala]]
+
 
 class HouseholdBatchCompletionTest(TestCase):
     def test_store(self):

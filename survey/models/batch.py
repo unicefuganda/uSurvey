@@ -71,6 +71,12 @@ class Batch(BaseModel):
     def is_open_for(self, location):
         return not self.is_closed_for(location)
 
+    def get_non_response_active_locations(self):
+        non_response_active_batch_location_status = self.open_locations.filter(non_response=True)
+        locations = []
+        map(lambda batch_status: locations.append(batch_status.location), non_response_active_batch_location_status)
+        return locations
+
     def close_for_location(self, location):
         self.open_locations.filter(batch=self).delete()
 

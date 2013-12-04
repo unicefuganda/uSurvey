@@ -38,8 +38,11 @@ def show(request, survey_id, batch_id):
     prime_location_type = LocationType.objects.get(name=PRIME_LOCATION_TYPE)
     locations = Location.objects.filter(type=prime_location_type).order_by('name')
     open_locations = Location.objects.filter(id__in=batch.open_locations.values_list('location_id', flat=True))
-    return render(request, 'batches/show.html',
-                  {'batch': batch, 'locations': locations, 'open_locations': open_locations})
+    context = {'batch': batch,
+               'locations': locations,
+               'open_locations': open_locations,
+               'non_response_active_locations': batch.get_non_response_active_locations()}
+    return render(request, 'batches/show.html', context)
 
 
 @login_required

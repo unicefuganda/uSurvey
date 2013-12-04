@@ -22,6 +22,10 @@ Feature: Batch related features
     When I open batch for a different location
     And I activate non response for that location
     Then I should see it is activated for that location in db
+    When I visit the home page
+    And I visit batches listing page
+    And I visit the first batch listed
+    Then I should see that it is still activated
     When I deactivate non response for batch and location
     Then I should see it is deactivated for that location in db
 

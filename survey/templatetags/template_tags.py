@@ -84,3 +84,8 @@ def is_survey_selected_given(survey, selected_batch):
 
     if survey == selected_batch.survey:
         return "selected='selected'"
+
+@register.filter
+def non_response_is_activefor(open_locations, location):
+    if location in open_locations:
+       return "checked='checked'"

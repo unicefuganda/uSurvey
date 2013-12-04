@@ -2,8 +2,9 @@ from time import sleep
 from lettuce import *
 from rapidsms.contrib.locations.models import *
 
-from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage
+from survey.features.page_objects.batches import BatchListPage, AddBatchPage, EditBatchPage, AssignQuestionToBatchPage, BatchShowPage
 from survey.features.page_objects.question import BatchQuestionsListPage
+from survey.features.page_objects.root import HomePage
 from survey.investigator_configs import *
 from survey.models import HouseholdMemberGroup, Survey
 from survey.models.question import Question
@@ -344,3 +345,12 @@ def when_i_open_batch_for_a_different_location(step):
 @step(u'And I activate non response for that location')
 def and_i_activate_non_response_for_that_location(step):
     world.page.activate_non_response_for_batch_and(world.districts[0])
+
+@step(u'When I visit the home page')
+def when_i_visit_the_home_page(step):
+    world.page = HomePage(world.browser)
+    world.page.visit()
+
+@step(u'Then I should see that it is still activated')
+def then_i_should_see_that_it_is_still_activated_for_that_location_in_db(step):
+    world.page.is_text_present("On")

@@ -57,6 +57,7 @@ class BatchViewsTest(BaseTest):
         self.assertEquals(self.survey, response.context['survey'])
 
     def test_get_batch_view(self):
+        self.batch.activate_non_response_for(self.abim)
         response = self.client.get('/surveys/%d/batches/%d/' % (self.survey.id, self.batch.pk))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -64,6 +65,14 @@ class BatchViewsTest(BaseTest):
         self.assertEquals(self.batch, response.context['batch'])
         self.assertIn(self.kampala, response.context['locations'])
         self.assertIn(self.abim, response.context['open_locations'])
+        self.assertIn(self.abim, response.context['non_response_active_locations'])
+
+    def test_get_batch_view_with_only_non_response_active_locations_in_context(self):
+        self.batch.activate_non_response_for(self.abim)
+        self.batch.open_for_location(self.kampala)
+        response = self.client.get('/surveys/%d/batches/%d/' % (self.survey.id, self.batch.pk))
+        self.assertIn(self.abim, response.context['non_response_active_locations'])
+        self.assertNotIn(self.kampala, response.context['non_response_active_locations'])
 
     def test_open_batch_for_location(self):
         self.assertFalse(self.batch.is_open_for(self.kampala))

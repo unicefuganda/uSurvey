@@ -50,7 +50,7 @@
           <input type="text" name="non_response_location_id" value="{{ location.pk }}">
         </form>
         <div class="switch switch-activate-non-response" data-on="success" data-off="danger" data-on-label="On" data-off-label="Off">
-          <input type="checkbox" id="activate_non_response_switch_{{ location.id }}" class="activate"/>
+          <input type="checkbox" id="activate_non_response_switch_{{ location.id }}" class="activate" {{ non_response_active_locations|non_response_is_activefor:location }}/>
         </div>
         </td>
         </tr>
