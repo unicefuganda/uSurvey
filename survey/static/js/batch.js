@@ -6,11 +6,15 @@ jQuery(function($){
     }
 
   $('.switch-open-close').on('switch-change', function(e, data){
-      toggleStatus($(this), ['open-for-location-form', 'close-for-location-form'], data, true)
+      var $this = $(this);
+      toggleStatus($this, ['open-for-location-form', 'close-for-location-form'], data);
+      if (!$this.bootstrapSwitch('status')){
+          $this.parents("tr").find('.switch-activate-non-response').bootstrapSwitch('setState', false);
+      }
   });
 
   $('.switch-activate-non-response').on('switch-change', function(e, data){
-        toggleStatus($(this), ['activate-non_response-for-location-form', 'deactivate-non_response-for-location-form'], data, false)
+        toggleStatus($(this), ['activate-non_response-for-location-form', 'deactivate-non_response-for-location-form'], data)
   });
 
   var survey_id = $("#survey_id").val(),
@@ -61,7 +65,7 @@ function load_questions_for_filter(){
     });
 }
 
-function toggleStatus(element, forms_ids, data, switch_open_close){
+function toggleStatus(element, forms_ids, data){
     element.parent().find('.error').remove();
     var $el = $(data.el), form;
     if (data.value) {

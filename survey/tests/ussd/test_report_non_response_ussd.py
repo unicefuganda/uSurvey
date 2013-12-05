@@ -31,6 +31,8 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         self.kampala = Location.objects.create(name="Kampala")
         self.entebbe = Location.objects.create(name="Entebbe")
 
+        self.batch.open_for_location(self.kampala)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''),

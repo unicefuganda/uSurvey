@@ -55,7 +55,7 @@ class Batch(BaseModel):
     def activate_non_response_for(self, location, status=True):
         all_related_locations = location.get_descendants(include_self=True).all()
         for related_location in all_related_locations:
-            batch_location_status = self.open_locations.get_or_create(batch=self, location=related_location)[0]
+            batch_location_status = self.open_locations.get(location=related_location)
             batch_location_status.non_response = status
             batch_location_status.save()
 

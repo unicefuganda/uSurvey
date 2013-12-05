@@ -108,12 +108,34 @@ class BatchViewsTest(BaseTest):
         self.assertEqual('', json_response)
 
     def test_de_activate_non_response_for_batch_and_location(self):
+        self.batch.open_for_location(self.kampala)
         self.batch.activate_non_response_for(self.kampala)
         self.assertTrue(self.batch.non_response_is_activated_for(self.kampala))
         response = self.client.post('/batches/%s/non_response/deactivate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
         self.failUnlessEqual(response.status_code, 200)
 
         for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
+            self.assertFalse(self.batch.non_response_is_activated_for(loc))
+
+        json_response = json.loads(response.content)
+        self.assertEqual('', json_response)
+
+    def test_de_activate_non_response_for_batch_only_if_active_location(self):
+        self.batch.open_for_location(self.kampala)
+
+        response = self.client.post('/batches/%s/non_response/deactivate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
+        for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
+            self.assertFalse(self.batch.non_response_is_activated_for(loc))
+
+        json_response = json.loads(response.content)
+        self.assertEqual('', json_response)
+
+    def test_deactivate_non_response_does_nothing_if_not_open(self):
+        self.batch.close_for_location(self.kampala)
+
+        response = self.client.post('/batches/%s/non_response/deactivate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
+        for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
+            self.assertTrue(self.batch.is_closed_for(loc))
             self.assertFalse(self.batch.non_response_is_activated_for(loc))
 
         json_response = json.loads(response.content)

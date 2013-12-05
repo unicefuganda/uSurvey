@@ -188,5 +188,6 @@ def activate_non_response(request, batch_id):
 def deactivate_non_response(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     location = Location.objects.get(id=request.POST['non_response_location_id'])
-    batch.deactivate_non_response_for(location)
+    if batch.is_open_for(location):
+        batch.deactivate_non_response_for(location)
     return HttpResponse(json.dumps(""), content_type="application/json")

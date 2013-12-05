@@ -315,8 +315,9 @@ class BatchLocationStatusTest(TestCase):
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
         self.assertEqual(len(investigator_2.get_open_batch()), 0)
 
-        batch.open_for_location(kampala)
+        self.assertRaises(BatchLocationStatus.DoesNotExist, batch.activate_non_response_for, kampala)
 
+        batch.open_for_location(kampala)
         batch.activate_non_response_for(kampala)
 
         self.assertEqual(1, batch.open_locations.filter(non_response=True, location=kampala).count())
@@ -335,6 +336,7 @@ class BatchLocationStatusTest(TestCase):
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
         self.assertEqual(len(investigator_2.get_open_batch()), 0)
 
+        batch.open_for_location(kampala)
         batch.activate_non_response_for(kampala)
 
         batch.deactivate_non_response_for(kampala)
@@ -356,7 +358,7 @@ class BatchLocationStatusTest(TestCase):
 
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
         self.assertEqual(len(investigator_2.get_open_batch()), 0)
-
+        batch.open_for_location(kampala)
         batch.activate_non_response_for(kampala)
         self.assertTrue(batch.non_response_is_activated_for(kampala))
         self.assertTrue(batch.non_response_is_activated_for(bukoto))
@@ -370,6 +372,7 @@ class BatchLocationStatusTest(TestCase):
         kampala = Location.objects.create(name="Kampala")
         bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
         abim = Location.objects.create(name="Abim")
+        batch.open_for_location(abim)
         batch.activate_non_response_for(abim)
         self.assertIn(abim, batch.get_non_response_active_locations())
         [self.assertNotIn(location, batch.get_non_response_active_locations()) for location in [bukoto, kampala]]

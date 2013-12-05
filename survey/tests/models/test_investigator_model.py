@@ -371,6 +371,7 @@ class InvestigatorTest(TestCase):
                                                                household=self.household)
         self.investigator.batch_completion_completed_households.all().delete()
 
+        batch.open_for_location(self.kampala)
         batch.activate_non_response_for(self.kampala)
 
         self.assertTrue(self.investigator.can_report_non_response())
@@ -378,6 +379,7 @@ class InvestigatorTest(TestCase):
     def test_investigator_knows_non_response_reporting_is_deactivated_for_his_location(self):
         batch = Batch.objects.create(name="hoho")
 
+        batch.open_for_location(self.kampala)
         batch.deactivate_non_response_for(self.kampala)
 
         self.assertFalse(self.investigator.can_report_non_response())
