@@ -1,4 +1,5 @@
 from datetime import date
+from random import randint
 from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.models import User
@@ -115,6 +116,13 @@ class NumericalFormulaResults(BaseTest):
 
 
 class MultichoiceResults(BaseTest):
+
+    def create_household_head(self, uid, investigator):
+        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                                  uid=uid)
+        return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
+                                            date_of_birth="1990-02-09")
+
     def setUp(self):
         self.client = Client()
         self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
@@ -140,16 +148,16 @@ class MultichoiceResults(BaseTest):
                                              module=module, description="Indicator 1")
 
         self.formula = Formula.objects.create(numerator=self.question_3, denominator=self.question_1, indicator=indicator)
-        country = LocationType.objects.create(name='Country', slug='country')
-        self.uganda = Location.objects.create(name='Country', type=country)
-        country_type_details = LocationTypeDetails.objects.create(country=self.uganda, location_type=country)
+        self.country = LocationType.objects.create(name='Country', slug='country')
+        self.uganda = Location.objects.create(name='Country', type=self.country)
+        country_type_details = LocationTypeDetails.objects.create(country=self.uganda, location_type=self.country)
 
-        district = LocationType.objects.create(name = 'District', slug = 'district')
-        village = LocationType.objects.create(name = 'Village', slug = 'village')
+        self.district = LocationType.objects.create(name = 'District', slug='district')
+        self.village = LocationType.objects.create(name = 'Village', slug='village')
 
-        self.kampala = Location.objects.create(name='Kampala', type = district, tree_parent=self.uganda)
-        self.village_1 = Location.objects.create(name='Village 1', type = village, tree_parent = self.kampala)
-        self.village_2 = Location.objects.create(name='Village 2', type = village, tree_parent = self.kampala)
+        self.kampala = Location.objects.create(name='Kampala', type=self.district, tree_parent=self.uganda)
+        self.village_1 = Location.objects.create(name='Village 1', type=self.village, tree_parent=self.kampala)
+        self.village_2 = Location.objects.create(name='Village 2', type=self.village, tree_parent=self.kampala)
 
         backend = Backend.objects.create(name='something')
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.village_1, backend = backend, weights = 0.3)
@@ -223,3 +231,66 @@ class MultichoiceResults(BaseTest):
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for("/batches/%s/formulae/%s/?location=%s" % (self.batch.pk, self.formula.pk, self.kampala.pk))
+
+    def test_get_data_for_simple_indicator_chart(self):
+        Location.objects.all().delete()
+        region = LocationType.objects.create(name="Region", slug="region")
+
+        uganda = Location.objects.create(name="Uganda", type=self.country)
+        west = Location.objects.create(name="WEST", type=region, tree_parent=uganda)
+        central = Location.objects.create(name="CENTRAL", type=region, tree_parent=uganda)
+        kampala = Location.objects.create(name="Kampala", tree_parent=central, type=self.district)
+        mbarara = Location.objects.create(name="Mbarara", tree_parent=west, type=self.district)
+
+
+        backend = Backend.objects.create(name='BACKEND')
+
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="122000", location=kampala,
+                                                   backend=backend)
+        investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="3333331", location=mbarara,
+                                                     backend=backend)
+
+        health_module = QuestionModule.objects.create(name="Health")
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=33)
+        self.question_3 = Question.objects.create(text="This is a question",
+                                                  answer_type=Question.MULTICHOICE, order=3,
+                                                  module=health_module, group=member_group)
+        yes_option = QuestionOption.objects.create(question=self.question_3, text="Yes", order=1)
+        no_option = QuestionOption.objects.create(question=self.question_3, text="No", order=2)
+
+        self.question_3.batches.add(self.batch)
+
+        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
+                                             batch=self.batch, module=health_module)
+        formula = Formula.objects.create(count=self.question_3, indicator=indicator)
+
+        household_head_1 = self.create_household_head(0, investigator)
+        household_head_2 = self.create_household_head(1, investigator)
+        household_head_3 = self.create_household_head(2, investigator)
+        household_head_4 = self.create_household_head(3, investigator)
+        household_head_5 = self.create_household_head(4, investigator)
+
+        household_head_6 = self.create_household_head(5, investigator_2)
+        household_head_7 = self.create_household_head(6, investigator_2)
+        household_head_8 = self.create_household_head(7, investigator_2)
+        household_head_9 = self.create_household_head(8, investigator_2)
+
+        investigator.member_answered(self.question_3, household_head_1, yes_option.order, self.batch)
+        investigator.member_answered(self.question_3, household_head_2, yes_option.order, self.batch)
+        investigator.member_answered(self.question_3, household_head_3, yes_option.order, self.batch)
+        investigator.member_answered(self.question_3, household_head_4, no_option.order, self.batch)
+        investigator.member_answered(self.question_3, household_head_5, no_option.order, self.batch)
+
+        investigator_2.member_answered(self.question_3, household_head_6, yes_option.order, self.batch)
+        investigator_2.member_answered(self.question_3, household_head_7, yes_option.order, self.batch)
+        investigator_2.member_answered(self.question_3, household_head_8, no_option.order, self.batch)
+        investigator_2.member_answered(self.question_3, household_head_9, no_option.order, self.batch)
+        central_region_responses = {yes_option.text: 3, no_option.text: 2}
+        west_region_responses = {yes_option.text: 2, no_option.text: 2}
+        url = "/indicators/%s/simple/" % indicator.id
+        response = self.client.get(url)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('formula/simple_indicator.html', templates)
+        self.assertEquals(response.context['simple_indicator_count'][west], west_region_responses)
+        self.assertEquals(response.context['simple_indicator_count'][central], central_region_responses)
