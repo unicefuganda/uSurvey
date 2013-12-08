@@ -1000,7 +1000,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 response_string = "responseString=%s&action=end" % USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
-    def test_resume_from_non_response_to_register_HH(self):
+    def test_resume_from_non_response_to_register_HH_to_non_response(self):
         self.batch.activate_non_response_for(self.kampala)
 
         self.household2.delete()
@@ -1082,8 +1082,8 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                            "1: Register households\n"\
                            "2: Take survey\n"\
                            "3: Report non-response" % self.investigator.name
-                response_string = "responseString=%s&action=request" % homepage
-                self.assertEqual(urllib2.unquote(response.content), response_string)
+                homepage_response_string = "responseString=%s&action=request" % homepage
+                self.assertEqual(urllib2.unquote(response.content), homepage_response_string)
 
                 self.household2 = self.create_household(2)
 
@@ -1112,6 +1112,25 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 member = self.household2.household_member.all()[0]
                 self.assertEqual(member.surname, answers['name'])
                 self.assertEqual(member.male, True)
+
+
+                response = self.reset_session()
+                response_string = "responseString=%s&action=request" % USSD.MESSAGES['RESUME_MESSAGE']
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond(USSD.ANSWER['NO'])
+                self.assertEqual(urllib2.unquote(response.content), homepage_response_string)
+
+                response = self.report_non_response()
+
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s" \
+                                 % (self.household1.uid, self.household_head.surname,
+                                    self.household2.uid, self.household2.get_head().surname)
+                first_page_list = "responseString=%s&action=request" % household_list
+                self.assertEquals(urllib2.unquote(response.content), first_page_list)
+
+
+
 
     def test_resume_non_response_to_non_response(self):
         household_member_3_1 = self.create_household_member(name="bob 3 son", household=self.household3, head=False, date_of_birth="1996-9-9")
