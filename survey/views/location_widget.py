@@ -5,10 +5,11 @@ from survey.models import LocationTypeDetails
 
 class LocationWidget(object):
 
-    def __init__(self, selected_location):
+    def __init__(self, selected_location, level=None):
         super(LocationWidget, self).__init__()
         self.selected_location = selected_location
         self.selected_locations = []
+        self.level = level
 
     def get_widget_data(self):
         if not self.selected_location:
@@ -18,10 +19,17 @@ class LocationWidget(object):
 
     def sorted_by_hierarchy(self, old_data):
         data = SortedDict()
-        for slug in LocationType.objects.exclude(name__iexact='country').values('slug'):
-            slug = slug['slug']
+        all_types = self.get_all_location_types()
+        location_types_excluding_country = all_types.values_list('location_type', flat=True)[1:]
+        for slug in location_types_excluding_country:
             data[slug] = old_data[slug] if old_data.has_key(slug) else []
         return data
+
+    def get_all_location_types(self):
+        all_types = LocationTypeDetails.objects.order_by('order')
+        if self.level:
+            all_types = all_types.filter(order__lte=self.level)
+        return all_types
 
     def has_location_selected(self, location):
         return location in self.selected_locations

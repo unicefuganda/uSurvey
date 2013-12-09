@@ -25,16 +25,18 @@ class InvestigatorTest(BaseTest):
 
 class InvestigatorsViewTest(InvestigatorTest):
     def test_new(self):
-        country = LocationType.objects.create(name = 'Country', slug = 'country')
-        district = LocationType.objects.create(name = 'District', slug = 'district')
-        city = LocationType.objects.create(name = 'City', slug = 'city')
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', slug='district')
+        city = LocationType.objects.create(name='City', slug='city')
 
-        uganda = Location.objects.create(name='Uganda', type = country)
+        uganda = Location.objects.create(name='Uganda', type=country)
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=district)
+        LocationTypeDetails.objects.create(country=uganda, location_type=city)
 
-        kampala = Location.objects.create(name='Kampala', tree_parent = uganda, type = district)
-        abim = Location.objects.create(name='Abim', tree_parent = uganda, type = district)
-        kampala_city = Location.objects.create(name='Kampala City', tree_parent = kampala, type = city)
+        kampala = Location.objects.create(name='Kampala', tree_parent=uganda, type=district)
+        abim = Location.objects.create(name='Abim', tree_parent=uganda, type=district)
+        kampala_city = Location.objects.create(name='Kampala City', tree_parent=kampala, type=city)
 
         response = self.client.get('/investigators/new/')
         self.failUnlessEqual(response.status_code, 200)
@@ -172,6 +174,7 @@ class InvestigatorsViewTest(InvestigatorTest):
         uganda = Location.objects.create(name="Uganda", type=country)
         district = LocationType.objects.create(name='district', slug='district')
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=district)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
 
@@ -195,6 +198,7 @@ class InvestigatorsViewTest(InvestigatorTest):
         uganda = Location.objects.create(name="Uganda", type=country)
         district = LocationType.objects.create(name='district', slug='district')
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=district)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
 
@@ -218,6 +222,11 @@ class InvestigatorsViewTest(InvestigatorTest):
         district = LocationType.objects.create(name="district", slug=slugify("district"))
 
         africa = Location.objects.create(name="Uganda", type=country)
+
+        LocationTypeDetails.objects.create(country=africa, location_type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=region)
+        LocationTypeDetails.objects.create(country=africa, location_type=district)
+
         uganda = Location.objects.create(name="Uganda", type=region, tree_parent=africa)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
         bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
@@ -283,6 +292,7 @@ class EditInvestigatorPage(InvestigatorTest):
 
         uganda = Location.objects.create(name="Uganda", type=country)
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=city)
 
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
         investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)

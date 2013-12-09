@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 import xlwt
-
+from survey.models import LocationTypeDetails
 
 class BaseTest(TestCase):
 
@@ -54,3 +54,8 @@ class BaseTest(TestCase):
             for j in xrange(size):
                 sheet1.write(i, j, randint(0,100))
         book.save(filename)
+
+    def generate_location_type_details(self, location, the_country):
+        LocationTypeDetails.objects.get_or_create(country=the_country, location_type=location.type)
+        if location.get_children().exists():
+            self.generate_location_type_details(location.get_children()[0], the_country)

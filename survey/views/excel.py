@@ -13,7 +13,7 @@ from survey.models.investigator import Investigator
 @login_required
 @permission_required('auth.can_view_aggregates')
 def download(request):
-    batch = Batch.objects.get(id = request.POST['batch'])
+    batch = Batch.objects.get(id=request.POST['batch'])
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % batch.name
     data = batch.generate_report(Investigator)

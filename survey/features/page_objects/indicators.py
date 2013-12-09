@@ -14,3 +14,10 @@ class ListIndicatorPage(PageObject):
         values.append(list_titles)
         fields = [field for fields in values for field in fields]
         self.validate_fields_present(fields)
+
+
+class SimpleIndicatorGraphPage(PageObject):
+    def __init__(self, browser, indicator):
+        self.indicator = indicator
+        self.browser = browser
+        self.url = "/indicators/%s/simple/" % self.indicator.id

@@ -230,6 +230,7 @@ class HouseholdViewTest(BaseTest):
         district = LocationType.objects.create(name='district', slug='district')
         uganda = Location.objects.create(name="Uganda", type=country)
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=district)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=kampala,
@@ -271,6 +272,7 @@ class HouseholdViewTest(BaseTest):
         district = LocationType.objects.create(name='district', slug='district')
         uganda = Location.objects.create(name="Uganda", type=country)
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=district)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
         form_data = {
@@ -302,6 +304,7 @@ class HouseholdViewTest(BaseTest):
         uganda = Location.objects.create(name="Uganda", type=country)
         district = LocationType.objects.create(name='district', slug='district')
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=district)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
 
@@ -338,6 +341,7 @@ class HouseholdViewTest(BaseTest):
         uganda = Location.objects.create(name="Uganda", type=country)
         district = LocationType.objects.create(name='district', slug='district')
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=district)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
 
@@ -363,6 +367,9 @@ class HouseholdViewTest(BaseTest):
 
         africa = Location.objects.create(name="Africa", type=country)
         LocationTypeDetails.objects.create(country=africa, location_type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=region)
+        LocationTypeDetails.objects.create(country=africa, location_type=district)
+        LocationTypeDetails.objects.create(country=africa, location_type=county)
 
         uganda = Location.objects.create(name="Uganda", type=region, tree_parent=africa)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)

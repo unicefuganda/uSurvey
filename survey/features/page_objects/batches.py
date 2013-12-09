@@ -4,51 +4,6 @@ from survey.features.page_objects.base import PageObject
 from nose.tools import assert_equals
 
 
-class FormulaShowPage(PageObject):
-    def __init__(self, browser, formula):
-        self.browser = browser
-        self.formula = formula
-        self.url = "/batches/%s/formulae/%s/" % (self.formula.indicator.batch.pk, self.formula.pk)
-
-    def choose_location(self, location):
-        self.fill_in_with_js('$("#location-%s")' % location.type.slug, location.id)
-
-    def presence_of_computed_value(self, computed_value):
-        self.is_text_present(str(computed_value))
-
-    def presence_of_bar_graph_for_villages(self, data):
-        for village, value in data.items():
-            self.is_text_present(village.name)
-            self.is_text_present(str(int(value)))
-
-    def presence_of_bar_graph_for_households(self,data):
-        for key, value in data.items():
-            for household, val in value.items():
-                self.is_text_present(household.text)
-                self.is_text_present(str(val))
-
-    def presence_of_bar_chart_for_all_the_options(self,data):
-        for option, value in data.items():
-            self.is_text_present(str(option))
-            self.is_text_present(str(int(value)))
-
-    def presence_of_stacked_bar_graph_for_villages(self,data):
-        for village, value in data.items():
-            self.is_text_present(village.name)
-            for option, val in value.items():
-                self.is_text_present(str(option))
-
-    def presence_of_tabulated_results_for_households(self,data):
-        for household, value in data.items():
-            self.is_text_present(household.get_head().surname)
-            for question, val in value.items():
-                self.is_text_present(question.text)
-                if type(val) == int:
-                    self.is_text_present(str(val))
-                else:
-                    self.is_text_present(val.text)
-
-
 class AddBatchPage(PageObject):
     def __init__(self, browser, survey):
         self.browser = browser

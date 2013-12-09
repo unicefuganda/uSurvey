@@ -5,6 +5,7 @@ from survey.investigator_configs import MONTHS
 from survey.models.investigator import Investigator
 from lettuce.django import django_url
 
+
 class NewHouseholdPage(PageObject):
     url = "/households/new/"
 
@@ -102,6 +103,7 @@ class NewHouseholdPage(PageObject):
 
 class HouseholdDetailsPage(PageObject):
     def __init__(self, browser, household):
+        super(HouseholdDetailsPage, self).__init__(browser)
         self.browser = browser
         self.household = household
         self.url = '/households/' + str(household.id) + '/'

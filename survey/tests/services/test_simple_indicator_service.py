@@ -14,24 +14,22 @@ class SimpleIndicatorServiceTest(BaseTest):
 
     def setUp(self):
         self.batch = Batch.objects.create(order=1)
+        self.country = LocationType.objects.create(name="Country", slug="country")
+        self.region = LocationType.objects.create(name="Region", slug="region")
+        self.district = LocationType.objects.create(name="District", slug='district')
 
-    def test_returns_options_counts_given_list_of_locations(self):
-        country = LocationType.objects.create(name="Country", slug="country")
-        region = LocationType.objects.create(name="Region", slug="region")
-        district = LocationType.objects.create(name="District", slug='district')
-
-        uganda = Location.objects.create(name="Uganda", type=country)
-        west = Location.objects.create(name="WEST", type=region, tree_parent=uganda)
-        central = Location.objects.create(name="CENTRAL", type=region, tree_parent=uganda)
-        kampala = Location.objects.create(name="Kampala", tree_parent=central, type=district)
-        mbarara = Location.objects.create(name="Mbarara", tree_parent=west, type=district)
+        self.uganda = Location.objects.create(name="Uganda", type=self.country)
+        self.west = Location.objects.create(name="WEST", type=self.region, tree_parent=self.uganda)
+        self.central = Location.objects.create(name="CENTRAL", type=self.region, tree_parent=self.uganda)
+        self.kampala = Location.objects.create(name="Kampala", tree_parent=self.central, type=self.district)
+        self.mbarara = Location.objects.create(name="Mbarara", tree_parent=self.west, type=self.district)
 
 
         backend = Backend.objects.create(name='something')
 
-        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.kampala,
                                                    backend=backend)
-        investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331", location=mbarara,
+        self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331", location=self.mbarara,
                                                      backend=backend)
 
         health_module = QuestionModule.objects.create(name="Health")
@@ -39,46 +37,92 @@ class SimpleIndicatorServiceTest(BaseTest):
         self.question_3 = Question.objects.create(text="This is a question",
                                                   answer_type=Question.MULTICHOICE, order=3,
                                                   module=health_module, group=member_group)
-        yes_option = QuestionOption.objects.create(question=self.question_3, text="Yes", order=1)
-        no_option = QuestionOption.objects.create(question=self.question_3, text="No", order=2)
+        self.yes_option = QuestionOption.objects.create(question=self.question_3, text="Yes", order=1)
+        self.no_option = QuestionOption.objects.create(question=self.question_3, text="No", order=2)
 
         self.question_3.batches.add(self.batch)
 
-        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
+        self.indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
                                              batch=self.batch, module=health_module)
-        formula = Formula.objects.create(count=self.question_3, indicator=indicator)
+        self.formula = Formula.objects.create(count=self.question_3, indicator=self.indicator)
 
-        household_head_1 = self.create_household_head(0, investigator)
-        household_head_2 = self.create_household_head(1, investigator)
-        household_head_3 = self.create_household_head(2, investigator)
-        household_head_4 = self.create_household_head(3, investigator)
-        household_head_5 = self.create_household_head(4, investigator)
+        self.household_head_1 = self.create_household_head(0, self.investigator)
+        self.household_head_2 = self.create_household_head(1, self.investigator)
+        self.household_head_3 = self.create_household_head(2, self.investigator)
+        self.household_head_4 = self.create_household_head(3, self.investigator)
+        self.household_head_5 = self.create_household_head(4, self.investigator)
 
-        household_head_6 = self.create_household_head(5, investigator_2)
-        household_head_7 = self.create_household_head(6, investigator_2)
-        household_head_8 = self.create_household_head(7, investigator_2)
-        household_head_9 = self.create_household_head(8, investigator_2)
+        self.household_head_6 = self.create_household_head(5, self.investigator_2)
+        self.household_head_7 = self.create_household_head(6, self.investigator_2)
+        self.household_head_8 = self.create_household_head(7, self.investigator_2)
+        self.household_head_9 = self.create_household_head(8, self.investigator_2)
 
-        investigator.member_answered(self.question_3, household_head_1, yes_option.order, self.batch)
-        investigator.member_answered(self.question_3, household_head_2, yes_option.order, self.batch)
-        investigator.member_answered(self.question_3, household_head_3, yes_option.order, self.batch)
-        investigator.member_answered(self.question_3, household_head_4, no_option.order, self.batch)
-        investigator.member_answered(self.question_3, household_head_5, no_option.order, self.batch)
+    def test_returns_options_counts_given_list_of_locations(self):
+        self.investigator.member_answered(self.question_3, self.household_head_1, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_2, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_3, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_4, self.no_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_5, self.no_option.order, self.batch)
 
-        investigator_2.member_answered(self.question_3, household_head_6, yes_option.order, self.batch)
-        investigator_2.member_answered(self.question_3, household_head_7, yes_option.order, self.batch)
-        investigator_2.member_answered(self.question_3, household_head_8, no_option.order, self.batch)
-        investigator_2.member_answered(self.question_3, household_head_9, no_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_6, self.yes_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_7, self.yes_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_8, self.no_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_9, self.no_option.order, self.batch)
 
-        simple_indicator_service = SimpleIndicatorService(formula, uganda)
-        region_responses = {central: {yes_option.text: 3, no_option.text: 2},
-                            west: {yes_option.text: 2, no_option.text: 2}}
+        simple_indicator_service = SimpleIndicatorService(self.formula, self.uganda)
+        region_responses = {self.central: {self.yes_option.text: 3, self.no_option.text: 2},
+                            self.west: {self.yes_option.text: 2, self.no_option.text: 2}}
         self.assertEquals(simple_indicator_service.hierarchical_count(), region_responses)
 
-        simple_indicator_service = SimpleIndicatorService(formula, central)
-        central_region_responses = {kampala: {yes_option.text: 3, no_option.text: 2}}
+        simple_indicator_service = SimpleIndicatorService(self.formula, self.central)
+        central_region_responses = {self.kampala: {self.yes_option.text: 3, self.no_option.text: 2}}
         self.assertEquals(simple_indicator_service.hierarchical_count(), central_region_responses)
 
-        simple_indicator_service = SimpleIndicatorService(formula, west)
-        west_region_responses = {mbarara: {yes_option.text: 2, no_option.text: 2}}
+        simple_indicator_service = SimpleIndicatorService(self.formula, self.west)
+        west_region_responses = {self.mbarara: {self.yes_option.text: 2, self.no_option.text: 2}}
         self.assertEquals(simple_indicator_service.hierarchical_count(), west_region_responses)
+
+    def test_gets_location_names_and_data_series_for_a_parent_location_and_formula(self):
+        self.investigator.member_answered(self.question_3, self.household_head_1, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_2, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_3, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_4, self.no_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_5, self.no_option.order, self.batch)
+
+        self.investigator_2.member_answered(self.question_3, self.household_head_6, self.yes_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_7, self.yes_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_8, self.no_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_9, self.no_option.order, self.batch)
+
+        simple_indicator_service = SimpleIndicatorService(self.formula, self.uganda)
+        region_responses = [{'data': [3, 2], 'name': self.yes_option.text}, {'data': [2, 2], 'name': self.no_option.text}]
+        data_series, location = simple_indicator_service.get_location_names_and_data_series()
+        self.assertEquals([self.central.name, self.west.name],  location)
+        self.assertEquals(region_responses,  data_series)
+
+    def test_formats_details_data(self):
+        self.investigator.member_answered(self.question_3, self.household_head_1, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_2, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_3, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_4, self.no_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_5, self.no_option.order, self.batch)
+
+        self.investigator_2.member_answered(self.question_3, self.household_head_6, self.yes_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_7, self.yes_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_8, self.no_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_9, self.no_option.order, self.batch)
+
+        kibungo = Location.objects.create(name="Kibungo", type=self.district, tree_parent=self.west)
+        mpigi = Location.objects.create(name="Mpigi", type=self.district, tree_parent=self.central)
+        table_row_1 = {'Region': self.central.name, 'District': self.kampala.name, self.yes_option.text: 3, self.no_option.text: 2,'Total': 5}
+        table_row_2 = {'Region': self.central.name, 'District': mpigi.name, self.yes_option.text: 0, self.no_option.text: 0,'Total': 0}
+        table_row_3 = {'Region': self.west.name, 'District': kibungo.name, self.yes_option.text: 0, self.no_option.text: 0,'Total': 0}
+        table_row_4 = {'Region': self.west.name, 'District': self.mbarara.name, self.yes_option.text: 2, self.no_option.text: 2,'Total': 4}
+        expected_table_data = [table_row_1, table_row_2, table_row_3, table_row_4]
+
+        simple_indicator_service = SimpleIndicatorService(self.formula, self.uganda)
+        tabulated_data = simple_indicator_service.tabulated_data_series()
+
+        self.assertEqual(4, len(tabulated_data))
+        for i in range(4):
+            self.assertEqual(expected_table_data[i], tabulated_data[i])

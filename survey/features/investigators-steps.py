@@ -50,6 +50,11 @@ def and_i_have_locations(step):
     subcounty = LocationType.objects.create(name="Subcounty", slug=slugify("subcounty"))
     parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
     village = LocationType.objects.create(name="Village", slug=slugify("village"))
+    LocationTypeDetails.objects.create(country=uganda, location_type=district)
+    LocationTypeDetails.objects.create(country=uganda, location_type=county)
+    LocationTypeDetails.objects.create(country=uganda, location_type=subcounty)
+    LocationTypeDetails.objects.create(country=uganda, location_type=parish)
+    LocationTypeDetails.objects.create(country=uganda, location_type=village)
 
     world.kampala_district = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
     world.kampala_county = Location.objects.create(name="Kampala County", type=county, tree_parent=world.kampala_district)
@@ -140,8 +145,12 @@ def then_i_should_see_no_investigator_for_this_county(step):
 def and_i_have_an_investigator(step):
     country = LocationType.objects.create(name="Country", slug=slugify("country"))
     city = LocationType.objects.create(name="City", slug=slugify("city"))
+
     uganda = Location.objects.create(name="Uganda", type=country)
     kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+
+    LocationTypeDetails.objects.create(country=uganda, location_type=country)
+    LocationTypeDetails.objects.create(country=uganda, location_type=city)
     world.investigator = Investigator.objects.create(name="Rajni", mobile_number = "123456789", age = 25, level_of_education = "Nursery", language = "Luganda", location = kampala)
 
 @step(u'And I visit investigators page')

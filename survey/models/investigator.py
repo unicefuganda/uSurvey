@@ -114,7 +114,6 @@ class Investigator(BaseModel):
                 next_batch = household_member.get_next_batch()
                 next_question = household_member.next_question_in_order(next_batch) if next_batch else None
             return next_question
-
         return question
 
     def last_answer_for(self, question):

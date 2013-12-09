@@ -6,6 +6,9 @@ from survey.models import BaseModel
 
 
 class LocationTypeDetails(BaseModel):
+    INITIAL_ORDER = 0
+    ONE = 1
+
     required = models.BooleanField(default=False, verbose_name='required')
     has_code = models.BooleanField(default=False, verbose_name='has code')
     length_of_code = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)], blank=True,
@@ -20,9 +23,9 @@ class LocationTypeDetails(BaseModel):
         return LocationType.objects.all().order_by('details__order')
 
     def save(self, *args, **kwargs):
-        last_order = LocationTypeDetails.objects.aggregate(Max('order'))['order__max'] or 0
+        last_order = LocationTypeDetails.objects.aggregate(Max('order'))['order__max'] or self.INITIAL_ORDER
         if not self.order:
-            self.order = last_order + 1
+            self.order = last_order + self.ONE
         super(LocationTypeDetails, self).save(*args, **kwargs)
 
     @classmethod

@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location
 from django.contrib.auth.decorators import login_required, permission_required
 from survey.forms.formula import FormulaForm
-from survey.models import Indicator
+from survey.models import Indicator, NumericalAnswer
 from survey.models.formula import Formula
 from survey.services.simple_indicator_service import SimpleIndicatorService
 from survey.views.location_widget import LocationWidget
@@ -90,8 +90,23 @@ def delete(request, indicator_id, formula_id):
 
 
 def simple_indicator(request, indicator_id):
-    uganda = Location.objects.filter(type__name="Country")
+    hierarchy_limit = 2
+    selected_location = None
+    first_level_location_analyzed = Location.objects.filter(type__name="Country")[0]
     indicator = Indicator.objects.get(id=indicator_id)
-    simple_indicator_count = SimpleIndicatorService(indicator.formula.all()[0], uganda).hierarchical_count()
-    context = {'request': request, 'simple_indicator_count': simple_indicator_count}
+    formula = indicator.formula.all()
+    params = request.GET
+    if contains_key(params, 'location'):
+        first_level_location_analyzed = Location.objects.get(id=params['location'])
+        selected_location = first_level_location_analyzed
+    if formula:
+        formula = formula[0]
+    indicator_service = SimpleIndicatorService(formula, first_level_location_analyzed)
+    data_series, locations = indicator_service.get_location_names_and_data_series()
+    context = {'request': request,
+               'data_series': data_series,
+               'tabulated_data': indicator_service.tabulated_data_series(),
+               'location_names': locations,
+               'indicator': indicator,
+               'locations': LocationWidget(selected_location, level=hierarchy_limit)}
     return render(request, 'formula/simple_indicator.html', context)

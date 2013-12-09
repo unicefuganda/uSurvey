@@ -20,31 +20,37 @@ class TestSurveyCompletion(BaseTest):
                                         'can_view_batches')
         self.assign_permission_to(raj, 'can_view_aggregates')
         self.client.login(username='Rajni', password='I_Rock')
-        self.country = LocationType.objects.create(name = 'Country', slug = 'country')
-        self.region = LocationType.objects.create(name = 'Region', slug = 'region')
-        self.city = LocationType.objects.create(name = 'City', slug = 'city')
+        self.country = LocationType.objects.create(name='Country', slug='country')
+        self.region = LocationType.objects.create(name='Region', slug='region')
+        self.city = LocationType.objects.create(name='City', slug='city')
 
-        self.africa = Location.objects.create(name='Africa', type = self.country)
+        self.africa = Location.objects.create(name='Africa', type=self.country)
         LocationTypeDetails.objects.create(country=self.africa, location_type=self.country)
+        LocationTypeDetails.objects.create(country=self.africa, location_type=self.region)
+        LocationTypeDetails.objects.create(country=self.africa, location_type=self.city)
 
-        self.uganda = Location.objects.create(name='Uganda', type = self.region, tree_parent=self.africa)
-        self.abim = Location.objects.create(name='Abim', tree_parent = self.uganda, type = self.city)
-        self.kampala = Location.objects.create(name='Kampala', tree_parent = self.uganda, type = self.city)
-        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent = self.kampala, type = self.city)
+        self.uganda = Location.objects.create(name='Uganda', type=self.region, tree_parent=self.africa)
+        self.abim = Location.objects.create(name='Abim', tree_parent=self.uganda, type=self.city)
+        self.kampala = Location.objects.create(name='Kampala', tree_parent=self.uganda, type=self.city)
+        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
 
-        self.investigator_1 = Investigator.objects.create(name='some_inv',mobile_number='123456789',male=True,location=self.kampala)
-        self.investigator_2 = Investigator.objects.create(name='some_inv',mobile_number='123456788',male=True,location=self.kampala_city)
+        self.investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456789', male=True,
+                                                          location=self.kampala)
+        self.investigator_2 = Investigator.objects.create(name='some_inv', mobile_number='123456788', male=True,
+                                                          location=self.kampala_city)
 
-        self.household_1 = Household.objects.create(investigator = self.investigator_1,location= self.kampala)
-        self.household_2 = Household.objects.create(investigator = self.investigator_2,location= self.kampala_city)
-        self.member_1 = HouseholdMember.objects.create(household=self.household_1, date_of_birth=datetime.date(1980, 05, 01))
-        self.member_2 = HouseholdMember.objects.create(household=self.household_2, date_of_birth=datetime.date(1980, 05, 3))
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
+        self.household_2 = Household.objects.create(investigator=self.investigator_2, location=self.kampala_city)
+        self.member_1 = HouseholdMember.objects.create(household=self.household_1,
+                                                       date_of_birth=datetime.date(1980, 05, 01))
+        self.member_2 = HouseholdMember.objects.create(household=self.household_2,
+                                                       date_of_birth=datetime.date(1980, 05, 3))
 
-        self.batch = Batch.objects.create(order=1,name='somebatch')
+        self.batch = Batch.objects.create(order=1, name='somebatch')
 
     def test_should_render_success_status_code_on_GET(self):
         response = self.client.get('/surveys/completion/')
-        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.status_code, 200)
 
     def test_should_render_template(self):
         response = self.client.get('/surveys/completion/')
@@ -55,9 +61,9 @@ class TestSurveyCompletion(BaseTest):
         survey = Survey.objects.create()
         batch = Batch.objects.create()
         response = self.client.get('/surveys/completion/')
-        self.assertIn(survey,response.context['surveys'])
-        self.assertIn(batch,response.context['batches'])
-        self.assertIn('survey_completion_rates',response.context['action'])
+        self.assertIn(survey, response.context['surveys'])
+        self.assertIn(batch, response.context['batches'])
+        self.assertIn('survey_completion_rates', response.context['action'])
         locations = response.context['locations'].get_widget_data()
         self.assertEquals(len(locations.keys()), 2)
         self.assertEquals(locations.keys()[0], 'region')
@@ -66,10 +72,10 @@ class TestSurveyCompletion(BaseTest):
         self.assertEquals(len(locations['city']), 0)
 
     def test_validates_when_location_is_present_in_parameters_and_parameters_contains_batch_key(self):
-        self.assertTrue(is_valid({'location':'', 'batch':'1'}))
+        self.assertTrue(is_valid({'location': '', 'batch': '1'}))
 
     def test_show_retrieves_high_level_completion_rates_if_no_location_is_provided(self):
-        response = self.client.get('/surveys/completion/', {'location':'', 'batch': str(self.batch.pk)})
+        response = self.client.get('/surveys/completion/', {'location': '', 'batch': str(self.batch.pk)})
         self.assertEqual(self.batch, response.context['selected_batch'])
         self.assertIn(self.uganda, response.context['completion_rates'].locations)
         self.assertIsNotNone(response.context['request'])
@@ -77,29 +83,31 @@ class TestSurveyCompletion(BaseTest):
     def test_knows_to_retrieve_completion_for_locations_that_have_no_tree_parent_if_country_type_does_not_exist(self):
         LocationType.objects.filter(name__iexact='country').delete()
 
-        location_with_no_parent = Location.objects.create(name='Abim', type = self.city)
-        another_location_with_no_parent = Location.objects.create(name='Kampala', type = self.city)
-        response = self.client.get('/surveys/completion/', {'location':'', 'batch': str(self.batch.pk)})
+        location_with_no_parent = Location.objects.create(name='Abim', type=self.city)
+        another_location_with_no_parent = Location.objects.create(name='Kampala', type=self.city)
+        response = self.client.get('/surveys/completion/', {'location': '', 'batch': str(self.batch.pk)})
         self.assertEqual(self.batch, response.context['selected_batch'])
         self.assertIn(location_with_no_parent, response.context['completion_rates'].locations)
         self.assertIn(another_location_with_no_parent, response.context['completion_rates'].locations)
         self.assertIsNotNone(response.context['request'])
 
     def test_should_validate_params(self):
-        self.assertFalse(is_valid({'location':'2', 'batch':'NOT_A_DIGIT'}))
-        self.assertFalse(is_valid({'location':'2', 'batch':''}))
+        self.assertFalse(is_valid({'location': '2', 'batch': 'NOT_A_DIGIT'}))
+        self.assertFalse(is_valid({'location': '2', 'batch': ''}))
 
     def test_should_render_error_message_if_params_invalid(self):
-        response = self.client.get('/surveys/completion/', {'location':'2', 'batch':'NOT_A_DIGIT'})
+        response = self.client.get('/surveys/completion/', {'location': '2', 'batch': 'NOT_A_DIGIT'})
         error_message = 'Please select a valid location and batch.'
         self.assertIn(error_message, str(response))
 
     def test_should_render_context_data_after_selecting_location_and_batch(self):
-        response = self.client.get('/surveys/completion/', {'location': str(self.uganda.pk) ,'batch': str(self.batch.pk)})
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.uganda.pk), 'batch': str(self.batch.pk)})
         self.assertEqual(self.batch, response.context['selected_batch'])
 
     def test_should_render_location_children_if_location_in_get_params(self):
-        response = self.client.get('/surveys/completion/', {'location': str(self.uganda.pk) ,'batch': str(self.batch.pk)})
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.uganda.pk), 'batch': str(self.batch.pk)})
         self.assertEqual(2, len(response.context['completion_rates'].attributes()))
         index_of_abim = 0
         index_of_kampala = 1
@@ -108,7 +116,8 @@ class TestSurveyCompletion(BaseTest):
         self.assertEqual(self.kampala, response.context['completion_rates'].attributes()[index_of_kampala]['location'])
 
     def test_should_render_total_number_of_household_under_child_locations(self):
-        response = self.client.get('/surveys/completion/', {'location': str(self.uganda.pk), 'batch': str(self.batch.pk)})
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.uganda.pk), 'batch': str(self.batch.pk)})
         self.assertEqual(2, len(response.context['completion_rates'].attributes()))
         index_of_abim = 0
         index_of_kampala = 1
@@ -118,70 +127,90 @@ class TestSurveyCompletion(BaseTest):
 
     def test_should_render_household_completion_percentage_in_child_locations(self):
         self.batch.completed_households.create(householdmember=self.member_1)
-        response = self.client.get('/surveys/completion/', {'location': str(self.uganda.pk),'batch':str(self.batch.pk)})
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.uganda.pk), 'batch': str(self.batch.pk)})
         self.assertEqual(2, len(response.context['completion_rates'].attributes()))
         index_of_abim = 0
         index_of_kampala = 1
 
-        self.assertEqual(0,response.context['completion_rates'].attributes()[index_of_abim]['completed_households_percent'])
-        self.assertEqual(50,response.context['completion_rates'].attributes()[index_of_kampala]['completed_households_percent'])
+        self.assertEqual(0, response.context['completion_rates'].attributes()[index_of_abim][
+            'completed_households_percent'])
+        self.assertEqual(50, response.context['completion_rates'].attributes()[index_of_kampala][
+            'completed_households_percent'])
 
     def test_should_return_household_objects_if_lowest_level_selected(self):
-        response = self.client.get('/surveys/completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.kampala_city.pk), 'batch': str(self.batch.pk)})
         self.assertEqual(1, len(response.context['completion_rates'].interviewed_households()))
-        self.assertEqual(self.household_2, response.context['completion_rates'].interviewed_households()[0]['household'])
+        self.assertEqual(self.household_2,
+                         response.context['completion_rates'].interviewed_households()[0]['household'])
 
     def test_should_render_context_if_lowest_level_selected(self):
-        response = self.client.get('/surveys/completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        self.assertEqual(self.kampala_city,response.context['selected_location'])
-        self.assertEqual(self.investigator_2,response.context['investigator'])
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.kampala_city.pk), 'batch': str(self.batch.pk)})
+        self.assertEqual(self.kampala_city, response.context['selected_location'])
+        self.assertEqual(self.investigator_2, response.context['investigator'])
         self.assertIsInstance(response.context['completion_rates'], BatchLocationCompletionRates)
 
-        self.assertEqual(0,response.context['completion_rates'].percent_completed_households())
+        self.assertEqual(0, response.context['completion_rates'].percent_completed_households())
 
         self.batch.completed_households.create(householdmember=self.member_2)
-        response = self.client.get('/surveys/completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        self.assertEqual(100,response.context['completion_rates'].percent_completed_households())
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.kampala_city.pk), 'batch': str(self.batch.pk)})
+        self.assertEqual(100, response.context['completion_rates'].percent_completed_households())
 
     def test_should_show_error_message_if_investigator_not_present_on_lowest_level(self):
         Investigator.objects.all().delete()
-        response = self.client.get('/surveys/completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.kampala_city.pk), 'batch': str(self.batch.pk)})
         error_message = 'Investigator not registered for this location.'
-        self.assertIn(error_message,str(response))
+        self.assertIn(error_message, str(response))
 
     def test_should_render_interviewed_number_of_members_if_lowest_level_selected(self):
-        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
-        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        member_group = HouseholdMemberGroup.objects.create(name='group1', order=1)
+        question = Question.objects.create(text="some question", answer_type=Question.NUMBER, order=1,
+                                           group=member_group)
         self.batch.questions.add(question)
         BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
-        member_1 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
-        member_2 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
-        self.investigator_2.member_answered(question,member_1,1,self.batch)
-        response = self.client.get('/surveys/completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
+        member_1 = HouseholdMember.objects.create(household=self.household_2,
+                                                  date_of_birth=datetime.datetime(2000, 02, 02))
+        member_2 = HouseholdMember.objects.create(household=self.household_2,
+                                                  date_of_birth=datetime.datetime(2000, 02, 02))
+        self.investigator_2.member_answered(question, member_1, 1, self.batch)
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.kampala_city.pk), 'batch': str(self.batch.pk)})
 
-        self.assertEqual(1,len(response.context['completion_rates'].interviewed_households()))
-        self.assertEqual(self.household_2,response.context['completion_rates'].interviewed_households()[0]['household'])
-        self.assertEqual(1,response.context['completion_rates'].interviewed_households()[0]['number_of_member_interviewed'])
+        self.assertEqual(1, len(response.context['completion_rates'].interviewed_households()))
+        self.assertEqual(self.household_2,
+                         response.context['completion_rates'].interviewed_households()[0]['household'])
+        self.assertEqual(1, response.context['completion_rates'].interviewed_households()[0][
+            'number_of_member_interviewed'])
 
     def test_restricted_permissions(self):
         self.assert_login_required('/surveys/completion/')
         self.assert_restricted_permission_for('/surveys/completion/')
 
     def test_should_return_date_of_completion_of_household_if_lowest_level_selected(self):
-        member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
-        question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
+        member_group = HouseholdMemberGroup.objects.create(name='group1', order=1)
+        question = Question.objects.create(text="some question", answer_type=Question.NUMBER, order=1,
+                                           group=member_group)
         self.batch.questions.add(question)
         BatchQuestionOrder.objects.create(question=question, batch=self.batch, order=1)
-        member_1 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
-        member_2 = HouseholdMember.objects.create(household=self.household_2,date_of_birth= datetime.datetime(2000,02, 02))
-        self.investigator_2.member_answered(question,self.member_2,1,self.batch)
-        self.investigator_2.member_answered(question,member_1,1,self.batch)
-        self.investigator_2.member_answered(question,member_2,1,self.batch)
-        response = self.client.get('/surveys/completion/', {'location': str(self.kampala_city.pk),'batch':str(self.batch.pk)})
-        expected = HouseholdMemberBatchCompletion.objects.filter(household=self.household_2).latest('created').created.strftime('%d-%b-%Y %H:%M:%S')
-        self.assertEqual(1,len(response.context['completion_rates'].interviewed_households()))
-        self.assertEqual(self.household_2,response.context['completion_rates'].interviewed_households()[0]['household'])
-        self.assertEqual(expected,response.context['completion_rates'].interviewed_households()[0]['date_interviewed'])
+        member_1 = HouseholdMember.objects.create(household=self.household_2,
+                                                  date_of_birth=datetime.datetime(2000, 02, 02))
+        member_2 = HouseholdMember.objects.create(household=self.household_2,
+                                                  date_of_birth=datetime.datetime(2000, 02, 02))
+        self.investigator_2.member_answered(question, self.member_2, 1, self.batch)
+        self.investigator_2.member_answered(question, member_1, 1, self.batch)
+        self.investigator_2.member_answered(question, member_2, 1, self.batch)
+        response = self.client.get('/surveys/completion/',
+                                   {'location': str(self.kampala_city.pk), 'batch': str(self.batch.pk)})
+        expected = HouseholdMemberBatchCompletion.objects.filter(household=self.household_2).latest(
+            'created').created.strftime('%d-%b-%Y %H:%M:%S')
+        self.assertEqual(1, len(response.context['completion_rates'].interviewed_households()))
+        self.assertEqual(self.household_2,
+                         response.context['completion_rates'].interviewed_households()[0]['household'])
+        self.assertEqual(expected, response.context['completion_rates'].interviewed_households()[0]['date_interviewed'])
 
 
 class HouseholdCompletionJsonViewTest(BaseTest):
@@ -233,23 +262,24 @@ class HouseholdCompletionJsonViewTest(BaseTest):
                                                             date_of_birth=datetime.date(1980, 05, 01))
         household_3_member = HouseholdMember.objects.create(household=self.household_3,
                                                             date_of_birth=datetime.date(1980, 05, 01))
-        household_4_member = HouseholdMember.objects.create(household=self.household_4, date_of_birth=datetime.date(1980, 05, 01))
+        household_4_member = HouseholdMember.objects.create(household=self.household_4,
+                                                            date_of_birth=datetime.date(1980, 05, 01))
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_1, householdmember=household_1_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_1)
+                                                      batch=self.batch,
+                                                      investigator=self.investigator_1)
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_2, householdmember=household_2_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_1)
+                                                      batch=self.batch,
+                                                      investigator=self.investigator_1)
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_3, householdmember=household_3_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_1)
+                                                      batch=self.batch,
+                                                      investigator=self.investigator_1)
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_3, householdmember=household_4_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_1)
+                                                      batch=self.batch,
+                                                      investigator=self.investigator_1)
 
         self.household_5 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
                                                     survey=self.survey)
@@ -269,11 +299,11 @@ class HouseholdCompletionJsonViewTest(BaseTest):
         HouseholdMember.objects.create(household=self.household_8, date_of_birth=datetime.date(1980, 05, 01))
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_1, householdmember=household_5_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_2)
+                                                      batch=self.batch,
+                                                      investigator=self.investigator_2)
         HouseholdMemberBatchCompletion.objects.create(household=self.household_2, householdmember=household_6_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_2)
+                                                      batch=self.batch,
+                                                      investigator=self.investigator_2)
 
         response = self.client.get('/survey/%s/completion/json/' % self.survey.pk)
         self.assertEqual(response.status_code, 200)
