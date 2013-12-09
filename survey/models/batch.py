@@ -87,32 +87,6 @@ class Batch(BaseModel):
         if next_open_batch:
             return next_open_batch[0].batch
 
-    def set_report_headers(self):
-        header = []
-        batch_questions = self.all_questions()
-
-        location_types = LocationType.objects.filter()
-        other_headers = ['Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender']
-        for location_type in location_types:
-            header.append(location_type.name)
-
-        for other_header in other_headers:
-            header.append(other_header)
-
-        for question in batch_questions:
-            header.append(question.identifier)
-            if question.is_multichoice():
-                header.append('')
-
-        return batch_questions, header
-
-    def generate_report(self, investigator_klass):
-        data = []
-        questions, header = self.set_report_headers()
-        data = [header]
-        investigator_klass.get_summarised_answers_for(questions, data)
-        return data
-
     def get_next_question(self, order, location):
         if self.is_open_for(location=location):
             question = self.questions.filter(order=order+1)

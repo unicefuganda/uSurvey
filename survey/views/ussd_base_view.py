@@ -38,8 +38,6 @@ class USSDBaseView(object):
 
     def response(self):
         answer = self.request['ussdRequestString'].strip()
-        print '*'*100
-        print 'Answer:', answer
         if self.investigator.is_blocked:
             return {'action': self.ussd_survey.ACTIONS['END'],
                     'responseString': self.ussd_survey.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']}
@@ -87,10 +85,6 @@ class USSDBaseView(object):
                     action, response_string = self.render_home_page()
                     self.clear_HH_caches()
                 self.ussd_survey.set_in_session('IS_RESUMING', False)
-        print 'Action:', action
-        print 'Response:\n', response_string
-        print '#'*100
-
         return {'action': action, 'responseString': response_string}
 
     def is_new_request_parameter(self, answer):

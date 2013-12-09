@@ -9,6 +9,13 @@ class LocationCode(BaseModel):
     location = models.ForeignKey(Location, null=False, related_name="code")
     code = models.CharField(max_length=10, null=False, default=0)
 
+    @classmethod
+    def get_household_code(cls, investigator):
+        location_hierarchy = investigator.locations_in_hierarchy()
+        codes = cls.objects.filter(location__in=location_hierarchy).order_by('location').values_list('code', flat=True)
+        return ''.join(codes)
+
+
 class LocationAutoComplete(models.Model):
     location = models.ForeignKey(Location, null=True)
     text = models.CharField(max_length=500)

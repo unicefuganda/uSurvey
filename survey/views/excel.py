@@ -5,9 +5,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from django.contrib.auth.decorators import login_required, permission_required
-from survey.models import Survey
+from survey.models import Survey, Investigator
 from survey.models.batch import Batch
-from survey.models.investigator import Investigator
+from survey.services.results_download_service import ResultsDownloadService
 
 
 @login_required
@@ -16,7 +16,7 @@ def download(request):
     batch = Batch.objects.get(id=request.POST['batch'])
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % batch.name
-    data = batch.generate_report(Investigator)
+    data = ResultsDownloadService(batch).generate_report()
     writer = csv.writer(response)
     for row in data:
         writer.writerow(row)
@@ -34,7 +34,7 @@ def completed_investigator(request):
     survey = Survey.objects.get(id = request.POST['survey'])
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="investigator.csv"'
-    data = Investigator.genrate_completion_report(survey)
+    data = Investigator.generate_completion_report(survey)
     writer = csv.writer(response)
     for row in data:
         writer.writerow(row)

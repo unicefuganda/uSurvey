@@ -2,7 +2,7 @@ import random
 from django.db import models
 from rapidsms.router import send
 from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
-from survey.models import Household
+from survey.models import Household, LocationCode
 from survey.models.backend import Backend
 from survey.models.base import BaseModel
 from survey.models.investigator import Investigator
@@ -46,7 +46,7 @@ class RandomHouseHoldSelection(BaseModel):
 
         for random_household in all_random_households:
             uid = Household.next_uid(survey)
-            household_code_value = investigator.get_household_code() + str(uid)
+            household_code_value = LocationCode.get_household_code(investigator) + str(uid)
             Household.objects.create(investigator=investigator, location=investigator.location,
                                      uid=uid, random_sample_number=random_household,
                                      survey=survey, household_code=household_code_value)

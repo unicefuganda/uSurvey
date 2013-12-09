@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from rapidsms.contrib.locations.models import *
 from survey.forms.householdHead import *
 from survey.forms.household import *
-from survey.models import Survey
+from survey.models import Survey, LocationCode
 from survey.models.households import Household
 from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
@@ -60,10 +60,10 @@ def create_household(householdform, investigator, valid, uid):
         household.investigator = investigator
         household.location = investigator.location
         open_survey = Survey.currently_open_survey(investigator.location)
-        household.household_code = investigator.get_household_code() + str(Household.next_uid(open_survey))
+        household.household_code = LocationCode.get_household_code(investigator) + str(Household.next_uid(open_survey))
         if uid:
             household.uid = uid
-            household.household_code = investigator.get_household_code() + str(uid)
+            household.household_code = LocationCode.get_household_code(investigator) + str(uid)
 
         household.survey = open_survey
         household.save()

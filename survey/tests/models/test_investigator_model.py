@@ -54,36 +54,6 @@ class InvestigatorTest(TestCase):
         self.assertEqual(investigator.identity, COUNTRY_PHONE_CODE + investigator.mobile_number)
         self.assertEqual(investigator.weights, 30.99)
 
-    def test_investigator_knows_how_to_get_household_code(self):
-        country = LocationType.objects.create(name="Country", slug=slugify("country"))
-        city = LocationType.objects.create(name="City", slug=slugify("city"))
-        subcounty = LocationType.objects.create(name="Subcounty", slug=slugify("subcounty"))
-        parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
-        village = LocationType.objects.create(name="Village", slug=slugify("village"))
-        uganda = Location.objects.create(name="Uganda", type=country)
-        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
-        abim = Location.objects.create(name="Abim", type=subcounty, tree_parent=kampala)
-        kololo = Location.objects.create(name="Kololo", type=parish, tree_parent=abim)
-        village = Location.objects.create(name="Village", type=village, tree_parent=kololo)
-
-        uganda_code_value = '01'
-        kampala_code_value = '00001'
-        kololo_code_value = '00001'
-        village_code_value = '00001'
-
-        LocationCode.objects.create(location=uganda, code=uganda_code_value)
-        LocationCode.objects.create(location=kampala, code=kampala_code_value)
-        LocationCode.objects.create(location=kololo, code=kololo_code_value)
-        LocationCode.objects.create(location=village, code=village_code_value)
-
-        investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
-                                                   location=village, backend=self.backend)
-
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            household_code_value = uganda_code_value + kampala_code_value + kololo_code_value + village_code_value
-            self.assertEqual(household_code_value, investigator.get_household_code())
-
     def test_mobile_number_is_unique(self):
         self.failUnlessRaises(IntegrityError, Investigator.objects.create, mobile_number="123456789")
 
@@ -107,7 +77,10 @@ class InvestigatorTest(TestCase):
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
                                                    location=kampala, backend=self.backend)
-        self.assertEquals(investigator.locations_in_hierarchy(), [uganda, kampala])
+        location_hierarchy = investigator.locations_in_hierarchy()
+        self.assertEqual(2, len(location_hierarchy))
+        self.assertIn(kampala, location_hierarchy)
+        self.assertIn(uganda, location_hierarchy)
 
     def test_saves_household_member_answer_and_batch_is_complete(self):
         household_member1 = HouseholdMember.objects.create(household=self.household, surname="abcd", male=True,
@@ -260,7 +233,9 @@ class InvestigatorTest(TestCase):
     def test_knows_first_open_batch(self):
         batch_1 = Batch.objects.create(name="Batch 1", order=1)
         batch_2 = Batch.objects.create(name="Batch 2", order=2)
+        batch_3 = Batch.objects.create(name="Batch 3", order=3)
 
+        batch_3.open_for_location(self.investigator.location)
         batch_1.open_for_location(self.investigator.location)
         batch_2.open_for_location(self.investigator.location)
 
@@ -421,13 +396,13 @@ class InvestigatorGenerateReport(TestCase):
         data = ['Investigator', 'Phone Number']
         data.extend([loc.name for loc in LocationType.objects.all()])
 
-        response = Investigator.genrate_completion_report(self.survey)
+        response = Investigator.generate_completion_report(self.survey)
         self.assertIn(data,response)
 
     def test_should_return_data_when_generate_data_called(self):
         data = [self.investigator_1.name, self.investigator_1.mobile_number]
         data.extend([loc.name for loc in self.investigator_1.location_hierarchy().values()])
-        response = Investigator.genrate_completion_report(self.survey)
+        response = Investigator.generate_completion_report(self.survey)
         self.assertIn(data,response)
 
     def test_should_know_if_investigator_has_completed_survey(self):
@@ -459,7 +434,6 @@ class InvestigatorGenerateReport(TestCase):
         self.investigator_1.member_answered(question,member_3,1,self.batch)
         self.assertFalse(self.investigator_1.completed_survey(self.survey))
 
-
     def test_should_show_data_only_for_investigators_who_completed_the_survey(self):
         member_group = HouseholdMemberGroup.objects.create(name='group1',order=1)
         question = Question.objects.create(text="some question",answer_type=Question.NUMBER,order=1,group=member_group)
@@ -473,9 +447,9 @@ class InvestigatorGenerateReport(TestCase):
 
         data = [self.investigator_1.name, self.investigator_1.mobile_number]
         data.extend([loc.name for loc in self.investigator_1.location_hierarchy().values()])
-        response = Investigator.genrate_completion_report(self.survey)
+        response = Investigator.generate_completion_report(self.survey)
         self.assertNotIn(data, response)
 
         self.investigator_1.member_answered(question,member_3,1,self.batch)
-        response = Investigator.genrate_completion_report(self.survey)
+        response = Investigator.generate_completion_report(self.survey)
         self.assertIn(data, response)

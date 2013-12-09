@@ -8,7 +8,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import LocationTypeDetails
+from survey.models import LocationTypeDetails, LocationCode
 from survey.models.households import HouseholdMember, HouseholdHead, Household
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -197,7 +197,7 @@ class HouseholdViewTest(BaseTest):
             'uid': '2',
         }
 
-        household_code = investigator.get_household_code() + str(Household.next_uid())
+        household_code = LocationCode.get_household_code(investigator) + str(Household.next_uid())
 
         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
         household = Household.objects.filter(uid=form_data['uid'])

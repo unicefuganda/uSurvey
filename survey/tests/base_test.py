@@ -7,6 +7,9 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 import xlwt
 from survey.models import LocationTypeDetails
+from survey.models import Household
+from survey.models import HouseholdHead
+
 
 class BaseTest(TestCase):
 
@@ -59,3 +62,9 @@ class BaseTest(TestCase):
         LocationTypeDetails.objects.get_or_create(country=the_country, location_type=location.type)
         if location.get_children().exists():
             self.generate_location_type_details(location.get_children()[0], the_country)
+
+    def create_household_head(self, uid, investigator, survey=None):
+        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                                  uid=uid, survey=survey)
+        return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
+                                            date_of_birth="1990-02-09")

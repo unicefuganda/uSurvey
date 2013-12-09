@@ -4,7 +4,7 @@ from django.test import TestCase
 from mock import patch
 import mock
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import RandomHouseHoldSelection, Investigator, Backend, Household, Survey
+from survey.models import RandomHouseHoldSelection, Investigator, Backend, Household, Survey, LocationCode
 
 
 class RandomHouseHoldSelectionTest(TestCase):
@@ -33,4 +33,4 @@ class RandomHouseHoldSelectionTest(TestCase):
         for random_household in random_households:
             household = Household.objects.get(random_sample_number=random_household)
             self.assertIn(household, investigator.households.all())
-            self.assertEqual(household.household_code, (investigator.get_household_code() + str(household.uid)))
+            self.assertEqual(household.household_code, (LocationCode.get_household_code(investigator) + str(household.uid)))

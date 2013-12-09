@@ -12,11 +12,6 @@ from survey.tests.base_test import BaseTest
 
 
 class SimpleIndicatorChartViewTest(BaseTest):
-    def create_household_head(self, uid, investigator):
-        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
-                                                  uid=uid)
-        return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
-                                            date_of_birth="1990-02-09")
 
     def setUp(self):
         self.client = Client()

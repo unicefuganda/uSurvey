@@ -10,7 +10,7 @@ from rapidsms.router import send
 from survey.investigator_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PHONE_CODE
 from survey.models.backend import Backend
 from survey.models.base import BaseModel
-from survey.models.batch import Batch, BatchLocationStatus
+from survey.models.batch import BatchLocationStatus
 
 
 class Investigator(BaseModel):
@@ -157,6 +157,14 @@ class Investigator(BaseModel):
         all_households = list(self.all_households(open_survey, non_response_reporting))
         paginator = Paginator(all_households, self.HOUSEHOLDS_PER_PAGE)
         households = paginator.page(page)
+        households_list = self.create_ussd_household_list(households, all_households, registered, non_response_reporting)
+        if households.has_previous():
+            households_list.append(self.PREVIOUS_PAGE_TEXT)
+        if households.has_next():
+            households_list.append(self.NEXT_PAGE_TEXT)
+        return "\n".join(households_list)
+
+    def create_ussd_household_list(self, households, all_households, registered, non_response_reporting):
         households_list = []
         for household in households:
             household_head = household.get_head()
@@ -165,15 +173,12 @@ class Investigator(BaseModel):
             if household.has_completed_option_given_(registered, non_response_reporting):
                 text += "*"
             households_list.append(text)
-        if households.has_previous():
-            households_list.append(self.PREVIOUS_PAGE_TEXT)
-        if households.has_next():
-            households_list.append(self.NEXT_PAGE_TEXT)
-        return "\n".join(households_list)
+        return households_list
 
     def all_households(self, open_survey=None, non_response_reporting=False):
         all_households = self.households.order_by('created').all()
-        all_households = all_households.filter(survey=open_survey) if open_survey else all_households
+        if open_survey:
+            all_households = all_households.filter(survey=open_survey)
         if non_response_reporting:
             all_households = self.filter_non_completed_households(all_households)
         return all_households
@@ -198,13 +203,11 @@ class Investigator(BaseModel):
 
     def first_open_batch(self):
         open_batches = self.get_open_batch()
-        query_open_batches = Batch.objects.filter(id__in=[batch.id for batch in open_batches])
-        batch = query_open_batches.order_by('order')[0]
-        return batch
+        return sorted(open_batches, key=lambda batch: batch.order)[0]
 
     def has_open_batch(self):
         locations = self.location.get_ancestors(include_self=True)
-        return BatchLocationStatus.objects.filter(location__in=locations).count() > 0
+        return BatchLocationStatus.objects.filter(location__in=locations).exists()
 
     def created_member_within(self, minutes, open_survey=None):
         last_member = self.last_registered()
@@ -225,24 +228,12 @@ class Investigator(BaseModel):
         return last_active >= timeout
 
     def location_hierarchy(self):
-        hierarchy = []
-        location = self.location
-        hierarchy.append([location.type.name, location])
-        while location.tree_parent:
-            location = location.tree_parent
-            hierarchy.append([location.type.name, location])
-        hierarchy.reverse()
+        locations = self.locations_in_hierarchy()
+        hierarchy = map(lambda _location: (_location.type.name, _location), locations)
         return SortedDict(hierarchy)
 
     def locations_in_hierarchy(self):
-        hierarchy = []
-        location = self.location
-        hierarchy.append(location)
-        while location.tree_parent:
-            location = location.tree_parent
-            hierarchy.append(location)
-        hierarchy.reverse()
-        return hierarchy
+        return self.location.get_ancestors(include_self=True)
 
     def remove_invalid_households(self):
         all_households = self.households.all()
@@ -254,7 +245,7 @@ class Investigator(BaseModel):
         batches = self.get_open_batch()
         return[batch for batch in batches if batch.survey == survey]
 
-    def completed_survey(self,survey):
+    def completed_survey(self, survey):
         if self.get_open_batch_for_survey(survey):
             for household in self.all_households():
                 if not household.survey_completed():
@@ -263,15 +254,9 @@ class Investigator(BaseModel):
         return False
 
     def get_household_code(self):
-        household_code = ""
         location_hierarchy = self.locations_in_hierarchy()
-        for location in location_hierarchy:
-            all_locations = location.code.all()
-
-            location_code = all_locations[0] if all_locations else None
-            if location_code:
-                household_code += location_code.code
-        return household_code
+        codes = LocationCode.objects.filter(location__in=location_hierarchy).values_list('code', flat=True)
+        return ''.join(codes)
 
     def can_report_non_response(self):
         batch_location_status = BatchLocationStatus.objects.filter(location=self.location, non_response=True)
@@ -279,24 +264,6 @@ class Investigator(BaseModel):
             return False
         batch = batch_location_status[0].batch
         return self.all_households(batch.survey, non_response_reporting=True)
-
-    @classmethod
-    def get_summarised_answers_for(self, questions, data):
-        for investigator in self.objects.all():
-            for household in investigator.households.all():
-                for member in household.all_members():
-                    member_gender = 'Male' if member.male else "Female"
-                    household_location = household.location
-                    household_locations = household_location.get_ancestors(include_self=True)
-                    answers = []
-                    for location in household_locations:
-                        answers.append(location.name)
-
-                    answers = answers + [household.household_code, member.surname, str(int(member.get_age())),
-                                         str(member.get_month_of_birth()), str(member.get_year_of_birth()),
-                                         member_gender]
-                    answers = answers + member.answers_for(questions)
-                    data.append(answers)
 
     @classmethod
     def sms_investigators_in_locations(cls, locations, text):
@@ -311,14 +278,14 @@ class Investigator(BaseModel):
         return Investigator.objects.filter(location__in=locations)
 
     @classmethod
-    def genrate_completion_report(cls, survey):
+    def generate_completion_report(cls, survey):
         header = ['Investigator', 'Phone Number']
-        header.extend([loc.name for loc in LocationType.objects.all()])
+        header.extend(LocationType.objects.all().values_list('name', flat=True))
         data = [header]
         for investigator in Investigator.objects.all():
             if investigator.completed_survey(survey):
-                row=[investigator.name,investigator.mobile_number]
+                row = [investigator.name, investigator.mobile_number]
                 if investigator.location:
-                    row.extend([loc.name for loc in investigator.location_hierarchy().values()])
+                    row.extend(investigator.locations_in_hierarchy().values_list('name', flat=True))
                 data.append(row)
         return data
