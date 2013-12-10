@@ -107,4 +107,3 @@ class USSDBaseView(object):
         self.investigator.clear_interview_caches()
         self.ussd_register_household.set_in_session('HOUSEHOLD', None)
         self.ussd_survey.set_in_session('HOUSEHOLD', None)
-

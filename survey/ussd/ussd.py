@@ -88,7 +88,6 @@ class USSD(USSDBase):
     def set_investigator_cache(self, key, value):
         self.investigator.set_in_cache(key, value)
 
-
     def is_pagination_option(self, answer):
         return answer in getattr(settings, 'USSD_PAGINATION', None).values()
 
@@ -152,3 +151,9 @@ class USSD(USSDBase):
         self.responseString += "%s\n%s" % \
                                (self.MESSAGES['MEMBERS_LIST'],
                                 self.household.members_list(page, reporting_non_response=True))
+
+    def render_menu(self):
+        responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
+        if self.investigator.can_report_non_response():
+            responseString += self.MESSAGES['NON_RESPONSE_MENU']
+        return responseString
