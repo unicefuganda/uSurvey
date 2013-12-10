@@ -448,7 +448,12 @@ class HouseholdMember(BaseModel):
         answers = []
         for question in questions:
             answer_class = question.answer_class()
-            answer = answer_class.objects.filter(question=question, householdmember=self)
+            answer = answer_class.objects.filter(question=question, household=self.household)
+            if self.belongs_to_general_group(question):
+                answer = answer.filter(householdmember=self if self.is_head() else self.household.get_head())
+            else:
+                answer = answer.filter(householdmember=self)
+
             if answer:
                 answer = answer[0]
                 if question.is_multichoice():
@@ -468,6 +473,10 @@ class HouseholdMember(BaseModel):
     def has_answered_non_response(self):
         open_batch = Batch.currently_open_for(self.household.location)
         return self.multichoiceanswer.filter(question__group__name="NON_RESPONSE", batch=open_batch).count() > 0
+
+    @staticmethod
+    def belongs_to_general_group(question):
+        return question.group.name == GroupCondition.GROUP_TYPES['GENERAL']
 
     class Meta:
         app_label = 'survey'

@@ -24,8 +24,7 @@ class BatchQuestionOrder(BaseModel):
             BatchQuestionOrder.objects.create(question=question, batch=batch, order=order_question_id[0])
 
     @classmethod
-    def get_batch_order_specific_questions(cls, batch_id, filter_condition):
-        batch = Batch.objects.get(id=batch_id)
+    def get_batch_order_specific_questions(cls, batch, filter_condition):
         batch_question_orders = BatchQuestionOrder.objects.filter(batch=batch, **filter_condition).order_by('order')
         questions = []
         for batch_question_order in batch_question_orders:

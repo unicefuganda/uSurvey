@@ -1,6 +1,7 @@
 import csv
 from random import randint
 from urllib import quote
+from datetime import date
 
 from django.test import TestCase
 from django.contrib.auth.models import Group, Permission
@@ -67,4 +68,4 @@ class BaseTest(TestCase):
         self.household = Household.objects.create(investigator=investigator, location=investigator.location,
                                                   uid=uid, survey=survey)
         return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
-                                            date_of_birth="1990-02-09")
+                                            date_of_birth=date(1990, 2, 9))

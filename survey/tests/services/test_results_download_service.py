@@ -1,6 +1,6 @@
 from datetime import date
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Survey, HouseholdMember, Household, Batch, Investigator, Backend, HouseholdMemberGroup, QuestionModule, Question, BatchQuestionOrder, LocationTypeDetails, QuestionOption
+from survey.models import Survey, HouseholdMember, Batch, Investigator, Backend, HouseholdMemberGroup, QuestionModule, Question, BatchQuestionOrder, LocationTypeDetails, QuestionOption, GroupCondition
 from survey.services.results_download_service import ResultsDownloadService
 from survey.tests.base_test import BaseTest
 
@@ -32,6 +32,9 @@ class ResultsDownloadServiceTest(BaseTest):
                                                         backend=backend)
 
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        general_condition = GroupCondition.objects.create(attribute="GENDER", value=False, condition='EQUALS')
+        group.conditions.add(general_condition)
+
         module = QuestionModule.objects.create(name="Education")
         self.question_1 = Question.objects.create(group=group, text="Question 1", module=module,
                                                   answer_type=Question.NUMBER,
@@ -45,7 +48,6 @@ class ResultsDownloadServiceTest(BaseTest):
 
         self.yes_option = QuestionOption.objects.create(question=self.question_2, text="Yes", order=1)
         self.no_option = QuestionOption.objects.create(question=self.question_2, text="No", order=2)
-
 
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
@@ -92,18 +94,77 @@ class ResultsDownloadServiceTest(BaseTest):
         self.investigator.member_answered(self.question_3, household_head_5, 3, self.batch)
 
         result_down_load_service = ResultsDownloadService(self.batch)
-        expected_csv_data = [['Kampala', household_head_1.household.household_code, household_head_1.surname, '23', '2',  '1990',
-                             'Male' if household_head_1.male else 'Female',  1, self.no_option.order, self.no_option.text,  1],
-                             ['Kampala', household_head_2.household.household_code, household_head_2.surname, '23', '2',  '1990',
-                             'Male' if household_head_2.male else 'Female',  2, self.yes_option.order, self.yes_option.text,  2],
-                             ['Kampala', household_head_3.household.household_code, household_head_3.surname, '23', '2',  '1990',
-                             'Male' if household_head_3.male else 'Female',  1, self.no_option.order, self.no_option.text,  1],
-                             ['Kampala', household_head_4.household.household_code, household_head_4.surname, '23', '2',  '1990',
-                             'Male' if household_head_4.male else 'Female',  2, self.yes_option.order, self.yes_option.text,  2],
-                             ['Kampala', household_head_5.household.household_code, household_head_5.surname, '23', '2',  '1990',
-                             'Male' if household_head_5.male else 'Female',  3, self.yes_option.order, self.yes_option.text,  3]]
+        expected_csv_data = [
+            ['Kampala', household_head_1.household.household_code, household_head_1.surname, '23', '2', '1990',
+             'Male' if household_head_1.male else 'Female', 1, self.no_option.order, self.no_option.text, 1],
+            ['Kampala', household_head_2.household.household_code, household_head_2.surname, '23', '2', '1990',
+             'Male' if household_head_2.male else 'Female', 2, self.yes_option.order, self.yes_option.text, 2],
+            ['Kampala', household_head_3.household.household_code, household_head_3.surname, '23', '2', '1990',
+             'Male' if household_head_3.male else 'Female', 1, self.no_option.order, self.no_option.text, 1],
+            ['Kampala', household_head_4.household.household_code, household_head_4.surname, '23', '2', '1990',
+             'Male' if household_head_4.male else 'Female', 2, self.yes_option.order, self.yes_option.text, 2],
+            ['Kampala', household_head_5.household.household_code, household_head_5.surname, '23', '2', '1990',
+             'Male' if household_head_5.male else 'Female', 3, self.yes_option.order, self.yes_option.text, 3]]
 
         actual_csv_data = result_down_load_service.get_summarised_answers()
         self.assertEqual(5, len(actual_csv_data))
         for i in range(5):
+            self.assertIn(expected_csv_data[i], actual_csv_data)
+
+    def test_should_repeat_questions_in_general_for_all_members(self):
+        general_group = HouseholdMemberGroup.objects.create(name="GENERAL", order=2)
+
+        general_condition = GroupCondition.objects.create(attribute="GENERAL", value="HEAD", condition='EQUALS')
+        general_group.conditions.add(general_condition)
+
+        general_question_1 = Question.objects.create(group=general_group, text="General Question 1",
+                                                     answer_type=Question.NUMBER,
+                                                     order=4, identifier='Q3')
+        general_question_2 = Question.objects.create(group=general_group, text="General Question 2",
+                                                     answer_type=Question.NUMBER,
+                                                     order=5, identifier='Q4')
+
+        general_question_1.batches.add(self.batch)
+        general_question_2.batches.add(self.batch)
+
+        BatchQuestionOrder.objects.create(question=general_question_1, batch=self.batch, order=4)
+        BatchQuestionOrder.objects.create(question=general_question_2, batch=self.batch, order=5)
+
+        household_head_1 = self.create_household_head(0, self.investigator, self.batch.survey)
+        household_head_2 = self.create_household_head(1, self.investigator, self.batch.survey)
+
+        member_1 = HouseholdMember.objects.create(surname="Member 1", date_of_birth=date(1999, 2, 9),
+                                                  household=household_head_1.household)
+        member_2 = HouseholdMember.objects.create(surname="Member 2", date_of_birth=date(1999, 2, 9),
+                                                  household=household_head_2.household)
+
+        self.investigator.member_answered(self.question_1, household_head_1, 1, self.batch)
+        self.investigator.member_answered(self.question_1, household_head_2, 2, self.batch)
+
+        self.investigator.member_answered(general_question_1, household_head_1, 4, self.batch)
+        self.investigator.member_answered(general_question_1, household_head_2, 1, self.batch)
+
+        self.investigator.member_answered(general_question_2, household_head_1, 4, self.batch)
+        self.investigator.member_answered(general_question_2, household_head_2, 3, self.batch)
+
+        self.investigator.member_answered(self.question_2, household_head_1, self.no_option.order, self.batch)
+        self.investigator.member_answered(self.question_2, household_head_2, self.yes_option.order, self.batch)
+
+        self.investigator.member_answered(self.question_3, household_head_1, 1, self.batch)
+        self.investigator.member_answered(self.question_3, household_head_2, 2, self.batch)
+
+        result_down_load_service = ResultsDownloadService(self.batch)
+        expected_csv_data = [
+            ['Kampala', household_head_1.household.household_code, household_head_1.surname, '23', '2', '1990',
+             'Male' if household_head_1.male else 'Female', 1, self.no_option.order, self.no_option.text, 1, 4, 4],
+            ['Kampala', household_head_2.household.household_code, member_1.surname, '14', '2', '1999',
+             'Male' if member_1.male else 'Female', '', '', '', 4, 4],
+            ['Kampala', household_head_2.household.household_code, household_head_2.surname, '23', '2', '1990',
+             'Male' if household_head_2.male else 'Female', 2, self.yes_option.order, self.yes_option.text, 2, 1, 3],
+            ['Kampala', household_head_2.household.household_code, member_2.surname, '14', '2', '1999',
+             'Male' if member_2.male else 'Female', '', '', '', 1, 3]]
+
+        actual_csv_data = result_down_load_service.get_summarised_answers()
+        self.assertEqual(4, len(actual_csv_data))
+        for i in range(4):
             self.assertIn(expected_csv_data[i], actual_csv_data)
