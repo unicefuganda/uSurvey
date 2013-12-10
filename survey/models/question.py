@@ -138,6 +138,7 @@ class QuestionOption(BaseModel):
 
     class Meta:
         app_label = 'survey'
+        ordering = ['order']
 
     def to_text(self):
         return "%d: %s" % (self.order, self.text)
