@@ -1,4 +1,4 @@
-from survey.models import LocationTypeDetails, Investigator, Household
+from survey.models import LocationTypeDetails, Investigator, Household, HouseholdMemberGroup
 
 
 class ResultsDownloadService(object):
@@ -25,6 +25,7 @@ class ResultsDownloadService(object):
         data = []
         all_households = Household.objects.filter(survey=self.batch.survey)
         locations = list(set(all_households.values_list('location', flat=True)))
+        general_group = HouseholdMemberGroup.objects.get(name="GENERAL")
         for location_id in locations:
             households_in_location = all_households.filter(location=location_id)
             household_location = households_in_location[0].location
@@ -36,7 +37,7 @@ class ResultsDownloadService(object):
                     answers = answers + [household.household_code, member.surname, str(int(member.get_age())),
                                          str(member.get_month_of_birth()), str(member.get_year_of_birth()),
                                          member_gender]
-                    answers = answers + member.answers_for(self.questions)
+                    answers = answers + member.answers_for(self.questions, general_group)
                     data.append(answers)
         return data
 

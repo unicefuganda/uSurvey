@@ -437,34 +437,35 @@ class HouseholdMember(BaseModel):
 
     def mark_past_answers_as_old(self):
         self.completed_member_batches.all().delete()
-
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
             answers = getattr(self, related_name).all()
             for answer in answers:
                 answer.is_old = True
                 answer.save()
 
-    def answers_for(self, questions):
+    def answers_for(self, questions, general_group):
         answers = []
         for question in questions:
             answer_class = question.answer_class()
             answer = answer_class.objects.filter(question=question, household=self.household)
-            if self.belongs_to_general_group(question):
-                answer = answer.filter(householdmember=self if self.is_head() else self.household.get_head())
-            else:
-                answer = answer.filter(householdmember=self)
-
-            if answer:
-                answer = answer[0]
-                if question.is_multichoice():
-                    option = answer.answer
-                    answers.append(option.order)
-                    answers.append(option.text)
-                else:
-                    answers.append(answer.answer)
-            else:
-                answers.append('')
+            answer = self._filter_answer(answer, question, general_group)
+            answers.extend(self._format_answer(answer, question))
         return answers
+
+    @classmethod
+    def _format_answer(cls, answer, question):
+        if answer:
+            answer = answer[0]
+            if question.is_multichoice():
+                option = answer.answer
+                return [option.order, option.text]
+            return [answer.answer]
+        return ['']
+
+    def _filter_answer(self, answer, question, general_group):
+        if question.belongs_to(general_group):
+            return answer.filter(householdmember=self if self.is_head() else self.household.get_head())
+        return answer.filter(householdmember=self)
 
     def has_completed_survey_options(self, reporting_non_response):
         return (self.survey_completed() and not reporting_non_response)\

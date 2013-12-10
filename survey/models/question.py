@@ -127,6 +127,9 @@ class Question(BaseModel):
             batch_order.save()
         batch_order_object.delete()
 
+    def belongs_to(self, group):
+        return self.group == group
+
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")

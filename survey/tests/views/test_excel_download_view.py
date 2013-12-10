@@ -20,6 +20,7 @@ class ExcelDownloadTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
+        HouseholdMemberGroup.objects.create(name="GENERAL", order=2)
         self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
         self.condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         self.condition.groups.add(self.member_group)

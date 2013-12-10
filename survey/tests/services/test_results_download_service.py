@@ -69,6 +69,7 @@ class ResultsDownloadServiceTest(BaseTest):
         self.assertEqual(header_structure, headers)
 
     def test_gets_summarised_response_for_a_given_batch(self):
+        HouseholdMemberGroup.objects.create(name="GENERAL", order=2)
         household_head_1 = self.create_household_head(0, self.investigator, self.batch.survey)
         household_head_2 = self.create_household_head(1, self.investigator, self.batch.survey)
         household_head_3 = self.create_household_head(2, self.investigator, self.batch.survey)

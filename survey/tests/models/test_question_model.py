@@ -3,11 +3,10 @@ from django.core.exceptions import ValidationError
 
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
-from survey.models import QuestionModule, BatchQuestionOrder
+from survey.models import BatchQuestionOrder, GroupCondition
 
 from survey.models.batch import Batch
 from survey.models.backend import Backend
-from survey.models.answer_rule import AnswerRule
 from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.question import Question, QuestionOption
@@ -168,12 +167,35 @@ class QuestionTest(TestCase):
 
         batch_question_order = BatchQuestionOrder.objects.filter(batch=batch, question=batch_question)
         self.failIf(batch_question_order)
-        updated_question = Question.objects.filter(text="This is a test question", answer_type="multichoice", batches=batch)
+        updated_question = Question.objects.filter(text="This is a test question", answer_type="multichoice",
+                                                   batches=batch)
         self.failIf(updated_question)
 
-        remaining_batch_order_questions = BatchQuestionOrder.objects.filter(batch=batch, question=another_batch_question)
+        remaining_batch_order_questions = BatchQuestionOrder.objects.filter(batch=batch,
+                                                                            question=another_batch_question)
         self.failUnless(remaining_batch_order_questions)
         self.assertEqual(1, remaining_batch_order_questions[0].order)
+
+    def test_question_knows_it_belongs_to_agroup(self):
+        another_group = HouseholdMemberGroup.objects.create(name="GENERAL", order=1)
+        general_group = HouseholdMemberGroup.objects.create(name="GENERAL", order=2)
+
+        general_condition = GroupCondition.objects.create(attribute="GENERAL", value="HEAD", condition='EQUALS')
+        general_group.conditions.add(general_condition)
+
+        general_question = Question.objects.create(group=general_group, text="General Question 1",
+                                                   answer_type=Question.NUMBER,
+                                                   order=4, identifier='Q3')
+        another_group_question = Question.objects.create(group=another_group, text="General Question 2",
+                                                         answer_type=Question.NUMBER,
+                                                         order=5, identifier='Q4')
+
+        self.assertTrue(general_question.belongs_to(general_group))
+        self.assertFalse(general_question.belongs_to(another_group))
+
+        self.assertTrue(another_group_question.belongs_to(another_group))
+        self.assertFalse(another_group_question.belongs_to(general_group))
+
 
 class QuestionOptionTest(TestCase):
     def setUp(self):
