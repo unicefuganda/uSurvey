@@ -7,6 +7,7 @@ from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
 
+
 class QuestionForm(ModelForm):
 
     options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
@@ -15,6 +16,7 @@ class QuestionForm(ModelForm):
         super(QuestionForm, self).__init__(data=data, initial=initial, instance=instance)
         self.fields['answer_type'].choices = list(Question.TYPE_OF_ANSWERS)
         self.fields['module'].choices = map(lambda question_module: (question_module.id, question_module.name), QuestionModule.objects.filter())
+        self.fields['identifier'].label = "Variable name"
 
         groups = []
 
@@ -39,10 +41,10 @@ class QuestionForm(ModelForm):
     def clean_options(self):
         options = dict(self.data).get('options')
         if options:
-          options = filter(lambda text: text.strip(), options)
-          options = map(lambda option: re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', option), options)
-          options = map(lambda option: re.sub("  ", ' ', option), options)
-          self.cleaned_data['options'] = options
+            options = filter(lambda text: text.strip(), options)
+            options = map(lambda option: re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', option), options)
+            options = map(lambda option: re.sub("  ", ' ', option), options)
+            self.cleaned_data['options'] = options
         return options
 
     def clean(self):
@@ -50,7 +52,7 @@ class QuestionForm(ModelForm):
         options = self.cleaned_data.get('options', None)
         text = self.cleaned_data.get('text', None)
 
-        if answer_type==Question.MULTICHOICE and not options:
+        if answer_type == Question.MULTICHOICE and not options:
             message = 'Question Options missing.'
             self._errors['answer_type'] = self.error_class([message])
             del self.cleaned_data['answer_type']

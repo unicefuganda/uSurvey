@@ -1,6 +1,7 @@
 from random import randint
 from time import sleep
 from lettuce import *
+from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.question import BatchQuestionsListPage, AddQuestionPage, ListAllQuestionsPage, CreateNewQuestionPage, CreateNewSubQuestionPage, EditQuestionPage
 from survey.models import Batch, QuestionModule, BatchQuestionOrder
 from survey.models.question import Question, QuestionOption
@@ -133,7 +134,8 @@ def and_i_fill_an_option_question(step):
 @step(u'And I have more than 50 questions')
 def and_i_have_100_questions(step):
     for i in xrange(100):
-        Question.objects.create(text="some questions %d" % i, answer_type=Question.NUMBER, identifier='ID %d' % i, order=i)
+        Question.objects.create(text="some questions %d" % i, answer_type=Question.NUMBER, identifier='ID %d' % i,
+                                order=i)
 
 
 @step(u'And I visit questions list page')
@@ -295,7 +297,8 @@ def then_i_should_see_that_the_question_was_deleted_successfully(step):
 
 @step(u'And I have a sub question for that question')
 def and_i_have_a_sub_question_for_that_question(step):
-    world.sub_question = Question.objects.create(module=world.module, parent=world.multi_choice_question, text="Sub Question 2?",
+    world.sub_question = Question.objects.create(module=world.module, parent=world.multi_choice_question,
+                                                 text="Sub Question 2?",
                                                  answer_type=Question.NUMBER, subquestion=True, identifier='ID 1')
 
 
@@ -311,7 +314,6 @@ def and_i_have_a_non_multi_choice_question(step):
                                                           group=world.household_member_group, identifier='ID 1')
     world.multi_choice_question.batches.add(world.batch)
     BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=1)
-
 
 
 @step(u'When I click on the question')
@@ -335,13 +337,14 @@ def and_i_have_a_rule_linking_one_option_with_that_subquestion(step):
 
 @step(u'And I have a subquestion under that question')
 def and_i_have_a_subquestion_under_that_question(step):
-    world.sub_question = Question.objects.create(module=world.module, subquestion=True, parent=world.multi_choice_question,
+    world.sub_question = Question.objects.create(module=world.module, subquestion=True,
+                                                 parent=world.multi_choice_question,
                                                  text="this is a subquestion", identifier='ID 1')
 
 
 @step(u'When I fill in duplicate subquestion details')
 def when_i_fill_in_duplicate_subquestion_details(step):
-    world.page.fill_valid_values({'module': world.module.id,'identifier': 'ID 1', 'text': world.sub_question.text})
+    world.page.fill_valid_values({'module': world.module.id, 'identifier': 'ID 1', 'text': world.sub_question.text})
     world.page.select('group', [world.household_member_group.pk])
     world.page.select('answer_type', [Question.NUMBER])
 
@@ -426,14 +429,15 @@ def and_i_click_edit_sub_question_link(step):
     sleep(3)
     world.page.click_by_css("#edit_subquestion_%s" % world.sub_question.id)
 
+
 @step(u'Then I see the sub question form with values')
 def then_i_see_the_sub_question_form_with_values(step):
-
     form_values = {'module': world.module.id, 'text': world.sub_question.text,
                    'group': world.multi_choice_question.group.id,
                    'identifier': 'ID 1',
                    'answer_type': world.sub_question.answer_type}
     world.page.validate_form_values(form_values)
+
 
 @step(u'When I fill in edited sub question details')
 def when_i_fill_in_edited_sub_question_details(step):
@@ -443,18 +447,22 @@ def when_i_fill_in_edited_sub_question_details(step):
     world.page.see_select_option(['Number'], 'answer_type')
     world.page.fill_valid_values(world.edited_sub_question_details)
 
+
 @step(u'Then I should see the sub question successfully edited')
 def then_i_should_see_the_sub_question_successfully_edited(step):
     world.page.see_success_message("Sub question", "edited")
+
 
 @step(u'And I click delete question rule')
 def and_i_click_delete_question_rule(step):
     sleep(2)
     world.page.click_by_css('#delete-icon-%s' % world.answer_rule.id)
 
+
 @step(u'And I should see that the logic was deleted successfully')
 def and_i_should_see_that_the_logic_was_deleted_successfully(step):
     world.page.see_success_message("Logic", "deleted")
+
 
 @step(u'And I select multichoice question in batch')
 def and_i_select_multichoice_question_in_batch(step):
@@ -466,3 +474,43 @@ def and_i_select_multichoice_question_in_batch(step):
 @step(u'And I have a module')
 def and_i_have_a_module(step):
     world.module = QuestionModule.objects.create(name="Education")
+
+
+@step(u'And I have a location')
+def and_i_have_a_location(step):
+    world.kampala = Location.objects.create(name="Kampala")
+
+
+@step(u'And I have an open batch in that location')
+def and_i_have_an_open_batch_in_that_location(step):
+    world.batch = Batch.objects.create(order=1, name="Batch A", description='description', survey=world.survey)
+    world.batch.open_for_location(world.kampala)
+
+
+@step(u'Then I should see question list with only view options action')
+def then_i_should_see_question_list_with_only_view_options_action(step):
+    world.page.validate_only_view_options_action_exists()
+
+
+@step(u'And I have a multichoice and numeric questions with logics')
+def and_i_have_a_multichoice_and_numeric_questions(step):
+    world.numeric_question = Question.objects.create(text="some questions", answer_type=Question.NUMBER,
+                                                     identifier='ID', order=1)
+    world.multi_choice_question = Question.objects.create(text="Are these insecticide?",
+                                                          answer_type=Question.MULTICHOICE, order=6, identifier='ID 1')
+    world.option3 = QuestionOption.objects.create(text="haha", order=1, question=world.multi_choice_question)
+
+    world.numeric_question.batches.add(world.batch)
+    world.multi_choice_question.batches.add(world.batch)
+    BatchQuestionOrder.objects.create(batch=world.batch, question=world.numeric_question, order=1)
+    BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=2)
+
+    AnswerRule.objects.create(batch=world.batch, question=world.multi_choice_question,
+                              action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                              condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
+                              validate_with_option=world.option3)
+
+    AnswerRule.objects.create(batch=world.batch, question=world.numeric_question,
+                              action=AnswerRule.ACTIONS['END_INTERVIEW'],
+                              condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
+                              validate_with_value=2)

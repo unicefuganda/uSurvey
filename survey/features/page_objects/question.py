@@ -23,6 +23,15 @@ class BatchQuestionsListPage(PageObject):
         assert_equals(False, self.browser.is_text_present("Order"))
         assert_equals(False, self.browser.is_text_present("Close"))
 
+    def validate_only_view_options_action_exists(self):
+        self.find_link_by_text("View options/Logic")
+        self.find_link_by_text("View Logic")
+
+        self.is_text_present("Add Subquestion", False)
+        self.is_text_present("Add Logic", False)
+        self.is_text_present("Edit", False)
+        self.is_text_present("Remove", False)
+
 
 class ListAllQuestionsPage(PageObject):
     url = "/questions/"

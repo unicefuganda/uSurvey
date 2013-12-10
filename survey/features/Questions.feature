@@ -8,6 +8,15 @@ Feature: Questions related features
     And I visit questions listing page of the batch
     Then I should see the questions list paginated
 
+  Scenario: List Questions Under an open-batch
+    Given I am logged in as researcher
+    And I have a survey
+    And I have a location
+    And I have an open batch in that location
+    And I have a multichoice and numeric questions with logics
+    And I visit questions listing page of the batch
+    Then I should see question list with only view options action
+
   Scenario: Error Message on no question
     Given I am logged in as researcher
     And I have a survey
