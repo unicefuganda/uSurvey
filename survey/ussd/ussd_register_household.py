@@ -110,9 +110,6 @@ class USSDRegisterHousehold(USSD):
         self.investigator.set_in_cache('is_selecting_member', True)
         self.responseString = self.MESSAGES['SELECT_HEAD_OR_MEMBER'] % str(self.household.random_sample_number)
 
-    def render_welcome_screen(self):
-        self.responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-
     def render_questions_or_member_selection(self, answer):
 
         if self.household.get_head():
@@ -143,9 +140,8 @@ class USSDRegisterHousehold(USSD):
             if answer == self.ANSWER['NO']:
                 self.investigator.clear_interview_caches()
                 self.set_in_session('HOUSEHOLD', None)
-                self.render_welcome_screen()
+                self.responseString = self.render_menu()
             self.set_in_session('HOUSEHOLD_MEMBER', None)
-
         else:
             return self.render_questions(answer)
 

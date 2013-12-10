@@ -1145,7 +1145,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
 
-    def test_resume_from_register_to_non_response(self):
+    def test_resume_from_register_to_non_response_without_reset_session(self):
         self.batch.activate_non_response_for(self.kampala)
         self.household2.delete()
         self.household3.delete()
@@ -1160,8 +1160,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-                with patch.object(USSDSurvey, "is_active", return_value=False):
-                    response = self.reset_session()
+                response = self.reset_session()
                 homepage = "Welcome %s to the survey.\n" \
                            "1: Register households\n" \
                            "2: Take survey\n" \
@@ -1197,9 +1196,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 self.assertEqual(member.surname, answers['name'])
                 self.assertEqual(member.male, True)
 
-                with patch.object(USSDSurvey, "is_active", return_value=False):
-                    response = self.reset_session()
-
+                response = self.respond(USSD.ANSWER['NO'])
                 self.assertEqual(urllib2.unquote(response.content), homepage_response_string)
 
                 response = self.report_non_response()
@@ -1209,6 +1206,13 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                     self.household2.uid, self.household2.get_head().surname)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
+
+                response = self.select_household("1")
+                non_response_option_page = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
+                question_and_options = self.non_response_question.text % (
+                    self.household1.uid, self.household_head.surname) + non_response_option_page
+                non_response_question = "responseString=%s&action=request" % question_and_options
+                self.assertEquals(urllib2.unquote(response.content), non_response_question)
 
     def test_transition_from_take_survey_to_non_response(self):
         self.batch.activate_non_response_for(self.kampala)
