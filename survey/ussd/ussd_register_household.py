@@ -111,7 +111,6 @@ class USSDRegisterHousehold(USSD):
         self.responseString = self.MESSAGES['SELECT_HEAD_OR_MEMBER'] % str(self.household.random_sample_number)
 
     def render_questions_or_member_selection(self, answer):
-
         if self.household.get_head():
             self.investigator.set_in_cache('is_head', False)
             self.responseString = USSD.MESSAGES['HEAD_REGISTERED']
@@ -124,6 +123,7 @@ class USSDRegisterHousehold(USSD):
         all_questions = Question.objects.filter(group__name="REGISTRATION GROUP").order_by('order')
 
         if not self.question:
+            self.investigator.set_in_cache('INVALID_ANSWER', [])
             self.question = all_questions[0]
         else:
             self.question = self.process_registration_answer(answer)

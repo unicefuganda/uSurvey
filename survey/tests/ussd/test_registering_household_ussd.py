@@ -975,3 +975,51 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 unknown_attr = UnknownDOBAttribute.objects.filter(household_member=saved_member)
                 self.assertEqual(1, unknown_attr.count())
                 self.assertEqual('MONTH', unknown_attr[0].type)
+
+
+    def test_invalid_answer_prefix_is_not_carried_on_when_session_time_out_or_cancelled(self):
+        some_age = 10
+        answers = {'name': 'dummy name',
+                   'age': some_age,
+                   'gender': '1',
+                   'month': '2',
+                   'year': datetime.datetime.now().year - some_age
+        }
+
+        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+                self.reset_session()
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+                self.respond('2')
+                self.respond(answers['name'])
+                self.respond(answers['age'])
+                invalid_month = 45
+                response = self.respond(invalid_month)
+
+                months_option_page_1 = "\n1: January\n2: February\n3: March\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % (
+                    "INVALID ANSWER: " + self.month_question.text + months_option_page_1)
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+
+                self.reset_session()
+
+                self.register_household()
+                selected_household_id = '2'
+                self.select_household(selected_household_id)
+
+                response = self.respond('2')
+                name_question = "responseString=%s&action=request" % self.question_1.text
+                self.assertEquals(urllib2.unquote(response.content), name_question)
+
+                response = self.respond(answers['name'])
+                next_registration_question = "responseString=%s&action=request" % self.age_question.text
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
+
+                response = self.respond(answers['age'])
+                months_option_page_1 = "\n1: January\n2: February\n3: March\n#: Next"
+                next_registration_question = "responseString=%s&action=request" % \
+                                             (self.month_question.text + months_option_page_1)
+                self.assertNotIn('INVALID ANSWER', urllib2.unquote(response.content))
+                self.assertEquals(urllib2.unquote(response.content), next_registration_question)
