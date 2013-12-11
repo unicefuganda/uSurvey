@@ -49,6 +49,58 @@ class IndicatorViewTest(BaseTest):
         error_message = "Indicator was not created."
         self.assertIn(error_message, response.content)
 
+    def test_get_edit_indicator(self):
+        indicator = Indicator.objects.create(name='ITN1', module=self.module, batch=self.batch)
+        response = self.client.get('/indicators/%s/edit/' % indicator.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('indicator/new.html', templates)
+        self.assertIsNotNone(response.context['indicator_form'])
+        self.assertIsInstance(response.context['indicator_form'], IndicatorForm)
+        self.assertEqual(response.context['title'], "Edit Indicator")
+        self.assertEqual(response.context['button_label'], "Save")
+
+    def test_post_edit_indicator_updates_and_returns_success(self):
+        indicator = Indicator.objects.create(name='ITN1', module=self.module, batch=self.batch)
+        survey = Survey.objects.create(name='Survey A')
+        batch = Batch.objects.create(name='Batch A', survey=survey)
+        form_data = {'module': self.module.id,
+                     'name': 'Edited Health',
+                     'description': 'some new description',
+                     'measure': '%',
+                     'batch': batch.id,
+                     'survey': survey.id}
+
+        data = form_data.copy()
+        del data['survey']
+        self.failIf(Indicator.objects.filter(**data))
+        response = self.client.post('/indicators/%s/edit/' % indicator.id, data=form_data)
+
+        self.failUnless(Indicator.objects.filter(name=form_data['name'], description=form_data['description']))
+        self.assertRedirects(response, expected_url='/indicators/')
+        success_message = "Indicator successfully edited."
+        self.assertIn(success_message, response.cookies['messages'].value)
+
+    def test_post_edit_indicator_updates_and_returns_error(self):
+        batch = Batch.objects.create(name='Batch A', survey=self.survey)
+        indicator = Indicator.objects.create(name='ITN1', module=self.module, batch=batch)
+        form_data = {'module': indicator.module.id,
+                     'name': 'Edited Health',
+                     'description': 'some new description',
+                     'measure': indicator.measure,
+                     'batch': self.batch.id,
+                     'survey': self.survey.id}
+
+        data = form_data.copy()
+        del data['survey']
+        self.failIf(Indicator.objects.filter(**data))
+        response = self.client.post('/indicators/%s/edit/' % indicator.id, data=form_data)
+
+        self.failIf(Indicator.objects.filter(name=form_data['name'], description=form_data['description']))
+        self.failUnlessEqual(response.status_code, 200)
+        error_message = "Indicator was not successfully edited."
+        self.assertIn(error_message, response.content)
+
     def test_post_indicator_fails_and_returns_error_message(self):
         data = self.form_data.copy()
         del data['survey']

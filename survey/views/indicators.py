@@ -58,3 +58,18 @@ def delete(request, indicator_id):
     indicator.delete()
     messages.success(request, 'Indicator successfully deleted.')
     return HttpResponseRedirect('/indicators/')
+
+
+def edit(request, indicator_id):
+    indicator = Indicator.objects.get(id=indicator_id)
+    indicator_form = IndicatorForm(instance=indicator)
+    if request.method == 'POST':
+        indicator_form = IndicatorForm(data=request.POST, instance=indicator)
+        if indicator_form.is_valid():
+            indicator_form.save()
+            messages.success(request, "Indicator successfully edited.")
+            return HttpResponseRedirect("/indicators/")
+        messages.error(request, "Indicator was not successfully edited.")
+    context = {'indicator_form': indicator_form, 'title': 'Edit Indicator', 'button_label': 'Save'}
+    return render(request, 'indicator/new.html', context)
+

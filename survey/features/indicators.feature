@@ -42,3 +42,16 @@ Feature: Indicators feature
     And if I click yes
     Then I should go back to indicator listing page
     And I should see the indicator successfully deleted
+
+  Scenario: Edit Indicator
+    Given I am logged in as researcher
+    And I have a survey
+    And I have three batches
+    And I have two question modules
+    And I have two indicators
+    When I visit indicator listing page
+    And I click the edit indicator link
+    Then I should see the indicator details in the form
+    When I fill in the new values for the indicator
+    And I submit the form
+    Then I should see the indicator successfully edited

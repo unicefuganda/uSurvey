@@ -102,6 +102,7 @@ urlpatterns = patterns('',
     url(r'^indicators/(?P<indicator_id>\d+)/formula/new/$', 'survey.views.formula.new', name='add_formula_page'),
     url(r'^indicators/(?P<indicator_id>\d+)/simple/$', 'survey.views.formula.simple_indicator', name='simple_indicator_chart_page'),
     url(r'^indicators/(?P<indicator_id>\d+)/delete/$', 'survey.views.indicators.delete', name='delete_indicator_page'),
+    url(r'^indicators/(?P<indicator_id>\d+)/edit/$', 'survey.views.indicators.edit', name='edit_indicator_page'),
     url(r'^indicators/(?P<indicator_id>\d+)/formula/(?P<formula_id>\d+)/delete/', 'survey.views.formula.delete', name='delete_indicator_formula_page')
 )
 

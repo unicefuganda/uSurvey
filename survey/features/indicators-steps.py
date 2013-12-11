@@ -152,3 +152,32 @@ def then_i_should_go_back_to_indicator_listing_page(step):
 @step(u'And I should see the indicator successfully deleted')
 def and_i_should_see_the_indicator_successfully_deleted(step):
     world.page.see_success_message("Indicator", "deleted")
+
+@step(u'And I click the edit indicator link')
+def and_i_click_the_edit_indicator_link(step):
+    world.page.click_by_css("#edit-indicator_%s" % world.indicator_1.id)
+
+
+@step(u'Then I should see the indicator details in the form')
+def then_i_should_see_the_indicator_details_in_the_form(step):
+    world.form_data = {'batch': world.indicator_1.batch.id,
+                       'module': world.indicator_1.module.id,
+                       'name': world.indicator_1.name,
+                       'description': world.indicator_1.description,
+                       'measure': '%'}
+    world.page.validate_form_values(world.form_data)
+
+@step(u'When I fill in the new values for the indicator')
+def when_i_fill_in_the_new_values_for_the_indicator(step):
+    world.form_data = {'survey': world.survey.id,
+                       'batch': world.batch_1.id,
+                       'module': world.indicator_1.module.id,
+                       'name': "Indicator new nme ",
+                       'description': "Hoho description",
+                       'measure': '%'}
+    world.page.fill_valid_values(world.form_data)
+
+
+@step(u'Then I should see the indicator successfully edited')
+def then_i_should_see_the_indicator_successfully_edited(step):
+    world.page.see_success_message("Indicator", 'edited')
