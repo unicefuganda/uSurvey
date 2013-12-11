@@ -266,3 +266,7 @@ class IndicatorFormulaViewsTest(BaseTest):
         redirect_url = '/indicators/%s/formula/new/' % self.indicator.id
         self.assertIn("Formula for indicator does not exist.", response.cookies['messages'].value)
         self.assertRedirects(response, redirect_url, 302, 200)
+
+    def test_permissions_required(self):
+        delete_url = '/indicators/%s/formula/%s/delete/' % (self.indicator.id, self.existing_formula.id)
+        self.assert_restricted_permission_for(delete_url)

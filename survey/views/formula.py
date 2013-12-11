@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location
@@ -55,6 +56,7 @@ def _process_new_request(request, formula_form, new_formula_url, indicator):
         return HttpResponseRedirect(new_formula_url)
 
 
+@permission_required('auth.can_view_batches')
 def new(request, indicator_id):
     try:
         indicator = Indicator.objects.get(id=indicator_id)
@@ -77,6 +79,7 @@ def new(request, indicator_id):
         return HttpResponseRedirect("/indicators/")
 
 
+@permission_required('auth.can_view_batches')
 def delete(request, indicator_id, formula_id):
     try:
         formula = Formula.objects.get(id=formula_id)
@@ -89,18 +92,22 @@ def delete(request, indicator_id, formula_id):
     return HttpResponseRedirect(redirect_url)
 
 
+@permission_required('auth.can_view_batches')
 def simple_indicator(request, indicator_id):
     hierarchy_limit = 2
     selected_location = None
     first_level_location_analyzed = Location.objects.filter(type__name="Country")[0]
     indicator = Indicator.objects.get(id=indicator_id)
     formula = indicator.formula.all()
+    if not formula:
+        messages.error(request, "No formula was found in this indicator")
+        return HttpResponseRedirect(reverse("list_indicator_page"))
+
     params = request.GET
     if contains_key(params, 'location'):
         first_level_location_analyzed = Location.objects.get(id=params['location'])
         selected_location = first_level_location_analyzed
-    if formula:
-        formula = formula[0]
+    formula = formula[0]
     indicator_service = SimpleIndicatorService(formula, first_level_location_analyzed)
     data_series, locations = indicator_service.get_location_names_and_data_series()
     context = {'request': request,

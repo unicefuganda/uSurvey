@@ -3,13 +3,12 @@ from lettuce import *
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.indicators import ListIndicatorPage, SimpleIndicatorGraphPage
-from survey.models import HouseholdMemberGroup, Indicator, LocationTypeDetails, BatchQuestionOrder, NumericalAnswer, MultiChoiceAnswer
+from survey.models import HouseholdMemberGroup, Indicator, LocationTypeDetails, BatchQuestionOrder
 from survey.models.households import HouseholdHead, Household
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 from survey.models.formula import *
 from survey.models.question import Question, QuestionOption
-from survey.services.simple_indicator_service import SimpleIndicatorService
 
 
 def create_household_head(uid, investigator):
@@ -131,3 +130,17 @@ def and_i_should_see_indicator_data_table_for_the_country(step):
     world.page.validate_fields_present(central_tabulated_data_results)
     world.page.validate_fields_present(west_tabulated_data_results)
 
+
+@step(u'And I have an indicator with out a formula')
+def and_i_have_an_indicator_with_out_a_formula(step):
+    world.indicator_with_no_formula = Indicator.objects.create(name="ITN 1.23", description="rajni indicator",
+                                                               measure='Percentage',
+                                                               batch=world.batch_1, module=world.health_module_1)
+
+@step(u'Then I should see indicator has no formula message')
+def then_i_should_see_indicator_has_no_formula_message(step):
+    world.page.see_message("No formula was found in this indicator")
+
+@step(u'And I click that indicators analysis link')
+def and_i_click_that_indicators_analysis_link(step):
+    world.page.click_by_css("#analyse-indicator_%s" % world.indicator_with_no_formula.id)

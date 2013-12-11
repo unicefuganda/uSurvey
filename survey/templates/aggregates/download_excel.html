@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
   <h4>
-    Choose which reports you would like to import to excel
+    Choose which reports you would like to export to excel
   </h4>
   <form id="download-csv-form" action="{% url 'excel_report' %}" method="POST" accept-charset="utf-8">
     {% csrf_token %}

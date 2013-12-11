@@ -18,3 +18,10 @@ Feature: Simple indicator results
         Then I should see indicator result page
         And I should see indicator graph for the country
         And I should see indicator data table for the country
+
+    Scenario: Simple Indicator - Transition from List to analysis when no formula is added
+        And I have regions and districts
+        And I have an indicator with out a formula
+        Given I am on the indicator listing page
+        And I click that indicators analysis link
+        Then I should see indicator has no formula message

@@ -1,8 +1,7 @@
-from random import randint
 from django.contrib.auth.models import User
 from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import HouseholdMemberGroup, GroupCondition, QuestionModule, Indicator, Household, HouseholdHead, LocationTypeDetails, Batch
+from survey.models import HouseholdMemberGroup, GroupCondition, QuestionModule, Indicator, LocationTypeDetails, Batch
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 
@@ -20,7 +19,8 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.condition.groups.add(self.member_group)
 
         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-        self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_aggregates')
+        self.assign_permission_to(raj, 'can_view_batches')
         self.client.login(username='Rajni', password='I_Rock')
 
         self.country = LocationType.objects.create(name='Country', slug='country')
@@ -47,18 +47,18 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="3333331", location=self.mbarara,
                                                      backend=backend)
 
-        health_module = QuestionModule.objects.create(name="Health")
+        self.health_module = QuestionModule.objects.create(name="Health")
         member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=33)
         self.question_3 = Question.objects.create(text="This is a question",
                                                   answer_type=Question.MULTICHOICE, order=3,
-                                                  module=health_module, group=member_group)
+                                                  module=self.health_module, group=member_group)
         self.yes_option = QuestionOption.objects.create(question=self.question_3, text="Yes", order=1)
         self.no_option = QuestionOption.objects.create(question=self.question_3, text="No", order=2)
 
         self.question_3.batches.add(self.batch)
 
         self.indicator = Indicator.objects.create(name="ITN 4.5", description="rajni indicator", measure='Percentage',
-                                             batch=self.batch, module=health_module)
+                                             batch=self.batch, module=self.health_module)
         self.formula = Formula.objects.create(count=self.question_3, indicator=self.indicator)
 
     def test_get_data_for_simple_indicator_chart(self):
@@ -138,3 +138,12 @@ class SimpleIndicatorChartViewTest(BaseTest):
 
         region_data_series = [{'data': [3, 0], 'name': self.yes_option.text}, {'data': [2, 0], 'name':self.no_option.text}]
         self.assertEquals(response.context['data_series'], region_data_series)
+
+    def test_returns_error_message_if_no_formula_is_found_for_that_indicator(self):
+        indicator = Indicator.objects.create(name="ITN 4.5", description="rajni indicator", measure='Percentage',
+                                             batch=self.batch, module=self.health_module)
+        url = "/indicators/%s/simple/?location=%s" % (indicator.id, self.west.id)
+        response = self.client.get(url)
+        message = "No formula was found in this indicator"
+        self.assertIn(message, response.cookies['messages'].value)
+        self.assertRedirects(response, expected_url='/indicators/')
