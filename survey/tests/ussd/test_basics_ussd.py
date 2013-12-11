@@ -948,3 +948,40 @@ class USSDTest(USSDBaseTest):
                     homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
                     response_string = "responseString=%s&action=request" % homepage
                     self.assertEquals(urllib2.unquote(response.content), response_string)
+
+    def test_subquestion_of_different_type_from_a_multichoice_parent_question_should_not_invoke_invalid_answer(self):
+        HouseholdMember.objects.create(surname="Name 2", household=self.household, date_of_birth='1980-02-03')
+        question_1 = Question.objects.create(text="This is a question",
+                                             answer_type=Question.MULTICHOICE, order=1, group=self.member_group)
+        question_1.batches.add(self.batch)
+        BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
+
+        option_1 = QuestionOption.objects.create(question=question_1, text="OPTION 1", order=1)
+        option_2 = QuestionOption.objects.create(question=question_1, text="OPTION 2", order=2)
+        option_3 = QuestionOption.objects.create(question=question_1, text="specify", order=3)
+        sub_question_1 = Question.objects.create(text="some subquestion of question 1",
+                                                 group=self.member_group,
+                                                 answer_type=Question.TEXT, subquestion=True, parent=question_1)
+        sub_question_1.batches.add(self.batch)
+        AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
+                                  condition=AnswerRule.CONDITIONS['EQUALS_OPTION'], validate_with_option=option_3,
+                                  next_question=sub_question_1)
+
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+                with patch.object(USSDSurvey, 'is_active', return_value=False):
+                    self.reset_session()
+
+                self.take_survey()
+                self.select_household()
+
+                response = self.select_household_member()
+                page_1 = "%s\n1: %s\n2: %s\n3: %s" % (question_1.text, option_1.text, option_2.text, option_3.text)
+
+                response_string = "responseString=%s&action=request" % page_1
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+
+                response = self.respond("3")
+                response_string = "responseString=%s&action=request" % (sub_question_1.text)
+                self.assertEquals(urllib2.unquote(response.content), response_string)
+                self.assertNotIn("INVALID ANSWER", urllib2.unquote(response.content))
