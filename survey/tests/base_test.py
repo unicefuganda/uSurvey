@@ -22,6 +22,11 @@ class BaseTest(TestCase):
         some_group.user_set.add(user)
         return user
 
+    def assert_not_allowed_when_batch_is_open(self, url, expected_redirect_url, expected_message):
+        response = self.client.get(url)
+        self.assertRedirects(response, expected_url=expected_redirect_url, status_code=302, target_status_code=200, msg_prefix='')
+        self.assertIn(expected_message, response.cookies['messages'].value)
+
     def assert_restricted_permission_for(self, url):
         self.client.logout()
         self.client.login(username='useless', password='I_Suck')

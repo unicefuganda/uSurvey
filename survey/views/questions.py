@@ -3,17 +3,19 @@ import re
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import messages
-
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.logic import LogicForm
 from survey.forms.filters import QuestionFilterForm
-from survey.models import AnswerRule, QuestionModule, BatchQuestionOrder
-
+from survey.models import AnswerRule, BatchQuestionOrder
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
 from survey.forms.question import QuestionForm
+from survey.views.custom_decorators import not_allowed_when_batch_is_open
 
+ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE = "Logics cannot be added while the batch is open."
+ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE = "Subquestions cannot be added while batch is open."
+REMOVE_QUESTION_FROM_OPEN_BATCH_ERROR_MESSAGE = "Question cannot be removed from a batch while the batch is open."
 
 def _set_filter_condition_based_on_group(group_id, filter_condition):
     if group_id and group_id.lower() != 'all':
@@ -151,7 +153,10 @@ def __process_sub_question_form(request, questionform, parent_question, action_p
     else:
         messages.error(request, 'Sub question not saved.')
 
+
 @permission_required('auth.can_view_batches')
+@not_allowed_when_batch_is_open(message=ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE,
+                                redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def new_subquestion(request, question_id, batch_id=None):
     parent_question = Question.objects.get(pk=question_id)
     questionform = QuestionForm()
@@ -214,7 +219,10 @@ def _get_post_values(post_data):
 def _rule_exists(question, batch, **kwargs):
     return AnswerRule.objects.filter(question=question, batch=batch, **kwargs).count() > 0
 
+
 @permission_required('auth.can_view_batches')
+@not_allowed_when_batch_is_open(message=ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE,
+                                redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def add_logic(request, batch_id, question_id):
     question = Question.objects.get(id=question_id)
     batch = Batch.objects.get(id=batch_id)
@@ -341,7 +349,10 @@ def delete_logic(request, batch_id, answer_rule_id):
     messages.success(request, "Logic successfully deleted.")
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
+
 @permission_required('auth.can_view_batches')
+@not_allowed_when_batch_is_open(message=REMOVE_QUESTION_FROM_OPEN_BATCH_ERROR_MESSAGE,
+                                redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def remove(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
     question = Question.objects.get(id=question_id, batches__id=batch_id)

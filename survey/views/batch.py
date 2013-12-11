@@ -1,3 +1,5 @@
+import json
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
@@ -6,12 +8,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 
 from survey.investigator_configs import *
-from survey.models import HouseholdMemberGroup, Question, QuestionModule, BatchQuestionOrder
+from survey.models import HouseholdMemberGroup, QuestionModule, BatchQuestionOrder
 from survey.models.surveys import Survey
-from survey.models.batch import Batch, BatchLocationStatus
-
+from survey.models.batch import Batch
 from survey.forms.batch import BatchForm, BatchQuestionsForm
-import json
 
 
 @login_required

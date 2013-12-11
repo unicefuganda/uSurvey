@@ -22,14 +22,13 @@ def new(request):
                    'action': '/modules/new/'})
 
 
-@login_required
 @permission_required('auth.can_view_batches')
 def index(request):
     all_question_modules = QuestionModule.objects.all()
     context = {'question_modules': all_question_modules}
     return render(request, "question_module/index.html", context)
 
-
+@permission_required('auth.can_view_batches')
 def delete(request, module_id):
     try:
         module = QuestionModule.objects.get(id=module_id)
@@ -47,7 +46,7 @@ def _process_form(request, question_module_form):
         messages.success(request, "Question module successfully edited.")
     return question_module_form, HttpResponseRedirect("/modules/")
 
-
+@permission_required('auth.can_view_batches')
 def edit(request, module_id):
     response = None
     module = QuestionModule.objects.get(id=module_id)

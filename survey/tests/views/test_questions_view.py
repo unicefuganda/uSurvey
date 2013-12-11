@@ -2,6 +2,7 @@ import json
 from django.test.client import Client
 from django.contrib.auth.models import User
 from mock import patch
+from rapidsms.contrib.locations.models import Location
 from survey.forms.logic import LogicForm
 from survey.forms.filters import QuestionFilterForm
 from survey.models import AnswerRule, QuestionModule, BatchQuestionOrder
@@ -259,6 +260,16 @@ class QuestionsViews(BaseTest):
         self.assert_restricted_permission_for('/questions/1/edit/')
         self.assert_restricted_permission_for('/batches/2/questions/1/add_logic/')
         self.assert_restricted_permission_for('/questions/1/sub_questions/new/')
+
+    def test_not_allowed_if_batch_is_open(self):
+        some_location = Location.objects.create(name="Bukoto")
+        self.batch.open_for_location(some_location)
+        self.assert_not_allowed_when_batch_is_open("/batches/%d/questions/%d/sub_questions/new/"%(self.batch.id,self.question_1.id),
+                                                   expected_redirect_url="/batches/%d/questions/"%self.batch.id,
+                                                   expected_message="Subquestions cannot be added while batch is open.")
+        self.assert_not_allowed_when_batch_is_open("/batches/%d/questions/%d/remove/"%(self.batch.id,self.question_1.id),
+                                                   expected_redirect_url="/batches/%d/questions/"%self.batch.id,
+                                                   expected_message="Question cannot be removed from a batch while the batch is open.")
 
     def test_create_question_number_does_not_create_options(self):
         form_data = {

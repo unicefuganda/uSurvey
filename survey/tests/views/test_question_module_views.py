@@ -105,3 +105,5 @@ class QuestionModuleViewTest(BaseTest):
     def test_permission_for_question_modules(self):
         self.assert_restricted_permission_for('/modules/')
         self.assert_restricted_permission_for('/modules/new/')
+        self.assert_restricted_permission_for('/modules/1/edit/')
+        self.assert_restricted_permission_for('/modules/1/delete/')
