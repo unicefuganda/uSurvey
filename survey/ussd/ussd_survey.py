@@ -283,4 +283,5 @@ class USSDSurvey(USSD):
         self.investigator.set_in_cache('HOUSEHOLD', None)
         self.investigator.set_in_cache('HOUSEHOLD_MEMBER', None)
         self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', None)
+        self.investigator.set_in_cache('IS_REPORTING_NON_RESPONSE', False)
         self.clear_caches()
