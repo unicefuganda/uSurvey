@@ -9,17 +9,16 @@ from survey.models import LocationTypeDetails
 
 class Migration(DataMigration):
 
-    def forwards(self, orm):
-        types = LocationType.objects.all()
-        the_country = LocationTypeDetails.the_country()
-        for index, type in enumerate(types):
-            if not LocationTypeDetails.objects.filter(location_type=type).exists():
-                LocationTypeDetails.objects.get_or_create(required=True, location_type=type, country=the_country)
-
+    def generate_location_type_details(self, location, the_country):
         if the_country:
-            for location in Location.objects.filter(tree_parent=None).exclude(type__name__iexact="country"):
-                location.tree_parent=the_country
-                location.save()
+            LocationTypeDetails.objects.get_or_create(country=the_country, location_type=location.type)
+            if location.get_children().exists():
+                self.generate_location_type_details(location.get_children()[0], the_country)
+
+    def forwards(self, orm):
+        the_country = LocationTypeDetails.the_country()
+        LocationTypeDetails.objects.all().delete()
+        self.generate_location_type_details(the_country, the_country)
 
     def backwards(self, orm):
         "Write your backwards methods here."

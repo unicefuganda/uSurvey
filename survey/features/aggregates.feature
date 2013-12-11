@@ -68,5 +68,7 @@ Feature: Aggregates feature
       And I have 2 surveys with one batch each
       When I visit investigator report page
       Then I should see title-text message
-      And I should see dropdown with two surveys
-      And I should see generate report button
+      When I select one of the survey
+      Then I should batches in that survey
+      When I select a batch
+      And I click generate report button

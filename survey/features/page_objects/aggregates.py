@@ -1,4 +1,5 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
+import os
 from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.base import PageObject
 
@@ -54,9 +55,13 @@ class DownloadExcelPage(PageObject):
 
     def export_to_csv(self, batch):
         self.browser.select('batch', batch.pk)
-        # self.submit()
+
 
 class InvestigatorReportPage(PageObject):
     def __init__(self, browser):
         super(InvestigatorReportPage, self).__init__(browser)
         self.url = '/investigator_report/'
+
+    def validate_select_option(self, batch):
+        element_value = self.browser.find_by_css("#id_batch")[0].value
+        assert int(element_value) == int(batch.id)

@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+from django.template.defaultfilters import slugify
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User, Group, Permission
@@ -122,12 +123,15 @@ class ExcelDownloadViewTest(BaseTest):
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/download_spreadsheet')
 
+
 class ReportForCompletedInvestigatorTest(BaseTest):
     def setUp(self):
         self.client = Client()
         raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
 
+        self.survey = Survey.objects.create(name='some group')
+        self.batch = Batch.objects.create(name='BatchA', survey=self.survey)
         some_group = Group.objects.create(name='some group')
         auth_content = ContentType.objects.get_for_model(Permission)
         permission, out = Permission.objects.get_or_create(codename='can_view_aggregates', content_type=auth_content)
@@ -139,22 +143,72 @@ class ReportForCompletedInvestigatorTest(BaseTest):
     def test_should_have_header_fields_in_download_report(self):
         survey = Survey.objects.create(name='some survey')
         file_name = "investigator.csv"
-        response = self.client.post('/investigators/completed/download/',{'survey':survey.id})
+        response = self.client.post('/investigators/completed/download/', {'survey': survey.id})
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
         row1 = ['Investigator', 'Phone Number']
-        row1.extend([loc.name for loc in LocationType.objects.all()])
+        row1.extend(list(LocationType.objects.all().values_list('name', flat=True)))
         contents = "%s\r\n" % (",".join(row1))
         self.assertEquals(contents, response.content)
+
+    def test_should_have_investigators_who_completed_a_selected_batch(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        district = LocationType.objects.create(name="District", slug=slugify("district"))
+        city = LocationType.objects.create(name="City", slug=slugify("city"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        abim = Location.objects.create(name="Abim", type=district, tree_parent=uganda)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=abim)
+
+        backend = Backend.objects.create(name='something')
+        survey = Survey.objects.create(name='SurveyA')
+        batch = Batch.objects.create(name='Batch A')
+
+        investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
+                                                     location=kampala, backend=backend)
+        investigator_2 = Investigator.objects.create(name="investigator AYOYO", mobile_number="987654210",
+                                                     location=kampala, backend=backend)
+
+        household_1 = Household.objects.create(investigator=investigator_1, location=kampala, survey=survey)
+        household_2 = Household.objects.create(investigator=investigator_2, location=kampala, survey=survey)
+
+        member_group = HouseholdMemberGroup.objects.create(name='group1', order=1)
+        question_1 = Question.objects.create(text="some question", answer_type=Question.NUMBER, order=1,
+                                             group=member_group)
+        batch.questions.add(question_1)
+
+        BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
+
+        member_1 = HouseholdMember.objects.create(household=household_1, date_of_birth=datetime(2000, 02, 02))
+        member_2 = HouseholdMember.objects.create(household=household_1, date_of_birth=datetime(2000, 02, 02))
+        HouseholdMember.objects.create(household=household_2, date_of_birth=datetime(2000, 02, 02))
+
+        investigator_1.member_answered(question_1, member_1, 1, batch)
+        investigator_1.member_answered(question_1, member_2, 1, batch)
+
+        expected_data = [investigator_1.name, investigator_1.mobile_number]
+        unexpected_data = [investigator_2.name, investigator_2.mobile_number]
+
+        post_data = {'survey': survey.id, 'batch': batch.id}
+        response = self.client.post('/investigators/completed/download/', post_data)
+        row1 = ['Investigator', 'Phone Number']
+        row1.extend(list(LocationType.objects.all().values_list('name', flat=True)))
+        contents = "%s\r\n" % (",".join(row1))
+        self.assertIn(contents, response.content)
+        [self.assertIn(investigator_details, response.content) for investigator_details in expected_data]
+        [self.assertNotIn(investigator_details, response.content) for investigator_details in unexpected_data]
 
     def test_restricted_permission(self):
         self.assert_login_required('/investigators/completed/download/')
         self.assert_restricted_permission_for('/investigators/completed/download/')
+        self.assert_restricted_permission_for('/investigator_report/')
 
     def test_should_get_view_for_download(self):
         response = self.client.get('/investigator_report/')
-        self.assertEqual(200,response.status_code)
+        self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/download_investigator.html', templates)
-        self.assertEquals(len(response.context['surveys']), 0)
+        self.assertEquals(len(response.context['surveys']), 1)
+        self.assertEquals(len(response.context['batches']), 1)
+        self.assertIn(self.batch, response.context['batches'])
+        self.assertIn(self.survey, response.context['surveys'])

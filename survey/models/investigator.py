@@ -253,17 +253,23 @@ class Investigator(BaseModel):
             return True
         return False
 
-    def get_household_code(self):
-        location_hierarchy = self.locations_in_hierarchy()
-        codes = LocationCode.objects.filter(location__in=location_hierarchy).values_list('code', flat=True)
-        return ''.join(codes)
-
     def can_report_non_response(self):
         batch_location_status = BatchLocationStatus.objects.filter(location=self.location, non_response=True)
         if not batch_location_status.exists():
             return False
         batch = batch_location_status[0].batch
         return self.all_households(batch.survey, non_response_reporting=True)
+
+    def completed_batch_or_survey(self, survey, batch):
+        if survey and not batch:
+            return self.completed_survey(survey)
+        return self.has_completed(batch)
+
+    def has_completed(self, batch):
+        for household in self.all_households():
+            if not household.has_completed_batch(batch):
+                return False
+        return True
 
     @classmethod
     def sms_investigators_in_locations(cls, locations, text):
@@ -278,12 +284,13 @@ class Investigator(BaseModel):
         return Investigator.objects.filter(location__in=locations)
 
     @classmethod
-    def generate_completion_report(cls, survey):
+    def generate_completion_report(cls, survey, batch=None):
         header = ['Investigator', 'Phone Number']
         header.extend(LocationType.objects.all().values_list('name', flat=True))
         data = [header]
-        for investigator in Investigator.objects.all():
-            if investigator.completed_survey(survey):
+        all_investigators = cls.objects.all()
+        for investigator in all_investigators:
+            if investigator.has_households(survey) and investigator.completed_batch_or_survey(survey, batch):
                 row = [investigator.name, investigator.mobile_number]
                 if investigator.location:
                     row.extend(investigator.locations_in_hierarchy().values_list('name', flat=True))

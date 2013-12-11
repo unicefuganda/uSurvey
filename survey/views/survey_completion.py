@@ -10,13 +10,13 @@ from survey.services.completion_rates_calculator import BatchLocationCompletionR
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
 
+
 def is_valid(params):
     if contains_key(params, 'location') and contains_key(params, 'batch'):
         return True
     if params.has_key('location') and params['location'] == '' and contains_key(params, 'batch'):
         return True
     return False
-
 
 
 def render_household_details(request, location, batch):
@@ -49,7 +49,7 @@ def show(request):
                'locations': LocationWidget(selected_location),
                'batches': Batch.objects.all(),
                'action': 'survey_completion_rates',
-               'request': request,}
+               'request': request}
 
     if is_valid(params):
         batch = Batch.objects.get(id=params['batch'])

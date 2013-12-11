@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from time import sleep
 import datetime
 from lettuce import *
 from django.utils.datastructures import SortedDict
@@ -11,7 +10,6 @@ from survey.models import Survey
 from survey.models.batch import Batch
 from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
-from survey.models.formula import *
 from survey import investigator_configs
 
 
@@ -173,8 +171,8 @@ def and_i_should_see_percent_completion(step):
 def and_i_have_2_surveys_with_one_batch_each(step):
     world.survey_1 = Survey.objects.create(name='survey1', sample_size=10)
     world.survey_2 = Survey.objects.create(name='survey2', sample_size=10)
-    world.batch_1 = Batch.objects.create(name='batch1', order=1, survey= world.survey_1)
-    world.batch_2 = Batch.objects.create(name='batch2', order=1, survey= world.survey_2)
+    world.batch_1 = Batch.objects.create(name='batch1', order=1, survey=world.survey_1)
+    world.batch_2 = Batch.objects.create(name='batch2', order=1, survey=world.survey_2)
 
 @step(u'When I select survey 2 from survey list')
 def when_i_select_survey_2_from_survey_list(step):
@@ -182,11 +180,11 @@ def when_i_select_survey_2_from_survey_list(step):
 
 @step(u'Then I should see batch2 in batch list')
 def then_i_should_see_batch2_in_batch_list(step):
-    world.page.see_select_option([world.batch_2.name],'batch')
+    world.page.see_select_option([world.batch_2.name], 'batch')
 
 @step(u'And I should not see batch1 in batch list')
 def and_i_should_not_see_batch1_in_batch_list(step):
-    world.page.option_not_present([world.batch_1.name],'batch')
+    world.page.option_not_present([world.batch_1.name], 'batch')
 
 @step(u'When I select survey 1 from survey list')
 def when_i_select_survey_1_from_survey_list(step):
@@ -194,11 +192,11 @@ def when_i_select_survey_1_from_survey_list(step):
 
 @step(u'Then I should see batch1 in batch list')
 def then_i_should_see_batch1_in_batch_list(step):
-    world.page.see_select_option([world.batch_1.name],'batch')
+    world.page.see_select_option([world.batch_1.name], 'batch')
 
 @step(u'And I should not see batch2 in batch list')
 def and_i_should_not_see_batch2_in_batch_list(step):
-    world.page.option_not_present([world.batch_2.name],'batch')
+    world.page.option_not_present([world.batch_2.name], 'batch')
 
 @step(u'And I should see title message')
 def and_i_should_see_title_message(step):
@@ -236,5 +234,20 @@ def then_i_should_see_district_completion_table_paginated(step):
 
 @step(u'And I have one batch open in those locations')
 def and_i_have_one_batch_open_in_those_locations(step):
-    world.batch_12 = Batch.objects.create(order = 12, name = "Batch A")
+    world.batch_12 = Batch.objects.create(order=12, name="Batch A")
     world.batch_12.open_for_location(world.uganda)
+
+
+@step(u'When I select one of the survey')
+def when_i_select_one_of_the_survey(step):
+    world.page.see_select_option([world.survey_1.name, world.survey_2.name], 'survey')
+
+
+@step(u'Then I should batches in that survey')
+def then_i_should_batches_in_that_survey(step):
+    world.page.validate_select_option(world.batch_1)
+
+
+@step(u'And I click generate report button')
+def and_i_click_generate_report_button(step):
+    world.page.find_by_css("#generate_report", "Generate Report")

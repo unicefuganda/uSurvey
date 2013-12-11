@@ -8,11 +8,19 @@
   </h4>
   <form id="download-investigator-form" action="{% url 'download_investigator_excel' %}" method="POST" accept-charset="utf-8">
     {% csrf_token %}
-    <select name="survey">
+    <select name="survey" id="id_survey">
       {% for survey in surveys %}
         <option value="{{ survey.id }}">{{ survey.name }}</option>
       {% endfor %}
     </select>
-    <button class="btn btn-primary">Generate Report</button>
+
+      {% if batches %}
+      <select name="batch" id="id_batch">
+          {% for batch in batches %}
+            <option value="{{ batch.id }}">{{ batch.name }}</option>
+          {% endfor %}
+        </select>
+  {% endif %}
+    <button class="btn btn-primary" id="generate_report">Generate Report</button>
   </form>
 {% endblock %}
