@@ -198,29 +198,42 @@ jQuery(function($){
         show_or_hide_attribute_fields(attribute.val());
     });
 
-    $('#add-question-form').submit(function(event){
-        event.preventDefault();
-        var $form = $(this),
+    var $add_question_form = $('#add-question-form');
+    $add_question_form.validate({
+      rules: {
+        'text':'required',
+        'identifier':'required',
+        'group':'required',
+        'answer_type':'required'
+      },
+      submitHandler: function(form){
+        var $form = $(form),
             url = $form.attr("action"),
             data = $form.serialize();
-
         var post = $.post(url, data);
 
         post.done(function(data){
-            var text_error_field = $('#id_text').next();
-            text_error_field.text('');
-            if(isHTML(data)){
-                var text_error = $(data).find('#id_text').next().text();
-                if(text_error != ''){
-                text_error_field.text(text_error);
-                }
-            }
-            else{
+            if(subquestion_saved(data)){
                 $('#id_next_question').append("<option value=" + $.parseJSON(data)['id'] + ">" + $.parseJSON(data)['text'] + "</option>");
                 $('#close_modal').click();
+            } else{
+                append_error_to_text(data);
             }
-        })
-    })
+        });
+      }
+      });
 
+    function subquestion_saved(data){
+      return !isHTML(data);
+    };
 
+    function append_error_to_text(data){
+        var text_error_field_on_page = $('#id_text').next(),
+            text_error_ajax_result = $(data).find('#id_text').next().text();
+        text_error_field_on_page.text('');
+        if(text_error_ajax_result != ''){
+            text_error_field_on_page.text(text_error_ajax_result);
+            text_error_field_on_page.show();
+        }
+    };
 });

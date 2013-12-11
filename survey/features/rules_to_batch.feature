@@ -128,6 +128,8 @@ Feature: Batch related features
     Then I should see add subquestion button
     When I click add subquestion button
     Then I should see a modal for add subquestion
+    And I click save question button on the form
+    Then I should see field required error message
     When I fill the subquestion details
     And I click save question button on the form
     Then I should see the recent subquestion in next question dropdown

@@ -11,4 +11,15 @@ jQuery(function($){
         if (current_length > maxlength) return false;
         counter.html(current_length + counter_text);
     });
+
+      $('.question-form').validate({
+      rules: {
+        'text':'required',
+        'identifier':'required',
+        'group':'required',
+        'answer_type':'required'
+      }
+      });
+
+
 });

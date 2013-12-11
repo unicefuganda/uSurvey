@@ -88,6 +88,8 @@ Feature: Questions related features
     And I visit questions list page
     And I click on view add subquestion link
     Then I should go to add subquestion page
+    And I submit the form
+    Then I should see field required error message
     When I fill in subquestion details
     And I submit the form
     And I should see subquestion successfully added message
