@@ -170,7 +170,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
                     response = self.report_non_response()
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" % \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" % \
                                      (self.household4.uid, self.household_head4.surname)
                     first_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -198,10 +198,10 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
                     response = self.report_non_response()
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" \
-                                                                       "\n2: Household-%s-%s" \
-                                                                       "\n3: Household-%s-%s" \
-                                                                       "\n4: Household-%s-%s" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" \
+                                                                       "\n2: HH-%s-%s" \
+                                                                       "\n3: HH-%s-%s" \
+                                                                       "\n4: HH-%s-%s" \
                                                                        "\n#: Next" % (
                                          self.household2.uid, self.household_head2.surname,
                                          self.household3.uid, self.household_head3.surname,
@@ -211,10 +211,10 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
                     response = self.respond("#")
 
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: Household-%s-%s" \
-                                                                       "\n6: Household-%s-%s" \
-                                                                       "\n7: Household-%s-%s" \
-                                                                       "\n8: Household-%s-%s" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: HH-%s-%s" \
+                                                                       "\n6: HH-%s-%s" \
+                                                                       "\n7: HH-%s-%s" \
+                                                                       "\n8: HH-%s-%s" \
                                                                        "\n*: Back\n#: Next" % (
                                          household6.uid, household_head6.surname,
                                          household7.uid, household_head7.surname,
@@ -225,7 +225,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                     response = self.respond("#")
 
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n9: Household-%s-%s\n*: Back" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n9: HH-%s-%s\n*: Back" \
                                      % (household10.uid, household_head10.surname)
                     last_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), last_page_list)
@@ -316,8 +316,8 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 self.report_non_response()
                 self.select_household()
                 response = self.respond("2")
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s" \
-                                                                   "\n3: Household-%s-%s\n4: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s*\n2: HH-%s-%s" \
+                                                                   "\n3: HH-%s-%s\n4: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,
                                     self.household2.uid, self.household_head2.surname,
                                     self.household3.uid, self.household_head3.surname,
@@ -573,8 +573,8 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 self.select_household_member("2")
                 response = self.respond("1")
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s" \
-                                                                   "\n3: Household-%s-%s\n4: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s*\n2: HH-%s-%s" \
+                                                                   "\n3: HH-%s-%s\n4: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,
                                     self.household2.uid, self.household_head2.surname,
                                     self.household3.uid, self.household_head3.surname,
@@ -639,8 +639,8 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     self.select_household("4")
                     self.respond("1")
                     response = self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s*" \
-                                                                       "\n3: Household-%s-%s*\n4: Household-%s-%s*" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s*\n2: HH-%s-%s*" \
+                                                                       "\n3: HH-%s-%s*\n4: HH-%s-%s*" \
                                      % (self.household1.uid, self.household_head.surname,
                                         self.household2.uid, self.household_head2.surname,
                                         self.household3.uid, self.household_head3.surname,
@@ -670,8 +670,8 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     self.respond("1")
 
                     response = self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s*" \
-                                                                       "\n3: Household-%s-%s*\n4: Household-%s-%s*" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s*\n2: HH-%s-%s*" \
+                                                                       "\n3: HH-%s-%s*\n4: HH-%s-%s*" \
                                      % (self.household1.uid, self.household_head.surname,
                                         self.household2.uid, self.household_head2.surname,
                                         self.household3.uid, self.household_head3.surname,
@@ -768,7 +768,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     self.respond(USSD.ANSWER['NO'])
                     response = self.respond(USSD.ANSWER['TAKE_SURVEY'])
 
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" \
                                      % (self.household1.uid, self.household_head.surname)
                     first_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -823,7 +823,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                     response = self.respond(USSD.ANSWER['REGISTER_HOUSEHOLD'])
 
-                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s\n2: Household-%s" \
+                    household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s" \
                                      % (self.household1.uid, self.household_head.surname, self.household2.uid)
                     first_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -907,10 +907,10 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 self.reset_session()
                 response = self.report_non_response()
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" \
-                                                                   "\n2: Household-%s-%s" \
-                                                                   "\n3: Household-%s-%s" \
-                                                                   "\n4: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" \
+                                                                   "\n2: HH-%s-%s" \
+                                                                   "\n3: HH-%s-%s" \
+                                                                   "\n4: HH-%s-%s" \
                                                                    "\n#: Next" % (
                                      self.household1.uid, self.household_head.surname,
                                      self.household2.uid, self.household_head2.surname,
@@ -1017,7 +1017,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                 response = self.respond(USSD.ANSWER['TAKE_SURVEY'])
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -1105,7 +1105,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                 response = self.respond(USSD.ANSWER['REGISTER_HOUSEHOLD'])
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s\n2: Household-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s" \
                                  % (self.household1.uid, self.household_head.surname, self.household2.uid)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -1138,7 +1138,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                 response = self.report_non_response()
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s*\n2: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s*\n2: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,
                                     self.household2.uid, self.household2.get_head().surname)
                 first_page_list = "responseString=%s&action=request" % household_list
@@ -1171,7 +1171,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                 response = self.respond(USSD.ANSWER['REGISTER_HOUSEHOLD'])
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s\n2: Household-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s" \
                                  % (self.household1.uid, self.household_head.surname, self.household2.uid)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -1200,7 +1200,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                 response = self.report_non_response()
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s\n2: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,
                                     self.household2.uid, self.household2.get_head().surname)
                 first_page_list = "responseString=%s&action=request" % household_list
@@ -1230,7 +1230,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 self.assertEqual(urllib2.unquote(response.content), response_string)
 
                 response = self.respond(USSD.ANSWER['TAKE_SURVEY'])
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s\n2: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s-%s" \
                 % (self.household1.uid, self.household_head.surname, self.household2.uid, self.household_head2.surname)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -1262,7 +1262,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 self.assertEqual(urllib2.unquote(response.content), response_string)
 
                 response = self.report_non_response()
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" \
                                 % (self.household2.uid, self.household_head2.surname)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -1353,7 +1353,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                 response = self.respond(USSD.ANSWER['REGISTER_HOUSEHOLD'])
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s\n2: Household-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s" \
                                  % (self.household1.uid, self.household_head.surname, self.household2.uid)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
@@ -1386,9 +1386,8 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
                 response = self.report_non_response()
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s-%s\n2: Household-%s-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,
                                     self.household2.uid, self.household2.get_head().surname)
                 first_page_list = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), first_page_list)
-

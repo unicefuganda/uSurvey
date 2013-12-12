@@ -67,7 +67,7 @@ class USSDBaseTest(TestCase):
             answer.save()
 
     def hh_string(self, household_head):
-        return "Household-%s-%s" % (household_head.household.random_sample_number, household_head.surname)
+        return "HH-%s-%s" % (household_head.household.random_sample_number, household_head.surname)
 
     def mock_date_today(self, target, real_date_class=datetime.date):
         class DateSubclassMeta(type):

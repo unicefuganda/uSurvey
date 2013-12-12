@@ -118,10 +118,10 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
                 response = self.register_household()
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: Household-%s" \
-                                                                   "\n2: Household-%s" \
-                                                                   "\n3: Household-%s" \
-                                                                   "\n4: Household-%s" \
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s" \
+                                                                   "\n2: HH-%s" \
+                                                                   "\n3: HH-%s" \
+                                                                   "\n4: HH-%s" \
                                                                    "\n#: Next" % (
                                      self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
 
@@ -130,7 +130,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
                 response = self.respond("#")
 
-                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: Household-%s\n*: Back" % self.household5.uid
+                household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: HH-%s\n*: Back" % self.household5.uid
 
                 response_string = "responseString=%s&action=request" % household_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -144,7 +144,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 self.reset_session()
                 response = self.register_household()
                 household_list = USSD.MESSAGES[
-                                     'HOUSEHOLD_LIST'] + "\n1: Household-%s\n2: Household-%s\n3: Household-%s\n4: Household-%s\n#: Next" % (
+                                     'HOUSEHOLD_LIST'] + "\n1: HH-%s\n2: HH-%s\n3: HH-%s\n4: HH-%s\n#: Next" % (
                                      self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
 
                 first_page_hh_list = "responseString=%s&action=request" % household_list
@@ -166,7 +166,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
             self.reset_session()
             response = self.register_household()
             household_list = USSD.MESSAGES[
-                                 'HOUSEHOLD_LIST'] + "\n1: Household-%s\n2: Household-%s\n3: Household-%s\n4: Household-%s\n#: Next" % (
+                                 'HOUSEHOLD_LIST'] + "\n1: HH-%s\n2: HH-%s\n3: HH-%s\n4: HH-%s\n#: Next" % (
                                  self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
 
             first_page_hh_list = "responseString=%s&action=request" % household_list
@@ -174,7 +174,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
             response = self.respond("#")
 
-            household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: Household-%s\n*: Back" % self.household5.uid
+            household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n5: HH-%s\n*: Back" % self.household5.uid
 
             response_string = "responseString=%s&action=request" % household_list
             self.assertEquals(urllib2.unquote(response.content), response_string)

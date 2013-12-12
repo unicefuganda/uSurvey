@@ -168,7 +168,7 @@ class Investigator(BaseModel):
         households_list = []
         for household in households:
             household_head = household.get_head()
-            text = "%s: Household-%s" % (all_households.index(household) + 1,  household.random_sample_number)
+            text = "%s: HH-%s" % (all_households.index(household) + 1,  household.random_sample_number)
             text = "%s-%s"%(text, household_head.surname) if household_head else text
             if household.has_completed_option_given_(registered, non_response_reporting):
                 text += "*"
