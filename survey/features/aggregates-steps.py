@@ -92,18 +92,11 @@ def and_i_choose_a_location_and_a_closed_batch(step):
 def and_i_should_see_a_message_that_says_that_this_batch_is_currently_closed(step):
     world.page.assert_presence_of_batch_is_closed_message()
 
-@step(u'And I have few batches')
-def and_i_have_few_batches(step):
-    world.batch = Batch.objects.create(order = 1, name = "Batch A")
 
 @step(u'And I visit download excel page')
 def and_i_visit_download_excel_page(step):
     world.page = DownloadExcelPage(world.browser)
     world.page.visit()
-
-@step(u'And I select a batch and click export to csv')
-def and_i_select_a_batch_and_click_export_to_csv(step):
-    world.page.export_to_csv(world.batch)
 
 @step(u'And I visit district aggregate page')
 def and_i_visit_district_aggregate_page(step):
@@ -251,3 +244,29 @@ def then_i_should_batches_in_that_survey(step):
 @step(u'And I click generate report button')
 def and_i_click_generate_report_button(step):
     world.page.find_by_css("#generate_report", "Generate Report")
+
+
+@step(u'And I have three surveys')
+def and_i_have_three_surveys(step):
+    world.survey_1 = Survey.objects.create(name="Haha Survey")
+    world.survey_2 = Survey.objects.create(name="Hoho Survey")
+
+
+@step(u'And I have batches in those surveys')
+def and_i_have_batches_in_those_surveys(step):
+    world.batch_1 = Batch.objects.create(order=1, name="Batch A haha", survey=world.survey_1)
+    world.batch_2 = Batch.objects.create(order=2, name="Batch A hoho", survey=world.survey_2)
+
+
+@step(u'Then I should only see the batches in that survey')
+def then_i_should_only_see_the_batches_in_that_survey(step):
+    world.page.see_select_option([str(world.batch_1.name)], 'batch')
+
+
+@step(u'Then I should be able to export the responses for that batch')
+def then_i_should_be_able_to_export_the_responses_for_that_batch(step):
+    world.page.click_by_css("#export_excel")
+
+@step(u'When I select one of the two surveys')
+def when_i_select_one_of_the_two_surveys(step):
+    world.page.select('surveys', [str(world.survey_1.id)])

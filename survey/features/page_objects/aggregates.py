@@ -53,9 +53,6 @@ class AggregateStatusPage(PageObject):
 class DownloadExcelPage(PageObject):
     url = "/aggregates/download_spreadsheet"
 
-    def export_to_csv(self, batch):
-        self.browser.select('batch', batch.pk)
-
 
 class InvestigatorReportPage(PageObject):
     def __init__(self, browser):

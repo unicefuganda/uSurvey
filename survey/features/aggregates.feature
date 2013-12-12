@@ -2,9 +2,13 @@ Feature: Aggregates feature
 
     Scenario: Download Excel
       Given I am logged in as researcher
-      And I have few batches
+      And I have three surveys
+      And I have batches in those surveys
       And I visit download excel page
-      And I select a batch and click export to csv
+      When I select one of the two surveys
+      Then I should only see the batches in that survey
+      When I select a batch
+      Then I should be able to export the responses for that batch
 
     Scenario: Region/district completion rates
       Given I am logged in as researcher

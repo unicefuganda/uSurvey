@@ -155,7 +155,7 @@ class PageObject(object):
 
     def select(self, name, values):
         for value in values:
-            self.browser.select(name,value)
+            self.browser.select(name, value)
 
     def click_by_css(self, css_selector):
         self.browser.find_by_css(css_selector).first.click()

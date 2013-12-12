@@ -8,11 +8,16 @@
   </h4>
   <form id="download-csv-form" action="{% url 'excel_report' %}" method="POST" accept-charset="utf-8">
     {% csrf_token %}
-    <select name="batch">
+    <select name="surveys"  id="id_survey">
+      {% for survey in surveys %}
+        <option value="{{ survey.id }}">{{ survey.name }}</option>
+      {% endfor %}
+    </select>
+    <select name="batch" id="id_batch"gst>
       {% for batch in batches %}
         <option value="{{ batch.id }}">{{ batch.name }}</option>
       {% endfor %}
     </select>
-    <button class="btn btn-primary">Export to spreadsheet</button>
+    <button class="btn btn-primary" id="export_excel">Export to spreadsheet</button>
   </form>
 {% endblock %}

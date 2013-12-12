@@ -16,11 +16,11 @@ import json
 class BatchViewsTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com',
+        User.objects.create_user(username='useless', email='rajni@kant.com',
                                                            password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
                                         'can_view_batches')
-        raj = self.assign_permission_to(raj, 'can_view_investigators')
+        self.assign_permission_to(raj, 'can_view_investigators')
 
         self.client.login(username='Rajni', password='I_Rock')
         self.survey = Survey.objects.create(name='survey name', description='survey descrpition', type=False,
@@ -198,7 +198,6 @@ class BatchViewsTest(BaseTest):
         self.assert_restricted_permission_for('/surveys/%d/batches/%d/delete/' % (self.survey.id, self.batch.id))
         self.assert_login_required('/surveys/%d/batches/check_name/' % (self.survey.id))
 
-
     def test_add_new_batch_should_load_new_template(self):
         response = self.client.get('/surveys/%d/batches/new/' % self.survey.id)
         self.assertEqual(response.status_code, 200)
@@ -275,12 +274,11 @@ class BatchViewsTest(BaseTest):
         self.failIf(recovered_batch)
 
     def test_should_not_delete_batch_if_open(self):
-        self.batch.open_for_location(self.kampala)
         response = self.client.get('/surveys/%d/batches/%d/delete/' % (self.survey.id, self.batch.id))
         recovered_batch = Batch.objects.filter(id=self.batch.id)
         self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
                              target_status_code=200, msg_prefix='')
-        self.assertIn("Batch cannot be deleted because it is open in Kampala District, Abim District.", response.cookies['messages'].value)
+        self.assertIn("Batch cannot be deleted because it is open in Abim District", response.cookies['messages'].value)
         self.failUnless(recovered_batch)
 
     def test_should_not_delete_batch_if_batches_questions_have_been_responded_to(self):

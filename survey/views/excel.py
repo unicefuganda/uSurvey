@@ -26,9 +26,10 @@ def download(request):
 
 @login_required
 @permission_required('auth.can_view_aggregates')
-def list(request):
-    batches = Batch.objects.order_by('order').all()
-    return render(request, 'aggregates/download_excel.html', {'batches': batches})
+def _list(request):
+    surveys = Survey.objects.order_by('name')
+    batches = Batch.objects.order_by('order')
+    return render(request, 'aggregates/download_excel.html', {'batches': batches, 'surveys': surveys})
 
 @login_required
 @permission_required('auth.can_view_aggregates')
