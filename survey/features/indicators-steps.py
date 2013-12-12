@@ -1,3 +1,5 @@
+from time import sleep
+from django.utils.datastructures import SortedDict
 from lettuce import step, world
 from survey.features.page_objects.indicators import NewIndicatorPage, ListIndicatorPage
 from survey.models import QuestionModule, Batch, Indicator
@@ -160,12 +162,12 @@ def and_i_click_the_edit_indicator_link(step):
 
 @step(u'Then I should see the indicator details in the form')
 def then_i_should_see_the_indicator_details_in_the_form(step):
-    world.form_data = {'batch': world.indicator_1.batch.id,
-                       'module': world.indicator_1.module.id,
-                       'name': world.indicator_1.name,
+    world.form_data = {'name': world.indicator_1.name,
                        'description': world.indicator_1.description,
                        'measure': '%'}
     world.page.validate_form_values(world.form_data)
+    world.page.is_text_present(world.indicator_1.batch.name)
+    world.page.is_text_present(world.indicator_1.module.name)
 
 @step(u'When I fill in the new values for the indicator')
 def when_i_fill_in_the_new_values_for_the_indicator(step):

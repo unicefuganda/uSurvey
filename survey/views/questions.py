@@ -159,7 +159,7 @@ def __process_sub_question_form(request, questionform, parent_question, action_p
                                 redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def new_subquestion(request, question_id, batch_id=None):
     parent_question = Question.objects.get(pk=question_id)
-    questionform = QuestionForm()
+    questionform = QuestionForm(parent_question=parent_question)
     response = None
     if request.method == 'POST':
         questionform = QuestionForm(request.POST, parent_question=parent_question)

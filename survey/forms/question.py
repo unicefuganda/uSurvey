@@ -17,17 +17,29 @@ class QuestionForm(ModelForm):
         self.fields['answer_type'].choices = list(Question.TYPE_OF_ANSWERS)
         self.fields['module'].choices = map(lambda question_module: (question_module.id, question_module.name), QuestionModule.objects.filter())
         self.fields['identifier'].label = "Variable name"
-
-        groups = []
-
-        if parent_question and parent_question.group:
-            groups = [parent_question.group]
-
-        if not parent_question:
-            groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')
-
-        self.fields['group'].choices = [(group.id, group.name) for group in groups]
         self.parent_question = parent_question
+        self.parent_has_module = False
+        self.parent_has_group = False
+        self._set_group_choices()
+        self._set_module_choices()
+
+    def _set_group_choices(self):
+        groups = []
+        if self.parent_question and self.parent_question.group:
+            groups = [self.parent_question.group]
+            self.parent_has_group = True
+        if not self.parent_question:
+            groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')
+        self.fields['group'].choices = [(group.id, group.name) for group in groups]
+
+    def _set_module_choices(self):
+        if self.parent_question and self.parent_question.module:
+            modules = [self.parent_question.module]
+            self.parent_has_module = True
+        else:
+            modules = QuestionModule.objects.filter()
+        self.fields['module'].choices = [(question_module.id, question_module.name) for question_module in modules]
+
 
     class Meta:
         model = Question
@@ -47,11 +59,32 @@ class QuestionForm(ModelForm):
             self.cleaned_data['options'] = options
         return options
 
+    def clean_module(self):
+        module = self.cleaned_data.get('module', None)
+        if module and self.parent_has_module and module.id != self.parent_question.module.id:
+            message = "Subquestions cannot have a different module from its parent."
+            self._errors['module'] = self.error_class([message])
+            del self.cleaned_data['module']
+        return module
+
+    def clean_group(self):
+        group = self.cleaned_data.get('group', None)
+        if group and self.parent_has_group and group.id != self.parent_question.group.id:
+            message = "Subquestions cannot have a different group from its parent."
+            self._errors['group'] = self.error_class([message])
+            del self.cleaned_data['group']
+        return group
+
     def clean(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         options = self.cleaned_data.get('options', None)
         text = self.cleaned_data.get('text', None)
+        self._check__multichoice_and_options_compatibility(answer_type, options)
+        self._strip_special_characters_for_ussd(text)
+        self._prevent_duplicate_subquestions(text)
+        return self.cleaned_data
 
+    def _check__multichoice_and_options_compatibility(self, answer_type, options):
         if answer_type == Question.MULTICHOICE and not options:
             message = 'Question Options missing.'
             self._errors['answer_type'] = self.error_class([message])
@@ -60,10 +93,12 @@ class QuestionForm(ModelForm):
         if answer_type != Question.MULTICHOICE and options:
             del self.cleaned_data['options']
 
+    def _strip_special_characters_for_ussd(self, text):
         if text:
             text = re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', text)
             self.cleaned_data['text'] = re.sub("  ", ' ', text)
 
+    def _prevent_duplicate_subquestions(self, text):
         if self.parent_question:
             duplicate_sub_question = self.parent_question.get_subquestions().filter(text__iexact=text)
             has_instance_id_different = (self.instance.id and self.instance.id != duplicate_sub_question[0].id)
@@ -71,8 +106,6 @@ class QuestionForm(ModelForm):
             if duplicate_sub_question.exists() and (not self.instance.id or has_instance_id_different):
                 self._errors['text'] = self.error_class(["Sub question for this question with this text already exists."])
                 del self.cleaned_data['text']
-
-        return self.cleaned_data
 
     def kwargs_has_batch(self, **kwargs):
         return kwargs.has_key('batch') and isinstance(kwargs['batch'], Batch)

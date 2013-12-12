@@ -42,4 +42,3 @@ class IndicatorFormTest(TestCase):
         indicator_form = IndicatorForm(form_data)
         self.assertFalse(indicator_form.is_valid())
         self.assertEqual(['This field is required.'], indicator_form.errors['survey'])
-

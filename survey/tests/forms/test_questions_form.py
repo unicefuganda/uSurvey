@@ -160,12 +160,66 @@ class QuestionFormTest(TestCase):
         self.assertIn((self.household_member_group.id, self.household_member_group.name), question_form.fields['group'].choices)
         self.assertIn((another_member_group.id, another_member_group.name), question_form.fields['group'].choices)
 
+    def test_form_is_invalid_if_parent_question_group_is_different_from_subquestion_group(self):
+        another_member_group = HouseholdMemberGroup.objects.create(name='Age 6-7', order=2)
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
+                                            group=another_member_group, identifier='Q1')
+
+        question_form = QuestionForm(parent_question=question, data=self.form_data)
+
+        self.assertFalse(question_form.is_valid())
+        error_message = "Subquestions cannot have a different group from its parent."
+        self.assertEqual([error_message], question_form.errors['group'])
+
     def test_form_is_invalid_if_module_not_selected(self):
         form_data = self.form_data.copy()
         form_data['module'] = ''
 
         question_form = QuestionForm(form_data)
         self.assertFalse(question_form.is_valid())
+
+    def test_form_has_parent_module_only_if_parent_question_has_one(self):
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
+                                            module=self.question_module, identifier='Q1')
+
+        another_module = QuestionModule.objects.create(name="haha")
+
+        question_form = QuestionForm(parent_question=question)
+
+        self.assertIn((self.question_module.id, self.question_module.name), question_form.fields['module'].choices)
+        self.assertNotIn((another_module.id, another_module.name), question_form.fields['module'].choices)
+
+    def test_form_has_all_module_if_parent_question_has_no_module(self):
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
+                                            identifier='Q1')
+
+        another_module = QuestionModule.objects.create(name="haha")
+
+        question_form = QuestionForm(parent_question=question)
+
+        self.assertEqual(2, len(question_form.fields['module'].choices))
+        self.assertIn((self.question_module.id, self.question_module.name), question_form.fields['module'].choices)
+        self.assertIn((another_module.id, another_module.name), question_form.fields['module'].choices)
+
+    def test_form_has_all_module_if_parent_question_is_not_supplied(self):
+        another_module = QuestionModule.objects.create(name="haha")
+
+        question_form = QuestionForm()
+
+        self.assertEqual(2, len(question_form.fields['module'].choices))
+        self.assertIn((self.question_module.id, self.question_module.name), question_form.fields['module'].choices)
+        self.assertIn((another_module.id, another_module.name), question_form.fields['module'].choices)
+
+    def test_form_is_invalid_if_parent_question_module_is_different_from_subquestion_module(self):
+        another_module = QuestionModule.objects.create(name="haha")
+        question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
+                                            module=another_module, identifier='Q1')
+
+        question_form = QuestionForm(parent_question=question, data=self.form_data)
+
+        self.assertFalse(question_form.is_valid())
+        error_message = "Subquestions cannot have a different module from its parent."
+        self.assertEqual([error_message], question_form.errors['module'])
 
     def test_form_is_invalid_if_trying_to_add_duplicate_subquestion_under_question(self):
         question = Question.objects.create(text="Question 1?", answer_type=Question.NUMBER, order=1,
