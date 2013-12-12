@@ -272,3 +272,25 @@ class UsersViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 302)
         edited_user = User.objects.filter(last_name='knightngale')
         self.assertEqual(len(edited_user), 1)
+
+    def test_view_user_details(self):
+        user = User.objects.create_user(username='rrrajni', email='rrajni@kant.com',
+                                          password='I_Rock_0', first_name='some name', last_name='last_name')
+        UserProfile.objects.create(user=user, mobile_number='123456666')
+
+        response = self.client.get('/users/%d/'%user.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('users/show.html', templates)
+        self.assertEquals(response.context['the_user'], user)
+        self.assertEquals(response.context['cancel_url'], '/users/')
+
+    def test_view_user_details_when_no_such_user_exists(self):
+        non_existing_user_id = 111
+        response = self.client.get('/users/%d/'%non_existing_user_id)
+        self.assertRedirects(response, expected_url="/users/")
+        self.assertIn("User not found.", response.cookies['messages'].value)
+
+    def test_restricted_permission_for_view_details(self):
+        self.assert_restricted_permission_for('/users/1/')
+

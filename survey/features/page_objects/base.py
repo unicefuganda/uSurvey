@@ -163,6 +163,9 @@ class PageObject(object):
     def click_link_by_partial_href(self, modal_id):
         self.browser.click_link_by_partial_href(modal_id)
 
+    def click_link_by_href(self, modal_id):
+        self.browser.click_link_by_href(modal_id)
+
     def click_button(self, name):
         self.browser.find_by_name(name).first.click()
 

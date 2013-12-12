@@ -92,3 +92,11 @@ Feature: Users feature
       When I modify the users information
       And I click the update button
       Then I should see user information updated successfully
+
+    Scenario: View user details
+      Given I am logged in as admin
+      And I have one user
+      And I visit the users list page
+      And I click the user details link
+      Then I should see the user details displayed
+      Then back button should take back to users page

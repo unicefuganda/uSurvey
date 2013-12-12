@@ -1,5 +1,6 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from time import sleep
+from lettuce.django import django_url
 from survey.features.page_objects.base import PageObject
 
 
@@ -19,7 +20,7 @@ class UsersListPage(PageObject):
         self.is_text_present("User successfully edited.")
 
 
-class UsersDetailsPage(PageObject):
+class EditUserDetailsPage(PageObject):
     def set_user(self, user):
         self.user = user
         self.url = "/users/" + str(user.pk) + "/edit/"
@@ -41,8 +42,7 @@ class UsersDetailsPage(PageObject):
 
     def assert_username_is_readonly(self):
         try:
-            self.browser.find_by_css('#id_username[readonly]').first
-            return True
+           assert self.browser.find_by_css('#id_username[readonly]').first
         except Exception, e:
             return False
 
@@ -51,6 +51,30 @@ class UsersDetailsPage(PageObject):
             assert self.browser.find_by_name("groups")
         else:
             assert not self.browser.find_by_name("groups")
+
+class UserDetailsPage(PageObject):
+
+    def __init__(self, browser, user):
+        self.browser = browser
+        self.user = user
+        self.url = '/users/%d/'%user.id
+
+
+    def validate_page_content(self):
+        details = {
+            'Username': self.user.username,
+            'First name': self.user.first_name,
+            'Last name': self.user.last_name,
+            'Mobile number': self.user.userprofile.mobile_number,
+            'Email': self.user.email,
+            'Groups': ", ".join(self.user.groups.all().values_list('name', flat=True)),
+            }
+        for label, text in details.items():
+            self.is_text_present(label)
+            self.is_text_present(text)
+
+    def validate_back_link(self):
+        self.browser.find_link_by_href(django_url(UsersListPage.url))
 
 
 class NewUserPage(PageObject):

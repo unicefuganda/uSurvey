@@ -68,7 +68,7 @@ def index(request):
 @permission_required_for_perm_or_current_user('auth.can_view_users')
 def edit(request, user_id):
     user = User.objects.get(pk=user_id)
-    initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number }
+    initial={'mobile_number': UserProfile.objects.get(user=user).mobile_number}
     userform = EditUserForm(user= request.user, instance=user, initial=initial)
     response = None
     if request.method == 'POST':
@@ -81,3 +81,11 @@ def edit(request, user_id):
                         'country_phone_code': COUNTRY_PHONE_CODE,
                         'title': 'Edit User'}
     return response or render(request, 'users/new.html', context_variables)
+
+@permission_required('auth.can_view_users')
+def show(request, user_id):
+    user = User.objects.filter(id=user_id)
+    if not user.exists():
+        messages.error(request, "User not found.")
+        return HttpResponseRedirect("/users/")
+    return render(request, 'users/show.html', {'the_user': user[0], 'cancel_url': '/users/'})

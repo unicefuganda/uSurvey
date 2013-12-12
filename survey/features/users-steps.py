@@ -4,7 +4,7 @@ from lettuce import *
 from django.contrib.auth.models import User, Group
 
 from survey.features.page_objects.accounts import LoginPage, LogoutPage
-from survey.features.page_objects.users import NewUserPage, UsersListPage, UsersDetailsPage
+from survey.features.page_objects.users import NewUserPage, UsersListPage, EditUserDetailsPage, UserDetailsPage
 from survey.models.users import UserProfile
 
 
@@ -173,7 +173,7 @@ def then_i_should_see_a_list_of_users(step):
 
 @step(u'Then I should see the users information in a form')
 def then_i_should_see_the_users_information_in_a_form(step):
-    world.page = UsersDetailsPage(world.browser)
+    world.page = EditUserDetailsPage(world.browser)
     world.page.set_user(world.user)
     world.page.assert_form_has_infomation()
 
@@ -207,7 +207,7 @@ def then_i_should_see_the_groups_field(step):
 @step(u'And I select edit action')
 def and_i_select_edit_action(step):
     world.page.click_link_by_text(" Edit Profile")
-    world.page = UsersDetailsPage(world.browser)
+    world.page = EditUserDetailsPage(world.browser)
 
 @step(u'When I click add user button')
 def when_i_click_add_user_button(step):
@@ -219,3 +219,26 @@ def when_i_click_add_user_button(step):
 def then_i_should_see_add_user_page(step):
     world.page = NewUserPage(world.browser)
     world.page.validate_url()
+
+@step(u'And I have one user')
+def and_i_have_one_user(step):
+    world.user = User.objects.create_user(username='hahaRajni', email='rarajni@kant.com',
+                                          password='I_Rock_0', first_name='some rajni name', last_name='last_name')
+    UserProfile.objects.create(user=world.user, mobile_number='123456667')
+    admin = Group.objects.get(name='mics_admin')
+    admin.user_set.add(world.user)
+
+
+@step(u'And I click the user details link')
+def and_i_click_the_user_details_link(step):
+    world.page.click_link_by_href("/users/%d/"%world.user.id)
+
+@step(u'Then I should see the user details displayed')
+def then_i_should_see_the_user_details_displayed(step):
+    world.page = UserDetailsPage(world.browser, world.user)
+    world.page.validate_url()
+    world.page.validate_page_content()
+
+@step(u'Then back button should take back to users page')
+def then_back_button_should_take_back_to_users_page(step):
+    world.page.validate_back_link()
