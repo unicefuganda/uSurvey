@@ -16,6 +16,7 @@ from survey.views.views_helper import contains_key
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
 
+
 def _add_error_response_message(investigator, request,action_text):
     error_message = "Investigator not %s. " % action_text
     messages.error(request, error_message + "See errors below.")
@@ -27,6 +28,7 @@ def _add_error_response_message(investigator, request,action_text):
     if investigator.non_field_errors():
         for err in investigator.non_field_errors():
             messages.error(request, error_message + str(err))
+
 
 def _process_form(investigator_form, request, action_text,
                   redirect_url):
@@ -77,7 +79,7 @@ def get_locations(request):
 def list_investigators(request):
     params = request.GET
     selected_location = None
-    investigators = Investigator.objects.all()
+    investigators = Investigator.objects.order_by('id')
 
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))

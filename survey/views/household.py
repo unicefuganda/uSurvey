@@ -182,7 +182,7 @@ def get_investigators(request):
 def list_households(request):
     selected_location = None
 
-    all_households = Household.objects.all().order_by('household_member__householdhead__surname')
+    all_households = Household.objects.order_by('household_member__householdhead__surname')
     households = list()
     map(lambda household: not household in households and households.append(household), all_households)
 

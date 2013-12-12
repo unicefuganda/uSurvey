@@ -21,8 +21,8 @@ class QuestionModuleViewTest(BaseTest):
         self.assertIn('question_module/new.html', templates)
         self.assertIsNotNone(response.context['question_module_form'])
         self.assertIsInstance(response.context['question_module_form'], QuestionModuleForm)
-        self.assertEqual(response.context['heading'], "Edit Module")
-        self.assertEqual(response.context['button-label'], "Save")
+        self.assertEqual(response.context['title'], "New Module")
+        self.assertEqual(response.context['button_label'], "Create")
         self.assertEqual(response.context['action'], "/modules/new/")
 
     def test_post_question_module_form_ceates_question_module_and_returns_success(self):
@@ -53,8 +53,8 @@ class QuestionModuleViewTest(BaseTest):
         self.assertIsNotNone(response.context['question_module_form'])
         self.assertIsInstance(response.context['question_module_form'], QuestionModuleForm)
         self.assertEqual(response.context['question_module_form'].instance, education_module)
-        self.assertEqual(response.context['heading'], "Edit Module")
-        self.assertEqual(response.context['button-label'], "Save")
+        self.assertEqual(response.context['title'], "Edit Module")
+        self.assertEqual(response.context['button_label'], "Save")
         self.assertEqual(response.context['action'], "/modules/%s/edit/" % education_module.id)
 
     def test_post_edit_question_module(self):

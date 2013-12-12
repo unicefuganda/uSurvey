@@ -18,7 +18,7 @@ def new(request):
             return HttpResponseRedirect("/modules/")
         messages.error(request, "Question module was not created.")
     return render(request, 'question_module/new.html',
-                  {'question_module_form': question_module_form, 'heading': 'Edit Module', 'button-label': 'Save',
+                  {'question_module_form': question_module_form, 'title': 'New Module', 'button_label': 'Create',
                    'action': '/modules/new/'})
 
 
@@ -55,5 +55,5 @@ def edit(request, module_id):
         question_module_form = QuestionModuleForm(instance=module, data=request.POST)
         question_module_form, response = _process_form(request, question_module_form)
     return response or render(request, 'question_module/new.html',
-                  {'question_module_form': question_module_form, 'heading': 'Edit Module', 'button-label': 'Save',
+                  {'question_module_form': question_module_form, 'title': 'Edit Module', 'button_label': 'Save',
                    'action': '/modules/%s/edit/' % module.id})

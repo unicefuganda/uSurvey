@@ -679,7 +679,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                     first_page_list = "responseString=%s&action=request" % household_list
                     self.assertEquals(urllib2.unquote(response.content), first_page_list)
 
-    def test_shows_HH_non_response_questions_after_selecting_HH_transition_from_non_response_completion_message(self):
+    def test_shows_hh_non_response_questions_after_selecting_hh_transition_from_non_response_completion_message(self):
         self.batch.activate_non_response_for(self.kampala)
         answer_dict = {'investigator': self.investigator, 'question': self.non_response_question, 'batch': self.batch}
         MultiChoiceAnswer.objects.create(household=self.household1, **answer_dict)
