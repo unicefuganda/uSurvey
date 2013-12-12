@@ -152,7 +152,7 @@ def and_i_click_delete_batch_link(step):
 
 @step(u'Then I should see confirm delete batch')
 def then_i_should_see_confirm_delete_bacth(step):
-    world.page.see_confirm_delete_message(world.batch.name)
+    world.page.see_confirm_modal_message(world.batch.name)
 
 
 @step(u'And if I click yes')

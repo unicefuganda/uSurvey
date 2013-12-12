@@ -40,7 +40,7 @@ def and_i_click_delete_module(step):
 
 @step(u'I should see a delete module confirmation modal')
 def i_should_see_a_confirmation_modal(step):
-    world.page.see_confirm_delete_message(world.health_module.name)
+    world.page.see_confirm_modal_message(world.health_module.name)
 
 @step(u'When I confirm delete')
 def when_i_confirm_delete(step):

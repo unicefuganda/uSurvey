@@ -242,3 +242,35 @@ def then_i_should_see_the_user_details_displayed(step):
 @step(u'Then back button should take back to users page')
 def then_back_button_should_take_back_to_users_page(step):
     world.page.validate_back_link()
+
+@step(u'And I click the user deactivate link')
+def and_i_click_the_user_deactivate_link(step):
+    world.page.click_link_by_partial_href("#deactivate_user_%d"%world.user.id)
+
+@step(u'Then I should see a deactivate user confirmation modal')
+def then_i_should_see_a_deactivate_user_confirmation_modal(step):
+    world.page.see_confirm_modal_message(world.user.username, "deactivate")
+
+@step(u'Then I should see the user is deactivated')
+def then_i_should_see_the_user_is_deactivated(step):
+    world.page.see_success_message("User %s"%world.user.username,"deactivated")
+
+@step(u'When I click the activate link for that user')
+def when_i_click_the_activate_link_for_that_user(step):
+    world.page.click_link_by_partial_href("#re-activate_user_%d"%world.user.id)
+
+@step(u'Then I should see a reactivate user confirmation modal')
+def then_i_should_see_a_reactivate_user_confirmation_modal(step):
+    world.page.see_confirm_modal_message(world.user.username, "re-activate")
+
+@step(u'Then I should see the user is reactivated')
+def then_i_should_see_the_user_is_reactivated(step):
+    world.page.see_success_message("User %s"%world.user.username,"re-activated")
+
+@step(u'When I confirm deactivate')
+def when_i_confirm_deactivate(step):
+    world.page.click_by_css("#deactivate-user-%d"%world.user.id)
+
+@step(u'When I confirm reactivate')
+def when_i_confirm_reactivate(step):
+    world.page.click_by_css("#re-activate-user-%d"%world.user.id)

@@ -124,4 +124,4 @@ def and_i_should_see_that_the_survey_was_deleted_successfully(step):
 
 @step(u'Then I should see confirm delete survey')
 def then_i_should_see_confirm_delete_survey(step):
-    world.page.see_confirm_delete_message(world.survey.name)
+    world.page.see_confirm_modal_message(world.survey.name)

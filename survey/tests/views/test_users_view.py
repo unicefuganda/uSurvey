@@ -112,10 +112,6 @@ class UsersViewTest(BaseTest):
         self.failIf(user)
         assert error_message.called
 
-    def test_restricted_permission(self):
-        self.assert_restricted_permission_for('/users/new/')
-        self.assert_restricted_permission_for('/users/')
-
     def test_index(self):
         response = self.client.get('/users/')
         self.failUnlessEqual(response.status_code, 200)
@@ -291,6 +287,43 @@ class UsersViewTest(BaseTest):
         self.assertRedirects(response, expected_url="/users/")
         self.assertIn("User not found.", response.cookies['messages'].value)
 
-    def test_restricted_permission_for_view_details(self):
-        self.assert_restricted_permission_for('/users/1/')
+    def test_deactivate_user(self):
+        user = User.objects.create_user(username='rrrajni', email='rrajni@kant.com',
+                                          password='I_Rock_0', first_name='some name', last_name='last_name')
+        UserProfile.objects.create(user=user, mobile_number='123456666')
 
+        response = self.client.get('/users/%d/deactivate/'%user.id)
+        self.assertRedirects(response, expected_url="/users/")
+        self.assertIn("User %s successfully deactivated."%user.username, response.cookies['messages'].value)
+
+    def test_deactivate_user_when_no_such_user_exist(self):
+        non_existing_user_id = 222
+        response = self.client.get('/users/%d/deactivate/'%non_existing_user_id)
+        self.assertRedirects(response, expected_url="/users/")
+        self.assertIn("User not found.", response.cookies['messages'].value)
+
+    def test_reactivate_user(self):
+        user = User.objects.create_user(username='rrrajni', email='rrajni@kant.com',
+                                          password='I_Rock_0', first_name='some name', last_name='last_name')
+        UserProfile.objects.create(user=user, mobile_number='123456666')
+        user.is_active = False
+        user.save()
+
+        self.assertFalse(user.is_active)
+
+        response = self.client.get('/users/%d/activate/'%user.id)
+        self.assertRedirects(response, expected_url="/users/")
+        self.assertIn("User %s successfully re-activated."%user.username, response.cookies['messages'].value)
+
+    def test_deactivate_user_when_no_such_user_exist(self):
+        non_existing_user_id = 222
+        response = self.client.get('/users/%d/activate/'%non_existing_user_id)
+        self.assertRedirects(response, expected_url="/users/")
+        self.assertIn("User not found.", response.cookies['messages'].value)
+
+    def test_restricted_permission(self):
+        self.assert_restricted_permission_for('/users/new/')
+        self.assert_restricted_permission_for('/users/')
+        self.assert_restricted_permission_for('/users/1/')
+        self.assert_restricted_permission_for('/users/1/deactivate/')
+        self.assert_restricted_permission_for('/users/1/activate/')

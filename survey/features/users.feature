@@ -100,3 +100,16 @@ Feature: Users feature
       And I click the user details link
       Then I should see the user details displayed
       Then back button should take back to users page
+
+  Scenario: Deactivate/Activate a user
+    Given I am logged in as admin
+    And I have one user
+    And I visit the users list page
+    And I click the user deactivate link
+    Then I should see a deactivate user confirmation modal
+    When I confirm deactivate
+    Then I should see the user is deactivated
+    When I click the activate link for that user
+    Then I should see a reactivate user confirmation modal
+    When I confirm reactivate
+    Then I should see the user is reactivated

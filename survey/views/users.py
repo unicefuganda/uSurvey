@@ -89,3 +89,27 @@ def show(request, user_id):
         messages.error(request, "User not found.")
         return HttpResponseRedirect("/users/")
     return render(request, 'users/show.html', {'the_user': user[0], 'cancel_url': '/users/'})
+
+def _set_is_active(user, status, request):
+    action_str = "re-" if status else "de"
+    user.is_active = status
+    user.save()
+    messages.success(request, "User %s successfully %sactivated."%(user.username, action_str))
+
+def _activate(request, user_id, status):
+    user = User.objects.filter(id=user_id)
+    if not user.exists():
+        messages.error(request, "User not found.")
+        return HttpResponseRedirect("/users/")
+    user = user[0]
+    if user.is_active is not status:
+        _set_is_active(user, status, request)
+    return HttpResponseRedirect("/users/")
+
+@permission_required('auth.can_view_users')
+def deactivate(request, user_id):
+    return _activate(request, user_id, status=False)
+
+@permission_required('auth.can_view_users')
+def activate(request, user_id):
+    return _activate(request, user_id, status=True)

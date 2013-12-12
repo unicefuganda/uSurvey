@@ -40,10 +40,16 @@
                         <div class="btn-group">
                             <a href="{% url 'users_edit' user.pk %}" class="btn btn-small edit"><i class="icon-pencil"></i> Edit</a>
                             <a href="{% url 'users_show_details' user.pk %}" class="btn btn-small"><i class="icon-list"></i> Details</a>
-                            <a href="#" class="btn btn-small"><i class="icon-trash"></i> Delete</a>
+                            {% if user.is_active %}
+                                <a href="#deactivate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Deactivate</a>
+                            {% else %}
+                                <a href="#re-activate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Activate</a>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
+                {% include "base/delete_modal.html" with object_name=user.username id=user.pk name="User" url=user.pk|get_url_with_ids:"deactivate_user" action_str="deactivate"%}
+                {% include "base/delete_modal.html" with object_name=user.username id=user.pk name="User" url=user.pk|get_url_with_ids:"activate_user" action_str="re-activate"%}
             {% endfor %}
             </tbody>
         </table>

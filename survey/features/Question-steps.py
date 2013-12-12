@@ -287,7 +287,7 @@ def and_i_click_on_delete_question_link(step):
 
 @step(u'Then I should see a delete question confirmation modal')
 def then_i_should_see_a_delete_question_confirmation_modal(step):
-    world.page.see_confirm_delete_message(world.multi_choice_question.text)
+    world.page.see_confirm_modal_message(world.multi_choice_question.text)
 
 
 @step(u'Then I should see that the question was deleted successfully')
@@ -411,7 +411,7 @@ def and_i_click_delete_sub_question_link(step):
 
 @step(u'Then I should see a confirm delete subqestion modal')
 def then_i_should_see_a_confirm_delete_subqestion_modal(step):
-    world.page.see_confirm_delete_message(world.sub_question.text)
+    world.page.see_confirm_modal_message(world.sub_question.text)
 
 
 @step(u'Then I should see the sub question deleted successfully')

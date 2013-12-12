@@ -142,7 +142,7 @@ def and_i_click_the_delete_indicator_link(step):
 
 @step(u'Then I should see confirm indicator batch')
 def then_i_should_see_confirm_indicator_batch(step):
-    world.page.see_confirm_delete_message(world.indicator_1.name)
+    world.page.see_confirm_modal_message(world.indicator_1.name)
 
 @step(u'Then I should go back to indicator listing page')
 def then_i_should_go_back_to_indicator_listing_page(step):
