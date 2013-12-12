@@ -16,7 +16,6 @@ class BatchTest(TestCase):
         for field in ['id', 'created', 'modified', 'name', 'description', 'order', 'survey_id']:
             self.assertIn(field, fields)
 
-
     def test_store(self):
         batch = Batch.objects.create(order=1, name="Batch name")
         self.failUnless(batch.id)
@@ -294,13 +293,14 @@ class BatchLocationStatusTest(TestCase):
         BatchQuestionOrder.objects.create(question=question_2, batch=batch, order=2)
         BatchQuestionOrder.objects.create(question=question_3, batch=batch, order=3)
 
-
         batch.open_for_location(kampala)
         investigator.member_answered(question_1, member, 1, batch)
         investigator.member_answered(question_2, member, 1, batch)
         investigator.member_answered(question_3, member, 1, batch)
         batch.close_for_location(kampala)
-        self.assertFalse(batch.can_be_deleted())
+        can_delete_batch, message = batch.can_be_deleted()
+        self.assertFalse(can_delete_batch)
+        self.assertEqual(message, Batch.BATCH_HAS_ANSWERS_MESSAGE)
 
     def test_activate_non_response_for_location(self):
         batch = Batch.objects.create(order=1)

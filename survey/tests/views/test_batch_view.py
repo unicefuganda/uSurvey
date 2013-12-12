@@ -26,14 +26,16 @@ class BatchViewsTest(BaseTest):
         self.survey = Survey.objects.create(name='survey name', description='survey descrpition', type=False,
                                             sample_size=10)
         self.batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
+        country = LocationType.objects.create(name="Country", slug="country")
+        self.uganda = Location.objects.create(name="Uganda", type=country)
         district = LocationType.objects.create(name=PRIME_LOCATION_TYPE, slug=PRIME_LOCATION_TYPE)
-        self.kampala = Location.objects.create(name="Kampala", type=district)
+        self.kampala = Location.objects.create(name="Kampala", type=district, tree_parent=self.uganda)
         city = LocationType.objects.create(name="City", slug="city")
         village = LocationType.objects.create(name="Village", slug="village")
         self.kampala_city = Location.objects.create(name="Kampala City", type=city, tree_parent=self.kampala)
         self.bukoto = Location.objects.create(name="Bukoto", type=city, tree_parent=self.kampala)
         self.kamoja = Location.objects.create(name="kamoja", type=village, tree_parent=self.bukoto)
-        self.abim = Location.objects.create(name="Abim", type=district)
+        self.abim = Location.objects.create(name="Abim", type=district, tree_parent=self.uganda)
         self.batch.open_for_location(self.abim)
 
     def test_get_index(self):
@@ -278,7 +280,7 @@ class BatchViewsTest(BaseTest):
         recovered_batch = Batch.objects.filter(id=self.batch.id)
         self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
                              target_status_code=200, msg_prefix='')
-        self.assertIn("Batch cannot be deleted.", response.cookies['messages'].value)
+        self.assertIn("Batch cannot be deleted because it is open in Kampala District, Abim District.", response.cookies['messages'].value)
         self.failUnless(recovered_batch)
 
     def test_should_not_delete_batch_if_batches_questions_have_been_responded_to(self):
@@ -313,7 +315,7 @@ class BatchViewsTest(BaseTest):
         recovered_batch = Batch.objects.filter(id=self.batch.id)
         self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
                              target_status_code=200, msg_prefix='')
-        self.assertIn("Batch cannot be deleted.", response.cookies['messages'].value)
+        self.assertIn("Batch cannot be deleted because it has responses.", response.cookies['messages'].value)
         self.failUnless(recovered_batch)
 
     def test_assign_question_to_the_batch_should_show_list_of_questions(self):

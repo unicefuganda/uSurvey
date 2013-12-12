@@ -30,7 +30,7 @@ class LocationTypeDetails(BaseModel):
 
     @classmethod
     def the_country(cls):
-        all_types_details = LocationTypeDetails.objects.all().exclude(country=None)
+        all_types_details = cls.objects.all().exclude(country=None)
         if all_types_details.exists():
             return all_types_details[0].country
         return None

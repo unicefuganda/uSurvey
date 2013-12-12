@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Max
-from rapidsms.contrib.locations.models import Location, LocationType
+from rapidsms.contrib.locations.models import Location
 from survey.models.surveys import Survey
 from survey.models.base import BaseModel
 
@@ -10,6 +10,9 @@ class Batch(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=True)
     description = models.CharField(max_length=300, blank=True, null=True)
     survey = models.ForeignKey(Survey, null=True, related_name="batch")
+
+    BATCH_IS_OPEN_MESSAGE = "Batch cannot be deleted because it is open in %s."
+    BATCH_HAS_ANSWERS_MESSAGE = "Batch cannot be deleted because it has responses."
 
     def save(self, *args, **kwargs):
         last_order = Batch.objects.aggregate(Max('order'))['order__max']
@@ -104,17 +107,25 @@ class Batch(BaseModel):
             return next_batch.get_next_question(order=0, location=location)
 
     def is_open(self):
-        return self.open_locations.all()
+        return self.open_locations.all().exists()
 
     def can_be_deleted(self):
         if self.is_open():
-            return False
+            the_country = Location.objects.get(tree_parent=None)
+            open_in_locations_ids = self.open_locations.filter(location__tree_parent=the_country).values_list('location', flat=True)
+            open_location_names = Location.objects.filter(id__in=open_in_locations_ids).values_list('name', 'type')
+            return False, self.message_for_inability_to_delete(open_location_names)
 
         for question in self.all_questions():
             answer = question.answer_class().objects.filter(batch=self)
             if answer:
-                return False
-        return True
+                return False, self.message_for_inability_to_delete()
+        return True, ''
+
+    def message_for_inability_to_delete(self, open_location_names=None):
+        if open_location_names:
+            return self.BATCH_IS_OPEN_MESSAGE % ", ".join([" ".join(item) for item in open_location_names])
+        return self.BATCH_HAS_ANSWERS_MESSAGE
 
     @classmethod
     def open_ordered_batches(cls, location):
