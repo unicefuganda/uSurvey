@@ -1,5 +1,4 @@
 from django.utils.datastructures import SortedDict
-from rapidsms.contrib.locations.models import Location
 from survey.models import MultiChoiceAnswer, Household
 
 

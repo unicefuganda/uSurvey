@@ -739,18 +739,17 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-                with patch.object(Investigator, "was_active_within", return_value=False):
-                    self.reset_session()
-                    self.report_non_response()
-                    self.select_household("4")
-                    self.respond("1")
-                    response = self.respond(USSD.ANSWER['NO'])
-                    homepage = "Welcome %s to the survey.\n1:" \
-                               " Register households\n2: " \
-                               "Take survey\n3: " \
-                               "Report non-response" % self.investigator.name
-                    response_string = "responseString=%s&action=request" % homepage
-                    self.assertEqual(urllib2.unquote(response.content), response_string)
+                self.reset_session()
+                self.report_non_response()
+                self.select_household("4")
+                self.respond("1")
+                response = self.respond(USSD.ANSWER['NO'])
+                homepage = "Welcome %s to the survey.\n1:" \
+                           " Register households\n2: " \
+                           "Take survey\n3: " \
+                           "Report non-response" % self.investigator.name
+                response_string = "responseString=%s&action=request" % homepage
+                self.assertEqual(urllib2.unquote(response.content), response_string)
 
     def test_flow_from_non_response_to_take_survey(self):
         self.batch.activate_non_response_for(self.kampala)

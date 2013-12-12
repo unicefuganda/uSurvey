@@ -48,8 +48,8 @@ class USSDBaseView(object):
         elif self.is_reporting_non_response:
             if self.ussd_report_non_response.can_retake and answer == self.ANSWER['NO']:
                 self.ussd_report_non_response.clear_caches()
-                self.investigator.set_in_cache('IS_REPORTING_NON_RESPONSE', False)
-                action, response_string = self.ussd_survey.render_welcome_or_resume()
+                self.clear_HH_caches()
+                action, response_string = self.render_home_page()
             elif self.ussd_survey.is_resuming_survey and answer == self.ANSWER['NO']:
                 action, response_string = self.render_home_page()
                 self.clear_HH_caches()
