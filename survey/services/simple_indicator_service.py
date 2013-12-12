@@ -1,10 +1,9 @@
 from django.utils.datastructures import SortedDict
-from survey.models import MultiChoiceAnswer, Household
 
 
 class SimpleIndicatorService(object):
     def __init__(self, formula, location_parent):
-        self.question = formula.count
+        self.count = formula.get_count_type()
         self.survey = formula.indicator.batch.survey
         self.location_parent = location_parent
 
@@ -12,18 +11,7 @@ class SimpleIndicatorService(object):
         return self.hierarchical_count_for(self.location_parent)
 
     def hierarchical_count_for(self, location_parent):
-        locations = location_parent.get_children().order_by('name')[:10]
-        answers = MultiChoiceAnswer.objects.filter(question=self.question)
-        return self._format_answer(locations, answers)
-
-    def _format_answer(self, locations, answers):
-        question_options = self.question.options.all()
-        data = SortedDict()
-        for location in locations:
-            households = Household.all_households_in(location, self.survey)
-            data[location] = {option.text: answers.filter(answer=option, household__in=households).count() for option in
-                              question_options}
-        return data
+        return self.count.hierarchical_result_for(location_parent, self.survey)
 
     def get_location_names_and_data_series(self):
         options, locations_names = self._arrange_answers_per_options()

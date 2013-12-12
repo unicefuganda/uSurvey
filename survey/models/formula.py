@@ -18,6 +18,9 @@ class Formula(BaseModel):
     class Meta:
         app_label = 'survey'
 
+    def get_count_type(self):
+        return self.count or self.groups
+
     def compute_for_location(self, location):
         investigators = Investigator.lives_under_location(location)
         if self.numerator.is_multichoice():

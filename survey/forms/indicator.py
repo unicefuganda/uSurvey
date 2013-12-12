@@ -8,10 +8,10 @@ class IndicatorForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
-        self.fields['batch'].choices = map(lambda batch: (batch.id, batch.name), Batch.objects.all())
+        self.fields['batch'].choices = map(lambda batch: (batch.id, batch.name),
+                                           Batch.objects.filter(survey=self.fields['survey'].queryset[0]))
         self.fields['module'].choices = map(lambda module: (module.id, module.name), QuestionModule.objects.all())
         self.fields['name'].label = 'Indicator'
-        self.fields.keyOrder=['survey', 'batch', 'module', 'name', 'description', 'measure']
 
     def clean(self):
         super(IndicatorForm, self).clean()
@@ -26,3 +26,4 @@ class IndicatorForm(ModelForm):
 
     class Meta:
         model = Indicator
+        fields = ['survey', 'batch', 'module', 'name', 'description', 'measure']

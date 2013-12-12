@@ -1,9 +1,10 @@
 from datetime import date
+from random import randint
 from django.core.exceptions import ValidationError
 
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location
-from survey.models import BatchQuestionOrder, GroupCondition
+from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models import BatchQuestionOrder, GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey
 
 from survey.models.batch import Batch
 from survey.models.backend import Backend
@@ -11,6 +12,7 @@ from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.question import Question, QuestionOption
 from survey.models.householdgroups import HouseholdMemberGroup
+from survey.tests.base_test import BaseTest
 
 
 class QuestionTest(TestCase):
@@ -195,6 +197,77 @@ class QuestionTest(TestCase):
 
         self.assertTrue(another_group_question.belongs_to(another_group))
         self.assertFalse(another_group_question.belongs_to(general_group))
+
+class SimpleIndicatorQuestionCount(BaseTest):
+    def create_household_head(self, uid, investigator):
+        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
+                                                  uid=uid, survey=self.survey)
+        return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
+                                            date_of_birth="1990-02-09")
+
+    def setUp(self):
+        self.survey = Survey.objects.create(name="haha")
+        self.batch = Batch.objects.create(order=1, survey=self.survey)
+        self.country = LocationType.objects.create(name="Country", slug="country")
+        self.region = LocationType.objects.create(name="Region", slug="region")
+        self.district = LocationType.objects.create(name="District", slug='district')
+
+        self.uganda = Location.objects.create(name="Uganda", type=self.country)
+        self.west = Location.objects.create(name="WEST", type=self.region, tree_parent=self.uganda)
+        self.central = Location.objects.create(name="CENTRAL", type=self.region, tree_parent=self.uganda)
+        self.kampala = Location.objects.create(name="Kampala", tree_parent=self.central, type=self.district)
+        self.mbarara = Location.objects.create(name="Mbarara", tree_parent=self.west, type=self.district)
+
+
+        backend = Backend.objects.create(name='something')
+
+        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.kampala,
+                                                   backend=backend)
+        self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331", location=self.mbarara,
+                                                     backend=backend)
+
+        health_module = QuestionModule.objects.create(name="Health")
+        member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
+        self.question_3 = Question.objects.create(text="This is a question",
+                                                  answer_type=Question.MULTICHOICE, order=3,
+                                                  module=health_module, group=member_group)
+        self.yes_option = QuestionOption.objects.create(question=self.question_3, text="Yes", order=1)
+        self.no_option = QuestionOption.objects.create(question=self.question_3, text="No", order=2)
+
+        self.question_3.batches.add(self.batch)
+
+        self.household_head_1 = self.create_household_head(0, self.investigator)
+        self.household_head_2 = self.create_household_head(1, self.investigator)
+        self.household_head_3 = self.create_household_head(2, self.investigator)
+        self.household_head_4 = self.create_household_head(3, self.investigator)
+        self.household_head_5 = self.create_household_head(4, self.investigator)
+
+        self.household_head_6 = self.create_household_head(5, self.investigator_2)
+        self.household_head_7 = self.create_household_head(6, self.investigator_2)
+        self.household_head_8 = self.create_household_head(7, self.investigator_2)
+        self.household_head_9 = self.create_household_head(8, self.investigator_2)
+
+    def test_returns_options_counts_given_list_of_locations(self):
+        self.investigator.member_answered(self.question_3, self.household_head_1, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_2, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_3, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_4, self.no_option.order, self.batch)
+        self.investigator.member_answered(self.question_3, self.household_head_5, self.no_option.order, self.batch)
+
+        self.investigator_2.member_answered(self.question_3, self.household_head_6, self.yes_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_7, self.yes_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_8, self.no_option.order, self.batch)
+        self.investigator_2.member_answered(self.question_3, self.household_head_9, self.no_option.order, self.batch)
+
+        region_responses = {self.central: {self.yes_option.text: 3, self.no_option.text: 2},
+                            self.west: {self.yes_option.text: 2, self.no_option.text: 2}}
+        self.assertEquals(self.question_3.hierarchical_result_for(self.uganda, self.survey), region_responses)
+
+        central_region_responses = {self.kampala: {self.yes_option.text: 3, self.no_option.text: 2}}
+        self.assertEquals(self.question_3.hierarchical_result_for(self.central, self.survey), central_region_responses)
+
+        west_region_responses = {self.mbarara: {self.yes_option.text: 2, self.no_option.text: 2}}
+        self.assertEquals(self.question_3.hierarchical_result_for(self.west, self.survey), west_region_responses)
 
 
 class QuestionOptionTest(TestCase):

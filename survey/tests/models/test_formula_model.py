@@ -295,3 +295,18 @@ class FormulaTest(BaseTest):
         self.assertEquals(formula.compute_for_location(kampala), {option_1.text: 15, option_2.text: 15})
         self.assertEquals(formula.compute_for_location(abim), {option_1.text: 40, option_2.text: 50})
         self.assertEquals(formula.compute_for_location(uganda), {option_1.text: 27.5, option_2.text: 32.5})
+
+    def test_get_group_formula_type(self):
+        general_group = HouseholdMemberGroup.objects.create(name="GENERAL", order=2)
+        formula = Formula.objects.create(groups=general_group)
+
+        self.assertEqual(general_group, formula.get_count_type())
+
+    def test_get_count_formula_type(self):
+        question_3 = Question.objects.create(text="This is a question",
+                                                  answer_type=Question.MULTICHOICE, order=3)
+        formula = Formula.objects.create(count=question_3)
+
+        self.assertEqual(question_3, formula.get_count_type())
+
+

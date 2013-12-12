@@ -265,14 +265,11 @@ class HouseholdMember(BaseModel):
         age = self.get_age()
         gender = self.male
         is_head = self.is_head()
-
         if condition.attribute.lower() == GroupCondition.GROUP_TYPES["AGE"].lower():
-            condition_value = condition.matches_condition(age)
-        elif condition.attribute.lower() == GroupCondition.GROUP_TYPES["GENDER"].lower():
-            condition_value = condition.matches_condition(gender)
-        else:
-            condition_value = condition.matches_condition(is_head)
-        return condition_value
+            return condition.matches_condition(age)
+        if condition.attribute.lower() == GroupCondition.GROUP_TYPES["GENDER"].lower():
+            return condition.matches_condition(gender)
+        return condition.matches_condition(is_head)
 
     def belongs_to(self, member_group):
         condition_match = []

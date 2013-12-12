@@ -37,10 +37,11 @@ Feature: Login feature
 
   Scenario: Login from download excel report page
     Given I have a user
-    And I have few batches
-    And I visit download excel page
-    And I login a user
-    Then I should see download excel page with logout link
+     And I have three surveys
+     And I have batches in those surveys
+     And I visit download excel page
+     And I login a user
+     Then I should see download excel page with logout link
 
   Scenario: Login from users page
      Given I have a user

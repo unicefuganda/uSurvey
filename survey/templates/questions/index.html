@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
     {% load pagination_tags %}
-    {% autopaginate questions 50 %}
+    {% autopaginate questions 20 %}
     {% load template_tags %}
     {% if batch %}
         <h3>

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.datastructures import SortedDict
 from survey.models.base import BaseModel
 
 
@@ -26,6 +27,23 @@ class HouseholdMemberGroup(BaseModel):
 
     def remove_related_questions(self):
         self.question_group.clear()
+
+    def household_members_count_per_location_in(self, locations, survey):
+        data = SortedDict()
+        all_households = survey.survey_household.all()
+        from survey.models import HouseholdMember
+        for location in locations:
+            location_descendants = location.get_descendants(include_self=True).values_list('id', flat=True)
+            households = all_households.filter(location__id__in=location_descendants).values_list('id', flat=True)
+            all_members = HouseholdMember.objects.filter(household__id__in=households)
+            qualified_members = filter(lambda member: member.belongs_to(self), all_members)
+            data[location] = {self.name: len(qualified_members)}
+        return data
+
+    def hierarchical_result_for(self, location_parent, survey):
+        locations = location_parent.get_children().order_by('name')[:10]
+        answers = self.household_members_count_per_location_in(locations, survey)
+        return answers
 
     @classmethod
     def max_order(cls):

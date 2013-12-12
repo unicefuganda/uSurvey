@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.paginator import Paginator
 from django.db import models
+from django.utils.datastructures import SortedDict
 from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.base import BaseModel
@@ -130,6 +131,20 @@ class Question(BaseModel):
     def belongs_to(self, group):
         return self.group == group
 
+    def hierarchical_result_for(self, location_parent, survey):
+        locations = location_parent.get_children().order_by('name')[:10]
+        answers = self.multichoiceanswer.all()
+        return self._format_answer(locations, answers, survey)
+
+    def _format_answer(self, locations, answers, survey):
+        question_options = self.options.all()
+        data = SortedDict()
+        for location in locations:
+            households = Household.all_households_in(location, survey)
+            data[location] = {option.text: answers.filter(answer=option, household__in=households).count() for option in
+                              question_options}
+        return data
+
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
@@ -148,7 +163,7 @@ class Answer(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="%(class)s")
     household = models.ForeignKey(Household, null=True, related_name="%(class)s")
     householdmember = models.ForeignKey(HouseholdMember, null=True, related_name="%(class)s")
-    question = models.ForeignKey(Question, null=True)
+    question = models.ForeignKey(Question, null=True, related_name="%(class)s")
     batch = models.ForeignKey("Batch", null=True)
     rule_applied = models.ForeignKey("AnswerRule", null=True)
     is_old = models.BooleanField(default=False)
