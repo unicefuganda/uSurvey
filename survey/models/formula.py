@@ -76,56 +76,32 @@ class Formula(BaseModel):
         return question.answer_class().objects.filter(investigator=investigator, question=question).\
             aggregate(Sum('answer'))['answer__sum']
 
-    def answer_for_household(self, question, household):
-        return question.answer_class().objects.get(household=household, question=question).answer
-
     def compute_numerical_question_for_investigator(self, investigator):
         denominator = self.answer_sum_for_investigator(self.denominator, investigator)
         numerator = self.answer_sum_for_investigator(self.numerator, investigator)
         return self.process_formula(numerator, denominator, investigator)
-
-    def weight_for_location(self, location):
-        investigator = Investigator.objects.filter(location=location)
-        if investigator:
-            return investigator[0].weights
-
-    def compute_for_households_in_location(self, location):
-        investigator = Investigator.objects.filter(location=location)
-        household_data = {}
-        if investigator:
-            for household in investigator[0].households.all():
-                household_data[household] = {
-                    self.numerator: self.answer_for_household(self.numerator, household),
-                    self.denominator: self.answer_for_household(self.denominator, household),
-                }
-        return household_data
 
     def get_denominator_sum_based_on_question_type(self, investigator, question):
         if question.is_multichoice():
             option_ids = []
             for option in self.denominator_options.all():
                 option_ids.append(option.id)
-
             denominator_number = len(question.answer_class().objects.filter(investigator=investigator,
                                                                             answer__id__in=option_ids))
         else:
             denominator_number = self.answer_sum_for_investigator(question, investigator)
-
         return denominator_number
 
     def numerator_computation(self, investigator, question):
         numerator_number = 1
-
         if question.is_multichoice():
             option_ids = []
             for option in self.numerator_options.all():
                 option_ids.append(option.id)
-
             numerator_number = len(question.answer_class().objects.filter(investigator=investigator,
                                                                           answer__id__in=option_ids))
         else:
             numerator_number = self.answer_sum_for_investigator(question, investigator)
-
         return numerator_number
 
     def denominator_computation(self, investigator, survey):

@@ -1,6 +1,5 @@
 from django import template
-from django.contrib import messages
-import json
+
 register = template.Library()
 
 @register.filter
