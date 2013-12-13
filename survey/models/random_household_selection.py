@@ -11,7 +11,7 @@ from survey.models.investigator import Investigator
 class RandomHouseHoldSelection(BaseModel):
     mobile_number = models.CharField(max_length=10, null=False, blank=False)
     no_of_households = models.PositiveIntegerField(null=True)
-    selected_households = models.CharField(max_length=510, blank=False, null=False)
+    selected_households = models.TextField(blank=False, null=False)
     survey = models.ForeignKey("Survey", null=True, related_name="random_household")
 
     class Meta:
