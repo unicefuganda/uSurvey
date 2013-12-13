@@ -9,7 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         csv_file = csv.reader(open(args[0],"rb"))
-        country , created = LocationType.objects.get_or_create(name='country',slug=slugify('country'))
+        country , created = LocationType.objects.get_or_create(name='Country',slug=slugify('country'))
         for items in csv_file:
             tree_parent = None
             for index, item in enumerate(items):

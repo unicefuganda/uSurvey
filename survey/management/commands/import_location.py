@@ -12,7 +12,7 @@ class Command(BaseCommand):
         headers = csv_file.next()
         location_types = []
         for header in headers:
-            header = header.strip()
+            header = header.strip().replace("Name", "")
             location_type, created = LocationType.objects.get_or_create(name=header, slug=slugify(header))
             location_types.append(location_type)
         for items in csv_file:
