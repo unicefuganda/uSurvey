@@ -96,7 +96,7 @@ def delete(request, indicator_id, formula_id):
 def simple_indicator(request, indicator_id):
     hierarchy_limit = 2
     selected_location = None
-    first_level_location_analyzed = Location.objects.filter(type__name="Country")[0]
+    first_level_location_analyzed = Location.objects.filter(type__name__iexact="country")[0]
     indicator = Indicator.objects.get(id=indicator_id)
     formula = indicator.formula.all()
     if not formula:

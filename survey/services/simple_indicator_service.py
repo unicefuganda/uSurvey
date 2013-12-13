@@ -44,8 +44,8 @@ class SimpleIndicatorService(object):
         first_level_locations = self.location_parent.get_children().order_by('name')[:10]
         for location in first_level_locations:
             for child_location, answers in self.hierarchical_count_for(location).items():
-                tab_data = SortedDict({location.type.name: location.name,
-                                       child_location.type.name: child_location.name})
+                tab_data = SortedDict({location.type.name: location.name})
+                tab_data[child_location.type.name] = child_location.name
                 tab_data.update(answers)
                 tab_data.update({'Total': sum(answers.values())})
                 tabulated_data.append(tab_data)

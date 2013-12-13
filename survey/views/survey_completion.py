@@ -46,7 +46,6 @@ def show(request):
     params = request.GET
     content = {'selected_batch': None,
                'surveys': Survey.objects.all(),
-               'locations': LocationWidget(selected_location),
                'batches': Batch.objects.all(),
                'action': 'survey_completion_rates',
                'request': request}
@@ -72,6 +71,8 @@ def show(request):
 
     elif params.has_key('location') or params.has_key('batch'):
         messages.error(request, "Please select a valid location and batch.")
+
+    content['locations'] = LocationWidget(selected_location)
 
     return render(request, 'aggregates/completion_status.html', content)
 

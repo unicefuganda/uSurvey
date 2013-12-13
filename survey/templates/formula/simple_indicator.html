@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% block title %} Simple Indicator {% endblock %}
 {% block content %}
 <form id="results-location-widget" method="get" accept-charset="utf-8">
     {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
