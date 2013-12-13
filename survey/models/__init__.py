@@ -19,6 +19,7 @@ from survey.models.question_module import QuestionModule
 from survey.models.location_type_details import LocationTypeDetails
 from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.indicators import Indicator
+from survey.models.about_us_content import AboutUs
 
 __all__ = [
     'Answer',
@@ -54,4 +55,5 @@ __all__ = [
     'BatchLocationStatus',
     'HouseholdMember',
     'HouseholdBatchCompletion',
+    'AboutUs'
 ]

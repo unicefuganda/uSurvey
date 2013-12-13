@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from lettuce.django import django_url
 from nose.tools import assert_equals
 
+
 class PageObject(object):
     def __init__(self, browser):
         self.browser = browser

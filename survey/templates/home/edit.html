@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h3>
+  {% block title %}
+      Edit About us
+   {% endblock %}
+</h3>
+    <form method="post" accept-charset="utf-8" class="horizontal-form">
+      {% csrf_token %}
+      <div class="control-group">
+        <div class="controls">
+          {{about_form.visible_fields.0}} <label class="error">
+            {% if about_form.visible_fields.0.errors %}
+                {% for error in about_form.visible_fields.0.errors %}
+                    {{ error}}
+                {% endfor %}
+            {% endif %}
+             </label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" name="save_button">Save</button>
+        <a href="{% url 'about_page' %}" class="btn btn-primary" name="cancel_button">Cancel</a>
+      </div>
+    </form>
+{% endblock %}
+{% block javascripts %}
+    <script src="{{STATIC_URL}}ckeditor/ckeditor.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        CKEDITOR.replace( 'content-editor' );
+    </script>
+{% endblock %}

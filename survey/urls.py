@@ -8,6 +8,7 @@ from django.conf import settings
 urlpatterns = patterns('',
     url(r'^$', 'survey.views.home_page.home', name='home_page'),
     url(r'^about/$', 'survey.views.home_page.about', name='about_page'),
+    url(r'^about/edit/$', 'survey.views.home_page.edit', name='edit_about_page'),
     url(r'^locations/hierarchy/add/$', 'survey.views.location_hierarchy.add', name='add_location_hierarchy'),
     url(r'^locations/upload/$', 'survey.views.location_hierarchy.upload', name='upload_locations'),
     url(r'^locations/weights/upload/$', 'survey.views.location_weights.upload', name='upload_weights'),

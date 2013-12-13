@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from time import sleep
 
 from rapidsms.backends.database.models import BackendMessage
 
@@ -23,6 +24,19 @@ class AboutPage(PageObject):
         self.is_text_present('Multiple Indicator Cluster Survey (MICS)')
         self.is_text_present('Survey tools')
         self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
+
+    def assert_edit_link_absent(self):
+        assert not self.browser.find_by_css("#edit-about_us")
+
+
+class EditAboutUsPage(PageObject):
+    url = '/about/edit/'
+
+    def fill_wywget_textarea(self, data):
+        script = '$("#content-editor").show().css("visibility","")'
+        self.browser.execute_script(script)
+        sleep(2)
+        self.fill_valid_values(data)
 
 
 class BulkSMSPage(PageObject):
