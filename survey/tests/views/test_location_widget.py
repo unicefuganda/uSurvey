@@ -54,3 +54,14 @@ class LocationWidgetTest(BaseTest):
         self.assertIn(self.kampala, location_widget.get_widget_data()['district'])
         self.assertIn(self.kampala_city, location_widget.get_widget_data()['city'])
         self.assertNotIn('village', location_widget.get_widget_data().keys())
+
+    def test_location_widget_knows_next_location_in_hierarchy(self):
+        village = LocationType.objects.create(name='Village', slug='village')
+        LocationTypeDetails.objects.create(location_type=village, country=self.uganda)
+        bukoto = Location.objects.create(name='Bukoto', tree_parent=self.kampala_city, type=village)
+
+        location_widget = LocationWidget(selected_location=self.kampala_city)
+        self.assertEqual(village, location_widget.next_type_in_hierarchy())
+
+        location_widget = LocationWidget(selected_location=bukoto)
+        self.assertIsNone(location_widget.next_type_in_hierarchy())
