@@ -66,11 +66,11 @@ class PageObject(object):
         assert self.browser.find_link_by_text('About')
         assert self.browser.find_link_by_text('mMICS')
         assert self.browser.find_link_by_text('Survey Administration')
-        assert self.browser.find_link_by_text('Analysis')
 
     def check_researcher_allowed_tabs(self):
         self.check_data_entry_allowed_tabs()
         assert self.browser.find_link_by_text('Downloads')
+        assert self.browser.find_link_by_text('Analysis')
 
     def check_all_tabs(self):
         self.check_researcher_allowed_tabs()
@@ -82,6 +82,7 @@ class PageObject(object):
     def check_data_entry_not_allowed_tabs(self):
         self.check_researcher_not_allowed_tabs()
         assert not self.browser.find_link_by_text('Downloads')
+        assert not self.browser.find_link_by_text('Analysis')
 
     def check_anonymous_user_not_allowed_tabs(self):
         self.check_data_entry_not_allowed_tabs()

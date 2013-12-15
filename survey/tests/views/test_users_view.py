@@ -13,8 +13,8 @@ from survey.forms.users import UserForm, EditUserForm
 class UsersViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_users')
+        self.user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        self.raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_users')
         self.client.login(username='Rajni', password='I_Rock')
 
     def test_new(self):
@@ -268,6 +268,45 @@ class UsersViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 302)
         edited_user = User.objects.filter(last_name='knightngale')
         self.assertEqual(len(edited_user), 1)
+
+    def test_a_non_admin_user_cannot_POST_edit_other_users_profile(self):
+        user_without_permission = User.objects.create_user(username='notpermitted', email='rajni@kant.com', password='I_Suck')
+        self.client.logout()
+        self.client.login(username=user_without_permission.username, password='I_Suck')
+        data = {
+                    'username':'knight',
+                    'first_name':'michael',
+                    'last_name':'knightngale',
+                    'mobile_number':'123456789',
+                    'email':'mm@mm.mm',
+                }
+
+        original_rajni_attributes = User.objects.filter(username=self.raj).values()[0]
+        edit_rajni_url = '/users/%s/edit/'%self.raj.pk
+
+        response = self.client.post(edit_rajni_url, data=data)
+        self.assertRedirects(response, expected_url="/accounts/login/?next=%s"%edit_rajni_url)
+        message = "Current user, %s, is not allowed to perform this action. " \
+                  "Please log in a user with enough privileges." %user_without_permission.get_full_name()
+        self.assertIn(message, response.cookies['messages'].value)
+        retrieved_rajni = User.objects.filter(**original_rajni_attributes)
+        self.assertEqual(1, retrieved_rajni.count())
+
+    def test_a_non_admin_user_cannot_GET_edit_other_users_profile(self):
+        user_without_permission = User.objects.create_user(username='notpermitted', email='rajni@kant.com', password='I_Suck')
+        self.client.logout()
+        self.client.login(username=user_without_permission.username, password='I_Suck')
+
+        original_rajni_attributes = User.objects.filter(username=self.raj).values()[0]
+        edit_rajni_url = '/users/%s/edit/'%self.raj.pk
+
+        response = self.client.get(edit_rajni_url)
+        self.assertRedirects(response, expected_url="/accounts/login/?next=%s"%edit_rajni_url)
+        message = "Current user, %s, is not allowed to perform this action. " \
+                  "Please log in a user with enough privileges." %user_without_permission.get_full_name()
+        self.assertIn(message, response.cookies['messages'].value)
+        retrieved_rajni = User.objects.filter(**original_rajni_attributes)
+        self.assertEqual(1, retrieved_rajni.count())
 
     def test_view_user_details(self):
         user = User.objects.create_user(username='rrrajni', email='rrajni@kant.com',

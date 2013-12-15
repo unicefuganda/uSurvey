@@ -58,16 +58,13 @@
               </li>
             {% endif %}
 
-            {% if perms.auth.can_view_investigators %}
+            {% if perms.auth.can_view_batches %}
               <li class="dropdown">
                 <a data-toggle="dropdown" id="drop-analysis-tab" class="dropdown-toggle" role="button" href="#">Analysis<b class="caret"></b></a>
                 <ul aria-labelledby="drop-analysis-tab" role="menu" class="dropdown-menu">
-
-                  {% if perms.auth.can_view_batches %}
-                      <li role="presentation"><a href="{% url 'list_indicator_page' %}">Indicators</a></li>
-                      <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion Rates</a></li>
-                      <li role="presentation"><a href="{% url 'list_weights_page' %}">Location Weights</a></li>
-                  {% endif %}
+                  <li role="presentation"><a href="{% url 'list_indicator_page' %}">Indicators</a></li>
+                  <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion Rates</a></li>
+                  <li role="presentation"><a href="{% url 'list_weights_page' %}">Location Weights</a></li>
                 </ul>
               </li>
             {% endif %}

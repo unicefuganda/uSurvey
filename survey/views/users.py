@@ -75,7 +75,7 @@ def edit(request, user_id):
         userform = EditUserForm(data=request.POST, user= request.user, instance=user, initial=initial)
         response = _process_form(userform, request, 'edited', '/users/'+ str(user_id)+'/edit/')
     context_variables = {'userform': userform,
-                        'action' : '/users/'+str(user_id)+'/edit/',
+                        'action' : '/users/%s/edit/'%user_id,
                         'id': 'edit-user-form', 'button_label' : 'Save',
                         'loading_text' : 'Saving...',
                         'country_phone_code': COUNTRY_PHONE_CODE,
