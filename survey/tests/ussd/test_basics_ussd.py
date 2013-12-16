@@ -5,9 +5,9 @@ import urllib2
 from django.core.cache import cache
 from django.test import Client
 from mock import patch
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule, BatchQuestionOrder, GroupCondition, Survey, RandomHouseHoldSelection
+from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, NumericalAnswer, Question, TextAnswer, QuestionOption, MultiChoiceAnswer, AnswerRule, BatchQuestionOrder, GroupCondition, Survey, RandomHouseHoldSelection, EnumerationArea
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest, FakeRequest
 from survey.ussd.ussd import USSD
@@ -26,10 +26,15 @@ class USSDTest(USSDBaseTest):
             'response': "false"
         }
         self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        city = LocationType.objects.create(name="City")
+        self.mbarara = Location.objects.create(name="Mbarara", type=city)
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        self.ea.locations.add(self.mbarara)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''),
-                                                        location=Location.objects.create(name="Kampala"),
+                                                        ea=self.ea,
                                                         backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
                                                   survey=self.open_survey, uid=0)

@@ -21,7 +21,7 @@ def is_valid(params):
 
 def render_household_details(request, location, batch):
     context = {'selected_location': location, }
-    investigator = Investigator.objects.filter(location=location)
+    investigator = Investigator.objects.filter(ea__locations=location)
     if not investigator.exists():
         messages.error(request, 'Investigator not registered for this location.')
         return render(request, 'aggregates/household_completion_status.html', context)

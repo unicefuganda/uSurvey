@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, AnswerRule, BatchQuestionOrder, UnknownDOBAttribute, MultiChoiceAnswer, QuestionOption
+from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, AnswerRule, BatchQuestionOrder, UnknownDOBAttribute, MultiChoiceAnswer, QuestionOption, Survey, EnumerationArea
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import HouseholdMember, Household, HouseholdHead
 from survey.models.backend import Backend
@@ -114,8 +114,12 @@ class HouseholdMemberTest(TestCase):
         some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
         some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
 
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(some_village)
+
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
-                                                    location=some_village,
+                                                    ea=ea,
                                                     backend=Backend.objects.create(name='something1'))
         hhold = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
         household_member = HouseholdMember.objects.create(household=hhold, surname="name", male=True,
@@ -292,8 +296,12 @@ class HouseholdMemberTest(TestCase):
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
@@ -328,8 +336,12 @@ class HouseholdMemberTest(TestCase):
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, uid=0)
@@ -365,8 +377,13 @@ class HouseholdMemberTest(TestCase):
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, uid=0)
@@ -402,8 +419,12 @@ class HouseholdMemberTest(TestCase):
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
@@ -445,8 +466,12 @@ class HouseholdMemberTest(TestCase):
     def test_household_knows_survey_can_be_retaken(self):
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, uid=0)
@@ -535,8 +560,12 @@ class HouseholdMemberTest(TestCase):
     def test_should_know_householdmember_has_completed_batch(self):
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
         self.batch = Batch.objects.create(name="Batch 1", order=1)
         group = HouseholdMemberGroup.objects.create(name="Group 1", order=1)
@@ -574,7 +603,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
         less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
@@ -613,7 +646,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
         less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
@@ -666,7 +703,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, uid=0)
@@ -693,7 +734,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, uid=0)
@@ -720,7 +765,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, uid=0)
@@ -842,7 +891,11 @@ class HouseholdMemberTest(TestCase):
 
     def test_member_knows_its_location(self):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
         household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
@@ -855,7 +908,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
@@ -884,7 +941,12 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
@@ -914,7 +976,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
@@ -926,7 +992,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),

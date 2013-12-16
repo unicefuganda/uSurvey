@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import BatchQuestionOrder, GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey
+from survey.models import BatchQuestionOrder, GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey, EnumerationArea
 
 from survey.models.batch import Batch
 from survey.models.backend import Backend
@@ -217,13 +217,17 @@ class SimpleIndicatorQuestionCount(BaseTest):
         self.central = Location.objects.create(name="CENTRAL", type=self.region, tree_parent=self.uganda)
         self.kampala = Location.objects.create(name="Kampala", tree_parent=self.central, type=self.district)
         self.mbarara = Location.objects.create(name="Mbarara", tree_parent=self.west, type=self.district)
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        ea.locations.add(self.kampala)
+        mbarara_ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        mbarara_ea.locations.add(self.mbarara)
 
 
         backend = Backend.objects.create(name='something')
 
-        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.kampala,
+        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                    backend=backend)
-        self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331", location=self.mbarara,
+        self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331", ea=mbarara_ea,
                                                      backend=backend)
 
         health_module = QuestionModule.objects.create(name="Health")

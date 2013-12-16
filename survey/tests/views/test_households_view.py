@@ -8,7 +8,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import LocationTypeDetails, LocationCode
+from survey.models import LocationTypeDetails, LocationCode, EnumerationArea
 from survey.models.households import HouseholdMember, HouseholdHead, Household
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -46,10 +46,14 @@ class HouseholdViewTest(BaseTest):
 
     def test_get_investigators(self):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         Investigator.objects.create(name="inv2", mobile_number="123456789",
                                     backend=Backend.objects.create(name='something1'))
+
         response = self.client.get('/households/investigators?location=' + str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
@@ -60,8 +64,11 @@ class HouseholdViewTest(BaseTest):
     def test_gets_only_investigators_who_are_not_blocked(self):
         uganda = Location.objects.create(name="Uganda")
         backend = Backend.objects.create(name='something')
-        investigator = Investigator.objects.create(name="inv1", mobile_number="1234", location=uganda, backend=backend)
-        blocked_investigator = Investigator.objects.create(name="inv2", mobile_number="12345", location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", mobile_number="1234", ea=ea, backend=backend)
+        blocked_investigator = Investigator.objects.create(name="inv2", mobile_number="12345", ea=ea,
                                                            is_blocked=True, backend=backend)
         response = self.client.get('/households/investigators?location=' + str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
@@ -72,7 +79,10 @@ class HouseholdViewTest(BaseTest):
 
     def test_get_investigators_returns_investigators_with_no_location_if_location_empty(self):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         investigator_duplicate = Investigator.objects.create(name="inv2", mobile_number="123456789",
                                                              backend=Backend.objects.create(name='something2'))
@@ -91,7 +101,11 @@ class HouseholdViewTest(BaseTest):
 
     def test_validate_investigators(self):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
         posted_locations = [uganda]
@@ -111,7 +125,10 @@ class HouseholdViewTest(BaseTest):
     @patch('survey.models.Investigator.objects.get')
     def test_validate_investigators_no_investigator_posted(self, mock_investigator_get, mock_error_class):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
         posted_locations = [uganda]
@@ -134,7 +151,10 @@ class HouseholdViewTest(BaseTest):
     @patch('survey.models.Investigator.objects.get')
     def test_validate_investigators_non_existing_investigator_id_posted(self, mock_investigator_get, mock_error_class):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
         posted_locations = [uganda]
@@ -157,7 +177,10 @@ class HouseholdViewTest(BaseTest):
     @patch('survey.models.Investigator.objects.get')
     def test_validate_investigators_NAN_investigator_id_posted(self, mock_investigator_get, mock_error_class):
         uganda = Location.objects.create(name="Uganda")
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
         posted_locations = [uganda]
@@ -180,7 +203,10 @@ class HouseholdViewTest(BaseTest):
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
         burundi = Location.objects.create(name="Burundi", type=country)
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         form_data = {
             'location': uganda.id,
@@ -221,7 +247,7 @@ class HouseholdViewTest(BaseTest):
         self.assertEqual(household.household_code, household_code)
         self.assertEqual(hHead.household, household)
 
-        investigator.location = burundi
+        investigator.ea = ea
         investigator.save()
         self.assertEqual(household.location, uganda)
 
@@ -233,7 +259,10 @@ class HouseholdViewTest(BaseTest):
         LocationTypeDetails.objects.create(country=uganda, location_type=district)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=kampala,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         form_data = {
             'location': kampala.id,
@@ -308,7 +337,10 @@ class HouseholdViewTest(BaseTest):
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
 
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=kampala,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household_a = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
         household_b = Household.objects.create(investigator=investigator, location=investigator.location, uid=1)
@@ -374,12 +406,21 @@ class HouseholdViewTest(BaseTest):
         uganda = Location.objects.create(name="Uganda", type=region, tree_parent=africa)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
         bukoto = Location.objects.create(name="Bukoto", type=county, tree_parent=kampala)
+        uganda_ea = EnumerationArea.objects.create(name="EA2")
+        uganda_ea.locations.add(uganda)
 
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda,
+        kampla_ea = EnumerationArea.objects.create(name="EA2")
+        kampla_ea.locations.add(kampala)
+
+        bukoto_ea = EnumerationArea.objects.create(name="EA2")
+        bukoto_ea.locations.add(bukoto)
+
+
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", ea=uganda_ea,
                                                     backend=Backend.objects.create(name='something1'))
-        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala,
+        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", ea=kampla_ea,
                                                     backend=Backend.objects.create(name='something2'))
-        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", location=bukoto,
+        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", ea=bukoto_ea,
                                                     backend=Backend.objects.create(name='something3'))
 
         household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
@@ -419,9 +460,11 @@ class HouseholdViewTest(BaseTest):
         some_sub_county = Location.objects.create(name="Some sub county", type=sub_county, tree_parent=bukoto_county)
         some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
         some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(some_village)
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
-                                                    location=some_village,
+                                                    ea=ea,
                                                     backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
@@ -437,7 +480,11 @@ class HouseholdViewTest(BaseTest):
     def test_should_send_only_number_of_households_sorted_by_head_surname(self):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', location=uganda,
+
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household_a = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
         household_b = Household.objects.create(investigator=investigator, location=investigator.location, uid=1)
@@ -477,8 +524,11 @@ class ViewHouseholdDetailsTest(BaseTest):
         city = LocationType.objects.create(name="City", slug=slugify("city"))
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="investigator", mobile_number="123456789",
-                                                   backend=Backend.objects.create(name='something'), location=kampala)
+                                                   backend=Backend.objects.create(name='something'), ea=ea)
 
         household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
         HouseholdHead.objects.create(surname='Bravo', household=household, first_name='Test',
@@ -502,15 +552,17 @@ class EditHouseholdDetailsTest(BaseTest):
         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_households')
         self.client.login(username='Rajni', password='I_Rock')
-
+        self.survey = Survey.objects.create(name="Survey A")
         self.country = LocationType.objects.create(name="Country", slug=slugify("country"))
         self.city = LocationType.objects.create(name="City", slug=slugify("city"))
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         self.kampala = Location.objects.create(name="Kampala", type=self.city, tree_parent=self.uganda)
         self.backend = Backend.objects.create(name='something')
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        self.ea.locations.add(self.kampala)
         self.investigator = Investigator.objects.create(name="investigator", mobile_number="123456789",
                                                         backend=self.backend,
-                                                        location=self.kampala)
+                                                        ea=self.ea)
 
         self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
                                                   uid=0)
@@ -538,8 +590,7 @@ class EditHouseholdDetailsTest(BaseTest):
     def test_post_edit__household_details(self):
         related_location = self.household.get_related_location()
         new_investigator = Investigator.objects.create(name="new Investigator", mobile_number="123553539",
-                                                       backend=self.backend,
-                                                       location=self.kampala)
+                                                       backend=self.backend, ea=self.ea)
 
         form_values = {'investigator': new_investigator.id, 'location': self.household.location.id, 'uid': self.household.uid}
         response = self.client.post('/households/%s/edit/' % self.household.id, data=form_values)

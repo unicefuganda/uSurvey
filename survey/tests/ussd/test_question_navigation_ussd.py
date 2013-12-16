@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question, BatchQuestionOrder, Survey, RandomHouseHoldSelection
+from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question, BatchQuestionOrder, Survey, RandomHouseHoldSelection, EnumerationArea
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd_survey import USSDSurvey
@@ -24,15 +24,18 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
             'response': "false"
         }
 
+        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         self.country = LocationType.objects.create(name='Country', slug='country')
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         self.district = LocationType.objects.create(name='District', slug='district')
         self.location = Location.objects.create(name="Kampala", type=self.district, tree_parent=self.uganda)
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        ea.locations.add(self.location)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
-                                                            COUNTRY_PHONE_CODE, ''), location=self.location,
+                                                            COUNTRY_PHONE_CODE, ''), ea=ea,
                                                         backend=Backend.objects.create(name='something'))
-        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
                                                   survey=self.open_survey, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, male=False, surname="Surname",

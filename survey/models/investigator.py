@@ -22,7 +22,7 @@ class Investigator(BaseModel):
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary',
                                           verbose_name="Highest level of education completed")
-    location = models.ForeignKey(Location, null=True)
+    ea = models.ForeignKey("EnumerationArea", null=True, related_name="enumeration_area")
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
                                 blank=False, default='English', verbose_name="Preferred language of communication")
     backend = models.ForeignKey(Backend, null=True, verbose_name="Connection")
@@ -281,7 +281,7 @@ class Investigator(BaseModel):
     @classmethod
     def lives_under_location(cls, location):
         locations = location.get_descendants(include_self=True)
-        return Investigator.objects.filter(location__in=locations)
+        return Investigator.objects.filter(ea__locations__in=locations)
 
     @classmethod
     def generate_completion_report(cls, survey, batch=None):
@@ -296,3 +296,8 @@ class Investigator(BaseModel):
                     row.extend(investigator.locations_in_hierarchy().values_list('name', flat=True))
                 data.append(row)
         return data
+
+    @property
+    def location(self):
+        ea_locations = self.ea.locations.all()[:1]
+        return None if not ea_locations.exists() else ea_locations[0]

@@ -7,7 +7,7 @@ from django.test import Client
 from rapidsms.contrib.locations.models import Location
 
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Backend, Survey, Investigator, Household, Batch, RandomHouseHoldSelection, QuestionModule, HouseholdMemberGroup, QuestionOption, Question, HouseholdHead, MultiChoiceAnswer, HouseholdMember, GroupCondition, BatchQuestionOrder, NumericalAnswer
+from survey.models import Backend, Survey, Investigator, Household, Batch, RandomHouseHoldSelection, QuestionModule, HouseholdMemberGroup, QuestionOption, Question, HouseholdHead, MultiChoiceAnswer, HouseholdMember, GroupCondition, BatchQuestionOrder, NumericalAnswer, EnumerationArea
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
 from survey.ussd.ussd_report_non_response import USSDReportNonResponse
@@ -31,13 +31,14 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         self.kampala = Location.objects.create(name="Kampala")
         self.entebbe = Location.objects.create(name="Entebbe")
 
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        self.ea.locations.add(self.kampala)
+
         self.batch.open_for_location(self.kampala)
 
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
-                                                            COUNTRY_PHONE_CODE, ''),
-                                                        location=self.kampala,
-                                                        backend=self.backend)
+                                                            COUNTRY_PHONE_CODE, ''), ea=self.ea, backend=self.backend)
 
         self.household1 = self.create_household(1)
         self.household2 = self.create_household(2)

@@ -6,7 +6,7 @@ from rapidsms.backends.database.models import BackendMessage
 from rapidsms.contrib.locations.models import Location, LocationType
 from mock import patch
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Backend, RandomHouseHoldSelection, Investigator, Survey
+from survey.models import Backend, RandomHouseHoldSelection, Investigator, Survey, EnumerationArea
 from survey.ussd.household_selection import HouseHoldSelection
 
 
@@ -23,16 +23,19 @@ class RandomHouseHoldSelectionTest(TestCase):
             'response': 'false'
         }
 
+        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        self.location_type = LocationType.objects.create(name="District", slug="district")
+        self.masaka = Location.objects.create(name="Masaka", type=self.location_type)
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        self.ea.locations.add(self.masaka)
+        mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+        Investigator.objects.create(name='Inv1', ea=self.ea, mobile_number=mobile_number,
+                                    backend=Backend.objects.create(name='Backend'))
+
+
     def test_selection(self):
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
-            location_type = LocationType.objects.create(name="District", slug="district")
-
-            Investigator.objects.create(name='Inv1', location=Location.objects.create(name='Kampala', type=location_type),
-                                        mobile_number=mobile_number, backend=Backend.objects.create(name='Backend'))
-
 
             response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
             response = self.client.get('/ussd', data=self.ussd_params)
@@ -51,6 +54,7 @@ class RandomHouseHoldSelectionTest(TestCase):
             self.assertEquals(RandomHouseHoldSelection.objects.count(), 1)
 
             household_selection = RandomHouseHoldSelection.objects.all()[0]
+            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
             self.assertEquals(household_selection.mobile_number, mobile_number)
             self.assertEquals(household_selection.no_of_households, 100)
             selected_households = household_selection.selected_households.split(',')
@@ -64,11 +68,6 @@ class RandomHouseHoldSelectionTest(TestCase):
         with patch.object(Survey, "currently_open_survey", return_value=open_survey):
             mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
             self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
-            location_type = LocationType.objects.create(name="District", slug="district")
-
-            Investigator.objects.create(name='Inv1', location=Location.objects.create(name='Kampala', type=location_type),
-                                        mobile_number=mobile_number, backend=Backend.objects.create(name='Backend'))
-
 
             response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
 
@@ -97,14 +96,8 @@ class RandomHouseHoldSelectionTest(TestCase):
             self.failIf(message)
 
     def test_less_than_ten_households_failure(self):
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
-            location_type = LocationType.objects.create(name="District", slug="district")
-
-            Investigator.objects.create(name='Inv1', location=Location.objects.create(name='Kampala', type=location_type),
-                                        mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), backend=Backend.objects.create(name='Backend'))
 
             response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
             response = self.client.get('/ussd', data=self.ussd_params)
@@ -131,6 +124,7 @@ class RandomHouseHoldSelectionTest(TestCase):
             self.failUnlessEqual(response.status_code, 200)
 
             household_selection = RandomHouseHoldSelection.objects.all()[0]
+            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
             self.assertEquals(household_selection.mobile_number, mobile_number)
             self.assertEquals(household_selection.no_of_households, 11)
             selected_households = household_selection.selected_households.split(',')
@@ -140,14 +134,9 @@ class RandomHouseHoldSelectionTest(TestCase):
             self.assertEquals(message.text, household_selection.text_message())
 
     def test_sort_household_selection_list(self):
-        open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        with patch.object(Survey, "currently_open_survey", return_value=open_survey):
+        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
             self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
-            location_type = LocationType.objects.create(name="District", slug="district")
-
-            Investigator.objects.create(name='Inv1', location=Location.objects.create(name='Kampala', type=location_type),
-                                        mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''), backend=Backend.objects.create(name='Backend'))
 
             response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
             response = self.client.get('/ussd', data=self.ussd_params)

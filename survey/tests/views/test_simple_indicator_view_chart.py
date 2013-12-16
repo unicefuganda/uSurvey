@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test.client import Client
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import HouseholdMemberGroup, GroupCondition, QuestionModule, Indicator, LocationTypeDetails, Batch
+from survey.models import HouseholdMemberGroup, GroupCondition, QuestionModule, Indicator, LocationTypeDetails, Batch, EnumerationArea
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
 
@@ -42,9 +42,15 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.batch = Batch.objects.create(order=1)
         backend = Backend.objects.create(name='BACKEND')
 
-        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="122000", location=self.kampala,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(self.kampala)
+
+        mbarara_ea = EnumerationArea.objects.create(name="EA3")
+        mbarara_ea.locations.add(self.mbarara)
+
+        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="122000", ea=ea,
                                                    backend=backend)
-        self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="3333331", location=self.mbarara,
+        self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="3333331", ea=mbarara_ea,
                                                      backend=backend)
 
         self.health_module = QuestionModule.objects.create(name="Health")

@@ -1,6 +1,6 @@
 from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Investigator, Backend
+from survey.models import Investigator, Backend, EnumerationArea, Survey
 from survey.models.locations import LocationCode
 from survey.tests.base_test import BaseTest
 
@@ -42,7 +42,11 @@ class LocationCodeTest(BaseTest):
         LocationCode.objects.create(location=kololo, code=kololo_code_value)
         LocationCode.objects.create(location=village, code=village_code_value)
         backend = Backend.objects.create(name="Backend")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(village)
+
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
-                                                   location=village, backend=backend)
+                                                   ea=ea, backend=backend)
         household_code_value = uganda_code_value + kampala_code_value + abim_code_value + kololo_code_value + village_code_value
         self.assertEqual(household_code_value, LocationCode.get_household_code(investigator))

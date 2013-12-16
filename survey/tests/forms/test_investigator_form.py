@@ -2,6 +2,7 @@ from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
 
 from survey.forms.investigator import *
+from survey.models import EnumerationArea, Survey
 from survey.models.backend import Backend
 
 
@@ -13,7 +14,10 @@ class InvestigatorFormTest(TestCase):
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
         self.location = kampala
+        self.survey = Survey.objects.create(name="hoho")
         self.backend = Backend.objects.create(name='something')
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        self.ea.locations.add(kampala)
 
     def test_valid(self):
         form_data = {
@@ -22,7 +26,7 @@ class InvestigatorFormTest(TestCase):
                         'male': 't',
                         'age': '20',
                         'level_of_education': 'Primary',
-                        'location': self.location.id,
+                        'ea': self.ea.id,
                         'language': 'Luganda',
                         'id': 200,
                         'confirm_mobile_number': '987654321',
@@ -42,7 +46,7 @@ class InvestigatorFormTest(TestCase):
                         'age': '20',
                         'level_of_education': 'Primary',
                         'language': 'Luganda',
-                        'location': self.location.id,
+                        'ea': self.ea.id,
                         'confirm_mobile_number': '987654321',
                         'backend': self.backend.pk,
                     }
@@ -62,7 +66,7 @@ class InvestigatorFormTest(TestCase):
                       'age': '20',
                       'level_of_education': 'Primary',
                       'language': 'Luganda',
-                      'location': self.location.id,
+                      'ea': self.ea.id,
                       'confirm_mobile_number': '123456789',
                       'backend': self.backend.pk,
                   }
@@ -83,7 +87,7 @@ class InvestigatorFormTest(TestCase):
                       'age': '20',
                       'level_of_education': 'Primary',
                       'language': 'Luganda',
-                      'location': self.location.id,
+                      'ea': self.ea.id,
                       'confirm_mobile_number': number_of_length_10,
                       'backend': self.backend.pk,
                   }
@@ -101,7 +105,7 @@ class InvestigatorFormTest(TestCase):
                       'age': '20',
                       'level_of_education': 'Primary',
                       'language': 'Luganda',
-                      'location': self.location.id,
+                      'ea': self.ea.id,
                       'confirm_mobile_number': '123456789',
                       'backend': self.backend.pk,
                   }

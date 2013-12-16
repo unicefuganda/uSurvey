@@ -6,7 +6,7 @@ from django.test.client import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, RandomHouseHoldSelection, Household, Survey
+from survey.models import Investigator, Backend, RandomHouseHoldSelection, Household, Survey, EnumerationArea
 from survey.tests.base_test import BaseTest
 
 from survey.ussd.ussd import USSD
@@ -32,11 +32,13 @@ class USSDTest(BaseTest):
         }
         self.backend = Backend.objects.create(name="Backend")
         self.location_type = LocationType.objects.create(name="District", slug="district")
+        self.kampala = Location.objects.create(name='Kampala', type=self.location_type)
+        self.ea = EnumerationArea.objects.create(name="EA2")
+        self.ea.locations.add(self.kampala)
 
     def test_url_without_open_survey_should_give_error_message(self):
-        Investigator.objects.create(name='Inv1', location=Location.objects.create(name='Kampala', type=self.location_type),
-                                        mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''),
-                                        backend=self.backend)
+        mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+        Investigator.objects.create(name='Inv1', ea=self.ea, mobile_number=mobile_number, backend=self.backend)
 
         response_message = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
         response = self.client.get('/ussd', data=self.ussd_params)
@@ -46,7 +48,7 @@ class USSDTest(BaseTest):
     def test_ussd_url(self):
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            Investigator.objects.create(name='Inv1', location=Location.objects.create(name='Kampala', type=self.location_type),
+            Investigator.objects.create(name='Inv1', ea=self.ea,
                                         mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''),
                                         backend=self.backend)
 
@@ -72,7 +74,7 @@ class USSDTest(BaseTest):
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         with patch.object(Survey, "currently_open_survey", return_value=open_survey):
             investigator = Investigator.objects.create(name='Investigator 1', mobile_number='776520831', male=True, age=32,
-                                                       backend=Backend.objects.create(name="Test"), is_blocked=True)
+                                                backend=Backend.objects.create(name="Test"), is_blocked=True, ea=self.ea)
             Household.objects.create(investigator=investigator, location=investigator.location,
                                      uid=0, random_sample_number=1, survey=open_survey)
             RandomHouseHoldSelection.objects.create(mobile_number='776520831', no_of_households=20,
@@ -91,9 +93,7 @@ class USSDTest(BaseTest):
             self):
         mobile_number = "123456789"
         investigator = Investigator.objects.create(mobile_number=mobile_number,
-                                                   location=Location.objects.create(name="Kampala",
-                                                                                    type=self.location_type),
-                                                   backend=self.backend)
+                                                   ea=self.ea, backend=self.backend)
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         with patch.object(Survey, "currently_open_survey", return_value=open_survey):
             with patch.object(RandomHouseHoldSelection, 'generate') as generate_method:

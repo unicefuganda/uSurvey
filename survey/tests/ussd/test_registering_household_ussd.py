@@ -8,7 +8,7 @@ from mock import patch
 from rapidsms.contrib.locations.models import Location
 
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule, QuestionOption, Survey, RandomHouseHoldSelection, Batch, UnknownDOBAttribute, HouseholdMember
+from survey.models import Investigator, Backend, Household, Question, HouseholdMemberGroup, HouseholdHead, QuestionModule, QuestionOption, Survey, RandomHouseHoldSelection, Batch, UnknownDOBAttribute, HouseholdMember, EnumerationArea
 from survey.tests.ussd.ussd_base_test import USSDBaseTest, FakeRequest
 from survey.ussd.ussd import USSD
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
@@ -32,10 +32,12 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.kampala = Location.objects.create(name="Kampala")
         self.entebbe = Location.objects.create(name="Entebbe")
 
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        self.ea.locations.add(self.kampala)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
-                                                            COUNTRY_PHONE_CODE, ''),
-                                                        location=self.kampala,
+                                                            COUNTRY_PHONE_CODE, ''), ea=self.ea,
                                                         backend=self.backend)
 
         self.household1 = self.create_household(1)

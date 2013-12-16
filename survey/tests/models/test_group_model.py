@@ -2,7 +2,7 @@ from datetime import date
 from random import randint
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Batch, BatchQuestionOrder, Survey, QuestionModule
+from survey.models import Batch, BatchQuestionOrder, Survey, EnumerationArea
 from survey.models.question import Question
 from survey.models.investigator import Investigator
 from survey.models.backend import Backend
@@ -106,8 +106,12 @@ class HouseholdMemberGroupTest(TestCase):
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, uid=0)
@@ -181,13 +185,18 @@ class SimpleIndicatorGroupCount(BaseTest):
         self.central = Location.objects.create(name="CENTRAL", type=self.region, tree_parent=self.uganda)
         self.kampala = Location.objects.create(name="Kampala", tree_parent=self.central, type=self.district)
         self.mbarara = Location.objects.create(name="Mbarara", tree_parent=self.west, type=self.district)
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        ea.locations.add(self.kampala)
+
+        mbarara_ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        mbarara_ea.locations.add(self.mbarara)
 
         backend = Backend.objects.create(name='something')
 
-        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.kampala,
+        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                         backend=backend)
         self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331",
-                                                          location=self.mbarara,
+                                                          ea=mbarara_ea,
                                                           backend=backend)
 
         self.general_group = HouseholdMemberGroup.objects.create(name="GENERAL", order=2)

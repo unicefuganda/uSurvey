@@ -2,7 +2,7 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
-from survey.models import Investigator, Backend, HouseholdMemberGroup, GroupCondition, Household, Batch, NumericalAnswer, Question, AnswerRule, QuestionOption, MultiChoiceAnswer, BatchQuestionOrder, Answer
+from survey.models import Investigator, Backend, HouseholdMemberGroup, GroupCondition, Household, Batch, NumericalAnswer, Question, AnswerRule, QuestionOption, MultiChoiceAnswer, BatchQuestionOrder, Answer, EnumerationArea
 from survey.models.households import HouseholdMember
 
 
@@ -10,8 +10,10 @@ class AnswerRuleTest(TestCase):
 
     def setUp(self):
         self.location = Location.objects.create(name="Kampala")
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        ea.locations.add(self.location)
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
-                                                        location=self.location,
+                                                        ea=ea,
                                                         backend=Backend.objects.create(name='something'))
 
         self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)

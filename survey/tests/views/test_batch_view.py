@@ -3,7 +3,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.investigator_configs import PRIME_LOCATION_TYPE
-from survey.models import HouseholdMemberGroup, QuestionModule, Investigator, GroupCondition, BatchQuestionOrder
+from survey.models import HouseholdMemberGroup, QuestionModule, Investigator, GroupCondition, BatchQuestionOrder, EnumerationArea
 from survey.models.households import HouseholdMember, Household
 from survey.models.surveys import Survey
 from survey.models.question import Question
@@ -37,6 +37,8 @@ class BatchViewsTest(BaseTest):
         self.kamoja = Location.objects.create(name="kamoja", type=village, tree_parent=self.bukoto)
         self.abim = Location.objects.create(name="Abim", type=district, tree_parent=self.uganda)
         self.batch.open_for_location(self.abim)
+
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
 
     def test_get_index(self):
         response = self.client.get('/surveys/%d/batches/' % self.survey.id)
@@ -282,7 +284,9 @@ class BatchViewsTest(BaseTest):
         self.failUnless(recovered_batch)
 
     def test_should_not_delete_batch_if_batches_questions_have_been_responded_to(self):
-        investigator = Investigator.objects.create(mobile_number="123456789", name="Rajni", location=self.kampala)
+        self.ea.locations.add(self.kampala)
+
+        investigator = Investigator.objects.create(mobile_number="123456789", name="Rajni", ea=self.ea)
         household = Household.objects.create(investigator=investigator, location=investigator.location)
         member = HouseholdMember.objects.create(surname="haha", date_of_birth=date(1990, 02, 01), household=household)
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)

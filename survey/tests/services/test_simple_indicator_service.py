@@ -1,12 +1,13 @@
 from random import randint
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Backend, Investigator, QuestionModule, Question, QuestionOption, Indicator, Formula, Household, HouseholdHead, Batch, MultiChoiceAnswer, HouseholdMemberGroup, Survey, GroupCondition
+from survey.models import Backend, Investigator, QuestionModule, Question, QuestionOption, Indicator, Formula, Household, HouseholdHead, Batch, MultiChoiceAnswer, HouseholdMemberGroup, Survey, GroupCondition, EnumerationArea
 from survey.services.simple_indicator_service import SimpleIndicatorService
 from survey.tests.base_test import BaseTest
 
 
 class MultiChoiceQuestionSimpleIndicatorServiceTest(BaseTest):
     def setUp(self):
+        self.survey = Survey.objects.create(name="haha")
         self.batch = Batch.objects.create(order=1)
         self.country = LocationType.objects.create(name="Country", slug="country")
         self.region = LocationType.objects.create(name="Region", slug="region")
@@ -17,13 +18,17 @@ class MultiChoiceQuestionSimpleIndicatorServiceTest(BaseTest):
         self.central = Location.objects.create(name="CENTRAL", type=self.region, tree_parent=self.uganda)
         self.kampala = Location.objects.create(name="Kampala", tree_parent=self.central, type=self.district)
         self.mbarara = Location.objects.create(name="Mbarara", tree_parent=self.west, type=self.district)
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        self.ea.locations.add(self.kampala)
+        self.mbarara_ea = EnumerationArea.objects.create(name="EA3", survey=self.survey)
+        self.mbarara_ea.locations.add(self.mbarara)
 
 
         backend = Backend.objects.create(name='something')
 
-        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.kampala,
+        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=self.ea,
                                                    backend=backend)
-        self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331", location=self.mbarara,
+        self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331", ea=self.mbarara_ea,
                                                      backend=backend)
 
         health_module = QuestionModule.objects.create(name="Health")
@@ -110,14 +115,18 @@ class GroupCountSimpleIndicatorServiceTest(BaseTest):
         self.central = Location.objects.create(name="CENTRAL", type=self.region, tree_parent=self.uganda)
         self.kampala = Location.objects.create(name="Kampala", tree_parent=self.central, type=self.district)
         self.mbarara = Location.objects.create(name="Mbarara", tree_parent=self.west, type=self.district)
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        self.ea.locations.add(self.kampala)
+        self.mbarara_ea = EnumerationArea.objects.create(name="EA3", survey=self.survey)
+        self.mbarara_ea.locations.add(self.mbarara)
 
         backend = Backend.objects.create(name='something')
 
         health_module = QuestionModule.objects.create(name="Health")
-        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.kampala,
+        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=self.ea,
                                                         backend=backend)
         self.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331",
-                                                          location=self.mbarara,
+                                                          ea=self.mbarara_ea,
                                                           backend=backend)
 
         self.general_group = HouseholdMemberGroup.objects.create(name="GENERAL", order=2)

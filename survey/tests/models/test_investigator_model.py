@@ -5,7 +5,7 @@ from mock import patch
 from django.db import IntegrityError, DatabaseError
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
-from survey.models import AnswerRule, HouseholdHead, BatchQuestionOrder, LocationCode
+from survey.models import AnswerRule, HouseholdHead, BatchQuestionOrder, LocationCode, EnumerationArea, LocationTypeDetails
 
 from survey.models.batch import Batch
 from survey.investigator_configs import COUNTRY_PHONE_CODE
@@ -23,14 +23,18 @@ class InvestigatorTest(TestCase):
         self.member_group = HouseholdMemberGroup.objects.create(name="Greater than 2 years", order=1)
         self.condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         self.condition.groups.add(self.member_group)
+        self.survey = Survey.objects.create(name="haha")
         self.backend = Backend.objects.create(name='something')
         self.kampala = Location.objects.create(name="Kampala")
+        self.ea = EnumerationArea.objects.create(name="EA1", survey=self.survey)
+        self.ea.locations.add(self.kampala)
+
         self.investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                        location=self.kampala,
+                                                        ea=self.ea,
                                                         backend=self.backend)
 
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
-                                                  uid=0)
+        self.household = Household.objects.create(investigator=self.investigator,
+                                                  location=self.investigator.ea.locations.all()[0], uid=0)
 
         self.household_member = HouseholdMember.objects.create(surname="Member",
                                                                date_of_birth=date(1980, 2, 2), male=False,
@@ -41,12 +45,12 @@ class InvestigatorTest(TestCase):
         fields = [str(item.attname) for item in investigator._meta.fields]
         self.assertEqual(len(fields), 13)
         for field in ['id', 'name', 'mobile_number', 'created', 'modified', 'male', 'age', 'level_of_education',
-                      'location_id', 'language', 'backend_id', 'weights', 'is_blocked']:
+                      'ea_id', 'language', 'backend_id', 'weights', 'is_blocked']:
             self.assertIn(field, fields)
 
     def test_store(self):
         investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321",
-                                                   location=self.kampala,
+                                                   ea=self.ea,
                                                    backend=self.backend, weights=30.99)
         self.failUnless(investigator.id)
         self.failUnless(investigator.created)
@@ -66,8 +70,11 @@ class InvestigatorTest(TestCase):
         city = LocationType.objects.create(name="City", slug=slugify("city"))
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        ea = EnumerationArea.objects.create(name="EA1", survey=self.survey)
+        ea.locations.add(kampala)
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
-                                                   location=kampala, backend=self.backend)
+                                                   ea=ea, backend=self.backend)
+        ea.locations.add(kampala)
         self.assertEquals(investigator.location_hierarchy(), {'Country': uganda, 'City': kampala})
 
     def test_locations_in_hierarchy(self):
@@ -75,8 +82,10 @@ class InvestigatorTest(TestCase):
         city = LocationType.objects.create(name="City", slug=slugify("city"))
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        ea = EnumerationArea.objects.create(name="EA1", survey=self.survey)
+        ea.locations.add(kampala)
         investigator = Investigator.objects.create(name="investigator name", mobile_number="9876543210",
-                                                   location=kampala, backend=self.backend)
+                                                   ea=ea, backend=self.backend)
         location_hierarchy = investigator.locations_in_hierarchy()
         self.assertEqual(2, len(location_hierarchy))
         self.assertIn(kampala, location_hierarchy)
@@ -219,7 +228,9 @@ class InvestigatorTest(TestCase):
 
     def test_should_know_how_to_remove_all_households_that_do_not_belong_to_investigators_location(self):
         entebbe = Location.objects.create(name="Entebbe")
-        self.investigator.location = entebbe
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        ea.locations.add(entebbe)
+        self.investigator.ea = ea
         self.investigator.save()
 
         self.investigator.remove_invalid_households()
@@ -243,7 +254,7 @@ class InvestigatorTest(TestCase):
         masaka = Location.objects.create(name="Masaka")
         investigator = Investigator.objects.create(name="Another investigator",
                                                    mobile_number='779432679',
-                                                   location=masaka,
+                                                   ea=self.ea,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10')
@@ -258,7 +269,7 @@ class InvestigatorTest(TestCase):
         masaka = Location.objects.create(name="Masaka")
         investigator = Investigator.objects.create(name="Another investigator",
                                                    mobile_number='779432679',
-                                                   location=masaka,
+                                                   ea=self.ea,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10')
@@ -270,7 +281,7 @@ class InvestigatorTest(TestCase):
         TIMEOUT_MINUTES = 5
         investigator = Investigator.objects.create(name="Another investigator",
                                                    mobile_number='779432679',
-                                                   location=masaka,
+                                                   ea=self.ea,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10')
@@ -287,7 +298,7 @@ class InvestigatorTest(TestCase):
         TIMEOUT_MINUTES = 5
         investigator = Investigator.objects.create(name="Another investigator",
                                                    mobile_number='779432679',
-                                                   location=masaka,
+                                                   ea=self.ea,
                                                    backend=self.backend)
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         closed_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
@@ -307,7 +318,7 @@ class InvestigatorTest(TestCase):
         TIMEOUT_MINUTES = 5
         investigator = Investigator.objects.create(name="Another investigator",
                                                    mobile_number='779432679',
-                                                   location=masaka,
+                                                   ea=self.ea,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10')
@@ -330,7 +341,7 @@ class InvestigatorTest(TestCase):
         TIMEOUT_MINUTES = 5
         investigator = Investigator.objects.create(name="Another investigator",
                                                    mobile_number='779432679',
-                                                   location=masaka,
+                                                   ea=self.ea,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10')
@@ -364,6 +375,16 @@ class InvestigatorTest(TestCase):
 
         self.assertFalse(self.investigator.can_report_non_response())
 
+    def test_investigator_knows_its_location_from_its_ea(self):
+        self.assertEqual(self.kampala, self.investigator.location)
+
+    def test_returns_none_if_its_ea_has_no_location(self):
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        investigator = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210", backend=self.backend, ea=ea)
+        self.assertEqual(None, investigator.location)
+
+    def test_location_property(self):
+        self.assertEqual(self.kampala, self.investigator.location)
 
 class InvestigatorGenerateReport(TestCase):
     def setUp(self):
@@ -377,18 +398,23 @@ class InvestigatorGenerateReport(TestCase):
 
         self.backend = Backend.objects.create(name='something')
         self.survey = Survey.objects.create(name='SurveyA')
+
+        self.ea = EnumerationArea.objects.create(name="EA1", survey=self.survey)
+        self.ea_2 = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        self.ea.locations.add(kampala)
+        self.ea_2.locations.add(some_city)
         self.batch = Batch.objects.create(order=1, name='somebatch', survey=self.survey)
         self.batch.open_for_location(self.abim)
 
         self.investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
-                                                          location=kampala, backend=self.backend)
+                                                          ea=self.ea, backend=self.backend)
         self.household_1 = Household.objects.create(investigator=self.investigator_1, location=kampala,
                                                     survey=self.survey)
         self.household_2 = Household.objects.create(investigator=self.investigator_1, location=kampala,
                                                     survey=self.survey)
 
         self.investigator_2 = Investigator.objects.create(name="investigator name_2", mobile_number="9876543211",
-                                                          location=some_city, backend=self.backend)
+                                                          ea=self.ea_2, backend=self.backend)
 
     def test_should_return_headers_when_generate_report_called(self):
         Investigator.objects.all().delete()

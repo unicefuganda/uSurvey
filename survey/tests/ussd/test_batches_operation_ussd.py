@@ -8,7 +8,7 @@ from django.test.client import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import HouseholdMemberGroup, GroupCondition, BatchQuestionOrder, Survey, RandomHouseHoldSelection
+from survey.models import HouseholdMemberGroup, GroupCondition, BatchQuestionOrder, Survey, RandomHouseHoldSelection, EnumerationArea
 from survey.models.backend import Backend
 from survey.models.household_batch_completion import HouseholdMemberBatchCompletion
 from survey.models.batch import Batch
@@ -33,10 +33,15 @@ class USSDOpenBatchTest(USSDBaseTest):
             'response': "false"
         }
         self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        city = LocationType.objects.create(name="City")
+        self.mbarara = Location.objects.create(name="Mbarara", type=city)
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        self.ea.locations.add(self.mbarara)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''),
-                                                        location=Location.objects.create(name="Kampala"),
+                                                        ea=self.ea,
                                                         backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
                                                   survey=self.open_survey, uid=0)
@@ -73,11 +78,14 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         self.district = LocationType.objects.create(name='District', slug='district')
         self.location = Location.objects.create(name="Kampala", type=self.district, tree_parent=self.uganda)
+        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        self.ea.locations.add(self.location)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
-                                                            COUNTRY_PHONE_CODE, ''), location=self.location,
+                                                            COUNTRY_PHONE_CODE, ''), ea=self.ea,
                                                         backend=Backend.objects.create(name='something'))
-        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
 
         self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
                                                   survey=self.open_survey, uid=0)

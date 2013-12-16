@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 from django.test import TestCase
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, NumericalAnswer, BatchQuestionOrder, Survey
+from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, NumericalAnswer, BatchQuestionOrder, Survey, EnumerationArea
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -20,8 +20,12 @@ class HouseholdTest(TestCase):
         self.city = LocationType.objects.create(name="City", slug=slugify("city"))
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         self.kampala = Location.objects.create(name="Kampala", type=self.city, tree_parent=self.uganda)
+        self.survey = Survey.objects.create(name="huhu")
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        self.ea.locations.add(self.kampala)
+
         self.investigator = Investigator.objects.create(name="", mobile_number="123456788",
-                                                        location=self.kampala,
+                                                        ea=self.ea,
                                                         backend=self.backend)
 
         self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
@@ -79,9 +83,12 @@ class HouseholdTest(TestCase):
         some_sub_county = Location.objects.create(name="Some sub county", type=sub_county, tree_parent=bukoto_county)
         some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
         some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(some_village)
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
-                                                    location=some_village,
+                                                    ea=ea,
                                                     backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
@@ -102,9 +109,12 @@ class HouseholdTest(TestCase):
         some_sub_county = Location.objects.create(name="Some sub county", type=sub_county, tree_parent=bukoto_county)
         some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
         some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(some_village)
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
-                                                    location=some_village,
+                                                    ea=ea,
                                                     backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
@@ -155,9 +165,12 @@ class HouseholdTest(TestCase):
         some_sub_county = Location.objects.create(name="Some sub county", type=sub_county, tree_parent=bukoto_county)
         some_parish = Location.objects.create(name="Some parish", type=parish, tree_parent=some_sub_county)
         some_village = Location.objects.create(name="Some village", type=village, tree_parent=some_parish)
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(some_village)
 
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
-                                                    location=some_village,
+                                                    ea=ea,
                                                     backend=Backend.objects.create(name='something1'))
 
         household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
@@ -196,8 +209,12 @@ class HouseholdTest(TestCase):
     def test_should_know_if_all_members_have_completed_currently_open_batches(self):
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
         hhold = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
         household_head = HouseholdHead.objects.create(household=hhold, surname="Name", date_of_birth=date(1989, 2, 2))
@@ -238,8 +255,12 @@ class HouseholdTest(TestCase):
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, uid=0)
@@ -410,7 +431,7 @@ class HouseholdTest(TestCase):
         self.assertTrue(self.household.has_completed_batches([batch]))
 
     def test_knows_to_mark_answers_as_old(self):
-        investigator = Investigator.objects.create(name="inv1", location=self.kampala,
+        investigator = Investigator.objects.create(name="inv1", ea=self.ea,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=self.kampala, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),

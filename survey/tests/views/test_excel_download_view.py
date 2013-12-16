@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group, Permission
 
 from django.contrib.contenttypes.models import ContentType
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import GroupCondition, HouseholdMemberGroup, BatchQuestionOrder, UnknownDOBAttribute
+from survey.models import GroupCondition, HouseholdMemberGroup, BatchQuestionOrder, UnknownDOBAttribute, EnumerationArea
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household, HouseholdMember
 from survey.models.backend import Backend
@@ -159,15 +159,18 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         uganda = Location.objects.create(name="Uganda", type=country)
         abim = Location.objects.create(name="Abim", type=district, tree_parent=uganda)
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=abim)
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        ea.locations.add(kampala)
+
 
         backend = Backend.objects.create(name='something')
         survey = Survey.objects.create(name='SurveyA')
         batch = Batch.objects.create(name='Batch A')
 
         investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
-                                                     location=kampala, backend=backend)
+                                                     ea=ea, backend=backend)
         investigator_2 = Investigator.objects.create(name="investigator AYOYO", mobile_number="987654210",
-                                                     location=kampala, backend=backend)
+                                                     ea=ea, backend=backend)
 
         household_1 = Household.objects.create(investigator=investigator_1, location=kampala, survey=survey)
         household_2 = Household.objects.create(investigator=investigator_2, location=kampala, survey=survey)

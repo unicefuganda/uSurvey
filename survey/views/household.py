@@ -33,7 +33,7 @@ def _add_error_response_message(householdform, request):
 
 def validate_investigator(request, householdform, posted_locations):
     investigator_form = {'value': '', 'text': '', 'error': '',
-                         'options': Investigator.objects.filter(location__in=posted_locations)}
+                         'options': Investigator.objects.filter(ea__locations__in=posted_locations)}
     investigator = None
     try:
         investigator = Investigator.objects.get(id=int(request.POST['investigator']))
@@ -171,7 +171,7 @@ def new(request):
 @login_required
 def get_investigators(request):
     location = request.GET['location'] if request.GET.has_key('location') and request.GET['location'] else None
-    investigators = Investigator.objects.filter(location=location, is_blocked=False)
+    investigators = Investigator.objects.filter(ea__locations=location, is_blocked=False)
     investigator_hash = {}
     for investigator in investigators:
         investigator_hash[investigator.name] = investigator.id
@@ -190,7 +190,7 @@ def list_households(request):
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))
         corresponding_locations = selected_location.get_descendants(include_self=True)
-        investigators = Investigator.objects.filter(location__in=corresponding_locations)
+        investigators = Investigator.objects.filter(ea__locations__in=corresponding_locations)
         households = Household.objects.filter(investigator__in=investigators)
     households = Household.set_related_locations(households)
     if not households:
@@ -212,7 +212,7 @@ def edit_household(request, household_id):
     response = None
     uid = household_selected.uid
     household_form = set_household_form(is_edit=True, instance=household_selected)
-    investigators = Investigator.objects.filter(location=selected_location, is_blocked=False)
+    investigators = Investigator.objects.filter(ea__locations=selected_location, is_blocked=False)
     investigator_form = {'value': '', 'text': '',
                          'options': investigators,
                          'error': ''}

@@ -1,5 +1,6 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
+from survey.models import EnumerationArea
 
 from survey.models.batch import Batch
 from survey.models.backend import Backend
@@ -10,8 +11,11 @@ from survey.models.question import Question, QuestionOption, NumericalAnswer, Te
 
 class NumericalAnswerTest(TestCase):
     def test_store(self):
+        kampala = Location.objects.create(name="Kampala")
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        ea.locations.add(kampala)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
-                                                   location=Location.objects.create(name="Kampala"),
+                                                   ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
@@ -24,8 +28,11 @@ class NumericalAnswerTest(TestCase):
 
 class TextAnswerTest(TestCase):
     def test_store(self):
+        kampala = Location.objects.create(name="Kampala")
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        ea.locations.add(kampala)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
-                                                   location=Location.objects.create(name="Kampala"),
+                                                   ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
@@ -38,8 +45,11 @@ class TextAnswerTest(TestCase):
 
 class MultiChoiceAnswerTest(TestCase):
     def test_store(self):
+        kampala = Location.objects.create(name="Kampala")
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        ea.locations.add(kampala)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
-                                                   location=Location.objects.create(name="Kampala"),
+                                                   ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         household = Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)
@@ -52,8 +62,11 @@ class MultiChoiceAnswerTest(TestCase):
         self.failUnless(answer.id)
 
     def test_pagination(self):
+        kampala = Location.objects.create(name="Kampala")
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        ea.locations.add(kampala)
         investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",
-                                                   location=Location.objects.create(name="Kampala"),
+                                                   ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         Household.objects.create(investigator=investigator, uid=0)
         batch = Batch.objects.create(order=1)

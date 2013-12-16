@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdMemberBatchCompletion, QuestionModule, BatchQuestionOrder, Survey, RandomHouseHoldSelection, QuestionOption, MultiChoiceAnswer
+from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdMemberBatchCompletion, QuestionModule, BatchQuestionOrder, Survey, RandomHouseHoldSelection, QuestionOption, MultiChoiceAnswer, EnumerationArea
 from survey.models.households import HouseholdMember
 from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.ussd import USSD
@@ -36,13 +36,18 @@ class USSDTestCompleteFlow(USSDBaseTest):
             'ussdRequestString': '',
             'response': "false"
         }
+        self.open_survey_1 = Survey.objects.create(name="open survey one", description="open survey", has_sampling=True)
+
         self.kampala = Location.objects.create(name="Kampala")
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey_1)
+        self.ea.locations.add(self.kampala)
+
+
         self.backend = Backend.objects.create(name='test')
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''),
-                                                        location=self.kampala,
-                                                        backend=self.backend)
+                                                        ea=self.ea, backend=self.backend)
 
         self.head_group = HouseholdMemberGroup.objects.create(name="General", order=1)
         self.condition = GroupCondition.objects.create(value='HEAD', attribute="GENERAL", condition="EQUALS")
@@ -51,8 +56,6 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.member_group = HouseholdMemberGroup.objects.create(name="Less than 10", order=2)
         self.member_condition = GroupCondition.objects.create(value=10, attribute="AGE", condition="LESS_THAN")
         self.member_condition.groups.add(self.member_group)
-
-        self.open_survey_1 = Survey.objects.create(name="open survey one", description="open survey", has_sampling=True)
 
         self.household_head_1 = self.create_household_head(0)
         self.household_head_2 = self.create_household_head(1)
@@ -412,10 +415,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
     def test_renders_no_households_message_if_investigator_is_in_open_survey_location_but_has_no_households(self):
         entebbe = Location.objects.create(name="Entebbe")
         another_open_survey = Survey.objects.create(name="another open survey", description="open survey", has_sampling=True)
+        ea = EnumerationArea.objects.create(name="EA2", survey=another_open_survey)
+        ea.locations.add(entebbe)
 
-        investigator = Investigator.objects.create(name="new investigator",
-                                                        mobile_number='123406489',
-                                                        location=entebbe,
+        investigator = Investigator.objects.create(name="new investigator", mobile_number='123406489', ea=ea,
                                                         backend=self.backend)
 
         Household.objects.create(investigator=investigator, location=investigator.location,
@@ -580,10 +583,12 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
     def test_ussd_answers_yes_on_resume_if_investigator_dials_when_all_households_are_complete(self):
+
         masaka = Location.objects.create(name="Masaka")
-        investigator = Investigator.objects.create(name="Another investigator",
-                                                   mobile_number='779432679',
-                                                   location=masaka,
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey_1)
+        ea.locations.add(masaka)
+
+        investigator = Investigator.objects.create(name="Another investigator", mobile_number='779432679', ea=ea,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10', survey=self.open_survey_1)
@@ -638,9 +643,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
     def test_ussd_answer_no_on_resume_if_investigator_dials_when_all_households_are_complete(self):
         masaka = Location.objects.create(name="Masaka")
-        investigator = Investigator.objects.create(name="Another investigator",
-                                                   mobile_number='779432679',
-                                                   location=masaka,
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey_1)
+        ea.locations.add(masaka)
+
+        investigator = Investigator.objects.create(name="Another investigator", mobile_number='779432679', ea=ea,
                                                    backend=self.backend)
         investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
@@ -683,9 +689,10 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
     def test_resume_message_if_investigator_dials_after_completing_registering_a_household(self):
         masaka = Location.objects.create(name="Masaka")
-        investigator = Investigator.objects.create(name="Another investigator",
-                                                   mobile_number='779432679',
-                                                   location=masaka,
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey_1)
+        ea.locations.add(masaka)
+
+        investigator = Investigator.objects.create(name="Another investigator", mobile_number='779432679', ea=ea,
                                                    backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10', survey=self.open_survey_1)
@@ -759,10 +766,12 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
     def test_knows_how_to_get_questions_for_non_head_member(self):
         masaka = Location.objects.create(name="Masaka")
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey_1)
+        ea.locations.add(masaka)
+
         investigator = Investigator.objects.create(name="Another investigator",
                                                    mobile_number='779432679',
-                                                   location=masaka,
-                                                   backend=self.backend)
+                                                   ea=ea, backend=self.backend)
         household = Household.objects.create(investigator=investigator, location=investigator.location,
                                              uid='10', survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,

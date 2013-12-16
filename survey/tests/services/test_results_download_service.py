@@ -1,6 +1,6 @@
 from datetime import date
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Survey, HouseholdMember, Batch, Investigator, Backend, HouseholdMemberGroup, QuestionModule, Question, BatchQuestionOrder, LocationTypeDetails, QuestionOption, GroupCondition
+from survey.models import Survey, HouseholdMember, Batch, Investigator, Backend, HouseholdMemberGroup, QuestionModule, Question, BatchQuestionOrder, LocationTypeDetails, QuestionOption, GroupCondition, EnumerationArea
 from survey.services.results_download_service import ResultsDownloadService
 from survey.tests.base_test import BaseTest
 
@@ -28,7 +28,9 @@ class ResultsDownloadServiceTest(BaseTest):
         self.kampala = Location.objects.create(name="Kampala", type=self.district, tree_parent=uganda)
         self.batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
         backend = Backend.objects.create(name='something')
-        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=self.kampala,
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        self.ea.locations.add(self.kampala)
+        self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=self.ea,
                                                         backend=backend)
 
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)

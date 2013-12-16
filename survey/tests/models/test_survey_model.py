@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.surveys import SurveyForm
-from survey.models import Batch, Investigator, Backend, Household, HouseholdHead, HouseholdMemberBatchCompletion
+from survey.models import Batch, Investigator, Backend, Household, HouseholdHead, HouseholdMemberBatchCompletion, EnumerationArea
 from survey.models.households import HouseholdMember
 from survey.models.surveys import Survey
 
@@ -25,9 +25,14 @@ class SurveyTest(TestCase):
         self.assertTrue(survey.has_sampling)
 
     def test_survey_knows_it_is_open(self):
+        survey = Survey.objects.create(name="survey name", description="rajni survey")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        kampala=Location.objects.create(name="Kampala")
+        ea.locations.add(kampala)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number='123456789',
-                                                        location=Location.objects.create(name="Kampala"),
+                                                        ea=ea,
                                                         backend=Backend.objects.create(name='something'))
 
         survey = Survey.objects.create(name="survey name", description="rajni survey")
@@ -38,9 +43,14 @@ class SurveyTest(TestCase):
         self.assertTrue(survey.is_open())
 
     def test_survey_knows_it_is_open_for_investigator_location_if_provided(self):
+        survey = Survey.objects.create(name="survey name", description="rajni survey")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        kampala=Location.objects.create(name="Kampala")
+        ea.locations.add(kampala)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number='123456789',
-                                                        location=Location.objects.create(name="Kampala"),
+                                                        ea=ea,
                                                         backend=Backend.objects.create(name='something'))
 
         survey = Survey.objects.create(name="survey name", description="rajni survey")
@@ -52,12 +62,16 @@ class SurveyTest(TestCase):
         self.assertTrue(survey.is_open(investigator_location))
 
     def test_survey_knows_it_is_not_open_for_investigator_location_if_provided(self):
+        survey = Survey.objects.create(name="survey name", description="rajni survey")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        kampala=Location.objects.create(name="Kampala")
+        ea.locations.add(kampala)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number='123456789',
-                                                        location=Location.objects.create(name="Kampala"),
+                                                        ea=ea,
                                                         backend=Backend.objects.create(name='something'))
 
-        survey = Survey.objects.create(name="survey name", description="rajni survey")
         batch = Batch.objects.create(order=1, survey=survey)
 
         not_investigator_location = Location.objects.create(name="Abim")
@@ -66,9 +80,14 @@ class SurveyTest(TestCase):
         self.assertFalse(survey.is_open(self.investigator.location))
 
     def test_survey_knows_it_is_closed(self):
+        survey = Survey.objects.create(name="survey name", description="rajni survey")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        kampala=Location.objects.create(name="Kampala")
+        ea.locations.add(kampala)
+
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number='123456789',
-                                                        location=Location.objects.create(name="Kampala"),
+                                                        ea=ea,
                                                         backend=Backend.objects.create(name='something'))
 
         survey = Survey.objects.create(name="survey name", description="rajni survey")
@@ -190,15 +209,15 @@ class SurveyTest(TestCase):
 
         survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         backend = Backend.objects.create(name='something')
-        investigator = Investigator.objects.create(name="investigator name",
-                                                   mobile_number='448447474',
-                                                   location=kampala,
+
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.create(name="investigator name", mobile_number='448447474', ea=ea,
                                                    backend=backend)
 
-        investigator_2 = Investigator.objects.create(name="investigator name",
-                                                     mobile_number='448447422',
-                                                     location=kampala,
-                                                     backend=backend)
+        investigator_2 = Investigator.objects.create(name="investigator name", mobile_number='448447422',
+                                                     ea=ea, backend=backend)
 
         household = Household.objects.create(investigator=investigator, survey=survey, location=investigator.location,
                                              uid=1)

@@ -84,7 +84,7 @@ def list_investigators(request):
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))
         corresponding_locations = selected_location.get_descendants(include_self=True)
-        investigators = Investigator.objects.filter(location__in=corresponding_locations)
+        investigators = Investigator.objects.filter(ea__locations__in=corresponding_locations)
 
     if not investigators:
         location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'

@@ -6,7 +6,7 @@ from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.models import User
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Backend, Household, LocationTypeDetails
+from survey.models import Backend, Household, LocationTypeDetails, EnumerationArea
 from survey.models.investigator import Investigator
 
 from survey.tests.base_test import BaseTest
@@ -101,6 +101,9 @@ class InvestigatorsViewTest(InvestigatorTest):
     def test_create_investigators_success(self):
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
         backend = Backend.objects.create(name='something')
         form_data = {
             'name': 'Rajini',
@@ -110,11 +113,12 @@ class InvestigatorsViewTest(InvestigatorTest):
             'level_of_education': 'Nursery',
             'language': 'Luganda',
             'country': uganda.id,
-            'location': uganda.id,
+            'ea': ea.id,
             'backend': backend.id,
             'confirm_mobile_number': '987654321',
         }
-        investigator = Investigator.objects.filter(name=form_data['name'], backend = Backend.objects.create(name='something1'))
+        investigator = Investigator.objects.filter(name=form_data['name'], ea=ea,
+                                                   backend = Backend.objects.create(name='something1'))
         self.failIf(investigator)
         response = self.client.post('/investigators/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 302) # ensure redirection to list investigator page
@@ -202,7 +206,10 @@ class InvestigatorsViewTest(InvestigatorTest):
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
 
-        investigator = Investigator.objects.filter(location=kampala).delete()
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.filter(ea=ea).delete()
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -231,9 +238,20 @@ class InvestigatorsViewTest(InvestigatorTest):
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
         bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
 
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=uganda, backend = Backend.objects.create(name='something1'))
-        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", location=kampala, backend = Backend.objects.create(name='something2'))
-        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", location=bukoto, backend = Backend.objects.create(name='something3'))
+        uganda_ea = EnumerationArea.objects.create(name="EA2")
+        uganda_ea.locations.add(uganda)
+        kampala_ea = EnumerationArea.objects.create(name="EA3")
+        kampala_ea.locations.add(uganda)
+        bukoto_ea = EnumerationArea.objects.create(name="EA2")
+        bukoto_ea.locations.add(uganda)
+
+
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", ea=uganda_ea,
+                                                    backend = Backend.objects.create(name='something1'))
+        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", ea=kampala_ea,
+                                                    backend = Backend.objects.create(name='something2'))
+        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", ea=bukoto_ea,
+                                                    backend = Backend.objects.create(name='something3'))
 
         response = self.client.get("/investigators/?location=" + str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
@@ -295,7 +313,11 @@ class EditInvestigatorPage(InvestigatorTest):
         LocationTypeDetails.objects.create(country=uganda, location_type=city)
 
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
-        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789",
+                                                   backend = Backend.objects.create(name='something'), ea=ea)
         response = self.client.get('/investigators/' + str(investigator.id) + '/edit/')
         self.assertEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -315,6 +337,9 @@ class EditInvestigatorPage(InvestigatorTest):
     def test_edit_post(self):
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
         backend = Backend.objects.create(name='something')
         data = {
             'name': 'Rajni',
@@ -323,7 +348,7 @@ class EditInvestigatorPage(InvestigatorTest):
             'age': '20',
             'level_of_education': 'Nursery',
             'language': 'Luganda',
-            'location': uganda,
+            'ea': ea,
             'backend': backend,
             }
         investigator = Investigator.objects.create(**data)
@@ -334,7 +359,7 @@ class EditInvestigatorPage(InvestigatorTest):
             'age': '23',
             'level_of_education': 'Primary',
             'language': 'Luganda',
-            'location': uganda.id,
+            'ea': ea.id,
             'backend': backend.id,
             'confirm_mobile_number': investigator.mobile_number
         }
@@ -359,6 +384,9 @@ class BlockInvestigatorTest(InvestigatorTest):
 
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
         backend = Backend.objects.create(name='something')
         data = {
             'name': 'Rajni',
@@ -367,7 +395,7 @@ class BlockInvestigatorTest(InvestigatorTest):
             'age': '20',
             'level_of_education': 'Nursery',
             'language': 'Luganda',
-            'location': uganda,
+            'ea': ea,
             'backend': backend,
             }
         self.investigator = Investigator.objects.create(**data)

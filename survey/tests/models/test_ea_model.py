@@ -1,17 +1,8 @@
-from datetime import date
-from django.core.exceptions import ValidationError
-from django.db import DatabaseError
-
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import BatchQuestionOrder, GroupCondition, Survey, LocationTypeDetails
+from survey.models import Survey, LocationTypeDetails
 
 from survey.models.batch import Batch
-from survey.models.backend import Backend
 from survey.models.enumeration_area import EnumerationArea
-from survey.models.households import Household, HouseholdMember
-from survey.models.investigator import Investigator
-from survey.models.question import Question
-from survey.models.householdgroups import HouseholdMemberGroup
 from survey.tests.base_test import BaseTest
 
 

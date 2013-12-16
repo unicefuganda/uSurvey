@@ -2,7 +2,7 @@ import json
 from django.test.client import Client
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location
-from survey.models import Batch, Investigator, Backend
+from survey.models import Batch, Investigator, Backend, EnumerationArea
 from survey.models.surveys import Survey
 from survey.forms.surveys import SurveyForm
 from survey.tests.base_test import BaseTest
@@ -143,13 +143,16 @@ class SurveyViewTest(BaseTest):
         self.assertIn(error_message, response.cookies['messages'].value)
 
     def test_should_throw_error_if_deleting_with_an_open_batch(self):
-        investigator = Investigator.objects.create(name="investigator name",
-                                                   mobile_number='123456789',
-                                                   location=Location.objects.create(name="Kampala"),
-                                                   backend=Backend.objects.create(name='something'))
-
         survey = Survey.objects.create(**self.form_data)
         batch = Batch.objects.create(order=1, survey=survey)
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        kampala=Location.objects.create(name="Kampala")
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.create(name="investigator name",
+                                                   mobile_number='123456789', ea=ea,
+                                                   backend=Backend.objects.create(name='something'))
+
         batch.open_for_location(investigator.location)
 
         response = self.client.get('/surveys/%s/delete/' % survey.id)

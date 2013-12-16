@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from django.test import TestCase
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdMemberBatchCompletion, Batch, QuestionModule, BatchQuestionOrder
+from survey.models import HouseholdMemberGroup, GroupCondition, Backend, Investigator, Household, Question, HouseholdMemberBatchCompletion, Batch, QuestionModule, BatchQuestionOrder, EnumerationArea
 from survey.models.batch import Batch, BatchLocationStatus
 from survey.models.households import HouseholdMember
 from survey.models.surveys import Survey
@@ -67,8 +67,11 @@ class BatchTest(TestCase):
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="Survey A")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
@@ -103,8 +106,11 @@ class BatchTest(TestCase):
         condition.groups.add(member_group)
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
         investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
+                                                   ea=ea,
                                                    backend=backend)
 
         household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
@@ -203,9 +209,15 @@ class BatchLocationStatusTest(TestCase):
         batch_2 = Batch.objects.create(order=2)
         kampala = Location.objects.create(name="Kampala")
         abim = Location.objects.create(name="Abim")
-        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+        survey = Survey.objects.create(name="hoho")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea_2 = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+        ea_2.locations.add(abim)
+
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                      backend=Backend.objects.create(name='something'))
-        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea_2,
                                                      backend=Backend.objects.create(name='something1'))
 
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
@@ -271,7 +283,9 @@ class BatchLocationStatusTest(TestCase):
         survey = Survey.objects.create(name='survey name', description='survey descrpition', type=False,
                                             sample_size=10)
         batch = Batch.objects.create(order=1, name="Batch A", survey=survey)
-        investigator = Investigator.objects.create(mobile_number="123456789", name="Rajni", location=kampala)
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+        investigator = Investigator.objects.create(mobile_number="123456789", name="Rajni", ea=ea)
         household = Household.objects.create(investigator=investigator, location=investigator.location)
         member = HouseholdMember.objects.create(surname="haha", date_of_birth=date(1990, 02, 01), household=household)
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)
@@ -307,9 +321,11 @@ class BatchLocationStatusTest(TestCase):
         kampala = Location.objects.create(name="Kampala")
         bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
         abim = Location.objects.create(name="Abim")
-        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        ea.locations.add(kampala)
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                      backend=Backend.objects.create(name='something'))
-        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea,
                                                      backend=Backend.objects.create(name='something1'))
 
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
@@ -328,9 +344,11 @@ class BatchLocationStatusTest(TestCase):
         kampala = Location.objects.create(name="Kampala")
         bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
         abim = Location.objects.create(name="Abim")
-        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        ea.locations.add(kampala)
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                      backend=Backend.objects.create(name='something'))
-        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea,
                                                      backend=Backend.objects.create(name='something1'))
 
         self.assertEqual(len(investigator_1.get_open_batch()), 0)
@@ -351,9 +369,13 @@ class BatchLocationStatusTest(TestCase):
         kampala = Location.objects.create(name="Kampala")
         bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
         abim = Location.objects.create(name="Abim")
-        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        ea.locations.add(kampala)
+        ea_2 = EnumerationArea.objects.create(name="Kampala EA A")
+        ea_2.locations.add(abim)
+        investigator_1 = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                      backend=Backend.objects.create(name='something'))
-        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+        investigator_2 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea_2,
                                                      backend=Backend.objects.create(name='something1'))
 
         self.assertEqual(len(investigator_1.get_open_batch()), 0)

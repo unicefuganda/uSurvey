@@ -1,10 +1,9 @@
-# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 import random
 from django.test import TestCase
 from mock import patch
 import mock
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import RandomHouseHoldSelection, Investigator, Backend, Household, Survey, LocationCode
+from survey.models import RandomHouseHoldSelection, Investigator, Backend, Household, Survey, LocationCode, EnumerationArea
 
 
 class RandomHouseHoldSelectionTest(TestCase):
@@ -18,9 +17,11 @@ class RandomHouseHoldSelectionTest(TestCase):
         location_type = LocationType.objects.create(name="District", slug="district")
         mobile_number = "123456789"
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-        investigator = Investigator.objects.create(mobile_number=mobile_number,
-                                                   location=Location.objects.create(name="Kampala", type=location_type),
-                                                   backend=backend)
+        kampala = Location.objects.create(name="Kampala", type=location_type)
+        ea = EnumerationArea.objects.create(name="EA2", survey=open_survey)
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.create(mobile_number=mobile_number, ea=ea, backend=backend)
 
         random_households = [1, 3, 4, 7, 9, 13, 20, 28, 39, 70]
 

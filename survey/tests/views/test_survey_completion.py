@@ -5,7 +5,7 @@ from django.template.defaultfilters import slugify
 from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdMemberBatchCompletion, Backend, LocationTypeDetails
+from survey.models import Survey, Batch, Investigator, Household, Question, HouseholdMemberGroup, BatchQuestionOrder, HouseholdMemberBatchCompletion, Backend, LocationTypeDetails, EnumerationArea
 from survey.models.households import HouseholdMember
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates
 from survey.tests.base_test import BaseTest
@@ -33,11 +33,18 @@ class TestSurveyCompletion(BaseTest):
         self.abim = Location.objects.create(name='Abim', tree_parent=self.uganda, type=self.city)
         self.kampala = Location.objects.create(name='Kampala', tree_parent=self.uganda, type=self.city)
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(self.kampala)
+        abim_ea = EnumerationArea.objects.create(name="ABIM EA")
+        abim_ea.locations.add(self.abim)
+
+        city_ea = EnumerationArea.objects.create(name="CITY EA")
+        city_ea.locations.add(self.kampala_city)
 
         self.investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456789', male=True,
-                                                          location=self.kampala)
+                                                          ea=ea)
         self.investigator_2 = Investigator.objects.create(name='some_inv', mobile_number='123456788', male=True,
-                                                          location=self.kampala_city)
+                                                          ea=city_ea)
 
         self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
         self.household_2 = Household.objects.create(investigator=self.investigator_2, location=self.kampala_city)

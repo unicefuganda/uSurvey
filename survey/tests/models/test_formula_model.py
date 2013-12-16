@@ -5,7 +5,7 @@ from random import randint
 from rapidsms.contrib.locations.models import Location
 from rapidsms.contrib.locations.models import LocationType
 
-from survey.models import Batch, HouseholdMemberGroup, GroupCondition, Question, Formula, Backend, Investigator, Household, QuestionOption, Survey
+from survey.models import Batch, HouseholdMemberGroup, GroupCondition, Question, Formula, Backend, Investigator, Household, QuestionOption, Survey, EnumerationArea
 from survey.models import HouseholdHead, Indicator, QuestionModule, Answer
 from survey.models.households import HouseholdMember
 from survey.tests.base_test import BaseTest
@@ -44,13 +44,18 @@ class FormulaTest(BaseTest):
         uganda = Location.objects.create(name="Uganda")
         kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
         abim = Location.objects.create(name="Abim", tree_parent=uganda)
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+        ea_2 = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea_2.locations.add(abim)
+
         backend = Backend.objects.create(name='something')
-        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                    backend=backend, weights=0.3)
         household_1 = Household.objects.create(investigator=investigator, survey=survey, uid=1)
         household_2 = Household.objects.create(investigator=investigator, survey=survey, uid=2)
 
-        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea_2,
                                                      backend=backend, weights=0.9)
 
         household_3 = Household.objects.create(investigator=investigator_1, survey=survey, uid=3)
@@ -215,12 +220,19 @@ class FormulaTest(BaseTest):
         kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
         abim = Location.objects.create(name="Abim", tree_parent=uganda)
         backend = Backend.objects.create(name='something')
-        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+
+        ea_2 = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea_2.locations.add(abim)
+
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                    backend=backend, weights=0.3)
         household_1 = Household.objects.create(investigator=investigator, uid=1)
         household_2 = Household.objects.create(investigator=investigator, uid=2)
 
-        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea_2,
                                                      backend=backend, weights=0.9)
         household_3 = Household.objects.create(investigator=investigator_1, uid=3)
         household_4 = Household.objects.create(investigator=investigator_1, uid=4)
@@ -250,13 +262,19 @@ class FormulaTest(BaseTest):
         kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
         abim = Location.objects.create(name="Abim", tree_parent=uganda)
         backend = Backend.objects.create(name='something')
-        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(kampala)
+        abim_ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        abim_ea.locations.add(abim)
+
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                    backend=backend, weights=0.3)
         household_1 = Household.objects.create(investigator=investigator, uid=0)
         household_2 = Household.objects.create(investigator=investigator, uid=1)
         household_3 = Household.objects.create(investigator=investigator, uid=2)
 
-        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=abim_ea,
                                                      backend=backend, weights=0.9)
         household_4 = Household.objects.create(investigator=investigator_1, uid=3)
         household_5 = Household.objects.create(investigator=investigator_1, uid=4)

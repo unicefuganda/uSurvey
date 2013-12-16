@@ -2,7 +2,7 @@ from datetime import date, datetime
 from django.template.defaultfilters import slugify
 from mock import patch
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Investigator, Household, Question, Backend, Survey, HouseholdMemberBatchCompletion
+from survey.models import Batch, Investigator, Household, Question, Backend, Survey, HouseholdMemberBatchCompletion, EnumerationArea
 from survey.models.households import HouseholdMember
 from survey.services.completion_rates_calculator import BatchCompletionRates, BatchLocationCompletionRates, BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.tests.base_test import BaseTest
@@ -12,18 +12,23 @@ class BatchCompletionRatesTest(BaseTest):
     def setUp(self):
         self.country = LocationType.objects.create(name='Country', slug='country')
         self.city = LocationType.objects.create(name='City', slug='city')
+        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
 
         self.uganda = Location.objects.create(name='Uganda', type=self.country)
         self.abim = Location.objects.create(name='Abim', tree_parent=self.uganda, type=self.city)
         self.kampala = Location.objects.create(name='Kampala', tree_parent=self.uganda, type=self.city)
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
+        self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        self.ea.locations.add(self.kampala)
+
+        self.ea_kla_city = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        self.ea_kla_city.locations.add(self.kampala_city)
 
         self.investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456789', male=True,
-                                                          location=self.kampala)
+                                                          ea=self.ea)
         self.investigator_2 = Investigator.objects.create(name='some_inv', mobile_number='123456788', male=True,
-                                                          location=self.kampala_city)
+                                                          ea=self.ea_kla_city)
 
-        self.open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala_city,
                                                     survey=self.open_survey)
         self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala_city,
