@@ -51,7 +51,6 @@ class HouseholdMemberGroupTest(TestCase):
         self.assertEqual(2, member_group.maximum_question_order())
         self.assertEqual(1, another_member_group.maximum_question_order())
 
-
     def test_knows_how_to_get_group_last_question(self):
         member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
         another_member_group = HouseholdMemberGroup.objects.create(name="7 to 8 years", order=1)
@@ -114,7 +113,7 @@ class HouseholdMemberGroupTest(TestCase):
                                                    ea=ea,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -169,7 +168,7 @@ class HouseholdMemberGroupTest(TestCase):
 
 class SimpleIndicatorGroupCount(BaseTest):
     def create_household_head(self, uid, investigator):
-        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
+        self.household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                                   uid=uid, survey=self.survey)
         return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
                                             date_of_birth="1990-02-09")

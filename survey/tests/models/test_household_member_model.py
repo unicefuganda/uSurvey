@@ -121,7 +121,7 @@ class HouseholdMemberTest(TestCase):
         investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321",
                                                     ea=ea,
                                                     backend=Backend.objects.create(name='something1'))
-        hhold = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
+        hhold = Household.objects.create(investigator=investigator1, ea=investigator1.ea, uid=0)
         household_member = HouseholdMember.objects.create(household=hhold, surname="name", male=True,
                                                           date_of_birth=date(1998, 2, 2))
 
@@ -202,14 +202,21 @@ class HouseholdMemberTest(TestCase):
 
     @patch('survey.models.households.HouseholdMember.get_member_groups')
     def test_knows_next_question_in_order_one_group_after_the_other(self, mock_groups):
-        investigator = Investigator.objects.create(name="inv1")
+        village = LocationType.objects.create(name="Village", slug=slugify("village"))
+        some_village = Location.objects.create(name="Some village", type=village)
+
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+        ea.locations.add(some_village)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea)
 
         member_group = HouseholdMemberGroup.objects.create(name="group1", order=0)
         member_group_2 = HouseholdMemberGroup.objects.create(name="group2", order=1)
 
         batch = Batch.objects.create(name="BATCH A", order=1)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=ea)
         household_member = HouseholdMember.objects.create(surname='member1', household=household,
                                                           date_of_birth=(date(2008, 8, 30)), male=False)
 
@@ -304,7 +311,7 @@ class HouseholdMemberTest(TestCase):
                                                    ea=ea,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -344,7 +351,7 @@ class HouseholdMemberTest(TestCase):
                                                    ea=ea,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -386,7 +393,7 @@ class HouseholdMemberTest(TestCase):
                                                    ea=ea,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -427,7 +434,7 @@ class HouseholdMemberTest(TestCase):
                                                    ea=ea,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -617,7 +624,7 @@ class HouseholdMemberTest(TestCase):
         greater_condition.groups.add(member_group)
 
         batch = Batch.objects.create(name="BATCH A", order=1)
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2008, 8, 30)),
                                                           male=False,
                                                           household=household)
@@ -898,7 +905,7 @@ class HouseholdMemberTest(TestCase):
         investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
-        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                           male=False,
                                                           household=household)
@@ -914,7 +921,7 @@ class HouseholdMemberTest(TestCase):
 
         investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                           male=False,
                                                           household=household)
@@ -948,7 +955,7 @@ class HouseholdMemberTest(TestCase):
 
         investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2013, 8, 30)),
                                                           male=False,
                                                           household=household)
@@ -1021,9 +1028,12 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
                                                           household=household)
@@ -1033,9 +1043,11 @@ class HouseholdMemberTest(TestCase):
         country = LocationType.objects.create(name="Country", slug="country")
 
         uganda = Location.objects.create(name="Uganda", type=country)
-        investigator = Investigator.objects.create(name="inv1", location=uganda,
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(uganda)
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
                                                           household=household)
@@ -1057,10 +1069,13 @@ class HouseholdMemberTest(TestCase):
         district = LocationType.objects.create(name="District", slug="district")
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
         self.batch.open_for_location(kampala)
-        investigator = Investigator.objects.create(name="inv1", location=kampala,
+        investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
-        household = Household.objects.create(investigator=investigator, uid=0, location=kampala)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
                                                           household=household)

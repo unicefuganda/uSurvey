@@ -15,7 +15,7 @@ from survey.ussd.ussd_survey import USSDSurvey
 
 class USSDTestCompleteFlow(USSDBaseTest):
     def create_household_head(self, uid):
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                                   uid=uid, survey=self.open_survey_1)
         return HouseholdHead.objects.create(household=self.household,
                                             surname="Name " + str(randint(1, 9999)),
@@ -590,7 +590,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         investigator = Investigator.objects.create(name="Another investigator", mobile_number='779432679', ea=ea,
                                                    backend=self.backend)
-        household = Household.objects.create(investigator=investigator, location=investigator.location,
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                              uid='10', survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,
                                                       surname="Name " + str(randint(1, 9999)),
@@ -649,7 +649,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
         investigator = Investigator.objects.create(name="Another investigator", mobile_number='779432679', ea=ea,
                                                    backend=self.backend)
         investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
-        household = Household.objects.create(investigator=investigator, location=investigator.location,
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                              uid='10', survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,
                                                       surname="Name " + str(randint(1, 9999)),
@@ -694,7 +694,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         investigator = Investigator.objects.create(name="Another investigator", mobile_number='779432679', ea=ea,
                                                    backend=self.backend)
-        household = Household.objects.create(investigator=investigator, location=investigator.location,
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                              uid='10', survey=self.open_survey_1)
         HouseholdHead.objects.create(household=household,
                                      surname="Name " + str(randint(1, 9999)),
@@ -772,7 +772,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
         investigator = Investigator.objects.create(name="Another investigator",
                                                    mobile_number='779432679',
                                                    ea=ea, backend=self.backend)
-        household = Household.objects.create(investigator=investigator, location=investigator.location,
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                              uid='10', survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,
                                                       surname="Name " + str(randint(1, 9999)),
@@ -824,7 +824,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
     def test_retaking_of_household_member_with_in_5min_session_marks_only_that_members_responses_as_old(self):
         Household.objects.all().delete()
-        household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                              uid=88, survey=self.open_survey_1)
         household_head = HouseholdHead.objects.create(household=household,
                                                       surname="Head 001",

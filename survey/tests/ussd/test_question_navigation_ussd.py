@@ -36,7 +36,7 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
                                                         mobile_number=self.ussd_params['msisdn'].replace(
                                                             COUNTRY_PHONE_CODE, ''), ea=ea,
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                                   survey=self.open_survey, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, male=False, surname="Surname",
                                                            date_of_birth=datetime.date(1929, 2, 2))

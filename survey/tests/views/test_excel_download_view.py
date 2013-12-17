@@ -46,10 +46,14 @@ class ExcelDownloadTest(BaseTest):
 
         location_type = LocationType.objects.create(name='Location', slug='location')
         kampala = Location.objects.create(name="Kampala", type=location_type)
-        self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", location=kampala,
-                                                        backend = Backend.objects.create(name='something'))
+        ea = EnumerationArea.objects.create(name="Kampala EA")
+        ea.locations.add(kampala)
+
+        backend = Backend.objects.create(name='something')
+        self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", ea=ea,
+                                                        backend=backend)
         self.household = Household.objects.create(investigator=self.investigator, uid=0, household_code='00010001',
-                                                  location=kampala)
+                                                  ea=self.investigator.ea)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname", date_of_birth=date(2000, 9, 1))
 
         self.investigator.member_answered(self.question_1, self.household_head, answer=1, batch=self.batch)
@@ -172,8 +176,8 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         investigator_2 = Investigator.objects.create(name="investigator AYOYO", mobile_number="987654210",
                                                      ea=ea, backend=backend)
 
-        household_1 = Household.objects.create(investigator=investigator_1, location=kampala, survey=survey)
-        household_2 = Household.objects.create(investigator=investigator_2, location=kampala, survey=survey)
+        household_1 = Household.objects.create(investigator=investigator_1, ea=investigator_1.ea, survey=survey)
+        household_2 = Household.objects.create(investigator=investigator_2, ea=investigator_1.ea, survey=survey)
 
         member_group = HouseholdMemberGroup.objects.create(name='group1', order=1)
         question_1 = Question.objects.create(text="some question", answer_type=Question.NUMBER, order=1,

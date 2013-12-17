@@ -34,7 +34,7 @@ class InvestigatorTest(TestCase):
                                                         backend=self.backend)
 
         self.household = Household.objects.create(investigator=self.investigator,
-                                                  location=self.investigator.ea.locations.all()[0], uid=0)
+                                                  ea=self.investigator.ea, uid=0)
 
         self.household_member = HouseholdMember.objects.create(surname="Member",
                                                                date_of_birth=date(1980, 2, 2), male=False,
@@ -408,9 +408,9 @@ class InvestigatorGenerateReport(TestCase):
 
         self.investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
                                                           ea=self.ea, backend=self.backend)
-        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=kampala,
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, ea=self.investigator_1.ea,
                                                     survey=self.survey)
-        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=kampala,
+        self.household_2 = Household.objects.create(investigator=self.investigator_1, ea=self.investigator_1.ea,
                                                     survey=self.survey)
 
         self.investigator_2 = Investigator.objects.create(name="investigator name_2", mobile_number="9876543211",

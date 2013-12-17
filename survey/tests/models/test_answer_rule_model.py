@@ -20,7 +20,7 @@ class AnswerRuleTest(TestCase):
         self.condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         self.condition.groups.add(self.member_group)
 
-        self.household = Household.objects.create(investigator=self.investigator, uid=0)
+        self.household = Household.objects.create(investigator=self.investigator, uid=0, ea=ea)
 
         self.household_member = HouseholdMember.objects.create(surname="Member",
                                                                date_of_birth=date(1980, 2, 2), male=False, household=self.household)
@@ -44,7 +44,7 @@ class AnswerRuleTest(TestCase):
 
         NumericalAnswer.objects.all().delete()
         AnswerRule.objects.create(question=question_1, action=AnswerRule.ACTIONS['END_INTERVIEW'],
-                                         condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
+                                  condition=AnswerRule.CONDITIONS['EQUALS'], validate_with_value=0)
 
         next_question = self.investigator.member_answered(question_1, self.household_member, answer=0, batch=self.batch)
         self.assertEqual(next_question, question_1)

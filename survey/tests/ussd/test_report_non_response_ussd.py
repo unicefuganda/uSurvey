@@ -109,7 +109,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_1, order=1)
 
     def create_household(self, unique_id):
-        return Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        return Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                         uid=unique_id, random_sample_number=unique_id, survey=self.open_survey)
 
     def create_household_member(self, name, household, head=True, date_of_birth="1990-9-9", minutes_ago=6):

@@ -3,10 +3,9 @@ from datetime import date
 from random import randint
 
 from rapidsms.contrib.locations.models import Location
-from rapidsms.contrib.locations.models import LocationType
 
 from survey.models import Batch, HouseholdMemberGroup, GroupCondition, Question, Formula, Backend, Investigator, Household, QuestionOption, Survey, EnumerationArea
-from survey.models import HouseholdHead, Indicator, QuestionModule, Answer
+from survey.models import HouseholdHead
 from survey.models.households import HouseholdMember
 from survey.tests.base_test import BaseTest
 
@@ -30,7 +29,7 @@ class FormulaTest(BaseTest):
                                               household=household)
 
     def create_household_head(self, uid, investigator):
-        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
+        self.household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                                   uid=uid)
         return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
                                             date_of_birth="1990-02-09")
@@ -52,14 +51,14 @@ class FormulaTest(BaseTest):
         backend = Backend.objects.create(name='something')
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                    backend=backend, weights=0.3)
-        household_1 = Household.objects.create(investigator=investigator, survey=survey, uid=1)
-        household_2 = Household.objects.create(investigator=investigator, survey=survey, uid=2)
+        household_1 = Household.objects.create(investigator=investigator, survey=survey, uid=1, ea=investigator.ea)
+        household_2 = Household.objects.create(investigator=investigator, survey=survey, uid=2, ea=investigator.ea)
 
         investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea_2,
                                                      backend=backend, weights=0.9)
 
-        household_3 = Household.objects.create(investigator=investigator_1, survey=survey, uid=3)
-        household_4 = Household.objects.create(investigator=investigator_1, survey=survey, uid=4)
+        household_3 = Household.objects.create(investigator=investigator_1, survey=survey, uid=3, ea=investigator_1.ea)
+        household_4 = Household.objects.create(investigator=investigator_1, survey=survey, uid=4, ea=investigator_1.ea)
 
         multi_choice_question = Question.objects.create(text="Question 2?", answer_type=Question.MULTICHOICE, order=2,
                                                        group=self.member_group)
@@ -143,16 +142,21 @@ class FormulaTest(BaseTest):
         kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
         abim = Location.objects.create(name="Abim", tree_parent=uganda)
         backend = Backend.objects.create(name='something')
-        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=kampala,
-                                                   backend=backend, weights=0.3)
-        household_1 = Household.objects.create(investigator=investigator, survey=survey, uid=1)
-        household_2 = Household.objects.create(investigator=investigator, survey=survey, uid=2)
+        ea = EnumerationArea.objects.create(name="Kampala EA", survey=survey)
+        ea.locations.add(kampala)
+        ea_2 = EnumerationArea.objects.create(name="Abim EA", survey=survey)
+        ea_2.locations.add(abim)
 
-        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", location=abim,
+        investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
+                                                   backend=backend, weights=0.3)
+        household_1 = Household.objects.create(investigator=investigator, survey=survey, uid=1, ea=investigator.ea)
+        household_2 = Household.objects.create(investigator=investigator, survey=survey, uid=2, ea=investigator.ea)
+
+        investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea_2,
                                                      backend=backend, weights=0.9)
 
-        household_3 = Household.objects.create(investigator=investigator_1, survey=survey, uid=3)
-        household_4 = Household.objects.create(investigator=investigator_1, survey=survey, uid=4)
+        household_3 = Household.objects.create(investigator=investigator_1, survey=survey, uid=3, ea=investigator_1.ea)
+        household_4 = Household.objects.create(investigator=investigator_1, survey=survey, uid=4, ea=investigator_1.ea)
 
         multi_choice_question = Question.objects.create(text="Question 2?", answer_type=Question.MULTICHOICE, order=2,
                                                        group=self.member_group)
@@ -229,13 +233,13 @@ class FormulaTest(BaseTest):
 
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                    backend=backend, weights=0.3)
-        household_1 = Household.objects.create(investigator=investigator, uid=1)
-        household_2 = Household.objects.create(investigator=investigator, uid=2)
+        household_1 = Household.objects.create(investigator=investigator, uid=1, ea=investigator.ea)
+        household_2 = Household.objects.create(investigator=investigator, uid=2, ea=investigator.ea)
 
         investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=ea_2,
                                                      backend=backend, weights=0.9)
-        household_3 = Household.objects.create(investigator=investigator_1, uid=3)
-        household_4 = Household.objects.create(investigator=investigator_1, uid=4)
+        household_3 = Household.objects.create(investigator=investigator_1, uid=3, ea=investigator_1.ea)
+        household_4 = Household.objects.create(investigator=investigator_1, uid=4, ea=investigator_1.ea)
 
         member_1 = self.create_household_member(household_1)
         member_2 = self.create_household_member(household_2)
@@ -270,15 +274,15 @@ class FormulaTest(BaseTest):
 
         investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
                                                    backend=backend, weights=0.3)
-        household_1 = Household.objects.create(investigator=investigator, uid=0)
-        household_2 = Household.objects.create(investigator=investigator, uid=1)
-        household_3 = Household.objects.create(investigator=investigator, uid=2)
+        household_1 = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
+        household_2 = Household.objects.create(investigator=investigator, uid=1, ea=investigator.ea)
+        household_3 = Household.objects.create(investigator=investigator, uid=2, ea=investigator.ea)
 
         investigator_1 = Investigator.objects.create(name="Investigator 2", mobile_number="2", ea=abim_ea,
                                                      backend=backend, weights=0.9)
-        household_4 = Household.objects.create(investigator=investigator_1, uid=3)
-        household_5 = Household.objects.create(investigator=investigator_1, uid=4)
-        household_6 = Household.objects.create(investigator=investigator_1, uid=5)
+        household_4 = Household.objects.create(investigator=investigator_1, uid=3, ea=investigator_1.ea)
+        household_5 = Household.objects.create(investigator=investigator_1, uid=4, ea=investigator_1.ea)
+        household_6 = Household.objects.create(investigator=investigator_1, uid=5, ea=investigator_1.ea)
 
         member_1 = self.create_household_member(household_1)
         member_2 = self.create_household_member(household_2)

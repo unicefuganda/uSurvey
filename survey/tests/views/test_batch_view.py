@@ -287,7 +287,7 @@ class BatchViewsTest(BaseTest):
         self.ea.locations.add(self.kampala)
 
         investigator = Investigator.objects.create(mobile_number="123456789", name="Rajni", ea=self.ea)
-        household = Household.objects.create(investigator=investigator, location=investigator.location)
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea)
         member = HouseholdMember.objects.create(surname="haha", date_of_birth=date(1990, 02, 01), household=household)
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)
         female = GroupCondition.objects.create(attribute="gender", value=True, condition="EQUALS")

@@ -34,7 +34,7 @@ class HouseholdMemberGroup(BaseModel):
         from survey.models import HouseholdMember
         for location in locations:
             location_descendants = location.get_descendants(include_self=True).values_list('id', flat=True)
-            households = all_households.filter(location__id__in=location_descendants).values_list('id', flat=True)
+            households = all_households.filter(ea__locations__in=location_descendants).values_list('id', flat=True)
             all_members = HouseholdMember.objects.filter(household__id__in=households)
             qualified_members = filter(lambda member: member.belongs_to(self), all_members)
             data[location] = {self.name: len(qualified_members)}

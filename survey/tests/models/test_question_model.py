@@ -117,12 +117,13 @@ class QuestionTest(TestCase):
     def test_knows_has_been_answered_by_member(self):
         backend = Backend.objects.create(name='something')
         kampala = Location.objects.create(name="Kampala")
-        investigator = Investigator.objects.create(name="", mobile_number="123456789",
-                                                   location=kampala,
-                                                   backend=backend)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.create(name="", mobile_number="123456789", ea=ea, backend=backend)
         household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
 
-        household = Household.objects.create(investigator=investigator, uid=0)
+        household = Household.objects.create(investigator=investigator, uid=0, ea=investigator.ea)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -198,9 +199,10 @@ class QuestionTest(TestCase):
         self.assertTrue(another_group_question.belongs_to(another_group))
         self.assertFalse(another_group_question.belongs_to(general_group))
 
+
 class SimpleIndicatorQuestionCount(BaseTest):
     def create_household_head(self, uid, investigator):
-        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
+        self.household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                                   uid=uid, survey=self.survey)
         return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
                                             date_of_birth="1990-02-09")

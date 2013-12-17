@@ -36,11 +36,11 @@ class USSDTest(USSDBaseTest):
                                                             COUNTRY_PHONE_CODE, ''),
                                                         ea=self.ea,
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                                   survey=self.open_survey, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname",
                                                            date_of_birth=datetime.date(1980, 9, 1))
-        self.household_1 = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        self.household_1 = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                                     survey=self.open_survey, uid=1)
         self.household_head_1 = HouseholdHead.objects.create(household=self.household_1, surname="Name " + str(randint(1, 9999)), date_of_birth=datetime.date(1980, 9, 1))
         self.household_member = HouseholdMember.objects.create(surname="Name 2", household=self.household_1,

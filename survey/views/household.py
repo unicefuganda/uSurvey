@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from rapidsms.contrib.locations.models import *
 from survey.forms.householdHead import *
 from survey.forms.household import *
-from survey.models import Survey, LocationCode
+from survey.models import Survey, LocationCode, EnumerationArea
 from survey.models.households import Household
 from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
@@ -58,7 +58,7 @@ def create_household(householdform, investigator, valid, uid):
     if investigator and is_valid_household:
         household = householdform['household'].save(commit=False)
         household.investigator = investigator
-        household.location = investigator.location
+        household.ea = investigator.ea
         open_survey = Survey.currently_open_survey(investigator.location)
         household.household_code = LocationCode.get_household_code(investigator) + str(Household.next_uid(open_survey))
         if uid:
@@ -142,8 +142,9 @@ def new(request):
     year_choices = {'selected_text': '', 'selected_value': ''}
 
     if request.method == 'POST':
-        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST,
-                                                                                              'location') else None
+        ea = EnumerationArea.objects.get(id=request.POST['ea']) if contains_key(request.POST, 'ea') else None
+        selected_location = ea.locations.all()[0]
+
         response, householdform, investigator, investigator_form = create(request, selected_location)
         month_choices = {'selected_text': MONTHS[int(request.POST['resident_since_month'])][1],
                          'selected_value': request.POST['resident_since_month']}

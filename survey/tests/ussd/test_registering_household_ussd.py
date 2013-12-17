@@ -112,7 +112,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         self.assertEqual(self.question_1, ussd_register_household.process_registration_answer(''))
 
     def create_household(self, unique_id):
-        return Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        return Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                         uid=unique_id, random_sample_number=unique_id, survey=self.open_survey)
 
     def test_should_show_list_of_households_with_uids_when_selected_option_to_register_household_and_pagination(self):

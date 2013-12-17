@@ -33,8 +33,8 @@ class TestSurveyCompletion(BaseTest):
         self.abim = Location.objects.create(name='Abim', tree_parent=self.uganda, type=self.city)
         self.kampala = Location.objects.create(name='Kampala', tree_parent=self.uganda, type=self.city)
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
-        ea = EnumerationArea.objects.create(name="EA2")
-        ea.locations.add(self.kampala)
+        kampala_ea = EnumerationArea.objects.create(name="EA2")
+        kampala_ea.locations.add(self.kampala)
         abim_ea = EnumerationArea.objects.create(name="ABIM EA")
         abim_ea.locations.add(self.abim)
 
@@ -42,12 +42,12 @@ class TestSurveyCompletion(BaseTest):
         city_ea.locations.add(self.kampala_city)
 
         self.investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456789', male=True,
-                                                          ea=ea)
+                                                          ea=kampala_ea)
         self.investigator_2 = Investigator.objects.create(name='some_inv', mobile_number='123456788', male=True,
                                                           ea=city_ea)
 
-        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala)
-        self.household_2 = Household.objects.create(investigator=self.investigator_2, location=self.kampala_city)
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, ea=kampala_ea)
+        self.household_2 = Household.objects.create(investigator=self.investigator_2, ea=city_ea)
         self.member_1 = HouseholdMember.objects.create(household=self.household_1,
                                                        date_of_birth=datetime.date(1980, 05, 01))
         self.member_2 = HouseholdMember.objects.create(household=self.household_2,
@@ -236,6 +236,11 @@ class HouseholdCompletionJsonViewTest(BaseTest):
 
         self.zombo = Location.objects.create(name="Zombo", type=self.district, tree_parent=self.uganda)
         self.apachi = Location.objects.create(name="Apachi", type=self.city, tree_parent=self.zombo)
+        self.apachi_ea = EnumerationArea.objects.create(name="Apachi EA")
+        self.apachi_ea.locations.add(self.apachi)
+
+        kampala_ea = EnumerationArea.objects.create(name="Kampala EA")
+        kampala_ea.locations.add(self.kampala)
 
         self.backend = Backend.objects.create(name='something')
         self.survey = Survey.objects.create(name='SurveyA')
@@ -249,17 +254,17 @@ class HouseholdCompletionJsonViewTest(BaseTest):
         self.batch_2.open_for_location(self.zombo)
 
         self.investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
-                                                          location=self.kampala, backend=self.backend)
+                                                          ea=kampala_ea, backend=self.backend)
 
         self.investigator_2 = Investigator.objects.create(name="investigator name_2", mobile_number="9876543330",
-                                                          location=self.apachi, backend=self.backend)
-        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                          ea=self.apachi_ea, backend=self.backend)
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, ea=kampala_ea,
                                                     survey=self.survey)
-        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=kampala_ea,
                                                     survey=self.survey)
-        self.household_3 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+        self.household_3 = Household.objects.create(investigator=self.investigator_1, location=kampala_ea,
                                                     survey=self.survey)
-        self.household_4 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+        self.household_4 = Household.objects.create(investigator=self.investigator_1, location=kampala_ea,
                                                     survey=self.survey)
 
     def test_knows_completion_rates_for_location_type(self):
@@ -288,13 +293,13 @@ class HouseholdCompletionJsonViewTest(BaseTest):
                                                       batch=self.batch,
                                                       investigator=self.investigator_1)
 
-        self.household_5 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+        self.household_5 = Household.objects.create(investigator=self.investigator_2, ea=self.apachi_ea,
                                                     survey=self.survey)
-        self.household_6 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+        self.household_6 = Household.objects.create(investigator=self.investigator_2, ea=self.apachi_ea,
                                                     survey=self.survey)
-        self.household_7 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+        self.household_7 = Household.objects.create(investigator=self.investigator_2, ea=self.apachi_ea,
                                                     survey=self.survey)
-        self.household_8 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+        self.household_8 = Household.objects.create(investigator=self.investigator_2, ea=self.apachi_ea,
                                                     survey=self.survey)
 
         household_5_member = HouseholdMember.objects.create(household=self.household_5,

@@ -24,10 +24,10 @@ class ResultsDownloadService(object):
     def get_summarised_answers(self):
         data = []
         all_households = Household.objects.filter(survey=self.batch.survey)
-        locations = list(set(all_households.values_list('location', flat=True)))
+        locations = list(set(all_households.values_list('ea__locations', flat=True)))
         general_group = HouseholdMemberGroup.objects.get(name="GENERAL")
         for location_id in locations:
-            households_in_location = all_households.filter(location=location_id)
+            households_in_location = all_households.filter(ea__locations=location_id)
             household_location = households_in_location[0].location
             location_ancestors = list(household_location.get_ancestors(include_self=True).exclude(type__name__iexact="country").values_list('name', flat=True))
             for household in households_in_location:

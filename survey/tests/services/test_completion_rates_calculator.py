@@ -29,9 +29,9 @@ class BatchCompletionRatesTest(BaseTest):
         self.investigator_2 = Investigator.objects.create(name='some_inv', mobile_number='123456788', male=True,
                                                           ea=self.ea_kla_city)
 
-        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala_city,
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, ea=self.ea_kla_city,
                                                     survey=self.open_survey)
-        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala_city,
+        self.household_2 = Household.objects.create(investigator=self.investigator_1, ea=self.ea_kla_city,
                                                     survey=self.open_survey)
 
         self.batch = Batch.objects.create(order=1, name='somebatch', survey=self.open_survey)
@@ -41,7 +41,6 @@ class BatchCompletionRatesTest(BaseTest):
         self.question = Question.objects.create(text="This is a question",
                                                 answer_type=Question.MULTICHOICE)
         self.question.batches.add(self.batch)
-
 
     def test_calculate_percent(self):
         completion_rate = BatchCompletionRates(self.batch)
@@ -107,13 +106,16 @@ class BatchCompletionRatesTest(BaseTest):
     @patch('survey.services.completion_rates_calculator.BatchCompletionRates.percent_completed_households')
     def test_completion_rates(self, mock_percent):
         masaka = Location.objects.create(name="masaka", tree_parent=self.uganda, type=self.city)
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        ea.locations.add(masaka)
         investigator_3 = Investigator.objects.create(name='some_inv_2', mobile_number='123456787', male=True,
-                                                     location=masaka)
+                                                     ea=ea)
 
-        household_3 = Household.objects.create(investigator=investigator_3, location=masaka,
+        household_3 = Household.objects.create(investigator=investigator_3, ea=investigator_3.ea,
                                                survey=self.open_survey)
         member_3 = HouseholdMember.objects.create(household=household_3, date_of_birth=date(1980, 05, 01))
-        mock_percent.side_effect = [self.kampala_city.id, self.open_survey] # return value only needed to change with locations
+        mock_percent.side_effect = [self.kampala_city.id, self.open_survey]  # return value only needed to change
+        # with locations
 
         completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [self.kampala_city])
         completions = completion_rate.attributes()
@@ -124,7 +126,7 @@ class BatchCompletionRatesTest(BaseTest):
         self.assertEqual(self.kampala_city.id, completion_1['completed_households_percent'])
 
         completions.remove(completion_1)
-        mock_percent.side_effect = [masaka.id, self.open_survey] # return value only needed to change with locations
+        mock_percent.side_effect = [masaka.id, self.open_survey]  # return value only needed to change with locations
         completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [masaka])
 
         completions = completion_rate.attributes()
@@ -173,6 +175,11 @@ class HouseholdCompletionJsonService(BaseTest):
         self.survey = Survey.objects.create(name='SurveyA')
         self.batch = Batch.objects.create(order=1, name='somebatch', survey=self.survey)
         self.batch_2 = Batch.objects.create(order=2, name='somebatch 2', survey=self.survey)
+        kampala_ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        kampala_ea.locations.add(self.kampala)
+
+        apachi_ea = EnumerationArea.objects.create(name="Apachi EA", survey=self.survey)
+        apachi_ea.locations.add(self.apachi)
 
         self.batch.open_for_location(self.abim)
         self.batch.open_for_location(self.zombo)
@@ -181,17 +188,17 @@ class HouseholdCompletionJsonService(BaseTest):
         self.batch_2.open_for_location(self.zombo)
 
         self.investigator_1 = Investigator.objects.create(name="investigator name_1", mobile_number="9876543210",
-                                                          location=self.kampala, backend=self.backend)
+                                                          ea=kampala_ea, backend=self.backend)
 
         self.investigator_2 = Investigator.objects.create(name="investigator name_2", mobile_number="9876543330",
-                                                          location=self.apachi, backend=self.backend)
-        self.household_1 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+                                                          ea=apachi_ea, backend=self.backend)
+        self.household_1 = Household.objects.create(investigator=self.investigator_1, ea=self.investigator_1.ea,
                                                     survey=self.survey)
-        self.household_2 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+        self.household_2 = Household.objects.create(investigator=self.investigator_1, ea=self.investigator_1.ea,
                                                     survey=self.survey)
-        self.household_3 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+        self.household_3 = Household.objects.create(investigator=self.investigator_1, ea=self.investigator_1.ea,
                                                     survey=self.survey)
-        self.household_4 = Household.objects.create(investigator=self.investigator_1, location=self.kampala,
+        self.household_4 = Household.objects.create(investigator=self.investigator_1, ea=self.investigator_1.ea,
                                                     survey=self.survey)
 
     def test_knows_completion_rates_for_location_type(self):
@@ -205,28 +212,24 @@ class HouseholdCompletionJsonService(BaseTest):
         household_4_member = HouseholdMember.objects.create(household=self.household_4, date_of_birth=date(1980, 05, 01))
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_1, householdmember=household_1_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_1)
+                                                      batch=self.batch, investigator=self.investigator_1)
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_2, householdmember=household_2_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_1)
+                                                      batch=self.batch, investigator=self.investigator_1)
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_3, householdmember=household_3_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_1)
+                                                      batch=self.batch, investigator=self.investigator_1)
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_3, householdmember=household_4_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_1)
+                                                      batch=self.batch, investigator=self.investigator_1)
 
-        self.household_5 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+        self.household_5 = Household.objects.create(investigator=self.investigator_2, ea=self.investigator_2.ea,
                                                     survey=self.survey)
-        self.household_6 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+        self.household_6 = Household.objects.create(investigator=self.investigator_2, ea=self.investigator_2.ea,
                                                     survey=self.survey)
-        self.household_7 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+        self.household_7 = Household.objects.create(investigator=self.investigator_2, ea=self.investigator_2.ea,
                                                     survey=self.survey)
-        self.household_8 = Household.objects.create(investigator=self.investigator_2, location=self.apachi,
+        self.household_8 = Household.objects.create(investigator=self.investigator_2, ea=self.investigator_2.ea,
                                                     survey=self.survey)
 
         household_5_member = HouseholdMember.objects.create(household=self.household_5,
@@ -238,11 +241,9 @@ class HouseholdCompletionJsonService(BaseTest):
         HouseholdMember.objects.create(household=self.household_8, date_of_birth=date(1980, 05, 01))
 
         HouseholdMemberBatchCompletion.objects.create(household=self.household_1, householdmember=household_5_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_2)
+                                                      batch=self.batch, investigator=self.investigator_2)
         HouseholdMemberBatchCompletion.objects.create(household=self.household_2, householdmember=household_6_member,
-                                                batch=self.batch,
-                                                investigator=self.investigator_2)
+                                                      batch=self.batch, investigator=self.investigator_2)
 
         district_level_completion = BatchSurveyCompletionRates(self.district)
         expected_completion = {self.zombo.name: 25.0, self.abim.name: 50.0}

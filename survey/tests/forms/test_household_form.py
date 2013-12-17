@@ -1,5 +1,7 @@
 from django.test import TestCase
+from rapidsms.contrib.locations.models import Location
 from survey.forms.household import *
+from survey.models import EnumerationArea
 from survey.models.households import Household
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -7,7 +9,10 @@ from survey.models.investigator import Investigator
 
 class HouseholdFormTest(TestCase):
     def test_valid(self):
-        form_data = {'uid': 6}
+        some_village = Location.objects.create(name="Vilage")
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(some_village)
+        form_data = {'uid': 6, 'ea': ea.id}
 
         household_form = HouseholdForm(data=form_data)
         self.assertTrue(household_form.is_valid())

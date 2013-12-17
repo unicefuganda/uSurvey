@@ -70,7 +70,7 @@ class BaseTest(TestCase):
             self.generate_location_type_details(location.get_children()[0], the_country)
 
     def create_household_head(self, uid, investigator, survey=None):
-        self.household = Household.objects.create(investigator=investigator, location=investigator.location,
+        self.household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                                   uid=uid, survey=survey)
         return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
                                             date_of_birth=date(1990, 2, 9))

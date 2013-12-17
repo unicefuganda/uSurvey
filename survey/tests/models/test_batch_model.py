@@ -74,7 +74,7 @@ class BatchTest(TestCase):
                                                    ea=ea,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -113,7 +113,7 @@ class BatchTest(TestCase):
                                                    ea=ea,
                                                    backend=backend)
 
-        household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
 
         household_member = HouseholdMember.objects.create(surname="Member",
                                                           date_of_birth=date(1980, 2, 2), male=False,
@@ -286,7 +286,7 @@ class BatchLocationStatusTest(TestCase):
         ea = EnumerationArea.objects.create(name="EA2", survey=survey)
         ea.locations.add(kampala)
         investigator = Investigator.objects.create(mobile_number="123456789", name="Rajni", ea=ea)
-        household = Household.objects.create(investigator=investigator, location=investigator.location)
+        household = Household.objects.create(investigator=investigator, ea=investigator.ea)
         member = HouseholdMember.objects.create(surname="haha", date_of_birth=date(1990, 02, 01), household=household)
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)
         female = GroupCondition.objects.create(attribute="gender", value=True, condition="EQUALS")

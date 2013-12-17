@@ -209,7 +209,7 @@ class HouseholdViewTest(BaseTest):
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         form_data = {
-            'location': uganda.id,
+            'ea': investigator.ea.id,
             'investigator': investigator.id,
             'surname': 'Rajini',
             'first_name': 'Kant',
@@ -265,7 +265,7 @@ class HouseholdViewTest(BaseTest):
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         form_data = {
-            'location': kampala.id,
+            'ea': ea.id,
             'investigator': investigator.id,
             'surname': 'Rajini',
             'first_name': 'Kant',
@@ -304,8 +304,11 @@ class HouseholdViewTest(BaseTest):
         LocationTypeDetails.objects.create(country=uganda, location_type=district)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
         form_data = {
-            'location': kampala.id,
+            'ea': ea.id,
             'surname': 'Rajini',
             'first_name': 'Kant',
             'male': 'False',
@@ -342,9 +345,9 @@ class HouseholdViewTest(BaseTest):
 
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
-        household_a = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
-        household_b = Household.objects.create(investigator=investigator, location=investigator.location, uid=1)
-        household_c = Household.objects.create(investigator=investigator, location=investigator.location, uid=2)
+        household_a = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
+        household_b = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=1)
+        household_c = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=2)
 
         HouseholdHead.objects.create(surname='Bravo', household=household_b, date_of_birth='1980-09-01')
         HouseholdHead.objects.create(surname='Alpha', household=household_a, date_of_birth='1980-09-01')
@@ -423,9 +426,9 @@ class HouseholdViewTest(BaseTest):
         investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", ea=bukoto_ea,
                                                     backend=Backend.objects.create(name='something3'))
 
-        household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
-        household2 = Household.objects.create(investigator=investigator2, location=investigator2.location, uid=1)
-        household3 = Household.objects.create(investigator=investigator3, location=investigator3.location, uid=2)
+        household1 = Household.objects.create(investigator=investigator1, ea=investigator1.ea, uid=0)
+        household2 = Household.objects.create(investigator=investigator2, ea=investigator2.ea, uid=1)
+        household3 = Household.objects.create(investigator=investigator3, ea=investigator3.ea, uid=2)
 
         response = self.client.get("/households/?location=" + str(uganda.id))
         self.failUnlessEqual(response.status_code, 200)
@@ -467,7 +470,7 @@ class HouseholdViewTest(BaseTest):
                                                     ea=ea,
                                                     backend=Backend.objects.create(name='something1'))
 
-        household1 = Household.objects.create(investigator=investigator1, location=investigator1.location, uid=0)
+        household1 = Household.objects.create(investigator=investigator1, ea=investigator1.ea, uid=0)
         HouseholdHead.objects.create(surname='Bravo', household=household1, date_of_birth='1980-09-01')
         household_location = {'District': 'Kampala', 'County': 'Bukoto', 'Subcounty': 'Some sub county',
                               'Parish': 'Some parish', 'Village': 'Some village'}
@@ -486,9 +489,9 @@ class HouseholdViewTest(BaseTest):
 
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
-        household_a = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
-        household_b = Household.objects.create(investigator=investigator, location=investigator.location, uid=1)
-        household_c = Household.objects.create(investigator=investigator, location=investigator.location, uid=2)
+        household_a = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
+        household_b = Household.objects.create(investigator=investigator,  ea=investigator.ea, uid=1)
+        household_c = Household.objects.create(investigator=investigator,  ea=investigator.ea,  uid=2)
 
         HouseholdHead.objects.create(surname='Bravo', household=household_b, date_of_birth='1980-09-01')
         HouseholdHead.objects.create(surname='Alpha', household=household_a, date_of_birth='1980-09-01')
@@ -564,7 +567,7 @@ class EditHouseholdDetailsTest(BaseTest):
                                                         backend=self.backend,
                                                         ea=self.ea)
 
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                                   uid=0)
         HouseholdHead.objects.create(surname='Bravo', household=self.household, first_name='Test',
                                      date_of_birth='1980-09-01', male=True, occupation='Agricultural labor',
@@ -588,11 +591,12 @@ class EditHouseholdDetailsTest(BaseTest):
         self.assertEqual(self.household.location, response.context['selected_location'])
 
     def test_post_edit__household_details(self):
-        related_location = self.household.get_related_location()
         new_investigator = Investigator.objects.create(name="new Investigator", mobile_number="123553539",
                                                        backend=self.backend, ea=self.ea)
 
-        form_values = {'investigator': new_investigator.id, 'location': self.household.location.id, 'uid': self.household.uid}
+        form_values = {'investigator': new_investigator.id,
+                       'location': self.household.location.id,
+                       'uid': self.household.uid, 'ea': new_investigator.ea.id}
         response = self.client.post('/households/%s/edit/' % self.household.id, data=form_values)
 
         self.assertRedirects(response, '/households/', 302, 200)

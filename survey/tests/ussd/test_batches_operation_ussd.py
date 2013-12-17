@@ -3,7 +3,6 @@ import urllib2
 
 from random import randint
 
-from django.test import TestCase
 from django.test.client import Client
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
@@ -43,7 +42,7 @@ class USSDOpenBatchTest(USSDBaseTest):
                                                             COUNTRY_PHONE_CODE, ''),
                                                         ea=self.ea,
                                                         backend=Backend.objects.create(name='something'))
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                                   survey=self.open_survey, uid=0)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname",
                                                            date_of_birth='1980-09-01')
@@ -87,7 +86,7 @@ class USSDWithMultipleBatches(USSDBaseTest):
                                                             COUNTRY_PHONE_CODE, ''), ea=self.ea,
                                                         backend=Backend.objects.create(name='something'))
 
-        self.household = Household.objects.create(investigator=self.investigator, location=self.investigator.location,
+        self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
                                                   survey=self.open_survey, uid=0)
         self.female_group = HouseholdMemberGroup.objects.create(name="Female", order=1)
         self.condition = GroupCondition.objects.create(value=False, attribute="GENDER", condition="EQUALS")

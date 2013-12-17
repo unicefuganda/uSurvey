@@ -17,7 +17,7 @@ from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
 class Household(BaseModel):
     investigator = models.ForeignKey(Investigator, null=True, related_name="households")
-    location = models.ForeignKey(Location, null=True)
+    ea = models.ForeignKey("EnumerationArea", null=True, related_name="household_enumeration_area")
     uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Unique Identification")
     random_sample_number = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Random Sample Number")
     survey = models.ForeignKey("Survey", null=True, related_name="survey_household")
@@ -224,7 +224,12 @@ class Household(BaseModel):
 
     @classmethod
     def all_households_in(cls, location, survey):
-        return Household.objects.filter(location__in=location.get_descendants(include_self=True), survey=survey)
+        return Household.objects.filter(ea__locations__in=location.get_descendants(include_self=True), survey=survey)
+
+    @property
+    def location(self):
+        ea_locations = self.ea.locations.all()[:1]
+        return None if not ea_locations.exists() else ea_locations[0]
 
 
 class HouseholdMember(BaseModel):
