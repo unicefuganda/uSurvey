@@ -3,6 +3,7 @@ from lettuce import *
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.features.page_objects.household_member import NewHouseholdMemberPage, EditHouseholdMemberPage, DeleteHouseholdMemberPage
 from survey.features.page_objects.households import HouseholdDetailsPage
+from survey.models import EnumerationArea
 from survey.models.households import HouseholdMember, HouseholdHead, Household
 from survey.models.investigator import Investigator
 
@@ -11,7 +12,9 @@ from survey.models.investigator import Investigator
 def and_i_have_a_household(step):
     district = LocationType.objects.get(slug = 'district')
     world.kampala = Location.objects.create(name='Kampala', type = district)
-    world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.kampala_village)
+    world.ea = EnumerationArea.objects.create(name="EA")
+    world.ea.locations.add(world.kampala_village)
+    world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=world.ea)
     world.household = Household.objects.create(investigator=world.investigator, location=world.investigator.location, uid=4)
     HouseholdHead.objects.create(household=world.household, surname="Test", first_name="User", date_of_birth="1980-09-01", male=True,
                                  occupation='Agricultural labor', level_of_education='Primary', resident_since_year=2013, resident_since_month=2)

@@ -4,7 +4,7 @@ from survey.features.page_objects.base import PageObject
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from rapidsms.contrib.locations.models import Location
 from lettuce.django import django_url
-
+from survey.models import EnumerationArea
 
 
 class NewInvestigatorPage(PageObject):
@@ -29,6 +29,7 @@ class NewInvestigatorPage(PageObject):
         kampala_subcounty = Location.objects.get(name="Subcounty")
         kampala_parish = Location.objects.get(name="Parish")
         kampala_village = Location.objects.get(name="Village")
+        ea = EnumerationArea.objects.get(name="EA")
         self.fill_in_with_js('$("#location-district")', kampala.id)
         self.fill_in_with_js('$("#location-county")', kampala_county.id)
         self.fill_in_with_js('$("#location-subcounty")', kampala_subcounty.id)
@@ -43,6 +44,7 @@ class NewInvestigatorPage(PageObject):
             'age': '25',
             'level_of_education': 'Primary',
             'language': 'Luo',
+            'ea': ea.id
         }
         self.browser.fill_form(self.values)
 

@@ -13,7 +13,7 @@ from rapidsms.contrib.locations.models import *
 from survey.features.page_objects.accounts import LoginPage
 
 from survey.features.page_objects.investigators import NewInvestigatorPage, InvestigatorsListPage, FilteredInvestigatorsListPage, EditInvestigatorPage, InvestigatorDetailsPage
-from survey.models import LocationTypeDetails
+from survey.models import LocationTypeDetails, EnumerationArea
 from survey.models.investigator import Investigator
 
 
@@ -63,6 +63,8 @@ def and_i_have_locations(step):
     world.kampala_village = Location.objects.create(name="Village", type=village, tree_parent=world.kampala_parish)
     world.kampala_county_village = Location.objects.create(name="Kampala County Village", type=village, tree_parent=world.kampala_parish)
 
+    world.ea = EnumerationArea.objects.create(name="EA")
+    world.ea.locations.add(world.kampala_village)
 
 @step(u'And I visit new investigator page')
 def and_i_visit_new_investigator_page(step):
@@ -133,7 +135,7 @@ def and_i_should_see_no_investigators_registered_message(step):
 def and_i_request_filter_list_for_another_county_with_no_investigator(step):
     county_type = LocationType.objects.get(name='County')
     new_county = Location.objects.create(name="some county", type=county_type, tree_parent=world.kampala_district)
-    Investigator.objects.filter(location=new_county).delete()
+    Investigator.objects.filter(ea__locations=new_county).delete()
     world.page = FilteredInvestigatorsListPage(world.browser, new_county.id)
     world.page.visit()
 
@@ -151,7 +153,11 @@ def and_i_have_an_investigator(step):
 
     LocationTypeDetails.objects.create(country=uganda, location_type=country)
     LocationTypeDetails.objects.create(country=uganda, location_type=city)
-    world.investigator = Investigator.objects.create(name="Rajni", mobile_number = "123456789", age = 25, level_of_education = "Nursery", language = "Luganda", location = kampala)
+
+    world.ea = EnumerationArea.objects.get_or_create(name="EA")[0]
+    world.ea.locations.add(kampala)
+
+    world.investigator = Investigator.objects.create(name="Rajni", mobile_number = "123456789", age = 25, level_of_education = "Nursery", language = "Luganda", ea=world.ea)
 
 @step(u'And I visit investigators page')
 def and_i_visit_investigators_page(step):

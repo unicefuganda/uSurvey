@@ -1,31 +1,25 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
+from survey.models import EnumerationArea
 
 
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Investigator.location'
-        db.delete_column(u'survey_investigator', 'location_id')
-
-        # Adding field 'Investigator.ea'
-        db.add_column(u'survey_investigator', 'ea',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='enumeration_area', null=True, to=orm['survey.EnumerationArea']),
-                      keep_default=False)
-
-
+        for investigator in orm['survey.investigator'].objects.all():
+            ea = EnumerationArea.objects.get_or_create(name="EA %s"%investigator.location.name)[0]
+            ea.locations.add(investigator.location)
+            investigator.ea = ea
+            investigator.save()
     def backwards(self, orm):
-        # Adding field 'Investigator.location'
-        db.add_column(u'survey_investigator', 'location',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['locations.Location'], null=True),
-                      keep_default=False)
-
-        # Deleting field 'Investigator.ea'
-        db.delete_column(u'survey_investigator', 'ea_id')
-
+        for investigator in orm['survey.investigator'].objects.all():
+            ea = EnumerationArea.objects.get_or_create(name="EA %s"%investigator.location.name)[0]
+            location = ea.locations.all()[0]
+            investigator.location = location
+            investigator.save()
 
     models = {
         u'auth.group': {
@@ -256,6 +250,7 @@ class Migration(SchemaMigration):
             'is_blocked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'language': ('django.db.models.fields.CharField', [], {'default': "'English'", 'max_length': '100', 'null': 'True'}),
             'level_of_education': ('django.db.models.fields.CharField', [], {'default': "'Primary'", 'max_length': '100', 'null': 'True'}),
+            'location': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['locations.Location']", 'null': 'True'}),
             'male': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'mobile_number': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '10'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -421,3 +416,4 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['survey']
+    symmetrical = True

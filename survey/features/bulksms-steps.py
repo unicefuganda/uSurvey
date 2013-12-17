@@ -3,7 +3,7 @@ from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.root import BulkSMSPage
 from survey.investigator_configs import *
-from survey.models import Backend
+from survey.models import Backend, EnumerationArea
 from survey.models.investigator import Investigator
 
 
@@ -13,8 +13,15 @@ def and_i_have_2_districts_with_investigators(step):
     world.kampala = Location.objects.create(name="Kampala", type=district)
     world.abim = Location.objects.create(name="Abim", type=district)
     backend = Backend.objects.all()[0]
-    Investigator.objects.create(name="Rajni", mobile_number="123456789", location=world.kampala, backend=backend)
-    Investigator.objects.create(name="Rajni", mobile_number="123456780", location=world.abim, backend=backend)
+
+    world.ea = EnumerationArea.objects.create(name="EA")
+    world.ea.locations.add(world.kampala)
+    world.ea_abim = EnumerationArea.objects.create(name="EA Abim")
+    world.ea_abim.locations.add(world.abim)
+
+
+    Investigator.objects.create(name="Rajni", mobile_number="123456789", ea=world.ea, backend=backend)
+    Investigator.objects.create(name="Rajni", mobile_number="123456780", ea=world.ea_abim, backend=backend)
 
 @step(u'And I visit bulk SMS page')
 def and_i_visit_bulk_sms_page(step):

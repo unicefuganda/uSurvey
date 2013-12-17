@@ -3,7 +3,7 @@ from lettuce import *
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.indicators import ListIndicatorPage, SimpleIndicatorGraphPage
-from survey.models import HouseholdMemberGroup, Indicator, LocationTypeDetails, BatchQuestionOrder
+from survey.models import HouseholdMemberGroup, Indicator, LocationTypeDetails, BatchQuestionOrder, EnumerationArea
 from survey.models.households import HouseholdHead, Household
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
@@ -39,6 +39,12 @@ def and_i_have_regions_and_districts(step):
 
     world.kibungo = Location.objects.create(name="Kibungo", type=world.district, tree_parent=world.west)
     world.mpigi = Location.objects.create(name="Mpigi", type=world.district, tree_parent=world.central)
+
+    world.ea = EnumerationArea.objects.get_or_create(name="EA")[0]
+    world.ea.locations.add(world.kampala)
+
+    world.ea_mbarara = EnumerationArea.objects.get_or_create(name="EA2")[0]
+    world.ea_mbarara.locations.add(world.mbarara)
 
 @step(u'And I have an indicator in that survey')
 def and_i_have_an_indicator_in_that_survey(step):
@@ -77,10 +83,10 @@ def and_i_have_households_in_in_those_districts(step):
 @step(u'And I have investigators in those districts')
 def and_i_have_investigators_in_those_districts(step):
     backend = Backend.objects.create(name="Backend")
-    world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", location=world.kampala,
+    world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=world.ea,
                                                      backend=backend)
     world.investigator_2 = Investigator.objects.create(name="Investigator 1", mobile_number="33331",
-                                                       location=world.mbarara,
+                                                       ea=world.ea_mbarara,
                                                        backend=backend)
 
 

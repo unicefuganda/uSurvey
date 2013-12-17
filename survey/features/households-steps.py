@@ -10,6 +10,7 @@ from django.template.defaultfilters import slugify
 
 from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage, HouseholdDetailsPage, EditHouseholdsPage
 from survey.features.page_objects.root import HomePage
+from survey.models import EnumerationArea
 from survey.models.households import HouseholdMember, HouseholdHead, Household
 from survey.models.investigator import Investigator
 
@@ -25,7 +26,9 @@ def and_i_see_all_households_fields_are_present(step):
 
 @step(u'And I have an investigator in that location')
 def and_i_have_an_investigator_in_that_location(step):
-    world.investigator = Investigator.objects.create(name="Investigator name", location=world.kampala_village)
+    world.ea = EnumerationArea.objects.create(name="EA")
+    world.ea.locations.add(world.kampala_village)
+    world.investigator = Investigator.objects.create(name="Investigator name", ea=world.ea)
 
 @step(u'Then I should see that the household is created')
 def then_i_should_see_that_the_household_is_created(step):
@@ -116,8 +119,11 @@ def then_specify_disappears(step):
 def given_i_have_an_investigator(step):
     country = LocationType.objects.create(name="Country", slug=slugify("country"))
     uganda = Location.objects.create(name="Uganda", type=country)
+    world.ea = EnumerationArea.objects.create(name="EA")
+    world.ea.locations.add(uganda)
+
     world.investigator = Investigator.objects.create(name="Investigator ", mobile_number='987654321', age=20,
-                                                     level_of_education="Nursery", language="Luganda", location=uganda)
+                                                     level_of_education="Nursery", language="Luganda", ea=world.ea)
 
 @step(u'Given I have 100 households')
 def given_i_have_100_households(step):
@@ -188,8 +194,8 @@ def and_i_should_see_actions_edit_and_delete_member(step):
 
 @step(u'And I have two other investigators')
 def and_i_have_two_other_investigators(step):
-    world.investigator_1 = Investigator.objects.create(name="Investigator name", location=world.kampala_village, mobile_number="123456789")
-    world.investigator_2 = Investigator.objects.create(name="Investigator name", location=world.kampala_village, mobile_number="123456782")
+    world.investigator_1 = Investigator.objects.create(name="Investigator name", ea=world.ea, mobile_number="123456789")
+    world.investigator_2 = Investigator.objects.create(name="Investigator name", ea=world.ea, mobile_number="123456782")
 
 @step(u'And I click on that household ID')
 def and_i_click_on_that_household_id(step):
