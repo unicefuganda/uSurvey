@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
 from south.v2 import DataMigration
-from django.db import models
-from survey.models import EnumerationArea
 
 
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        for investigator in orm['survey.investigator'].objects.all():
-            ea = EnumerationArea.objects.get_or_create(name="EA %s"%investigator.location.name)[0]
+        for investigator in orm['survey.investigator'].objects.all().exclude(location=None):
+            ea = orm.EnumerationArea.objects.get_or_create(name="EA %s"%investigator.location.name)[0]
             ea.locations.add(investigator.location)
             investigator.ea = ea
             investigator.save()
+
     def backwards(self, orm):
-        for investigator in orm['survey.investigator'].objects.all():
-            ea = EnumerationArea.objects.get_or_create(name="EA %s"%investigator.location.name)[0]
-            location = ea.locations.all()[0]
-            investigator.location = location
+        for investigator in orm['survey.investigator'].objects.all().exclude(ea=None):
+            location = investigator.ea.locations.all()
+            investigator.location = location[0] if location else None
             investigator.save()
 
     models = {

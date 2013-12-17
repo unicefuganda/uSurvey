@@ -1,6 +1,6 @@
 from random import randint
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import LocationTypeDetails
+from survey.models import LocationTypeDetails, EnumerationArea
 from survey.tests.base_test import BaseTest
 from survey.views.location_widget import LocationWidget
 
@@ -15,6 +15,8 @@ class LocationWidgetTest(BaseTest):
 
         self.kampala = Location.objects.create(name='Kampala', tree_parent=self.uganda, type=self.district)
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
+        ea = EnumerationArea.objects.create(name="Uganda EA")
+        ea.locations.add(self.kampala_city)
 
         self.generate_location_type_details(self.uganda, the_country=self.uganda)
         self.country_type_details = LocationTypeDetails.objects.get(location_type=self.country, country=self.uganda)

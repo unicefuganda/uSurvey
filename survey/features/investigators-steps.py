@@ -73,7 +73,16 @@ def and_i_visit_new_investigator_page(step):
 
 @step(u'And I fill all necessary fields')
 def and_i_fill_all_necessary_fields(step):
-    world.page.fill_valid_values()
+    values = {
+            'name': 'Investigator Name',
+            'mobile_number': "987654321",
+            'confirm_mobile_number': "987654321",
+            'male': 't',
+            'age': '25',
+            'level_of_education': 'Primary',
+            'language': 'Luo',
+            'ea': world.ea.id}
+    world.page.fill_valid_values(values)
 
 @step(u'And I submit the form')
 def and_i_submit_the_form(step):

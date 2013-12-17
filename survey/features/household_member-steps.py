@@ -11,13 +11,15 @@ from survey.models.investigator import Investigator
 @step(u'And I have a household')
 def and_i_have_a_household(step):
     district = LocationType.objects.get(slug = 'district')
-    world.kampala = Location.objects.create(name='Kampala', type = district)
+    world.kampala = Location.objects.create(name='Kampala', type=district)
     world.ea = EnumerationArea.objects.create(name="EA")
     world.ea.locations.add(world.kampala_village)
     world.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=world.ea)
-    world.household = Household.objects.create(investigator=world.investigator, location=world.investigator.location, uid=4)
-    HouseholdHead.objects.create(household=world.household, surname="Test", first_name="User", date_of_birth="1980-09-01", male=True,
-                                 occupation='Agricultural labor', level_of_education='Primary', resident_since_year=2013, resident_since_month=2)
+    world.household = Household.objects.create(investigator=world.investigator, ea=world.investigator.ea, uid=4)
+    HouseholdHead.objects.create(household=world.household, surname="Test", first_name="User",
+                                 date_of_birth="1980-09-01", male=True,
+                                 occupation='Agricultural labor', level_of_education='Primary',
+                                 resident_since_year=2013, resident_since_month=2)
 
 
 @step(u'And I visit new household member page')

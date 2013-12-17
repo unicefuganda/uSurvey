@@ -2,6 +2,7 @@
 from rapidsms.contrib.locations.models import Location
 from survey.features.page_objects.base import PageObject
 from survey.investigator_configs import MONTHS
+from survey.models import EnumerationArea
 from survey.models.investigator import Investigator
 from lettuce.django import django_url
 
@@ -19,15 +20,8 @@ class NewHouseholdPage(PageObject):
     def get_household_values(self):
         return self.values
 
-    def fill_valid_values(self):
-        self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
-        self.values = {
-            'surname': self.random_text('house'),
-            'first_name': self.random_text('ayoyo'),
-            'date_of_birth': '1980-02-01',
-            'uid':'2'
-        }
-
+    def fill_valid_values(self, values):
+        self.values = values
         self.browser.fill_form(self.values)
         kampala = Location.objects.get(name="Kampala")
         kampala_county = Location.objects.get(name="Kampala County")

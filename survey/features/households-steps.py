@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from random import randint
 from datetime import date
-from time import sleep
 
 from lettuce import *
 
@@ -9,16 +8,32 @@ from rapidsms.contrib.locations.models import *
 from django.template.defaultfilters import slugify
 
 from survey.features.page_objects.households import NewHouseholdPage, HouseholdsListPage, HouseholdDetailsPage, EditHouseholdsPage
-from survey.features.page_objects.root import HomePage
 from survey.models import EnumerationArea
 from survey.models.households import HouseholdMember, HouseholdHead, Household
 from survey.models.investigator import Investigator
+
+
+def random_text(text):
+    return text + str(randint(1, 999))
 
 
 @step(u'And I visit new household page')
 def and_i_visit_new_household_page(step):
     world.page = NewHouseholdPage(world.browser)
     world.page.visit()
+
+@step(u'And I fill household data')
+def and_i_fill_household_data(step):
+    uganda = Location.objects.create(name="Uganda")
+    ea = EnumerationArea.objects.create(name="Uganda EA")
+    ea.locations.add(uganda)
+    values = {
+        'surname': random_text('house'),
+        'first_name': random_text('ayoyo'),
+        'date_of_birth': '1980-02-01',
+        'uid': '2'}
+    world.page.fill_valid_values(values)
+    world.page.select('ea', [str(world.ea.id)])
 
 @step(u'And I see all households fields are present')
 def and_i_see_all_households_fields_are_present(step):
@@ -130,7 +145,7 @@ def given_i_have_100_households(step):
     for i in xrange(100):
         random_number = str(randint(1, 99999))
         try:
-            HouseholdHead.objects.create(surname="head" + random_number, date_of_birth='1980-06-01', male=False, household=Household.objects.create(investigator=world.investigator, location=world.investigator.location, uid=i))
+            HouseholdHead.objects.create(surname="head" + random_number, date_of_birth='1980-06-01', male=False, household=Household.objects.create(investigator=world.investigator, location=world.investigator.location, uid=i, ea=world.investigator.ea))
         except Exception:
             pass
 

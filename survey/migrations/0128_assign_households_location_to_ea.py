@@ -1,25 +1,21 @@
 # -*- coding: utf-8 -*-
 from south.v2 import DataMigration
-from survey.models import LocationTypeDetails
 
 
 class Migration(DataMigration):
 
-    def generate_location_type_details(self, location, the_country):
-        if the_country:
-            LocationTypeDetails.objects.get_or_create(country=the_country, location_type=location.type)
-            if location.get_children().exists():
-                self.generate_location_type_details(location.get_children()[0], the_country)
-
     def forwards(self, orm):
-        the_country = LocationTypeDetails.the_country()
-        if the_country:
-            the_country.order = 0
-        LocationTypeDetails.objects.all().delete()
-        self.generate_location_type_details(the_country, the_country)
+        for household in orm['survey.household'].objects.all().exclude(location=None):
+            ea = orm.EnumerationArea.objects.get_or_create(name="EA %s"%household.location.name)[0]
+            ea.locations.add(household.location)
+            household.ea = ea
+            household.save()
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+        for household in orm['survey.household'].objects.all().exclude(ea=None):
+            location = household.ea.locations.all()
+            household.location = location[0] if location else None
+            household.save()
 
     models = {
         u'auth.group': {
@@ -83,6 +79,13 @@ class Migration(DataMigration):
             'latitude': ('django.db.models.fields.DecimalField', [], {'max_digits': '13', 'decimal_places': '10'}),
             'longitude': ('django.db.models.fields.DecimalField', [], {'max_digits': '13', 'decimal_places': '10'})
         },
+        'survey.aboutus': {
+            'Meta': {'object_name': 'AboutUs'},
+            'content': ('django.db.models.fields.TextField', [], {}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'})
+        },
         'survey.answerrule': {
             'Meta': {'object_name': 'AnswerRule'},
             'action': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -120,7 +123,8 @@ class Migration(DataMigration):
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'location': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'open_batches'", 'null': 'True', 'to': u"orm['locations.Location']"}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'})
+            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'non_response': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'survey.batchquestionorder': {
             'Meta': {'object_name': 'BatchQuestionOrder'},
@@ -131,15 +135,27 @@ class Migration(DataMigration):
             'order': ('django.db.models.fields.PositiveIntegerField', [], {}),
             'question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'question_batch_order'", 'to': "orm['survey.Question']"})
         },
+        'survey.enumerationarea': {
+            'Meta': {'object_name': 'EnumerationArea'},
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'locations': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'locations'", 'null': 'True', 'to': u"orm['locations.Location']"}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
+            'survey': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'enumeration_area'", 'null': 'True', 'to': "orm['survey.Survey']"})
+        },
         'survey.formula': {
             'Meta': {'object_name': 'Formula'},
-            'count': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'as_count'", 'null': 'True', 'to': "orm['survey.Question']"}),
+            'count': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'as_count'", 'null': 'True', 'to': "orm['survey.Question']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'denominator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'as_denominator'", 'null': 'True', 'to': "orm['survey.Question']"}),
+            'denominator': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'as_denominator'", 'null': 'True', 'to': "orm['survey.Question']"}),
+            'denominator_options': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'denominator_options'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['survey.QuestionOption']"}),
+            'groups': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'as_group'", 'null': 'True', 'to': "orm['survey.HouseholdMemberGroup']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'indicator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'formula'", 'null': 'True', 'to': "orm['survey.Indicator']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'numerator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'as_numerator'", 'null': 'True', 'to': "orm['survey.Question']"})
+            'numerator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'as_numerator'", 'null': 'True', 'to': "orm['survey.Question']"}),
+            'numerator_options': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'numerator_options'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['survey.QuestionOption']"})
         },
         'survey.groupcondition': {
             'Meta': {'unique_together': "(('value', 'attribute', 'condition'),)", 'object_name': 'GroupCondition'},
@@ -154,6 +170,7 @@ class Migration(DataMigration):
         'survey.household': {
             'Meta': {'object_name': 'Household'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'ea': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'household_enumeration_area'", 'null': 'True', 'to': "orm['survey.EnumerationArea']"}),
             'household_code': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'households'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
@@ -169,7 +186,7 @@ class Migration(DataMigration):
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'household': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'batch_completion_batches'", 'null': 'True', 'to': "orm['survey.Household']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'investigator': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Investigator']", 'null': 'True'}),
+            'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'batch_completion_completed_households'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'})
         },
         'survey.householdhead': {
@@ -225,11 +242,11 @@ class Migration(DataMigration):
             'age': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'}),
             'backend': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Backend']", 'null': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'ea': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'enumeration_area'", 'null': 'True', 'to': "orm['survey.EnumerationArea']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_blocked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'language': ('django.db.models.fields.CharField', [], {'default': "'English'", 'max_length': '100', 'null': 'True'}),
             'level_of_education': ('django.db.models.fields.CharField', [], {'default': "'Primary'", 'max_length': '100', 'null': 'True'}),
-            'location': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['locations.Location']", 'null': 'True'}),
             'male': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'mobile_number': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '10'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -282,7 +299,7 @@ class Migration(DataMigration):
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'multichoiceanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'is_old': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'multichoiceanswer'", 'null': 'True', 'to': "orm['survey.Question']"}),
             'rule_applied': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.AnswerRule']", 'null': 'True'})
         },
         'survey.numericalanswer': {
@@ -296,7 +313,7 @@ class Migration(DataMigration):
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'numericalanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'is_old': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'numericalanswer'", 'null': 'True', 'to': "orm['survey.Question']"}),
             'rule_applied': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.AnswerRule']", 'null': 'True'})
         },
         'survey.question': {
@@ -323,7 +340,7 @@ class Migration(DataMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'survey.questionoption': {
-            'Meta': {'object_name': 'QuestionOption'},
+            'Meta': {'ordering': "['order']", 'object_name': 'QuestionOption'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -338,7 +355,7 @@ class Migration(DataMigration):
             'mobile_number': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'no_of_households': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'}),
-            'selected_households': ('django.db.models.fields.CharField', [], {'max_length': '510'}),
+            'selected_households': ('django.db.models.fields.TextField', [], {}),
             'survey': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'random_household'", 'null': 'True', 'to': "orm['survey.Survey']"})
         },
         'survey.survey': {
@@ -363,8 +380,16 @@ class Migration(DataMigration):
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'textanswer'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
             'is_old': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.Question']", 'null': 'True'}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'textanswer'", 'null': 'True', 'to': "orm['survey.Question']"}),
             'rule_applied': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['survey.AnswerRule']", 'null': 'True'})
+        },
+        'survey.unknowndobattribute': {
+            'Meta': {'object_name': 'UnknownDOBAttribute'},
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'household_member': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'unknown_dob_attribute'", 'to': "orm['survey.HouseholdMember']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
         },
         'survey.uploaderrorlog': {
             'Meta': {'object_name': 'UploadErrorLog'},

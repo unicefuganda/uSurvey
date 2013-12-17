@@ -13,7 +13,7 @@ Feature: Households feature
        And I have locations
        And I have an investigator in that location
        And I visit new household page
-       And I fill all necessary fields
+       And I fill household data
        And I submit the form
        Then I should see that the household is created
        And I have a member for that household

@@ -8,9 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Household.location'
-        db.delete_column(u'survey_household', 'location_id')
-
         # Adding field 'Household.ea'
         db.add_column(u'survey_household', 'ea',
                       self.gf('django.db.models.fields.related.ForeignKey')(related_name='household_enumeration_area', null=True, to=orm['survey.EnumerationArea']),
@@ -18,11 +15,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Adding field 'Household.location'
-        db.add_column(u'survey_household', 'location',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['locations.Location'], null=True),
-                      keep_default=False)
-
         # Deleting field 'Household.ea'
         db.delete_column(u'survey_household', 'ea_id')
 
@@ -184,6 +176,7 @@ class Migration(SchemaMigration):
             'household_code': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'investigator': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'households'", 'null': 'True', 'to': "orm['survey.Investigator']"}),
+            'location': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['locations.Location']", 'null': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'random_sample_number': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'survey': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'survey_household'", 'null': 'True', 'to': "orm['survey.Survey']"}),

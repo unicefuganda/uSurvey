@@ -16,9 +16,6 @@ class PageObject(object):
     def validate_url(self):
         assert self.browser.url == django_url(self.url)
 
-    def random_text(self, text):
-        return text + str(randint(1, 999))
-
     def fill(self, name, value):
         self.browser.fill(name, value)
 

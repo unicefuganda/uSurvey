@@ -153,9 +153,10 @@ def and_i_have_an_investigator_and_households(step):
     world.ea = EnumerationArea.objects.create(name="EA")
     world.ea.locations.add(world.kampala_village)
     world.investigator = Investigator.objects.create(name="some_investigator", mobile_number="123456784", ea=world.ea)
-    world.household_1 = Household.objects.create(investigator = world.investigator, uid=101, location=world.kampala_village)
-    world.household_2 = Household.objects.create(investigator = world.investigator, uid=102, location=world.kampala_village)
-    world.member_2 = HouseholdMember.objects.create(household=world.household_2,date_of_birth= datetime.datetime(2000,02, 02))
+    world.household_1 = Household.objects.create(investigator=world.investigator, uid=101, ea=world.ea)
+    world.household_2 = Household.objects.create(investigator=world.investigator, uid=102, ea=world.ea)
+    world.member_2 = HouseholdMember.objects.create(household=world.household_2,
+                                                    date_of_birth=datetime.datetime(2000, 02, 02))
 
 
 @step(u'And I should see percent completion')

@@ -12,7 +12,7 @@ from survey.models.question import Question, QuestionOption
 
 
 def create_household_head(uid, investigator):
-    household = Household.objects.create(investigator=investigator, location=investigator.location,
+    household = Household.objects.create(investigator=investigator, ea=investigator.ea,
                                          uid=uid, survey=world.survey)
     return HouseholdHead.objects.create(household=household, surname="Name " + str(randint(1, 9999)),
                                         date_of_birth="1990-02-09")
