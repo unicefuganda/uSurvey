@@ -15,11 +15,7 @@ class UploadLocationsPage(PageObject):
         self.is_text_present('0'*length_of_code )
 
 
-class UploadWeightsPage(PageObject):
-    def __init__(self, browser):
-        super(UploadWeightsPage, self).__init__(browser)
-        self.url = '/locations/weights/upload/'
-
+class UploadBase(PageObject):
     def submit(self):
         self.browser.find_by_name('save_button').first.click()
 
@@ -29,9 +25,13 @@ class UploadWeightsPage(PageObject):
         assert not 'in' in collapse_element.first['class']
 
 
-class ListLocationWeightsPage(PageObject):
-    url = "/locations/weights/"
+class UploadWeightsPage(UploadBase):
+    def __init__(self, browser):
+        super(UploadWeightsPage, self).__init__(browser)
+        self.url = '/locations/weights/upload/'
 
 
-class ListLocationWeightsErrorLogPage(PageObject):
-    url = "/locations/weights/error_logs/"
+class UploadEAPage(UploadBase):
+    def __init__(self, browser):
+        super(UploadEAPage, self).__init__(browser)
+        self.url = '/locations/enumeration_area/upload/'

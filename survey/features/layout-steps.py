@@ -8,7 +8,7 @@ def and_i_click_survey_administration_tab(step):
 @step(u'Then I should see survey administration dropdown list')
 def then_i_should_see_survey_administration_dropdown_list(step):
     reverse_url_links = ["investigators_page","list_household_page", "list_all_questions", "survey_list_page",
-                         "question_module_listing_page", "household_member_groups_page", "bulk_sms"]
+                         "question_module_listing_page", "household_member_groups_page", "bulk_sms", "upload_ea"]
     world.page.see_dropdown(reverse_url_links)
 
 @step(u'And I click Downloads Tab')

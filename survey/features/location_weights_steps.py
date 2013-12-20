@@ -3,7 +3,8 @@ from time import sleep
 import datetime
 from lettuce import step, world
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.features.page_objects.uploads import UploadWeightsPage, ListLocationWeightsPage, ListLocationWeightsErrorLogPage
+from survey.features.page_objects.uploads import UploadWeightsPage
+from survey.features.page_objects.weights import ListLocationWeightsPage, ListLocationWeightsErrorLogPage
 from survey.models import LocationWeight, UploadErrorLog, Survey, LocationTypeDetails
 
 

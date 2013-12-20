@@ -6,6 +6,8 @@ from survey.models import Survey, LocationTypeDetails
 from survey.services.csv_uploader import CSVUploader, UploadService
 from survey.services.location_upload import UploadLocation
 from survey.services.location_weights_upload import UploadLocationWeights
+from survey.services.ea_upload import UploadEA
+
 
 
 class UploadCSVFileForm(forms.Form):
@@ -82,16 +84,27 @@ class UploadLocationsForm(UploadCSVFileForm):
             raise ValidationError('Location types not in order. Please refer to input file format.')
 
 
-class UploadWeightsForm(UploadCSVFileForm):
+class UploadWithSurveyForm(UploadCSVFileForm):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)
 
-    def __init__(self,  *args, **kwargs):
-        super(UploadWeightsForm, self).__init__(UploadLocationWeights, *args, **kwargs)
+    def __init__(self,  uploader, *args, **kwargs):
+        super(UploadWithSurveyForm, self).__init__(uploader, *args, **kwargs)
         self.fields.keyOrder = ['survey', 'file']
-        self.fields['file'].label = 'Location weights file'
 
     def upload(self):
         _file = self.cleaned_data['file']
         survey = self.cleaned_data['survey']
         uploader = self.uploader(_file)
         return uploader.upload(survey)
+
+
+class UploadWeightsForm(UploadWithSurveyForm):
+    def __init__(self,  *args, **kwargs):
+        super(UploadWeightsForm, self).__init__(UploadLocationWeights, *args, **kwargs)
+        self.fields['file'].label = 'Location weights file'
+
+
+class UploadEAForm(UploadWithSurveyForm):
+    def __init__(self,  *args, **kwargs):
+        super(UploadEAForm, self).__init__(UploadEA, *args, **kwargs)
+        self.fields['file'].label = 'EA file'

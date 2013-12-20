@@ -14,8 +14,6 @@ from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
 
 
-
-@login_required
 @permission_required('auth.can_view_batches')
 def upload(request):
     upload_form = UploadWeightsForm()
