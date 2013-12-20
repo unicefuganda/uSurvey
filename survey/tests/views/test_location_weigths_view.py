@@ -4,7 +4,7 @@ from django.test import Client
 from mock import patch
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.upload_csv_file import UploadWeightsForm
-from survey.models import LocationWeight, Survey, UploadErrorLog
+from survey.models import LocationWeight, Survey, UploadErrorLog, LocationTypeDetails
 from survey.tests.base_test import BaseTest
 from survey.views.location_widget import LocationWidget
 from django.utils.timezone import utc
@@ -30,6 +30,11 @@ class UploadWeightsTest(BaseTest):
         region = Location.objects.create(name="region2", type=self.reqion_type)
         district = Location.objects.create(name="district2", tree_parent=region, type=self.district_type)
         Location.objects.create(name="county2", tree_parent=district, type=self.county_type)
+
+        LocationTypeDetails.objects.create(country=region, location_type=self.reqion_type)
+        LocationTypeDetails.objects.create(country=region, location_type=self.district_type)
+        LocationTypeDetails.objects.create(country=region, location_type=self.county_type)
+
 
         self.filename = 'test_uganda.csv'
         self.filedata = [['RegionName', 'DistrictName', 'CountyName', 'Selection Probability'],
@@ -135,7 +140,6 @@ class UploadWeightsTest(BaseTest):
     def test_filter_list_weights_by_location(self):
         district = Location.objects.create(name="district1", type=self.district_type)
         county = Location.objects.create(name="county1", tree_parent=district, type=self.county_type)
-
         region1 = Location.objects.create(name="region2", type=self.reqion_type)
         district1 = Location.objects.create(name="district2", tree_parent=region1, type=self.district_type)
         county1 = Location.objects.create(name="county2", tree_parent=district1, type=self.county_type)

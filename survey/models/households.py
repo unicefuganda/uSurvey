@@ -97,12 +97,9 @@ class Household(BaseModel):
 
     def _get_related_location_name(self, key, location_hierarchy):
         location_object = location_hierarchy.get(key, None)
-
         location_name = ""
-
         if location_object:
             location_name = location_object.name
-
         return location_name
 
     def location_hierarchy(self):
@@ -118,9 +115,8 @@ class Household(BaseModel):
 
     def get_related_location(self):
         location_hierarchy = self.location_hierarchy()
-
         keys = ['District', 'County', 'Subcounty', 'Parish', 'Village']
-        related_location = {}
+        related_location = SortedDict()
         for key in keys:
             related_location[key] = self._get_related_location_name(key, location_hierarchy)
 
@@ -223,8 +219,11 @@ class Household(BaseModel):
         return (all_households.order_by('uid').reverse()[0].uid + 1) if all_households else 1
 
     @classmethod
-    def all_households_in(cls, location, survey):
-        return Household.objects.filter(ea__locations__in=location.get_descendants(include_self=True), survey=survey)
+    def all_households_in(cls, location, survey, ea=None):
+        all_households = Household.objects.filter(survey=survey)
+        if ea:
+            return all_households.filter(ea=ea)
+        return all_households.filter(ea__locations__in=location.get_descendants(include_self=True))
 
     @property
     def location(self):

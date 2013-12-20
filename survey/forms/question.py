@@ -40,7 +40,6 @@ class QuestionForm(ModelForm):
             modules = QuestionModule.objects.filter()
         self.fields['module'].choices = [(question_module.id, question_module.name) for question_module in modules]
 
-
     class Meta:
         model = Question
         fields =['module', 'text', 'identifier', 'group', 'answer_type']
@@ -135,5 +134,4 @@ class QuestionForm(ModelForm):
 
         if self.options_supplied(commit):
             self.save_question_options(question)
-
         return question

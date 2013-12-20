@@ -32,6 +32,7 @@ class InvestigatorForm(ModelForm):
             'mobile_number': forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'style':"width:172px;", 'maxlength':'10'}),
             'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
             'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':18, 'max':50 }),
-            'location':forms.HiddenInput(),
+            'location': forms.HiddenInput(),
+            'ea': forms.HiddenInput(),
         }
 

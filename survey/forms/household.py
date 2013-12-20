@@ -1,12 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from survey.models.households import Household
-
+from django import forms
 
 class HouseholdForm(ModelForm):
     class Meta:
         model = Household
         exclude = ['investigator', 'location', 'survey', 'household_code']
+        widgets = {
+            'ea': forms.HiddenInput(),
+        }
 
     def __init__(self, is_edit=False, uid=None,  survey=None, *args, **kwargs):
         super(HouseholdForm, self).__init__(*args, **kwargs)

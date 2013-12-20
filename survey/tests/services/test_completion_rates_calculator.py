@@ -103,8 +103,7 @@ class BatchCompletionRatesTest(BaseTest):
         self.assertEqual(date_2.strftime('%d-%b-%Y %H:%M:%S'), interviewed_2['date_interviewed'])
         self.assertEqual(1, interviewed_2['number_of_member_interviewed'])
 
-    @patch('survey.services.completion_rates_calculator.BatchCompletionRates.percent_completed_households')
-    def test_completion_rates(self, mock_percent):
+    def test_completion_rates_for_location(self):
         masaka = Location.objects.create(name="masaka", tree_parent=self.uganda, type=self.city)
         ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
         ea.locations.add(masaka)
@@ -113,28 +112,54 @@ class BatchCompletionRatesTest(BaseTest):
 
         household_3 = Household.objects.create(investigator=investigator_3, ea=investigator_3.ea,
                                                survey=self.open_survey)
-        member_3 = HouseholdMember.objects.create(household=household_3, date_of_birth=date(1980, 05, 01))
-        mock_percent.side_effect = [self.kampala_city.id, self.open_survey]  # return value only needed to change
-        # with locations
+        HouseholdMember.objects.create(household=household_3, date_of_birth=date(1980, 05, 01))
 
-        completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [self.kampala_city])
-        completions = completion_rate.attributes()
+        with patch.object(BatchCompletionRates, 'percent_completed_households', return_value=self.kampala_city.id):
+
+            completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [self.kampala_city])
+            completions = completion_rate.attributes()
+            self.assertEqual(1, len(completions))
+
+            completion_1 = completions[0]
+            self.assertEqual(2, completion_1['total_households'])
+            self.assertEqual(self.kampala_city.id, completion_1['completed_households_percent'])
+
+            completions.remove(completion_1)
+
+        with patch.object(BatchCompletionRates, 'percent_completed_households', return_value=masaka.id):
+            completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [masaka])
+
+            completions = completion_rate.attributes()
+            self.assertEqual(1, len(completions))
+
+            completion_2 = completions[0]
+            self.assertEqual(1, completion_2['total_households'])
+            self.assertEqual(masaka.id, completion_2['completed_households_percent'])
+
+    def test_completion_rates_for_ea(self):
+        masaka = Location.objects.create(name="masaka", tree_parent=self.uganda, type=self.city)
+        mbarara = Location.objects.create(name="mbarara", tree_parent=self.uganda, type=self.city)
+
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
+        another_ea = EnumerationArea.objects.create(name="Another EA2", survey=self.open_survey)
+        ea.locations.add(masaka)
+        ea.locations.add(mbarara)
+
+        investigator_3 = Investigator.objects.create(name='some_inv_2', mobile_number='123456787', male=True, ea=ea)
+        another_investigator = Investigator.objects.create(name='some_inv_2', mobile_number='111111', male=True, ea=another_ea)
+
+        Household.objects.create(investigator=investigator_3, ea=investigator_3.ea, survey=self.open_survey)
+        Household.objects.create(investigator=investigator_3, ea=investigator_3.ea, survey=self.open_survey)
+        Household.objects.create(investigator=another_investigator, ea=another_ea, survey=self.open_survey)
+
+        with patch.object(BatchCompletionRates, 'percent_completed_households', return_value=ea.id):
+            completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [self.kampala_city], ea=ea)
+            completions = completion_rate.attributes()
+
         self.assertEqual(1, len(completions))
-
         completion_1 = completions[0]
         self.assertEqual(2, completion_1['total_households'])
-        self.assertEqual(self.kampala_city.id, completion_1['completed_households_percent'])
-
-        completions.remove(completion_1)
-        mock_percent.side_effect = [masaka.id, self.open_survey]  # return value only needed to change with locations
-        completion_rate = BatchHighLevelLocationsCompletionRates(self.batch, [masaka])
-
-        completions = completion_rate.attributes()
-        self.assertEqual(1, len(completions))
-
-        completion_2 = completions[0]
-        self.assertEqual(1, completion_2['total_households'])
-        self.assertEqual(masaka.id, completion_2['completed_households_percent'])
+        self.assertEqual(ea.id, completion_1['completed_households_percent'])
 
 
 class BatchSurveyCompletionRatesTest(BaseTest):

@@ -15,8 +15,8 @@ class AggregateStatusPage(PageObject):
             location = Location.objects.get(name=value)
             self.fill_in_with_js(jquery_id, location.pk)
 
-    def check_if_batches_present(self, *batches):
-        all_options = self.browser.find_by_id('batch-list-select')[0].find_by_tag('option')
+    def check_if_batches_present(self, batches):
+        all_options = self.browser.find_by_id('id_batch')[0].find_by_tag('option')
         all_options = [option.text for option in all_options]
         for batch in batches:
             assert batch.name in all_options

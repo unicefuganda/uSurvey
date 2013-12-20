@@ -22,8 +22,8 @@ jQuery(function($){
   });
 
   $(document).on('location-selected', function(){
-    var location = $('input[name=location]').val();
-    $.getJSON('/households/investigators', {'location':location}, function(data){
+    var ea_id = $('select[name=ea]').val();
+    $.getJSON('/households/investigators', {'ea':ea_id}, function(data){
       $.each(data, function(key, value) {
         $('#household-investigator').append($('<option>').val(value).text(key));
       });

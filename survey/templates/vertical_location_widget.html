@@ -14,4 +14,17 @@
   </div>
 {% endfor %}
 </div>
+<div id="ea-widget">
+  <div class="control-group">
+      <label class="control-label" for="widget_ea">Enumeration area</label>
+      <div class="controls">
+          <select id="widget_ea"  data-placeholder="Select or Type EA " class="chzn-select" name="ea" required="required">
+              <option value="">{{ default_text }}</option>
+              {% for ea in location_data.get_ea_data %}
+                <option data-location=true value="{{ ea.id }}" {{ location_data|is_ea_selected:ea }}>{{ ea.name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+  </div>
+</div>
 <input type="hidden" name="location" value="{% if selected_location %}{{selected_location.id}}{% endif %}">

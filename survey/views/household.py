@@ -31,9 +31,9 @@ def _add_error_response_message(householdform, request):
                 messages.error(request, error_message + str(err))
 
 
-def validate_investigator(request, householdform, posted_locations):
+def validate_investigator(request, householdform, selected_ea):
     investigator_form = {'value': '', 'text': '', 'error': '',
-                         'options': Investigator.objects.filter(ea__locations__in=posted_locations)}
+                         'options': Investigator.objects.filter(ea=selected_ea)}
     investigator = None
     try:
         investigator = Investigator.objects.get(id=int(request.POST['investigator']))
@@ -75,6 +75,7 @@ def create_remaining_modelforms(householdform, valid):
     if valid.get('household', None):
         householdform['householdHead'].instance.household = householdform['household'].instance
         is_valid_form = householdform['householdHead'].is_valid()
+
         if is_valid_form:
             householdform['householdHead'].save()
             valid['householdHead'] = True
@@ -110,30 +111,29 @@ def _process_form(householdform, investigator, request, is_edit=False, uid=None)
 
 
 def set_household_form(uid=None, data=None, is_edit=False, instance=None):
-    householdform = {}
+    household_form = {}
     if not is_edit:
-        householdform['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
+        household_form['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
 
     open_survey = Survey.currently_open_survey()
 
-    householdform['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid,
-                                               survey=open_survey, auto_id='household-%s', label_suffix='')
-    return householdform
+    household_form['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid,
+                                                survey=open_survey, auto_id='household-%s', label_suffix='')
+    return household_form
 
 
-def create(request, selected_location, instance=None, is_edit=False, uid=None):
-    householdform = set_household_form(uid=uid, data=request.POST, instance=instance, is_edit=is_edit)
-    posted_locations = selected_location.get_descendants(include_self=True)
-    investigator, investigator_form = validate_investigator(request, householdform['household'], posted_locations)
-    response = _process_form(householdform, investigator, request, is_edit=is_edit, uid=uid)
-
-    return response, householdform, investigator, investigator_form
+def create(request, selected_ea, instance=None, is_edit=False, uid=None):
+    household_form = set_household_form(uid=uid, data=request.POST, instance=instance, is_edit=is_edit)
+    investigator, investigator_form = validate_investigator(request, household_form['household'], selected_ea)
+    response = _process_form(household_form, investigator, request, is_edit=is_edit, uid=uid)
+    return response, household_form, investigator, investigator_form
 
 
 @login_required
 @permission_required('auth.can_view_households')
 def new(request):
     selected_location = None
+    selected_ea = None
     response = None
 
     householdform = set_household_form(data=None)
@@ -142,64 +142,77 @@ def new(request):
     year_choices = {'selected_text': '', 'selected_value': ''}
 
     if request.method == 'POST':
-        ea = EnumerationArea.objects.get(id=request.POST['ea']) if contains_key(request.POST, 'ea') else None
-        selected_location = ea.locations.all()[0]
+        selected_ea = EnumerationArea.objects.get(id=request.POST['ea']) if contains_key(request.POST, 'ea') else None
+        if selected_ea:
+            selected_location = selected_ea.locations.all()
+            if selected_location:
+                selected_location = selected_location[0]
 
-        response, householdform, investigator, investigator_form = create(request, selected_location)
+        response, householdform, investigator, investigator_form = create(request, selected_ea)
         month_choices = {'selected_text': MONTHS[int(request.POST['resident_since_month'])][1],
                          'selected_value': request.POST['resident_since_month']}
         year_choices = {'selected_text': request.POST['resident_since_year'],
                         'selected_value': request.POST['resident_since_year']}
 
-    householdHead = householdform['householdHead']
+    household_head = householdform['householdHead']
+
     del householdform['householdHead']
-    return response or render(request, 'households/new.html', {'selected_location': selected_location,
-                                                               'locations': LocationWidget(selected_location),
-                                                               'investigator_form': investigator_form,
-                                                               'headform': householdHead,
-                                                               'householdform': householdform,
-                                                               'months_choices': householdHead.resident_since_month_choices(
-                                                                   month_choices),
-                                                               'years_choices': householdHead.resident_since_year_choices(
-                                                                   year_choices),
-                                                               'action': "/households/new/",
-                                                               'heading': "New Household",
-                                                               'id': "create-household-form",
-                                                               'button_label': "Create",
-                                                               'loading_text': "Creating..."})
+    context = {'selected_location': selected_location,
+               'locations': LocationWidget(selected_location, ea=selected_ea),
+               'investigator_form': investigator_form,
+               'headform': household_head,
+               'householdform': householdform,
+               'months_choices': household_head.resident_since_month_choices(month_choices),
+               'years_choices': household_head.resident_since_year_choices(year_choices),
+               'action': "/households/new/",
+               'heading': "New Household",
+               'id': "create-household-form",
+               'button_label': "Create",
+               'loading_text': "Creating..."}
+    return response or render(request, 'households/new.html', context)
 
 
 @login_required
 def get_investigators(request):
-    location = request.GET['location'] if request.GET.has_key('location') and request.GET['location'] else None
-    investigators = Investigator.objects.filter(ea__locations=location, is_blocked=False)
+    ea = request.GET['ea'] if request.GET.has_key('ea') and request.GET['ea'] else None
+    investigators = Investigator.objects.filter(ea=ea, is_blocked=False)
     investigator_hash = {}
     for investigator in investigators:
         investigator_hash[investigator.name] = investigator.id
     return HttpResponse(json.dumps(investigator_hash), content_type="application/json")
 
 
+def _remove_duplicates(all_households):
+    households_without_heads = list(all_households.filter(household_member__householdhead__surname=None).distinct())
+    households = list(all_households.exclude(household_member__householdhead__surname=None).distinct('household_member__householdhead__surname'))
+    households.extend(households_without_heads)
+    return households
+
+
 @permission_required('auth.can_view_households')
 def list_households(request):
     selected_location = None
-
+    selected_ea = None
     all_households = Household.objects.order_by('household_member__householdhead__surname')
-    households = list()
-    map(lambda household: not household in households and households.append(household), all_households)
 
     params = request.GET
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))
         corresponding_locations = selected_location.get_descendants(include_self=True)
-        investigators = Investigator.objects.filter(ea__locations__in=corresponding_locations)
-        households = Household.objects.filter(investigator__in=investigators)
+        all_households = all_households.filter(ea__locations__in=corresponding_locations)
+
+    if params.has_key('ea') and params['ea'].isdigit():
+        selected_ea = EnumerationArea.objects.get(id=int(params['ea']))
+        all_households = all_households.filter(ea=selected_ea)
+
+    households = _remove_duplicates(all_households)
     households = Household.set_related_locations(households)
     if not households:
         location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'
         messages.error(request, "There are  no households currently registered  for this %s." % location_type)
 
     return render(request, 'households/index.html',
-                  {'households': households, 'location_data': LocationWidget(selected_location), 'request': request})
+                  {'households': households, 'location_data': LocationWidget(selected_location, ea=selected_ea), 'request': request})
 
 
 def view_household(request, household_id):
@@ -210,10 +223,11 @@ def view_household(request, household_id):
 def edit_household(request, household_id):
     household_selected = Household.objects.get(id=household_id)
     selected_location = household_selected.location
+    selected_ea = household_selected.ea
     response = None
     uid = household_selected.uid
     household_form = set_household_form(is_edit=True, instance=household_selected)
-    investigators = Investigator.objects.filter(ea__locations=selected_location, is_blocked=False)
+    investigators = Investigator.objects.filter(ea=selected_ea, is_blocked=False)
     investigator_form = {'value': '', 'text': '',
                          'options': investigators,
                          'error': ''}
@@ -223,11 +237,12 @@ def edit_household(request, household_id):
 
         selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST,
                                                                                               'location') else None
+        selected_ea = EnumerationArea.objects.get(id=request.POST['ea']) if contains_key(request.POST, 'ea') else None
         response, household_form, investigator, investigator_form = create(request, selected_location,
                                                                            instance=household_selected, is_edit=True,
                                                                            uid=uid)
     return response or render(request, 'households/new.html', {'selected_location': selected_location,
-                                                               'locations': LocationWidget(selected_location),
+                                                               'locations': LocationWidget(selected_location, ea=selected_ea),
                                                                'investigator_form': investigator_form,
                                                                'householdform': household_form,
                                                                'action': "/households/%s/edit/" % household_id,

@@ -34,3 +34,7 @@ class LocationTypeDetails(BaseModel):
         if all_types_details.exists():
             return all_types_details[0].country
         return None
+
+    @classmethod
+    def get_second_lowest_level_type(cls):
+        return cls.objects.all().order_by('-order')[1].location_type

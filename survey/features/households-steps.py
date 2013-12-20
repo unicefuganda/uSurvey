@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from random import randint
 from datetime import date
+from time import sleep
 
 from lettuce import *
 
@@ -24,16 +25,12 @@ def and_i_visit_new_household_page(step):
 
 @step(u'And I fill household data')
 def and_i_fill_household_data(step):
-    uganda = Location.objects.create(name="Uganda")
-    ea = EnumerationArea.objects.create(name="Uganda EA")
-    ea.locations.add(uganda)
     values = {
         'surname': random_text('house'),
         'first_name': random_text('ayoyo'),
         'date_of_birth': '1980-02-01',
         'uid': '2'}
-    world.page.fill_valid_values(values)
-    world.page.select('ea', [str(world.ea.id)])
+    world.page.fill_valid_values(values, world.ea)
 
 @step(u'And I see all households fields are present')
 def and_i_see_all_households_fields_are_present(step):
@@ -41,8 +38,6 @@ def and_i_see_all_households_fields_are_present(step):
 
 @step(u'And I have an investigator in that location')
 def and_i_have_an_investigator_in_that_location(step):
-    world.ea = EnumerationArea.objects.create(name="EA")
-    world.ea.locations.add(world.kampala_village)
     world.investigator = Investigator.objects.create(name="Investigator name", ea=world.ea)
 
 @step(u'Then I should see that the household is created')
@@ -229,8 +224,8 @@ def when_i_click_edit_household(step):
 def then_i_should_see_edit_household_form(step):
     world.page = EditHouseholdsPage(world.browser, world.household)
     world.related_location = world.household.get_related_location()
-    for key, value in world.related_location.items():
-        world.page.is_text_present(value)
+    for key in world.related_location.keys()[:-1]:
+        world.page.is_text_present(world.related_location[key])
 
 @step(u'When I assign a new investigator')
 def when_i_assign_a_new_investigator(step):

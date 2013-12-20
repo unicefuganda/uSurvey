@@ -3,7 +3,7 @@
   Completion Rates
 {% endblock %}
 {% block content %}
-    <h3>Survey Completion by household in {{ selected_location.type.name }} {{ selected_location.name }}</h3>
+    <h3>Survey Completion by household in EA {{ selected_ea.name }}</h3>
     {% if completion_rates %}
     <p>Investigator: {{ investigator.name }}({{ investigator.mobile_number }})</p>
     <p>Percent Completion: {{ completion_rates.percent_completed_households }}</p>

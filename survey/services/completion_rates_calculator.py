@@ -12,8 +12,8 @@ class BatchCompletionRates:
         except ZeroDivisionError:
             return 0
 
-    def percent_completed_households(self, location, survey):
-        all_households = Household.all_households_in(location, survey)
+    def percent_completed_households(self, location, survey, ea=None):
+        all_households = Household.all_households_in(location, survey, ea)
         return self.percentage_completed(all_households)
 
     def percentage_completed(self, all_households):
@@ -22,10 +22,11 @@ class BatchCompletionRates:
 
 
 class BatchLocationCompletionRates(BatchCompletionRates):
-    def __init__(self, batch, location):
+    def __init__(self, batch, location, ea=None):
         self.batch = batch
+        self.ea = ea
         self.location = location
-        self.all_households = Household.all_households_in(self.location, batch.survey)
+        self.all_households = Household.all_households_in(self.location, batch.survey, ea)
 
     def percent_completed_households(self):
         all_households = self.all_households
@@ -33,29 +34,28 @@ class BatchLocationCompletionRates(BatchCompletionRates):
         return self.calculate_percent(len(completed_households), all_households.count())
 
     def interviewed_households(self):
-        _interviewed_households=[]
+        _interviewed_households = []
         for household in self.all_households:
-            attributes= {'household':household,
-                         'date_interviewed':household.date_interviewed_for(self.batch),
-                         'number_of_member_interviewed':len(household.members_interviewed(self.batch)),}
+            attributes = {'household': household,
+                          'date_interviewed': household.date_interviewed_for(self.batch),
+                          'number_of_member_interviewed': len(household.members_interviewed(self.batch))}
             _interviewed_households.append(attributes)
         return _interviewed_households
 
 
 class BatchHighLevelLocationsCompletionRates(BatchCompletionRates):
-    def __init__(self, batch, locations):
+    def __init__(self, batch, locations, ea=None):
         self.batch = batch
         self.locations = locations
+        self.ea = ea
 
     def attributes(self):
         _completion_rates =[]
         for location in self.locations:
-            attribute ={}
-            attribute['location'] = location
-            attribute['total_households'] = Household.all_households_in(location, self.batch.survey).count()
-            attribute['completed_households_percent'] = self.percent_completed_households(location, self.batch.survey)
+            attribute = {'location': location,
+                         'total_households': Household.all_households_in(location, self.batch.survey, self.ea).count(),
+                         'completed_households_percent': self.percent_completed_households(location, self.batch.survey, self.ea)}
             _completion_rates.append(attribute)
-
         return _completion_rates
 
 

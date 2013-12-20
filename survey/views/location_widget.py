@@ -1,15 +1,17 @@
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.utils.datastructures import SortedDict
-from survey.models import LocationTypeDetails
+from survey.models import LocationTypeDetails, EnumerationArea
 
 
 class LocationWidget(object):
+    EA_WIDGET_KEY = 'Enumeration area'
 
-    def __init__(self, selected_location, level=None):
+    def __init__(self, selected_location, ea=None, level=None):
         super(LocationWidget, self).__init__()
         self.selected_location = selected_location
         self.selected_locations = []
         self.level = level
+        self.selected_ea = ea
 
     def get_widget_data(self):
         if not self.selected_location:
@@ -19,17 +21,16 @@ class LocationWidget(object):
 
     def sorted_by_hierarchy(self, old_data):
         data = SortedDict()
-        all_types = self.get_all_location_types()
-        location_types_excluding_country = all_types.values_list('location_type', flat=True)[1:]
-        for slug in location_types_excluding_country:
+        location_types_excluding_country_and_village = self.get_all_location_types()
+        for slug in location_types_excluding_country_and_village:
             data[slug] = old_data[slug] if old_data.has_key(slug) else []
         return data
 
     def get_all_location_types(self):
         all_types = LocationTypeDetails.objects.order_by('order')
-        if self.level:
-            all_types = all_types.filter(order__lte=self.level)
-        return all_types
+        if not self.level:
+            return list(all_types.values_list('location_type', flat=True))[1:-1]
+        return all_types.filter(order__lte=self.level).values_list('location_type', flat=True)[1:]
 
     def has_location_selected(self, location):
         return location in self.selected_locations
@@ -67,3 +68,14 @@ class LocationWidget(object):
         children = self.selected_location.get_children()
         if children:
             return children[0].type
+
+    def get_ea_data(self):
+        if self.level or not self.selected_location:
+            return
+        if self.selected_type_is_second_lowest():
+            return EnumerationArea.under_(self.selected_location)
+        if self.selected_ea:
+            return self.selected_ea.get_siblings()
+
+    def selected_type_is_second_lowest(self):
+        return self.selected_location.type == LocationTypeDetails.get_second_lowest_level_type()

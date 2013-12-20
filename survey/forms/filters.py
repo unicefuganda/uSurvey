@@ -1,6 +1,6 @@
-from django.core.exceptions import ValidationError
 from django import forms
-from survey.models import HouseholdMemberGroup, QuestionModule, Question, Batch, Survey
+from rapidsms.contrib.locations.models import Location
+from survey.models import HouseholdMemberGroup, QuestionModule, Question, Batch, Survey, EnumerationArea
 
 
 class QuestionFilterForm(forms.Form):
@@ -41,9 +41,26 @@ class IndicatorFilterForm(forms.Form):
         all_modules = [('All', 'All')]
         batches = Batch.objects.all()
         if data and data.get('survey', None).isdigit():
-            batches = batches.filter(survey__id = int(data.get('survey', None)))
+            batches = batches.filter(survey__id=int(data.get('survey', None)))
         map(lambda batch: all_batches.append((batch.id, batch.name)), batches)
         map(lambda survey: all_surveys.append((survey.id, survey.name)), Survey.objects.all())
         map(lambda module: all_modules.append((module.id, module.name)), QuestionModule.objects.all())
 
         return all_surveys, all_batches, all_modules
+
+
+class LocationFilterForm(forms.Form):
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)
+    batch = forms.ModelChoiceField(queryset=None, empty_label=None)
+    location = forms.ModelChoiceField(queryset=Location.objects.all(), widget=forms.HiddenInput(), required=False)
+    ea = forms.ModelChoiceField(queryset=None, widget=forms.HiddenInput(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(LocationFilterForm, self).__init__(*args, **kwargs)
+        self.constrain_batch_and_ea_choices_to_survey()
+
+    def constrain_batch_and_ea_choices_to_survey(self):
+        survey_id = self.data.get('survey', None)
+        survey_id = survey_id if str(survey_id).isdigit() else self.fields['survey'].queryset[0].id
+        self.fields['batch'].queryset = Batch.objects.filter(survey=survey_id)
+        self.fields['ea'].queryset = EnumerationArea.objects.filter(survey=survey_id)

@@ -29,7 +29,7 @@ class HouseholdTest(TestCase):
                                                         backend=self.backend)
 
         self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
-                                                  uid=100)
+                                                  uid=100, survey=self.survey)
 
         self.household_member = HouseholdMember.objects.create(surname="Member",
                                                                date_of_birth=date(1980, 2, 2), male=False,
@@ -560,3 +560,19 @@ class HouseholdTest(TestCase):
         HouseholdMemberBatchCompletion.objects.create(household=household_1, householdmember=member_2, batch=batch,
                                                       investigator=investigator_1)
         self.assertFalse(household_1.has_some_members_who_completed())
+
+    def test_knows_number_of_households_in_an_ea(self):
+        kisasi = Location.objects.create(name="Kisasi", type=self.city, tree_parent=self.uganda)
+        ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
+        ea.locations.add(kisasi)
+
+        investigator_1 = Investigator.objects.create(name='some_inv', mobile_number='123456783', male=True, ea=self.ea)
+        household_1 = Household.objects.create(uid='123', investigator=investigator_1, ea=investigator_1.ea,
+                                               survey=self.survey)
+        household_3 = Household.objects.create(uid='123', investigator=investigator_1, survey=self.survey, ea=ea)
+
+        households_in_ea = Household.all_households_in(self.uganda, self.survey, ea=self.ea)
+        self.assertEqual(households_in_ea.count(), 2)
+        self.assertIn(household_1, households_in_ea)
+        self.assertIn(self.household, households_in_ea)
+        self.assertNotIn(household_3, households_in_ea)

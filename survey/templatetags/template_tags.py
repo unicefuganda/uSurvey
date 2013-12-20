@@ -11,6 +11,12 @@ def is_location_selected(locations_data, location):
         return "selected='selected'"
 
 @register.filter
+def is_ea_selected(locations_data, ea):
+    if locations_data.selected_ea == ea:
+        return "selected='selected'"
+
+
+@register.filter
 def is_selected(batch, selected_batch):
     if batch == selected_batch:
         return "selected='selected'"

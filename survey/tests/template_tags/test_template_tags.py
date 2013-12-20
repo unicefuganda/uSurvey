@@ -1,8 +1,9 @@
 from datetime import date
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location
-from survey.models import Batch, Survey
+from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models import Batch, Survey, LocationTypeDetails, EnumerationArea
 from survey.templatetags.template_tags import *
+from survey.views.location_widget import LocationWidget
 
 
 class TemplateTagsTest(TestCase):
@@ -97,3 +98,17 @@ class TemplateTagsTest(TestCase):
 
         all_open_locations = Location.objects.filter(name="Mbarara")
         self.assertEqual(None, non_response_is_activefor(all_open_locations, kampala))
+
+    def test_knows_ea_is_selected_given_location_data(self):
+        kisasi = Location.objects.create(name='Kisaasi')
+
+        ea1 = EnumerationArea.objects.create(name="EA Kisasi1")
+        ea2 = EnumerationArea.objects.create(name="EA Kisasi2")
+        ea1.locations.add(kisasi)
+        ea2.locations.add(kisasi)
+
+        location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
+
+        self.assertEqual("selected='selected'", is_ea_selected(location_widget, ea1))
+        self.assertIsNone(is_ea_selected(location_widget, ea2))
+

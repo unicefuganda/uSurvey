@@ -46,15 +46,17 @@ class HouseholdViewTest(BaseTest):
 
     def test_get_investigators(self):
         uganda = Location.objects.create(name="Uganda")
-        ea = EnumerationArea.objects.create(name="EA2")
+        ea = EnumerationArea.objects.create(name="EA1")
         ea.locations.add(uganda)
+        ea_2 = EnumerationArea.objects.create(name="EA2")
+        ea_2.locations.add(uganda)
 
         investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
-        Investigator.objects.create(name="inv2", mobile_number="123456789",
+        Investigator.objects.create(name="inv2", mobile_number="123456789", ea=ea_2,
                                     backend=Backend.objects.create(name='something1'))
 
-        response = self.client.get('/households/investigators?location=' + str(uganda.id))
+        response = self.client.get('/households/investigators?ea=' + str(ea.id))
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
         self.failUnlessEqual(result_investigator, {
@@ -70,7 +72,7 @@ class HouseholdViewTest(BaseTest):
         investigator = Investigator.objects.create(name="inv1", mobile_number="1234", ea=ea, backend=backend)
         blocked_investigator = Investigator.objects.create(name="inv2", mobile_number="12345", ea=ea,
                                                            is_blocked=True, backend=backend)
-        response = self.client.get('/households/investigators?location=' + str(uganda.id))
+        response = self.client.get('/households/investigators?ea=' + str(ea.id))
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
         self.failUnlessEqual(result_investigator, {
@@ -112,7 +114,7 @@ class HouseholdViewTest(BaseTest):
         request = MagicMock()
         request.POST = {'investigator': investigator.id}
 
-        investigator_result, investigator_form = validate_investigator(request, householdForm, posted_locations)
+        investigator_result, investigator_form = validate_investigator(request, householdForm, ea)
 
         self.assertEquals(investigator_result, investigator)
         self.assertEquals(investigator_form['value'], investigator.id)
@@ -136,7 +138,7 @@ class HouseholdViewTest(BaseTest):
         request.POST = {'investigator': investigator.id}
         mock_investigator_get.side_effect = MultiValueDictKeyError
 
-        investigator_result, investigator_form = validate_investigator(request, householdForm, posted_locations)
+        investigator_result, investigator_form = validate_investigator(request, householdForm, ea)
 
         self.assertEquals(investigator_result, None)
         self.assertEquals(investigator_form['value'], '')
@@ -157,12 +159,11 @@ class HouseholdViewTest(BaseTest):
         investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
                                                    backend=Backend.objects.create(name='something'))
         householdForm = HouseholdForm()
-        posted_locations = [uganda]
         request = MagicMock()
         request.POST = {'investigator': 'mocked so not important'}
         mock_investigator_get.side_effect = ObjectDoesNotExist
 
-        investigator_result, investigator_form = validate_investigator(request, householdForm, posted_locations)
+        investigator_result, investigator_form = validate_investigator(request, householdForm, ea)
 
         self.assertEquals(investigator_result, None)
         self.assertEquals(investigator_form['value'], 'mocked so not important')
@@ -188,7 +189,7 @@ class HouseholdViewTest(BaseTest):
         request.POST = {'investigator': 'mocked so not important'}
         mock_investigator_get.side_effect = ValueError
 
-        investigator_result, investigator_form = validate_investigator(request, householdForm, posted_locations)
+        investigator_result, investigator_form = validate_investigator(request, householdForm, ea)
 
         self.assertEquals(investigator_result, None)
         self.assertEquals(investigator_form['value'], 'mocked so not important')
@@ -335,8 +336,10 @@ class HouseholdViewTest(BaseTest):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
         district = LocationType.objects.create(name='district', slug='district')
+        village = LocationType.objects.create(name='village', slug='village')
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
         LocationTypeDetails.objects.create(country=uganda, location_type=district)
+        LocationTypeDetails.objects.create(country=uganda, location_type=village)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
 
@@ -360,9 +363,48 @@ class HouseholdViewTest(BaseTest):
 
         self.assertIn('households/index.html', templates)
         self.assertEqual(len(response.context['households']), 3)
-        self.assertIn(household_b, response.context['households'])
         self.assertEqual(household_a, response.context['households'][0])
         self.assertEqual(household_b, response.context['households'][1])
+        self.assertEqual(household_c, response.context['households'][2])
+
+        locations = response.context['location_data'].get_widget_data()
+        self.assertEquals(len(locations['district']), 1)
+        self.assertEquals(locations['district'][0], kampala)
+
+    def test_should_render_without_duplicates_at_the_end_households_without_heads_with_or_without_members(self):
+        country = LocationType.objects.create(name="country", slug=slugify("country"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        district = LocationType.objects.create(name='district', slug='district')
+        village = LocationType.objects.create(name='village', slug='village')
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=district)
+        LocationTypeDetails.objects.create(country=uganda, location_type=village)
+
+        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
+
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
+        investigator = Investigator.objects.create(name="inv", mobile_number='987654321', ea=ea,
+                                                   backend=Backend.objects.create(name='something'))
+        household_a = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
+        household_b = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=1)
+        household_c = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=2)
+
+        HouseholdHead.objects.create(surname='Bravo', household=household_b, date_of_birth='1980-09-01')
+        HouseholdMember.objects.create(surname='A', household=household_a, date_of_birth='1980-09-01')
+        HouseholdMember.objects.create(surname='B', household=household_a, date_of_birth='1980-09-01')
+        HouseholdMember.objects.create(surname='C', household=household_a, date_of_birth='1980-09-01')
+        response = self.client.get('/households/')
+
+        self.assertEqual(response.status_code, 200)
+
+        templates = [template.name for template in response.templates]
+
+        self.assertIn('households/index.html', templates)
+        self.assertEqual(len(response.context['households']), 3)
+        self.assertEqual(household_b, response.context['households'][0])
+        self.assertEqual(household_a, response.context['households'][1])
         self.assertEqual(household_c, response.context['households'][2])
 
         locations = response.context['location_data'].get_widget_data()
@@ -375,8 +417,10 @@ class HouseholdViewTest(BaseTest):
         country = LocationType.objects.create(name="country", slug=slugify("country"))
         uganda = Location.objects.create(name="Uganda", type=country)
         district = LocationType.objects.create(name='district', slug='district')
+        village = LocationType.objects.create(name='village', slug='village')
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
         LocationTypeDetails.objects.create(country=uganda, location_type=district)
+        LocationTypeDetails.objects.create(country=uganda, location_type=village)
 
         kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
 
@@ -394,7 +438,61 @@ class HouseholdViewTest(BaseTest):
         self.assertEquals(len(locations['district']), 1)
         self.assertEquals(locations['district'][0], kampala)
 
-    def test_filter_list_investigators(self):
+    def test_filter_list_investigators_by_location(self):
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        region = LocationType.objects.create(name="Region", slug=slugify("region"))
+        district = LocationType.objects.create(name="District", slug=slugify("district"))
+        county = LocationType.objects.create(name="County", slug=slugify("county"))
+
+        africa = Location.objects.create(name="Africa", type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=region)
+        LocationTypeDetails.objects.create(country=africa, location_type=district)
+        LocationTypeDetails.objects.create(country=africa, location_type=county)
+
+        uganda = Location.objects.create(name="Uganda", type=region, tree_parent=africa)
+        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
+        bukoto = Location.objects.create(name="Bukoto", type=county, tree_parent=kampala)
+        uganda_ea = EnumerationArea.objects.create(name="EA1")
+        uganda_ea.locations.add(uganda)
+
+        kampla_ea = EnumerationArea.objects.create(name="EA2")
+        kampla_ea.locations.add(kampala)
+
+        bukoto_ea = EnumerationArea.objects.create(name="EA3")
+        bukoto_ea.locations.add(bukoto)
+
+
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", ea=uganda_ea,
+                                                    backend=Backend.objects.create(name='something1'))
+        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", ea=kampla_ea,
+                                                    backend=Backend.objects.create(name='something2'))
+        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", ea=bukoto_ea,
+                                                    backend=Backend.objects.create(name='something3'))
+
+        household1 = Household.objects.create(investigator=investigator1, ea=investigator1.ea, uid=0)
+        household2 = Household.objects.create(investigator=investigator2, ea=investigator2.ea, uid=1)
+        household3 = Household.objects.create(investigator=investigator3, ea=investigator3.ea, uid=2)
+
+        response = self.client.get("/households/?location=" + str(uganda.id))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('households/index.html', templates)
+
+        self.assertEqual(len(response.context['households']), 3)
+        for household in [household1, household2, household3]:
+            self.assertIn(household, response.context['households'])
+
+        response = self.client.get("/households/?location=" + str(kampala.id))
+        self.assertEqual(len(response.context['households']), 2)
+        for household in [household2, household3]:
+            self.assertIn(household, response.context['households'])
+
+        response = self.client.get("/households/?location=" + str(bukoto.id))
+        self.assertEqual(len(response.context['households']), 1)
+        self.assertEqual(household3, response.context['households'][0])
+
+    def test_filter_list_investigators_by_ea(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
         region = LocationType.objects.create(name="Region", slug=slugify("region"))
         district = LocationType.objects.create(name="District", slug=slugify("district"))
@@ -430,21 +528,26 @@ class HouseholdViewTest(BaseTest):
         household2 = Household.objects.create(investigator=investigator2, ea=investigator2.ea, uid=1)
         household3 = Household.objects.create(investigator=investigator3, ea=investigator3.ea, uid=2)
 
-        response = self.client.get("/households/?location=" + str(uganda.id))
+        HouseholdHead.objects.create(surname='Bravo 1', household=household1, date_of_birth='1980-09-01')
+        HouseholdHead.objects.create(surname='Bravo 2', household=household2, date_of_birth='1980-09-01')
+        HouseholdHead.objects.create(surname='Bravo 3', household=household3, date_of_birth='1980-09-01')
+
+
+        response = self.client.get("/households/?ea=" + str(uganda_ea.id))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('households/index.html', templates)
 
-        self.assertEqual(len(response.context['households']), 3)
-        for household in [household1, household2, household3]:
-            self.assertIn(household, response.context['households'])
+        self.assertEqual(len(response.context['households']), 1)
+        self.assertEqual(household1, response.context['households'][0])
 
-        locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['region']), 1)
-        self.assertEquals(locations['region'][0], uganda)
+        response = self.client.get("/households/?ea=" + str(kampla_ea.id))
+        self.assertEqual(len(response.context['households']), 1)
+        self.assertEqual(household2, response.context['households'][0])
 
-        self.assertEquals(len(locations['district']), 1)
-        self.assertEquals(locations['district'][0], kampala)
+        response = self.client.get("/households/?ea=" + str(bukoto_ea.id))
+        self.assertEqual(len(response.context['households']), 1)
+        self.assertEqual(household3, response.context['households'][0])
 
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/households/')
@@ -492,10 +595,12 @@ class HouseholdViewTest(BaseTest):
         household_a = Household.objects.create(investigator=investigator, ea=investigator.ea, uid=0)
         household_b = Household.objects.create(investigator=investigator,  ea=investigator.ea, uid=1)
         household_c = Household.objects.create(investigator=investigator,  ea=investigator.ea,  uid=2)
+        household_d = Household.objects.create(investigator=investigator,  ea=investigator.ea,  uid=3)
 
         HouseholdHead.objects.create(surname='Bravo', household=household_b, date_of_birth='1980-09-01')
         HouseholdHead.objects.create(surname='Alpha', household=household_a, date_of_birth='1980-09-01')
         HouseholdHead.objects.create(surname='Charlie', household=household_c, date_of_birth='1980-09-01')
+        HouseholdHead.objects.create(surname='Charlie', household=household_d, date_of_birth='1980-09-01')
 
         HouseholdMember.objects.create(surname='Bravo', first_name='first_member', household=household_b,
                                        date_of_birth='1980-09-01')
@@ -505,6 +610,8 @@ class HouseholdViewTest(BaseTest):
                                        date_of_birth='1980-09-01')
         HouseholdMember.objects.create(surname='Charlie', first_name='first_member', household=household_c,
                                        date_of_birth='1980-09-01')
+        HouseholdMember.objects.create(surname='Charlie ', first_name='first_member', household=household_d,
+                                       date_of_birth='1980-09-01')
         response = self.client.get('/households/')
 
         self.assertEqual(response.status_code, 200)
@@ -512,7 +619,7 @@ class HouseholdViewTest(BaseTest):
         templates = [template.name for template in response.templates]
 
         self.assertIn('households/index.html', templates)
-        self.assertEqual(len(response.context['households']), 3)
+        self.assertEqual(len(response.context['households']), 4)
         self.assertIn(household_b, response.context['households'])
         self.assertEqual(household_a, response.context['households'][0])
         self.assertEqual(household_b, response.context['households'][1])
@@ -558,9 +665,13 @@ class EditHouseholdDetailsTest(BaseTest):
         self.survey = Survey.objects.create(name="Survey A")
         self.country = LocationType.objects.create(name="Country", slug=slugify("country"))
         self.city = LocationType.objects.create(name="City", slug=slugify("city"))
+        self.village = LocationType.objects.create(name="Village", slug=slugify("village"))
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
         self.kampala = Location.objects.create(name="Kampala", type=self.city, tree_parent=self.uganda)
         self.backend = Backend.objects.create(name='something')
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.country)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.city)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.village)
         self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
         self.ea.locations.add(self.kampala)
         self.investigator = Investigator.objects.create(name="investigator", mobile_number="123456789",

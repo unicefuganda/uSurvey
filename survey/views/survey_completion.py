@@ -5,75 +5,66 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Survey, Investigator
-from survey.services.completion_rates_calculator import BatchLocationCompletionRates, BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
+from survey.forms.filters import LocationFilterForm
+from survey.models import Survey, Investigator
+from survey.services.completion_rates_calculator import BatchLocationCompletionRates, \
+    BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.views.location_widget import LocationWidget
-from survey.views.views_helper import contains_key
+from survey.views.views_helper import contains_key, is_not_digit_nor_empty
 
 
 def is_valid(params):
-    if contains_key(params, 'location') and contains_key(params, 'batch'):
-        return True
-    if params.has_key('location') and params['location'] == '' and contains_key(params, 'batch'):
-        return True
-    return False
+    if not contains_key(params, 'batch'):
+        return False
+    if is_not_digit_nor_empty(params, 'location'):
+        return False
+    if is_not_digit_nor_empty(params, 'ea'):
+        return False
+    return True
 
 
-def render_household_details(request, location, batch):
-    context = {'selected_location': location, }
-    investigator = Investigator.objects.filter(ea__locations=location)
+def render_household_details(request, ea, batch):
+    context = {'selected_ea': ea}
+    investigator = Investigator.objects.filter(ea=ea)
     if not investigator.exists():
-        messages.error(request, 'Investigator not registered for this location.')
+        messages.error(request, 'Investigator not registered for this ea.')
         return render(request, 'aggregates/household_completion_status.html', context)
-
-    completion_rates = BatchLocationCompletionRates(batch, location)
-    context.update({'completion_rates': completion_rates, 'investigator': investigator[0],})
+    completion_rates = BatchLocationCompletionRates(batch, location=None, ea=ea)
+    context.update({'completion_rates': completion_rates,
+                    'investigator': investigator[0]})
     return render(request, 'aggregates/household_completion_status.html', context)
 
 
 def __get_parent_level_locations():
     country = LocationType.objects.filter(name__iexact='country')
     if country:
-        return Location.objects.filter(tree_parent__type=country[0])
+        return Location.objects.filter(tree_parent__type=country[0]).order_by('name')
 
-    return Location.objects.filter(tree_parent=None)
+    return Location.objects.filter(tree_parent=None).order_by('name')
 
 
 @login_required
 @permission_required('auth.can_view_aggregates')
 def show(request):
     selected_location = None
-    params = request.GET
-    content = {'selected_batch': None,
-               'surveys': Survey.objects.all(),
-               'batches': Batch.objects.all(),
-               'action': 'survey_completion_rates',
+    location_filter_form = LocationFilterForm()
+    content = {'action': 'survey_completion_rates',
                'request': request}
-
-    if is_valid(params):
-        batch = Batch.objects.get(id=params['batch'])
-        location_id = params['location']
-        high_level_locations = []
-
-        if not location_id:
-            high_level_locations = __get_parent_level_locations()
-        else:
-            selected_location = Location.objects.filter(id=location_id)
+    if request.method == 'POST':
+        location_filter_form = LocationFilterForm(request.POST)
+        if location_filter_form.is_valid():
+            batch = location_filter_form.cleaned_data.get('batch', None)
+            selected_location = location_filter_form.cleaned_data.get('location', None)
+            selected_ea = location_filter_form.cleaned_data.get('ea', None)
+            if selected_ea:
+                return render_household_details(request, selected_ea, batch)
             if selected_location:
-                selected_location = selected_location[0]
-                high_level_locations = selected_location.get_children()
-            if not high_level_locations:
-                return render_household_details(request, selected_location, batch)
-
-        content['completion_rates'] = BatchHighLevelLocationsCompletionRates(batch, high_level_locations)
-        content['selected_batch'] = batch
-        content['batches'] = content['batches'].filter(survey=batch.survey)
-
-    elif params.has_key('location') or params.has_key('batch'):
-        messages.error(request, "Please select a valid location and batch.")
-
+                high_level_locations = selected_location.get_children().order_by('name')
+            else:
+                high_level_locations = __get_parent_level_locations()
+            content['completion_rates'] = BatchHighLevelLocationsCompletionRates(batch, high_level_locations)
     content['locations'] = LocationWidget(selected_location)
-
+    content['filter'] = location_filter_form
     return render(request, 'aggregates/completion_status.html', content)
 
 

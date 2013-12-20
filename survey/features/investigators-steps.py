@@ -49,19 +49,19 @@ def and_i_have_locations(step):
     county = LocationType.objects.create(name="County", slug=slugify("county"))
     subcounty = LocationType.objects.create(name="Subcounty", slug=slugify("subcounty"))
     parish = LocationType.objects.create(name="Parish", slug=slugify("parish"))
-    village = LocationType.objects.create(name="Village", slug=slugify("village"))
+    world.village = LocationType.objects.create(name="Village", slug=slugify("village"))
     LocationTypeDetails.objects.create(country=uganda, location_type=district)
     LocationTypeDetails.objects.create(country=uganda, location_type=county)
     LocationTypeDetails.objects.create(country=uganda, location_type=subcounty)
     LocationTypeDetails.objects.create(country=uganda, location_type=parish)
-    LocationTypeDetails.objects.create(country=uganda, location_type=village)
+    LocationTypeDetails.objects.create(country=uganda, location_type=world.village)
 
     world.kampala_district = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
     world.kampala_county = Location.objects.create(name="Kampala County", type=county, tree_parent=world.kampala_district)
     world.kampala_subcounty = Location.objects.create(name="Subcounty", type=subcounty, tree_parent=world.kampala_county)
     world.kampala_parish = Location.objects.create(name="Parish", type=parish, tree_parent=world.kampala_subcounty)
-    world.kampala_village = Location.objects.create(name="Village", type=village, tree_parent=world.kampala_parish)
-    world.kampala_county_village = Location.objects.create(name="Kampala County Village", type=village, tree_parent=world.kampala_parish)
+    world.kampala_village = Location.objects.create(name="Village", type=world.village, tree_parent=world.kampala_parish)
+    world.kampala_county_village = Location.objects.create(name="Kampala County Village", type=world.village, tree_parent=world.kampala_parish)
 
     world.ea = EnumerationArea.objects.create(name="EA")
     world.ea.locations.add(world.kampala_village)
@@ -81,8 +81,8 @@ def and_i_fill_all_necessary_fields(step):
             'age': '25',
             'level_of_education': 'Primary',
             'language': 'Luo',
-            'ea': world.ea.id}
-    world.page.fill_valid_values(values)
+            }
+    world.page.fill_valid_values(values, world.ea)
 
 @step(u'And I submit the form')
 def and_i_submit_the_form(step):
@@ -91,7 +91,6 @@ def and_i_submit_the_form(step):
 @step(u'Then I should see that the investigator is created')
 def then_i_should_see_that_the_investigator_is_created(step):
     index_page = InvestigatorsListPage(world.browser)
-    index_page.visit()
     index_page.validate_presence_of_investigator( world.page.get_investigator_values() )
 
 @step(u'Given I have 100 investigators')

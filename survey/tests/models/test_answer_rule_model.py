@@ -1,7 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from datetime import date
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import Investigator, Backend, HouseholdMemberGroup, GroupCondition, Household, Batch, NumericalAnswer, Question, AnswerRule, QuestionOption, MultiChoiceAnswer, BatchQuestionOrder, Answer, EnumerationArea
 from survey.models.households import HouseholdMember
 
@@ -9,7 +9,8 @@ from survey.models.households import HouseholdMember
 class AnswerRuleTest(TestCase):
 
     def setUp(self):
-        self.location = Location.objects.create(name="Kampala")
+        self.location_type = LocationType.objects.create(name="Village", slug='village')
+        self.location = Location.objects.create(name="Kampala", type=self.location_type)
         ea = EnumerationArea.objects.create(name="Kampala EA A")
         ea.locations.add(self.location)
         self.investigator = Investigator.objects.create(name="Investigator", mobile_number="9876543210",

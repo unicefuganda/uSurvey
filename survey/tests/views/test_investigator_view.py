@@ -15,29 +15,29 @@ from survey.forms.investigator import InvestigatorForm
 from survey.models.formula import *
 
 
-class InvestigatorTest(BaseTest):
+class InvestigatorsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_investigators')
         self.client.login(username='Rajni', password='I_Rock')
-        
 
-class InvestigatorsViewTest(InvestigatorTest):
+        self.country = LocationType.objects.create(name='Country', slug='country')
+        self.district = LocationType.objects.create(name='District', slug='district')
+        self.city = LocationType.objects.create(name='City', slug='city')
+        self.village = LocationType.objects.create(name='Village', slug='village')
+
+        self.uganda = Location.objects.create(name='Uganda', type=self.country)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.country)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.district)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.city)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.village)
+
+        self.kampala = Location.objects.create(name='Kampala', tree_parent=self.uganda, type=self.district)
+        self.abim = Location.objects.create(name='Abim', tree_parent=self.uganda, type=self.district)
+        self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
+
     def test_new(self):
-        country = LocationType.objects.create(name='Country', slug='country')
-        district = LocationType.objects.create(name='District', slug='district')
-        city = LocationType.objects.create(name='City', slug='city')
-
-        uganda = Location.objects.create(name='Uganda', type=country)
-        LocationTypeDetails.objects.create(country=uganda, location_type=country)
-        LocationTypeDetails.objects.create(country=uganda, location_type=district)
-        LocationTypeDetails.objects.create(country=uganda, location_type=city)
-
-        kampala = Location.objects.create(name='Kampala', tree_parent=uganda, type=district)
-        abim = Location.objects.create(name='Abim', tree_parent=uganda, type=district)
-        kampala_city = Location.objects.create(name='Kampala City', tree_parent=kampala, type=city)
-
         response = self.client.get('/investigators/new/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -53,56 +53,47 @@ class InvestigatorsViewTest(InvestigatorTest):
         self.assertEquals(len(locations.keys()), 2)
         self.assertEquals(locations.keys()[0], 'district')
         self.assertEquals(len(locations['district']), 2)
-        self.assertEquals(locations['district'][1], kampala)
-        self.assertEquals(locations['district'][0], abim)
+        self.assertEquals(locations['district'][1], self.kampala)
+        self.assertEquals(locations['district'][0], self.abim)
 
         self.assertEquals(len(locations['city']), 0)
 
     def test_get_district_location_returns_all_locations_if_parent_not_specified(self):
-        uganda = Location.objects.create(name="Uganda")
         uganda_duplicate = Location.objects.create(name="Uganda something else")
         response = self.client.get('/investigators/locations')
         self.failUnlessEqual(response.status_code, 200)
         locations = json.loads(response.content)
         self.failUnlessEqual(locations, {
-            'Uganda': uganda.id,
+            'Uganda': self.uganda.id,
             'Uganda something else': uganda_duplicate.id,
         })
 
     def test_get_district_location_returns_all_locations_if_parent_empty(self):
-        uganda = Location.objects.create(name="Uganda")
         uganda_duplicate = Location.objects.create(name="Uganda something else")
         response = self.client.get('/investigators/locations?parent=')
         self.failUnlessEqual(response.status_code, 200)
         locations = json.loads(response.content)
         self.failUnlessEqual(locations, {
-            'Uganda': uganda.id,
+            'Uganda': self.uganda.id,
             'Uganda something else': uganda_duplicate.id,
         })
 
-
     def test_get_district_location_with_specified_parent_tree(self):
-        uganda = Location.objects.create(name="Uganda")
-        uganda_region = Location.objects.create(name="Uganda Region", tree_parent=uganda)
-        other_location_that_is_not_child_of_uganda = Location.objects.create(name="Uganda Something else")
-        response = self.client.get("/investigators/locations?parent=" + str(uganda.id))
+        response = self.client.get("/investigators/locations?parent=" + str(self.uganda.id))
         self.failUnlessEqual(response.status_code, 200)
         locations = json.loads(response.content)
-        self.failUnlessEqual(locations, {
-            'Uganda Region': uganda_region.id,
-        })
+        self.failUnlessEqual(locations, {'Abim': self.abim.id, 'Kampala': self.kampala.id,})
 
     def test_get_location_failures(self):
+        Location.objects.all().delete()
         response = self.client.get('/investigators/locations')
         self.failUnlessEqual(response.status_code, 200)
         locations = json.loads(response.content)
         self.failUnlessEqual(locations, {})
 
     def test_create_investigators_success(self):
-        country = LocationType.objects.create(name='country', slug='country')
-        uganda = Location.objects.create(name="Uganda", type=country)
         ea = EnumerationArea.objects.create(name="EA2")
-        ea.locations.add(uganda)
+        ea.locations.add(self.uganda)
 
         backend = Backend.objects.create(name='something')
         form_data = {
@@ -112,7 +103,7 @@ class InvestigatorsViewTest(InvestigatorTest):
             'age': '20',
             'level_of_education': 'Nursery',
             'language': 'Luganda',
-            'country': uganda.id,
+            'country': self.uganda.id,
             'ea': ea.id,
             'backend': backend.id,
             'confirm_mobile_number': '987654321',
@@ -129,19 +120,12 @@ class InvestigatorsViewTest(InvestigatorTest):
             self.assertEqual(form_data[key], str(value))
 
         self.assertTrue(investigator.male)
-        self.assertEqual(investigator.location, uganda)
+        self.assertEqual(investigator.location, self.uganda)
         self.assertEqual(len(investigator.households.all()), 0)
         self.assertRedirects(response, '/investigators/', 302, 200)
 
     @patch('django.contrib.messages.error')
     def test_create_investigators_failure(self, mock_messages_error):
-        country = LocationType.objects.create(name='country', slug='country')
-        uganda = Location.objects.create(name="Uganda", type=country)
-        district = LocationType.objects.create(name='district', slug='district')
-        LocationTypeDetails.objects.create(country=uganda, location_type=country)
-
-        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
-
         backend = Backend.objects.create(name='something')
         form_data = {
             'name': 'Rajini',
@@ -150,8 +134,8 @@ class InvestigatorsViewTest(InvestigatorTest):
             'age': '20',
             'level_of_education': 'Nursery',
             'language': 'Luganda',
-            'country': uganda.id,
-            'location': kampala.id,
+            'country': self.uganda.id,
+            'location': self.kampala.id,
             'backend': backend.id,
             'confirm_mobile_number': '987654321',
         }
@@ -164,7 +148,7 @@ class InvestigatorsViewTest(InvestigatorTest):
         investigator = Investigator.objects.filter(name=form_data['name'])
         assert mock_messages_error.called
 
-        form_data['location']=kampala.id
+        form_data['location']=self.kampala.id
         form_data['confirm_mobile_number']='123456789' # not the same as mobile number, causing non-field error
         response = self.client.post('/investigators/new/', data=form_data)
         self.failUnlessEqual(response.status_code, 200) # ensure redirection to list investigator page
@@ -174,15 +158,8 @@ class InvestigatorsViewTest(InvestigatorTest):
         self.failIf(investigator)
 
     def test_list_investigators(self):
-        country = LocationType.objects.create(name="country", slug=slugify("country"))
-        uganda = Location.objects.create(name="Uganda", type=country)
-        district = LocationType.objects.create(name='district', slug='district')
-        LocationTypeDetails.objects.create(country=uganda, location_type=country)
-        LocationTypeDetails.objects.create(country=uganda, location_type=district)
-
-        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
-
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=kampala, backend = Backend.objects.create(name='something'))
+        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=self.kampala,
+                                                   backend = Backend.objects.create(name='something'))
         response = self.client.get("/investigators/")
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -193,21 +170,14 @@ class InvestigatorsViewTest(InvestigatorTest):
         self.assertNotEqual(None, response.context['request'])
 
         locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['district']), 1)
-        self.assertEquals(locations['district'][0], kampala)
+        self.assertEquals(len(locations['district']), 2)
+        self.assertIn(self.kampala, locations['district'])
+        self.assertIn(self.abim, locations['district'])
 
     @patch('django.contrib.messages.error')
     def test_list_investigators_no_investigators(self, mock_error_message):
-        country = LocationType.objects.create(name="country", slug=slugify("country"))
-        uganda = Location.objects.create(name="Uganda", type=country)
-        district = LocationType.objects.create(name='district', slug='district')
-        LocationTypeDetails.objects.create(country=uganda, location_type=country)
-        LocationTypeDetails.objects.create(country=uganda, location_type=district)
-
-        kampala = Location.objects.create(name="kampala", type=district, tree_parent=uganda)
-
         ea = EnumerationArea.objects.create(name="EA2")
-        ea.locations.add(kampala)
+        ea.locations.add(self.kampala)
 
         investigator = Investigator.objects.filter(ea=ea).delete()
         response = self.client.get("/investigators/")
@@ -217,43 +187,26 @@ class InvestigatorsViewTest(InvestigatorTest):
 
         self.assertEqual(len(response.context['investigators']), 0)
 
-        locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['district']), 1)
-        self.assertEquals(locations['district'][0], kampala)
-
         assert mock_error_message.called_once_with('There are  no investigators currently registered  for this location.')
 
-    def test_filter_list_investigators(self):
-        country = LocationType.objects.create(name="country", slug=slugify("country"))
-        region = LocationType.objects.create(name="region", slug=slugify("region"))
-        district = LocationType.objects.create(name="district", slug=slugify("district"))
+    def test_filter_list_investigators_by_location(self):
+        bukoto = Location.objects.create(name="Bukoto", tree_parent=self.kampala_city, type=self.village)
 
-        africa = Location.objects.create(name="Uganda", type=country)
-
-        LocationTypeDetails.objects.create(country=africa, location_type=country)
-        LocationTypeDetails.objects.create(country=africa, location_type=region)
-        LocationTypeDetails.objects.create(country=africa, location_type=district)
-
-        uganda = Location.objects.create(name="Uganda", type=region, tree_parent=africa)
-        kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
-        bukoto = Location.objects.create(name="Bukoto", tree_parent=kampala)
-
-        uganda_ea = EnumerationArea.objects.create(name="EA2")
-        uganda_ea.locations.add(uganda)
+        kampala_city_ea = EnumerationArea.objects.create(name="EA2")
+        kampala_city_ea.locations.add(self.kampala_city)
         kampala_ea = EnumerationArea.objects.create(name="EA3")
-        kampala_ea.locations.add(uganda)
+        kampala_ea.locations.add(self.kampala)
         bukoto_ea = EnumerationArea.objects.create(name="EA2")
-        bukoto_ea.locations.add(uganda)
+        bukoto_ea.locations.add(bukoto)
 
-
-        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654321", ea=uganda_ea,
-                                                    backend = Backend.objects.create(name='something1'))
-        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654322", ea=kampala_ea,
-                                                    backend = Backend.objects.create(name='something2'))
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654322", ea=kampala_ea,
+                                                    backend=Backend.objects.create(name='something2'))
+        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654321", ea=kampala_city_ea,
+                                                    backend=Backend.objects.create(name='something1'))
         investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", ea=bukoto_ea,
-                                                    backend = Backend.objects.create(name='something3'))
+                                                    backend=Backend.objects.create(name='something3'))
 
-        response = self.client.get("/investigators/?location=" + str(uganda.id))
+        response = self.client.get("/investigators/?location=" + str(self.kampala.id))
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('investigators/index.html', templates)
@@ -262,12 +215,67 @@ class InvestigatorsViewTest(InvestigatorTest):
         for investigator in [investigator1, investigator2, investigator3]:
             self.assertIn(investigator, response.context['investigators'])
 
-        locations = response.context['location_data'].get_widget_data()
-        self.assertEquals(len(locations['region']), 1)
-        self.assertEquals(locations['region'][0], uganda)
+        response = self.client.get("/investigators/?location=" + str(self.kampala_city.id))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('investigators/index.html', templates)
 
-        self.assertEquals(len(locations['district']), 1)
-        self.assertEquals(locations['district'][0], kampala)
+        self.assertEqual(len(response.context['investigators']), 2)
+        for investigator in [investigator2, investigator3]:
+            self.assertIn(investigator, response.context['investigators'])
+
+        response = self.client.get("/investigators/?location=" + str(bukoto.id))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('investigators/index.html', templates)
+
+        self.assertEqual(len(response.context['investigators']), 1)
+        self.assertEqual(investigator3, response.context['investigators'][0])
+
+    def test_filter_list_investigators_by_ea(self):
+        bukoto = Location.objects.create(name="Bukoto", tree_parent=self.kampala_city, type=self.village)
+
+        subvillage = LocationType.objects.create(name='Sub Village', slug='subvillage')
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=subvillage)
+
+
+        kampala_city_ea = EnumerationArea.objects.create(name="EA2")
+        kampala_city_ea.locations.add(self.kampala_city)
+        kampala_ea = EnumerationArea.objects.create(name="EA3")
+        kampala_ea.locations.add(self.kampala)
+        bukoto_ea = EnumerationArea.objects.create(name="EA2")
+        bukoto_ea.locations.add(bukoto)
+
+        investigator1 = Investigator.objects.create(name="Investigator", mobile_number="987654322", ea=kampala_ea,
+                                                    backend=Backend.objects.create(name='something2'))
+        investigator2 = Investigator.objects.create(name="Investigator", mobile_number="987654321", ea=kampala_city_ea,
+                                                    backend=Backend.objects.create(name='something1'))
+        investigator3 = Investigator.objects.create(name="Investigator", mobile_number="987654323", ea=bukoto_ea,
+                                                    backend=Backend.objects.create(name='something3'))
+
+        response = self.client.get("/investigators/?ea=" + str(kampala_ea.id))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('investigators/index.html', templates)
+
+        self.assertEqual(len(response.context['investigators']), 1)
+        self.assertEqual(investigator1, response.context['investigators'][0])
+
+        response = self.client.get("/investigators/?ea=" + str(kampala_city_ea.id))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('investigators/index.html', templates)
+
+        self.assertEqual(len(response.context['investigators']), 1)
+        self.assertEqual(investigator2, response.context['investigators'][0])
+
+        response = self.client.get("/investigators/?ea=" + str(bukoto_ea.id))
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('investigators/index.html', templates)
+
+        self.assertEqual(len(response.context['investigators']), 1)
+        self.assertEqual(investigator3, response.context['investigators'][0])
 
     def test_check_mobile_number(self):
         investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'))
@@ -286,7 +294,13 @@ class InvestigatorsViewTest(InvestigatorTest):
         self.assert_restricted_permission_for('/investigators/')
 
 
-class ViewInvestigatorDetailsPage(InvestigatorTest):
+class ViewInvestigatorDetailsPage(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_investigators')
+        self.client.login(username='Rajni', password='I_Rock')
+
     def test_view_page(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
         city = LocationType.objects.create(name="City", slug=slugify("city"))
@@ -302,19 +316,27 @@ class ViewInvestigatorDetailsPage(InvestigatorTest):
         self.assert_restricted_permission_for('/investigators/' + str(investigator.id) +'/')
 
 
-class EditInvestigatorPage(InvestigatorTest):
+class EditInvestigatorPage(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_investigators')
+        self.client.login(username='Rajni', password='I_Rock')
 
     def test_edit(self):
         country = LocationType.objects.create(name="Country", slug=slugify("country"))
         city = LocationType.objects.create(name="City", slug=slugify("city"))
+        village = LocationType.objects.create(name="Village", slug=slugify("village"))
 
         uganda = Location.objects.create(name="Uganda", type=country)
         LocationTypeDetails.objects.create(country=uganda, location_type=country)
         LocationTypeDetails.objects.create(country=uganda, location_type=city)
+        LocationTypeDetails.objects.create(country=uganda, location_type=village)
 
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        bukoto = Location.objects.create(name="Bukoto", type=city, tree_parent=kampala)
         ea = EnumerationArea.objects.create(name="EA2")
-        ea.locations.add(kampala)
+        ea.locations.add(bukoto)
 
         investigator = Investigator.objects.create(name="investigator", mobile_number="123456789",
                                                    backend = Backend.objects.create(name='something'), ea=ea)
@@ -331,7 +353,7 @@ class EditInvestigatorPage(InvestigatorTest):
         self.assertEquals(response.context['cancel_url'], '/investigators/')
         self.assertIsInstance(response.context['form'], InvestigatorForm)
         locations = response.context['locations'].get_widget_data()
-        self.assertEqual(len(locations),1)
+        self.assertEqual(len(locations), 1)
         self.assert_restricted_permission_for('/investigators/' + str(investigator.id) +'/edit/')
 
     def test_edit_post(self):
@@ -375,7 +397,8 @@ class EditInvestigatorPage(InvestigatorTest):
         self.assertEqual(investigator.location, uganda)
         self.assertRedirects(response, '/investigators/', 302, 200)
 
-class BlockInvestigatorTest(InvestigatorTest):
+
+class BlockInvestigatorTest(BaseTest):
     def setUp(self):
         self.client = Client()
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
@@ -428,7 +451,8 @@ class BlockInvestigatorTest(InvestigatorTest):
         updated_investigator = Investigator.objects.get(id=self.investigator.id)
         self.assertEqual(0, len(updated_investigator.households.all()))
 
-class UnblockInvestigatorTest(InvestigatorTest):
+
+class UnblockInvestigatorTest(BaseTest):
     def setUp(self):
         self.client = Client()
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')

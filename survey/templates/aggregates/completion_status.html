@@ -6,22 +6,13 @@
    {% load pagination_tags %}
 
     <h3>Survey Completion by Region/District</h3>
-  <form id="aggregates-form" action="{% url action %}" method="get">
-    <div>
-      {% load template_tags %}
-      <label>Survey</label>
-      <select name="survey" id="survey-list-select" name="survey">
-        {% for survey in surveys %}
-          <option value="{{ survey.id }}" {{ survey|is_survey_selected_given:selected_batch }} >{{ survey.name }}</option>
-        {% endfor %}
-      </select>
 
-      <label>Batch</label>
-      <select name="batch" id="batch-list-select" name="batch">
-        {% for batch in batches %}
-          <option value="{{ batch.id }}" {{ batch|is_selected:selected_batch }} >{{ batch.name }}</option>
-        {% endfor %}
-      </select>
+
+
+  <form id="aggregates-form" action="{% url action %}" method="post">
+    {% csrf_token %}
+    <div>
+        {% include "naked_form.html" with a_form=filter %}
     </div>
      <div>
         {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}

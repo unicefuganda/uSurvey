@@ -22,7 +22,7 @@ class NewInvestigatorPage(PageObject):
     def validate_detail_page_url(self):
         assert self.browser.url == django_url(self.url)
 
-    def fill_valid_values(self, values):
+    def fill_valid_values(self, values, ea):
         self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
         kampala = Location.objects.get(name="Kampala")
         kampala_county = Location.objects.get(name="Kampala County")
@@ -35,6 +35,7 @@ class NewInvestigatorPage(PageObject):
         self.fill_in_with_js('$("#location-subcounty")', kampala_subcounty.id)
         self.fill_in_with_js('$("#location-parish")', kampala_parish.id)
         self.fill_in_with_js('$("#location-village")', kampala_village.id)
+        self.fill_in_with_js('$("#widget_ea")', ea.id)
 
         self.values = values
         self.browser.fill_form(self.values)

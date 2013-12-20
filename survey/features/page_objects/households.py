@@ -20,9 +20,7 @@ class NewHouseholdPage(PageObject):
     def get_household_values(self):
         return self.values
 
-    def fill_valid_values(self, values):
-        self.values = values
-        self.browser.fill_form(self.values)
+    def fill_valid_values(self, values, ea=None):
         kampala = Location.objects.get(name="Kampala")
         kampala_county = Location.objects.get(name="Kampala County")
         kampala_subcounty = Location.objects.get(name="Subcounty")
@@ -33,11 +31,14 @@ class NewHouseholdPage(PageObject):
         self.fill_in_with_js('$("#location-subcounty")', kampala_subcounty.id)
         self.fill_in_with_js('$("#location-parish")', kampala_parish.id)
         self.fill_in_with_js('$("#location-village")', kampala_village.id)
+        self.fill_in_with_js('$("#widget_ea")', ea.id)
 
         investigator = Investigator.objects.get(name="Investigator name")
         self.fill_in_with_js('$("#household-investigator")', investigator.id)
         self.fill_in_with_js('$("#household-extra_resident_since_year")', 1984)
         self.fill_in_with_js('$("#household-extra_resident_since_month")', 1)
+        self.values = values
+        self.browser.fill_form(self.values)
 
     def validate_household_created(self):
         assert self.browser.is_text_present("Household successfully registered.")

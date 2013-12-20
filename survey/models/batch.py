@@ -19,6 +19,9 @@ class Batch(BaseModel):
         self.order = last_order + 1 if last_order else 1
         super(Batch, self).save(*args, **kwargs)
 
+    def __unicode__(self):
+        return "%s" % self.name
+
     class Meta:
         app_label = 'survey'
         unique_together = ('survey', 'name',)
@@ -52,7 +55,6 @@ class Batch(BaseModel):
         all_related_locations = location.get_descendants(include_self=False).all()
         for related_location in all_related_locations:
             self.open_locations.get_or_create(batch=self, location=related_location)
-
         return self.open_locations.get_or_create(batch=self, location=location)
 
     def activate_non_response_for(self, location, status=True):

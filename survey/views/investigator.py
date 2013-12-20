@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from survey.investigator_configs import *
 
 from survey.forms.investigator import *
+from survey.models import EnumerationArea
 from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
 from survey.views.views_helper import contains_key
@@ -45,17 +46,19 @@ def _process_form(investigator_form, request, action_text,
 def new_investigator(request):
     investigator = InvestigatorForm(label_suffix='')
     selected_location = None
+    selected_ea = None
     response = None
 
     if request.method == 'POST':
         investigator = InvestigatorForm(data=request.POST, label_suffix='')
         selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
+        selected_ea = EnumerationArea.objects.get(id=request.POST['ea']) if contains_key(request.POST, 'ea') else None
         action_text = "registered."
         redirect_url = "/investigators/"
         response = _process_form(investigator, request, action_text, redirect_url)
 
     return response or render(request, 'investigators/investigator_form.html', {'country_phone_code': COUNTRY_PHONE_CODE,
-                                                                  'locations': LocationWidget(selected_location),
+                                                                  'locations': LocationWidget(selected_location, ea=selected_ea),
                                                                   'form': investigator,
                                                                   'action': "/investigators/new/",
                                                                   'title': 'New Investigator',
@@ -79,20 +82,26 @@ def get_locations(request):
 def list_investigators(request):
     params = request.GET
     selected_location = None
+    selected_ea = None
     investigators = Investigator.objects.order_by('id')
 
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))
         corresponding_locations = selected_location.get_descendants(include_self=True)
-        investigators = Investigator.objects.filter(ea__locations__in=corresponding_locations)
+        investigators = investigators.filter(ea__locations__in=corresponding_locations)
+
+    if params.has_key('ea') and params['ea'].isdigit():
+        selected_ea = EnumerationArea.objects.get(id=int(params['ea']))
+        investigators = investigators.filter(ea=selected_ea)
 
     if not investigators:
         location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'
         messages.error(request, "There are  no investigators currently registered  for this %s." % location_type)
 
+    location_widget = LocationWidget(selected_location, ea=selected_ea)
     return render(request, 'investigators/index.html',
                   {'investigators': investigators,
-                   'location_data': LocationWidget(selected_location),
+                   'location_data': location_widget,
                    'request': request})
 
 @login_required
@@ -109,14 +118,18 @@ def show_investigator(request, investigator_id):
 def edit_investigator(request, investigator_id):
     response = None
     investigator = Investigator.objects.get(id=investigator_id)
+    selected_location = investigator.location
+    selected_ea = investigator.ea
     investigator_form = InvestigatorForm(instance=investigator, initial= {'confirm_mobile_number':investigator.mobile_number})
     if request.method == 'POST':
         investigator_form = InvestigatorForm(data=request.POST, instance=investigator)
         action_text = "edited."
         redirect_url = "/investigators/"
+        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST, 'location') else None
+        selected_ea = EnumerationArea.objects.get(id=request.POST['ea']) if contains_key(request.POST, 'ea') else None
         response = _process_form(investigator_form, request, action_text, redirect_url)
 
-    context = { 'action': '/investigators/' + str(investigator_id) + '/edit/',
+    context = { 'action': '/investigators/%s/edit/' % investigator_id,
                 'country_phone_code': COUNTRY_PHONE_CODE,
                 'title': 'Edit Investigator',
                 'id': 'edit-investigator-form',
@@ -125,7 +138,7 @@ def edit_investigator(request, investigator_id):
                 'cancel_url': '/investigators/',
                 'loading_text': 'Saving...',
                 'form': investigator_form,
-                'locations': LocationWidget(investigator.location)}
+                'locations': LocationWidget(selected_location, ea=selected_ea)}
     return response or render(request, 'investigators/investigator_form.html', context)
 
 @permission_required('auth.can_view_investigators')

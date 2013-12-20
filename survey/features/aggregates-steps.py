@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import datetime
+from time import sleep
 from lettuce import *
 from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import *
 
 from survey.features.page_objects.aggregates import AggregateStatusPage, DownloadExcelPage, InvestigatorReportPage
 from survey.features.page_objects.survey_completion_rates import SurveyCompletionRatesPage
-from survey.models import Survey, EnumerationArea
+from survey.models import Survey, EnumerationArea, HouseholdMemberGroup
 from survey.models.batch import Batch
 from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
@@ -15,11 +16,16 @@ from survey import investigator_configs
 
 @step(u'And I have 2 batches with one open')
 def and_i_have_2_batches_with_one_open(step):
-    world.batch_1 = Batch.objects.create(order = 1, name = "Batch A")
-    world.batch_2 = Batch.objects.create(order = 2, name = "Batch B")
-    world.kampala_county = Location.objects.get(name = "Kampala County")
-    world.someother_county = Location.objects.create(name = "Some County", tree_parent = world.kampala_county.tree_parent)
+    world.batch_1 = Batch.objects.create(order=1, name="Batch A", survey=world.survey_1)
+    world.batch_2 = Batch.objects.create(order=2, name="Batch B", survey=world.survey_2)
+    world.kampala_county = Location.objects.get(name="Kampala County")
+    world.someother_county = Location.objects.create(name="Some County", tree_parent=world.kampala_county.tree_parent)
     world.batch_1.open_for_location(world.kampala_county.tree_parent)
+
+@step(u'And I have eas in the lowest location')
+def and_i_have_eas_in_the_lowest_location(step):
+    world.ea = EnumerationArea.objects.create(name="EA", survey=world.survey_1)
+    world.ea.locations.add(world.kampala_village)
 
 @step(u'And one household has completed that open batch')
 def and_one_household_has_completed_that_open_batch(step):
@@ -36,7 +42,7 @@ def then_i_should_see_an_option_to_select_location_hierarchically(step):
 
 @step(u'And I should see an option to select batch')
 def and_i_should_see_an_option_to_select_batch(step):
-    world.page.check_if_batches_present(world.batch_1, world.batch_2)
+    world.page.check_if_batches_present([world.batch_1])
 
 @step(u'And I should see a get status button')
 def and_i_should_see_a_get_status_button(step):
@@ -120,18 +126,18 @@ def then_i_should_see_status_page_for_that_location(step):
     world.page.see_completion_rates_table()
     world.page.is_text_present(world.kampala_parish.name)
 
-@step(u'And I choose a village and an open batch')
-def and_i_choose_a_village_and_an_open_batch(step):
+
+@step(u'And I choose ea and an open batch')
+def and_i_choose_ea_and_an_open_batch(step):
     locations = SortedDict()
     locations['district'] = world.kampala_district.name
     locations['county'] = world.kampala_county.name
     locations['subcounty'] = world.kampala_subcounty.name
     locations['parish'] = world.kampala_parish.name
-    locations['village'] = world.kampala_village.name
 
     world.page.choose_location(locations)
     world.page.choose_batch(world.batch_1)
-
+    world.page.choose_ea(world.ea)
 
 @step(u'Then I should see a table for household completion rates')
 def then_i_should_see_a_table_for_household_completion_rates(step):
@@ -139,22 +145,20 @@ def then_i_should_see_a_table_for_household_completion_rates(step):
 
 @step(u'And I should see household details text')
 def and_i_should_see_household_details_text(step):
-    world.page.is_text_present("Survey Completion by household in %s %s" %(world.kampala_village.type.name, world.kampala_village.name))
-    world.page.is_text_present("%s" %(world.household_1.uid))
-    world.page.is_text_present("%s" %(world.household_1.household_member.all().count()))
+    world.page.is_text_present("Survey Completion by household in %s EA" % world.ea.name)
+    world.page.is_text_present("%s" % world.household_1.uid)
+    world.page.is_text_present("%s" % world.household_1.household_member.all().count())
 
 @step(u'And I should see investigator details text')
 def and_i_should_see_investigator_details_text(step):
-    world.page.is_text_present('Investigator: %s(%s)' %(world.investigator.name, world.investigator.mobile_number))
+    world.page.is_text_present('Investigator: %s(%s)' % (world.investigator.name, world.investigator.mobile_number))
 
 @step(u'And I have an investigator and households')
 def and_i_have_an_investigator_and_households(step):
-    world.batch = Batch.objects.create()
-    world.ea = EnumerationArea.objects.create(name="EA")
-    world.ea.locations.add(world.kampala_village)
+    world.batch = Batch.objects.create(survey=world.survey_1, name="Haha")
     world.investigator = Investigator.objects.create(name="some_investigator", mobile_number="123456784", ea=world.ea)
-    world.household_1 = Household.objects.create(investigator=world.investigator, uid=101, ea=world.ea)
-    world.household_2 = Household.objects.create(investigator=world.investigator, uid=102, ea=world.ea)
+    world.household_1 = Household.objects.create(investigator=world.investigator, uid=101, ea=world.ea, survey=world.survey_1)
+    world.household_2 = Household.objects.create(investigator=world.investigator, uid=102, ea=world.ea, survey=world.survey_1)
     world.member_2 = HouseholdMember.objects.create(household=world.household_2,
                                                     date_of_birth=datetime.datetime(2000, 02, 02))
 
@@ -165,8 +169,6 @@ def and_i_should_see_percent_completion(step):
 
 @step(u'And I have 2 surveys with one batch each')
 def and_i_have_2_surveys_with_one_batch_each(step):
-    world.survey_1 = Survey.objects.create(name='survey1', sample_size=10)
-    world.survey_2 = Survey.objects.create(name='survey2', sample_size=10)
     world.batch_1 = Batch.objects.create(name='batch1', order=1, survey=world.survey_1)
     world.batch_2 = Batch.objects.create(name='batch2', order=1, survey=world.survey_2)
 
@@ -184,7 +186,7 @@ def and_i_should_not_see_batch1_in_batch_list(step):
 
 @step(u'When I select survey 1 from survey list')
 def when_i_select_survey_1_from_survey_list(step):
-    world.page.select('survey',[world.survey_1.id])
+    world.page.select('survey', [world.survey_1.id])
 
 @step(u'Then I should see batch1 in batch list')
 def then_i_should_see_batch1_in_batch_list(step):
@@ -230,7 +232,7 @@ def then_i_should_see_district_completion_table_paginated(step):
 
 @step(u'And I have one batch open in those locations')
 def and_i_have_one_batch_open_in_those_locations(step):
-    world.batch_12 = Batch.objects.create(order=12, name="Batch A")
+    world.batch_12 = Batch.objects.create(order=12, name="Batch A", survey=world.survey_1)
     world.batch_12.open_for_location(world.uganda)
 
 
@@ -268,8 +270,12 @@ def then_i_should_only_see_the_batches_in_that_survey(step):
 
 @step(u'Then I should be able to export the responses for that batch')
 def then_i_should_be_able_to_export_the_responses_for_that_batch(step):
-    world.page.click_by_css("#export_excel")
+    world.page.find_by_css("#export_excel", "Export to spreadsheet")
 
 @step(u'When I select one of the two surveys')
 def when_i_select_one_of_the_two_surveys(step):
     world.page.select('surveys', [str(world.survey_1.id)])
+
+@step(u'And I have general member group')
+def and_i_have_general_member_group(step):
+    HouseholdMemberGroup.objects.create(order=1, name="GENERAL")
