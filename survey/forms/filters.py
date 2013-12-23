@@ -1,13 +1,15 @@
 from django import forms
 from rapidsms.contrib.locations.models import Location
 from survey.models import HouseholdMemberGroup, QuestionModule, Question, Batch, Survey, EnumerationArea
-
+MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
+DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE =50
 
 class QuestionFilterForm(forms.Form):
 
     groups = forms.ChoiceField(label='Group', widget=forms.Select(), choices=[])
     modules = forms.ChoiceField(label='Module', widget=forms.Select(), choices=[])
     question_types = forms.ChoiceField(label='Question Type', widget=forms.Select(), choices=[])
+    number_of_questions_per_page = forms.IntegerField(max_value=MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, min_value=20)
 
     def __init__(self, data=None,initial=None):
         super(QuestionFilterForm, self).__init__(data=data, initial=initial)
@@ -21,6 +23,7 @@ class QuestionFilterForm(forms.Form):
         self.fields['groups'].choices = group_choices
         self.fields['modules'].choices = module_choices
         self.fields['question_types'].choices = question_type_choices
+        self.fields['number_of_questions_per_page'].default = DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 
 
 class IndicatorFilterForm(forms.Form):

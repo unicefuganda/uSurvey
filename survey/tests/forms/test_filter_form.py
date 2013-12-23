@@ -36,7 +36,6 @@ class QuestionFilterFormTest(TestCase):
 
         [self.assertIn(question_type, question_filter_form.fields['question_types'].choices) for question_type in all_question_types]
 
-
 class IndicatorFilterFormTest(TestCase):
 
     def setUp(self):

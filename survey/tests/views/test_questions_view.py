@@ -11,8 +11,13 @@ from survey.models.question import Question, QuestionOption
 
 from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
+from survey.forms.filters import MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models.householdgroups import HouseholdMemberGroup
-from survey.views.questions import _rule_exists, _set_filter_condition_based_on_group, _set_filter_condition_based_on_module, _set_filter_condition_based_on_answer_type, _set_filter_condition_based_on_batch_id, _get_questions_based_on_filter, _set_filter_condition_for_batch_questions
+from survey.views.questions import _rule_exists, _set_filter_condition_based_on_group,\
+    _set_filter_condition_based_on_module, _set_filter_condition_based_on_answer_type,\
+    _set_filter_condition_based_on_batch_id, _get_questions_based_on_filter,\
+    _set_filter_condition_for_batch_questions
+
 
 
 class QuestionsViews(BaseTest):
@@ -38,6 +43,13 @@ class QuestionsViews(BaseTest):
 
         self.question_1.batches.add(self.batch)
         self.question_2.batches.add(self.batch)
+
+        self.form_data={
+            'groups':"All",
+            'modules':"All",
+            'question_types':"All",
+            'number_of_questions_per_page':50
+        }
 
     def test_set_filter_condition_based_on_batch_id_specified(self):
         filter_condition = {}
@@ -209,7 +221,26 @@ class QuestionsViews(BaseTest):
         self.assertIn(self.question_1, response.context['questions'])
         self.assertIn(self.question_2, response.context['questions'])
         self.assertEqual(self.batch, response.context['batch'])
+        self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
         self.assertIsNotNone(response.context['request'])
+
+    def test_limit_list_size_per_page(self):
+        max_question_per_page_supplied = 100
+        data = self.form_data.copy()
+        data['number_of_questions_per_page'] = max_question_per_page_supplied
+        response = self.client.post('/batches/%d/questions/'%self.batch.id, data)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(max_question_per_page_supplied, response.context['max_question_per_page'])
+
+    def test_limit_list_size_per_page_cannot_be_greater_than_1000(self):
+        max_question_per_page_supplied = 2000
+        data = self.form_data.copy()
+        data['number_of_questions_per_page'] = max_question_per_page_supplied
+        response = self.client.post('/batches/%d/questions/'%self.batch.id, data)
+
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
+
 
     def test_post_index_per_batch(self):
         response = self.client.post('/batches/%d/questions/' % self.batch.id)
@@ -732,6 +763,7 @@ class QuestionsViews(BaseTest):
         self.assertIsNotNone(response.context['question_filter_form'])
         self.assertIsInstance(response.context['question_filter_form'], QuestionFilterForm)
         self.assertNotIn(sub_question, response.context['questions'])
+        self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
         self.assertIsNotNone(response.context['request'])
 
     def test_post_index_all(self):
@@ -749,7 +781,24 @@ class QuestionsViews(BaseTest):
         self.assertIsNotNone(response.context['question_filter_form'])
         self.assertIsInstance(response.context['question_filter_form'], QuestionFilterForm)
         self.assertNotIn(sub_question, response.context['questions'])
+        self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
         self.assertIsNotNone(response.context['request'])
+
+    def test_limit_list_size_per_page_on_index_alla(self):
+        max_question_per_page_supplied = 100
+        data = self.form_data.copy()
+        data['number_of_questions_per_page'] = max_question_per_page_supplied
+        response = self.client.post('/questions/', data)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(max_question_per_page_supplied, response.context['max_question_per_page'])
+
+    def test_limit_list_size_per_page_cannot_be_greater_than_1000_on_index_all(self):
+        max_question_per_page_supplied = 2000
+        data = self.form_data.copy()
+        data['number_of_questions_per_page'] = max_question_per_page_supplied
+        response = self.client.post('/questions/', data)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
 
     def test_post_index_should_return_questions_matching_posted_keys(self):
         question = Question.objects.create(text="Sub Question 2?", answer_type=Question.NUMBER, module=self.module,
@@ -775,7 +824,8 @@ class QuestionsViews(BaseTest):
         excluded_questions = [sub_question, question]
 
         filter_form_data = {'groups': member_group.id, 'modules': module.id, 'identifier': 'ID 1',
-                            'question_types': Question.NUMBER, 'batch_id': self.batch.id}
+                            'question_types': Question.NUMBER, 'batch_id': self.batch.id,
+                            'number_of_questions_per_page':50}
 
         response = self.client.post('/questions/', data=filter_form_data)
         [self.assertIn(expected_question, response.context['questions']) for expected_question in expected_questions]

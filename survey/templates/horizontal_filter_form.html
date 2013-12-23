@@ -1,4 +1,19 @@
-{% for field in a_form.visible_fields %}
-    {{ field.label }}
-      {{field }}
-{% endfor %}
+<form id="{{ filter_id }}" action="{{ action }}" method="post" class="pull-left padded-bottom">
+   {% csrf_token %}
+    <div>
+        <ul id="horizontal-filter">
+            {% for field in a_form.visible_fields %}
+                <li>
+                    <ul class="inner-field-list">
+                        <li><b>{{ field.label }}</b></li>
+                        <li>{{ field}}</li>
+                    </ul>
+                </li>
+            {% endfor %}
+
+            <li>
+                {% block submit_button %}{% endblock %}
+            </li>
+        </ul>
+    </div>
+</form>

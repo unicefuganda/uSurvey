@@ -15,8 +15,8 @@ class BatchQuestionsListPage(PageObject):
         self.is_text_present('Group')
         self.is_text_present('Actions')
 
-    def validate_pagination(self):
-        self.browser.click_link_by_text("2")
+    def validate_pagination(self, status=True):
+        assert_equals(not status, not self.browser.find_link_by_text("2"))
 
     def validate_back_to_questions_list_page(self):
         assert_equals(False, self.browser.is_text_present("Text"))

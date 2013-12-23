@@ -30,6 +30,14 @@ def then_i_should_see_the_questions_list_paginated(step):
     world.page.validate_pagination()
     world.page.validate_fields()
 
+@step(u'When I change to 100 questions per page')
+def when_i_change_to_100_questions_per_page(step):
+    world.page.fill_valid_values({'number_of_questions_per_page':100})
+    world.page.click_by_css('#a-question-list')
+
+@step(u'Then I should not see pagination')
+def then_i_should_not_see_pagination(step):
+    world.page.validate_pagination(False)
 
 @step(u'And I have no questions under the batch')
 def and_i_have_no_questions_under_the_batch(step):

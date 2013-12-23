@@ -4,13 +4,13 @@
 {% endblock %}
 {% block content %}
     {% load pagination_tags %}
-    {% autopaginate questions 20 %}
+    {% autopaginate questions max_question_per_page %}
     {% load template_tags %}
     {% if batch %}
         <h3>
             {{ batch.name.capitalize }} Questions
         </h3>
-        {% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" %}
+        {% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" filter_id="question-filter-form" a_form=question_filter_form %}
         {% if not batch.is_open %}
             <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary pull-right" id="add_question">Select Question</a>
         {% endif %}

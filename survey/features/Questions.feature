@@ -7,6 +7,9 @@ Feature: Questions related features
     And I have 100 questions under the batch
     And I visit questions listing page of the batch
     Then I should see the questions list paginated
+    When I change to 100 questions per page
+    Then I should not see pagination
+
 
   Scenario: List Questions Under an open-batch
     Given I am logged in as researcher

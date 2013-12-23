@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.logic import LogicForm
-from survey.forms.filters import QuestionFilterForm
+from survey.forms.filters import QuestionFilterForm, MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models import AnswerRule, BatchQuestionOrder
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
@@ -61,9 +61,11 @@ def _get_questions_based_on_filter(batch_id, group_id='All', module_id='All', qu
         filter_condition = _set_filter_condition_for_batch_questions(filter_condition, group_id, module_id, question_type)
         return BatchQuestionOrder.get_batch_order_specific_questions(batch_id, filter_condition)
 
+
 @permission_required('auth.can_view_batches')
 def index(request, batch_id):
     batch = None
+    max_per_page = DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 
     if len(batch_id.strip()) != 0:
         batch = Batch.objects.get(id=batch_id)
@@ -75,9 +77,12 @@ def index(request, batch_id):
 
     if request.method == "POST":
         question_filter_form = QuestionFilterForm(data=request.POST)
-        group_id = request.POST.get('groups', None)
-        module_id = request.POST.get('modules', None)
-        question_type = request.POST.get('question_types', None)
+        if question_filter_form.is_valid():
+            group_id = request.POST.get('groups', None)
+            module_id = request.POST.get('modules', None)
+            question_type = request.POST.get('question_types', None)
+            max_question_per_page_supplied = question_filter_form.cleaned_data.get('number_of_questions_per_page', None)
+            max_per_page = min(int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
 
     questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
 
@@ -90,7 +95,7 @@ def index(request, batch_id):
         for question in questions:
             question_rules_for_batch[question] = question.rules_for_batch(batch)
 
-    context = {'questions': questions, 'request': request, 'batch': batch,
+    context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page':max_per_page,
                'question_filter_form': question_filter_form, 'rules_for_batch': question_rules_for_batch}
     return render(request, 'questions/index.html', context)
 
@@ -118,22 +123,28 @@ def list_all_questions(request):
     module_id = None
     question_type = None
     batch_id = request.GET.get('batch_id', None)
+    max_per_page = DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 
     if request.method == "POST":
         question_filter_form = QuestionFilterForm(data=request.POST)
-        group_id = request.POST.get('groups', None)
-        module_id = request.POST.get('modules', None)
-        question_type = request.POST.get('question_types', None)
-        batch_id = request.POST.get('batch_id', None)
+        if question_filter_form.is_valid():
+            group_id = request.POST.get('groups', None)
+            module_id = request.POST.get('modules', None)
+            question_type = request.POST.get('question_types', None)
+            batch_id = request.POST.get('batch_id', None)
+            max_question_per_page_supplied = question_filter_form.cleaned_data.get('number_of_questions_per_page', None)
+            max_per_page = min(int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
 
     questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
 
     context = {'questions': questions, 'request': request, 'question_filter_form': question_filter_form,
-               'rules_for_batch': {}}
+               'rules_for_batch': {}, 'max_question_per_page':max_per_page}
     return render(request, 'questions/index.html', context)
+
 
 def _sub_question_hash(sub_question):
     return {'id': str(sub_question.id), 'text': sub_question.text}
+
 
 def __process_sub_question_form(request, questionform, parent_question, action_performed, batch_id=None):
     if questionform.is_valid():
