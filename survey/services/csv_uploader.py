@@ -8,6 +8,7 @@ from survey.investigator_configs import UPLOAD_ERROR_LOG_EXPIRY
 
 FIRST_LINE = 0
 
+
 class CSVUploader:
 
     def __init__(self, file):

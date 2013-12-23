@@ -1,6 +1,5 @@
 from rapidsms.contrib.locations.models import Location, LocationType
 
-from django.utils.timezone import utc
 from survey.models import UploadErrorLog, EnumerationArea
 from survey.services.csv_uploader import UploadService
 
