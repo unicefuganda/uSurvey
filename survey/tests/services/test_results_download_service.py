@@ -33,18 +33,18 @@ class ResultsDownloadServiceTest(BaseTest):
         self.investigator = Investigator.objects.create(name="Investigator 1", mobile_number="1", ea=self.ea,
                                                         backend=backend)
 
-        group = HouseholdMemberGroup.objects.create(name="Females", order=1)
+        self.group = HouseholdMemberGroup.objects.create(name="Females", order=1)
         general_condition = GroupCondition.objects.create(attribute="GENDER", value=False, condition='EQUALS')
-        group.conditions.add(general_condition)
+        self.group.conditions.add(general_condition)
 
         module = QuestionModule.objects.create(name="Education")
-        self.question_1 = Question.objects.create(group=group, text="Question 1", module=module,
+        self.question_1 = Question.objects.create(group=self.group, text="Question 1", module=module,
                                                   answer_type=Question.NUMBER,
                                                   order=1, identifier='Q1')
-        self.question_2 = Question.objects.create(group=group, text="Question 2", module=module,
+        self.question_2 = Question.objects.create(group=self.group, text="Question 2", module=module,
                                                   answer_type=Question.MULTICHOICE,
                                                   order=2, identifier='Q2')
-        self.question_3 = Question.objects.create(group=group, text="Question 3", module=module,
+        self.question_3 = Question.objects.create(group=self.group, text="Question 3", module=module,
                                                   answer_type=Question.NUMBER,
                                                   order=3, identifier='Q3')
 
@@ -60,7 +60,7 @@ class ResultsDownloadServiceTest(BaseTest):
         BatchQuestionOrder.objects.create(question=self.question_3, batch=self.batch, order=3)
 
     def test_formats_headers_for_csv_leaving_out_country(self):
-        result_down_load_service = ResultsDownloadService(self.batch)
+        result_down_load_service = ResultsDownloadService(batch=self.batch)
         header_structure = [self.district.name, self.county.name, self.subcounty.name, self.parish.name,
                             self.village.name,
                             'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender',
@@ -96,7 +96,7 @@ class ResultsDownloadServiceTest(BaseTest):
         self.investigator.member_answered(self.question_3, household_head_4, 2, self.batch)
         self.investigator.member_answered(self.question_3, household_head_5, 3, self.batch)
 
-        result_down_load_service = ResultsDownloadService(self.batch)
+        result_down_load_service = ResultsDownloadService(batch=self.batch)
         expected_csv_data = [
             ['Kampala', household_head_1.household.household_code, household_head_1.surname, '23', '2', '1990',
              'Male' if household_head_1.male else 'Female', 1, self.no_option.order, self.no_option.text, 1],
@@ -156,7 +156,7 @@ class ResultsDownloadServiceTest(BaseTest):
         self.investigator.member_answered(self.question_3, household_head_1, 1, self.batch)
         self.investigator.member_answered(self.question_3, household_head_2, 2, self.batch)
 
-        result_down_load_service = ResultsDownloadService(self.batch)
+        result_down_load_service = ResultsDownloadService(batch=self.batch)
         expected_csv_data = [
             ['Kampala', household_head_1.household.household_code, household_head_1.surname, '23', '2', '1990',
              'Male' if household_head_1.male else 'Female', 1, self.no_option.order, self.no_option.text, 1, 4, 4],
@@ -171,3 +171,105 @@ class ResultsDownloadServiceTest(BaseTest):
         self.assertEqual(4, len(actual_csv_data))
         for i in range(4):
             self.assertIn(expected_csv_data[i], actual_csv_data)
+            
+    def test_gets_summarised_response_for_all_batches_under_survey(self):
+        HouseholdMemberGroup.objects.create(name="GENERAL", order=2)
+        household_head_1 = self.create_household_head(0, self.investigator, self.batch.survey)
+        household_head_2 = self.create_household_head(1, self.investigator, self.batch.survey)
+        household_head_3 = self.create_household_head(2, self.investigator, self.batch.survey)
+        household_head_4 = self.create_household_head(3, self.investigator, self.batch.survey)
+        household_head_5 = self.create_household_head(4, self.investigator, self.batch.survey)
+
+        self.investigator.member_answered(self.question_1, household_head_1, 1, self.batch)
+        self.investigator.member_answered(self.question_1, household_head_2, 2, self.batch)
+        self.investigator.member_answered(self.question_1, household_head_3, 1, self.batch)
+        self.investigator.member_answered(self.question_1, household_head_4, 2, self.batch)
+        self.investigator.member_answered(self.question_1, household_head_5, 3, self.batch)
+
+        self.investigator.member_answered(self.question_2, household_head_1, self.no_option.order, self.batch)
+        self.investigator.member_answered(self.question_2, household_head_2, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_2, household_head_3, self.no_option.order, self.batch)
+        self.investigator.member_answered(self.question_2, household_head_4, self.yes_option.order, self.batch)
+        self.investigator.member_answered(self.question_2, household_head_5, self.yes_option.order, self.batch)
+
+        self.investigator.member_answered(self.question_3, household_head_1, 1, self.batch)
+        self.investigator.member_answered(self.question_3, household_head_2, 2, self.batch)
+        self.investigator.member_answered(self.question_3, household_head_3, 1, self.batch)
+        self.investigator.member_answered(self.question_3, household_head_4, 2, self.batch)
+        self.investigator.member_answered(self.question_3, household_head_5, 3, self.batch)
+
+        batchB = Batch.objects.create(order=2, name="different batch", survey=self.survey)
+        module = QuestionModule.objects.create(name="Education in a different batch")
+        question_1B = Question.objects.create(group=self.group, text="Question 1 B", module=module,
+                                                  answer_type=Question.NUMBER,
+                                                  order=1, identifier='Q1B')
+        question_2B = Question.objects.create(group=self.group, text="Question 2B", module=module,
+                                                  answer_type=Question.MULTICHOICE,
+                                                  order=2, identifier='Q2B')
+        question_3B = Question.objects.create(group=self.group, text="Question 3B", module=module,
+                                                  answer_type=Question.NUMBER,
+                                                  order=3, identifier='Q3B')
+
+        yes_option = QuestionOption.objects.create(question=question_2B, text="Yes", order=1)
+        no_option = QuestionOption.objects.create(question=question_2B, text="No", order=2)
+
+        question_1B.batches.add(batchB)
+        question_2B.batches.add(batchB)
+        question_3B.batches.add(batchB)
+
+        BatchQuestionOrder.objects.create(question=question_1B, batch=batchB, order=1)
+        BatchQuestionOrder.objects.create(question=question_2B, batch=batchB, order=2)
+        BatchQuestionOrder.objects.create(question=question_3B, batch=batchB, order=3)
+
+        self.investigator.member_answered(question_1B, household_head_1, 1, batchB)
+        self.investigator.member_answered(question_1B, household_head_2, 2, batchB)
+        self.investigator.member_answered(question_1B, household_head_3, 1, batchB)
+        self.investigator.member_answered(question_1B, household_head_4, 2, batchB)
+        self.investigator.member_answered(question_1B, household_head_5, 3, batchB)
+
+        self.investigator.member_answered(question_2B, household_head_1, no_option.order, batchB)
+        self.investigator.member_answered(question_2B, household_head_2, yes_option.order, batchB)
+        self.investigator.member_answered(question_2B, household_head_3, no_option.order, batchB)
+        self.investigator.member_answered(question_2B, household_head_4, yes_option.order, batchB)
+        self.investigator.member_answered(question_2B, household_head_5, yes_option.order, batchB)
+
+        self.investigator.member_answered(question_3B, household_head_1, 1, batchB)
+        self.investigator.member_answered(question_3B, household_head_2, 2, batchB)
+        self.investigator.member_answered(question_3B, household_head_3, 1, batchB)
+        self.investigator.member_answered(question_3B, household_head_4, 2, batchB)
+        self.investigator.member_answered(question_3B, household_head_5, 3, batchB)
+
+        result_down_load_service = ResultsDownloadService(survey=self.survey)
+
+        header_structure = [self.district.name, self.county.name, self.subcounty.name, self.parish.name,
+                            self.village.name,
+                            'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender',
+                            self.question_1.identifier, self.question_2.identifier, '', self.question_3.identifier,
+                            question_1B.identifier, question_2B.identifier, '', question_3B.identifier]
+
+        headers = result_down_load_service.set_report_headers()
+        self.assertEqual(header_structure, headers)
+
+        expected_csv_data = [
+            ['Kampala', household_head_1.household.household_code, household_head_1.surname, '23', '2', '1990',
+             'Male' if household_head_1.male else 'Female', 1, self.no_option.order, self.no_option.text, 1,
+            1, no_option.order, no_option.text, 1],
+            ['Kampala', household_head_2.household.household_code, household_head_2.surname, '23', '2', '1990',
+             'Male' if household_head_2.male else 'Female', 2, self.yes_option.order, self.yes_option.text, 2,
+             2, yes_option.order, yes_option.text, 2],
+            ['Kampala', household_head_3.household.household_code, household_head_3.surname, '23', '2', '1990',
+             'Male' if household_head_3.male else 'Female', 1, self.no_option.order, self.no_option.text, 1,
+             1, no_option.order, no_option.text, 1],
+            ['Kampala', household_head_4.household.household_code, household_head_4.surname, '23', '2', '1990',
+             'Male' if household_head_4.male else 'Female', 2, self.yes_option.order, self.yes_option.text, 2,
+             2, yes_option.order, yes_option.text, 2],
+            ['Kampala', household_head_5.household.household_code, household_head_5.surname, '23', '2', '1990',
+             'Male' if household_head_5.male else 'Female', 3, self.yes_option.order, self.yes_option.text, 3,
+             3, yes_option.order, yes_option.text, 3]]
+
+        actual_csv_data = result_down_load_service.get_summarised_answers()
+        self.assertEqual(5, len(actual_csv_data))
+        for i in range(5):
+            self.assertIn(expected_csv_data[i], actual_csv_data)
+
+            

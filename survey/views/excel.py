@@ -5,24 +5,34 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from django.contrib.auth.decorators import login_required, permission_required
-from survey.forms.filters import IndicatorFilterForm
+from survey.forms.filters import IndicatorFilterForm, SurveyBatchFilterForm
 from survey.models import Survey, Investigator
 from survey.models.batch import Batch
 from survey.services.results_download_service import ResultsDownloadService
 from survey.views.views_helper import contains_key
 
 
-@login_required
-@permission_required('auth.can_view_aggregates')
-def download(request):
-    batch = Batch.objects.get(id=request.POST['batch'])
+def _process_export(survey_batch_filter_form):
+    batch = survey_batch_filter_form.cleaned_data['batch']
+    survey = survey_batch_filter_form.cleaned_data['survey']
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % batch.name
-    data = ResultsDownloadService(batch).generate_report()
+    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % (batch.name if batch else survey.name)
+    data = ResultsDownloadService(batch=batch, survey=survey).generate_report()
     writer = csv.writer(response)
     for row in data:
         writer.writerow(row)
     return response
+
+
+@login_required
+@permission_required('auth.can_view_aggregates')
+def download(request):
+    survey_batch_filter_form = SurveyBatchFilterForm()
+    if request.method == 'POST':
+        survey_batch_filter_form = SurveyBatchFilterForm(request.POST)
+        if survey_batch_filter_form.is_valid():
+            return _process_export(survey_batch_filter_form)
+    return render(request, 'aggregates/download_excel.html', {'survey_batch_filter_form': survey_batch_filter_form})
 
 @login_required
 @permission_required('auth.can_view_aggregates')

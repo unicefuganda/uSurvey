@@ -274,7 +274,7 @@ def then_i_should_be_able_to_export_the_responses_for_that_batch(step):
 
 @step(u'When I select one of the two surveys')
 def when_i_select_one_of_the_two_surveys(step):
-    world.page.select('surveys', [str(world.survey_1.id)])
+    world.page.select('survey', [str(world.survey_1.id)])
 
 @step(u'And I have general member group')
 def and_i_have_general_member_group(step):

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.forms.surveys import SurveyForm
-from survey.models import Batch, Investigator, Backend, Household, HouseholdHead, HouseholdMemberBatchCompletion, EnumerationArea
+from survey.models import Batch, Investigator, Backend, Household, HouseholdHead, HouseholdMemberBatchCompletion, EnumerationArea, Question, BatchQuestionOrder
 from survey.models.households import HouseholdMember
 from survey.models.surveys import Survey
 
@@ -236,3 +236,29 @@ class SurveyTest(TestCase):
                                                 investigator=investigator_2)
         household_2.batch_completed(batch)
         self.assertEqual(1, survey.get_total_respondents())
+
+    def test_knows_all_questions(self):
+        survey = Survey.objects.create(name="haha")
+        batch1 = Batch.objects.create(name="haha batch", survey=survey)
+        batch2 = Batch.objects.create(name="haha batch1", survey=survey)
+        batch3 = Batch.objects.create(name="batch not in a survey")
+
+        question1 = Question.objects.create(text="Question 1", answer_type=Question.NUMBER,
+                                                  order=1, identifier='Q1')
+        question2 = Question.objects.create(text="Question 2", answer_type=Question.NUMBER,
+                                                  order=2, identifier='Q2')
+        question3 = Question.objects.create(text="Question 3", answer_type=Question.NUMBER,
+                                                  order=3, identifier='Q3')
+        batch1.questions.add(question1)
+        batch2.questions.add(question2)
+        batch3.questions.add(question3)
+        BatchQuestionOrder.objects.create(question=question1, batch=batch1, order=1)
+        BatchQuestionOrder.objects.create(question=question2, batch=batch2, order=2)
+        BatchQuestionOrder.objects.create(question=question3, batch=batch3, order=3)
+
+        survey_questions = survey.all_questions()
+
+        self.assertEquals(2, len(survey_questions))
+        self.assertEquals(question1, survey_questions[0])
+        self.assertEquals(question2, survey_questions[1])
+        self.assertNotIn(question3, survey_questions)

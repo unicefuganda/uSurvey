@@ -6,6 +6,7 @@ from django.contrib.auth.models import User, Group, Permission
 
 from django.contrib.contenttypes.models import ContentType
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.forms.filters import SurveyBatchFilterForm
 from survey.models import GroupCondition, HouseholdMemberGroup, BatchQuestionOrder, UnknownDOBAttribute, EnumerationArea
 from survey.models.batch import Batch
 from survey.models.households import HouseholdHead, Household, HouseholdMember
@@ -26,7 +27,9 @@ class ExcelDownloadTest(BaseTest):
         self.condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         self.condition.groups.add(self.member_group)
 
-        self.batch = Batch.objects.create(order = 1, name="BATCH A")
+        self.survey = Survey.objects.create(name='survey name', description='survey descrpition', type=False,
+                                            sample_size=10)
+        self.batch = Batch.objects.create(order = 1, name="BATCH A", survey=self.survey)
         self.question_1 = Question.objects.create(text="How many members are there in this household?", answer_type=Question.NUMBER, order=1, identifier="QUESTION_1", group=self.member_group)
         self.question_2 = Question.objects.create(text="How many members are there in this household?", answer_type=Question.MULTICHOICE, order=2, identifier="QUESTION_2", group=self.member_group)
         self.question_1.batches.add(self.batch)
@@ -53,7 +56,7 @@ class ExcelDownloadTest(BaseTest):
         self.investigator = Investigator.objects.create(name="investigator name", mobile_number="123", ea=ea,
                                                         backend=backend)
         self.household = Household.objects.create(investigator=self.investigator, uid=0, household_code='00010001',
-                                                  ea=self.investigator.ea)
+                                                  ea=self.investigator.ea, survey=self.survey)
         self.household_head = HouseholdHead.objects.create(household=self.household, surname="Surname", date_of_birth=date(2000, 9, 1))
 
         self.investigator.member_answered(self.question_1, self.household_head, answer=1, batch=self.batch)
@@ -66,7 +69,8 @@ class ExcelDownloadTest(BaseTest):
 
     def test_downloaded_excel_file(self):
         file_name = "%s.csv" % self.batch.name
-        response = self.client.post('/aggregates/spreadsheet_report', data={'batch': self.batch.pk})
+        data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk}
+        response = self.client.post('/aggregates/spreadsheet_report', data=data)
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
@@ -85,7 +89,8 @@ class ExcelDownloadTest(BaseTest):
         UnknownDOBAttribute.objects.create(household_member=member, type="YEAR")
         UnknownDOBAttribute.objects.create(household_member=member, type="MONTH")
 
-        response = self.client.post('/aggregates/spreadsheet_report', data={'batch': self.batch.pk})
+        data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk}
+        response = self.client.post('/aggregates/spreadsheet_report', data=data)
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
@@ -96,6 +101,47 @@ class ExcelDownloadTest(BaseTest):
         row3 = ['Kampala', household_id, 'someone', '13', '99',  '99',   'Male', '', '', '']
 
         contents = "%s\r\n%s\r\n%s\r\n" % (",".join(row1), ",".join(row2), ",".join(row3))
+
+        self.assertEquals(contents, response.content)
+        
+    def test_downloaded_excel_when_only_survey_supplied(self):
+        batchB = Batch.objects.create(order=2, name="different batch", survey=self.survey)
+        question_1B = Question.objects.create(group=self.member_group, text="Question 1 B", answer_type=Question.NUMBER,
+                                                  order=1, identifier='Q1B')
+        question_2B = Question.objects.create(group=self.member_group, text="Question 2B", answer_type=Question.MULTICHOICE,
+                                                  order=2, identifier='Q2B')
+        question_3B = Question.objects.create(group=self.member_group, text="Question 3B", answer_type=Question.NUMBER,
+                                                  order=3, identifier='Q3B')
+
+        yes_option = QuestionOption.objects.create(question=question_2B, text="Yes", order=1)
+        no_option = QuestionOption.objects.create(question=question_2B, text="No", order=2)
+
+        question_1B.batches.add(batchB)
+        question_2B.batches.add(batchB)
+        question_3B.batches.add(batchB)
+
+        BatchQuestionOrder.objects.create(question=question_1B, batch=batchB, order=1)
+        BatchQuestionOrder.objects.create(question=question_2B, batch=batchB, order=2)
+        BatchQuestionOrder.objects.create(question=question_3B, batch=batchB, order=3)
+
+        self.investigator.member_answered(question_1B, self.household_head, 1, batchB)
+        self.investigator.member_answered(question_2B, self.household_head, no_option.order, batchB)
+        self.investigator.member_answered(question_3B, self.household_head, 1, batchB)
+
+        header_structure = ['Location', 'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender',
+                            self.question_1.identifier, self.question_2.identifier, '', self.question_3.identifier,
+                            question_1B.identifier, question_2B.identifier, '', question_3B.identifier]
+
+        expected_csv_data = ['Kampala', self.household.household_code, 'Surname', '13', '9',  '2000',   'Male',
+                             '1',       '1', 'OPTION 1',  'ANSWER', str(1), str(no_option.order), no_option.text, '1']
+
+        contents = "%s\r\n%s\r\n" % (",".join(header_structure), ",".join(expected_csv_data))
+
+        file_name = "%s.csv" % self.survey.name
+        response = self.client.post('/aggregates/spreadsheet_report', data={'survey': self.survey.pk, 'batch':''})
+        self.assertEquals(200, response.status_code)
+        self.assertEquals(response.get('Content-Type'), "text/csv")
+        self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
 
         self.assertEquals(contents, response.content)
 
@@ -117,12 +163,13 @@ class ExcelDownloadViewTest(BaseTest):
         some_group.user_set.add(raj)
 
         self.client.login(username='Rajni', password='I_Rock')
+        Survey.objects.create(name="survey")
 
         response = self.client.get('/aggregates/download_spreadsheet')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/download_excel.html', templates)
-        self.assertEquals(len(response.context['batches']), 0)
+        self.assertIsInstance(response.context['survey_batch_filter_form'], SurveyBatchFilterForm)
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/download_spreadsheet')

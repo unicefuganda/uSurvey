@@ -47,4 +47,10 @@ class Survey(BaseModel):
         survey.save()
 
     def __unicode__(self):
-        return self.name
+        return "%s" % self.name
+
+    def all_questions(self):
+        questions = []
+        for batch in self.batch.all().order_by('order'):
+            questions.extend(batch.all_questions())
+        return questions

@@ -1,10 +1,15 @@
-from survey.models import LocationTypeDetails, Investigator, Household, HouseholdMemberGroup
+from survey.models import LocationTypeDetails, Household, HouseholdMemberGroup
 
 
 class ResultsDownloadService(object):
-    def __init__(self, batch):
+    def __init__(self, survey=None, batch=None):
         self.batch = batch
-        self.questions = self.batch.all_questions()
+        self.survey, self.questions = self._set_survey_and_questions(survey)
+
+    def _set_survey_and_questions(self, survey):
+        if self.batch:
+            return self.batch.survey, self.batch.all_questions()
+        return survey, survey.all_questions()
 
     def set_report_headers(self):
         header = list(LocationTypeDetails.get_ordered_types().exclude(name__iexact="country").values_list('name', flat=True))
@@ -23,7 +28,7 @@ class ResultsDownloadService(object):
 
     def get_summarised_answers(self):
         data = []
-        all_households = Household.objects.filter(survey=self.batch.survey)
+        all_households = Household.objects.filter(survey=self.survey)
         locations = list(set(all_households.values_list('ea__locations', flat=True)))
         general_group = HouseholdMemberGroup.objects.get(name="GENERAL")
         for location_id in locations:
@@ -45,3 +50,4 @@ class ResultsDownloadService(object):
         data = [self.set_report_headers()]
         data.extend(self.get_summarised_answers())
         return data
+

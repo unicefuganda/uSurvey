@@ -3,21 +3,9 @@
   Download reports
 {% endblock %}
 {% block content %}
+{% load template_tags %}
   <h4>
     Choose which reports you would like to export to excel
   </h4>
-  <form id="download-csv-form" action="{% url 'excel_report' %}" method="POST" accept-charset="utf-8">
-    {% csrf_token %}
-    <select name="surveys"  id="id_survey">
-      {% for survey in surveys %}
-        <option value="{{ survey.id }}">{{ survey.name }}</option>
-      {% endfor %}
-    </select>
-    <select name="batch" id="id_batch"gst>
-      {% for batch in batches %}
-        <option value="{{ batch.id }}">{{ batch.name }}</option>
-      {% endfor %}
-    </select>
-    <button class="btn btn-primary" id="export_excel">Export to spreadsheet</button>
-  </form>
+  {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-csv-form" a_form=survey_batch_filter_form %}
 {% endblock %}

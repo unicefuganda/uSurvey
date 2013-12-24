@@ -67,3 +67,17 @@ class LocationFilterForm(forms.Form):
         survey_id = survey_id if str(survey_id).isdigit() else self.fields['survey'].queryset[0].id
         self.fields['batch'].queryset = Batch.objects.filter(survey=survey_id)
         self.fields['ea'].queryset = EnumerationArea.objects.filter(survey=survey_id)
+
+
+class SurveyBatchFilterForm(forms.Form):
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all().order_by('name'), empty_label=None)
+    batch = forms.ModelChoiceField(queryset=None, empty_label="All", required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(SurveyBatchFilterForm, self).__init__(*args, **kwargs)
+        self.constrain_batch_choices_to_survey()
+
+    def constrain_batch_choices_to_survey(self):
+        survey_id = self.data.get('survey', None)
+        survey_id = survey_id if str(survey_id).isdigit() else self.fields['survey'].queryset[0].id
+        self.fields['batch'].queryset = Batch.objects.filter(survey=survey_id).order_by('name')

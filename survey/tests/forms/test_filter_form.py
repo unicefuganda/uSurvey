@@ -1,6 +1,6 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location
-from survey.forms.filters import QuestionFilterForm, IndicatorFilterForm, LocationFilterForm
+from survey.forms.filters import QuestionFilterForm, IndicatorFilterForm, LocationFilterForm, SurveyBatchFilterForm
 from survey.models import Question, QuestionModule, HouseholdMemberGroup, Indicator, Batch, Survey, EnumerationArea
 
 
@@ -180,3 +180,58 @@ class CompletionLocationFilterFormTest(TestCase):
         form_data['ea'] = ''
         location_filter_form = LocationFilterForm(form_data)
         self.assertTrue(location_filter_form.is_valid())
+
+
+class SurveyBatchFilterFormTest(TestCase):
+    def setUp(self):
+        self.survey = Survey.objects.create(name="Survey A")
+        self.survey_2 = Survey.objects.create(name="Survey B")
+        self.batch = Batch.objects.create(name="Batch A", survey=self.survey)
+        self.batch_1 = Batch.objects.create(name="Batch B", survey=self.survey_2)
+
+        self.data = {'survey': self.survey.id,
+                     'batch': self.batch.id}
+
+    def test_valid(self):
+        survey_batch_filter_form = SurveyBatchFilterForm(self.data)
+        self.assertTrue(survey_batch_filter_form.is_valid())
+
+    def test_empty_batch_is_valid(self):
+        data = self.data.copy()
+        data['batch'] = ''
+        survey_batch_filter_form = SurveyBatchFilterForm(data)
+        self.assertTrue(survey_batch_filter_form.is_valid())
+
+    def assert_invalid_if_field_does_not_exist(self, field_key):
+        form_data = self.data.copy()
+        non_existing_survey_id = 666
+        form_data[field_key] = non_existing_survey_id
+        survey_batch_filter_form = SurveyBatchFilterForm(form_data)
+        self.assertFalse(survey_batch_filter_form.is_valid())
+        message = "Select a valid choice. That choice is not one of the available choices."
+        self.assertEqual([message], survey_batch_filter_form.errors[field_key])
+
+    def assert_invalid_if_field_is_non_sense(self, field_key):
+        form_data = self.data.copy()
+        form_data[field_key] = 'non_sense_hohoho_&^%$#'
+        survey_batch_filter_form = SurveyBatchFilterForm(form_data)
+        self.assertFalse(survey_batch_filter_form.is_valid())
+        message = "Select a valid choice. That choice is not one of the available choices."
+        self.assertEqual([message], survey_batch_filter_form.errors[field_key])
+
+    def test_invalid_if_fields_do_not_exist(self):
+        self.assert_invalid_if_field_does_not_exist('survey')
+        self.assert_invalid_if_field_does_not_exist('batch')
+
+    def test_invalid_if_fields_are_non_sense(self):
+        self.assert_invalid_if_field_is_non_sense('survey')
+        self.assert_invalid_if_field_is_non_sense('batch')
+
+    def test_invalid_if_batch_is_not_under_survey(self):
+        form_data = self.data.copy()
+        form_data['survey'] = self.survey.id
+        form_data['batch'] = self.batch_1.id
+        survey_batch_filter_form = SurveyBatchFilterForm(form_data)
+        self.assertFalse(survey_batch_filter_form.is_valid())
+        message = "Select a valid choice. That choice is not one of the available choices."
+        self.assertEqual([message], survey_batch_filter_form.errors['batch'])
