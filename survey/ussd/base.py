@@ -10,7 +10,7 @@ class USSDBase(object):
         'WELCOME_TEXT': "Welcome %s to the survey.\n1: Register households\n2: Take survey",
         'HOUSEHOLD_LIST': "Please enter household from the list or enter the sequence number",
         'MEMBERS_LIST': "Please select a member from the list",
-        'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "The survey is now complete. Please collect your salary from the district coordinator.",
+        'SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS': "Survey Completed. Thank you.",
         'RETAKE_SURVEY': "You have already completed this household. Would you like to start again?\n1: Yes\n2: No",
         'NO_HOUSEHOLDS': "Sorry, you have no households registered.",
         'NO_OPEN_BATCH': "Sorry, currently there are no open surveys.",
