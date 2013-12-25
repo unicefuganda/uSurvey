@@ -26,9 +26,9 @@ def and_i_login_a_user(step):
     world.page = LoginPage(world.browser)
     world.page.login(world.user)
 
-@step(u'Then I should see home page and logout link')
-def then_i_should_see_home_page_and_logout_link(step):
-    world.page.see_home_page_and_logout_link()
+@step(u'Then I should see that I am logged in as given username')
+def then_i_should_see_that_i_am_logged_in_as_given_username(step):
+    world.page.see_home_page_and_logged_in_status(world.user)
 
 @step(u'And I am in the home page')
 def and_i_am_in_the_home_page(step):

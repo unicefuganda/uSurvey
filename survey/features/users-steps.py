@@ -1,4 +1,5 @@
 from random import randint
+from time import sleep
 
 from lettuce import *
 from django.contrib.auth.models import User, Group
@@ -77,7 +78,7 @@ def and_i_can_login_that_user_successfully(step):
     logout(world)
     user = User.objects.get(username=world.user_data['username'])
     login(user, world)
-    world.page.see_home_page_and_logout_link()
+    world.page.see_home_page_and_logged_in_status(user)
 
 
 @step(u'Then I fill an existing mobile number')
@@ -206,7 +207,7 @@ def then_i_should_see_the_groups_field(step):
 
 @step(u'And I select edit action')
 def and_i_select_edit_action(step):
-    world.page.click_link_by_text(" Edit Profile")
+    world.page.click_by_css("#edit_user")
     world.page = EditUserDetailsPage(world.browser)
 
 @step(u'When I click add user button')

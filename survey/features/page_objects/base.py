@@ -39,11 +39,11 @@ class PageObject(object):
         self.browser.find_by_css("form button").first.click()
 
     def see_username_link(self):
+        self.click_by_css('.btn-navbar')
         assert self.browser.find_by_css("#drop-user-settings")
 
-    def see_logout_link(self):
-        self.click_by_css('#drop-user-settings')
-        assert self.browser.find_link_by_text(" Logout")
+    def see_logged_in_status(self, user):
+        assert self.browser.find_link_by_partial_text("Logged in as: %s" % user.get_full_name())
 
     def see_the_about_link(self):
         assert self.browser.find_link_by_text('About')
@@ -96,7 +96,9 @@ class PageObject(object):
     def see_user_settings_link(self, user):
         assert self.browser.find_link_by_partial_text("%s" % str(user.get_full_name()))
 
-    def click_user_settings(self, user):
+    def click_user_settings(self):
+        self.click_by_css("#fold-menu")
+        sleep(3)
         self.click_by_css("#drop-user-settings")
 
     def assert_user_can_see_profile_and_logout_link(self):

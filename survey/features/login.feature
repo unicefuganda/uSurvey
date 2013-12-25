@@ -4,14 +4,14 @@ Feature: Login feature
     Given I have a user
     And And I visit the login page
     And I login a user
-    Then I should see home page and logout link
+    Then I should see that I am logged in as given username
 
   Scenario: Login from Home page
     Given I have a user
     And I am in the home page
     And I click the login link
     And I login a user
-    Then I should see home page and logout link
+    Then I should see that I am logged in as given username
 
   Scenario: Login from new investigator page
     Given I have a user

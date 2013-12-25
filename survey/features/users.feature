@@ -72,7 +72,6 @@ Feature: Users feature
       And I visit the login page
       And I login a user
       And I am in the home page
-      Then I see user settings link
       And I click user settings link
       And I select edit action
       Then I should not see the groups field
@@ -85,7 +84,6 @@ Feature: Users feature
       And I visit the login page
       And I login a user
       And I am in the home page
-      Then I see user settings link
       And I click user settings link
       And I select edit action
       Then I should see the groups field
