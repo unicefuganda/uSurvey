@@ -152,9 +152,14 @@
         {% block content %}
         {% endblock %}
     </div>
+<div id="push"></div>
 </div>
-{% block footer %}
-{% endblock %}
+<footer>
+    <hr>
+     <div class="inner-footer">
+         <div class="text-center pull-right"><img src="{{STATIC_URL}}logo/unicef_logo.gif" alt="UNICEF LOGO" height="70" width="70" style="margin-right: 10px">&copy; UNICEF 2013</div>
+      </div>
+</footer>
 
 <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
