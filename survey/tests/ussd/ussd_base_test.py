@@ -86,7 +86,6 @@ class USSDBaseTest(TestCase):
         return patch.object(datetime, 'date', MockedDate)
 
 
-
 class FakeRequest(HttpRequest):
     def dict(self):
         obj = self.__dict__

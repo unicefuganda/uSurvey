@@ -20,9 +20,9 @@ class HouseholdHeadForm(ModelForm):
     @staticmethod
     def resident_since_year_choices(choices):
         year_now = datetime.now().year
-        years = list(xrange(year_now-60, year_now+1, 1))
+        years = list(xrange(year_now - 60, year_now + 1, 1))
         years.reverse()
-        choices['choices']= years
+        choices['choices'] = years
         return choices
 
     class Meta:

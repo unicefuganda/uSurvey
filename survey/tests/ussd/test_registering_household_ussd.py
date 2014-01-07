@@ -317,7 +317,8 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 self.select_household("2")
                 self.respond('2')
                 self.respond('Dummy name')
-                self.respond("34")
+                age = "34"
+                self.respond(age)
                 self.respond("4")
                 response = self.respond("1989")
                 response_string = "responseString=%s&action=request" % ("INVALID ANSWER: " + self.age_question.text)
@@ -330,7 +331,8 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                 response = self.respond("4")
                 response_string = "responseString=%s&action=request" % self.year_question.text
                 self.assertEquals(urllib2.unquote(response.content), response_string)
-                response = self.respond("1979")
+                correct_year_of_birth = datetime.date.today().year - int(age)
+                response = self.respond(correct_year_of_birth)
                 response_string = "responseString=%s&action=request" % self.gender_question.text
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -686,13 +688,19 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_day_of_birth_should_be_adjusted_to_last_day_of_month_if_it_exceeds_the_number_of_days_in_the_given_month(self):
         some_age = 10
+        year = datetime.datetime.now().year - some_age
+        import calendar
+        if calendar.isleap(year):
+            year = year + 1
+            some_age = some_age -1
+
         feb = '2'
         answers = {'name': 'dummy name',
                    'age': some_age,
                    'gender': '1',
                    'month': feb,
-                   'year': datetime.datetime.now().year - some_age
-            }
+                   'year': datetime.datetime.now().year - some_age}
+
         day_not_existing_in_feb = 29
         not_feb = 11
         date_this_year_with_day_not_existing_in_feb = datetime.date.today().replace(month=not_feb, day=day_not_existing_in_feb)
@@ -719,8 +727,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    'age': some_age,
                    'gender': '1',
                    'month': '2',
-                   'year': datetime.datetime.now().year - some_age
-        }
+                   'year': datetime.datetime.now().year - some_age}
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):

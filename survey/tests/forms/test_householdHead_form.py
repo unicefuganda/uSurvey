@@ -9,23 +9,22 @@ from survey.models.households import HouseholdHead, Household
 class MockDate(datetime):
     @classmethod
     def now(cls):
-        return cls(2013, 1, 1)
+        return cls(datetime.now().year, 1, 1)
 
 
 class HouseholdHeadFormTest(TestCase):
-
     def setUp(self):
         self.form_data = {
-                        'surname': 'household',
-                        'first_name': 'bla',
-                        'male': 't',
-                        'date_of_birth': date(2013, 05, 01),
-                        'level_of_education':'Primary',
-                        'occupation':'Brewing',
-                        'resident_since_year':'2013',
-                        'resident_since_month':'5',
-                        'time_measure':'Years',
-                    }
+            'surname': 'household',
+            'first_name': 'bla',
+            'male': 't',
+            'date_of_birth': date(2013, 05, 01),
+            'level_of_education': 'Primary',
+            'occupation': 'Brewing',
+            'resident_since_year': '2013',
+            'resident_since_month': '5',
+            'time_measure': 'Years',
+        }
 
     def test_valid(self):
         hHead_form = HouseholdHeadForm(self.form_data)
@@ -102,32 +101,31 @@ class HouseholdHeadFormTest(TestCase):
         message = 'Select a valid choice. not a number is not one of the available choices.'
         self.assertEquals(hHead_form.errors['resident_since_month'], [message])
 
-
     def test_resident_since_month_choices(self):
-        month_choices= {'selected_text':'', 'selected_value':''}
-        months=[{'value':1, 'text':'January'},
-                {'value':2, 'text':'February'},
-                {'value':3, 'text':'March'},
-                {'value':4, 'text':'April'},
-                {'value':5, 'text':'May'},
-                {'value':6, 'text':'June'},
-                {'value':7, 'text':'July'},
-                {'value':8, 'text':'August'},
-                {'value':9, 'text':'September'},
-                {'value':10, 'text':'October'},
-                {'value':11, 'text':'November'},
-                {'value':12, 'text':'December'},]
+        month_choices = {'selected_text': '', 'selected_value': ''}
+        months = [{'value': 1, 'text': 'January'},
+                  {'value': 2, 'text': 'February'},
+                  {'value': 3, 'text': 'March'},
+                  {'value': 4, 'text': 'April'},
+                  {'value': 5, 'text': 'May'},
+                  {'value': 6, 'text': 'June'},
+                  {'value': 7, 'text': 'July'},
+                  {'value': 8, 'text': 'August'},
+                  {'value': 9, 'text': 'September'},
+                  {'value': 10, 'text': 'October'},
+                  {'value': 11, 'text': 'November'},
+                  {'value': 12, 'text': 'December'}, ]
         month_choices = HouseholdHeadForm.resident_since_month_choices(month_choices)
 
-        self.assertEquals(months, month_choices['choices'] )
+        self.assertEquals(months, month_choices['choices'])
 
     def test_resident_since_year_choices(self):
-        year_choices= {'selected_text':'', 'selected_value':''}
+        year_choices = {'selected_text': '', 'selected_value': ''}
         datetime = MockDate
 
-        self.assertEqual(MockDate.now(), datetime(2013, 1, 1))
+        self.assertEqual(MockDate.now(), datetime(datetime.now().year, 1, 1))
 
-        years= list(xrange(2013-60, 2014, 1))
+        years = list(xrange(datetime.now().year - 60, datetime.now().year + 1, 1))
         years.reverse()
         year_choices = HouseholdHeadForm.resident_since_year_choices(year_choices)
         self.assertEquals(years, year_choices['choices'])
