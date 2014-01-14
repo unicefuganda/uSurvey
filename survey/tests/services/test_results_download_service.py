@@ -122,10 +122,10 @@ class ResultsDownloadServiceTest(BaseTest):
 
         general_question_1 = Question.objects.create(group=general_group, text="General Question 1",
                                                      answer_type=Question.NUMBER,
-                                                     order=4, identifier='Q3')
+                                                     order=4, identifier='Q31')
         general_question_2 = Question.objects.create(group=general_group, text="General Question 2",
                                                      answer_type=Question.NUMBER,
-                                                     order=5, identifier='Q4')
+                                                     order=5, identifier='Q41')
 
         general_question_1.batches.add(self.batch)
         general_question_2.batches.add(self.batch)

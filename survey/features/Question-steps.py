@@ -213,7 +213,7 @@ def then_i_should_go_to_add_subquestion_page(step):
 
 @step(u'When I fill in subquestion details')
 def when_i_fill_in_subquestion_details(step):
-    world.page.fill_valid_values({'module': world.module.id, 'text': 'hritik  question', 'identifier': 'ID 1'})
+    world.page.fill_valid_values({'module': world.module.id, 'text': 'hritik  question', 'identifier': 'Q001'})
     world.page.select('group', [world.household_member_group.pk])
     world.page.select('answer_type', [Question.NUMBER])
 
@@ -307,7 +307,7 @@ def then_i_should_see_that_the_question_was_deleted_successfully(step):
 def and_i_have_a_sub_question_for_that_question(step):
     world.sub_question = Question.objects.create(module=world.module, parent=world.multi_choice_question,
                                                  text="Sub Question 2?",
-                                                 answer_type=Question.NUMBER, subquestion=True, identifier='ID 1')
+                                                 answer_type=Question.NUMBER, subquestion=True, identifier='Q101')
 
 
 @step(u'Then I should not see the sub question')
@@ -319,7 +319,7 @@ def then_i_should_not_see_the_sub_question(step):
 def and_i_have_a_non_multi_choice_question(step):
     world.multi_choice_question = Question.objects.create(module=world.module, text="Are these insecticide?",
                                                           answer_type=Question.NUMBER, order=7,
-                                                          group=world.household_member_group, identifier='ID 1')
+                                                          group=world.household_member_group, identifier='Q921')
     world.multi_choice_question.batches.add(world.batch)
     BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=1)
 
@@ -347,7 +347,7 @@ def and_i_have_a_rule_linking_one_option_with_that_subquestion(step):
 def and_i_have_a_subquestion_under_that_question(step):
     world.sub_question = Question.objects.create(module=world.module, subquestion=True,
                                                  parent=world.multi_choice_question,
-                                                 text="this is a subquestion", identifier='ID 1')
+                                                 text="this is a subquestion", identifier='Q022')
 
 
 @step(u'When I fill in duplicate subquestion details')
@@ -442,14 +442,14 @@ def and_i_click_edit_sub_question_link(step):
 def then_i_see_the_sub_question_form_with_values(step):
     form_values = {'module': world.module.id, 'text': world.sub_question.text,
                    'group': world.multi_choice_question.group.id,
-                   'identifier': 'ID 1',
+                   'identifier': "Q101",
                    'answer_type': world.sub_question.answer_type}
     world.page.validate_form_values(form_values)
 
 
 @step(u'When I fill in edited sub question details')
 def when_i_fill_in_edited_sub_question_details(step):
-    world.edited_sub_question_details = {'identifier': 'ID 1', 'module': world.module.id, 'text': 'edited question',
+    world.edited_sub_question_details = {'identifier': 'Q101', 'module': world.module.id, 'text': 'edited question',
                                          'group': world.multi_choice_question.group.id
     }
     world.page.see_select_option(['Number'], 'answer_type')

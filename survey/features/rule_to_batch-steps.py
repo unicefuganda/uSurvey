@@ -229,7 +229,7 @@ def then_i_should_see_a_modal_for_add_subquestion(step):
 def when_i_fill_the_subquestion_details(step):
     world.data = {'text': 'hritik question',
                   'answer_type': Question.NUMBER,
-                  'identifier': 'ID 4'}
+                  'identifier': 'Q234'}
 
     world.page.fill_valid_values(world.data)
 
@@ -333,7 +333,7 @@ def when_i_refill_the_form_with_valid_values(step):
         'identifier': 'ID 5',
         'group': world.household_member_group.pk
     }
-    world.page.fill_valid_values({'text': world.data['text']})
+    world.page.fill_valid_values({'text': world.data['text'], 'identifier': world.data['identifier']})
     world.page.select('group', [world.data['group']])
     world.page.select('answer_type', [world.data['answer_type']])
 

@@ -138,10 +138,10 @@ class InvestigatorTest(TestCase):
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=self.member_group)
 
-        question_2 = Question.objects.create(identifier="identifier1",
+        question_2 = Question.objects.create(identifier="identifier2",
                                              text="Question 2", answer_type='number',
                                              order=2, subquestion=False, group=self.member_group)
-        question_3 = Question.objects.create(identifier="identifier1",
+        question_3 = Question.objects.create(identifier="identifier3",
                                              text="Question 3", answer_type='number',
                                              order=3, subquestion=False, group=self.member_group)
         order = 1
@@ -167,10 +167,10 @@ class InvestigatorTest(TestCase):
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=self.member_group)
 
-        question_2 = Question.objects.create(identifier="identifier1",
+        question_2 = Question.objects.create(identifier="identifier2",
                                              text="Question 2", answer_type='number',
                                              order=2, subquestion=False, group=self.member_group)
-        question_3 = Question.objects.create(identifier="identifier1",
+        question_3 = Question.objects.create(identifier="identifier3",
                                              text="Question 3", answer_type='number',
                                              order=3, subquestion=False, group=self.member_group)
 
@@ -195,16 +195,16 @@ class InvestigatorTest(TestCase):
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=self.member_group)
 
-        question_2 = Question.objects.create(identifier="identifier1",
+        question_2 = Question.objects.create(identifier="identifier2",
                                              text="Question 2", answer_type='number',
                                              order=2, subquestion=False, group=self.member_group)
-        question_3 = Question.objects.create(identifier="identifier1",
+        question_3 = Question.objects.create(identifier="identifier3",
                                              text="Question 3", answer_type='number',
                                              order=3, subquestion=False, group=self.member_group)
-        question_4 = Question.objects.create(identifier="identifier1",
+        question_4 = Question.objects.create(identifier="identifier4",
                                              text="Question 4", answer_type='number',
                                              order=4, subquestion=False, group=self.member_group)
-        question_5 = Question.objects.create(identifier="identifier1",
+        question_5 = Question.objects.create(identifier="identifier5",
                                              text="Question 5", answer_type='number',
                                              order=5, subquestion=False, group=self.member_group)
         order = 1

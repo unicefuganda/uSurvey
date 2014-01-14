@@ -34,10 +34,10 @@ class HouseholdMemberGroupTest(TestCase):
         question_1 = Question.objects.create(identifier="identifier1",
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=member_group)
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
-        question_3 = Question.objects.create(identifier="identifier1", text="Question 3",
+        question_3 = Question.objects.create(identifier="identifier3", text="Question 3",
                                              answer_type='number', order=1,
                                              subquestion=False, group=another_member_group)
         expected_member_questions = [question_1, question_2]
@@ -58,7 +58,7 @@ class HouseholdMemberGroupTest(TestCase):
         question_1 = Question.objects.create(identifier="identifier1",
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=member_group)
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
         batch = Batch.objects.create(name='Batch A', order=1)

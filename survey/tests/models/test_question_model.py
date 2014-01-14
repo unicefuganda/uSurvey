@@ -6,6 +6,7 @@ from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import BatchQuestionOrder, GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey, EnumerationArea
 
+from django.db import IntegrityError
 from survey.models.batch import Batch
 from survey.models.backend import Backend
 from survey.models.households import Household, HouseholdMember
@@ -30,6 +31,11 @@ class QuestionTest(TestCase):
     def test_text_question(self):
         question = Question.objects.create(text="This is a question", answer_type=Question.TEXT)
         self.failUnless(question.id)
+
+    def test_variable_name_should_be_unique(self):
+        question = Question.objects.create(text="This is a question", answer_type=Question.TEXT, identifier="Q1haha")
+        duplicate_question = Question(text="haha", answer_type=Question.TEXT, identifier="Q1haha")
+        self.assertRaises(IntegrityError, duplicate_question.save)
 
     def test_multichoice_question(self):
         question = Question.objects.create(text="This is a question",

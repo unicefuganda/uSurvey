@@ -166,11 +166,11 @@ class BatchTest(TestCase):
 
         question_2 = Question.objects.create(group=group_2,
                                              text="Question 1", answer_type=Question.NUMBER,
-                                             identifier="identifier", order=1)
+                                             identifier="identifier1", order=1)
 
         question_3 = Question.objects.create(group=group_3,
                                              text="Question 1", answer_type=Question.NUMBER,
-                                             identifier="identifier", order=1)
+                                             identifier="identifier2", order=1)
 
         question_1.batches.add(batch)
         question_2.batches.add(batch)
@@ -250,11 +250,11 @@ class BatchLocationStatusTest(TestCase):
 
         question_2 = Question.objects.create(module=module, group=group_1,
                                              text="Question 2", answer_type=Question.NUMBER,
-                                             identifier="identifier", order=2)
+                                             identifier="identifier1", order=2)
 
         question_3 = Question.objects.create(module=module, group=group_1,
                                              text="Question 3", answer_type=Question.NUMBER,
-                                             identifier="identifier", order=1)
+                                             identifier="identifier2", order=1)
 
         question_1.batches.add(batch)
         question_2.batches.add(batch)

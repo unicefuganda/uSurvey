@@ -222,12 +222,12 @@ class HouseholdMemberTest(TestCase):
 
         question_1 = Question.objects.create(identifier="identifier1", text="Question 1",
                                              answer_type='number', order=1, subquestion=False, group=member_group)
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=2, subquestion=False, group=member_group)
 
-        question_3 = Question.objects.create(identifier="identifier1", text="Question 3",
+        question_3 = Question.objects.create(identifier="identifier3", text="Question 3",
                                              answer_type='number', order=0, subquestion=False, group=member_group_2)
-        question_4 = Question.objects.create(identifier="identifier1", text="Question 4",
+        question_4 = Question.objects.create(identifier="identifier4", text="Question 4",
                                              answer_type='number', order=1, subquestion=False, group=member_group_2)
 
         question_1.batches.add(batch)
@@ -271,12 +271,12 @@ class HouseholdMemberTest(TestCase):
 
         question_1 = Question.objects.create(identifier="identifier1", text="Question 1",
                                              answer_type='number', order=1, subquestion=False, group=member_group)
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=2, subquestion=False, group=member_group)
 
-        question_3 = Question.objects.create(identifier="identifier1", text="Question 3",
+        question_3 = Question.objects.create(identifier="identifier3", text="Question 3",
                                              answer_type='number', order=0, subquestion=False, group=member_group_2)
-        question_4 = Question.objects.create(identifier="identifier1", text="Question 4",
+        question_4 = Question.objects.create(identifier="identifier4", text="Question 4",
                                              answer_type='number', order=1, subquestion=False, group=member_group_2)
 
         question_1.batches.add(batch)
@@ -321,7 +321,7 @@ class HouseholdMemberTest(TestCase):
         question_1 = Question.objects.create(identifier="identifier1",
                                              text="Question 1", answer_type='number',
                                              order=1, subquestion=False, group=member_group)
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
 
@@ -367,7 +367,7 @@ class HouseholdMemberTest(TestCase):
         question_1.batches.add(batch)
         BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
 
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
         question_2.batches.add(batch_2)
@@ -410,7 +410,7 @@ class HouseholdMemberTest(TestCase):
         question_1.batches.add(batch)
         BatchQuestionOrder.objects.create(question=question_1, batch=batch, order=1)
 
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
         question_2.batches.add(batch_2)
@@ -632,7 +632,7 @@ class HouseholdMemberTest(TestCase):
         question_1 = Question.objects.create(identifier="identifier1",
                                              text="Question 1", answer_type='number',
                                              order=0, subquestion=False, group=member_group)
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=1,
                                              subquestion=False, group=member_group)
         question_1.batches.add(batch)
@@ -675,10 +675,10 @@ class HouseholdMemberTest(TestCase):
         question_1 = Question.objects.create(identifier="identifier1",
                                              text="Question 1", answer_type='number',
                                              order=0, subquestion=False, group=member_group)
-        question_2 = Question.objects.create(identifier="identifier1", text="Question 2",
+        question_2 = Question.objects.create(identifier="identifier2", text="Question 2",
                                              answer_type='number', order=1,
                                              subquestion=False, group=member_group)
-        question_3 = Question.objects.create(identifier="identifier1", text="Question 3",
+        question_3 = Question.objects.create(identifier="identifier3", text="Question 3",
                                              answer_type='number', order=2,
                                              subquestion=False, group=member_group)
         question_1.batches.add(batch)

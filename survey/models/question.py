@@ -30,7 +30,7 @@ class Question(BaseModel):
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
     NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
 
-    identifier = models.CharField(max_length=100, blank=False, null=True)
+    identifier = models.CharField(max_length=100, blank=False, null=True, unique=True)
     batches = models.ManyToManyField(Batch, null=True, related_name="questions")
     group = models.ForeignKey("HouseholdMemberGroup", null=True, related_name="question_group")
     text = models.CharField(max_length=150, blank=False, null=False)
