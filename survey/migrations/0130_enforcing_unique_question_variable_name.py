@@ -8,11 +8,12 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        all_question_identifier = orm['survey.question'].objects.values_list('identifier', flat=True)
+        all_question_identifier = list(orm['survey.question'].objects.values_list('identifier', flat=True))
         duplicates = filter(lambda identifier: all_question_identifier.count(identifier) > 1, list(set(all_question_identifier)))
         for identifier in list(set(duplicates)) :
-            for question in orm['survey_question'].objects.filter(identifier=identifier):
-                question.identifier = identifier + "%d" % randint(0, 100)
+            for question in orm['survey.question'].objects.filter(identifier=identifier):
+                identifier = identifier if identifier else 'HAHA'
+                question.identifier = identifier + "%d" % question.id
                 question.save()
 
     def backwards(self, orm):
