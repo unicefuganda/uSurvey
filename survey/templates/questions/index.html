@@ -19,7 +19,7 @@
         <h3>
             Questions List
         </h3>
-        {% include "questions/_question_filter_form.html" with action="/questions/" %}
+        {% include "questions/_question_filter_form.html" with action="/questions/" a_form=question_filter_form %}
         <a href="{% url 'new_question_page' %}" class="btn btn_primary pull-right" id="add_question">Create New Question</a>
     {% endif %}
     <br class="clear"/>
