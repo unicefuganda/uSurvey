@@ -62,29 +62,23 @@ def _get_questions_based_on_filter(batch_id, group_id='All', module_id='All', qu
         return BatchQuestionOrder.get_batch_order_specific_questions(batch_id, filter_condition)
 
 
-@permission_required('auth.can_view_batches')
-def index(request, batch_id):
-    batch = None
-    max_per_page = DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
-
-    if len(batch_id.strip()) != 0:
-        batch = Batch.objects.get(id=batch_id)
-
-    question_filter_form = QuestionFilterForm()
+def _questions_given(batch_id, request):
     group_id = request.GET.get('groups', None)
     module_id = request.GET.get('modules', None)
     question_type = request.GET.get('question_types', None)
+    max_question_per_page_supplied = request.GET.get('number_of_questions_per_page', 0) or 0
+    given_max_per_page = min(int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
+    max_per_page = max(given_max_per_page, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
 
-    if request.method == "POST":
-        question_filter_form = QuestionFilterForm(data=request.POST)
-        if question_filter_form.is_valid():
-            group_id = request.POST.get('groups', None)
-            module_id = request.POST.get('modules', None)
-            question_type = request.POST.get('question_types', None)
-            max_question_per_page_supplied = question_filter_form.cleaned_data.get('number_of_questions_per_page', None)
-            max_per_page = min(int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
+    return _get_questions_based_on_filter(batch_id, group_id, module_id, question_type), max_per_page
 
-    questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
+
+@permission_required('auth.can_view_batches')
+def index(request, batch_id):
+    batch = Batch.objects.get(id=batch_id) if batch_id else None
+
+    question_filter_form = QuestionFilterForm(data=request.GET)
+    questions, max_per_page = _questions_given(batch_id, request)
 
     if not questions:
         messages.error(request, 'There are no questions associated with this batch yet.')
@@ -118,27 +112,13 @@ def filter_by_group_and_module(request, batch_id, group_id, module_id):
 
 @permission_required('auth.can_view_batches')
 def list_all_questions(request):
-    question_filter_form = QuestionFilterForm()
-    group_id = None
-    module_id = None
-    question_type = None
     batch_id = request.GET.get('batch_id', None)
-    max_per_page = DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 
-    if request.method == "POST":
-        question_filter_form = QuestionFilterForm(data=request.POST)
-        if question_filter_form.is_valid():
-            group_id = request.POST.get('groups', None)
-            module_id = request.POST.get('modules', None)
-            question_type = request.POST.get('question_types', None)
-            batch_id = request.POST.get('batch_id', None)
-            max_question_per_page_supplied = question_filter_form.cleaned_data.get('number_of_questions_per_page', None)
-            max_per_page = min(int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
-
-    questions = _get_questions_based_on_filter(batch_id, group_id, module_id, question_type)
+    question_filter_form = QuestionFilterForm(data=request.GET)
+    questions, max_per_page = _questions_given(batch_id, request)
 
     context = {'questions': questions, 'request': request, 'question_filter_form': question_filter_form,
-               'rules_for_batch': {}, 'max_question_per_page':max_per_page}
+               'rules_for_batch': {}, 'max_question_per_page': max_per_page}
     return render(request, 'questions/index.html', context)
 
 

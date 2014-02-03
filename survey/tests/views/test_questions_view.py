@@ -224,11 +224,17 @@ class QuestionsViews(BaseTest):
         self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
         self.assertIsNotNone(response.context['request'])
 
+    def _convert_to_get_parameters(self, data):
+        get_params = "?"
+        for key in data.keys():
+            get_params +="%s=%s&"%(key, data[key])
+        return get_params
+
     def test_limit_list_size_per_page(self):
         max_question_per_page_supplied = 100
         data = self.form_data.copy()
         data['number_of_questions_per_page'] = max_question_per_page_supplied
-        response = self.client.post('/batches/%d/questions/'%self.batch.id, data)
+        response = self.client.get('/batches/%d/questions/%s'% (self.batch.id, self._convert_to_get_parameters(data)))
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(max_question_per_page_supplied, response.context['max_question_per_page'])
 
@@ -768,12 +774,12 @@ class QuestionsViews(BaseTest):
         self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
         self.assertIsNotNone(response.context['request'])
 
-    def test_post_index_all(self):
+    def test_get_index_all(self):
         sub_question = Question.objects.create(parent=self.question_1, text="Sub Question 2?",
                                                answer_type=Question.NUMBER, subquestion=True, module=self.module,
                                                identifier='Q122')
 
-        response = self.client.post('/questions/')
+        response = self.client.get('/questions/')
 
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
@@ -790,7 +796,7 @@ class QuestionsViews(BaseTest):
         max_question_per_page_supplied = 100
         data = self.form_data.copy()
         data['number_of_questions_per_page'] = max_question_per_page_supplied
-        response = self.client.post('/questions/', data)
+        response = self.client.get('/questions/%s' % self._convert_to_get_parameters(data))
         self.failUnlessEqual(response.status_code, 200)
         self.assertEqual(max_question_per_page_supplied, response.context['max_question_per_page'])
 
@@ -798,11 +804,11 @@ class QuestionsViews(BaseTest):
         max_question_per_page_supplied = 2000
         data = self.form_data.copy()
         data['number_of_questions_per_page'] = max_question_per_page_supplied
-        response = self.client.post('/questions/', data)
+        response = self.client.get('/questions/%s' % self._convert_to_get_parameters(data))
         self.failUnlessEqual(response.status_code, 200)
-        self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
+        self.assertEqual(MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
 
-    def test_post_index_should_return_questions_matching_posted_keys(self):
+    def test_get_index_should_return_questions_matching_get_keys(self):
         question = Question.objects.create(text="Sub Question 2?", answer_type=Question.NUMBER, module=self.module,
                                            identifier='Q09')
         sub_question = Question.objects.create(parent=question, text="Sub Question 2?",
@@ -829,9 +835,26 @@ class QuestionsViews(BaseTest):
                             'question_types': Question.NUMBER, 'batch_id': self.batch.id,
                             'number_of_questions_per_page':50}
 
-        response = self.client.post('/questions/', data=filter_form_data)
+        response = self.client.get('/questions/%s' % self._convert_to_get_parameters(filter_form_data))
         [self.assertIn(expected_question, response.context['questions']) for expected_question in expected_questions]
         [self.assertNotIn(excluded_question, response.context['questions']) for excluded_question in excluded_questions]
+
+    def test_filter_question_list_pagination(self):
+        for i in range(25):
+            Question.objects.create(text="%d" % i, answer_type=Question.NUMBER, order=i, module=self.module, identifier='Q%d'% i)
+
+
+        module = QuestionModule.objects.create(name="Education")
+        different_module_question = Question.objects.create(text="haha", answer_type=Question.NUMBER, module=module,
+                                           identifier='Q09')
+
+        filter_form_data = {'modules': self.module.id,
+                            'question_types': Question.NUMBER, 'batch_id': self.batch.id,
+                            'number_of_questions_per_page':20}
+
+        response = self.client.get('/questions/%spage=2' % self._convert_to_get_parameters(filter_form_data))
+        [self.assertEqual(self.module, question.module) for question in  response.context['questions'] ]
+        self.assertNotIn(different_module_question, response.context['questions'])
 
     def test_add_new_subquestion(self):
         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)

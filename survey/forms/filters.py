@@ -2,7 +2,7 @@ from django import forms
 from rapidsms.contrib.locations.models import Location
 from survey.models import HouseholdMemberGroup, QuestionModule, Question, Batch, Survey, EnumerationArea
 MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
-DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE =50
+DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE =20
 
 class QuestionFilterForm(forms.Form):
 
