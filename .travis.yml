@@ -21,8 +21,8 @@ before_install:
 
 # command to install dependencies
 install:
-  - pip install -r pip-requires.txt --use-mirrors
-  - pip install coveralls --use-mirrors
+  - pip install -r pip-requires.txt
+  - pip install coveralls
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
 
 before_script:
