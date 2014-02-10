@@ -74,3 +74,8 @@ class BaseTest(TestCase):
                                                   uid=uid, survey=survey)
         return HouseholdHead.objects.create(household=self.household, surname="Name " + str(randint(1, 9999)),
                                             date_of_birth=date(1990, 2, 9))
+
+    def assert_object_does_not_exist(self, url, message):
+        response = self.client.get(url)
+        self.assertRedirects(response, expected_url='/object_does_not_exist/', status_code=302)
+        self.assertIn(message, response.cookies['messages'].value)

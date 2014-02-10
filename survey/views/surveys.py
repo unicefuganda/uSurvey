@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from survey.models.surveys import Survey
 from survey.forms.surveys import SurveyForm
+from survey.views.custom_decorators import handle_object_does_not_exist
 
 
 @permission_required('auth.can_view_batches')
@@ -38,39 +39,34 @@ def new(request):
 
     return response or render(request, 'surveys/new.html', context)
 
+@handle_object_does_not_exist(message="Survey does not exist.")
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id):
-    try:
-        survey = Survey.objects.get(id=survey_id)
-        survey_form = SurveyForm(instance=survey)
-        if request.method == 'POST':
-            survey_form = SurveyForm(instance=survey, data=request.POST)
-            if survey_form.is_valid():
-                Survey.save_sample_size(survey_form)
-                messages.success(request, 'Survey successfully edited.')
-                return HttpResponseRedirect('/surveys/')
+    survey = Survey.objects.get(id=survey_id)
+    survey_form = SurveyForm(instance=survey)
+    if request.method == 'POST':
+        survey_form = SurveyForm(instance=survey, data=request.POST)
+        if survey_form.is_valid():
+            Survey.save_sample_size(survey_form)
+            messages.success(request, 'Survey successfully edited.')
+            return HttpResponseRedirect('/surveys/')
 
-        context = {'survey_form': survey_form,
-                   'title': "Edit Survey",
-                   'button_label': 'Save',
-                   'id': 'edit-survey-form',
-                   'cancel_url': '/surveys/',
-                   'action': '/surveys/%s/edit/' %survey_id
-                   }
-        return render(request, 'surveys/new.html', context)
-    except ObjectDoesNotExist:
-        messages.error(request, "Survey does not exist.")
-        return HttpResponseRedirect('/surveys/')
+    context = {'survey_form': survey_form,
+               'title': "Edit Survey",
+               'button_label': 'Save',
+               'id': 'edit-survey-form',
+               'cancel_url': '/surveys/',
+               'action': '/surveys/%s/edit/' %survey_id
+               }
+    return render(request, 'surveys/new.html', context)
 
+@handle_object_does_not_exist(message="Survey does not exist.")
 @permission_required('auth.can_view_batches')
 def delete(request, survey_id):
-    try:
-        survey = Survey.objects.get(id=survey_id)
-        if not survey.is_open():
-            survey.delete()
-            messages.success(request, 'Survey successfully deleted.')
-        else:
-            messages.error(request, "Survey cannot be deleted as it is open.")
-    except ObjectDoesNotExist:
-        messages.error(request, "Survey does not exist.")
+    survey = Survey.objects.get(id=survey_id)
+    if not survey.is_open():
+        survey.delete()
+        messages.success(request, 'Survey successfully deleted.')
+    else:
+        messages.error(request, "Survey cannot be deleted as it is open.")
     return HttpResponseRedirect('/surveys/')

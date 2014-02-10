@@ -1,6 +1,6 @@
 
 from django.conf.urls import patterns, include, url
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic import TemplateView
 from django.conf import settings
@@ -108,7 +108,8 @@ urlpatterns = patterns('',
     url(r'^indicators/(?P<indicator_id>\d+)/simple/$', 'survey.views.formula.simple_indicator', name='simple_indicator_chart_page'),
     url(r'^indicators/(?P<indicator_id>\d+)/delete/$', 'survey.views.indicators.delete', name='delete_indicator_page'),
     url(r'^indicators/(?P<indicator_id>\d+)/edit/$', 'survey.views.indicators.edit', name='edit_indicator_page'),
-    url(r'^indicators/(?P<indicator_id>\d+)/formula/(?P<formula_id>\d+)/delete/', 'survey.views.formula.delete', name='delete_indicator_formula_page')
+    url(r'^indicators/(?P<indicator_id>\d+)/formula/(?P<formula_id>\d+)/delete/', 'survey.views.formula.delete', name='delete_indicator_formula_page'),
+    url(r'^object_does_not_exist/$', login_required(TemplateView.as_view(template_name="empty.html")), name='empty_page'),
 )
 
 if not settings.PRODUCTION:

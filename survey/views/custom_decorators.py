@@ -59,3 +59,17 @@ def not_allowed_when_batch_is_open(message="This function is not allowed when ba
     def batch_is_open(batch_id):
         return BatchLocationStatus.objects.filter(batch=batch_id).exists()
     return batch_passes_test(batch_is_open, message, redirect_url_name, url_kwargs_keys)
+
+
+def handle_object_does_not_exist( message):
+    def decorator(method):
+        @wraps(method, assigned=available_attrs(method))
+        def wrap(request, *args, **kwargs):
+            from django.core.exceptions import ObjectDoesNotExist
+            try:
+                return method(request, *args, **kwargs)
+            except ObjectDoesNotExist, ex:
+                messages.error(request, message)
+                return HttpResponseRedirect('/object_does_not_exist/')
+        return wrap
+    return decorator

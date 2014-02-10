@@ -119,12 +119,6 @@ class SurveyViewTest(BaseTest):
         success_message = "Survey successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
 
-    def test_should_throw_error_if_editing_non_existing_survey(self):
-        response = self.client.get('/surveys/11/edit/')
-        self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
-        error_message = "Survey does not exist."
-        self.assertIn(error_message, response.cookies['messages'].value)
-
     def test_delete_should_delete_the_survey(self):
         survey = Survey.objects.create(**self.form_data)
         self.failUnless(survey)
@@ -137,10 +131,8 @@ class SurveyViewTest(BaseTest):
         self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_should_throw_error_if_deleting_non_existing_survey(self):
-        response = self.client.get('/surveys/11/delete/')
-        self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
-        error_message = "Survey does not exist."
-        self.assertIn(error_message, response.cookies['messages'].value)
+        message = "Survey does not exist."
+        self.assert_object_does_not_exist('/surveys/500/delete/', message)
 
     def test_should_throw_error_if_deleting_with_an_open_batch(self):
         survey = Survey.objects.create(**self.form_data)
@@ -159,3 +151,7 @@ class SurveyViewTest(BaseTest):
         self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
         error_message = "Survey cannot be deleted as it is open."
         self.assertIn(error_message, response.cookies['messages'].value)
+
+    def test_survey_does_not_exist(self):
+        message = "Survey does not exist."
+        self.assert_object_does_not_exist('/surveys/500/edit/', message)
