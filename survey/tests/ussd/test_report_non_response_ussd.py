@@ -170,7 +170,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
-                    response = self.report_non_response()
+                    response = self.choose_menu_to_report_non_response()
                     household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" % \
                                      (self.household4.uid, self.household_head4.surname)
                     first_page_list = "responseString=%s&action=request" % household_list
@@ -198,7 +198,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
-                    response = self.report_non_response()
+                    response = self.choose_menu_to_report_non_response()
                     household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" \
                                                                        "\n2: HH-%s-%s" \
                                                                        "\n3: HH-%s-%s" \
@@ -246,7 +246,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     response = self.select_household()
                     non_response_option_page = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
                     question_and_options = self.non_response_question.text % (
@@ -266,7 +266,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     response = self.select_household()
                     non_response_option_page_1 = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
                     question_and_options_page_1 = self.non_response_question.text % (
@@ -314,7 +314,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 self.select_household()
                 response = self.respond("2")
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s*\n2: HH-%s-%s" \
@@ -342,7 +342,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 response = self.select_household()
                 households_member_list = (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname,
                                           household_member.surname)
@@ -377,7 +377,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 response = self.select_household()
                 households_member_list = (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname,
                                           household_member1.surname, household_member2.surname,
@@ -428,7 +428,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 response = self.select_household()
                 households_member_list = (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
                 expected_screen = "%s\n1: %s - (HEAD)" % households_member_list
@@ -445,7 +445,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 self.select_household()
                 response = self.select_household_member()
                 non_response_option_page = "\n1: Member Refused\n2: Reason"
@@ -470,7 +470,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 self.select_household()
                 response = self.select_household_member()
                 non_response_option_page = "\n1: Member Refused\n2: Reason\n3: Reason 2\n#: Next"
@@ -519,7 +519,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 self.select_household()
                 self.select_household_member()
                 response = self.respond("1")
@@ -546,7 +546,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 self.select_household()
                 self.select_household_member()
                 self.respond("1")
@@ -567,7 +567,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 self.select_household()
                 self.select_household_member()
                 self.respond("1")
@@ -595,7 +595,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     self.select_household("4")
                     response = self.respond("1")
                     response_string = "responseString=%s&action=request" % USSD.MESSAGES['NON_RESPONSE_COMPLETION']
@@ -617,7 +617,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     self.select_household("4")
                     self.select_household_member("1")
                     response = self.respond("1")
@@ -636,7 +636,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     self.select_household("4")
                     self.respond("1")
                     response = self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
@@ -665,7 +665,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     self.select_household("4")
                     self.select_household_member("1")
                     self.respond("1")
@@ -691,7 +691,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     self.select_household("4")
                     self.respond("1")
                     self.respond(USSDReportNonResponse.ANSWER['IS_RETAKING'])
@@ -718,7 +718,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     self.select_household("4")
                     self.select_household_member("1")
                     self.respond("1")
@@ -741,7 +741,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 self.select_household("4")
                 self.respond("1")
                 response = self.respond(USSD.ANSWER['NO'])
@@ -763,7 +763,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     self.select_household("1")
                     self.respond("1")
                     self.respond(USSD.ANSWER['NO'])
@@ -815,7 +815,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                    self.report_non_response()
+                    self.choose_menu_to_report_non_response()
                     self.select_household("1")
                     self.respond("1")
                     self.respond(USSD.ANSWER['NO'])
@@ -906,7 +906,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                response = self.report_non_response()
+                response = self.choose_menu_to_report_non_response()
 
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" \
                                                                    "\n2: HH-%s-%s" \
@@ -978,7 +978,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 response = self.select_household("1")
                 non_response_option_page = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
                 question_and_options = self.non_response_question.text % (
@@ -1064,7 +1064,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 response = self.select_household("1")
                 non_response_option_page = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
                 question_and_options = self.non_response_question.text % (
@@ -1137,7 +1137,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 response = self.respond(USSD.ANSWER['NO'])
                 self.assertEqual(urllib2.unquote(response.content), homepage_response_string)
 
-                response = self.report_non_response()
+                response = self.choose_menu_to_report_non_response()
 
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s*\n2: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,
@@ -1199,7 +1199,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 response = self.respond(USSD.ANSWER['NO'])
                 self.assertEqual(urllib2.unquote(response.content), homepage_response_string)
 
-                response = self.report_non_response()
+                response = self.choose_menu_to_report_non_response()
 
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,
@@ -1262,7 +1262,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 response_string = "responseString=%s&action=request" % homepage
                 self.assertEqual(urllib2.unquote(response.content), response_string)
 
-                response = self.report_non_response()
+                response = self.choose_menu_to_report_non_response()
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s" \
                                 % (self.household2.uid, self.household_head2.surname)
                 first_page_list = "responseString=%s&action=request" % household_list
@@ -1288,7 +1288,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 self.select_household("3")
                 self.select_household_member("2")
                 self.respond("1")
@@ -1333,7 +1333,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
-                self.report_non_response()
+                self.choose_menu_to_report_non_response()
                 response = self.select_household("1")
                 non_response_option_page = "\n1: House closed\n2: Household moved\n3: Refused to answer\n#: Next"
                 question_and_options = self.non_response_question.text % (
@@ -1385,7 +1385,7 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                 response = self.respond(USSD.ANSWER['NO'])
                 self.assertEqual(urllib2.unquote(response.content), homepage_response_string)
 
-                response = self.report_non_response()
+                response = self.choose_menu_to_report_non_response()
 
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s-%s\n2: HH-%s-%s" \
                                  % (self.household1.uid, self.household_head.surname,

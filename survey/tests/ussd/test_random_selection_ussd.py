@@ -6,11 +6,12 @@ from rapidsms.backends.database.models import BackendMessage
 from rapidsms.contrib.locations.models import Location, LocationType
 from mock import patch
 from survey.investigator_configs import COUNTRY_PHONE_CODE
-from survey.models import Backend, RandomHouseHoldSelection, Investigator, Survey, EnumerationArea
+from survey.models import Backend, RandomHouseHoldSelection, Investigator, Survey, EnumerationArea, Household
+from survey.tests.ussd.ussd_base_test import USSDBaseTest
 from survey.ussd.household_selection import HouseHoldSelection
 
 
-class RandomHouseHoldSelectionTest(TestCase):
+class RandomHouseHoldSelectionTest(USSDBaseTest):
     def setUp(self):
         Backend.objects.create(name='HTTP')
         self.client = Client()
@@ -29,7 +30,7 @@ class RandomHouseHoldSelectionTest(TestCase):
         self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
         self.ea.locations.add(self.masaka)
         mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
-        Investigator.objects.create(name='Inv1', ea=self.ea, mobile_number=mobile_number,
+        self.investigator = Investigator.objects.create(name='Inv1', ea=self.ea, mobile_number=mobile_number,
                                     backend=Backend.objects.create(name='Backend'))
 
 
@@ -62,6 +63,17 @@ class RandomHouseHoldSelectionTest(TestCase):
 
             message = BackendMessage.objects.get(identity=self.ussd_params['msisdn'])
             self.assertEquals(message.text, household_selection.text_message())
+
+    def test_HH_selection_creates_HH(self):
+        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+            self.assertEquals(Household.objects.count(), 0)
+            self.client.post('/ussd', data=self.ussd_params)
+            response = self.respond(" 100 ")
+            households = Household.objects.all()
+            self.assertEqual(self.open_survey.sample_size, households.count())
+            self.assertEqual(self.open_survey.sample_size, households.filter(ea=self.ea, investigator=self.investigator).count())
+
+
 
     def test_selection_for_survey_that_has_no_sampling(self):
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=False)
@@ -164,3 +176,35 @@ class RandomHouseHoldSelectionTest(TestCase):
 
             message = BackendMessage.objects.get(identity=self.ussd_params['msisdn'])
             self.assertEquals(message.text, household_selection.text_message())
+    def test_transition_random_HH_selection_to_register_HHmember(self):
+        with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
+            self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
+            self.client.get('/ussd', data=self.ussd_params)
+            self.respond(" 100 ")
+
+            some_age = 10
+            answers = {'name': 'dummy name',
+                   'age': some_age,
+                   'gender': '1',
+                   'month': '2',
+                   'year': datetime.datetime.now().year - some_age
+                }
+
+            self.generate_register_HH_questions()
+
+            self.reset_session()
+            self.choose_menu_to_register_household()
+            selected_household_id = '2'
+            self.select_household(selected_household_id)
+            self.respond('2')
+            self.respond(answers['name'])
+            self.respond(answers['age'])
+            self.respond(answers['month'])
+            self.respond(answers['year'])
+            self.respond(answers['gender'])
+
+            selected_household = Household.objects.get(uid=selected_household_id)
+            self.assertEqual(1, selected_household.household_member.count())
+            member = selected_household.household_member.all()[0]
+            self.assertEqual(member.surname, answers['name'])
+            self.assertEqual(member.male, True)

@@ -69,7 +69,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 response = self.select_household()
                 response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -102,7 +102,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 response = self.select_household('2')
                 response_string = "responseString=%s&action=request" % USSD.MESSAGES['RETAKE_SURVEY']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -296,7 +296,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
                 response = self.select_household_member()
                 response_string = "responseString=%s&action=request" % question_1.to_ussd()
@@ -332,7 +332,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
                 response = self.select_household_member()
 
@@ -376,7 +376,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
                 response = self.select_household_member()
 
@@ -430,7 +430,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
                 response = self.select_household_member()
                 response_string = "responseString=%s&action=request" % page_1
@@ -479,7 +479,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
                 response = self.select_household_member()
                 response_string = "responseString=%s&action=request" % question_1.text
@@ -514,7 +514,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
 
                 response = self.select_household_member()
@@ -541,7 +541,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
                 response = self.select_household_member()
                 response_string = "responseString=%s&action=request" % question_1.text
@@ -570,7 +570,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
 
                 response = self.select_household_member()
@@ -609,7 +609,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 response = self.select_household("1")
 
                 members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
@@ -652,7 +652,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 response = self.select_household("2")
 
                 members_list = "%s\n1: %s - (HEAD)\n2: %s" % (
@@ -668,7 +668,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                response = self.take_survey()
+                response = self.choose_menu_to_take_survey()
 
                 households_list_1 = "%s\n1: HH-%s-%s*\n2: HH-%s-%s" % (
                         USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
@@ -702,7 +702,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 response = self.select_household()
                 members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
                 response_string = "responseString=%s&action=request" % members_list
@@ -745,7 +745,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 response = self.select_household()
 
                 members_list = "%s\n1: %s - (HEAD)\n2: %s" % (
@@ -787,7 +787,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 response = self.select_household()
 
                 members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
@@ -834,7 +834,7 @@ class USSDTest(USSDBaseTest):
                     homepage = "Welcome %s to the survey.\n1: Register households\n2: Take survey" % self.investigator.name
                     response_string = "responseString=%s&action=request" % homepage
                     self.assertEquals(urllib2.unquote(response.content), response_string)
-                    response = self.take_survey()
+                    response = self.choose_menu_to_take_survey()
                     households_list_1 = "%s\n1: HH-%s-%s*\n2: HH-%s-%s*" % (
                         USSD.MESSAGES['HOUSEHOLD_LIST'], self.household_head.household.random_sample_number, self.household_head.surname,
                         self.household_head_1.household.random_sample_number, self.household_head_1.surname)
@@ -856,7 +856,7 @@ class USSDTest(USSDBaseTest):
                 response_string = "responseString=%s&action=request" % homepage
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
-                response = self.register_household()
+                response = self.choose_menu_to_register_household()
 
                 self.assertTrue(self.investigator.get_from_cache('IS_REGISTERING_HOUSEHOLD'))
 
@@ -880,7 +880,7 @@ class USSDTest(USSDBaseTest):
                 response_string = "responseString=%s&action=request" % homepage
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
-                response = self.take_survey()
+                response = self.choose_menu_to_take_survey()
                 response = self.select_household()
 
                 members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
@@ -977,7 +977,7 @@ class USSDTest(USSDBaseTest):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
 
                 response = self.select_household_member()

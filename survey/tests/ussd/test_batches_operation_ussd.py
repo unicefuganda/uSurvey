@@ -56,7 +56,7 @@ class USSDOpenBatchTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                response = self.take_survey()
+                response = self.choose_menu_to_take_survey()
                 response_string = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -126,7 +126,7 @@ class USSDWithMultipleBatches(USSDBaseTest):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
-                self.take_survey()
+                self.choose_menu_to_take_survey()
                 self.select_household()
                 response = self.select_household_member()
                 response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
@@ -156,7 +156,7 @@ class USSDWithMultipleBatches(USSDBaseTest):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
-            self.take_survey()
+            self.choose_menu_to_take_survey()
             self.select_household()
             response = self.select_household_member()
             response_string = "responseString=%s&action=request" % self.question_1.to_ussd()
@@ -199,7 +199,7 @@ class USSDWithMultipleBatches(USSDBaseTest):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
-            self.take_survey()
+            self.choose_menu_to_take_survey()
             self.select_household()
             response = self.select_household_member()
 
@@ -221,7 +221,7 @@ class USSDWithMultipleBatches(USSDBaseTest):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
-            self.take_survey()
+            self.choose_menu_to_take_survey()
             self.select_household()
             response = self.select_household_member()
             response_string = "responseString=%s&action=request" % self.question_1.to_ussd()

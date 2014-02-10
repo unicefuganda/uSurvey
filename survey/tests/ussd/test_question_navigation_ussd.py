@@ -92,7 +92,7 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
-            self.take_survey()
+            self.choose_menu_to_take_survey()
             self.select_household()
 
             response = self.select_household_member()
@@ -110,7 +110,7 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 response = self.reset_session()
-            self.take_survey()
+            self.choose_menu_to_take_survey()
             self.batch.open_for_location(self.location)
             self.select_household()
 
@@ -128,7 +128,7 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
-            self.take_survey()
+            self.choose_menu_to_take_survey()
             self.select_household()
 
             response = self.select_household_member()

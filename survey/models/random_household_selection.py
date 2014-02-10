@@ -47,7 +47,7 @@ class RandomHouseHoldSelection(BaseModel):
         for random_household in all_random_households:
             uid = Household.next_uid(survey)
             household_code_value = LocationCode.get_household_code(investigator) + str(uid)
-            Household.objects.create(investigator=investigator, location=investigator.location,
+            Household.objects.create(investigator=investigator, ea=investigator.ea,
                                      uid=uid, random_sample_number=random_household,
                                      survey=survey, household_code=household_code_value)
 

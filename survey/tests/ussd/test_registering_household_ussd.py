@@ -119,7 +119,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                response = self.register_household()
+                response = self.choose_menu_to_register_household()
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s" \
                                                                    "\n2: HH-%s" \
                                                                    "\n3: HH-%s" \
@@ -144,7 +144,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                response = self.register_household()
+                response = self.choose_menu_to_register_household()
                 household_list = USSD.MESSAGES[
                                      'HOUSEHOLD_LIST'] + "\n1: HH-%s\n2: HH-%s\n3: HH-%s\n4: HH-%s\n#: Next" % (
                                      self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
@@ -166,7 +166,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             self.reset_session()
-            response = self.register_household()
+            response = self.choose_menu_to_register_household()
             household_list = USSD.MESSAGES[
                                  'HOUSEHOLD_LIST'] + "\n1: HH-%s\n2: HH-%s\n3: HH-%s\n4: HH-%s\n#: Next" % (
                                  self.household1.uid, self.household2.uid, self.household3.uid, self.household4.uid)
@@ -188,7 +188,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
 
                 response = self.select_household("2")
 
@@ -209,7 +209,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
 
                 self.select_household("2")
                 self.respond('2')
@@ -230,7 +230,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household("2")
                 response = self.respond('2')
                 first_registration_question = "responseString=%s&action=request" % self.question_1.text
@@ -240,7 +240,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household("2")
                 self.respond('2')
                 response = self.respond('Dummy name')
@@ -251,7 +251,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household("2")
                 self.respond('2')
                 self.respond('Dummy name')
@@ -265,7 +265,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household("2")
                 self.respond('2')
                 self.respond('Dummy name')
@@ -280,7 +280,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household("2")
                 self.respond('2')
                 self.respond('Dummy name')
@@ -299,7 +299,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household("2")
                 self.respond('2')
                 self.respond('Dummy name')
@@ -313,7 +313,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household("2")
                 self.respond('2')
                 self.respond('Dummy name')
@@ -348,7 +348,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('2')
@@ -377,7 +377,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('2')
@@ -429,7 +429,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('2')
@@ -486,7 +486,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('2')
@@ -587,7 +587,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('1')
@@ -616,7 +616,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 HouseholdHead.objects.all().delete()
@@ -643,7 +643,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('1')
@@ -671,7 +671,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('1')
@@ -708,7 +708,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 with self.mock_date_today(date_this_year_with_day_not_existing_in_feb):
                     self.reset_session()
-                    self.register_household()
+                    self.choose_menu_to_register_household()
                     selected_household_id = '2'
                     self.select_household(selected_household_id)
                     self.respond('2')
@@ -732,7 +732,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('2')
@@ -782,7 +782,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('2')
@@ -850,7 +850,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 response = self.select_household(selected_household_id)
 
                 first_registration_question = "responseString=%s%s&action=request" % (
@@ -873,7 +873,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household(selected_household_id)
                 self.respond('2')
                 self.respond(answers['name'])
@@ -915,7 +915,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household(selected_household_id)
                 self.respond('2')
                 self.respond(answers['name'])
@@ -958,7 +958,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 self.select_household(selected_household_id)
                 self.respond('2')
                 self.respond(answers['name'])
@@ -998,7 +998,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
             with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
                 self.reset_session()
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
                 self.respond('2')
@@ -1014,7 +1014,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
                 self.reset_session()
 
-                self.register_household()
+                self.choose_menu_to_register_household()
                 selected_household_id = '2'
                 self.select_household(selected_household_id)
 
