@@ -3,7 +3,8 @@ mics
 
 Installation
 ------------
-* Postgres and memcached should be running
+* Postgres, rabbitmq and memcached should be running
+(on OSX  install memcached and libmemcached from brew)
 
 ##Git
 
@@ -19,8 +20,6 @@ Installation
         python manage.py syncdb --noinput
 
         python manage.py migrate
-
-        python manage.py loaddata survey/fixtures/*.json
 
         python manage.py runserver
 
