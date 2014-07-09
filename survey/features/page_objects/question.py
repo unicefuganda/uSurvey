@@ -10,6 +10,7 @@ class BatchQuestionsListPage(PageObject):
 
     def validate_fields(self):
         self.is_text_present('%s Question' % self.batch.name.capitalize())
+        self.is_text_present('Code')
         self.is_text_present('Question')
         self.is_text_present('Type')
         self.is_text_present('Group')

@@ -1,5 +1,5 @@
-Feature: Questions related features
 
+Feature: Question feature
   Scenario: List Questions Under a batch
     Given I am logged in as researcher
     And I have a survey
@@ -62,6 +62,7 @@ Feature: Questions related features
     And If I click create new question link
     Then I should see create new question page
 
+  @test
   Scenario: View multichoice question options
     Given I am logged in as researcher
     And I have a member group
