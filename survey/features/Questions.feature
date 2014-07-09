@@ -62,7 +62,6 @@ Feature: Question feature
     And If I click create new question link
     Then I should see create new question page
 
-  @test
   Scenario: View multichoice question options
     Given I am logged in as researcher
     And I have a member group
