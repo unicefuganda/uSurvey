@@ -42,10 +42,8 @@ def _process_form(indicator_filter_form, indicators):
 @permission_required('auth.can_view_batches')
 def index(request):
     indicators = Indicator.objects.all()
-    indicator_filter_form = IndicatorFilterForm()
-    if request.method == 'POST':
-        indicator_filter_form = IndicatorFilterForm(request.POST)
-        indicators = _process_form(indicator_filter_form, indicators)
+    indicator_filter_form = IndicatorFilterForm(data=request.GET)
+    indicators = _process_form(indicator_filter_form, indicators)
 
     return render(request, 'indicator/index.html',
                   {'indicators': indicators, 'indicator_filter_form': indicator_filter_form})
