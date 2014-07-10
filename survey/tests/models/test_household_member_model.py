@@ -1,17 +1,19 @@
 from datetime import date, datetime, timedelta
+
 from django.template.defaultfilters import slugify
-from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, AnswerRule, BatchQuestionOrder, UnknownDOBAttribute, MultiChoiceAnswer, QuestionOption, Survey, EnumerationArea
+from django.utils.timezone import utc
+from mock import patch
+
+from survey.models import Batch, Question, HouseholdMemberBatchCompletion, NumericalAnswer, BatchQuestionOrder, UnknownDOBAttribute, MultiChoiceAnswer, QuestionOption, Survey, EnumerationArea
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import HouseholdMember, Household, HouseholdHead
 from survey.models.backend import Backend
 from survey.models.investigator import Investigator
-from django.utils.timezone import utc
-from mock import patch
+from survey.tests.base_test import BaseTest
 
 
-class HouseholdMemberTest(TestCase):
+class HouseholdMemberTest(BaseTest):
     def setUp(self):
         self.batch = Batch.objects.create(name="BATCH 1", order=1)
 
@@ -48,7 +50,9 @@ class HouseholdMemberTest(TestCase):
         fields_data = dict(surname='xyz', male=True, date_of_birth=date(1980, 05, 01), household=household)
         household_member = HouseholdMember.objects.create(**fields_data)
 
-        self.assertEqual(household_member.get_age(), 33)
+        date_today_that_makes_his_age_33 = date(2014, 04, 01)
+        with self.mock_date_today(date_today_that_makes_his_age_33):
+            self.assertEqual(household_member.get_age(), 33)
 
     def test_household_member_should_know_groups_they_belong_to(self):
         age_value = 6

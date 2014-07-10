@@ -9,9 +9,17 @@ Installation
 ##Git
 
         git clone https://github.com/unicefuganda/mics.git
-        (adjust localsettings.py for db setup)
 
-        cd mics
+        cd mics/mics
+
+        cp localsettings.py.example localsettings.py
+        (adjust localsettings.py for db and test_db setup)
+
+        cd ../survey
+
+        cp investigator_configs.py.example investigator_configs.py
+
+        cd ..
 
         mkvirtualenv mics
 
@@ -25,9 +33,18 @@ Installation
 
 ==
 
-* run test and harvest
+* run test
 
         python manage.py test
+
+* run lettuce test
+adjust testsettings for test_db setup
+first install phantomjs if not already installed (brew install phantomjs in OSX).
+    python manage.py syncdb --settings=mics.testsettings
+    python manage.py migrate --settings=mics.testsettings
+    python manage.py harvest
+
+
 
 Done!! you're good to go :)
 

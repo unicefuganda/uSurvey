@@ -1,12 +1,14 @@
 from random import randint
 import datetime
+
 from django.http import HttpRequest
-from django.test.testcases import TestCase
-from survey.models import NumericalAnswer, Question, QuestionOption, QuestionModule, HouseholdMemberGroup
 from mock import patch
 
+from survey.models import NumericalAnswer, Question, QuestionOption, QuestionModule, HouseholdMemberGroup
+from survey.tests.base_test import Base
 
-class USSDBaseTest(TestCase):
+
+class USSDBaseTest(Base):
     def setUp(self):
         self.ussd_params = {
             'transactionId': "123344" + str(randint(1, 99999)),
@@ -69,22 +71,6 @@ class USSDBaseTest(TestCase):
 
     def hh_string(self, household_head):
         return "HH-%s-%s" % (household_head.household.random_sample_number, household_head.surname)
-
-    def mock_date_today(self, target, real_date_class=datetime.date):
-        class DateSubclassMeta(type):
-            @classmethod
-            def __instancecheck__(mcs, obj):
-                return isinstance(obj, real_date_class)
-
-        class BaseMockedDate(real_date_class):
-            @classmethod
-            def today(cls):
-                return target
-
-        # Python2 & Python3 compatible metaclass
-        MockedDate = DateSubclassMeta('date', (BaseMockedDate,), {})
-
-        return patch.object(datetime, 'date', MockedDate)
 
     def generate_register_HH_questions(self):
         self.registration_group = HouseholdMemberGroup.objects.create(name="REGISTRATION GROUP",

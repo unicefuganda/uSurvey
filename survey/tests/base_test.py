@@ -10,9 +10,29 @@ import xlwt
 from survey.models import LocationTypeDetails
 from survey.models import Household
 from survey.models import HouseholdHead
+from mock import patch
+import datetime
 
 
-class BaseTest(TestCase):
+class Base(TestCase):
+    def mock_date_today(self, target, real_date_class=datetime.date):
+        class DateSubclassMeta(type):
+            @classmethod
+            def __instancecheck__(mcs, obj):
+                return isinstance(obj, real_date_class)
+
+        class BaseMockedDate(real_date_class):
+            @classmethod
+            def today(cls):
+                return target
+
+        # Python2 & Python3 compatible metaclass
+        MockedDate = DateSubclassMeta('date', (BaseMockedDate,), {})
+
+        return patch.object(datetime, 'date', MockedDate)
+
+
+class BaseTest(Base):
 
     def assign_permission_to(self, user, permission_type='can_view_investigators'):
         some_group = Group.objects.create(name='some group that %s'% permission_type)
