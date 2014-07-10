@@ -12,6 +12,7 @@ from survey.models import HouseholdMemberGroup, QuestionModule, BatchQuestionOrd
 from survey.models.surveys import Survey
 from survey.models.batch import Batch
 from survey.forms.batch import BatchForm, BatchQuestionsForm
+from survey.views.views_helper import get_descendants
 
 
 @login_required
@@ -56,7 +57,7 @@ def open(request, batch_id):
         message = "%s has already open batches from survey %s" % (location.name, other_surveys[0].name)
         return HttpResponse(json.dumps(message), content_type="application/json")
     else:
-        locations = location.get_descendants(include_self=True)
+        locations = get_descendants(location)
         for location in locations:
             batch.open_for_location(location)
         return HttpResponse(json.dumps(""), content_type="application/json")
