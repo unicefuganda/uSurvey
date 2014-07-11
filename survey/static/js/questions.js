@@ -1,5 +1,6 @@
 ;
 jQuery(function($){
+
     var text_area = $('.question-form textarea'),
         counter = $('#text-counter'),
         maxlength = parseInt(text_area.attr('maxlength')),
@@ -21,5 +22,8 @@ jQuery(function($){
       }
       });
 
-
+      $('#questions_table').dataTable({
+          paging:   false,
+          filter: false
+      });
 });

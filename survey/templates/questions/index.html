@@ -2,6 +2,10 @@
 {% block title %}
     Questions List
 {% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
+{% endblock %}
+
 {% block content %}
     {% load pagination_tags %}
     {% autopaginate questions max_question_per_page %}
@@ -167,5 +171,7 @@
         <script src="{{STATIC_URL}}js/jquery.tablednd.js" type="text/javascript" charset="utf-8"></script>
         <script src="{{STATIC_URL}}js/batch_questions.js" type="text/javascript" charset="utf-8"></script>
     {% endif %}
+    <script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
