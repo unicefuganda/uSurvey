@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
+    <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
 
     {% block extra_css %}{% endblock %}
 
@@ -167,8 +168,9 @@
 <script src="{{ STATIC_URL }}/js/highcharts.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/exporting.js" type="text/javascript" charset="utf-8"></script>
 
-
 <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+<script src="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/underscore.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/question_options.js" type="text/javascript" charset="utf-8"></script>
@@ -186,6 +188,8 @@
 <script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
+
+
 {% block javascripts %}
 {% endblock %}
 </body>

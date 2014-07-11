@@ -22,4 +22,9 @@ $(function(){
     function goBack() {
         window.location = document.referrer;
      }
+
+    $('.table-sort').dataTable({
+        paging:   false,
+        filter: false
+    });
 });

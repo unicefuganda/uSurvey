@@ -21,9 +21,4 @@ jQuery(function($){
         'answer_type':'required'
       }
       });
-
-      $('#questions_table').dataTable({
-          paging:   false,
-          filter: false
-      });
 });
