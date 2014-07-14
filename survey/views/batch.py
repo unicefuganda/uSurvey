@@ -56,11 +56,8 @@ def open(request, batch_id):
     if other_surveys.count() > 0:
         message = "%s has already open batches from survey %s" % (location.name, other_surveys[0].name)
         return HttpResponse(json.dumps(message), content_type="application/json")
-    else:
-        locations = get_descendants(location)
-        for location in locations:
-            batch.open_for_location(location)
-        return HttpResponse(json.dumps(""), content_type="application/json")
+    batch.open_for_location(location)
+    return HttpResponse(json.dumps(""), content_type="application/json")
 
 
 @login_required

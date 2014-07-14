@@ -3,6 +3,7 @@ from django.db.models import Max
 from rapidsms.contrib.locations.models import Location
 from survey.models.surveys import Survey
 from survey.models.base import BaseModel
+from survey.views.views_helper import get_descendants
 
 
 class Batch(BaseModel):
@@ -52,7 +53,7 @@ class Batch(BaseModel):
         return BatchQuestionOrder.get_batch_order_specific_questions(self, {})
 
     def open_for_location(self, location):
-        all_related_locations = location.get_descendants(include_self=False).all()
+        all_related_locations = get_descendants(location, include_self=False)
         for related_location in all_related_locations:
             self.open_locations.get_or_create(batch=self, location=related_location)
         return self.open_locations.get_or_create(batch=self, location=location)
