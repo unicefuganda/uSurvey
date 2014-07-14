@@ -116,8 +116,8 @@ class UserFormTest(TestCase):
         user_form = UserForm(form_data)
         self.assertTrue(user_form.is_valid())
 
-class EditUserFormTest(TestCase):
 
+class EditUserFormTest(TestCase):
     def setUp(self):
         self.user_data = {
         'username':'rajnii',
@@ -222,20 +222,116 @@ class EditUserFormTest(TestCase):
         message = "username cannot be changed."
         self.assertEquals(user_form.errors['username'], [message])
 
-    def test_user_can_view_users_permission_can_edit_groups(self):
+    def create_admin_user(self):
         raj = User.objects.create_user(username='Rajni', email='rajni@kant.com', password='I_Rock')
         some_group = Group.objects.create(name='some group')
         auth_content = ContentType.objects.get_for_model(Permission)
         permission, out = Permission.objects.get_or_create(codename='can_view_users', content_type=auth_content)
         some_group.permissions.add(permission)
         some_group.user_set.add(raj)
-        
+        return raj, some_group
+
+    def test_user_can_view_users_permission_can_edit_groups(self):
+        raj, some_group = self.create_admin_user()
         form_data = dict(self.user_data, **self.initial)
         form_data['groups']=[str(some_group.id)]
         
         user_form = EditUserForm(data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
         self.assertTrue(user_form.is_valid())
         self.assertIn('groups', user_form.fields.keys())
+
+    def test_empty_password_is_valid(self):
+        EMPTY = ''
+        user_data = self.user_data
+        user_data['last_name'] = 'Rajniii'
+        user_data['password'] = EMPTY
+        user_data['confirm_password'] = EMPTY
+        form_data = dict(user_data, **self.initial)
+
+        raj, some_group = self.create_admin_user()
+
+        user_form = EditUserForm(data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
+        self.assertTrue(user_form.is_valid())
+
+    def test_empty_password_does_not_change_password(self):
+        EMPTY = ''
+        user_data = self.user_data
+        user_data['last_name'] = 'Rajniii'
+        user_data['password'] = EMPTY
+        user_data['confirm_password'] = EMPTY
+        form_data = dict(user_data, **self.initial)
+
+        raj, some_group = self.create_admin_user()
+
+        user_form = EditUserForm(data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
+        user_form.is_valid()
+
+        user = user_form.save()
+        self.failUnless(user.id)
+        del user_data['password']
+        del user_data['confirm_password']
+        user_retrieved = User.objects.get(**user_data)
+
+        self.assertEqual(user_retrieved, user)
+        self.assertEqual(self.user_to_be_edited.password, user_retrieved.password)
+
+    def test_mismatching_passwords_is_invalid(self):
+        user_data = self.user_data
+        user_data['last_name'] = 'Rajniii'
+        user_data['password'] = 'something'
+        user_data['confirm_password'] = 'something else'
+        form_data = dict(user_data, **self.initial)
+
+        raj, some_group = self.create_admin_user()
+
+        user_form = EditUserForm(data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
+        self.assertFalse(user_form.is_valid())
+        message = "passwords must match."
+        self.assertEquals(user_form.errors['confirm_password'], [message])
+
+    def test_valid_password_changes_user_password(self):
+        SOME_PASSWORD = '@yo.yo'
+        user_data = self.user_data
+        user_data['last_name'] = 'Rajniii'
+        user_data['password'] = SOME_PASSWORD
+        user_data['confirm_password'] = SOME_PASSWORD
+        form_data = dict(user_data, **self.initial)
+
+        raj, some_group = self.create_admin_user()
+
+        user_form = EditUserForm(data=form_data, user=raj, instance=self.user_to_be_edited, initial=self.initial)
+        user_form.is_valid()
+
+        user = user_form.save()
+        self.failUnless(user.id)
+        del user_data['password']
+        del user_data['confirm_password']
+        user_retrieved = User.objects.get(**user_data)
+
+        self.assertEqual(user_retrieved, user)
+        self.assertTrue(user_retrieved.check_password(SOME_PASSWORD))
+
+    def test_non_admin_user_cannot_change_password(self):
+        SOME_PASSWD = 'some passwd'
+        user_data = self.user_data
+        user_data['last_name'] = 'Rajniii'
+        user_data['password'] = SOME_PASSWD
+        user_data['confirm_password'] = SOME_PASSWD
+        form_data = dict(user_data, **self.initial)
+
+        user_form = EditUserForm(data=form_data, user=self.user_to_be_edited, instance=self.user_to_be_edited, initial=self.initial)
+        user_form.is_valid()
+
+        user = user_form.save()
+        self.failUnless(user.id)
+        del user_data['password']
+        del user_data['confirm_password']
+        user_retrieved = User.objects.get(**user_data)
+
+        self.assertEqual(user_retrieved, user)
+        self.assertEqual(self.user_to_be_edited.password, user_retrieved.password)
+        self.assertFalse(user_retrieved.check_password(SOME_PASSWD))
+
 
 class UserProfileFormTest(TestCase):
 

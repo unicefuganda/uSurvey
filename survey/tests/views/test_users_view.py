@@ -186,21 +186,21 @@ class UsersViewTest(BaseTest):
     def test_edit_user_updates_user_information(self):
         form_data = {
                     'username':'knight',
-                    'password1':'mk',
-                    'password2':'mk',
+                    'password':'mk',
+                    'confirm_password':'mk',
                     'first_name':'michael',
                     'last_name':'knight',
                     'mobile_number':'123456789',
                     'email':'mm@mm.mm',
                 }
         self.failIf(User.objects.filter(username=form_data['username']))
-        user = User.objects.create(username=form_data['username'], email=form_data['email'], password=form_data['password1'])
+        user = User.objects.create(username=form_data['username'], email=form_data['email'], password=form_data['password'])
         UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
 
         data = {
                     'username':'knight',
-                    'password1':'mk',
-                    'password2':'mk',
+                    'password':'mk',
+                    'confirm_password':'mk',
                     'first_name':'michael',
                     'last_name':'knightngale',
                     'mobile_number':'123456789',
@@ -209,22 +209,23 @@ class UsersViewTest(BaseTest):
 
         response = self.client.post('/users/'+str(user.pk)+'/edit/', data=data)
         self.failUnlessEqual(response.status_code, 302)
-        edited_user = User.objects.filter(last_name='knightngale')
-        self.assertEqual(len(edited_user), 1)
+        edited_user = User.objects.filter(last_name=data['last_name'])
+        self.assertEqual(1, edited_user.count())
+        self.assertTrue(edited_user[0].check_password(data['password']))
 
     @patch('survey.views.users._add_error_messages')
     def test_edit_username_not_allowed(self, mock_add_error_messages):
         form_data = {
                     'username':'knight',
-                    'password1':'mk',
-                    'password2':'mk',
+                    'password':'mk',
+                    'confirm_password':'mk',
                     'first_name':'michael',
                     'last_name':'knight',
                     'mobile_number':'123456789',
                     'email':'mm@mm.mm',
                 }
         self.failIf(User.objects.filter(username=form_data['username']))
-        user = User.objects.create(username=form_data['username'], email=form_data['email'], password=form_data['password1'])
+        user = User.objects.create(username=form_data['username'], email=form_data['email'], password=form_data['password'])
         UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
 
         data = form_data.copy()
@@ -240,8 +241,8 @@ class UsersViewTest(BaseTest):
     def test_current_user_edits_his_own_profile(self):
         form_data = {
                     'username':'knight',
-                    'password1':'mk',
-                    'password2':'mk',
+                    'password':'mk',
+                    'confirm_password':'mk',
                     'first_name':'michael',
                     'last_name':'knight',
                     'mobile_number':'123456789',
@@ -249,16 +250,18 @@ class UsersViewTest(BaseTest):
                 }
         self.failIf(User.objects.filter(username=form_data['username']))
         user_without_permission = User.objects.create(username=form_data['username'], email=form_data['email'])
-        user_without_permission.set_password(form_data['password1'])
+        user_without_permission.set_password(form_data['password'])
         user_without_permission.save()
         UserProfile.objects.create(user=user_without_permission, mobile_number=form_data['mobile_number'])
 
         self.client.logout()
-        self.client.login(username=form_data['username'], password=form_data['password1'])
+        self.client.login(username=form_data['username'], password=form_data['password'])
 
         data = {
                     'username':'knight',
                     'first_name':'michael',
+                    'password':'changed mk',
+                    'confirm_password':'changed mk',
                     'last_name':'knightngale',
                     'mobile_number':'123456789',
                     'email':'mm@mm.mm',
@@ -266,8 +269,10 @@ class UsersViewTest(BaseTest):
 
         response = self.client.post('/users/'+str(user_without_permission.pk)+'/edit/', data=data)
         self.failUnlessEqual(response.status_code, 302)
-        edited_user = User.objects.filter(last_name='knightngale')
-        self.assertEqual(len(edited_user), 1)
+        edited_user = User.objects.filter(last_name=data['last_name'])
+        self.assertEqual(1, edited_user.count())
+        self.assertTrue(edited_user[0].check_password(form_data['password']))
+        self.assertFalse(edited_user[0].check_password(data['password']))
 
     def test_a_non_admin_user_cannot_POST_edit_other_users_profile(self):
         user_without_permission = User.objects.create_user(username='notpermitted', email='rajni@kant.com', password='I_Suck')

@@ -63,16 +63,21 @@ class EditUserForm(ModelForm):
                                        widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
                                                                    'style':"width:172px;" ,
                                                                    'maxlength':'10'}))
+    password = forms.CharField(label="Password", required=False,
+                                        widget=forms.PasswordInput())
+
     confirm_password = forms.CharField(label="Confirm Password",
-                                        required=True,           
+                                        required=False,
                                         widget=forms.PasswordInput())
 
     def __init__(self, user, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
+        self.set_form_fields_order(user)
+
+    def set_form_fields_order(self, user):
+        self.fields.keyOrder = ['username', 'first_name', 'last_name','mobile_number', 'email',]
         if user.has_perm("auth.can_view_users"):
-            self.fields.keyOrder= ['username','first_name', 'last_name','mobile_number', 'email', 'password', 'confirm_password', 'groups']
-        else:    
-            self.fields.keyOrder= ['username','first_name', 'last_name','mobile_number', 'email']
+            self.fields.keyOrder.extend(['password', 'confirm_password', 'groups'])
 
     def _clean_attribute(self, Klass, **kwargs):
         attribute_name = kwargs.keys()[0]
@@ -102,29 +107,44 @@ class EditUserForm(ModelForm):
         email = self.cleaned_data['email']
         return self._clean_attribute(User, email=email)
 
-    def clean(self):
-        if self.cleaned_data.get('password') != self.cleaned_data.get('confirm_password'):
+    def _clean_passwords(self, cleaned_data):
+        password = cleaned_data.get('password', '')
+        confirm_password = cleaned_data.get('confirm_password', '')
+        if password != confirm_password:
             message = "passwords must match."
             self._errors['confirm_password'] = self.error_class([message])
-        
-        return self.cleaned_data
+            del cleaned_data['password']
+            del cleaned_data['confirm_password']
+        return password
 
-    def save(self, commit = True, *args, **kwargs):
+    def clean(self):
+        cleaned_data = super(EditUserForm, self).clean()
+        self._clean_passwords(cleaned_data)
+        return cleaned_data
+
+    def save(self, commit=True, *args, **kwargs):
         user = super(EditUserForm, self).save(commit = commit, *args, **kwargs)
-        user.set_password(self.cleaned_data["password"])
+        self._change_password(user)
         if commit:
-            user_profile,b = UserProfile.objects.get_or_create(user = user)
-            user_profile.mobile_number = self.cleaned_data['mobile_number']
-            user_profile.save()
+            self._create_or_update_profile(user)
             user.save()
         return user
 
+    def _change_password(self, user):
+        password = self.cleaned_data.get("password", None)
+        if password:
+            user.set_password(password)
+
+    def _create_or_update_profile(self, user):
+            user_profile, created = UserProfile.objects.get_or_create(user = user)
+            user_profile.mobile_number = self.cleaned_data['mobile_number']
+            user_profile.save()
+
     class Meta:
         model = User
-        fields = ("username", "first_name", "last_name", "email", "groups", "password")
+        fields = ("username", "first_name", "last_name", "email", "groups")
         widgets={
                 'username':forms.TextInput(attrs={'readonly':'readonly'}),
-                'password':forms.PasswordInput()
         }
 
 
