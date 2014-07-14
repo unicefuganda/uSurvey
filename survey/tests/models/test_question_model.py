@@ -21,8 +21,9 @@ class QuestionTest(TestCase):
         self.batch = Batch.objects.create(order=1)
 
     def test_unicode_representation_of_question(self):
-        question = Question.objects.create(text="This is a question", answer_type=Question.NUMBER)
-        self.assertEqual("%s: (%s)" % (question.text, question.answer_type.upper()), str(question))
+        question = Question.objects.create(text="This is a question", answer_type=Question.NUMBER, identifier="QN123")
+        question_unicode = "%s - %s: (%s)" % (question.identifier, question.text, question.answer_type.upper())
+        self.assertEqual(question_unicode, str(question))
 
     def test_numerical_question(self):
         question = Question.objects.create(text="This is a question", answer_type=Question.NUMBER)
