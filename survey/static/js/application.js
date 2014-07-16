@@ -25,6 +25,7 @@ $(function(){
 
     $('.table-sort').dataTable({
         paging:   false,
-        filter: false
+        filter: false,
+        "aaSorting": []
     });
 });
