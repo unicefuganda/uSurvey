@@ -1758,3 +1758,60 @@ class DeleteSubQuestionFromBatchTest(BaseTest):
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/batches/%d/questions/%s/delete/' % (self.batch.id, self.subquestion.id))
         self.assert_restricted_permission_for('/questions/%s/delete/' % (self.subquestion.id))
+
+
+class ExportAllQuestionsTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user_with_permission = self.assign_permission_to(User.objects.create_user('User', 'user@test.com', 'password'),
+                                                         'can_view_batches')
+        self.client.login(username='User', password='password')
+
+        self.member_group = HouseholdMemberGroup.objects.create(name="old people", order=0)
+        self.question1 = Question.objects.create(text="Question 1?", group=self.member_group,
+                                                answer_type=Question.NUMBER, order=1, identifier='Q1')
+        self.question2 = Question.objects.create(text="Question 2?", group=self.member_group,
+                                                answer_type=Question.TEXT, order=2, identifier='Q2')
+        self.question3 = Question.objects.create(text="Question 3?", group=self.member_group,
+                                                answer_type=Question.MULTICHOICE, order=3, identifier='Q3')
+        self.option1 = QuestionOption.objects.create(question=self.question3, text="option1", order=1)
+        self.option2 = QuestionOption.objects.create(question=self.question3, text="option2", order=2)
+        self.option3 = QuestionOption.objects.create(question=self.question3, text="option3", order=3)
+
+        self.headings = "Question Text; Group; Answer Type; Options"
+        self.url = '/questions/export/'
+
+    def test_GET_should_redirect_to_referer_url_upon_success(self):
+        referer_url = '/questions/'
+        meta = {'HTTP_REFERER': referer_url}
+        response = self.client.get(self.url, data={}, **meta)
+        self.assertRedirects(response, referer_url)
+
+    def test_downloaded_questions_file(self):
+        file_name = "all_questions.csv"
+
+        response = self.client.post(self.url, data={})
+
+        self.assertEquals(response.get('Content-Type'), "text/csv")
+        self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
+
+
+        question1 = "%s; %s; %s" %(self.question1.text, self.question1.group.name, self.question1.answer_type.upper())
+        question2 = "%s; %s; %s" %(self.question2.text, self.question2.group.name, self.question2.answer_type.upper())
+        question3_1 = "%s; %s; %s; %s" %(self.question3.text, self.question3.group.name,
+                                         self.question3.answer_type.upper(), self.option1.text)
+        question3_2 = "; ; ; %s" %(self.option2.text)
+        question3_3 = "; ; ; %s" %(self.option3.text)
+        contents = "%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s" % (self.headings, question1, question2, question3_1, question3_2, question3_3)
+        self.assertEquals(contents, response.content)
+
+    # def test_should_delete_subquestion_and_redirect_to_master_question_lists_if_no_batch_id_supplied(self):
+    #     response = self.client.get('/questions/%s/delete/' % (int(self.subquestion.id)))
+    #     self.assertRedirects(response, '/questions/', 302, 200)
+    #
+    #     success_message = 'Sub question successfully deleted.'
+    #     self.assertIn(success_message, response.cookies['messages'].value)
+    #
+    # def test_restricted_permissions(self):
+    #     self.assert_restricted_permission_for('/batches/%d/questions/%s/delete/' % (self.batch.id, self.subquestion.id))
+    #     self.assert_restricted_permission_for('/questions/%s/delete/' % (self.subquestion.id))

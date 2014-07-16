@@ -9,6 +9,7 @@ Feature: Question feature
     Then I should see the questions list paginated
     When I change to 100 questions per page
     Then I should not see pagination
+    And I should be able to export questions
 
 
   Scenario: List Questions Under an open-batch

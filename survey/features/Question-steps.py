@@ -526,3 +526,7 @@ def and_i_have_a_multichoice_and_numeric_questions(step):
 @step(u'Then I should see field required error message')
 def then_i_should_see_field_required_error_message(step):
     world.page.is_text_present("This field is required.")
+
+@step(u'And I should be able to export questions')
+def and_i_should_be_able_to_export_questions(step):
+    world.page.find_by_css("#export_question", "Export Questions")

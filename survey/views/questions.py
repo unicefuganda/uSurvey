@@ -11,6 +11,7 @@ from survey.models import AnswerRule, BatchQuestionOrder
 from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
 from survey.forms.question import QuestionForm
+from survey.services.export_questions import ExportQuestionsService
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
 
 ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE = "Logics cannot be added while the batch is open."
@@ -351,3 +352,19 @@ def remove(request, batch_id, question_id):
     question.de_associate_from(batch)
     messages.success(request, "Question successfully removed from %s." % batch.name)
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
+
+
+def export_all_questions(request):
+    if request.method == 'POST':
+        formatted_responses = ExportQuestionsService().formatted_responses()
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="all_questions.csv"'
+        response.write("\r\n".join(formatted_responses))
+        return response
+
+    referer_url = request.META.get('HTTP_REFERER', None)
+    return HttpResponseRedirect(referer_url)
+
+
+def export_batch_questions(request, batch_id):
+    return HttpResponse()
