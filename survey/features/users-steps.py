@@ -240,6 +240,7 @@ def then_i_should_see_the_user_details_displayed(step):
     world.page.validate_url()
     world.page.validate_page_content()
 
+
 @step(u'Then back button should take back to users page')
 def then_back_button_should_take_back_to_users_page(step):
     world.page.validate_back_link()
