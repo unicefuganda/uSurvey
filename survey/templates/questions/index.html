@@ -13,6 +13,10 @@
         </h3>
         {% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" filter_id="question-filter-form" a_form=question_filter_form %}
         <div class="question-button pull-right">
+            <form accept-charset="utf-8" action="{% url 'export_questions_in_batch' batch.id %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn_primary" id="export_question">Export Questions</button>
+            </form>
             {% if not batch.is_open %}
                 <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary" id="add_question">Select
                     Question</a>

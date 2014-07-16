@@ -20,6 +20,7 @@ Feature: Question feature
     And I have a multichoice and numeric questions with logics
     And I visit questions listing page of the batch
     Then I should see question list with only view options action
+    And I should be able to export questions
 
   Scenario: Error Message on no question
     Given I am logged in as researcher
@@ -62,6 +63,7 @@ Feature: Question feature
     Then I should see the questions list paginated
     And If I click create new question link
     Then I should see create new question page
+    And I should be able to export questions
 
   Scenario: View multichoice question options
     Given I am logged in as researcher

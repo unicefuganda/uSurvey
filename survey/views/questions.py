@@ -353,18 +353,25 @@ def remove(request, batch_id, question_id):
     messages.success(request, "Question successfully removed from %s." % batch.name)
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
-
+@permission_required('auth.can_view_batches')
 def export_all_questions(request):
+    return _export_questions(request)
+
+@permission_required('auth.can_view_batches')
+def export_batch_questions(request, batch_id):
+    batch = Batch.objects.get(id=batch_id)
+    return _export_questions(request, batch)
+
+
+def _export_questions(request, batch=None):
+    filename = '%s_questions' % batch.name if batch else 'all_questions'
     if request.method == 'POST':
-        formatted_responses = ExportQuestionsService().formatted_responses()
+        formatted_responses = ExportQuestionsService(batch).formatted_responses()
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="all_questions.csv"'
+        response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
         response.write("\r\n".join(formatted_responses))
         return response
 
-    referer_url = request.META.get('HTTP_REFERER', None)
-    return HttpResponseRedirect(referer_url)
+    referrer_url = request.META.get('HTTP_REFERER', None)
+    return HttpResponseRedirect(referrer_url)
 
-
-def export_batch_questions(request, batch_id):
-    return HttpResponse()

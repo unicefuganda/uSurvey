@@ -1,7 +1,7 @@
 from survey.services.export_questions import ExportQuestionsService
 
 from survey.tests.base_test import BaseTest
-from survey.models import Question, QuestionOption, HouseholdMemberGroup
+from survey.models import Question, QuestionOption, HouseholdMemberGroup, Batch
 
 
 class ExportQuestionsTest(BaseTest):
@@ -19,7 +19,10 @@ class ExportQuestionsTest(BaseTest):
         self.option3 = QuestionOption.objects.create(question=self.question3, text="option3", order=3)
         self.headings = "Question Text; Group; Answer Type; Options"
 
-    def test_exports_questions_with_normal_group(self):
+        self.batch = Batch.objects.create(name="batch", order=0)
+        self.batch.questions.add(self.question1, self.question2, self.question3)
+
+    def test_exports_all_questions_with_normal_group(self):
 
         question1 = "%s; %s; %s" %(self.question1.text, self.question1.group.name, self.question1.answer_type.upper())
         question2 = "%s; %s; %s" %(self.question2.text, self.question2.group.name, self.question2.answer_type.upper())
@@ -31,6 +34,28 @@ class ExportQuestionsTest(BaseTest):
         expected_data = [self.headings, question1, question2, question3_1, question3_2, question3_3]
 
         export_questions_service = ExportQuestionsService()
+        actual_data = export_questions_service.formatted_responses()
+
+        self.assertEqual(len(expected_data), len(actual_data))
+        self.assertIn(expected_data[0], actual_data)
+        self.assertIn(expected_data[1], actual_data)
+        self.assertIn(expected_data[2], actual_data)
+        self.assertIn(expected_data[3], actual_data)
+        self.assertIn(expected_data[4], actual_data)
+
+    def test_exports_all_questions_in_a_batch(self):
+        self.create_questions_not_in_batch()
+
+        question1 = "%s; %s; %s" %(self.question1.text, self.question1.group.name, self.question1.answer_type.upper())
+        question2 = "%s; %s; %s" %(self.question2.text, self.question2.group.name, self.question2.answer_type.upper())
+        question3_1 = "%s; %s; %s; %s" %(self.question3.text, self.question3.group.name,
+                                         self.question3.answer_type.upper(), self.option1.text)
+        question3_2 = "; ; ; %s" %(self.option2.text)
+        question3_3 = "; ; ; %s" %(self.option3.text)
+
+        expected_data = [self.headings, question1, question2, question3_1, question3_2, question3_3]
+
+        export_questions_service = ExportQuestionsService(self.batch)
         actual_data = export_questions_service.formatted_responses()
 
         self.assertEqual(len(expected_data), len(actual_data))
