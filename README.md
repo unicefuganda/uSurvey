@@ -40,11 +40,10 @@ Installation
 * run lettuce test
 adjust testsettings for test_db setup
 first install phantomjs if not already installed (brew install phantomjs in OSX).
-    python manage.py syncdb --settings=mics.testsettings
-    python manage.py migrate --settings=mics.testsettings
-    python manage.py harvest
 
-
+        python manage.py syncdb --settings=mics.testsettings
+        python manage.py migrate --settings=mics.testsettings
+        python manage.py harvest
 
 Done!! you're good to go :)
 

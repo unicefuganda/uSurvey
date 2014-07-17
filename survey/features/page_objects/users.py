@@ -32,12 +32,7 @@ class EditUserDetailsPage(PageObject):
 
     def modify_users_information(self):
         assert self.browser.find_by_name('mobile_number')
-        assert self.browser.find_by_name('password')
-        assert self.browser.find_by_name('confirm_password')
         self.fill('mobile_number', '994747474')
-        self.fill('password', 'password')
-        self.fill('confirm_password', 'password')
-
 
     def click_update_button(self):
         self.browser.find_by_name("save_button").first.click()

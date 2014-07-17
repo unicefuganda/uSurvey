@@ -61,9 +61,10 @@ Feature: Question feature
     And I have more than 50 questions
     And I visit questions list page
     Then I should see the questions list paginated
+    And I should be able to export questions
     And If I click create new question link
     Then I should see create new question page
-    And I should be able to export questions
+
 
   Scenario: View multichoice question options
     Given I am logged in as researcher
