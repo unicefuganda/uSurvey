@@ -2,6 +2,7 @@ from django import template
 from survey.investigator_configs import MONTHS
 from django.core.urlresolvers import reverse
 from survey.models.helper_constants import CONDITIONS
+from survey.views.views_helper import get_ancestors
 
 register = template.Library()
 
@@ -95,3 +96,9 @@ def is_survey_selected_given(survey, selected_batch):
 def non_response_is_activefor(open_locations, location):
     if location in open_locations:
        return "checked='checked'"
+
+@register.filter
+def ancestors_reversed(location):
+    ancestors = get_ancestors(location)
+    ancestors.reverse()
+    return ancestors

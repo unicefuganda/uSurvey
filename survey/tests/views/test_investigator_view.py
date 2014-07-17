@@ -306,7 +306,10 @@ class ViewInvestigatorDetailsPage(BaseTest):
         city = LocationType.objects.create(name="City", slug=slugify("city"))
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
-        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789", backend = Backend.objects.create(name='something'), location=kampala)
+        ea_kampala = EnumerationArea.objects.create(name="ea_kampala")
+        ea_kampala.locations.add(kampala)
+        investigator = Investigator.objects.create(name="investigator", mobile_number="123456789",
+                                                   backend=Backend.objects.create(name='something'), ea=ea_kampala)
         response = self.client.get('/investigators/' + str(investigator.pk) + '/')
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]

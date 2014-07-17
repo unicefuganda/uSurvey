@@ -22,3 +22,12 @@ def get_descendants(location, include_self=True):
     if not include_self:
         all_descendants_including_self.remove(location)
     return all_descendants_including_self
+
+
+def get_ancestors(location):
+    parent = location.tree_parent
+    if not parent:
+        return []
+    result = [parent]
+    result.extend(get_ancestors(parent))
+    return result

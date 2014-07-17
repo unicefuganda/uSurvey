@@ -112,3 +112,39 @@ class TemplateTagsTest(TestCase):
         self.assertEqual("selected='selected'", is_ea_selected(location_widget, ea1))
         self.assertIsNone(is_ea_selected(location_widget, ea2))
 
+    def test_ancestors_reversed_reversed(self):
+        country = LocationType.objects.create(name='Country', slug='country')
+        region = LocationType.objects.create(name='Region', slug='region')
+        city = LocationType.objects.create(name='City', slug='city')
+        parish = LocationType.objects.create(name='Parish', slug='parish')
+        village = LocationType.objects.create(name='Village', slug='village')
+        subcounty = LocationType.objects.create(name='Subcounty', slug='subcounty')
+
+        africa = Location.objects.create(name='Africa', type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=region)
+        LocationTypeDetails.objects.create(country=africa, location_type=city)
+        LocationTypeDetails.objects.create(country=africa, location_type=parish)
+        LocationTypeDetails.objects.create(country=africa, location_type=village)
+        LocationTypeDetails.objects.create(country=africa, location_type=subcounty)
+
+        uganda = Location.objects.create(name='Uganda', type=region, tree_parent=africa)
+
+        abim = Location.objects.create(name='ABIM', tree_parent=uganda, type=city)
+
+        abim_son = Location.objects.create(name='LABWOR', tree_parent=abim, type=parish)
+
+        abim_son_son = Location.objects.create(name='KALAKALA', tree_parent=abim_son, type=village)
+        abim_son_daughter = Location.objects.create(name='OYARO', tree_parent=abim_son, type=village)
+
+        abim_son_daughter_daughter = Location.objects.create(name='WIAWER', tree_parent=abim_son_daughter, type=subcounty)
+
+        abim_son_son_daughter = Location.objects.create(name='ATUNGA', tree_parent=abim_son_son, type=subcounty)
+        abim_son_son_son = Location.objects.create(name='WICERE', tree_parent=abim_son_son, type=subcounty)
+
+        self.assertEqual([], ancestors_reversed(africa))
+        self.assertEqual([africa], ancestors_reversed(uganda))
+        self.assertEqual([africa, uganda], ancestors_reversed(abim))
+        self.assertEqual([africa, uganda, abim], ancestors_reversed(abim_son))
+        self.assertEqual([africa, uganda, abim, abim_son], ancestors_reversed(abim_son_son))
+        self.assertEqual([africa, uganda, abim, abim_son, abim_son_son], ancestors_reversed(abim_son_son_son))
