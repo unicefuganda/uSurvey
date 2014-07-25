@@ -65,8 +65,7 @@ class UsersViewTest(BaseTest):
 
         assert success_message.called
 
-    @patch('django.contrib.messages.error')
-    def test_create_users_unsuccessful(self, error_message):
+    def test_create_users_unsuccessful(self):
         some_group = Group.objects.create()
         form_data = {
                     'username':'knight',
@@ -88,9 +87,12 @@ class UsersViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
-        assert  error_message.called
+        print response.context['messages']._loaded_messages[0].message
+        print dir(response.context['messages']._loaded_messages[0].message)
+        # assert False
+        self.assertEqual(1, len(response.context['messages']._loaded_messages))
+        self.assertIn("User not registered. See errors below.", response.context['messages']._loaded_messages[0].message)
 
-        error_message.reset_mock()
         form_data['confirm_password']= form_data['password']
         unexisting_group_id = 123456677
         form_data['groups'] = unexisting_group_id
@@ -99,9 +101,9 @@ class UsersViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
-        assert error_message.called
+        self.assertEqual(1, len(response.context['messages']._loaded_messages))
+        self.assertIn("User not registered. See errors below.", response.context['messages']._loaded_messages[0].message)
 
-        error_message.reset_mock()
         form_data['groups']= some_group.id
         user = User.objects.create(username='some_other_name')
         userprofile = UserProfile.objects.create(user=user, mobile_number=form_data['mobile_number'])
@@ -110,7 +112,8 @@ class UsersViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
-        assert error_message.called
+        self.assertEqual(1, len(response.context['messages']._loaded_messages))
+        self.assertIn("User not registered. See errors below.", response.context['messages']._loaded_messages[0].message)
 
     def test_index(self):
         response = self.client.get('/users/')
@@ -213,8 +216,7 @@ class UsersViewTest(BaseTest):
         self.assertEqual(1, edited_user.count())
         self.assertTrue(edited_user[0].check_password(data['password']))
 
-    @patch('survey.views.users._add_error_messages')
-    def test_edit_username_not_allowed(self, mock_add_error_messages):
+    def test_edit_username_not_allowed(self):
         form_data = {
                     'username':'knight',
                     'password':'mk',
@@ -236,8 +238,10 @@ class UsersViewTest(BaseTest):
         self.failIf(edited_user)
         original_user = User.objects.filter(username=form_data['username'], email=form_data['email'])
         self.failUnless(original_user)
-        assert mock_add_error_messages.is_called
-    
+        self.assertEqual(1, len(response.context['messages']._loaded_messages))
+        self.assertIn("User not edited. See errors below.", response.context['messages']._loaded_messages[0].message)
+
+
     def test_current_user_edits_his_own_profile(self):
         form_data = {
                     'username':'knight',

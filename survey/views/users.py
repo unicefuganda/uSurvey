@@ -12,8 +12,8 @@ from survey.models.users import UserProfile
 from survey.views.custom_decorators import permission_required_for_perm_or_current_user
 
 
-def _add_error_messages(userform, request):
-    error_message = "User not registered. "
+def _add_error_messages(userform, request, action_str='registered'):
+    error_message = "User not %s. "%action_str
     messages.error(request, error_message + "See errors below.")
 
 
@@ -22,7 +22,7 @@ def _process_form(userform, request, action_success="registered", redirect_url="
         userform.save()
         messages.success(request, "User successfully %s." % action_success)
         return HttpResponseRedirect(redirect_url)
-    _add_error_messages(userform, request)
+    _add_error_messages(userform, request, action_success)
     return None
 
 @login_required
