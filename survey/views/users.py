@@ -38,6 +38,7 @@ def new(request):
                           'country_phone_code':COUNTRY_PHONE_CODE,
                           'action': "/users/new/",
                           'id': "create-user-form",
+                          'class': "user-form",
                           'button_label': "Create",
                           'loading_text': "Creating...",
                           'title' : 'New User'}
@@ -76,7 +77,7 @@ def edit(request, user_id):
         response = _process_form(userform, request, 'edited', '/users/'+ str(user_id)+'/edit/')
     context_variables = {'userform': userform,
                         'action' : '/users/%s/edit/'%user_id,
-                        'id': 'edit-user-form', 'button_label' : 'Save',
+                        'id': 'edit-user-form','class': 'user-form', 'button_label' : 'Save',
                         'loading_text' : 'Saving...',
                         'country_phone_code': COUNTRY_PHONE_CODE,
                         'title': 'Edit User'}

@@ -12,11 +12,49 @@ $(function(){
         return ($("#id_password1").val()==value)
       }, "Password not matched.");
 
+  jQuery.validator.addMethod("validate_edit_password", function(value, element) {
+        return ($("#id_password").val()==value)
+      }, "Password not matched.");
+
   jQuery.validator.addMethod( "regex", function(value, element, regexp) {
                   var re = new RegExp(regexp);
                   return re.test(value);
               },"username may contain only letters characters."
       );
+
+  $('#edit-user-form').validate({
+      ignore: ":hidden:not(select)",
+      rules: {
+        "mobile_number": {
+          required: true,
+          minlength: 9,
+          no_leading_zero_if_number_is_9_digits: true,
+          leading_zero_if_number_is_10_digits: true
+        },
+        "email":{required:true},
+        "confirm_password":{validate_edit_password: true},
+      },
+      messages: {
+        "mobile_number": {
+          number: "Please enter a valid number. No space or special charcters.",
+          minlength:jQuery.format("Too few digits. Please enter {0} digits."),
+        }
+      },
+      errorPlacement: function(error, element) {
+        if ($(element).is(':hidden')) {
+          error.insertAfter(element.next());
+        } else {
+          error.insertAfter(element);
+        }
+       },
+      submitHandler: function(form){
+         var button = $(form).find('button'),
+             value = button.val();
+         button.attr('disabled', true);
+         form.submit();
+       }
+  });
+
 
   $('#create-user-form').validate({
       ignore: ":hidden:not(select)",
@@ -35,6 +73,8 @@ $(function(){
                     remote:'/users/'},
         "password1":{required: true},
         "password2":{validate_password: true, required: true},
+        "password":{required: true},
+        "confirm_password":{validate_edit_password: true, required: true},
         "groups":"required",
       },
       messages: {
