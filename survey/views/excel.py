@@ -28,8 +28,8 @@ def _process_export(survey_batch_filter_form):
 @permission_required('auth.can_view_aggregates')
 def download(request):
     survey_batch_filter_form = SurveyBatchFilterForm()
-    if request.method == 'POST':
-        survey_batch_filter_form = SurveyBatchFilterForm(request.POST)
+    if request.GET:
+        survey_batch_filter_form = SurveyBatchFilterForm(request.GET)
         if survey_batch_filter_form.is_valid():
             return _process_export(survey_batch_filter_form)
     return render(request, 'aggregates/download_excel.html', {'survey_batch_filter_form': survey_batch_filter_form})

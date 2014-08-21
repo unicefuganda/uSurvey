@@ -70,7 +70,7 @@ class ExcelDownloadTest(BaseTest):
     def test_downloaded_excel_file(self):
         file_name = "%s.csv" % self.batch.name
         data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk}
-        response = self.client.post('/aggregates/spreadsheet_report', data=data)
+        response = self.client.get('/aggregates/spreadsheet_report', data=data)
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
@@ -90,7 +90,7 @@ class ExcelDownloadTest(BaseTest):
         UnknownDOBAttribute.objects.create(household_member=member, type="MONTH")
 
         data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk}
-        response = self.client.post('/aggregates/spreadsheet_report', data=data)
+        response = self.client.get('/aggregates/spreadsheet_report', data=data)
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
@@ -138,7 +138,7 @@ class ExcelDownloadTest(BaseTest):
         contents = "%s\r\n%s\r\n" % (",".join(header_structure), ",".join(expected_csv_data))
 
         file_name = "%s.csv" % self.survey.name
-        response = self.client.post('/aggregates/spreadsheet_report', data={'survey': self.survey.pk, 'batch':''})
+        response = self.client.get('/aggregates/spreadsheet_report', data={'survey': self.survey.pk, 'batch':''})
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/csv")
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
