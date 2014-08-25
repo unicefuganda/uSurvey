@@ -1,16 +1,15 @@
 ;
 jQuery(function($){
     var $batch = $("#id_batch");
-    $("#id_filter_survey").on('change', function(){
-          $batch.find('option').remove();
-          $batch.append($('<option />').val('All').text('All'));
-         populate_choices.call(this)
-    });
 
-    $('#id_survey').on('change', function(){
-        $batch.find('option').remove();
+    $("#id_filter_survey").on('change', updateBatchSelectField);
+    $('#id_survey').on('change', updateBatchSelectField);
+
+    function updateBatchSelectField () {
+       $batch.find('option').remove();
+        $batch.append($('<option />').val('All').text('All'));
         populate_choices.call(this);
-    });
+    }
 
     function get_url(survey_id){
         if (survey_id == 'All'){

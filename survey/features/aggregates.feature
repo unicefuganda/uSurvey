@@ -8,7 +8,7 @@ Feature: Aggregates feature
       And I visit download excel page
       When I select one of the two surveys
       Then I should only see the batches in that survey
-      When I select a batch
+      When I choose a batch in that survey
       Then I should be able to export the responses for that batch
 
     Scenario: Region/district completion rates

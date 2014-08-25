@@ -265,8 +265,11 @@ def and_i_have_batches_in_those_surveys(step):
 
 @step(u'Then I should only see the batches in that survey')
 def then_i_should_only_see_the_batches_in_that_survey(step):
-    world.page.see_select_option([str(world.batch_1.name)], 'batch')
+    world.page.see_select_option(['All', str(world.batch_2.name)], 'batch')
 
+@step(u'When I choose a batch in that survey')
+def when_i_choose_a_batch_in_that_survey(step):
+    world.page.select('batch', [world.batch_2.id])
 
 @step(u'Then I should be able to export the responses for that batch')
 def then_i_should_be_able_to_export_the_responses_for_that_batch(step):
@@ -274,7 +277,7 @@ def then_i_should_be_able_to_export_the_responses_for_that_batch(step):
 
 @step(u'When I select one of the two surveys')
 def when_i_select_one_of_the_two_surveys(step):
-    world.page.select('survey', [str(world.survey_1.id)])
+    world.page.select('survey', [str(world.survey_2.id)])
 
 @step(u'And I have general member group')
 def and_i_have_general_member_group(step):
