@@ -1,5 +1,7 @@
-
 test:
   adapter: postgresql
-  database: mics_test
-  username: postgres
+  encoding: utf8
+  database: app_test
+  username: go
+  password: go
+  host: localhost
