@@ -43,6 +43,7 @@ def clear_cookies(scenario):
 @after.all
 def close_browser(total):
     world.browser.quit()
+    call_command('flush', interactive=False)
 
 
 def create_backends():
