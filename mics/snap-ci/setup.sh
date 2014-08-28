@@ -1,17 +1,9 @@
 #!/bin/sh
-
-sudo yum -y groupinstall "Development Tools"
-sudo yum install memcached python-memcached  -y
-wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
-tar -xvf libmemcached-1.0.18.tar.gz
-cd libmemcached-1.0.18
-sudo ./configure
-sudo make
-sudo make install
-
-cd ..
-
-sudo /etc/init.d/memcached start
+sudo yum remove -y libmemcached libmemcached-devel
+sudo wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+sudo wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+sudo rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
+sudo yum --enablerepo=remi install -y libmemcached-last libmemcached-last-devel
 
 cd ..
 virtualenv mics_env
