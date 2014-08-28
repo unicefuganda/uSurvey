@@ -11,5 +11,6 @@ source mics_env/bin/activate
 cd -
 pip install -r pip-requires.txt
 cp mics/snap-ci/snap-settings.py mics/localsettings.py
+cp survey/investigator_configs.py.example survey/investigator_configs.py
 ./manage.py syncdb --noinput
 ./manage.py migrate
