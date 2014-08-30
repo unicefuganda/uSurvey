@@ -13,11 +13,7 @@ from survey.tests.base_test import BaseTest
 from survey.forms.question import QuestionForm
 from survey.forms.filters import MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models.householdgroups import HouseholdMemberGroup
-from survey.views.questions import _rule_exists, _set_filter_condition_based_on_group,\
-    _set_filter_condition_based_on_module, _set_filter_condition_based_on_answer_type,\
-    _set_filter_condition_based_on_batch_id, _get_questions_based_on_filter,\
-    _set_filter_condition_for_batch_questions
-
+from survey.views.questions import _rule_exists, _get_questions_based_on_filter
 
 
 class QuestionsViews(BaseTest):
@@ -51,68 +47,15 @@ class QuestionsViews(BaseTest):
             'number_of_questions_per_page':50
         }
 
-    def test_set_filter_condition_based_on_batch_id_specified(self):
-        filter_condition = {}
-        updated_filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, None)
-        self.assertIsNone(updated_filter_condition.get('batches', None))
-
-        updated_filter_condition = _set_filter_condition_based_on_batch_id(filter_condition, self.batch.id)
-        self.assertEqual(self.batch, updated_filter_condition.get('batches', None))
-
-    def test_set_filter_condition_based_on_group(self):
-        filter_condition = {}
-        updated_filter_condition = _set_filter_condition_based_on_group('All', filter_condition)
-        self.assertIsNone(updated_filter_condition.get('group__id', None))
-
-        updated_filter_condition = _set_filter_condition_based_on_group('2', filter_condition)
-        self.assertEqual('2', updated_filter_condition.get('group__id', None))
-
-    def test_set_filter_condition_based_on_module(self):
-        filter_condition = {}
-        updated_filter_condition = _set_filter_condition_based_on_module('All', filter_condition)
-        self.assertIsNone(updated_filter_condition.get('module__id', None))
-
-        updated_filter_condition = _set_filter_condition_based_on_module('2', filter_condition)
-        self.assertEqual('2', updated_filter_condition.get('module__id', None))
-
-    def test_set_filter_condition_based_on_answer_type(self):
-        filter_condition = {}
-        updated_filter_condition = _set_filter_condition_based_on_answer_type('All', filter_condition)
-        self.assertIsNone(updated_filter_condition.get('answer_type', None))
-
-        updated_filter_condition = _set_filter_condition_based_on_answer_type('2', filter_condition)
-        self.assertEqual('2', updated_filter_condition.get('answer_type', None))
-
-    def test_set_filter_condition_based_on_group_for_batch_questions(self):
-        filter_condition = {}
-        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, 'All')
-        self.assertIsNone(updated_filter_condition.get('question__group__id', None))
-
-        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, '2')
-        self.assertEqual('2', updated_filter_condition.get('question__group__id', None))
-
-    def test_set_filter_condition_based_on_module_for_batch_questions(self):
-        filter_condition = {}
-        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, module_id='All')
-        self.assertIsNone(updated_filter_condition.get('question__module__id', None))
-
-        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, module_id='2')
-        self.assertEqual('2', updated_filter_condition.get('question__module__id', None))
-
-    def test_set_filter_condition_based_on_answer_type_for_batch_questions(self):
-        filter_condition = {}
-        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, question_type='All')
-        self.assertIsNone(updated_filter_condition.get('question__answer_type', None))
-
-        updated_filter_condition = _set_filter_condition_for_batch_questions(filter_condition, question_type='2')
-        self.assertEqual('2', updated_filter_condition.get('question__answer_type', None))
-
     def test_get_questions_based_on_filter_should_return_all_questions_if_batch_is_none_and_all_other_keys_are_all_or_none(
             self):
         question_3 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1,
                                              module=QuestionModule.objects.create(name="Economics"))
-        questions = _get_questions_based_on_filter(None, 'All', 'All', 'All')
+
+        params = {'group__id': 'All', 'module__id': 'All', 'answer_type': 'All'}
+
+        questions = _get_questions_based_on_filter(None, params)
 
         all_questions = [self.question_1, self.question_2, question_3]
 
@@ -123,7 +66,10 @@ class QuestionsViews(BaseTest):
         question_3 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1,
                                              module=QuestionModule.objects.create(name="Economics"), identifier='Q3')
-        questions = _get_questions_based_on_filter(None, 'All', str(self.module.id), 'All')
+
+        params = {'group__id': 'All', 'module__id': str(self.module.id), 'answer_type': 'All'}
+
+        questions = _get_questions_based_on_filter(None, params)
 
         all_questions = [self.question_1, self.question_2]
 
@@ -136,7 +82,10 @@ class QuestionsViews(BaseTest):
                                              answer_type=Question.NUMBER, order=1,
                                              module=QuestionModule.objects.create(name="Economics"),
                                              group=self.household_member_group, identifier='Q3')
-        questions = _get_questions_based_on_filter(None, str(self.household_member_group.id), 'All', 'All')
+
+        params = {'group__id': str(self.household_member_group.id), 'module__id': 'All', 'answer_type': 'All'}
+
+        questions = _get_questions_based_on_filter(None, params)
 
         all_questions = [self.question_1, self.question_2]
 
@@ -149,7 +98,10 @@ class QuestionsViews(BaseTest):
                                              answer_type=Question.MULTICHOICE, order=1,
                                              module=QuestionModule.objects.create(name="Economics"),
                                              group=self.household_member_group, identifier='Q3')
-        questions = _get_questions_based_on_filter(None, 'All', 'All', Question.NUMBER)
+
+        params = {'group__id': 'All', 'module__id': 'All', 'answer_type': Question.NUMBER}
+
+        questions = _get_questions_based_on_filter(None, params)
 
         all_questions = [self.question_1, self.question_2]
 
@@ -170,8 +122,10 @@ class QuestionsViews(BaseTest):
         question_3.batches.add(new_batch)
         BatchQuestionOrder.objects.create(batch=new_batch, question=question_3, order=1)
 
-        questions = _get_questions_based_on_filter(new_batch.id, str(self.household_member_group.id),
-                                                   str(new_module.id), Question.MULTICHOICE)
+        params = {'group__id': str(self.household_member_group.id), 'module__id': str(new_module.id),
+                  'answer_type': Question.MULTICHOICE}
+
+        questions = _get_questions_based_on_filter(new_batch.id, params)
 
         all_questions = [self.question_1, self.question_2, question_4]
 
@@ -192,9 +146,10 @@ class QuestionsViews(BaseTest):
         question_3.batches.add(new_batch)
         BatchQuestionOrder.objects.create(batch=new_batch, question=question_3, order=1)
 
+        params = {'group__id': str(self.household_member_group.id), 'module__id': str(new_module.id),
+                  'answer_type': Question.MULTICHOICE}
 
-        questions = _get_questions_based_on_filter(None, str(self.household_member_group.id), str(new_module.id),
-                                                   Question.MULTICHOICE)
+        questions = _get_questions_based_on_filter(None, params)
 
         all_questions = [self.question_1, self.question_2]
 
@@ -206,7 +161,10 @@ class QuestionsViews(BaseTest):
         question_3 = Question.objects.create(text="How many members are there in this household?",
                                              answer_type=Question.NUMBER, order=1,
                                              module=QuestionModule.objects.create(name="Economics"), identifier='Q3')
-        questions = _get_questions_based_on_filter(self.batch.id, 'All', 'All', 'All')
+
+        params = {'group__id': 'All', 'module__id': 'All', 'answer_type': 'All'}
+
+        questions = _get_questions_based_on_filter(self.batch.id, params)
 
         all_questions = [self.question_1, self.question_2]
 

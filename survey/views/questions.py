@@ -12,6 +12,7 @@ from survey.models.batch import Batch
 from survey.models.question import Question, QuestionOption
 from survey.forms.question import QuestionForm
 from survey.services.export_questions import ExportQuestionsService
+from survey.utils.views_helper import prepend_to_keys, clean_query_params
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
 from collections import OrderedDict
 
@@ -19,61 +20,27 @@ ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE = "Logics cannot be added while the batch 
 ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE = "Subquestions cannot be added while batch is open."
 REMOVE_QUESTION_FROM_OPEN_BATCH_ERROR_MESSAGE = "Question cannot be removed from a batch while the batch is open."
 
-def _set_filter_condition_based_on_group(group_id, filter_condition):
-    if group_id and group_id.lower() != 'all':
-        filter_condition['group__id'] = group_id
-    return filter_condition
 
-def _set_filter_condition_based_on_module(module_id, filter_condition):
-    if module_id and module_id.lower() != 'all':
-        filter_condition['module__id'] = module_id
-    return filter_condition
-
-def _set_filter_condition_based_on_answer_type(answer_type, filter_condition):
-    if answer_type and answer_type.lower() != 'all':
-        filter_condition['answer_type'] = answer_type
-    return filter_condition
-
-def _set_filter_condition_based_on_batch_id(filter_condition, batch_id=None):
+def _get_questions_based_on_filter(batch_id, filter_params):
+    filter_params = clean_query_params(filter_params)
     if batch_id:
-        filter_condition['batches'] = Batch.objects.get(id=batch_id)
-    return filter_condition
-
-def _set_filter_condition_for_batch_questions(filter_condition, group_id='All', module_id='All', question_type='All'):
-    if group_id and group_id.lower() != 'all':
-        filter_condition['question__group__id'] = group_id
-
-    if module_id and module_id.lower() != 'all':
-        filter_condition['question__module__id'] = module_id
-
-    if question_type and question_type.lower() != 'all':
-        filter_condition['question__answer_type'] = question_type
-
-    return filter_condition
+        filter_params = prepend_to_keys(filter_params, 'question__')
+        return BatchQuestionOrder.get_batch_order_specific_questions(batch_id, filter_params)
+    return Question.objects.filter(subquestion=False, **filter_params).exclude(group__name='REGISTRATION GROUP')
 
 
-def _get_questions_based_on_filter(batch_id, group_id='All', module_id='All', question_type='All'):
-    filter_condition = {}
-    if not batch_id:
-        filter_condition = _set_filter_condition_based_on_group(group_id, filter_condition)
-        filter_condition = _set_filter_condition_based_on_module(module_id, filter_condition)
-        filter_condition = _set_filter_condition_based_on_answer_type(question_type, filter_condition)
-
-        return Question.objects.filter(subquestion=False, **filter_condition).exclude(group__name='REGISTRATION GROUP')
-    else:
-        filter_condition = _set_filter_condition_for_batch_questions(filter_condition, group_id, module_id, question_type)
-        return BatchQuestionOrder.get_batch_order_specific_questions(batch_id, filter_condition)
+def _max_number_of_question_per_page(number_sent_in_request):
+    max_question_per_page_supplied = number_sent_in_request or 0
+    given_max_per_page = min(int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
+    return max(given_max_per_page, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
 
 
 def _questions_given(batch_id, request):
-    group_id = request.GET.get('groups', None)
-    module_id = request.GET.get('modules', None)
-    question_type = request.GET.get('question_types', None)
-    max_question_per_page_supplied = request.GET.get('number_of_questions_per_page', 0) or 0
-    given_max_per_page = min(int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
-    max_per_page = max(given_max_per_page, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
+    filter_params = {'group__id': request.GET.get('groups', None), 'module__id': request.GET.get('modules', None),
+                     'answer_type': request.GET.get('question_types', None)}
+    max_per_page = _max_number_of_question_per_page(request.GET.get('number_of_questions_per_page', 0))
 
-    return _get_questions_based_on_filter(batch_id, group_id, module_id, question_type), max_per_page
+    return _get_questions_based_on_filter(batch_id, filter_params), max_per_page
 
 
 @permission_required('auth.can_view_batches')
@@ -98,18 +65,8 @@ def index(request, batch_id):
 
 @permission_required('auth.can_view_batches')
 def filter_by_group_and_module(request, batch_id, group_id, module_id):
-    if group_id.lower() != 'all' and module_id.lower() != 'all':
-        questions = Question.objects.filter(group__id=group_id, module__id=module_id)
-    elif group_id.lower() == 'all' and module_id.lower() != 'all':
-        questions = Question.objects.filter(module__id=module_id)
-    elif group_id.lower() != 'all' and module_id.lower() == 'all':
-        questions = Question.objects.filter(group__id=group_id)
-    else:
-        questions = Question.objects.filter()
-
-    questions_from_batch = Question.objects.filter(batches__id=batch_id)
-
-    questions = questions.exclude(id__in=questions_from_batch).values('id', 'text', 'answer_type').order_by('text')
+    filter_params = clean_query_params({'group__id': group_id, 'module__id': module_id})
+    questions = Question.objects.filter(**filter_params).exclude(batches__id=batch_id).values('id', 'text', 'answer_type').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')
 
@@ -194,7 +151,7 @@ def _get_post_values(post_data):
     value_max_key = post_data.get('max_value', None)
 
     save_data = {'action': post_data['action'],
-                 'condition': condition_response if condition_response else 'EQUALS_OPTION',
+                 'condition': condition_response or 'EQUALS_OPTION',
                  'next_question': Question.objects.get(id=next_question_key) if next_question_key else None,
                  'validate_with_option': QuestionOption.objects.get(id=option_key) if option_key else None,
                  'validate_with_question': Question.objects.get(id=question_key) if question_key else None
@@ -227,11 +184,11 @@ def add_logic(request, batch_id, question_id):
 
     if request.method == "POST":
         logic_form = LogicForm(data=request.POST, question=question, batch=batch)
-
         if logic_form.is_valid():
             AnswerRule.objects.create(question=question, batch=batch, **_get_post_values(request.POST))
             messages.success(request, 'Logic successfully added.')
             response = HttpResponseRedirect('/batches/%s/questions/' % batch_id)
+
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'rules_for_batch': question_rules_for_batch,
                'questionform': QuestionForm(parent_question=question),
@@ -244,6 +201,7 @@ def add_logic(request, batch_id, question_id):
 def new(request):
     response, context = _render_question_view(request)
     return response or render(request, 'questions/new.html', context)
+
 
 def is_multichoice(request, question_id):
     is_multichoice_type = False
@@ -284,6 +242,7 @@ def delete(request, question_id, batch_id=None):
     question.delete()
     return HttpResponseRedirect(redirect_url)
 
+
 def _process_question_form(request, options, response, instance=None):
     question_form = QuestionForm(data=request.POST, instance=instance)
     action_str = 'edit' if instance else 'add'
@@ -295,6 +254,7 @@ def _process_question_form(request, options, response, instance=None):
         messages.error(request, 'Question was not %sed.' % action_str)
         options = dict(request.POST).get('options', None)
     return response, options, question_form
+
 
 def _render_question_view(request, instance=None):
     question_form = QuestionForm(instance=instance)

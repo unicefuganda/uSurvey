@@ -2,7 +2,7 @@ from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
 
 from survey.models import LocationTypeDetails
-from survey.utils.views_helper import contains_key, get_descendants, get_ancestors
+from survey.utils.views_helper import contains_key, get_descendants, get_ancestors, clean_query_params, prepend_to_keys
 
 
 class ViewsHelperTest(TestCase):
@@ -121,3 +121,19 @@ class ViewsHelperTest(TestCase):
         self.assertEqual([abim, uganda, africa], get_ancestors(abim_son))
         self.assertEqual([abim_son, abim, uganda, africa], get_ancestors(abim_son_son))
         self.assertEqual([abim_son_son, abim_son, abim, uganda, africa], get_ancestors(abim_son_son_son))
+
+    def test_remove_key_value_when_value_is_ALL(self):
+        params= {'group__id': 'All', 'batch__id': 1, 'module__id': '', 'question__text':'haha', 'survey': None}
+
+        self.assertEqual({'batch__id':1, 'question__text': 'haha'}, clean_query_params(params))
+
+    def test_remove_key_value_when_value_is_NONE(self):
+        params= {'module__id': None, 'group__id': None, 'answer_type': None}
+
+        self.assertEqual({}, clean_query_params(params))
+
+    def test_append_text_to_all_keys(self):
+        params= {'batch__id': 1, 'question__text':'haha',}
+
+        self.assertEqual({'group__batch__id':1, 'group__question__text': 'haha'}, prepend_to_keys(params, 'group__'))
+

@@ -31,3 +31,17 @@ def get_ancestors(location):
     result = [parent]
     result.extend(get_ancestors(parent))
     return result
+
+
+def clean_query_params(params):
+    for key, value in params.items():
+        if not value or str(value).lower() == 'all':
+            del params[key]
+    return params
+
+
+def prepend_to_keys(params, text):
+    new_params = {}
+    for key, value in params.items():
+        new_params[text+key] = value
+    return new_params
