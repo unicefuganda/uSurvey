@@ -4,12 +4,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location
 from django.contrib.auth.decorators import permission_required
+
 from survey.forms.formula import FormulaForm
 from survey.models import Indicator
 from survey.models.formula import Formula
 from survey.services.simple_indicator_service import SimpleIndicatorService
 from survey.views.location_widget import LocationWidget
-from survey.views.views_helper import contains_key
+from survey.utils.views_helper import contains_key
+
 
 def _process_new_request(request, formula_form, new_formula_url, indicator):
     if formula_form.is_valid():

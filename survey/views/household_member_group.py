@@ -1,15 +1,15 @@
 import json
-from django.core.exceptions import ObjectDoesNotExist
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
+from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.forms.group_condition import GroupConditionForm
 from survey.forms.household_member_group import HouseholdMemberGroupForm
-from survey.views.views_helper import contains_key
+from survey.utils.views_helper import contains_key
 
 
 @permission_required('auth.can_view_household_groups')

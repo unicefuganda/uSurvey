@@ -1,16 +1,18 @@
 import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location, LocationType
+
 from survey.forms.filters import LocationFilterForm
 from survey.models import Survey, Investigator
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates, \
     BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.views.location_widget import LocationWidget
-from survey.views.views_helper import contains_key, is_not_digit_nor_empty
+from survey.utils.views_helper import contains_key, is_not_digit_nor_empty
 
 
 def is_valid(params):

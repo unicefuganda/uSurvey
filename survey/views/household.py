@@ -6,15 +6,15 @@ from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required, permission_required
-
 from rapidsms.contrib.locations.models import *
+
 from survey.forms.householdHead import *
 from survey.forms.household import *
 from survey.models import Survey, LocationCode, EnumerationArea
 from survey.models.households import Household
 from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
-from survey.views.views_helper import contains_key
+from survey.utils.views_helper import contains_key
 
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''

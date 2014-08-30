@@ -1,8 +1,8 @@
 from datetime import datetime
+
 from django.utils.timezone import utc
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
-
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from rapidsms.contrib.locations.models import LocationType, Location
@@ -11,7 +11,7 @@ from survey.forms.upload_csv_file import UploadWeightsForm
 from survey.models import LocationWeight, LocationTypeDetails, UploadErrorLog, Survey
 from survey.tasks import upload_task
 from survey.views.location_widget import LocationWidget
-from survey.views.views_helper import contains_key
+from survey.utils.views_helper import contains_key
 
 
 @permission_required('auth.can_view_batches')

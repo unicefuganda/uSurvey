@@ -7,12 +7,11 @@ from rapidsms.contrib.locations.models import Location
 from django.contrib.auth.decorators import login_required, permission_required
 
 from survey.investigator_configs import *
-
 from survey.forms.investigator import *
 from survey.models import EnumerationArea
 from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
-from survey.views.views_helper import contains_key
+from survey.utils.views_helper import contains_key
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'

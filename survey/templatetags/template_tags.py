@@ -1,8 +1,10 @@
 from django import template
-from survey.investigator_configs import MONTHS
 from django.core.urlresolvers import reverse
+
+from survey.investigator_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
-from survey.views.views_helper import get_ancestors
+from survey.utils.views_helper import get_ancestors
+
 
 register = template.Library()
 

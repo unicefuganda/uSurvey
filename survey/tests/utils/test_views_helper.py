@@ -1,8 +1,8 @@
 from django.test import TestCase
-
 from rapidsms.contrib.locations.models import Location, LocationType
+
 from survey.models import LocationTypeDetails
-from survey.views.views_helper import contains_key, get_descendants, get_ancestors
+from survey.utils.views_helper import contains_key, get_descendants, get_ancestors
 
 
 class ViewsHelperTest(TestCase):

@@ -1,9 +1,10 @@
 from django.db import models
 from django.db.models import Max
 from rapidsms.contrib.locations.models import Location
+
 from survey.models.surveys import Survey
 from survey.models.base import BaseModel
-from survey.views.views_helper import get_descendants
+from survey.utils.views_helper import get_descendants
 
 
 class Batch(BaseModel):

@@ -12,7 +12,6 @@ from survey.models import HouseholdMemberGroup, QuestionModule, BatchQuestionOrd
 from survey.models.surveys import Survey
 from survey.models.batch import Batch
 from survey.forms.batch import BatchForm, BatchQuestionsForm
-from survey.views.views_helper import get_descendants
 
 
 @login_required

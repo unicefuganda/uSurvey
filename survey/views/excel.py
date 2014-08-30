@@ -1,15 +1,14 @@
 import csv
 
 from django.shortcuts import render
-
 from django.http import HttpResponse
-
 from django.contrib.auth.decorators import login_required, permission_required
-from survey.forms.filters import IndicatorFilterForm, SurveyBatchFilterForm
+
+from survey.forms.filters import SurveyBatchFilterForm
 from survey.models import Survey, Investigator
 from survey.models.batch import Batch
 from survey.services.results_download_service import ResultsDownloadService
-from survey.views.views_helper import contains_key
+from survey.utils.views_helper import contains_key
 
 
 def _process_export(survey_batch_filter_form):

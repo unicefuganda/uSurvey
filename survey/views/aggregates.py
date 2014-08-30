@@ -1,4 +1,4 @@
-from survey.views.views_helper import contains_key
+from survey.utils.views_helper import contains_key
 
 
 def is_valid(params):
