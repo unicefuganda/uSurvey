@@ -89,6 +89,27 @@ class QuestionFormTest(TestCase):
         self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), options)
         self.assertIn(QuestionOption.objects.get(text=form_data['options'][0]), options)
 
+    def test_should_edit_options_text_and_order_of_question_if_supplied(self):
+        form_data = self.form_data.copy()
+        form_data['answer_type'] = Question.MULTICHOICE
+        form_data['options']=['option 1', 'option 2']
+        question_form = QuestionForm(form_data)
+
+        question = question_form.save(group=[self.household_member_group.id])
+
+        form_data['options'] = ['option 2', 'option aaaaaaa 1']
+
+        question_form = QuestionForm(instance=question, data=form_data)
+
+        edited_question = question_form.save(group=[self.household_member_group.id])
+
+        options = question.options.all()
+        self.assertEqual(2, options.count())
+        self.assertEqual(QuestionOption.objects.get(text=form_data['options'][0], order=1), options[0])
+        self.assertEqual(QuestionOption.objects.get(text=form_data['options'][1], order=2), options[1])
+        self.failIf(QuestionOption.objects.filter(text='options 1'))
+        self.assertEqual(question.id, edited_question.id)
+
     def test_should_not_save_options_if_not_multichoice_even_if_options_supplied(self):
         form_data = self.form_data.copy()
         form_data['answer_type'] = Question.TEXT

@@ -997,7 +997,9 @@ class HouseholdMemberTest(BaseTest):
         household_member = HouseholdMember.objects.create(surname='member1', date_of_birth=(date(2003, 8, 30)),
                                                           male=False,
                                                           household=household)
-        self.assertEqual(10, household_member.get_age())
+        date_today_that_makes_his_age_10 = date(2014, 04, 01)
+        with self.mock_date_today(date_today_that_makes_his_age_10):
+            self.assertEqual(10, household_member.get_age())
 
     def test_year_of_birth_when_known(self):
         country = LocationType.objects.create(name="Country", slug="country")

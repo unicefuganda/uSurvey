@@ -13,6 +13,7 @@ from survey.models.question import Question, QuestionOption
 from survey.forms.question import QuestionForm
 from survey.services.export_questions import ExportQuestionsService
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
+from collections import OrderedDict
 
 ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE = "Logics cannot be added while the batch is open."
 ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE = "Subquestions cannot be added while batch is open."
@@ -49,6 +50,7 @@ def _set_filter_condition_for_batch_questions(filter_condition, group_id='All', 
         filter_condition['question__answer_type'] = question_type
 
     return filter_condition
+
 
 def _get_questions_based_on_filter(batch_id, group_id='All', module_id='All', question_type='All'):
     filter_condition = {}
@@ -315,7 +317,7 @@ def _render_question_view(request, instance=None):
                'questionform': question_form}
 
     if options:
-        options = filter(lambda text: text.strip(), list(set(options)))
+        options = filter(lambda text: text.strip(), list(OrderedDict.fromkeys(options)))
         options = map(lambda option: re.sub("[%s]" % Question.IGNORED_CHARACTERS, '', option), options)
         context['options'] = map(lambda option: re.sub("  ", ' ', option), options)
 

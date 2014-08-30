@@ -1044,12 +1044,12 @@ class QuestionsViews(BaseTest):
         success_message = "Question successfully edited."
         self.assertTrue(success_message in response.cookies['messages'].value)
 
-    def test_should_not_recreate_already_existing_options_and_update_options_order_on_edit_mutlichoicequestion(self):
+    def test_should_update_options_order_and_text_on_edit_of_mutlichoice_question(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)
         question = Question.objects.create(text="question text", group=group, answer_type=Question.MULTICHOICE,
                                            identifier='Q1')
-        question_option = QuestionOption.objects.create(text="question option text 1", question=question)
-        question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question)
+        question_option = QuestionOption.objects.create(text="question option text 1", question=question, order=1)
+        question_option_2 = QuestionOption.objects.create(text="question option text 2", question=question, order=2)
         question.batches.add(self.batch)
         form_data = {
             'module': self.module.id,
@@ -1057,7 +1057,7 @@ class QuestionsViews(BaseTest):
             'identifier': 'ID 1',
             'answer_type': Question.MULTICHOICE,
             'group': group.id,
-            'options': [question_option.text, 'hahaha', question_option_2.text]
+            'options': [question_option_2.text, 'hahaha', question_option.text]
         }
 
         form_data1 = form_data.copy()
@@ -1069,14 +1069,9 @@ class QuestionsViews(BaseTest):
         self.assertEqual(1, retrieved_question.count())
         options = retrieved_question[0].options.all()
         self.assertEqual(3, options.count())
-        self.assertIn(question_option, options)
-        self.assertIn(question_option_2, options)
-        option_index = 0
-        for option_text in form_data['options']:
-            self.assertIn(option_text, [option.text for option in options])
-            option_index += 1
-            self.assertEqual(option_index,
-                             QuestionOption.objects.get(text=form_data['options'][option_index - 1]).order)
+        self.failUnless(QuestionOption.objects.filter(text=question_option_2.text, order=1, question=question))
+        self.failUnless(QuestionOption.objects.filter(text="hahaha", order=2, question=question))
+        self.failUnless(QuestionOption.objects.filter(text=question_option.text, order=3, question=question))
 
     def test_should_not_save_on_post_edit_question_failure(self):
         group = HouseholdMemberGroup.objects.create(name="group", order=33)

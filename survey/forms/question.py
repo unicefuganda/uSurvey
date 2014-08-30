@@ -115,11 +115,10 @@ class QuestionForm(ModelForm):
     def save_question_options(self, question):
         order = 0
         options = self.cleaned_data['options']
+        question.options.all().delete()
         for text in options:
             order += 1
-            option, bbb = QuestionOption.objects.get_or_create(question=question, text=text)
-            option.order = order
-            option.save()
+            QuestionOption.objects.create(question=question, text=text, order=order)
 
     def save(self, commit=True, **kwargs):
         question = super(QuestionForm, self).save(commit=False)
