@@ -40,7 +40,7 @@ def and_i_visit_the_first_batch_listed(step):
 def then_i_should_see_all_the_prime_locations_with_open_close_toggles(step):
     world.page.batch_closed_for_all_locations()
 
-
+@step(u'And I open batch for a location')
 @step(u'When I open batch for a location')
 def when_i_open_batch_for_a_location(step):
     world.page.open_batch_for(world.districts[1])
@@ -354,3 +354,12 @@ def when_i_visit_the_home_page(step):
 @step(u'Then I should see that it is still activated')
 def then_i_should_see_that_it_is_still_activated_for_that_location_in_db(step):
     world.page.is_text_present("On")
+
+@step(u'When I close the batch of the other survey')
+def when_i_close_the_batch_of_the_other_survey(step):
+    world.batch.close_for_location(world.districts[1])
+
+@step(u'Then the non-response switch for that location is active')
+def then_the_non_response_switch_for_that_location_is_active(step):
+    world.page.is_disabled('activate_non_response_switch_%d' % world.batch.id)
+    world.page.is_text_present("%s is not open for %s" % (world.batch.name, world.districts[1]), False)

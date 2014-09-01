@@ -18,6 +18,9 @@ Feature: Batch related features
     And I should not be able to open this batch
     When I activate non response for batch and location
     Then I should see message batch is closed that location
+    When I close the batch of the other survey
+    And I open batch for a location
+    Then the non-response switch for that location is active
     And I should not be able to activate this batch
     When I open batch for a different location
     And I activate non response for that location
