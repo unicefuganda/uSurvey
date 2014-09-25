@@ -77,7 +77,7 @@ class ExcelDownloadTest(BaseTest):
         household_id = self.household.household_code
 
         row1 = ['Location', 'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender', 'QUESTION_1', 'QUESTION_2', '', 'QUESTION_3']
-        row2 = ['Kampala', household_id, 'Surname', '13', '9',  '2000',   'Male',      '1',       '1', 'OPTION 1',  'ANSWER']
+        row2 = ['Kampala', household_id, 'Surname', '14', '9',  '2000',   'Male',      '1',       '1', 'OPTION 1',  'ANSWER']
 
         contents = "%s\r\n%s\r\n" % (",".join(row1), ",".join(row2))
 
@@ -97,8 +97,8 @@ class ExcelDownloadTest(BaseTest):
         household_id = self.household.household_code
 
         row1 = ['Location', 'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender', 'QUESTION_1', 'QUESTION_2', '', 'QUESTION_3']
-        row2 = ['Kampala', household_id, 'Surname', '13', '9',  '2000',   'Male',      '1',       '1', 'OPTION 1',  'ANSWER']
-        row3 = ['Kampala', household_id, 'someone', '13', '99',  '99',   'Male', '', '', '']
+        row2 = ['Kampala', household_id, 'Surname', '14', '9',  '2000',   'Male',      '1',       '1', 'OPTION 1',  'ANSWER']
+        row3 = ['Kampala', household_id, 'someone', '14', '99',  '99',   'Male', '', '', '']
 
         contents = "%s\r\n%s\r\n%s\r\n" % (",".join(row1), ",".join(row2), ",".join(row3))
 
@@ -132,7 +132,7 @@ class ExcelDownloadTest(BaseTest):
                             self.question_1.identifier, self.question_2.identifier, '', self.question_3.identifier,
                             question_1B.identifier, question_2B.identifier, '', question_3B.identifier]
 
-        expected_csv_data = ['Kampala', self.household.household_code, 'Surname', '13', '9',  '2000',   'Male',
+        expected_csv_data = ['Kampala', self.household.household_code, 'Surname', '14', '9',  '2000',   'Male',
                              '1',       '1', 'OPTION 1',  'ANSWER', str(1), str(no_option.order), no_option.text, '1']
 
         contents = "%s\r\n%s\r\n" % (",".join(header_structure), ",".join(expected_csv_data))
