@@ -59,4 +59,6 @@ class ResultsDownloadService(object):
             exclude_location = Location.objects.filter(type__name__iexact=exclude_type.lower())
             for location in exclude_location:
                 location_ancestors.remove(location)
-        return [ancestor.name for ancestor in location_ancestors]
+        result= [ancestor.name for ancestor in location_ancestors]
+        result.reverse()
+        return result
