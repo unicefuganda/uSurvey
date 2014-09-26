@@ -491,6 +491,6 @@ class HouseholdHead(HouseholdMember):
         return HouseholdMember.objects.get(householdhead=self)
 
     def name_used_in_ussd(self):
-        return self.surname + " - (HEAD)"
+        return self.surname + " - (respondent)"
 
 

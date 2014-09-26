@@ -106,7 +106,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
         member_6 = self.create_household_member("6", household)
         member_7 = self.create_household_member("7", household)
 
-        member_list_1 = "%s\n1: %s - (HEAD)\n2: %s\n3: %s\n4: %s\n#: Next" % (
+        member_list_1 = "%s\n1: %s - (respondent)\n2: %s\n3: %s\n4: %s\n#: Next" % (
             USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, member_1.surname,
             member_2.surname, member_3.surname)
 
@@ -339,7 +339,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
                 response = self.client.post('/ussd', data=self.ussd_params)
 
-                households_member_list = "%s\n1: %s - (HEAD)*\n2: %s" % (
+                households_member_list = "%s\n1: %s - (respondent)*\n2: %s" % (
                     USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, household1_member.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -408,7 +408,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
                 response = self.respond(USSD.ANSWER['NO'])
-                households_member_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
+                households_member_list = "%s\n1: %s - (respondent)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -561,7 +561,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.choose_menu_to_take_survey()
                 response = self.select_household()
 
-                households_member_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
+                households_member_list = "%s\n1: %s - (respondent)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -574,7 +574,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
                 response = self.post_ussd_response("true", "1")
-                households_member_list = "%s\n1: %s - (HEAD)*" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
+                households_member_list = "%s\n1: %s - (respondent)*" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -683,7 +683,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
                 response = self.respond(USSD.ANSWER['NO'])
 
-                households_member_list = "%s\n1: %s - (HEAD)*" % (USSD.MESSAGES['MEMBERS_LIST'], household_head.surname)
+                households_member_list = "%s\n1: %s - (respondent)*" % (USSD.MESSAGES['MEMBERS_LIST'], household_head.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -812,7 +812,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
                 response = self.respond("1")
 
-                households_member_list = "%s\n1: %s - (HEAD)*\n2: %s" % (
+                households_member_list = "%s\n1: %s - (respondent)*\n2: %s" % (
                     USSD.MESSAGES['MEMBERS_LIST'], household_head.surname, household_member.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -840,7 +840,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.choose_menu_to_take_survey()
                 response = self.select_household()
 
-                households_member_list = "%s\n1: %s - (HEAD)\n2: %s" % (
+                households_member_list = "%s\n1: %s - (respondent)\n2: %s" % (
                     USSD.MESSAGES['MEMBERS_LIST'], household_head.surname, household_member.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -858,7 +858,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
                 response = self.post_ussd_response("true", "1")
-                households_member_list = "%s\n1: %s - (HEAD)*\n2: %s" % (
+                households_member_list = "%s\n1: %s - (respondent)*\n2: %s" % (
                     USSD.MESSAGES['MEMBERS_LIST'], household_head.surname, household_member.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -872,7 +872,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
                 response = self.post_ussd_response(response='true', request_string="1")
-                households_member_list = "%s\n1: %s - (HEAD)*\n2: %s*" % (
+                households_member_list = "%s\n1: %s - (respondent)*\n2: %s*" % (
                     USSD.MESSAGES['MEMBERS_LIST'], household_head.surname, household_member.surname)
                 response_string = "responseString=%s&action=request" % households_member_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)

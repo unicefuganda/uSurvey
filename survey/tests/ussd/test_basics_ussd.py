@@ -76,7 +76,7 @@ class USSDTest(USSDBaseTest):
 
                 response = self.respond('1')
 
-                members_list = "%s\n1: %s - (HEAD)*\n2: %s*\n3: %s*" % (
+                members_list = "%s\n1: %s - (respondent)*\n2: %s*\n3: %s*" % (
                     USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, household_member1.surname,
                     household_member2.surname)
                 response_string = "responseString=%s&action=request" % members_list
@@ -122,7 +122,7 @@ class USSDTest(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
                 response = self.respond('1')
-                members_list = "%s\n1: %s - (HEAD)*" % (
+                members_list = "%s\n1: %s - (respondent)*" % (
                     USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -139,7 +139,7 @@ class USSDTest(USSDBaseTest):
         session['HOUSEHOLD'] = self.household_1
         cache.set(session_string, session)
 
-        members_list = "%s\n1: %s - (HEAD)*\n2: %s*" % (
+        members_list = "%s\n1: %s - (respondent)*\n2: %s*" % (
                     USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, self.household_member.surname)
 
         ussd_survey = USSDSurvey(self.investigator, request)
@@ -612,7 +612,7 @@ class USSDTest(USSDBaseTest):
                 self.choose_menu_to_take_survey()
                 response = self.select_household("1")
 
-                members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
+                members_list = "%s\n1: %s - (respondent)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -655,7 +655,7 @@ class USSDTest(USSDBaseTest):
                 self.choose_menu_to_take_survey()
                 response = self.select_household("2")
 
-                members_list = "%s\n1: %s - (HEAD)\n2: %s" % (
+                members_list = "%s\n1: %s - (respondent)\n2: %s" % (
                     USSD.MESSAGES['MEMBERS_LIST'], self.household_head_1.surname, self.household_member.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -678,7 +678,7 @@ class USSDTest(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
                 response = self.select_household('1')
-                members_list = "%s\n1: %s - (HEAD)*" % (
+                members_list = "%s\n1: %s - (respondent)*" % (
                     USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -704,7 +704,7 @@ class USSDTest(USSDBaseTest):
 
                 self.choose_menu_to_take_survey()
                 response = self.select_household()
-                members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
+                members_list = "%s\n1: %s - (respondent)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -748,7 +748,7 @@ class USSDTest(USSDBaseTest):
                 self.choose_menu_to_take_survey()
                 response = self.select_household()
 
-                members_list = "%s\n1: %s - (HEAD)\n2: %s" % (
+                members_list = "%s\n1: %s - (respondent)\n2: %s" % (
                     USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -766,7 +766,7 @@ class USSDTest(USSDBaseTest):
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
                 response = self.respond("1")
-                members_list = "%s\n1: %s - (HEAD)*\n2: %s" % (
+                members_list = "%s\n1: %s - (respondent)*\n2: %s" % (
                     USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname, member_2.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
@@ -790,7 +790,7 @@ class USSDTest(USSDBaseTest):
                 self.choose_menu_to_take_survey()
                 response = self.select_household()
 
-                members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
+                members_list = "%s\n1: %s - (respondent)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
@@ -883,7 +883,7 @@ class USSDTest(USSDBaseTest):
                 response = self.choose_menu_to_take_survey()
                 response = self.select_household()
 
-                members_list = "%s\n1: %s - (HEAD)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
+                members_list = "%s\n1: %s - (respondent)" % (USSD.MESSAGES['MEMBERS_LIST'], self.household_head.surname)
                 response_string = "responseString=%s&action=request" % members_list
                 self.assertEquals(urllib2.unquote(response.content), response_string)
 
