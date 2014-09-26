@@ -46,7 +46,7 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.backend = Backend.objects.create(name='test')
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
-                                                            COUNTRY_PHONE_CODE, ''),
+                                                            COUNTRY_PHONE_CODE, '', 1),
                                                         ea=self.ea, backend=self.backend)
 
         self.head_group = HouseholdMemberGroup.objects.create(name="General", order=1)

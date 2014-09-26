@@ -3,13 +3,14 @@ import urllib2
 from django.contrib.auth.models import User
 
 from django.test.client import Client
-from mock import patch
+from mock import patch, MagicMock
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, RandomHouseHoldSelection, Household, Survey, EnumerationArea
 from survey.tests.base_test import BaseTest
 
 from survey.ussd.ussd import USSD
+from survey.views.ussd import ussd
 
 
 class USSDTest(BaseTest):
@@ -37,7 +38,7 @@ class USSDTest(BaseTest):
         self.ea.locations.add(self.kampala)
 
     def test_url_without_open_survey_should_give_error_message(self):
-        mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+        mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '', 1)
         Investigator.objects.create(name='Inv1', ea=self.ea, mobile_number=mobile_number, backend=self.backend)
 
         response_message = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
@@ -45,11 +46,36 @@ class USSDTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         self.assertEquals(urllib2.unquote(response.content), response_message)
 
+    @patch('survey.ussd.ussd_survey.USSDSurvey.investigator_not_registered_response')
+    def test_phone_number_that_has_the_COUNTRY_PHONE_CODE_finds_the_investigator_unit(self, mock_investigator_not_registered):
+        mobile_number = '123'+COUNTRY_PHONE_CODE+'456'
+        Investigator.objects.create(name='Inv1', ea=self.ea, mobile_number=mobile_number, backend=self.backend)
+        self.ussd_params['msisdn']= COUNTRY_PHONE_CODE + mobile_number
+
+        request = MagicMock()
+        request.GET = self.ussd_params
+
+        ussd(request)
+
+        self.assertFalse(mock_investigator_not_registered.called)
+
+    def test_phone_number_that_has_the_COUNTRY_PHONE_CODE_finds_the_investigator_integration(self):
+        mobile_number = '123'+COUNTRY_PHONE_CODE+'456'
+        Investigator.objects.create(name='Inv1', ea=self.ea, mobile_number=mobile_number, backend=self.backend)
+        self.ussd_params['msisdn']= COUNTRY_PHONE_CODE + mobile_number
+
+        response_message = "responseString=%s&action=end" % USSD.MESSAGES['NO_OPEN_BATCH']
+        response = self.client.get('/ussd', data=self.ussd_params)
+        self.failUnlessEqual(response.status_code, 200)
+        self.assertEquals(urllib2.unquote(response.content), response_message)
+
+
+
     def test_ussd_url(self):
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
         with patch.object(Survey, "currently_open_survey", return_value=open_survey):
             Investigator.objects.create(name='Inv1', ea=self.ea,
-                                        mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, ''),
+                                        mobile_number=self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '', 1),
                                         backend=self.backend)
 
             response_message = "responseString=%s&action=request" % USSD.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']

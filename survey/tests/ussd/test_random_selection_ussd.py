@@ -29,7 +29,7 @@ class RandomHouseHoldSelectionTest(USSDBaseTest):
         self.masaka = Location.objects.create(name="Masaka", type=self.location_type)
         self.ea = EnumerationArea.objects.create(name="EA2", survey=self.open_survey)
         self.ea.locations.add(self.masaka)
-        mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+        mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '', 1)
         self.investigator = Investigator.objects.create(name='Inv1', ea=self.ea, mobile_number=mobile_number,
                                     backend=Backend.objects.create(name='Backend'))
 
@@ -55,7 +55,7 @@ class RandomHouseHoldSelectionTest(USSDBaseTest):
             self.assertEquals(RandomHouseHoldSelection.objects.count(), 1)
 
             household_selection = RandomHouseHoldSelection.objects.all()[0]
-            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '', 1)
             self.assertEquals(household_selection.mobile_number, mobile_number)
             self.assertEquals(household_selection.no_of_households, 100)
             selected_households = household_selection.selected_households.split(',')
@@ -78,7 +78,7 @@ class RandomHouseHoldSelectionTest(USSDBaseTest):
     def test_selection_for_survey_that_has_no_sampling(self):
         open_survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=False)
         with patch.object(Survey, "currently_open_survey", return_value=open_survey):
-            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '', 1)
             self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
 
             response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
@@ -136,7 +136,7 @@ class RandomHouseHoldSelectionTest(USSDBaseTest):
             self.failUnlessEqual(response.status_code, 200)
 
             household_selection = RandomHouseHoldSelection.objects.all()[0]
-            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '', 1)
             self.assertEquals(household_selection.mobile_number, mobile_number)
             self.assertEquals(household_selection.no_of_households, 11)
             selected_households = household_selection.selected_households.split(',')
@@ -147,7 +147,7 @@ class RandomHouseHoldSelectionTest(USSDBaseTest):
 
     def test_sort_household_selection_list(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '')
+            mobile_number = self.ussd_params['msisdn'].replace(COUNTRY_PHONE_CODE, '', 1)
             self.assertEquals(RandomHouseHoldSelection.objects.count(), 0)
 
             response_message = "responseString=%s&action=request" % HouseHoldSelection.MESSAGES['HOUSEHOLDS_COUNT_QUESTION']

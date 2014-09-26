@@ -37,7 +37,7 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
-                                                            COUNTRY_PHONE_CODE, ''), ea=self.ea,
+                                                            COUNTRY_PHONE_CODE, '', 1), ea=self.ea,
                                                         backend=self.backend)
 
         self.household1 = self.create_household(1)

@@ -39,7 +39,7 @@ class USSDOpenBatchTest(USSDBaseTest):
 
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
-                                                            COUNTRY_PHONE_CODE, ''),
+                                                            COUNTRY_PHONE_CODE, '', 1),
                                                         ea=self.ea,
                                                         backend=Backend.objects.create(name='something'))
         self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
@@ -83,7 +83,7 @@ class USSDWithMultipleBatches(USSDBaseTest):
 
         self.investigator = Investigator.objects.create(name="investigator name",
                                                         mobile_number=self.ussd_params['msisdn'].replace(
-                                                            COUNTRY_PHONE_CODE, ''), ea=self.ea,
+                                                            COUNTRY_PHONE_CODE, '', 1), ea=self.ea,
                                                         backend=Backend.objects.create(name='something'))
 
         self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,

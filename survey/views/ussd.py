@@ -29,7 +29,7 @@ def ussd(request):
     msisdn = params.get('msisdn', None)
 
     if msisdn:
-        mobile_number = msisdn.replace(COUNTRY_PHONE_CODE, '')
+        mobile_number = msisdn.replace(COUNTRY_PHONE_CODE, '', 1)
     try:
         investigator = Investigator.objects.get(mobile_number=mobile_number)
         open_survey = Survey.currently_open_survey(investigator.location)
