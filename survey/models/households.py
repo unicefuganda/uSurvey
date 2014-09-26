@@ -145,7 +145,7 @@ class Household(BaseModel):
         members_list = []
 
         for member in members:
-            name = member.surname + " - (HEAD)" if isinstance(member, HouseholdHead) else member.surname
+            name = member.name_used_in_ussd()
             text = "%s: %s" % (all_members.index(member) + 1, name)
             if member.has_completed_survey_options(reporting_non_response):
                 text += "*"
@@ -240,6 +240,9 @@ class HouseholdMember(BaseModel):
 
     def is_head(self):
         return len(HouseholdHead.objects.filter(householdmember_ptr_id=self.id)) > 0
+
+    def name_used_in_ussd(self):
+        return  self.surname
 
     def cast_original_type(self):
         head_object = HouseholdHead.objects.filter(householdmember_ptr_id=self.id)
@@ -486,4 +489,8 @@ class HouseholdHead(HouseholdMember):
 
     def get_member(self):
         return HouseholdMember.objects.get(householdhead=self)
+
+    def name_used_in_ussd(self):
+        return self.surname + " - (HEAD)"
+
 
