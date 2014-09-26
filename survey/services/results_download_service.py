@@ -1,4 +1,6 @@
+from rapidsms.contrib.locations.models import Location
 from survey.models import LocationTypeDetails, Household, HouseholdMemberGroup
+from survey.utils.views_helper import get_ancestors
 
 
 class ResultsDownloadService(object):
@@ -34,7 +36,7 @@ class ResultsDownloadService(object):
         for location_id in locations:
             households_in_location = all_households.filter(ea__locations=location_id)
             household_location = households_in_location[0].location
-            location_ancestors = list(household_location.get_ancestors(include_self=True).exclude(type__name__iexact="country").values_list('name', flat=True))
+            location_ancestors = self._get_ancestors_names(household_location, exclude_type='country')
             for household in households_in_location:
                 for member in household.all_members():
                     member_gender = 'Male' if member.male else 'Female'
@@ -51,3 +53,10 @@ class ResultsDownloadService(object):
         data.extend(self.get_summarised_answers())
         return data
 
+    def _get_ancestors_names(self, household_location, exclude_type='country'):
+        location_ancestors = get_ancestors(household_location, include_self=True)
+        if exclude_type:
+            exclude_location = Location.objects.filter(type__name__iexact=exclude_type.lower())
+            for location in exclude_location:
+                location_ancestors.remove(location)
+        return [ancestor.name for ancestor in location_ancestors]

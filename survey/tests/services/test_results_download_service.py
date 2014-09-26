@@ -5,7 +5,6 @@ from survey.services.results_download_service import ResultsDownloadService
 from survey.tests.base_test import BaseTest
 
 
-
 class ResultsDownloadServiceTest(BaseTest):
     def setUp(self):
         self.country = LocationType.objects.create(name='Country', slug='country')

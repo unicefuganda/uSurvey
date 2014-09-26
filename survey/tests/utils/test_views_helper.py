@@ -122,6 +122,41 @@ class ViewsHelperTest(TestCase):
         self.assertEqual([abim_son, abim, uganda, africa], get_ancestors(abim_son_son))
         self.assertEqual([abim_son_son, abim_son, abim, uganda, africa], get_ancestors(abim_son_son_son))
 
+    def test_get_ancestor_including_self(self):
+        country = LocationType.objects.create(name='Country', slug='country')
+        region = LocationType.objects.create(name='Region', slug='region')
+        city = LocationType.objects.create(name='City', slug='city')
+        parish = LocationType.objects.create(name='Parish', slug='parish')
+        village = LocationType.objects.create(name='Village', slug='village')
+        subcounty = LocationType.objects.create(name='Subcounty', slug='subcounty')
+
+        africa = Location.objects.create(name='Africa', type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=country)
+        LocationTypeDetails.objects.create(country=africa, location_type=region)
+        LocationTypeDetails.objects.create(country=africa, location_type=city)
+        LocationTypeDetails.objects.create(country=africa, location_type=parish)
+        LocationTypeDetails.objects.create(country=africa, location_type=village)
+        LocationTypeDetails.objects.create(country=africa, location_type=subcounty)
+
+        uganda = Location.objects.create(name='Uganda', type=region, tree_parent=africa)
+
+        abim = Location.objects.create(name='ABIM', tree_parent=uganda, type=city)
+
+        abim_son = Location.objects.create(name='LABWOR', tree_parent=abim, type=parish)
+
+        abim_son_son = Location.objects.create(name='KALAKALA', tree_parent=abim_son, type=village)
+        abim_son_daughter = Location.objects.create(name='OYARO', tree_parent=abim_son, type=village)
+
+        abim_son_daughter_daughter = Location.objects.create(name='WIAWER', tree_parent=abim_son_daughter, type=subcounty)
+
+        abim_son_son_daughter = Location.objects.create(name='ATUNGA', tree_parent=abim_son_son, type=subcounty)
+        abim_son_son_son = Location.objects.create(name='WICERE', tree_parent=abim_son_son, type=subcounty)
+
+        expected_location_ancestors = [abim_son_son_son, abim_son_son, abim_son, abim, uganda, africa]
+
+        ancestors = get_ancestors(abim_son_son_son, include_self=True)
+        self.assertEqual(expected_location_ancestors, ancestors)
+
     def test_remove_key_value_when_value_is_ALL(self):
         params= {'group__id': 'All', 'batch__id': 1, 'module__id': '', 'question__text':'haha', 'survey': None}
 

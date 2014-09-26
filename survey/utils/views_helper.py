@@ -24,13 +24,20 @@ def get_descendants(location, include_self=True):
     return all_descendants_including_self
 
 
-def get_ancestors(location):
+def _get_ancestors(location):
     parent = location.tree_parent
     if not parent:
         return []
     result = [parent]
-    result.extend(get_ancestors(parent))
+    result.extend(_get_ancestors(parent))
     return result
+
+
+def get_ancestors(location, include_self=False):
+    all_ancestors_including_self = _get_ancestors(location)
+    if include_self:
+        all_ancestors_including_self.insert(0, location)
+    return all_ancestors_including_self
 
 
 def clean_query_params(params):
