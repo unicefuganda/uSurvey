@@ -156,7 +156,7 @@ class EAUploadCSVLayoutHelperTest(BaseTest):
                 ['regiontype_0',    'districttype_0',    'countytype_0',   'ea_0', 'parishtype_0',   ''],
                 ['regiontype_0',    'districttype_0',    'countytype_0',   'ea_0', 'parishtype_0_b',   ''],
                 ['regiontype_1',    'districttype_1',    'countytype_1',   '', 'parishtype_1',   'ea_1'],
-                ['regiontype_1',    'districttype_1',    'countytype_1',   '', 'parishtype_1_b',   'ea_1']]
+                ['regiontype_1',    'districttype_1',    'countytype_1',   '', 'parishtype_1',   'ea_1_b']]
        self.assertEqual(expected, self.ea_csv_layout.table_layout_example())
 
     def test_table_layout_when_no_location_type_or_location_yet(self):

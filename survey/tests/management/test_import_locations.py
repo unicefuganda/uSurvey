@@ -14,6 +14,7 @@ class FakeCommand(Command):
         super(FakeCommand, self).__init__()
         self.stdout = FakeStdout()
 
+
 class ImportLocationTest(BaseTest):
     def setUp(self):
         self.data = [['RegionName', 'DistrictName', 'CountyName'],

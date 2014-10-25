@@ -25,11 +25,8 @@ def _render_survey_or_selection(investigator, mobile_number, open_survey, params
 @csrf_exempt
 def ussd(request):
     params = request.POST if request.method == 'POST' else request.GET
-    mobile_number = ""
-    msisdn = params.get('msisdn', None)
-
-    if msisdn:
-        mobile_number = msisdn.replace(COUNTRY_PHONE_CODE, '', 1)
+    msisdn = params.get('msisdn', '')
+    mobile_number = msisdn.replace(COUNTRY_PHONE_CODE, '', 1)
     try:
         investigator = Investigator.objects.get(mobile_number=mobile_number)
         open_survey = Survey.currently_open_survey(investigator.location)

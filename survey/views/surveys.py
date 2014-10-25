@@ -64,9 +64,5 @@ def edit(request, survey_id):
 @permission_required('auth.can_view_batches')
 def delete(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
-    if not survey.is_open():
-        survey.delete()
-        messages.success(request, 'Survey successfully deleted.')
-    else:
-        messages.error(request, "Survey cannot be deleted as it is open.")
+    messages.error(request, "Survey cannot be deleted.")
     return HttpResponseRedirect('/surveys/')

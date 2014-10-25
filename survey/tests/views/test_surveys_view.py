@@ -124,10 +124,9 @@ class SurveyViewTest(BaseTest):
         self.failUnless(survey)
 
         response = self.client.get('/surveys/%d/delete/' % survey.id, )
-        self.failIf(Survey.objects.filter(id=survey.id))
 
         self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
-        success_message = "Survey successfully deleted"
+        success_message = "Survey cannot be deleted."
         self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_should_throw_error_if_deleting_non_existing_survey(self):
@@ -149,7 +148,8 @@ class SurveyViewTest(BaseTest):
 
         response = self.client.get('/surveys/%s/delete/' % survey.id)
         self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
-        error_message = "Survey cannot be deleted as it is open."
+        error_message = "Survey cannot be deleted."
+        # error_message = "Survey cannot be deleted as it is open."
         self.assertIn(error_message, response.cookies['messages'].value)
 
     def test_survey_does_not_exist(self):

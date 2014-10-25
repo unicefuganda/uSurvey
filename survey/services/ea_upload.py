@@ -77,7 +77,7 @@ class UploadEACSVLayoutHelper(object):
             row3 = [header+'_1' for header in headers]
             row3[-3] = ''
             row4 = list(row3)
-            row4[-2] += '_b'
+            row4[-1] += '_b'
             return [row1, row2, row3, row4]
         return [["No Location/LocationType added yet. Please add those first."]]
 
