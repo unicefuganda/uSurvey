@@ -4,7 +4,7 @@ import urllib2
 from random import randint
 
 from django.test.client import Client
-from mock import patch
+from mock import patch, MagicMock
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import HouseholdMemberGroup, GroupCondition, BatchQuestionOrder, Survey, RandomHouseHoldSelection, EnumerationArea
@@ -53,7 +53,9 @@ class USSDOpenBatchTest(USSDBaseTest):
         Batch.objects.create(order=1, survey=self.open_survey)
 
     def test_closed_batch(self):
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 response = self.choose_menu_to_take_survey()
@@ -122,7 +124,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
         self.batch.open_for_location(self.location)
 
         self.assertEquals(HouseholdMemberBatchCompletion.objects.count(), 0)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
@@ -152,7 +156,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
 
         self.assertEquals(HouseholdMemberBatchCompletion.objects.count(), 0)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
@@ -195,7 +201,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
     def test_with_second_batch_open(self):
         self.batch_1.open_for_location(self.location)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
@@ -217,7 +225,9 @@ class USSDWithMultipleBatches(USSDBaseTest):
     def test_with_batch_open_for_parent_location(self):
         self.batch.open_for_location(self.uganda)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 

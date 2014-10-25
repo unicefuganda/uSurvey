@@ -2,7 +2,7 @@ from random import randint
 import datetime
 import urllib2
 
-from mock import patch
+from mock import patch, MagicMock
 from django.test import Client
 from rapidsms.contrib.locations.models import Location
 
@@ -123,7 +123,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
     def test_shows_non_response_menu_if_its_activated_and_there_are_HH_who_qualify_for_NR_questions(self):
         self.batch.activate_non_response_for(self.kampala)
         self.investigator.batch_completion_completed_households.all().delete()
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     response = self.reset_session()
@@ -136,7 +138,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
     def test_does_not_show_non_response_menu_if_its_not_deactivated(self):
         self.batch.deactivate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     response = self.reset_session()
@@ -151,7 +155,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         self.household3.batch_completed(self.batch)
         self.household4.batch_completed(self.batch)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     response = self.reset_session()
@@ -166,7 +172,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         self.household_head3.delete()
 
         self.batch.activate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -194,7 +202,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         self.household1.batch_completed(self.batch)
 
         self.batch.activate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -242,7 +252,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household_member = self.create_household_member(name="bob son", household=self.household1, head=False,
                                                         date_of_birth="1996-9-9")
         self.batch.activate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -262,7 +274,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         QuestionOption.objects.create(question=self.non_response_question, text="Reason 6", order=6)
         QuestionOption.objects.create(question=self.non_response_question, text="Reason 7", order=7)
         QuestionOption.objects.create(question=self.non_response_question, text="Reason 8", order=8)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -311,7 +325,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                                         date_of_birth="1996-9-9")
 
         self.batch.activate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -339,7 +355,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                                                       head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -374,7 +392,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household_member8 = self.create_household_member(name="bob8", household=self.household1, head=False,
                                                          date_of_birth="1996-9-16")
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -425,7 +445,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                                         date_of_birth="1996-9-9")
         household_member.batch_completed(self.batch)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -442,7 +464,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                                                       head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -467,7 +491,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 7", order=8)
         QuestionOption.objects.create(question=self.member_non_response_question, text="Reason 8", order=9)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -516,7 +542,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household_member_who_completed.batch_completed(self.batch)
 
         self.batch.activate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -543,7 +571,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household_member_who_completed.batch_completed(self.batch)
 
         self.batch.activate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -564,7 +594,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household_member_who_completed.batch_completed(self.batch)
 
         self.batch.activate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -591,7 +623,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -613,7 +647,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                                                       head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -632,7 +668,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -661,7 +699,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                                                       head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -687,7 +727,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -714,7 +756,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                                                                       head=False, date_of_birth="1996-9-1")
         household_member_who_completed.batch_completed(self.batch)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -738,7 +782,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         MultiChoiceAnswer.objects.create(household=self.household2, **answer_dict)
         MultiChoiceAnswer.objects.create(household=self.household3, **answer_dict)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -759,7 +805,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         self.household3.delete()
         self.household4.delete()
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -811,7 +859,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                    'month': '2',
                    'year': datetime.datetime.now().year - some_age}
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -903,7 +953,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         QuestionOption.objects.create(question=self.non_response_question, text="Reason 7", order=7)
         QuestionOption.objects.create(question=self.non_response_question, text="Reason 8", order=8)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 response = self.choose_menu_to_report_non_response()
@@ -974,7 +1026,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         self.household2.delete()
         self.household3.delete()
         self.household4.delete()
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -1060,7 +1114,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                    'year': datetime.datetime.now().year - some_age
         }
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()
@@ -1158,7 +1214,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                    'month': '2',
                    'year': datetime.datetime.now().year - some_age}
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 response = self.reset_session()
                 homepage = "Welcome %s to the survey.\n" \
@@ -1219,7 +1277,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
 
         self.household3.delete()
         self.household4.delete()
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(USSDSurvey, "is_active", return_value=False):
                     response = self.reset_session()
@@ -1285,7 +1345,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
         household_member_who_completed.batch_completed(self.batch)
 
         self.batch.activate_non_response_for(self.kampala)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_report_non_response()
@@ -1329,7 +1391,9 @@ class USSDReportingNonResponseTest(USSDBaseTest):
                    'year': datetime.datetime.now().year - some_age
         }
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 with patch.object(Investigator, "was_active_within", return_value=False):
                     self.reset_session()

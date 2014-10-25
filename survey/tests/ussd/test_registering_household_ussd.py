@@ -4,7 +4,7 @@ import datetime
 import urllib2
 
 from django.test import Client
-from mock import patch
+from mock import patch, MagicMock
 from rapidsms.contrib.locations.models import Location
 
 from survey.investigator_configs import COUNTRY_PHONE_CODE
@@ -117,7 +117,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_show_list_of_households_with_uids_when_selected_option_to_register_household_and_pagination(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 response = self.choose_menu_to_register_household()
                 household_list = USSD.MESSAGES['HOUSEHOLD_LIST'] + "\n1: HH-%s" \
@@ -142,7 +144,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_show_invalid_selection_if_wrong_household_option_selected(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 response = self.choose_menu_to_register_household()
                 household_list = USSD.MESSAGES[
@@ -164,7 +168,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         batch_2 = Batch.objects.create(order=8, name="Another Batch", survey=self.open_survey)
         batch_2.open_for_location(self.kampala)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             self.reset_session()
             response = self.choose_menu_to_register_household()
             household_list = USSD.MESSAGES[
@@ -186,7 +192,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_ask_for_head_or_member_after_selecting_household(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
 
@@ -207,7 +215,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         }
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
 
@@ -228,7 +238,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_render_first_registration_question_when_selected_member_for_registration(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household("2")
@@ -238,7 +250,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_render_next_registration_question_when_answered_one(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household("2")
@@ -249,7 +263,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_render_third_registration_question_when_answered_two(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household("2")
@@ -263,7 +279,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_ensure_that_age_is_not_empty(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household("2")
@@ -278,7 +296,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_should_show_month_and_year_question_given_a_valid_age_was_entered(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household("2")
@@ -297,7 +317,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
     def test_re_answer_age_questions_if_age_inferred_from_year_and_months_entered_does_not_match_age_earlier_given(
             self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household("2")
@@ -311,7 +333,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
 
     def test_re_answer_all_age_questions_given_age_given_does_not_match_inferred_age_from_date_of_birth(self):
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household("2")
@@ -345,7 +369,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    'year': datetime.datetime.now().year - some_age
         }
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_register_household()
@@ -374,7 +400,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
             'year': '2001',
             'gender': '2',
         }
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_register_household()
@@ -426,7 +454,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
             'gender': '2',
         }
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_register_household()
@@ -483,7 +513,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
             'gender': '2',
         }
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_register_household()
@@ -585,7 +617,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         }
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 selected_household_id = '2'
@@ -614,7 +648,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    'year': datetime.datetime.now().year - some_age
         }
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 selected_household_id = '2'
@@ -641,7 +677,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    'year': datetime.datetime.now().year - some_age
         }
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 selected_household_id = '2'
@@ -669,7 +707,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         }
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 selected_household_id = '2'
@@ -705,7 +745,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         not_feb = 11
         date_this_year_with_day_not_existing_in_feb = datetime.date.today().replace(month=not_feb, day=day_not_existing_in_feb)
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 with self.mock_date_today(date_this_year_with_day_not_existing_in_feb):
                     self.reset_session()
                     self.choose_menu_to_register_household()
@@ -730,7 +772,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                    'year': datetime.datetime.now().year - some_age}
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 selected_household_id = '2'
@@ -779,7 +823,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
             'year': '2001',
             'gender': '1',
         }
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
                 self.reset_session()
                 self.choose_menu_to_register_household()
@@ -848,7 +894,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
                                             date_of_birth=datetime.datetime(1980, 02, 02), male=False)
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 response = self.select_household(selected_household_id)
@@ -871,7 +919,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         selected_household_id = '2'
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household(selected_household_id)
@@ -913,7 +963,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         selected_household_id = '2'
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household(selected_household_id)
@@ -956,7 +1008,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         selected_household_id = '2'
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 self.select_household(selected_household_id)
@@ -996,7 +1050,9 @@ class USSDRegisteringHouseholdTest(USSDBaseTest):
         }
 
         with patch.object(Survey, "currently_open_survey", return_value=self.open_survey):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 self.reset_session()
                 self.choose_menu_to_register_household()
                 selected_household_id = '2'

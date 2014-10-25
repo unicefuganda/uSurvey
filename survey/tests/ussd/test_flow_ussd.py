@@ -3,7 +3,7 @@ import datetime
 from random import randint
 import urllib2
 from django.test import TestCase, Client
-from mock import patch
+from mock import patch, MagicMock
 from rapidsms.contrib.locations.models import Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Household, HouseholdHead, Investigator, Backend, HouseholdMemberGroup, GroupCondition, Batch, Question, NumericalAnswer, HouseholdMemberBatchCompletion, QuestionModule, BatchQuestionOrder, Survey, RandomHouseHoldSelection, QuestionOption, MultiChoiceAnswer, EnumerationArea
@@ -114,7 +114,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
             USSD.MESSAGES['MEMBERS_LIST'], member_4.surname, member_5.surname,
             member_6.surname, member_7.surname)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -164,7 +166,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
         household2_member = self.create_household_member("Member 2", self.household_head_2.household)
 
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     response = self.reset_session()
@@ -378,7 +382,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
         BatchQuestionOrder.objects.create(batch=self.batch, question=question_4, order=3)
 
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     response = self.reset_session()
@@ -429,7 +435,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % investigator.name
 
         with patch.object(Investigator.objects, "get", return_value=investigator):
-            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+            mock_filter = MagicMock()
+            mock_filter.exists.return_value = True
+            with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     response = self.reset_session()
                     response_string = "responseString=%s&action=request" % homepage
@@ -446,7 +454,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
         BatchQuestionOrder.objects.create(batch=self.batch, question=question_4, order=3)
 
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     response = self.reset_session()
@@ -500,7 +510,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
         self.household_head_1.batch_completed(self.batch)
         self.household_head_3.batch_completed(self.batch)
         homepage = USSD.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     response = self.reset_session()
@@ -531,7 +543,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         self.batch.close_for_location(self.investigator.location)
         self.batch_b.open_for_location(self.investigator.location)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -553,7 +567,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
     def test_allows_retaking_of_house_hold_member_with_in_5min_session(self):
         self.batch.open_for_location(self.investigator.location)
         self.investigator.member_answered(self.question_1, self.household_head_1, 1, self.batch)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -597,7 +613,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                                       date_of_birth=datetime.date(1980, 9, 1))
 
         self.batch.open_for_location(investigator.location)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -656,7 +674,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
                                                       date_of_birth=datetime.date(1980, 9, 1))
 
         self.batch.open_for_location(investigator.location)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -733,7 +753,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
         HouseholdHead.objects.create(household=household, surname="head_registered",
                                      date_of_birth=datetime.datetime(1980, 02, 02), male=False)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 self.ussd_params['msisdn'] = investigator.mobile_number
 
@@ -794,7 +816,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         self.batch.open_for_location(investigator.location)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 with patch.object(USSDSurvey, 'is_active', return_value=False):
                     self.reset_session()
@@ -835,7 +859,9 @@ class USSDTestCompleteFlow(USSDBaseTest):
 
         self.batch.open_for_location(self.investigator.location)
 
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(Survey, "currently_open_survey", return_value=self.open_survey_1):
                 self.choose_menu_to_take_survey()
                 response = self.select_household()

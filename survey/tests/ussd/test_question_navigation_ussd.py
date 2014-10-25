@@ -3,7 +3,7 @@ import datetime
 from random import randint
 import urllib2
 from django.test import TestCase, Client
-from mock import patch
+from mock import patch, MagicMock
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.investigator_configs import COUNTRY_PHONE_CODE
 from survey.models import Investigator, Backend, Household, HouseholdHead, Batch, HouseholdMemberGroup, GroupCondition, Question, BatchQuestionOrder, Survey, RandomHouseHoldSelection, EnumerationArea
@@ -88,7 +88,9 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
 
     def test_knows_to_select_the_first_general_question_for_household_head(self):
         self.batch.open_for_location(self.location)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
@@ -107,7 +109,9 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
 
     def test_knows_to_not_select_the_general_questions_for_household_member(self):
         self.batch.open_for_location(self.location)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 response = self.reset_session()
             self.choose_menu_to_take_survey()
@@ -124,7 +128,9 @@ class USSDHouseholdMemberQuestionNavigationTest(USSDBaseTest):
 
     def test_head_knows_how_to_get_questions_in_other_groups_when_general_questions_are_done(self):
         self.batch.open_for_location(self.location)
-        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=[1]):
+        mock_filter = MagicMock()
+        mock_filter.exists.return_value = True
+        with patch.object(RandomHouseHoldSelection.objects, 'filter', return_value=mock_filter):
             with patch.object(USSDSurvey, 'is_active', return_value=False):
                 self.reset_session()
 
