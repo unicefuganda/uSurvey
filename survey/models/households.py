@@ -322,7 +322,7 @@ class HouseholdMember(BaseModel):
 
     def has_answered(self, question, batch):
         answer_class = question.answer_class()
-        return len(answer_class.objects.filter(question=question, householdmember=self, batch=batch, is_old=False)) > 0
+        return answer_class.objects.filter(question=question, householdmember=self, batch=batch, is_old=False).count()
 
     def next_unanswered_question_in(self, member_group, batch, order):
         all_questions = []

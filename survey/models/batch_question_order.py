@@ -25,7 +25,7 @@ class BatchQuestionOrder(BaseModel):
 
     @classmethod
     def get_batch_order_specific_questions(cls, batch, filter_condition):
-        batch_question_orders = BatchQuestionOrder.objects.filter(batch=batch, **filter_condition).order_by('order')
+        batch_question_orders = BatchQuestionOrder.objects.filter(batch=batch, **filter_condition).select_related('question__group').order_by('order')
         questions = []
         for batch_question_order in batch_question_orders:
             if not batch_question_order.question.subquestion:

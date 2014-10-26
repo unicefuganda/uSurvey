@@ -78,7 +78,7 @@ class Question(BaseModel):
 
     def has_been_answered(self, member, batch):
         answer_class = self.answer_class()
-        return len(answer_class.objects.filter(question=self, householdmember=member, batch=batch)) > 0
+        return answer_class.objects.filter(question=self, householdmember=member, batch=batch).count()
 
     def options_in_text(self, page=1):
         paginator = Paginator(self.options.order_by('order').all(), self.OPTIONS_PER_PAGE)
