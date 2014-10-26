@@ -82,8 +82,8 @@ class Investigator(BaseModel):
     def last_answered(self):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
-            answer = getattr(self, related_name).all()
-            if answer: answered.append(answer.latest())
+            answer = getattr(self, related_name).select_related('householdmember').all()
+            if answer.exists(): answered.append(answer.latest())
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0]
 

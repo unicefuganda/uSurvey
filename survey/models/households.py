@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.datastructures import SortedDict
+from model_utils.managers import InheritanceManager
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -129,7 +130,7 @@ class Household(BaseModel):
         return household_members
 
     def completed_currently_open_batches(self):
-        all_members = self.household_member.all()
+        all_members = self.household_member.all().select_subclasses()
         for member in all_members:
             if not member.survey_completed():
                 return False
@@ -232,6 +233,8 @@ class Household(BaseModel):
 
 
 class HouseholdMember(BaseModel):
+    objects = InheritanceManager()
+
     surname = models.CharField(max_length=25, verbose_name="Family Name")
     first_name = models.CharField(max_length=25, blank=True, null=True, verbose_name="Other Names")
     male = models.BooleanField(default=True, verbose_name="Sex")
@@ -239,14 +242,20 @@ class HouseholdMember(BaseModel):
     household = models.ForeignKey(Household, related_name='household_member')
 
     def is_head(self):
-        return len(HouseholdHead.objects.filter(householdmember_ptr_id=self.id)) > 0
+        return False
+
+    def get_head(self):
+        self.household.get_head()
+
+    def get_member(self):
+        return self
 
     def name_used_in_ussd(self):
-        return  self.surname
+        return self.surname
 
     def cast_original_type(self):
         head_object = HouseholdHead.objects.filter(householdmember_ptr_id=self.id)
-        return head_object[0] if head_object else self
+        return head_object[0] if head_object.exists() else self
 
     def get_location(self):
         return self.household.location
@@ -262,23 +271,15 @@ class HouseholdMember(BaseModel):
         return condition.matches_condition(is_head)
 
     def belongs_to(self, member_group):
-        condition_match = []
         for condition in member_group.get_all_conditions():
-            condition_match.append(self.attribute_matches(condition))
-
-        return all(condition is True for condition in condition_match)
+            if not self.attribute_matches(condition):
+                return False
+        return True
 
     def get_member_groups(self, order_above=0):
-        member_groups = []
-        all_groups = HouseholdMemberGroup.objects.all().order_by('order')
-        if order_above or (order_above == 0):
-            all_groups = all_groups.filter(order__gte=order_above)
-
-        for group in all_groups:
-            if self.belongs_to(group):
-                member_groups.append(group)
-
-        return member_groups
+        order_above = order_above or 0
+        all_groups = HouseholdMemberGroup.objects.select_related('conditions').filter(order__gte=order_above).order_by('order')
+        return [group for group in all_groups if self.belongs_to(group)]
 
     def get_age(self):
         days_in_year = 365.2425
@@ -335,7 +336,7 @@ class HouseholdMember(BaseModel):
         return None
 
     def next_question(self, question, batch):
-        member = self if not self.is_head() else self.get_member()
+        member = self.get_member()
         answer = question.answer_class().objects.get(householdmember=member, question=question, batch=batch, is_old=False)
         try:
             return question.get_next_question_by_rule(answer, self.household.investigator)
@@ -448,7 +449,7 @@ class HouseholdMember(BaseModel):
 
     def _filter_answer(self, answer, question, general_group):
         if question.belongs_to(general_group):
-            return answer.filter(householdmember=self if self.is_head() else self.household.get_head())
+            return answer.filter(householdmember=self.get_head())
         return answer.filter(householdmember=self)
 
     def has_completed_survey_options(self, reporting_non_response):
@@ -483,6 +484,9 @@ class HouseholdHead(HouseholdMember):
 
     def is_head(self):
         return True
+
+    def get_head(self):
+        return self
 
     def get_member(self):
         return HouseholdMember.objects.get(householdhead=self)
