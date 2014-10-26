@@ -254,7 +254,7 @@ class Investigator(BaseModel):
         return False
 
     def can_report_non_response(self):
-        batch_location_status = BatchLocationStatus.objects.filter(location=self.location, non_response=True)
+        batch_location_status = BatchLocationStatus.objects.select_related('batch', 'batch__survey').filter(location=self.location, non_response=True)
         if not batch_location_status.exists():
             return False
         batch = batch_location_status[0].batch

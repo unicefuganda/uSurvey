@@ -73,7 +73,6 @@ class Question(BaseModel):
         return self.answer_type == self.MULTICHOICE
 
     def answer_class(self):
-
         return eval(Question.TYPE_OF_ANSWERS_CLASS[self.answer_type])
 
     def has_been_answered(self, member, batch):

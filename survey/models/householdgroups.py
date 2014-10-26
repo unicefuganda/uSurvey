@@ -61,6 +61,12 @@ class GroupCondition(BaseModel):
         'LESS_THAN': 'LESS_THAN',
     }
 
+    MATCHING_METHODS = {
+            'EQUALS': 'is_equal',
+            'GREATER_THAN': 'is_greater_than',
+            'LESS_THAN': 'is_less_than',
+    }
+
     GROUP_TYPES = {
         'AGE': 'AGE',
         'GENDER': 'GENDER',
@@ -77,15 +83,22 @@ class GroupCondition(BaseModel):
             return value
         return str(value).lower() == "male" or (str(value).lower() == "head" and self.attribute == GroupCondition.GROUP_TYPES['GENERAL'])
 
+    def matches(self, attributes):
+        value = attributes.get(self.attribute)
+        return self.matches_condition(value)
+
     def matches_condition(self, value):
-        if self.condition == GroupCondition.CONDITIONS['EQUALS']:
-            return str(self.value) == str(value) or str(value) == str(self.confirm_male(self.value))
+        method = getattr(self, self.MATCHING_METHODS[self.condition])
+        return method(value)
 
-        elif self.condition == GroupCondition.CONDITIONS['GREATER_THAN']:
-            return int(value) >= int(self.value)
+    def is_equal(self, value):
+        return str(self.value) == str(value) or str(value) == str(self.confirm_male(self.value))
 
-        elif self.condition == GroupCondition.CONDITIONS['LESS_THAN']:
-            return int(value) <= int(self.value)
+    def is_greater_than(self, value):
+        return int(value) >= int(self.value)
+
+    def is_less_than(self, value):
+        return int(value) <= int(self.value)
 
     class Meta:
         app_label = 'survey'

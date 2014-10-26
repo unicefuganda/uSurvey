@@ -122,7 +122,7 @@ class Batch(BaseModel):
 
         for question in self.all_questions():
             answer = question.answer_class().objects.filter(batch=self)
-            if answer:
+            if answer.exists():
                 return False, self.message_for_inability_to_delete()
         return True, ''
 

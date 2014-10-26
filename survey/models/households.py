@@ -261,14 +261,11 @@ class HouseholdMember(BaseModel):
         return self.household.location
 
     def attribute_matches(self, condition):
-        age = self.get_age()
-        gender = self.male
-        is_head = self.is_head()
-        if condition.attribute.lower() == GroupCondition.GROUP_TYPES["AGE"].lower():
-            return condition.matches_condition(age)
-        if condition.attribute.lower() == GroupCondition.GROUP_TYPES["GENDER"].lower():
-            return condition.matches_condition(gender)
-        return condition.matches_condition(is_head)
+        attributes = {'AGE': self.get_age(),
+                      'GENDER': self.male,
+                      'GENERAL': self.is_head()
+                      }
+        return condition.matches(attributes)
 
     def belongs_to(self, member_group):
         for condition in member_group.get_all_conditions():
@@ -337,7 +334,7 @@ class HouseholdMember(BaseModel):
 
     def next_question(self, question, batch):
         member = self.get_member()
-        answer = question.answer_class().objects.get(householdmember=member, question=question, batch=batch, is_old=False)
+        answer = question.answer_class().objects.select_related('rule').get(householdmember=member, question=question, batch=batch, is_old=False)
         try:
             return question.get_next_question_by_rule(answer, self.household.investigator)
         except ObjectDoesNotExist, e:
