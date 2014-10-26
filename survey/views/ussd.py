@@ -16,6 +16,6 @@ def ussd(request):
         investigator = Investigator.objects.get(mobile_number=mobile_number)
         response = USSDPremenu(investigator, params).respond()
     except Investigator.DoesNotExist:
-            response = USSDSurvey.investigator_not_registered_response()
+        response = USSDSurvey.investigator_not_registered_response()
     template = "ussd/%s.txt" % USSD_PROVIDER
     return render(request, template, response)

@@ -44,47 +44,62 @@ class USSDBaseView(object):
 
         if self.is_new_request_parameter(answer) and self.is_new_request():
             action, response_string = self.ussd_survey.render_welcome_or_resume()
+            return {'action': action, 'responseString': response_string}
 
-        elif self.is_reporting_non_response:
+        if self.is_reporting_non_response:
             if self.ussd_report_non_response.can_retake and answer == self.ANSWER['NO']:
                 self.ussd_report_non_response.clear_caches()
                 self.clear_HH_caches()
                 action, response_string = self.render_home_page()
-            elif self.ussd_survey.is_resuming_survey and answer == self.ANSWER['NO']:
+                return {'action': action, 'responseString': response_string}
+
+            if self.ussd_survey.is_resuming_survey and answer == self.ANSWER['NO']:
                 action, response_string = self.render_home_page()
                 self.clear_HH_caches()
                 self.ussd_survey.set_in_session('IS_RESUMING', False)
-            else:
-                action, response_string = self.ussd_report_non_response.start(answer)
-                self.ussd_survey.set_in_session('IS_RESUMING', False)
+                return {'action': action, 'responseString': response_string}
 
-        elif self.is_registering_household is None:
+            action, response_string = self.ussd_report_non_response.start(answer)
+            self.ussd_survey.set_in_session('IS_RESUMING', False)
+            return {'action': action, 'responseString': response_string}
+
+        if self.is_registering_household is None:
             if answer == self.ANSWER['TAKE_SURVEY']:
                 self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', False)
                 action, response_string = self.ussd_survey.start()
-            elif answer == self.ANSWER['REGISTER_HOUSEHOLD']:
+                return {'action': action, 'responseString': response_string}
+
+            if answer == self.ANSWER['REGISTER_HOUSEHOLD']:
                 self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
                 action, response_string = self.ussd_register_household.start("00")
-            elif answer == self.ANSWER['REPORT_NON_RESPONSE']:
+                return {'action': action, 'responseString': response_string}
+
+            if answer == self.ANSWER['REPORT_NON_RESPONSE']:
                 self.investigator.set_in_cache('IS_REPORTING_NON_RESPONSE', True)
                 action, response_string = self.ussd_report_non_response.start("00")
-            else:
-                action, response_string = self.ussd_survey.render_welcome_or_resume()
+                return {'action': action, 'responseString': response_string}
 
-        elif not self.is_registering_household:
+            action, response_string = self.ussd_survey.render_welcome_or_resume()
+            return {'action': action, 'responseString': response_string}
+
+        if not self.is_registering_household:
             action, response_string = self.ussd_survey.take_survey()
+            return {'action': action, 'responseString': response_string}
 
-        else:
-            if not self.ussd_survey.is_resuming_survey:
-                action, response_string = self.ussd_register_household.start(answer)
-            else:
-                if answer == USSDSurvey.ANSWER['YES']:
-                    action, response_string = self.ussd_register_household.start("00")
-                    self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
-                else:
-                    action, response_string = self.render_home_page()
-                    self.clear_HH_caches()
-                self.ussd_survey.set_in_session('IS_RESUMING', False)
+        if not self.ussd_survey.is_resuming_survey:
+            action, response_string = self.ussd_register_household.start(answer)
+            self.ussd_survey.set_in_session('IS_RESUMING', False)
+            return {'action': action, 'responseString': response_string}
+
+        if answer == USSDSurvey.ANSWER['YES']:
+            action, response_string = self.ussd_register_household.start("00")
+            self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
+            self.ussd_survey.set_in_session('IS_RESUMING', False)
+            return {'action': action, 'responseString': response_string}
+
+        action, response_string = self.render_home_page()
+        self.clear_HH_caches()
+        self.ussd_survey.set_in_session('IS_RESUMING', False)
         return {'action': action, 'responseString': response_string}
 
     def is_new_request_parameter(self, answer):
