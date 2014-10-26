@@ -9,8 +9,8 @@ class BatchQuestionOrder(BaseModel):
 
     @classmethod
     def next_question_order_for(cls, batch):
-        all_batches = BatchQuestionOrder.objects.filter(batch=batch).order_by('order').reverse()
-        return (all_batches[0].order + 1) if all_batches else 1
+        all_batches = BatchQuestionOrder.objects.select_related('batch').filter(batch=batch).order_by('-order')
+        return (all_batches[0].order + 1) if all_batches.exists() else 1
 
     @classmethod
     def update_question_order(cls, new_order, batch):
@@ -25,7 +25,7 @@ class BatchQuestionOrder(BaseModel):
 
     @classmethod
     def get_batch_order_specific_questions(cls, batch, filter_condition):
-        batch_question_orders = BatchQuestionOrder.objects.filter(batch=batch, **filter_condition).select_related('question__group').order_by('order')
+        batch_question_orders = BatchQuestionOrder.objects.select_related('question__subquestion', 'question__group', 'question', 'question__group__conditions').filter(batch=batch, **filter_condition).order_by('order')
         questions = []
         for batch_question_order in batch_question_orders:
             if not batch_question_order.question.subquestion:

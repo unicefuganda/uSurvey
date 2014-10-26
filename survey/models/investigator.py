@@ -107,8 +107,9 @@ class Investigator(BaseModel):
 
         answer = answer_class.objects.create(investigator=self, question=question, householdmember=household_member,
                                              answer=answer, household=household_member.household, batch=batch)
+
         if answer.pk:
-            next_question = household_member.next_question(question, batch)
+            next_question = household_member.next_question(question, batch, answer=answer)
             if next_question is None:
                 household_member.batch_completed(batch)
                 next_batch = household_member.get_next_batch()

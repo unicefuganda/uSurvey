@@ -45,7 +45,7 @@ class Batch(BaseModel):
 
     def has_unanswered_question(self, member):
         for question in self.all_questions():
-            if member.belongs_to(question.group) and not member.has_answered(question, self):
+            if not member.has_answered(question, self) and member.belongs_to(question.group):
                 return True
         return False
 
@@ -133,12 +133,9 @@ class Batch(BaseModel):
 
     @classmethod
     def open_ordered_batches(cls, location):
-        all_batches = Batch.objects.all().order_by('order')
-        open_batches = []
-        for batch in all_batches:
-            if batch.is_open_for(location):
-                open_batches.append(batch)
-        return open_batches
+        batch_ids = BatchLocationStatus.objects.filter(location=location).values_list('batch', flat=True)
+        return Batch.objects.filter(id__in=batch_ids).order_by('order')
+
 
 
 class BatchLocationStatus(BaseModel):

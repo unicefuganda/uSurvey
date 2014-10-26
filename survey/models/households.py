@@ -75,7 +75,7 @@ class Household(BaseModel):
 
     def has_completed_batch(self, batch):
         for member in self.household_member.all():
-            if not member.completed_member_batches.filter(batch=batch):
+            if not member.completed_member_batches.filter(batch=batch).exits():
                 return False
         return True
 
@@ -298,7 +298,7 @@ class HouseholdMember(BaseModel):
         open_ordered_batches = Batch.open_ordered_batches(self.get_location())
 
         for batch in open_ordered_batches:
-            if batch.has_unanswered_question(self) and not self.completed_member_batches.filter(batch=batch):
+            if not self.completed_member_batches.filter(batch=batch) and batch.has_unanswered_question(self):
                 return batch
         return None
 
@@ -332,9 +332,10 @@ class HouseholdMember(BaseModel):
                 return question
         return None
 
-    def next_question(self, question, batch):
+    def next_question(self, question, batch, answer=None):
         member = self.get_member()
-        answer = question.answer_class().objects.select_related('rule').get(householdmember=member, question=question, batch=batch, is_old=False)
+        if not answer:
+            answer = question.answer_class().objects.get(householdmember=member, question=question, batch=batch, is_old=False)
         try:
             return question.get_next_question_by_rule(answer, self.household.investigator)
         except ObjectDoesNotExist, e:
