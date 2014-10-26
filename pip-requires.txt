@@ -21,3 +21,4 @@ dateutils
 xlwt
 django-celery
 selenium==2.35.0
+django-model-utils==2.2
