@@ -75,7 +75,7 @@ class Household(BaseModel):
 
     def has_completed_batch(self, batch):
         for member in self.household_member.all():
-            if not member.completed_member_batches.filter(batch=batch).exits():
+            if not member.completed_member_batches.filter(batch=batch).exists():
                 return False
         return True
 
@@ -245,7 +245,7 @@ class HouseholdMember(BaseModel):
         return False
 
     def get_head(self):
-        self.household.get_head()
+        return self.household.get_head()
 
     def get_member(self):
         return self

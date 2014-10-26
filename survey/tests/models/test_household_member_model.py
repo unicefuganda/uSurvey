@@ -621,8 +621,8 @@ class HouseholdMemberTest(BaseTest):
         investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
-        less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
-        greater_condition = GroupCondition.objects.create(attribute="age", condition="LESS_THAN", value=6)
+        less_condition = GroupCondition.objects.create(attribute="AGE", condition="GREATER_THAN", value=4)
+        greater_condition = GroupCondition.objects.create(attribute="AGE", condition="LESS_THAN", value=6)
         member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
         less_condition.groups.add(member_group)
         greater_condition.groups.add(member_group)
@@ -664,8 +664,8 @@ class HouseholdMemberTest(BaseTest):
         investigator = Investigator.objects.create(name="inv1", ea=ea,
                                                    backend=Backend.objects.create(name='something'))
 
-        less_condition = GroupCondition.objects.create(attribute="age", condition="GREATER_THAN", value=4)
-        greater_condition = GroupCondition.objects.create(attribute="age", condition="LESS_THAN", value=6)
+        less_condition = GroupCondition.objects.create(attribute="AGE", condition="GREATER_THAN", value=4)
+        greater_condition = GroupCondition.objects.create(attribute="AGE", condition="LESS_THAN", value=6)
         member_group = HouseholdMemberGroup.objects.create(name="5 to 6 years", order=0)
         less_condition.groups.add(member_group)
         greater_condition.groups.add(member_group)
@@ -708,7 +708,7 @@ class HouseholdMemberTest(BaseTest):
 
     def test_knows_member_belongs_to_group_from_a_selected_household_member(self):
         age_value = 6
-        age_attribute_type = "age"
+        age_attribute_type = "AGE"
         gender_attribute_type = "GENDER"
 
         country = LocationType.objects.create(name="Country", slug="country")
@@ -830,9 +830,9 @@ class HouseholdMemberTest(BaseTest):
 
     def test_knows_head_belongs_to_general_group(self):
         age_value = 6
-        age_attribute_type = "Age"
+        age_attribute_type = "AGE"
         gender_attribute_type = "GENDER"
-        general_attribute_type = "Head"
+        general_attribute_type = "GENERAL"
 
         country = LocationType.objects.create(name="Country", slug="country")
 
@@ -846,7 +846,7 @@ class HouseholdMemberTest(BaseTest):
                                                         household=household)
 
         member_group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
-        general_group = HouseholdMemberGroup.objects.create(name="General", order=1)
+        general_group = HouseholdMemberGroup.objects.create(name="GENERAL", order=1)
         head_condition = GroupCondition.objects.create(attribute=general_attribute_type, value=True,
                                                        condition='EQUALS')
         head_condition.groups.add(general_group)

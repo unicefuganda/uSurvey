@@ -35,7 +35,7 @@ class HouseholdMemberGroup(BaseModel):
         for location in locations:
             location_descendants = location.get_descendants(include_self=True).values_list('id', flat=True)
             households = all_households.filter(ea__locations__in=location_descendants).values_list('id', flat=True)
-            all_members = HouseholdMember.objects.filter(household__id__in=households)
+            all_members = HouseholdMember.objects.filter(household__id__in=households).select_subclasses()
             qualified_members = filter(lambda member: member.belongs_to(self), all_members)
             data[location] = {self.name: len(qualified_members)}
         return data
@@ -84,7 +84,7 @@ class GroupCondition(BaseModel):
         return str(value).lower() == "male" or (str(value).lower() == "head" and self.attribute == GroupCondition.GROUP_TYPES['GENERAL'])
 
     def matches(self, attributes):
-        value = attributes.get(self.attribute)
+        value = attributes.get(self.attribute.upper())
         return self.matches_condition(value)
 
     def matches_condition(self, value):
