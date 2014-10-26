@@ -42,7 +42,7 @@ class Household(BaseModel):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
             answer = getattr(self, related_name).all()
-            if answer: answered.append(answer.latest())
+            if answer.exists(): answered.append(answer.latest())
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
@@ -67,10 +67,10 @@ class Household(BaseModel):
 
     def retake_latest_batch(self):
         batches = self.investigator.get_open_batch()
-        for batch in batches:
-            questions = batch.all_questions()
-            for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
-                getattr(self, related_name).filter(question__in=questions).delete()
+        from survey.models import Question
+        questions = Question.objects.filter(batches__in=batches)
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+            getattr(self, related_name).filter(question__in=questions).delete()
 
     def has_completed_batch(self, batch):
         for member in self.household_member.all():
@@ -315,7 +315,7 @@ class HouseholdMember(BaseModel):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
             answer = getattr(self, related_name).all()
-            if answer and answer.filter(is_old=False): answered.append(answer.latest())
+            if answer.exists() and answer.filter(is_old=False).exists(): answered.append(answer.latest())
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
@@ -425,10 +425,7 @@ class HouseholdMember(BaseModel):
     def mark_past_answers_as_old(self):
         self.completed_member_batches.all().delete()
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
-            answers = getattr(self, related_name).all()
-            for answer in answers:
-                answer.is_old = True
-                answer.save()
+            getattr(self, related_name).all().update(is_old=True)
 
     def answers_for(self, questions, general_group):
         answers = []
