@@ -44,9 +44,11 @@ class Batch(BaseModel):
         return list(set(map(lambda question: question.group, questions)))
 
     def has_unanswered_question(self, member):
+        member_answers = member.all_answers(self)
         for question in self.all_questions():
-            if not member.has_answered(question, self) and member.belongs_to(question.group):
+            if not member.has_answered(question, member_answers) and member.belongs_to(question.group):
                 return True
+
         return False
 
     def all_questions(self):

@@ -129,6 +129,12 @@ class Household(BaseModel):
             household_members.insert(0, self.get_head())
         return household_members
 
+    def all_answers(self, batch):
+        answers = {}
+        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+            answers[key] = getattr(self, key).filter(batch=batch, is_old=False).values_list('question', flat=True)
+        return answers
+
     def completed_currently_open_batches(self):
         all_members = self.household_member.all().select_subclasses()
         for member in all_members:
@@ -309,6 +315,12 @@ class HouseholdMember(BaseModel):
                 return False
         return True
 
+    def all_answers(self, batch):
+        answers = {}
+        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+            answers[key] = getattr(self, key).filter(batch=batch, is_old=False).values_list('question', flat=True)
+        return answers
+
     def last_question_answered(self):
         answered = []
         for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
@@ -317,9 +329,9 @@ class HouseholdMember(BaseModel):
         if answered:
             return sorted(answered, key=lambda x: x.created, reverse=True)[0].question
 
-    def has_answered(self, question, batch):
-        answer_class = question.answer_class()
-        return answer_class.objects.filter(question=question, householdmember=self, batch=batch, is_old=False).count()
+    def has_answered(self, question, all_answers):
+        answer_class = question.TYPE_OF_ANSWERS_CLASS[question.answer_type].lower()
+        return question.id in all_answers[answer_class]
 
     def next_unanswered_question_in(self, member_group, batch, order):
         all_questions = []
@@ -327,8 +339,9 @@ class HouseholdMember(BaseModel):
             if (question.question_batch_order.filter(batch=batch)[0].order > order) and (question.group == member_group):
                 all_questions.append(question)
 
+        answers = self.all_answers(batch)
         for question in all_questions:
-            if not self.has_answered(question, batch):
+            if not self.has_answered(question, answers):
                 return question
         return None
 
@@ -416,8 +429,9 @@ class HouseholdMember(BaseModel):
         return False
 
     def has_completed(self, batch):
+        answers = self.all_answers(batch)
         for question in batch.all_questions():
-            if not self.has_answered(question, batch):
+            if not self.has_answered(question, answers):
                 return False
         return True
 
