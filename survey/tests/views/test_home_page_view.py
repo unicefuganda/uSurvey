@@ -24,6 +24,16 @@ class HomepageViewTest(BaseTest):
         self.assertIn('home/index.html', templates)
         self.assertIn(survey_2, response.context['surveys'])
 
+    def test_no_content_available_on_about_page(self):
+        response = self.client.get('/about/')
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('home/about.html', templates)
+
+        about_us = AboutUs.objects.all()[0]
+        self.assertEqual(about_us, response.context['about_content'])
+        self.assertEqual(about_us.content, 'No content available yet !!')
+
     def test_about_page(self):
         about_us_content = AboutUs.objects.create(content="blah blah")
         response = self.client.get('/about/')

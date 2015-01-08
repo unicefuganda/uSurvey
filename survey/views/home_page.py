@@ -11,7 +11,11 @@ def home(request):
 
 
 def about(request):
-    about_us_content = AboutUs.objects.all()[0]
+    if AboutUs.objects.count():
+        about_us_content = AboutUs.objects.all()[0]
+    else:
+        about_us_content = AboutUs.objects.create(content="No content available yet !!")
+
     return render(request, 'home/about.html', {'about_content': about_us_content})
 
 
