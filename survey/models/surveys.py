@@ -34,7 +34,7 @@ class Survey(BaseModel):
 
     @classmethod
     def currently_open_survey(cls, location=None):
-        for survey in Survey.objects.filter():
+        for survey in Survey.objects.all():
             if survey.is_open(location):
                 return survey
         return None

@@ -172,22 +172,29 @@ class USSDSurvey(USSD):
         else:
             self.select_or_render_household_member(answer)
 
+    def show_household_list(self, survey=None):
+        self.set_in_session('HOUSEHOLD', None)
+        self.household = None
+        self.render_households_list(open_survey=survey)
+        self.set_in_session('CAN_RETAKE_HOUSEHOLD', False)
+        self.set_in_session('HAS_CHOSEN_RETAKE', False)
+
     def render_household_or_household_member(self, answer, survey=None):
         if self.has_chosen_household():
             if self.can_retake_household and answer == self.ANSWER['YES']:
-                self.render_household_members_list()
-                self.set_in_session('CAN_RETAKE_HOUSEHOLD', False)
+                if self.has_household_members():
+                    self.render_household_members_list()
+                    self.set_in_session('CAN_RETAKE_HOUSEHOLD', False)
+                else:
+                    self.show_household_list(survey)
+
             elif self.can_retake_household and answer == self.ANSWER['NO']:
                 if self.investigator.completed_open_surveys() and not self.has_chosen_retake:
                     self.action = self.ACTIONS['END']
                     self.responseString = USSD.MESSAGES['SUCCESS_MESSAGE_FOR_COMPLETING_ALL_HOUSEHOLDS']
                     self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
                 else:
-                    self.set_in_session('HOUSEHOLD', None)
-                    self.household = None
-                    self.render_households_list(open_survey=survey)
-                    self.set_in_session('CAN_RETAKE_HOUSEHOLD', False)
-                    self.set_in_session('HAS_CHOSEN_RETAKE', False)
+                    self.show_household_list(survey)
             elif self.household.survey_completed() and not self.has_chosen_retake:
                 self.render_retake_message()
                 self.set_in_session('CAN_RETAKE_HOUSEHOLD', True)
@@ -209,6 +216,10 @@ class USSDSurvey(USSD):
     def render_household_members_list(self):
         page = self.get_from_session('PAGE')
         self.responseString += "%s\n%s" % (self.MESSAGES['MEMBERS_LIST'], self.household.members_list(page))
+
+    def has_household_members(self):
+        page = self.get_from_session('PAGE')
+        return not not self.household.members_list(page)
 
     def render_homepage(self):
         open_survey = Survey.currently_open_survey(self.investigator.location)
