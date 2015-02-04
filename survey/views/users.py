@@ -3,13 +3,14 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, permission_required
-
+from django.db.models import Q
 from survey.investigator_configs import *
 from survey.forms.users import *
 from survey.models.users import UserProfile
 from survey.views.custom_decorators import permission_required_for_perm_or_current_user
+from survey.utils.query_helper import get_filterset
 
 
 def _add_error_messages(userform, request, action_str='registered'):
@@ -59,11 +60,20 @@ def index(request):
         return check_mobile_number(request.GET['mobile_number'])
 
     if request.GET.has_key('username'):
-        return check_user_attribute(username=request.GET['username'])
-
+        return check_user_attribute(
+                                    username=request.GET['username'])
     if request.GET.has_key('email'):
         return check_user_attribute(email=request.GET['email'])
-    return render(request, 'users/index.html', { 'users' : User.objects.all(),
+        
+    userlist = User.objects.all() 
+    search_fields = ['first_name', 'last_name', 'groups__name']
+    if request.GET.has_key('q'):
+        userlist = get_filterset(userlist, request.GET['q'], search_fields)
+        
+    if request.GET.has_key('status'):
+        userlist = userlist.filter(is_active=(True if request.GET['status'].lower() == 'active' else False))
+    
+    return render(request, 'users/index.html', { 'users' : userlist,
                                                  'request': request})
                                                  
 @permission_required_for_perm_or_current_user('auth.can_view_users')

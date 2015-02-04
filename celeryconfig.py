@@ -1,4 +1,8 @@
 import sys
+from django.core.management import setup_environ
+from mics import settings
+setup_environ(settings)
+
 
 ## Broker settings.
 BROKER_URL = "amqp://guest:guest@localhost:5672//"

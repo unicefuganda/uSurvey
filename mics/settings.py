@@ -7,7 +7,7 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
-PROJECT_TITLE = 'mMICS'
+PROJECT_TITLE = 'uSurvey'
 
 MANAGERS = ADMINS
 
