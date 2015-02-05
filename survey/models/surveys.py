@@ -10,6 +10,12 @@ class Survey(BaseModel):
     type = models.BooleanField(default=False)
     has_sampling = models.BooleanField(default=True)
 
+    class Meta:
+        app_label = 'survey'
+        permissions = ( 
+            ( "view_completed_survey", "Can View Completed Surveys" ),
+        )
+
     def is_open(self, location=None):
         all_batches = self.batch.all()
         for batch in all_batches:
