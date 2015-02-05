@@ -103,6 +103,14 @@ def list_investigators(request):
                    'location_data': location_widget,
                    'request': request})
 
+
+@login_required
+@permission_required('survey.view_completed_survey')
+def show_completion_summary(request, investigator_id):
+    investigator = Investigator.objects.get(pk=investigator_id)
+    return render(request, 'investigators/completion_summary.html', {'investigator': investigator})
+
+
 @login_required
 def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number=request.GET['mobile_number']).exists()

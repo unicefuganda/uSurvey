@@ -39,15 +39,17 @@
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
                         </li>
 
-                        {% if perms.auth.can_view_investigators %}
+                        {% if perms.auth.can_view_investigators or perms.survey.view_completed_survey %}
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
                                    role="button" href="#">Survey Administration<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'investigators_page' %}">Investigators</a>
                                     </li>
+                                    {%if perms.auth.can_view_investigators %}
                                     <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
                                     </li>
+				    {% endif %}
 
                                     {% if perms.auth.can_view_batches %}
                                         <li role="presentation"><a href="{% url 'list_all_questions' %}">Question

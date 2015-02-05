@@ -11,11 +11,17 @@ from survey.views.custom_decorators import handle_object_does_not_exist
 @permission_required('auth.can_view_batches')
 def index(request):
     surveys = Survey.objects.all().order_by('created')
+    search_fields = ['name', 'description']
+    if request.GET.has_key('q'):
+        surveys = get_filterset(surveys, request.GET['q'], search_fields)
+    if request.GET.has_key('type'):
+        surveys = surveys.filter(type=ast.literal_eval(request.GET['type']))
+    if request.GET.has_key('isopen'):
+        surveys = surveys.filter(type=ast.literal_eval(request.GET['isopen']))
     context = {'surveys': surveys, 'request': request,
                'survey_form': SurveyForm()}
     return render(request, 'surveys/index.html',
                   context)
-
 
 @permission_required('auth.can_view_batches')
 def new(request):

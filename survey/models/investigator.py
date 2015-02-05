@@ -17,6 +17,7 @@ class Investigator(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=False)
     mobile_number = models.CharField(validators=[MinLengthValidator(9), MaxLengthValidator(9)], max_length=10,
                                      unique=True, null=False, blank=False)
+    odk_token = models.CharField(max_length=settings.TOKEN_DEFAULT_SIZE, default=settings.ODK_DEFAULT_TOKEN) 
     male = models.BooleanField(default=True, verbose_name="Sex")
     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,

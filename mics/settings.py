@@ -212,6 +212,9 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1800
 SESSION_SAVE_EVERY_REQUEST = True
 
+#odk settings
+TOKEN_DEFAULT_SIZE=5
+ODK_DEFAULT_TOKEN='12345'
 
 # Importing server specific settings
 from localsettings import *

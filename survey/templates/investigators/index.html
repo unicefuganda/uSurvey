@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% load template_tags %}
 {% block title %}
   Investigators List
 {% endblock %}
@@ -25,6 +26,9 @@
           <th>
             Mobile Number
           </th>
+	 <th>
+          Completion Details
+         </th>
           <th>
             Actions
           </th>
@@ -39,6 +43,9 @@
             <td>
               {{ investigator.mobile_number }}
             </td>
+	   <td>
+		<a href="{% url 'investigator_completion_summary' investigator.pk %}">{{ investigator|household_completed_percent}} Completed</a>
+	  </td>
             <td>
                 {% include 'investigators/_action_button.html' with button_size="btn-mini" %}
             </td>

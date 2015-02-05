@@ -104,3 +104,18 @@ def ancestors_reversed(location):
     ancestors = get_ancestors(location)
     ancestors.reverse()
     return ancestors
+
+@register.filter
+def household_completed_percent(investigator):
+#    import pdb;pdb.set_trace()
+    households = investigator.households.all()
+    total = households.count()
+    completed = len([hld for hld in households.all() if hld.survey_completed])
+    if total > 0:
+        return completed*100/total
+
+@register.filter
+def total_household_members(investigator):
+    households = investigator.households.all()
+    return sum([household.household_member.count() for household in households])
+
