@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% load template_tags %}
+{% block title %}
+    {{ investigator.name }} Survey Completion Details
+{% endblock %}
+{% block content %}
+{% load template_tags %}
+    <h3 class="offset3">
+        {{ investigator.name|capfirst }} Survey Completion Details
+    </h3>
+   <div>
+	    <dl class="details offset1">
+		<dt>
+		    Name
+		</dt>
+		<dd>
+		    {{ investigator.name }}
+		</dd>
+		<dt>
+		    Total Households
+		</dt>
+		<dd>
+		    {{ investigator.households.count }}
+		</dd>
+		<dt>
+		    Total Members Accross Households
+		</dt>
+		<dd>
+		    {{ investigator | total_household_members}}
+		</dd>
+		<dt>
+		    Percentage Completed
+		</dt>
+		<dd>
+		    {{ investigator | household_completed_percent}}
+		</dd>
+		<dt>
+		    {{ investigator.location.type }}
+		</dt>
+		<dd>
+		    {{ investigator.location.name }}
+		</dd>
+	    </dl>
+    </div>
+{% endblock %}

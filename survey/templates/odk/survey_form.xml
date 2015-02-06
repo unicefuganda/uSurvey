@@ -1,0 +1,73 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+xmlns:h="http://www.w3.org/1999/xhtml"
+xmlns:ev="http://www.w3.org/2001/xml-events"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+<h:title> {{survey.name}} | {{ household.household_code }}</h:title>
+  <model>
+  <instance>
+   <survey id="{{ household.uid }}" >
+     <meta>
+       <instanceID/>
+     </meta>
+    <householdMember />
+	{% for batch in survey.ordered_batches %}
+		<b{{batch.pk}}>
+			{% for question in batch.all_questions %}
+				<q{{question.pk}} />
+			{% endfor %}
+		</b{{batch.pk}}>
+	{% endfor %}
+   </survey>
+  </instance>
+
+  <!-- bindings -->
+  <bind nodeset="/survey/meta/instanceID" type="string" 
+           readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/survey/householdMember" type="select1" required="true()" />
+	{% for batch in survey.ordered_batches %}
+		{% for question in batch.all_questions %}
+		<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}" 
+			type="{% if question.answer_type == 'number' %}int{% else %}{% if question.answer_type == 'multichoice' %}select1 {% else %} string {% endif %}{% endif %}" required="true()" />
+		{% endfor %}
+	{% endfor %}
+
+  </model>
+</h:head>
+<h:body>
+	<select1 ref="/survey/householdMember">
+		<label>Select Household Member</label>
+	{% for member in household.household_member.all %}
+		<item>
+			<label> {{ member.first_name }}, {{ member.surname }} </label>
+			<value>{{ member.pk }}</value>
+		</item>
+	{% endfor %}
+	</select1>
+	{% for batch in survey.ordered_batches %}
+		<group>
+			<label>{{ batch.name }}</label>
+			<hint>{{ batch.description }}</hint>
+			{% for question in batch.all_questions %}
+				{% if question.answer_type == 'multichoice' %}
+					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+						<label>{{question.text}}</label>
+						{% for option in question.options.all %}
+						<item>
+							<label>{{ option.text }}</label>
+							<value>{{ option.pk }}</value>
+						</item>
+						{% endfor %}
+					</select1>
+				{% else %}
+				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+					<label>{{question.text}}</label>
+				</input>
+				{% endif %}
+			{% endfor %}
+		</group>
+	{% endfor %}
+
+</h:body>
+</h:html>
