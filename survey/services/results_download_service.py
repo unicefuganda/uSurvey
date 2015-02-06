@@ -1,6 +1,31 @@
 from rapidsms.contrib.locations.models import Location
 from survey.models import LocationTypeDetails, Household, HouseholdMemberGroup
 from survey.utils.views_helper import get_ancestors
+from django.core.mail import send_mail, EmailMessage
+from django.conf import settings
+from datetime import datetime
+
+
+class ResultComposer:
+    def __init__(self, user, results_download_service):
+        self.results_download_service = results_download_service
+        self.user = user
+
+    def send_mail(self):
+        attachment_name = '%s.csv' % (self.results_download_service.batch.name if self.results_download_service.batch  \
+        else self.results_download_service.survey.name)
+        subject = 'Completion report for %s'  % attachment_name
+        text = 'Completion report for %s. Date: %s'  % (attachment_name, datetime.now())
+        print 'commencing...'
+        mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [self.user.email, ])
+        data = self.results_download_service.generate_report()
+        data = ['|'.join([unicode(entry) for entry in entries]) for entries in data]
+        print len(data)
+        mail.attach(attachment_name, '\r\n'.join(data), 'text/csv')
+        print mail
+        mail.send()
+        print 'Emailed!!'
+
 
 
 class ResultsDownloadService(object):

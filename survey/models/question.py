@@ -13,15 +13,24 @@ class Question(BaseModel):
     NUMBER = 'number'
     TEXT = 'text'
     MULTICHOICE = 'multichoice'
+    MULTISELECT = 'multiselect'
+    DATE = 'date'
+    FILE = 'file'
     TYPE_OF_ANSWERS = {
         (NUMBER, 'Number'),
         (TEXT, 'Text'),
-        (MULTICHOICE, 'Multichoice')
+        (MULTICHOICE, 'Multichoice'),
+        (MULTISELECT, 'Multiselect'),
+        (DATE, 'Date'),
+        (FILE, 'File')
     }
     TYPE_OF_ANSWERS_CLASS = {
         NUMBER: 'NumericalAnswer',
         TEXT: 'TextAnswer',
-        MULTICHOICE: 'MultiChoiceAnswer'
+        MULTICHOICE: 'MultiChoiceAnswer',
+        MULTISELECT: 'MultiSelectAnswer',
+        DATE: 'DateAnswer',
+        FILE: 'FileAnswer',
     }
 
     IGNORED_CHARACTERS = "*!#';&"
@@ -190,3 +199,9 @@ class TextAnswer(Answer):
 
 class MultiChoiceAnswer(Answer):
     answer = models.ForeignKey(QuestionOption, null=True)
+
+class DateAnswer(Answer):
+    answer = models.DateField(null=True)
+
+class FileAnswer(Answer):
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)

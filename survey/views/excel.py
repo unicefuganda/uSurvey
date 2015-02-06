@@ -3,12 +3,13 @@ import csv
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
-
+from django.contrib import messages
 from survey.forms.filters import SurveyBatchFilterForm
 from survey.models import Survey, Investigator
 from survey.models.batch import Batch
-from survey.services.results_download_service import ResultsDownloadService
+from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 from survey.utils.views_helper import contains_key
+from survey.tasks import email_task
 
 
 def _process_export(survey_batch_filter_form):
@@ -22,7 +23,6 @@ def _process_export(survey_batch_filter_form):
         writer.writerow(row)
     return response
 
-
 @login_required
 @permission_required('auth.can_view_aggregates')
 def download(request):
@@ -30,7 +30,11 @@ def download(request):
     if request.GET:
         survey_batch_filter_form = SurveyBatchFilterForm(request.GET)
         if survey_batch_filter_form.is_valid():
-            return _process_export(survey_batch_filter_form)
+            batch = survey_batch_filter_form.cleaned_data['batch']
+            survey = survey_batch_filter_form.cleaned_data['survey']
+            composer = ResultComposer(request.user, ResultsDownloadService(batch=batch, survey=survey))
+            email_task.delay(composer)
+            messages.warning(request, "Email would be sent to you shortly. This could take a while.")
     return render(request, 'aggregates/download_excel.html', {'survey_batch_filter_form': survey_batch_filter_form})
 
 @login_required

@@ -15,6 +15,7 @@ from survey.services.export_questions import ExportQuestionsService
 from survey.utils.views_helper import prepend_to_keys, clean_query_params
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
 from collections import OrderedDict
+from survey.utils.query_helper import get_filterset
 
 ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE = "Logics cannot be added while the batch is open."
 ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE = "Subquestions cannot be added while batch is open."
@@ -76,7 +77,9 @@ def list_all_questions(request):
 
     question_filter_form = QuestionFilterForm(data=request.GET)
     questions, max_per_page = _questions_given(batch_id, request)
-
+    search_fields = ['identifier', 'group__name', 'text', ]
+    if request.GET.has_key('q'):
+        questions = get_filterset(questions, request.GET['q'], search_fields)
     context = {'questions': questions, 'request': request, 'question_filter_form': question_filter_form,
                'rules_for_batch': {}, 'max_question_per_page': max_per_page}
     return render(request, 'questions/index.html', context)

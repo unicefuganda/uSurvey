@@ -7,22 +7,20 @@
 
     <h3>Survey Completion by Region/District</h3>
 
-
-
   <form id="aggregates-form" action="{% url action %}" method="post">
     {% csrf_token %}
     <div>
-        {% include "naked_form.html" with a_form=filter %}
+        {% include "horizontal_naked_form.html" with a_form=filter %}
     </div>
      <div>
         {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
      </div>
-    <button class="btn btn-primary">Get status</button>
+    <button class="btn btn-primary">Refresh status</button>
   </form>
   {% if completion_rates %}
     {% autopaginate completion_rates.attributes 50 %}
 
-    <table class="table table-striped table-bordered">
+    <table class="table table-striped table-bordered table-sort">
       <thead>
         <tr>
           <th>Location</th>

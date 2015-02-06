@@ -18,7 +18,7 @@ jQuery(function($){
     }
 
     $("#id_answer_type").on('change', function(){
-        if($(this).val() == 'multichoice'){
+        if($(this).val() == 'multichoice' || $(this).val() == 'multiselect'){
             addQuestionOption($(this).parents("div.control-group"));
         }else{
             $form.find("div.question-option").remove();

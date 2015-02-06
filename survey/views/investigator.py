@@ -78,6 +78,7 @@ def get_locations(request):
 
 @login_required
 @permission_required('auth.can_view_investigators')
+@permission_required('survey.view_completed_survey')
 def list_investigators(request):
     params = request.GET
     selected_location = None
@@ -109,6 +110,11 @@ def list_investigators(request):
 def show_completion_summary(request, investigator_id):
     investigator = Investigator.objects.get(pk=investigator_id)
     return render(request, 'investigators/completion_summary.html', {'investigator': investigator})
+
+@login_required
+@permission_required('survey.view_completed_survey')
+def download_investigators(request, investigator_id):
+    pass
 
 
 @login_required

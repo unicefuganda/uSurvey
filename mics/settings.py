@@ -1,4 +1,6 @@
 # Django settings for mics project.
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -215,6 +217,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 #odk settings
 TOKEN_DEFAULT_SIZE=5
 ODK_DEFAULT_TOKEN='12345'
+SUBMISSION_UPLOAD_BASE=os.path.join(BASE_DIR, 'submissions')
+ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerFiles')
+ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Processed"
 
 # Importing server specific settings
 from localsettings import *
