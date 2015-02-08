@@ -77,7 +77,7 @@ def _get_form_id(survey_tree):
 	return _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
 
 @transaction.autocommit
-def process_submission(investigator, xml_file, request=None):
+def process_submission(investigator, xml_file, media_files=[], request=None):
 	"""
 	extract surveys and for this xml file and for specified household member
 	"""
@@ -205,17 +205,19 @@ class OpenRosaResponseNotAllowed(OpenRosaResponse):
     status_code = 405
 
 def http_basic_auth(func):
-	@wraps(func)
-	def _decorator(request, *args, **kwargs):
-		if request.META.has_key('HTTP_AUTHORIZATION'):
-			authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
-			if authmeth.lower() == 'basic':
-				auth = auth.strip().decode('base64')
-				username, password = auth.split(':', 1)
-				authenticated = authenticate(username=username, password=password)
-				if authenticated:
-					return func(request, *args, **kwargs)
-	return _decorator
+    @wraps(func)
+    def _decorator(request, *args, **kwargs):
+        if request.META.has_key('HTTP_AUTHORIZATION'):
+	    authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
+            if authmeth.lower() == 'basic':
+                auth = auth.strip().decode('base64')
+                username, password = auth.split(':', 1)
+                try:
+                    Investigator.objects.get(mobile_number=username, odk_token=password)
+                    return func(request, *args, **kwargs)
+                except Investigator.DoesNotExist:
+                    pass
+    return _decorator
 
 
 

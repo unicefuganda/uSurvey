@@ -205,17 +205,19 @@ class OpenRosaResponseNotAllowed(OpenRosaResponse):
     status_code = 405
 
 def http_basic_auth(func):
-	@wraps(func)
-	def _decorator(request, *args, **kwargs):
-		if request.META.has_key('HTTP_AUTHORIZATION'):
-			authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
-			if authmeth.lower() == 'basic':
-				auth = auth.strip().decode('base64')
-				username, password = auth.split(':', 1)
-				authenticated = authenticate(username=username, password=password)
-				if authenticated:
-					return func(request, *args, **kwargs)
-	return _decorator
+    @wraps(func)
+    def _decorator(request, *args, **kwargs):
+        if request.META.has_key('HTTP_AUTHORIZATION'):
+	    authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
+            if authmeth.lower() == 'basic':
+                auth = auth.strip().decode('base64')
+                username, password = auth.split(':', 1)
+                try:
+                    Investigator.objects.get(mobile_number=username, odk_token=password)
+                    return func(request, *args, **kwargs)
+                except Investigator.DoesNotExist:
+                    raise
+    return _decorator
 
 
 
