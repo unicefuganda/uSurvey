@@ -30,7 +30,8 @@ def authenticate(request):
 	return True
 
 def get_survey_xform(household):
-	return render_to_string("odk/survey_form.xml", {
+    survey = household.survey
+    return render_to_string("odk/survey_form.xml", {
 		'household': household,
 		'survey' : household.survey,
 		})

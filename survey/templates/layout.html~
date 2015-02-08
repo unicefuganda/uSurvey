@@ -20,6 +20,7 @@
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/smoothness/jquery-ui.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="/local/path/to/firebug-lite.js"></script>
 
 </head>
 <body>
@@ -39,15 +40,17 @@
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
                         </li>
 
-                        {% if perms.auth.can_view_investigators %}
+                        {% if perms.auth.can_view_investigators or perms.survey.view_completed_survey %}
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
                                    role="button" href="#">Survey Administration<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'investigators_page' %}">Investigators</a>
                                     </li>
+                                    {%if perms.auth.can_view_investigators %}
                                     <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
                                     </li>
+				    {% endif %}
 
                                     {% if perms.auth.can_view_batches %}
                                         <li role="presentation"><a href="{% url 'list_all_questions' %}">Question

@@ -5,13 +5,14 @@ from django.shortcuts import render
 from django.contrib import messages
 from rapidsms.contrib.locations.models import Location
 from django.contrib.auth.decorators import login_required, permission_required
-
+from django.conf import settings
 from survey.investigator_configs import *
 from survey.forms.investigator import *
 from survey.models import EnumerationArea
 from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
+from survey.services.export_investigators import ExportInvestigatorsService
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
@@ -112,12 +113,6 @@ def show_completion_summary(request, investigator_id):
     return render(request, 'investigators/completion_summary.html', {'investigator': investigator})
 
 @login_required
-@permission_required('survey.view_completed_survey')
-def download_investigators(request, investigator_id):
-    pass
-
-
-@login_required
 def check_mobile_number(request):
     response = Investigator.objects.filter(mobile_number=request.GET['mobile_number']).exists()
     return HttpResponse(json.dumps(not response), content_type="application/json")
@@ -176,3 +171,12 @@ def unblock_investigator(request, investigator_id):
     except Investigator.DoesNotExist:
         messages.error(request, "Investigator does not exist.")
     return HttpResponseRedirect('/investigators/')
+
+@permission_required('auth.can_view_investigators')
+def download_investigators(request):
+    filename = 'all_investigators'
+    formatted_responses = ExportInvestigatorsService(settings.INVESTIGATOR_EXPORT_HEADERS).formatted_responses()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
+    response.write("\r\n".join(formatted_responses))
+    return response

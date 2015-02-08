@@ -15,7 +15,10 @@
   </form>
   <br class="clear"/>
   <br/>
-    <a href="{% url 'download_investigators' %}" class="btn btn_primary pull-right" id="export-investigator"><i class="icon-plus"></i> Export Investigators</a>
+	<form accept-charset="utf-8" action="{% url 'download_investigators' %}" method="get" id="download_investigators" class="pull-right">
+                {% csrf_token %}
+                <button class="btn btn_primary" id="export_question">Export Investigators</button>
+            </form>
     <a href="{% url 'new_investigator_page' %}" class="btn btn_primary pull-right" id="add-investigator"><i class="icon-plus"></i> Add Investigator</a>
   <br class="clear"/>
   <br/>

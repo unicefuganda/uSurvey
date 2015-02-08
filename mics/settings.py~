@@ -218,8 +218,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 TOKEN_DEFAULT_SIZE=5
 ODK_DEFAULT_TOKEN='12345'
 SUBMISSION_UPLOAD_BASE=os.path.join(BASE_DIR, 'submissions')
-ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerfiles')
+ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerFiles')
 ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Processed"
+
 
 # Importing server specific settings
 from localsettings import *

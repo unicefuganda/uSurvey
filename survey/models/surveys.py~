@@ -60,3 +60,6 @@ class Survey(BaseModel):
         for batch in self.batch.all().order_by('order'):
             questions.extend(batch.all_questions())
         return questions
+
+    def ordered_batches():
+        return self.batch.all().order_by('order')

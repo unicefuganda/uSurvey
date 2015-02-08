@@ -29,7 +29,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% for batch in survey.ordered_batches %}
 		{% for question in batch.all_questions %}
 		<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}" 
-			type="{% if question.answer_type == 'number' %}int{% elif question.answer_type == 'multichoice' %}select1{% elif question.answer_type == 'multiselect' %}select{% elif question.answer_type == 'date' %}date{% elif question.answer_type == 'audio' or question.answer_type == 'image' or question.answer_type == 'video' %}binary{% elif question.answer_type == 'geopoint' %}geopoint{% else %}string {% endif %}" {% if question.answer_type is not 'geopoint' %}required="true()"{% endif %} />
+			type="{% if question.answer_type == 'number' %}int{% elif question.answer_type == 'multichoice' %}select1{% elif question.answer_type == 'multiselect' %}select{% elif question.answer_type == 'date' %}date{% elif question.answer_type == 'audio' or question.answer_type == 'image' or question.answer_type == 'video' %}binary{% elif question.answer_type == 'geopoint' %}geopoint{% else %}string {% endif %}" {% if question.answer_type !== 'geopoint' %}required="true()"{% endif %} />
 		{% endfor %}
 	{% endfor %}
 
@@ -70,10 +70,6 @@ xmlns:jr="http://openrosa.org/javarosa">
 						</item>
 						{% endfor %}
 					</select>
-				{% elif question.answer_type == 'date' %}
-					<input ref="/survey/b{{batch.pk}}/q{{question.pk}}">
-						<label>{{question.text}}</label>
-					</input>
 				{% elif question.answer_type == 'image' %}
 					<input ref="/survey/b{{batch.pk}}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
 						<label>{{question.text}}</label>
