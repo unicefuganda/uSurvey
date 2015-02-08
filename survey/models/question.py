@@ -7,6 +7,7 @@ from survey.models.households import Household, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.base import BaseModel
 from survey.models.batch import Batch
+from rapidsms.contrib.locations.models import Point
 
 
 class Question(BaseModel):
@@ -15,14 +16,20 @@ class Question(BaseModel):
     MULTICHOICE = 'multichoice'
     MULTISELECT = 'multiselect'
     DATE = 'date'
-    FILE = 'file'
+    AUDIO = 'audio'
+    VIDEO = 'video'
+    IMAGE = 'image'
+    GEOPOINT = 'geopoint'
     TYPE_OF_ANSWERS = {
         (NUMBER, 'Number'),
         (TEXT, 'Text'),
         (MULTICHOICE, 'Multichoice'),
         (MULTISELECT, 'Multiselect'),
         (DATE, 'Date'),
-        (FILE, 'File')
+        (AUDIO, 'audio'),
+        (VIDEO, 'video'),
+        (IMAGE, 'image'),
+        (GEOPOINT, 'geopoint'),
     }
     TYPE_OF_ANSWERS_CLASS = {
         NUMBER: 'NumericalAnswer',
@@ -30,7 +37,10 @@ class Question(BaseModel):
         MULTICHOICE: 'MultiChoiceAnswer',
         MULTISELECT: 'MultiSelectAnswer',
         DATE: 'DateAnswer',
-        FILE: 'FileAnswer',
+        AUDIO : 'AudioAnswer',
+        VIDEO : 'VideoAnswer',
+        IMAGE : 'ImageAnswer',
+        GEOPOINT : 'GeopointAnswer',
     }
 
     IGNORED_CHARACTERS = "*!#';&"
@@ -196,12 +206,27 @@ class NumericalAnswer(Answer):
 class TextAnswer(Answer):
     answer = models.CharField(max_length=100, blank=False, null=False)
 
-
 class MultiChoiceAnswer(Answer):
     answer = models.ForeignKey(QuestionOption, null=True)
+
+class MultiSelectAnswer(Answer):
+    answer = models.ManyToManyField(QuestionOption, null=True)
 
 class DateAnswer(Answer):
     answer = models.DateField(null=True)
 
 class FileAnswer(Answer):
     answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
+
+class AudioAnswer(FileAnswer):
+    pass
+
+class VideoAnswer(FileAnswer):
+    pass
+
+class ImageAnswer(FileAnswer):
+    pass
+
+class GeopointAnswer(Answer):
+    answer = models.ForeignKey(Point, null=True)
+
