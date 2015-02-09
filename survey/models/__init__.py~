@@ -21,6 +21,8 @@ from survey.models.location_type_details import LocationTypeDetails
 from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.indicators import Indicator
 from survey.models.about_us_content import AboutUs
+from survey.models.odk_submission import ODKSubmission, Attachment
+
 __all__ = [
     'Answer',
     'AnswerRule',

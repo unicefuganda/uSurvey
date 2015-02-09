@@ -10,7 +10,7 @@ from django import template
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
-from survey.models import Survey, Investigator, Household, HouseholdMember, Question, Batch, ODKSubmission
+from survey.models import Survey, Investigator, Household, HouseholdMember, Question, Batch, ODKSubmission, ODKGeoPoint
 from survey.odk.utils.log import logger
 from survey.tasks import execute
 
