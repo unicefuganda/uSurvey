@@ -32,8 +32,9 @@ class ODKSubmission(BaseModel):
 def upload_to(attachment, filename):
     return os.path.join(
         settings.SUBMISSION_UPLOAD_BASE,
-        str(attachment.submission.pk),
-        'attachments')
+        attachment.submission.pk,
+        'attachments',
+        os.path.basename(filename))
 
 
 class Attachment(BaseModel):

@@ -19,7 +19,7 @@ from survey.odk.utils.log import audit_log, Actions, logger
 from survey.odk.utils.odk_helper import get_households, process_submission, disposition_ext_and_date, \
 	response_with_mimetype_and_name, OpenRosaResponseBadRequest, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound,\
-    BaseOpenRosaResponse, HttpResponseNotAuthorized
+    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_basic_investigator_auth
 from survey.models import Survey, Investigator, Household
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
@@ -49,6 +49,7 @@ def submission_list(request):
 	return render(request, 'odk/submission_list.html', { 'submissions' : odk_submissions,
                                                  'request': request})
 
+@http_basic_investigator_auth
 @require_GET
 def form_list(request, username):
 	"""
@@ -74,6 +75,7 @@ def form_list(request, username):
 	else:
 		return HttpResponseNotAuthorized()
 
+@http_basic_investigator_auth
 def download_xform(request, username, household_id):
 	if authenticate(request):
 		investigator = get_object_or_404(Investigator, mobile_number=username)
@@ -94,7 +96,7 @@ def download_xform(request, username, household_id):
 	else:
 		return HttpResponseNotAuthorized()
 
-
+@http_basic_investigator_auth
 @require_http_methods(["POST"])
 @csrf_exempt
 def submission(request, username=None):
