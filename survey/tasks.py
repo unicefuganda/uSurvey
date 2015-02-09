@@ -9,6 +9,10 @@ def email_task(composer):
     return composer.send_mail()
 
 @task
+def execute(function, param_list):
+    function(*param_list)
+
+@task
 def save_attachments(odk_submission, media_files, submission_function=None):
     """A function to save the media files associated with this ODK submissions
     using a celery task."""

@@ -1,6 +1,5 @@
 from celery.task import task
 
-
 @task
 def upload_task(upload_form):
     return upload_form.upload()
@@ -8,6 +7,10 @@ def upload_task(upload_form):
 @task
 def email_task(composer):
     return composer.send_mail()
+
+@task
+def execute(function, param_list)
+    function(*param_list)
 
 @task
 def save_attachments(odk_submission, media_files, submission_function=None):

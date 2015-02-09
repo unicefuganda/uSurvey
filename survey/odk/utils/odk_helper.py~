@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from survey.models import Survey, Investigator, Household, HouseholdMember, Question, Batch, ODKSubmission
 from survey.odk.utils.log import logger
-from survey.tasks import save_attachments
+from survey.tasks import execute
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
 HTTP_OPEN_ROSA_VERSION_HEADER = 'HTTP_X_OPENROSA_VERSION'
@@ -23,6 +23,7 @@ ANSWER_PATH = '//survey/b{{batch_id}}/q{{question_id}}'
 INSTANCE_ID_PATH = '//survey/meta/instanceID'
 FORM_ID_PATH = '//survey/@id'
 MULTI_SELECT_XFORM_SEP = ' '
+GEOPOINT_XFORM_SEP = ' '
 # default content length for submission requests
 DEFAULT_CONTENT_LENGTH = 10000000
 MAX_DISPLAY_PER_COLLECTOR = 1000
@@ -43,23 +44,33 @@ def _get_household_members(survey_tree):
 	member_nodes = _get_nodes(HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
 	return HouseholdMember.objects.filter(pk__in=[member_node.text for member_node in member_nodes]).all()
 
+def build_answer(question, response):
+    logger.info('question: %s, response: %s' % (question.pk, response))
+    if question.answer_type == Question.MULTICHOICE:
+        return question.options.get(pk=response)
+    if question.answer_type == Question.MULTISELECT:
+        return question.options.filter(pk__in=response.split(MULTI_SELECT_XFORM_SEP))
+    if question.answer_type == Question.DATE:
+        return datetime.strptime(response, '%Y-%m-%d')
+    if question.answer_type == Question.GEOPOINT:
+        answer = ODKGeoPoint()
+        (answer.latitude, answer.longitude, answer.altitude, answer.precision) = response.split(GEOPOINT_XFORM_SEP)
+        answer.save()
+        return answer
+    return response
+
 def register_member_answer(investigator, question, household_member, answer, batch):
-	answer_class = question.answer_class()
-	if question.is_multichoice():
-		answer = question.options.get(pk=answer)
-	if question.is_multiselect():
-		answer = question.options.filter(pk__in=answer.split(MULTI_SELECT_XFORM_SEP))
-	if not answer:
-		return False
-	if question.is_multiselect():
-		created = answer_class.objects.create(investigator=investigator, question=question, householdmember=household_member,
+    answer_class = question.answer_class()
+    answer = build_answer(question, answer)
+    if question.answer_type == Question.MULTISELECT:
+        created = answer_class.objects.create(investigator=investigator, question=question, householdmember=household_member,
                          household=household_member.household, batch=batch)
-		created.answer = answer
-		created.save()
-	else:
-		created = answer_class.objects.create(investigator=investigator, question=question, householdmember=household_member,
+        created.answer = answer
+        created.save()
+    else:
+        created = answer_class.objects.create(investigator=investigator, question=question, householdmember=household_member,
                          answer=answer, household=household_member.household, batch=batch)
-	return created
+    return created
 
 def _get_responses(survey_tree, household_member):
 	survey = household_member.household.survey
@@ -82,6 +93,7 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
 	"""
 	extract surveys and for this xml file and for specified household member
 	"""
+        media_files = dict([(os.path.basename(f.name), f) for f in media_files])
 	reports =  []
 	survey_tree = _get_tree(xml_file)
 	household_members = _get_household_members(survey_tree)
@@ -93,6 +105,8 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
 		for (b_id, q_id), answer in response_dict.items():
 			question = Question.objects.get(pk=q_id)
 			batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
+                        if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
+                            answer = media_files.get(answer, None)
 			created = register_member_answer(investigator, question, member, answer, batch)
 			member_completion_report[(b_id, q_id)] = created
 			if b_id not in treated_batches.keys():
@@ -101,6 +115,8 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
 				survey=survey, form_id=_get_form_id(survey_tree),
 				instance_id=_get_instance_id(survey_tree), household_member=member, 
 				xml=etree.tostring(survey_tree, pretty_print=True))
+                submission.save_attachments(media_files.values())
+#                execute.delay(submission.save_attachments, media_files)
 		map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
 		if member.household.completed_currently_open_batches():
 			map(lambda batch: member.household.batch_completed(batch), treated_batches.values())

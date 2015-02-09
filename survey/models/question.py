@@ -202,6 +202,13 @@ class NumericalAnswer(Answer):
         except ValueError, e:
             self.investigator.invalid_answer(self.question)
 
+class ODKGeoPoint(Point):
+    altitude = models.DecimalField(decimal_places=3, max_digits=10)
+    precision = models.DecimalField(decimal_places=3, max_digits=10)
+
+    class Meta:
+        app_label = 'survey'
+
 
 class TextAnswer(Answer):
     answer = models.CharField(max_length=100, blank=False, null=False)
@@ -228,5 +235,5 @@ class ImageAnswer(FileAnswer):
     pass
 
 class GeopointAnswer(Answer):
-    answer = models.ForeignKey(Point, null=True)
+    answer = models.ForeignKey(ODKGeoPoint, null=True)
 
