@@ -78,7 +78,6 @@ def get_locations(request):
     return HttpResponse(json.dumps(location_hash), content_type="application/json")
 
 @login_required
-@permission_required('auth.can_view_investigators')
 @permission_required('survey.view_completed_survey')
 def list_investigators(request):
     params = request.GET

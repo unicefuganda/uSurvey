@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from survey.models import Survey, Investigator, Household, HouseholdMember, Question, Batch, ODKSubmission
 from survey.odk.utils.log import logger
+from survey.tasks import save_attachments
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
 HTTP_OPEN_ROSA_VERSION_HEADER = 'HTTP_X_OPENROSA_VERSION'
@@ -100,6 +101,7 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
 				survey=survey, form_id=_get_form_id(survey_tree),
 				instance_id=_get_instance_id(survey_tree), household_member=member, 
 				xml=etree.tostring(survey_tree, pretty_print=True))
+                save_attachments.delay(submission, media_files)
 		map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
 		if member.household.completed_currently_open_batches():
 			map(lambda batch: member.household.batch_completed(batch), treated_batches.values())

@@ -78,8 +78,8 @@ def get_locations(request):
     return HttpResponse(json.dumps(location_hash), content_type="application/json")
 
 @login_required
-@permission_required('auth.can_view_investigators')
 @permission_required('survey.view_completed_survey')
+@permission_required('auth.can_view_investigators')
 def list_investigators(request):
     params = request.GET
     selected_location = None
@@ -175,7 +175,7 @@ def unblock_investigator(request, investigator_id):
 @permission_required('auth.can_view_investigators')
 def download_investigators(request):
     filename = 'all_investigators'
-    formatted_responses = ExportInvestigatorsService(settings.INVESTIGATOR_EXPORT_HEADERS =  [').formatted_responses()
+    formatted_responses = ExportInvestigatorsService(settings.INVESTIGATOR_EXPORT_HEADERS).formatted_responses()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))

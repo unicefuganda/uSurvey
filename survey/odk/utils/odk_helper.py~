@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from survey.models import Survey, Investigator, Household, HouseholdMember, Question, Batch, ODKSubmission
 from survey.odk.utils.log import logger
+from survey.tasks import save_attachments
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
 HTTP_OPEN_ROSA_VERSION_HEADER = 'HTTP_X_OPENROSA_VERSION'
@@ -216,7 +217,7 @@ def http_basic_auth(func):
                     Investigator.objects.get(mobile_number=username, odk_token=password)
                     return func(request, *args, **kwargs)
                 except Investigator.DoesNotExist:
-                    pass
+                    raise
     return _decorator
 
 
