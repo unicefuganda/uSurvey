@@ -8,7 +8,7 @@
     <majorMinorVersion/>
     <version/>
     <hash />
-    <descriptionText> {{ household.survey.description}}</descriptionText>
+    <descriptionText> {{ household.survey.description }}</descriptionText>
     <downloadUrl>{{ base_url }}{% url 'download_odk_survey_form' investigator.mobile_number household.uid %}</downloadUrl>
     <manifestUrl></manifestUrl>
   </xform>

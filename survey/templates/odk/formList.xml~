@@ -1,9 +1,9 @@
 <forms>
 
- 
-  <form url="{% url 'download_odk_survey_form' 2348122218788 153 %}">Test survey
+  {% for household in households %}
+  <form url="{% url 'download_odk_survey_form' investigator.mobile_number household.uid %}">{{ household.household_code }}
   </form>
-
+  {% endfor %}
 </forms>
 
 

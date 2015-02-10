@@ -49,14 +49,14 @@ def submission_list(request):
 	return render(request, 'odk/submission_list.html', { 'submissions' : odk_submissions,
                                                  'request': request})
 
-@http_basic_investigator_auth
+#@http_basic_investigator_auth
 @require_GET
-def form_list(request, username):
+def form_list(request, username, token):
 	"""
 		This is where ODK Collect gets its download list.
 	"""
 	if authenticate(request):
-		investigator = get_object_or_404(Investigator, mobile_number=username)
+		investigator = get_object_or_404(Investigator, mobile_number=username, odk_token=token)
 		#to do - Make fetching households more e
 		households = get_households(investigator)
 		audit = {}
@@ -75,10 +75,10 @@ def form_list(request, username):
 	else:
 		return HttpResponseNotAuthorized()
 
-@http_basic_investigator_auth
-def download_xform(request, username, household_id):
+#@http_basic_investigator_auth
+def download_xform(request, username, token, household_id):
 	if authenticate(request):
-		investigator = get_object_or_404(Investigator, mobile_number=username)
+		investigator = get_object_or_404(Investigator, mobile_number=username, odk_token=token)
 		#to do - Make fetching households more e
 		household = get_object_or_404(Household, uid=household_id, investigator=investigator)
 		survey_xform = get_survey_xform(household)
@@ -96,12 +96,12 @@ def download_xform(request, username, household_id):
 	else:
 		return HttpResponseNotAuthorized()
 
-@http_basic_investigator_auth
+#@http_basic_investigator_auth
 @require_http_methods(["POST"])
 @csrf_exempt
-def submission(request, username=None):
+def submission(request, username, token):
 	if authenticate(request):
-		investigator = get_object_or_404(Investigator, mobile_number=username)
+		investigator = get_object_or_404(Investigator, mobile_number=username, odk_token=token)
 		context = RequestContext(request)
 		submission_date = datetime.now().isoformat()
 		xml_file_list = []

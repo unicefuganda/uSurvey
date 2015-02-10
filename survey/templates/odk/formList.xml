@@ -1,7 +1,7 @@
 <forms>
 
   {% for household in households %}
-  <form url="{% url 'download_odk_survey_form' investigator.mobile_number household.uid %}">{{ household.household_code }}
+  <form url="{% url 'download_odk_survey_form' investigator.mobile_number investigator.odk_token household.uid %}">{{ household.household_code }}
   </form>
   {% endfor %}
 </forms>
