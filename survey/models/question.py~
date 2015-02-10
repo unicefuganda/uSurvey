@@ -26,10 +26,10 @@ class Question(BaseModel):
         (MULTICHOICE, 'Multichoice'),
         (MULTISELECT, 'Multiselect'),
         (DATE, 'Date'),
-        (AUDIO, 'audio'),
-        (VIDEO, 'video'),
-        (IMAGE, 'image'),
-        (GEOPOINT, 'geopoint'),
+        (AUDIO, 'Audio'),
+        (VIDEO, 'Video'),
+        (IMAGE, 'Image'),
+        (GEOPOINT, 'Geopoint'),
     }
     TYPE_OF_ANSWERS_CLASS = {
         NUMBER: 'NumericalAnswer',
@@ -202,7 +202,7 @@ class NumericalAnswer(Answer):
         except ValueError, e:
             self.investigator.invalid_answer(self.question)
 
-class ODKGeoPoint(BaseModel):
+class ODKGeoPoint(Point):
     altitude = models.DecimalField(decimal_places=3, max_digits=10)
     precision = models.DecimalField(decimal_places=3, max_digits=10)
 
@@ -222,17 +222,14 @@ class MultiSelectAnswer(Answer):
 class DateAnswer(Answer):
     answer = models.DateField(null=True)
 
-class FileAnswer(Answer):
-    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
+class AudioAnswer(Answer):
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True, default='')
 
-class AudioAnswer(FileAnswer):
-    pass
+class VideoAnswer(Answer):
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True, default='')
 
-class VideoAnswer(FileAnswer):
-    pass
-
-class ImageAnswer(FileAnswer):
-    pass
+class ImageAnswer(Answer):
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True, default='')
 
 class GeopointAnswer(Answer):
     answer = models.ForeignKey(ODKGeoPoint, null=True)

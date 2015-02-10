@@ -20,7 +20,6 @@
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/smoothness/jquery-ui.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript" src="/local/path/to/firebug-lite.js"></script>
 
 </head>
 <body>

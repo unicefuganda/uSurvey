@@ -41,7 +41,7 @@ class Household(BaseModel):
 
     def last_question_answered(self):
         answered = []
-        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             answer = getattr(self, related_name).all()
             if answer.exists(): answered.append(answer.latest())
         if answered:
@@ -70,7 +70,7 @@ class Household(BaseModel):
         batches = self.investigator.get_open_batch()
         from survey.models import Question
         questions = Question.objects.filter(batches__in=batches)
-        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             getattr(self, related_name).filter(question__in=questions).delete()
 
     def has_completed_batch(self, batch):
@@ -131,7 +131,7 @@ class Household(BaseModel):
 
     def all_answers(self, batch):
         answers = {}
-        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             answers[key] = getattr(self, key).filter(batch=batch, is_old=False).values_list('question', flat=True)
         return answers
 
@@ -317,13 +317,13 @@ class HouseholdMember(BaseModel):
 
     def all_answers(self, batch):
         answers = {}
-        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             answers[key] = getattr(self, key).filter(batch=batch, is_old=False).values_list('question', flat=True)
         return answers
 
     def last_question_answered(self):
         answered = []
-        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             answer = getattr(self, related_name).all()
             if answer.exists() and answer.filter(is_old=False).exists(): answered.append(answer.latest())
         if answered:
@@ -437,7 +437,7 @@ class HouseholdMember(BaseModel):
 
     def mark_past_answers_as_old(self):
         self.completed_member_batches.all().delete()
-        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer']:
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             getattr(self, related_name).all().update(is_old=True)
 
     def answers_for(self, questions, general_group):

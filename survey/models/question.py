@@ -26,10 +26,10 @@ class Question(BaseModel):
         (MULTICHOICE, 'Multichoice'),
         (MULTISELECT, 'Multiselect'),
         (DATE, 'Date'),
-        (AUDIO, 'audio'),
-        (VIDEO, 'video'),
-        (IMAGE, 'image'),
-        (GEOPOINT, 'geopoint'),
+        (AUDIO, 'Audio'),
+        (VIDEO, 'Video'),
+        (IMAGE, 'Image'),
+        (GEOPOINT, 'Geopoint'),
     }
     TYPE_OF_ANSWERS_CLASS = {
         NUMBER: 'NumericalAnswer',
@@ -222,17 +222,14 @@ class MultiSelectAnswer(Answer):
 class DateAnswer(Answer):
     answer = models.DateField(null=True)
 
-class FileAnswer(Answer):
+class AudioAnswer(Answer):
     answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
-class AudioAnswer(FileAnswer):
-    pass
+class VideoAnswer(Answer):
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
-class VideoAnswer(FileAnswer):
-    pass
-
-class ImageAnswer(FileAnswer):
-    pass
+class ImageAnswer(Answer):
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
 class GeopointAnswer(Answer):
     answer = models.ForeignKey(ODKGeoPoint, null=True)

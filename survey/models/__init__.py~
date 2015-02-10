@@ -10,7 +10,7 @@ from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.investigator import Investigator
 from survey.models.location_weight import LocationWeight
 from survey.models.locations import LocationAutoComplete, LocationCode
-from survey.models.question import Question, QuestionOption, NumericalAnswer, TextAnswer, MultiChoiceAnswer, Answer
+from survey.models.question import Question, QuestionOption, NumericalAnswer, TextAnswer, MultiChoiceAnswer, Answer, ODKGeoPoint, DateAnswer
 from survey.models.random_household_selection import RandomHouseHoldSelection
 from survey.models.surveys import Survey
 from survey.models.unknown_dob_attribute import UnknownDOBAttribute
