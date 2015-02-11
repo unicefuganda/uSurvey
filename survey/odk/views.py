@@ -16,7 +16,7 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.template import RequestContext, loader
 from survey.odk.utils.log import audit_log, Actions, logger
-from survey.odk.utils.odk_helper import get_households, process_submission, disposition_ext_and_date, \
+from survey.odk.utils.odk_helper import get_households, process_submission, disposition_ext_and_date, get_zipped_dir, \
 	response_with_mimetype_and_name, OpenRosaResponseBadRequest, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound,\
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_basic_investigator_auth
@@ -41,12 +41,24 @@ def base_url(request):
 
 @login_required
 @permission_required('auth.can_view_aggregates')
+def download_submission_attachment(request, submission_id):
+    odk_submission = ODKSubmission.objects.get(pk=submission_id)
+    filename = '%s-%s-%s.zip' % (odk_submission.survey.name, odk_submission.household_member.pk, odk_submission.investigator.pk)
+    attachment_dir = os.path.join(settings.SUBMISSION_UPLOAD_BASE, str(odk_submission.pk), 'attachments')
+    response = HttpResponse(content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+    response.write(get_zipped_dir(attachment_dir))
+    return response
+
+
+@login_required
+@permission_required('auth.can_view_aggregates')
 def submission_list(request):
-	odk_submissions = ODKSubmission.objects.all()
-	search_fields = ['investigator__name', 'survey__name', 'household__uid', 'form_id', 'instance_id']
-	if request.GET.has_key('q'):
-		odk_submissions = get_filterset(odk_submissions, request.GET['q'], search_fields)
-	return render(request, 'odk/submission_list.html', { 'submissions' : odk_submissions,
+    odk_submissions = ODKSubmission.objects.all()
+    search_fields = ['investigator__name', 'survey__name', 'household__uid', 'form_id', 'instance_id']
+    if request.GET.has_key('q'):
+        odk_submissions = get_filterset(odk_submissions, request.GET['q'], search_fields)
+    return render(request, 'odk/submission_list.html', { 'submissions' : odk_submissions,
                                                  'request': request})
 
 #@http_basic_investigator_auth

@@ -219,6 +219,7 @@ TOKEN_DEFAULT_SIZE=5
 ODK_DEFAULT_TOKEN='12345'
 SUBMISSION_UPLOAD_BASE=os.path.join(BASE_DIR, 'submissions')
 ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerFiles')
+TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
 ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Processed"
 INVESTIGATOR_EXPORT_HEADERS =  ['name', 'mobile_number', 'age', 'level_of_education', 'language', 'weights', 'is_blocked', 'ea']
 

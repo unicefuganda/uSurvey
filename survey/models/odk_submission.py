@@ -22,6 +22,9 @@ class ODKSubmission(BaseModel):
     class Meta:
         app_label = 'survey'
 
+    def has_attachments(self):
+        return self.attachments.count() > 0
+
     def save_attachments(self, media_files):
         for f in media_files:
             content_type = f.content_type if hasattr(f, 'content_type') else ''

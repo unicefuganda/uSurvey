@@ -1,6 +1,7 @@
 from datetime import date, datetime
 import decimal
 import os
+import zipfile
 import pytz
 from lxml import etree
 from django.http import HttpResponse
@@ -14,6 +15,7 @@ from survey.models import Survey, Investigator, Household, HouseholdMember, Ques
 from survey.odk.utils.log import logger
 from survey.tasks import execute
 from functools import wraps
+from survey.utils.zip import InMemoryZip
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
 HTTP_OPEN_ROSA_VERSION_HEADER = 'HTTP_X_OPENROSA_VERSION'
@@ -239,6 +241,22 @@ def http_basic_investigator_auth(func):
                     raise
         return OpenRosaResponseBadRequest(_(u"Unknown user."))
     return _decorator
+
+def get_zipped_dir(dirpath):
+    zipf = InMemoryZip()    
+    for root, dirs, files in os.walk(dirpath):
+        for filename in files:
+            f = open(os.path.join(root, filename))
+            zipf.append(filename, f.read())
+            f.close()
+    return zipf.read()
+
+
+
+
+
+
+
 
 
 

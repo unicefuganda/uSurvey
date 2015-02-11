@@ -21,7 +21,8 @@
 				<th>Household Member</th>
                 <th>Form Id</th>
                 <th>Submission Instance</th>
-				<th>Submission Date</th>
+		<th>Submission Date</th>
+                <th> Attachments </th>
             </tr>
             </thead>
             <tbody>
@@ -48,6 +49,16 @@
                     <td>
                         {{ submission.created }}
                     </td>
+                    <td class="attachments">
+           		
+			{% if submission.has_attachments %}
+                            <a href="{% url 'download_submission_attachment' submission.pk %}">
+			     <br /><span>Download({{submission.attachments.count}})</span>
+			    </a>
+			{% else %}
+			    <span>None</span>
+                        {% endif %}
+                     </td>
                 </tr>
             {% endfor %}
             </tbody>
