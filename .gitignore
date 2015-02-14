@@ -44,3 +44,7 @@ investigator_configs.py
 .DS_STORE
 tags
 */**/.DS_STORE
+
+#odk media submissions
+submissions
+answerFiles
