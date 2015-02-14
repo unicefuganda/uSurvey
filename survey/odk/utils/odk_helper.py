@@ -102,7 +102,10 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
 	household_members = _get_household_members(survey_tree)
 	for member in household_members:
 		member_completion_report = {}
-		survey = member.household.survey
+                household = member.household
+                if household.investigator is not investigator:
+                    continue #do not process current member if it does not belong to this investigator
+		survey = household.survey
 		response_dict = _get_responses(survey_tree, member)
 		treated_batches = {}
 		for (b_id, q_id), answer in response_dict.items():

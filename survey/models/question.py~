@@ -1,4 +1,6 @@
 from django.conf import settings
+#from django.utils.safestring import SafeUnicode
+from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.paginator import Paginator
 from django.db import models
@@ -68,7 +70,8 @@ class Question(BaseModel):
             self.subquestion = True
 
     def __unicode__(self):
-        return "%s - %s: (%s)" % (self.identifier, self.text, self.answer_type.upper())
+        name = '<div><table border="1"><tr><td>%s&nbsp;&nbsp;|</td><td>&nbsp;&nbsp;%s&nbsp;&nbsp;|</td><td>&nbsp;&nbsp;&nbsp;&nbsp;%s</td></tr></table></div>' % (self.identifier, self.text, self.answer_type.upper())
+        return mark_safe(name)
 
     def clean(self, *args, **kwargs):
         if self.subquestion and self.order:
@@ -223,13 +226,13 @@ class DateAnswer(Answer):
     answer = models.DateField(null=True)
 
 class AudioAnswer(Answer):
-    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True, default='')
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
 class VideoAnswer(Answer):
-    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True, default='')
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
 class ImageAnswer(Answer):
-    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True, default='')
+    answer = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
 class GeopointAnswer(Answer):
     answer = models.ForeignKey(ODKGeoPoint, null=True)
