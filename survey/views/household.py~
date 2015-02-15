@@ -15,7 +15,6 @@ from survey.models.households import Household
 from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
-from survey.utils.query_helper import get_filterset
 
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''

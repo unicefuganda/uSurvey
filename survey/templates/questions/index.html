@@ -12,6 +12,7 @@
             {{ batch.name.capitalize }} Questions
         </h3>
         {% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" filter_id="question-filter-form" a_form=question_filter_form %}
+<div class="form-actions">
         <div class="question-button pull-right">
             <form accept-charset="utf-8" action="{% url 'export_questions_in_batch' batch.id %}" method="post" id="export_questions_form">
                 {% csrf_token %}
@@ -35,14 +36,12 @@
             <a href="{% url 'new_question_page' %}" class="btn btn_primary" id="add_question">Create New Question</a>
         </div>
     {% endif %}
-
+ {% include "search_form.html" %}
+</div>
     {% if batch %}
         <form method="post" accept-charset="utf-8" action="{% url 'update_question_order_page' batch.id %}">
         {% csrf_token %}
     {% endif %}
-<br class="clear" />
-<br />
- {% include "search_form.html" %}
 
 <table class="table table-striped table-bordered table-hover clear table-sort" id="questions_table">
     <thead>

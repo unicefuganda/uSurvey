@@ -241,8 +241,6 @@ def http_basic_investigator_auth(func):
                 username, password = auth.split(':', 1)
                 try:
                     request.user = Investigator.objects.get(mobile_number=username, odk_token=password)
-#                    kwargs['username'] = username
-#                    kwargs['token'] = password
                     return func(request, *args, **kwargs)
                 except Investigator.DoesNotExist:
                     return OpenRosaResponseNotFound()
@@ -259,11 +257,8 @@ def http_digest_investigator_auth(func):
             try:
                 parsed_header = digestor.parse_authorization_header(request.META['HTTP_AUTHORIZATION'])
                 if parsed_header['realm'] == realm:
-#                    import pdb;pdb.set_trace()
                     investigator = Investigator.objects.get(mobile_number=parsed_header['username'])
                     authenticator = SimpleHardcodedAuthenticator(server_realm=realm, server_username=investigator.mobile_number, server_password=investigator.odk_token)
-#                    kwargs['username'] = username
-#                    kwargs['token'] = password
                     request.user = investigator
                     if authenticator.secret_passed(digestor):
                         return func(request, *args, **kwargs)
@@ -284,13 +279,3 @@ def get_zipped_dir(dirpath):
             zipf.append(filename, f.read())
             f.close()
     return zipf.read()
-
-
-
-
-
-
-
-
-
-
