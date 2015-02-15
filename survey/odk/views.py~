@@ -19,15 +19,12 @@ from survey.odk.utils.log import audit_log, Actions, logger
 from survey.odk.utils.odk_helper import get_households, process_submission, disposition_ext_and_date, get_zipped_dir, \
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound,\
-    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_basic_investigator_auth
+    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_investigator_auth
 from survey.models import Survey, Investigator, Household
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
 from survey.models import ODKSubmission
-
-def authenticate(request):
-    return True
 
 def get_survey_xform(household):
     survey = household.survey
@@ -61,18 +58,19 @@ def submission_list(request):
     return render(request, 'odk/submission_list.html', { 'submissions' : odk_submissions,
                                                  'request': request})
 
-@http_basic_investigator_auth
+@http_digest_investigator_auth
 @require_GET
-def form_list(request, username, token):
+def form_list(request):
     """
         This is where ODK Collect gets its download list.
     """
-    investigator = get_object_or_404(Investigator, mobile_number=username, odk_token=token)
+    investigator = request.user
+    #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     households = get_households(investigator)
     audit = {}
     audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, investigator,
-          _("Requested forms list. for %s" % username), audit, request)
+          _("Requested forms list. for %s" % investigator.mobile_number), audit, request)
     response = render_to_response("odk/xformsList.xml", {
     'households': households,
     'investigator' : investigator,
@@ -84,9 +82,10 @@ def form_list(request, username, token):
     response['Date'] = dt
     return response
 
-@http_basic_investigator_auth
-def download_xform(request, username, token, household_id):
-    investigator = get_object_or_404(Investigator, mobile_number=username, odk_token=token)
+@http_digest_investigator_auth
+def download_xform(request, household_id):
+    investigator = request.user
+    #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     household = get_object_or_404(Household, uid=household_id, investigator=investigator)
     survey_xform = get_survey_xform(household)
@@ -102,11 +101,12 @@ def download_xform(request, username, token, household_id):
     response.content = survey_xform
     return response
 
-@http_basic_investigator_auth
+@http_digest_investigator_auth
 @require_http_methods(["POST"])
 @csrf_exempt
-def submission(request, username, token):
-    investigator = get_object_or_404(Investigator, mobile_number=username, odk_token=token)
+def submission(request):
+    investigator = request.user
+    #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     context = RequestContext(request)
     submission_date = datetime.now().isoformat()
     xml_file_list = []

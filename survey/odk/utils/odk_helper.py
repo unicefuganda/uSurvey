@@ -10,6 +10,8 @@ from django.shortcuts import render
 from django import template
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from djangohttpdigest.digest import Digestor, parse_authorization_header
+from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
 from survey.models import Survey, Investigator, Household, HouseholdMember, Question, Batch, ODKSubmission, ODKGeoPoint
 from survey.odk.utils.log import logger
@@ -17,6 +19,7 @@ from survey.tasks import execute
 from functools import wraps
 from survey.utils.zip import InMemoryZip
 from django.contrib.sites.models import Site
+
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
 HTTP_OPEN_ROSA_VERSION_HEADER = 'HTTP_X_OPENROSA_VERSION'
@@ -237,13 +240,40 @@ def http_basic_investigator_auth(func):
                 auth = auth.strip().decode('base64')
                 username, password = auth.split(':', 1)
                 try:
-                    Investigator.objects.get(mobile_number=username, odk_token=password)
-                    kwargs['username'] = username
-                    kwargs['token'] = password
+                    request.user = Investigator.objects.get(mobile_number=username, odk_token=password)
+#                    kwargs['username'] = username
+#                    kwargs['token'] = password
                     return func(request, *args, **kwargs)
                 except Investigator.DoesNotExist:
                     return OpenRosaResponseNotFound()
         return HttpResponseNotAuthorized()
+    return _decorator
+
+def http_digest_investigator_auth(func):
+    @wraps(func)
+    def _decorator(request, *args, **kwargs):
+        realm = Site.objects.get_current().name
+        digestor = Digestor(method=request.method, path=request.get_full_path(), realm=realm)
+        if request.META.has_key('HTTP_AUTHORIZATION'):
+            logger.info('request meta: %s' % request.META['HTTP_AUTHORIZATION'])
+            try:
+                parsed_header = digestor.parse_authorization_header(request.META['HTTP_AUTHORIZATION'])
+                if parsed_header['realm'] == realm:
+#                    import pdb;pdb.set_trace()
+                    investigator = Investigator.objects.get(mobile_number=parsed_header['username'])
+                    authenticator = SimpleHardcodedAuthenticator(server_realm=realm, server_username=investigator.mobile_number, server_password=investigator.odk_token)
+#                    kwargs['username'] = username
+#                    kwargs['token'] = password
+                    request.user = investigator
+                    if authenticator.secret_passed(digestor):
+                        return func(request, *args, **kwargs)
+            except Investigator.DoesNotExist:
+                return OpenRosaResponseNotFound()
+            except ValueError, err:
+                return OpenRosaResponseBadRequest()
+        response = HttpResponseNotAuthorized()
+        response['www-authenticate'] = digestor.get_digest_challenge()
+        return response
     return _decorator
 
 def get_zipped_dir(dirpath):

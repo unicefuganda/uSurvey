@@ -85,8 +85,7 @@ def audit_log(action, request_user, investigator, message, audit, request, level
     """
     extra = {
         'formhub_action': action,
-        'request_username': request_user.username if request_user.username
-            else str(request_user),
+        'request_username': str(request_user),
         'account_username': investigator.name if investigator.name
             else str(investigator),
         'client_ip': get_client_ip(request),
