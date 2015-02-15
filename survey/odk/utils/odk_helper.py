@@ -232,6 +232,7 @@ def http_basic_investigator_auth(func):
     def _decorator(request, *args, **kwargs):
         if request.META.has_key('HTTP_AUTHORIZATION'):
             authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
+            logger.info('request meta: %s' % request.META['HTTP_AUTHORIZATION'])
             if authmeth.lower() == 'basic':
                 auth = auth.strip().decode('base64')
                 username, password = auth.split(':', 1)
