@@ -16,6 +16,7 @@ from survey.odk.utils.log import logger
 from survey.tasks import execute
 from functools import wraps
 from survey.utils.zip import InMemoryZip
+from django.contrib.sites.models import Site
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
 HTTP_OPEN_ROSA_VERSION_HEADER = 'HTTP_X_OPENROSA_VERSION'
@@ -230,7 +231,6 @@ class OpenRosaResponseNotAllowed(OpenRosaResponse):
 def http_basic_investigator_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
-        #import pdb;pdb.set_trace()
         if request.META.has_key('HTTP_AUTHORIZATION'):
 	    authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
             if authmeth.lower() == 'basic':
@@ -239,10 +239,11 @@ def http_basic_investigator_auth(func):
                 try:
                     Investigator.objects.get(mobile_number=username, odk_token=password)
                     kwargs['username'] = username
+                    kwargs['token'] = password
                     return func(request, *args, **kwargs)
                 except Investigator.DoesNotExist:
-                    raise
-        return OpenRosaResponseBadRequest(_(u"Unknown user."))
+                    return OpenRosaResponseNotFound()
+        return HttpResponseNotAuthorized()
     return _decorator
 
 def get_zipped_dir(dirpath):
