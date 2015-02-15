@@ -34,19 +34,19 @@ MAX_DISPLAY_PER_COLLECTOR = 1000
 
 
 def _get_tree(xml_file):
-	return etree.fromstring(xml_file.read())
+    return etree.fromstring(xml_file.read())
 
 def _get_nodes(search_path, tree=None, xml_string=None): #either tree or xml_string must be defined
-	if tree is None:
-		tree = etree.fromstring(xml_string)
-	try:
-		return tree.xpath(search_path)
-	except Exception, ex:
-		logger.error('Error retrieving path: %s, Desc: %s' % (search_path, str(ex)))
+    if tree is None:
+        tree = etree.fromstring(xml_string)
+    try:
+        return tree.xpath(search_path)
+    except Exception, ex:
+        logger.error('Error retrieving path: %s, Desc: %s' % (search_path, str(ex)))
 
 def _get_household_members(survey_tree):
-	member_nodes = _get_nodes(HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
-	return HouseholdMember.objects.filter(pk__in=[member_node.text for member_node in member_nodes]).all()
+    member_nodes = _get_nodes(HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
+    return HouseholdMember.objects.filter(pk__in=[member_node.text for member_node in member_nodes]).all()
 
 def build_answer(question, response):
     logger.info('question: %s, response: %s' % (question.pk, response))
@@ -77,76 +77,76 @@ def register_member_answer(investigator, question, household_member, answer, bat
     return created
 
 def _get_responses(survey_tree, household_member):
-	survey = household_member.household.survey
-	response_dict = {}
-	for batch in survey.batch.all():
-		for question in batch.all_questions():
-			context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
-			answer_path = template.Template(ANSWER_PATH).render(context)
-			response_dict[(batch.pk, question.pk)] = _get_nodes(answer_path, tree=survey_tree)[0].text
-	return response_dict
-				
+    survey = household_member.household.survey
+    response_dict = {}
+    for batch in survey.batch.all():
+        for question in batch.all_questions():
+            context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
+            answer_path = template.Template(ANSWER_PATH).render(context)
+            response_dict[(batch.pk, question.pk)] = _get_nodes(answer_path, tree=survey_tree)[0].text
+    return response_dict
+                
 def _get_instance_id(survey_tree):
-	return _get_nodes(INSTANCE_ID_PATH, tree=survey_tree)[0].text
+    return _get_nodes(INSTANCE_ID_PATH, tree=survey_tree)[0].text
 
 def _get_form_id(survey_tree):
-	return _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
+    return _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
 
 @transaction.autocommit
 def process_submission(investigator, xml_file, media_files=[], request=None):
-	"""
-	extract surveys and for this xml file and for specified household member
-	"""
-        media_files = dict([(os.path.basename(f.name), f) for f in media_files])
-	reports =  []
-	survey_tree = _get_tree(xml_file)
-	household_members = _get_household_members(survey_tree)
-	for member in household_members:
-		member_completion_report = {}
-                household = member.household
-                if household.investigator is not investigator:
-                    continue #do not process current member if it does not belong to this investigator
-		survey = household.survey
-		response_dict = _get_responses(survey_tree, member)
-		treated_batches = {}
-		for (b_id, q_id), answer in response_dict.items():
-			question = Question.objects.get(pk=q_id)
-			batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-                        if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
-                            answer = media_files.get(answer, None)
-			created = register_member_answer(investigator, question, member, answer, batch)
-                        member_completion_report[(b_id, q_id)] = created
-			if b_id not in treated_batches.keys():
-				treated_batches[b_id] = batch
-		submission = ODKSubmission.objects.create(investigator=investigator, 
-				survey=survey, form_id=_get_form_id(survey_tree),
-				instance_id=_get_instance_id(survey_tree), household_member=member, 
-				xml=etree.tostring(survey_tree, pretty_print=True))
-                submission.save_attachments(media_files.values())
+    """
+    extract surveys and for this xml file and for specified household member
+    """
+    media_files = dict([(os.path.basename(f.name), f) for f in media_files])
+    reports =  []
+    survey_tree = _get_tree(xml_file)
+    household_members = _get_household_members(survey_tree)
+    for member in household_members:
+        member_completion_report = {}
+        household = member.household
+        if household.investigator is not investigator:
+            continue #do not process current member if it does not belong to this investigator
+        survey = household.survey
+        response_dict = _get_responses(survey_tree, member)
+        treated_batches = {}
+        for (b_id, q_id), answer in response_dict.items():
+            question = Question.objects.get(pk=q_id)
+            batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
+            if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
+                answer = media_files.get(answer, None)
+            created = register_member_answer(investigator, question, member, answer, batch)
+            member_completion_report[(b_id, q_id)] = created
+            if b_id not in treated_batches.keys():
+                treated_batches[b_id] = batch
+        submission = ODKSubmission.objects.create(investigator=investigator, 
+                survey=survey, form_id=_get_form_id(survey_tree),
+                instance_id=_get_instance_id(survey_tree), household_member=member, 
+                xml=etree.tostring(survey_tree, pretty_print=True))
+        submission.save_attachments(media_files.values())
 #                execute.delay(submission.save_attachments, media_files)
-		map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
-		if member.household.completed_currently_open_batches():
-			map(lambda batch: member.household.batch_completed(batch), treated_batches.values())
-		reports.append(submission)
-	return reports
+        map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
+        if member.household.completed_currently_open_batches():
+            map(lambda batch: member.household.batch_completed(batch), treated_batches.values())
+        reports.append(submission)
+    return reports
 
 def get_households(investigator):
-	"""
-		return the households with uncompleted surveys for households assigned to this investigator
-		#to do: Need to make this retrieval more effecient in the future
-	"""
-	return [household for household in investigator.households.all() if not household.survey_completed()] 
+    """
+        return the households with uncompleted surveys for households assigned to this investigator
+        #to do: Need to make this retrieval more effecient in the future
+    """
+    return [household for household in investigator.households.all() if not household.survey_completed()] 
 
 
 class SubmissionReport:
-	form_id = None
-	instance_id = None
-	report_details = None
+    form_id = None
+    instance_id = None
+    report_details = None
 
-	def __init__(self, form_id, instance_id, report_details):
-		self.form_id = form_id
-		self.instance_id = instance_id
-		self.report_details = report_details
+    def __init__(self, form_id, instance_id, report_details):
+        self.form_id = form_id
+        self.instance_id = instance_id
+        self.report_details = report_details
 
 def disposition_ext_and_date(name, extension, show_date=True):
     if name is None:
@@ -224,16 +224,14 @@ class OpenRosaResponseNotFound(OpenRosaResponse):
 class OpenRosaResponseBadRequest(OpenRosaResponse):
     status_code = 400
 
-
 class OpenRosaResponseNotAllowed(OpenRosaResponse):
     status_code = 405
 
 def http_basic_investigator_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
-        #import pdb;pdb.set_trace()
         if request.META.has_key('HTTP_AUTHORIZATION'):
-	    authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
+        authmeth, auth = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
             if authmeth.lower() == 'basic':
                 auth = auth.strip().decode('base64')
                 username, password = auth.split(':', 1)
