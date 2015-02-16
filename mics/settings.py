@@ -214,6 +214,14 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1800
 SESSION_SAVE_EVERY_REQUEST = True
 
+#email settings
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'usurvey.unicef@gmail.com'
+EMAIL_HOST_PASSWORD = 'P@ssw0rdugd'
+DEFAULT_EMAIL_SENDER = 'usurvey.unicef@gmail.com'
+
 #odk settings
 TOKEN_DEFAULT_SIZE=5
 ODK_DEFAULT_TOKEN='12345'
