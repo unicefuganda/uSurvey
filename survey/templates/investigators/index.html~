@@ -37,7 +37,7 @@
 	 <th>
           Completion Details
          </th>
-          <th>
+          <th style="background-image: None;" onclick="return false;">
             Actions
           </th>
         </tr>

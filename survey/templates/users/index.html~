@@ -33,7 +33,7 @@
                 <th>Role</th>
                 <th>Mobile number</th>
                 <th>Current Status</th>
-                <th>Actions</th>
+                <th style="background-image: None;" onclick="return false;">Actions</th>
             </tr>
             </thead>
             <tbody>

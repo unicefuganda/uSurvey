@@ -25,10 +25,7 @@
         <th>
           Number of Households
         </th>
-	<th>
-	Completion Summary
-	</th>
-        <th>
+        <th  style="background-image: None;" onclick="return false;">
           Actions
         </th>
       </tr>
@@ -48,9 +45,6 @@
           <td>
               {{ survey.sample_size }}
           </td>
-          <td>
-		{{ investigator_completion_summary }}
-	  </td>
           <td>
             <div class="btn-group">
                 <a class="btn btn-small" href='{% url "edit_survey_page" survey.id %}'><i class="icon-pencil"></i> Edit</a>
