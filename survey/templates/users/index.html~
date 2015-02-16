@@ -7,11 +7,11 @@
 {% autopaginate users 30 %}
 {% load template_tags %}
     <h3>Users List</h3>
+<div class="form-actions">
     <a href="{% url 'new_user_page' %}" class="btn btn_primary pull-right" id="add-user"><i class="icon-plus"></i> Add User</a>
-    <br class="clear"/>
-    <br/>
-	<div class="filter-option">
     {% include "search_form.html" %}
+</div>
+	<div class="filter-option">
 			<h5>Filter By Status</h5>
 		    <ul id="horizontal-filter">
 		        <li>
