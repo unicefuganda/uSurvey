@@ -25,9 +25,9 @@ class ResultComposer:
             mail.attach(attachment_name, '\r\n'.join(data), 'text/csv')
             print mail
             sent = mail.send()
-            print 'Emailed!! %s' % sent
+            print 'Emailed!! ', sent
         except Exception ex:
-            print '
+            print 'error while sending mail: %s', str(ex)
 
 
 
