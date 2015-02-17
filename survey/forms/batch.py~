@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from survey.models import BatchQuestionOrder
 from survey.models.batch import Batch
 
@@ -26,7 +27,7 @@ class BatchForm(ModelForm):
 
 class BatchQuestionsForm(ModelForm):
     questions = forms.ModelMultipleChoiceField(label=u'', queryset=Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP'),
-                                               widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
+                                               widget=FilteredSelectMultiple('Select Questions', is_stacked=False, attrs={'class': 'multi-select'}))
 
     class Meta:
         model = Batch

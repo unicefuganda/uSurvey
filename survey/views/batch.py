@@ -145,6 +145,7 @@ def assign(request, batch_id):
     context = {'batch_questions_form': batch_questions_form, 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,
                'modules': all_modules}
+#    import pdb;pdb.set_trace()
     return render(request, 'batches/assign.html',
                   context)
 

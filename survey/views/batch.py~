@@ -41,6 +41,8 @@ def show(request, survey_id, batch_id):
     open_locations = Location.objects.filter(id__in=batch_location_ids)
     if request.GET.get('status', False) == 'open':
         locations = locations.filter(id__in=batch_location_ids)       
+    else:
+        locations = locations.exclude(id__in=batch_location_ids)       
     context = {'batch': batch,
                'locations': locations,
                'open_locations': open_locations,
@@ -143,6 +145,7 @@ def assign(request, batch_id):
     context = {'batch_questions_form': batch_questions_form, 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,
                'modules': all_modules}
+    import pdb;pdb.set_trace()
     return render(request, 'batches/assign.html',
                   context)
 
