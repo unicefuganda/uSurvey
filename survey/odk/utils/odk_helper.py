@@ -13,7 +13,8 @@ from django.shortcuts import get_object_or_404
 from djangohttpdigest.digest import Digestor, parse_authorization_header
 from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
-from survey.models import Survey, Investigator, Household, HouseholdMember, Question, Batch, ODKSubmission, ODKGeoPoint
+from survey.models import Survey, Investigator, Household, HouseholdMember, Question, Batch, ODKSubmission, ODKGeoPoint, RandomHouseHoldSelection
+from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
 from survey.odk.utils.log import logger
 from survey.tasks import execute
 from functools import wraps
@@ -138,6 +139,10 @@ def get_households(investigator):
         return the households with uncompleted surveys for households assigned to this investigator
         #to do: Need to make this retrieval more effecient in the future
     """
+    if investigator.households.count() == 0:
+        open_survey = Survey.currently_open_survey(self.investigator.location)
+        RandomHouseHoldSelection.objects.get_or_create(mobile_number=investigator.mobile_number, survey=open_survey)[0].generate(
+                no_of_households=NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR, survey=open_survey)
     return [household for household in investigator.households.all() if not household.survey_completed()] 
 
 
