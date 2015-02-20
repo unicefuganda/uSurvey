@@ -35,8 +35,8 @@
             Mobile Number
           </th>
 	 <th>
-          Completion Details
-         </th>
+          Has Open Allocated surveys
+	</th>
          <th>
           Total Allocated Members
 	</th>
@@ -55,7 +55,7 @@
               {{ investigator.mobile_number }}
             </td>
 	   <td>
-		{{ investigator|household_completed_percent}} Completed | <a href="{% url 'investigator_completion_summary' investigator.pk %}">Show</a>
+		{{ investigator|has_open_allocated_surveys}}
 	  </td>
 	   <td>
 		{{ investigator|total_household_members}}

@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
 from survey.models import ODKSubmission
+from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
 
 def get_survey_xform(household):
     survey = household.survey

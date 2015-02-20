@@ -110,9 +110,13 @@ def household_completed_percent(investigator):
 #    import pdb;pdb.set_trace()
     households = investigator.households.all()
     total = households.count()
-    completed = len([hld for hld in households.all() if hld.survey_completed()])
+    completed = len([hld for hld in households.all() if hld.survey_completed() and hld.household_member.count() > 0])
     if total > 0:
         return "%s%%" % str(completed*100/total)
+
+@register.filter
+def has_open_allocated_surveys(investigator):
+    return any([hld.survey_completed() for hld in investigator.households.all()])
     
 
 @register.filter

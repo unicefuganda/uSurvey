@@ -10,13 +10,13 @@
 			<h5>Filter By Status</h5>
 		    <ul id="horizontal-filter">
 		        <li>
-			    <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}">All</a>
+			    <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}" class="btn btn_primary">All</a>
 		        </li>
 		        <li>
-		            <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=open">Open</a>
+		            <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=open" class="btn btn_primary">Open</a>
 		        </li>
 		        <li>
-		            <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=closed">Closed</a>
+		            <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=closed" class="btn btn_primary">Closed</a>
 		        </li>
 		    </ul>
 	</div>

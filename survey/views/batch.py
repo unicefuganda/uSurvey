@@ -39,10 +39,11 @@ def show(request, survey_id, batch_id):
     locations = Location.objects.filter(type=prime_location_type).order_by('name')
     batch_location_ids = batch.open_locations.values_list('location_id', flat=True)
     open_locations = Location.objects.filter(id__in=batch_location_ids)
-    if request.GET.get('status', False) == 'open':
-        locations = locations.filter(id__in=batch_location_ids)       
-    else:
-        locations = locations.exclude(id__in=batch_location_ids)       
+    if request.GET.has_key('status'):
+        if request.GET['status'] == 'open':
+            locations = locations.filter(id__in=batch_location_ids)       
+        else:
+            locations = locations.exclude(id__in=batch_location_ids)       
     context = {'batch': batch,
                'locations': locations,
                'open_locations': open_locations,
