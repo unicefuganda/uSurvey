@@ -1,23 +1,18 @@
 {% load template_tags %}
-<div class="control-group">
-<table>
-<tr id="control-group">
 {% for field in a_form.visible_fields %}
-<td class="parent">
-  <label class="control-label" for="{{field.auto_id}}"><strong>{{field.label}}</strong></label>
-    <div class="controls {{ field|is_radio }}">
+  <div class="control-group">
+    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
+    <div class="controls ">
       {{field}} <label class="error">
         {% if field.errors %}
             {% for error in field.errors %}
                 {{ error}}
             {% endfor %}
         {% endif %}
+         </label>
     </div>
-</td>
+  </div>
 {% endfor %}
-</tr>
-</table>
-</div>
 
 {% for hidden in a_form.hidden_fields %}
   {{ hidden }}

@@ -70,7 +70,7 @@ class Question(BaseModel):
             self.subquestion = True
 
     def __unicode__(self):
-        name = '%s&nbsp;&nbsp;|&nbsp;&nbsp;%s&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;%s' % (self.identifier, self.text, self.answer_type.upper())
+        name = '<div><table border="1"><tr><td>%s&nbsp;&nbsp;|</td><td>&nbsp;&nbsp;%s&nbsp;&nbsp;|</td><td>&nbsp;&nbsp;&nbsp;%s</td></tr></table></div>' % (self.identifier, self.text, self.answer_type.upper())
         return mark_safe(name)
 
     def clean(self, *args, **kwargs):

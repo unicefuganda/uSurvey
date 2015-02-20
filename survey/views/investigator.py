@@ -13,6 +13,7 @@ from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
 from survey.services.export_investigators import ExportInvestigatorsService
+from survey.utils.query_helper import get_filterset
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'
@@ -84,7 +85,11 @@ def list_investigators(request):
     selected_location = None
     selected_ea = None
     investigators = Investigator.objects.order_by('id')
-
+    search_fields = ['name', 'mobile_number']
+    if request.GET.has_key('q'):
+        investigators = get_filterset(investigators, request.GET['q'], search_fields)
+    if params.has_key('status'):
+        investigators = investigators.filter(is_blocked=ast.literal_eval(params['status']))
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))
         corresponding_locations = selected_location.get_descendants(include_self=True)

@@ -79,13 +79,16 @@ def get_locations(request):
 
 @login_required
 @permission_required('survey.view_completed_survey')
-@permission_required('auth.can_view_investigators')
 def list_investigators(request):
     params = request.GET
     selected_location = None
     selected_ea = None
     investigators = Investigator.objects.order_by('id')
-
+    search_fields = ['name', 'mobile_number']
+    if request.GET.has_key('q'):
+        investigators = get_filterset(investigators, request.GET['q'], search_fields)
+    if params.has_key('status'):
+        investigators = investigators.filter(is_blocked=ast.literal_eval(params['status']))
     if params.has_key('location') and params['location'].isdigit():
         selected_location = Location.objects.get(id=int(params['location']))
         corresponding_locations = selected_location.get_descendants(include_self=True)

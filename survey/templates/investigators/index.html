@@ -37,6 +37,9 @@
 	 <th>
           Completion Details
          </th>
+         <th>
+          Total Allocated Members
+	</th>
           <th style="background-image: None;">
             Actions
           </th>
@@ -52,7 +55,10 @@
               {{ investigator.mobile_number }}
             </td>
 	   <td>
-		{{ investigator|household_completed_percent}}% Completed | <a href="{% url 'investigator_completion_summary' investigator.pk %}">Show</a>
+		{{ investigator|household_completed_percent}} Completed | <a href="{% url 'investigator_completion_summary' investigator.pk %}">Show</a>
+	  </td>
+	   <td>
+		{{ investigator|total_household_members}}
 	  </td>
             <td>
                 {% include 'investigators/_action_button.html' with button_size="btn-mini" %}

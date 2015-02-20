@@ -112,8 +112,8 @@ def household_completed_percent(investigator):
     total = households.count()
     completed = len([hld for hld in households.all() if hld.survey_completed()])
     if total > 0:
-        return completed*100/total
-    return 0
+        return "%s%%" % str(completed*100/total)
+    
 
 @register.filter
 def total_household_members(investigator):

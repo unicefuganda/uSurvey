@@ -3,8 +3,25 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from survey.models import BatchQuestionOrder
 from survey.models.batch import Batch
+from django.utils.safestring import mark_safe
 
 from survey.models.formula import *
+
+class TableMultiSelect(forms.SelectMultiple):
+
+    class Media:
+        css = ('css/tablemultiselect.css',)
+        js = ('js/tablemultiselect.js', )    
+
+    def render(self, name, value, attrs=None, choices=()):
+        if attrs is None: attrs = {}
+        questions = Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP')
+        question_dict = {int(q.pk): [q.identifier, q.text, q.answer_type.upper()] for q in questions}
+        html = super(TableMultiSelect, self).render(name, value, attrs, choices) + """
+               <script type="text/javascript">
+                   var qu_dict = """ + str(question_dict) + """;
+                </script>"""
+        return mark_safe(html)
 
 
 class BatchForm(ModelForm):
@@ -26,7 +43,7 @@ class BatchForm(ModelForm):
 
 class BatchQuestionsForm(ModelForm):
     questions = forms.ModelMultipleChoiceField(label=u'', queryset=Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP'),
-                                               widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
+                                               widget=TableMultiSelect(attrs={'class': 'multi-select'}))
 
     class Meta:
         model = Batch
@@ -49,3 +66,4 @@ class BatchQuestionsForm(ModelForm):
         if commit:
             batch.save()
             self.save_question_to_batch(batch)
+

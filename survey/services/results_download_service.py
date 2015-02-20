@@ -23,7 +23,6 @@ class ResultComposer:
             data = ['|'.join([unicode(entry) for entry in entries]) for entries in data]
             print len(data)
             mail.attach(attachment_name, '\r\n'.join(data), 'text/csv')
-            print mail
             sent = mail.send()
             print 'Emailed!! ', sent
         except Exception, ex:

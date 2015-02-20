@@ -26,7 +26,7 @@ class ResultComposer:
             print mail
             sent = mail.send()
             print 'Emailed!! ', sent
-        except Exception ex:
+        except Exception, ex:
             print 'error while sending mail: %s', str(ex)
 
 
