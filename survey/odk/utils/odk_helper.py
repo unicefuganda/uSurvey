@@ -139,14 +139,17 @@ def get_households(investigator):
         return the households with uncompleted surveys for households assigned to this investigator
         #to do: Need to make this retrieval more effecient in the future
     """
-    if investigator.households.count() == 0:
-        open_survey = Survey.currently_open_survey(investigator.location)
-        logger.info('open surveys: %s' % open_survey)
-        if has_sampling:
-            RandomHouseHoldSelection.objects.get_or_create(mobile_number=investigator.mobile_number, survey=open_survey)[0].generate(
+    open_survey = Survey.currently_open_survey(investigator.location)
+    logger.info('open surveys: %s' % open_survey)
+    if open_survey.has_sampling:
+        RandomHouseHoldSelection.objects.get_or_create(mobile_number=investigator.mobile_number, survey=open_survey)[0].generate(
                 no_of_households=open_survey.sample_size, survey=open_survey)
+        households = investigator.households.filter(ea=investigator.ea, survey=open_survey, 
+				random_sample_number__isnull=False)
+    else:
+        households = investigator.all_households(open_survey=open_survey, non_response_reporting=True)      
     logger.info('households: %s' % investigator.households.count())
-    return [household for household in investigator.households.all() if not household.survey_completed()] 
+    return [household for household in households.all() if not household.survey_completed()] 
 
 
 class SubmissionReport:

@@ -3,13 +3,13 @@
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
  {% for household in households %}
   <xform>
-    <formID>{{ household.uid }}</formID>
+    <formID>{{household.get_head.surname}}({{ household.uid }})</formID>
     <name>{{ household.survey.name }}</name>
     <majorMinorVersion/>
     <version/>
     <hash />
     <descriptionText> {{ household.survey.description }}</descriptionText>
-    <downloadUrl>{{ base_url }}{% url 'download_odk_survey_form' investigator.mobile_number  investigator.odk_token household.uid %}</downloadUrl>
+    <downloadUrl>{{ base_url }}{% url 'download_odk_survey_form' household.uid %}</downloadUrl>
     <manifestUrl></manifestUrl>
   </xform>
 {% endfor %}

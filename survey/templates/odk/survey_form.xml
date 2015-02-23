@@ -4,7 +4,7 @@ xmlns:ev="http://www.w3.org/2001/xml-events"
 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 xmlns:jr="http://openrosa.org/javarosa">
 <h:head>
-<h:title> {{survey.name}} | {{ household.household_code }}</h:title>
+<h:title> {{household.get_head.surname}} | {{survey.name}} | {{ household.household_code }}</h:title>
   <model>
   <instance>
    <survey id="{{ household.uid }}" >

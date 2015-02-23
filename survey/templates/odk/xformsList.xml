@@ -3,7 +3,7 @@
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
  {% for household in households %}
   <xform>
-    <formID>{{ household.uid }}</formID>
+    <formID>{{household.get_head.surname}} ({{ household.uid }}) </formID>
     <name>{{ household.survey.name }}</name>
     <majorMinorVersion/>
     <version/>
