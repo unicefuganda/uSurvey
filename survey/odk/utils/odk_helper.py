@@ -147,9 +147,9 @@ def get_households(investigator):
         households = investigator.households.filter(ea=investigator.ea, survey=open_survey, 
 				random_sample_number__isnull=False)
     else:
-        households = investigator.all_households(open_survey=open_survey, non_response_reporting=True)      
+        households = investigator.all_households(open_survey=open_survey, non_response_reporting=True).all()      
     logger.info('households: %s' % investigator.households.count())
-    return [household for household in households.all() if not household.survey_completed()] 
+    return [household for household in households if not household.survey_completed()] 
 
 
 class SubmissionReport:
