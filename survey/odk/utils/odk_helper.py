@@ -140,9 +140,12 @@ def get_households(investigator):
         #to do: Need to make this retrieval more effecient in the future
     """
     if investigator.households.count() == 0:
-        open_survey = Survey.currently_open_survey(self.investigator.location)
-        RandomHouseHoldSelection.objects.get_or_create(mobile_number=investigator.mobile_number, survey=open_survey)[0].generate(
-                no_of_households=NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR, survey=open_survey)
+        open_survey = Survey.currently_open_survey(investigator.location)
+        logger.info('open surveys: %s' % open_survey)
+        if has_sampling:
+            RandomHouseHoldSelection.objects.get_or_create(mobile_number=investigator.mobile_number, survey=open_survey)[0].generate(
+                no_of_households=open_survey.sample_size, survey=open_survey)
+    logger.info('households: %s' % investigator.households.count())
     return [household for household in investigator.households.all() if not household.survey_completed()] 
 
 
@@ -262,7 +265,7 @@ def http_digest_investigator_auth(func):
             try:
                 parsed_header = digestor.parse_authorization_header(request.META['HTTP_AUTHORIZATION'])
                 if parsed_header['realm'] == realm:
-                    investigator = Investigator.objects.get(mobile_number=parsed_header['username'])
+                    investigator = Investigator.objects.get(mobile_number=parsed_header['username'], is_blocked=False)
                     authenticator = SimpleHardcodedAuthenticator(server_realm=realm, server_username=investigator.mobile_number, server_password=investigator.odk_token)
                     request.user = investigator
                     if authenticator.secret_passed(digestor):
