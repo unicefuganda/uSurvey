@@ -145,9 +145,9 @@ def get_households(investigator):
         RandomHouseHoldSelection.objects.get_or_create(mobile_number=investigator.mobile_number, survey=open_survey)[0].generate(
                 no_of_households=open_survey.sample_size, survey=open_survey)
         households = investigator.households.filter(ea=investigator.ea, survey=open_survey, 
-				random_sample_number__isnull=False)
+				random_sample_number__isnull=False).all()
     else:
-        households = investigator.all_households(open_survey=open_survey, non_response_reporting=True).all()      
+        households = investigator.all_households(open_survey=open_survey, non_response_reporting=True)      
     logger.info('households: %s' % investigator.households.count())
     return [household for household in households if not household.survey_completed()] 
 
