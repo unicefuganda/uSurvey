@@ -149,7 +149,7 @@ def get_households(investigator):
     else:
         households = investigator.all_households(open_survey=open_survey, non_response_reporting=True)      
     logger.info('households: %s' % len(households))
-    return [household for household in households if not household.survey_completed()] 
+    return [household for household in households if household.has_pending_survey()] 
 
 
 class SubmissionReport:

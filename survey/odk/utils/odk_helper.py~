@@ -148,7 +148,7 @@ def get_households(investigator):
 				random_sample_number__isnull=False).all()
     else:
         households = investigator.all_households(open_survey=open_survey, non_response_reporting=True)      
-    logger.info('households: %s' % investigator.households.count())
+    logger.info('households: %s' % len(households))
     return [household for household in households if not household.survey_completed()] 
 
 
