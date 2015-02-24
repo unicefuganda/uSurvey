@@ -117,8 +117,8 @@ def household_completed_percent(investigator):
 
 @register.filter
 def has_open_survey_in_current_loc(investigator):
-    open_survey = Survey.currently_open_survey(investigator.location)
-    return not investigator.completed_open_surveys(open_survey)
+    return len(Survey.currently_open_surveys(investigator.location))
+    
     
 
 @register.filter
