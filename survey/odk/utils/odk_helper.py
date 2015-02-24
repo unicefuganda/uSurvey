@@ -148,7 +148,7 @@ def get_households(investigator):
                 no_of_households=open_survey.sample_size, survey=open_survey)
             households.extend(investigator.households.filter(ea=investigator.ea, survey=open_survey, random_sample_number__isnull=False).all())
         else:
-            households.extends(investigator.all_households(open_survey=open_survey, non_response_reporting=True))      
+            households.extend(investigator.all_households(open_survey=open_survey, non_response_reporting=True))      
         logger.info('households: %s' % len(households))
     return [household for household in households if household.has_pending_survey()] 
 
