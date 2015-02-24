@@ -35,10 +35,7 @@
             Mobile Number
           </th>
 	 <th>
-          Has Open Allocated surveys
-	</th>
-         <th>
-          Total Allocated Members
+          Open survey in current location
 	</th>
           <th style="background-image: None;">
             Actions
@@ -55,10 +52,7 @@
               {{ investigator.mobile_number }}
             </td>
 	   <td>
-		{{ investigator|has_open_allocated_surveys}}
-	  </td>
-	   <td>
-		{{ investigator|total_household_members}}
+		{{ investigator|has_open_survey_in_current_loc}}
 	  </td>
             <td>
                 {% include 'investigators/_action_button.html' with button_size="btn-mini" %}

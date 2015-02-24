@@ -46,6 +46,14 @@ class Survey(BaseModel):
         return None
 
     @classmethod
+    def currently_open_surveys(cls, location=None):
+        open_surveys = []
+        for survey in Survey.objects.all():
+            if survey.is_open(location):
+                open_surveys.append(survey)
+        return open_surveys
+
+    @classmethod
     def save_sample_size(cls, survey_form):
         survey = survey_form.save(commit=False)
         if not survey.has_sampling:

@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from survey.investigator_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
+from survey.models import Survey
 
 
 register = template.Library()
@@ -115,8 +116,9 @@ def household_completed_percent(investigator):
         return "%s%%" % str(completed*100/total)
 
 @register.filter
-def has_open_allocated_surveys(investigator):
-    return any([hld.survey_completed() for hld in investigator.households.all()])
+def has_open_survey_in_current_loc(investigator):
+    open_survey = Survey.currently_open_survey(investigator.location)
+    return not investigator.completed_open_surveys(open_survey)
     
 
 @register.filter
