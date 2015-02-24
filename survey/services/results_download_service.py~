@@ -20,10 +20,9 @@ class ResultComposer:
         try:
             mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [self.user.email, ])
             data = self.results_download_service.generate_report()
-            data = ['|'.join([unicode(entry) for entry in entries]) for entries in data]
+            data = [','.join([unicode('"%s"' % entry) for entry in entries]) for entries in data]
             print len(data)
             mail.attach(attachment_name, '\r\n'.join(data), 'text/csv')
-            print mail
             sent = mail.send()
             print 'Emailed!! ', sent
         except Exception, ex:
