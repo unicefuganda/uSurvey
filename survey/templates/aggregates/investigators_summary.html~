@@ -34,28 +34,16 @@
           <th>
             Mobile Number
           </th>
-	 <th>
-          Open surveys in current location
-	</th>
-          <th style="background-image: None;">
-            Actions
-          </th>
         </tr>
       </thead>
       <tbody>
         {% for investigator in investigators %}
           <tr>
             <td>
-              <a href="{% url 'show_investigator_page' investigator.pk %}">{{ investigator.name }}</a>
+              <a href="{% url 'investigator_completion_summary' investigator.pk %}">{{ investigator.name }}</a>
             </td>
             <td>
               {{ investigator.mobile_number }}
-            </td>
-	   <td>
-		{{ investigator|open_survey_in_current_loc}}
-	  </td>
-            <td>
-                {% include 'investigators/_action_button.html' with button_size="btn-mini" %}
             </td>
           </tr>
         {% endfor %}

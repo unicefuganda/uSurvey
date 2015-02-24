@@ -111,12 +111,12 @@ def household_completed_percent(investigator):
 #    import pdb;pdb.set_trace()
     households = investigator.households.all()
     total = households.count()
-    completed = len([hld for hld in households.all() if hld.survey_completed() and hld.household_member.count() > 0])
+    completed = len([hld for hld in households.all() if not hld.survey_completed() and hld.household_member.count() > 0])
     if total > 0:
         return "%s%%" % str(completed*100/total)
 
 @register.filter
-def has_open_survey_in_current_loc(investigator):
+def open_survey_in_current_loc(investigator):
     return len(Survey.currently_open_surveys(investigator.location))
     
     

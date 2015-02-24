@@ -13,6 +13,7 @@ from survey.services.completion_rates_calculator import BatchLocationCompletionR
     BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key, is_not_digit_nor_empty
+from survey.utils.query_helper import get_filterset
 
 
 def is_valid(params):
@@ -76,3 +77,21 @@ def completion_json(request, survey_id):
     completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
     json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')
+
+@login_required
+@permission_required('survey.view_completed_survey')
+def show_investigator_completion_summary(request):
+    params = request.GET
+    selected_location = None
+    selected_ea = None
+    investigators = Investigator.objects.order_by('id')
+    search_fields = ['name', 'mobile_number']
+    if request.GET.has_key('q'):
+        investigators = get_filterset(investigators, request.GET['q'], search_fields)
+    if params.has_key('status'):
+        investigators = investigators.filter(is_blocked=ast.literal_eval(params['status']))
+    location_widget = LocationWidget(selected_location, ea=selected_ea)
+    return render(request, 'aggregates/investigators_summary.html',
+                  {'investigators': investigators,
+                   'request': request})
+

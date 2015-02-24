@@ -39,7 +39,7 @@
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
                         </li>
 
-                        {% if perms.auth.can_view_investigators or perms.survey.view_completed_survey %}
+                        {% if perms.auth.can_view_investigators %}
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
                                    role="button" href="#">Survey Administration<b class="caret"></b></a>
@@ -85,10 +85,14 @@
                                 <a data-toggle="dropdown" id="drop-analysis-tab" class="dropdown-toggle" role="button"
                                    href="#">Analysis<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-analysis-tab" role="menu" class="dropdown-menu">
+                                   <li role="presentation"><a href="{% url 'odk_submission_list' %}">View ODK submissions</a></li>
                                     <li role="presentation"><a href="{% url 'list_indicator_page' %}">Indicators</a>
                                     </li>
                                     <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion
                                         Rates</a></li>
+                                    <li role="presentation"><a href="{% url 'show_investigator_completion_summary' %}">Investigator Completion
+                                        Summary</a></li>
+
                                     <li role="presentation"><a href="{% url 'list_weights_page' %}">Location Weights</a>
                                     </li>
                                 </ul>

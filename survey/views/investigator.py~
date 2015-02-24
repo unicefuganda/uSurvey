@@ -13,6 +13,7 @@ from survey.models.investigator import Investigator
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
 from survey.services.export_investigators import ExportInvestigatorsService
+from survey.utils.query_helper import get_filterset
 
 CREATE_INVESTIGATOR_DEFAULT_SELECT = ''
 LIST_INVESTIGATOR_DEFAULT_SELECT = 'All'

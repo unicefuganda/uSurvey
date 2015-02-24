@@ -35,10 +35,16 @@
 		    {{ investigator | total_household_members}}
 		</dd>
 		<dt>
-		    Percentage Completed
+		    Percentage Household Completed
 		</dt>
 		<dd>
 		    {{ investigator | household_completed_percent}}
+		</dd>
+		<dt>
+		    Open surveys in current location
+		</dt>
+		<dd>
+		    	{{ investigator|open_survey_in_current_loc}}
 		</dd>
 		<dt>
 		    {{ investigator.location.type }}

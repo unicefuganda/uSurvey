@@ -17,6 +17,12 @@
 		    {{ investigator.name }}
 		</dd>
 		<dt>
+		    Mobile Number
+		</dt>
+		<dd>
+		    {{ investigator.mobile_number }}
+		</dd>
+		<dt>
 		    Total Households
 		</dt>
 		<dd>
@@ -33,6 +39,12 @@
 		</dt>
 		<dd>
 		    {{ investigator | household_completed_percent}}
+		</dd>
+		<dt>
+		    Open surveys in current location
+		</dt>
+		<dd>
+		    	{{ investigator|open_survey_in_current_loc}}
 		</dd>
 		<dt>
 		    {{ investigator.location.type }}
