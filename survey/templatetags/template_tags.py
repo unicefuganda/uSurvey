@@ -119,7 +119,11 @@ def household_completed_percent(investigator):
 def open_survey_in_current_loc(investigator):
     return len(Survey.currently_open_surveys(investigator.location))
     
-    
+@register.filter
+def households_for_open_survey(investigator):
+    open_survey = Survey.currently_open_surveys(investigator.location)
+    households = investigator.households.filter(survey__in=open_survey).all()
+    return len([hs for hs in households if hs.get_head() is not None])
 
 @register.filter
 def total_household_members(investigator):

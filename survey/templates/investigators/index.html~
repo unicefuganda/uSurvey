@@ -37,6 +37,9 @@
 	 <th>
           Open surveys in current location
 	</th>
+	 <th>
+          Households for open surveys
+	</th>
           <th style="background-image: None;">
             Actions
           </th>
@@ -52,7 +55,7 @@
               {{ investigator.mobile_number }}
             </td>
 	   <td>
-		{{ investigator|has_open_survey_in_current_loc}}
+		{{ investigator|open_survey_in_current_loc}}
 	  </td>
             <td>
                 {% include 'investigators/_action_button.html' with button_size="btn-mini" %}
