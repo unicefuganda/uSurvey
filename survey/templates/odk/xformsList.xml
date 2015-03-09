@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 {% load i18n %}
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
- {% for household in households %}
+ {% for survey in surveys %}
   <xform>
-    <formID>{{household.get_head.surname}} ({{ household.uid }}) </formID>
-    <name>{{ household.survey.name }}</name>
+    <formID>{{investigator.pk}}_{{ survey.pk }} </formID>
+    <name>{{ survey.name }}</name>
     <majorMinorVersion/>
     <version/>
     <hash />
-    <descriptionText> {{ household.survey.description }}</descriptionText>
-    <downloadUrl>{{ base_url }}{% url 'download_odk_survey_form' household.uid %}</downloadUrl>
+    <descriptionText> {{ survey.description }}</descriptionText>
+    <downloadUrl>{{ base_url }}{% url 'download_odk_survey_form' survey.pk %}</downloadUrl>
     <manifestUrl></manifestUrl>
   </xform>
 {% endfor %}

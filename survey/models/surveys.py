@@ -71,3 +71,6 @@ class Survey(BaseModel):
 
     def ordered_batches(self):
         return self.batch.all().order_by('order')
+
+class SurveySampleSizeReached(Exception):
+    pass

@@ -16,12 +16,58 @@ class TableMultiSelect(forms.SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if attrs is None: attrs = {}
         questions = Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP')
-        question_dict = {int(q.pk): [q.identifier, q.text, q.answer_type.upper()] for q in questions}
-        html = super(TableMultiSelect, self).render(name, value, attrs, choices) + """
-               <script type="text/javascript">
-                   var qu_dict = """ + str(question_dict) + """;
-                </script>"""
-        return mark_safe(html)
+        question_items = []
+        map(lambda q: question_items.append((int(q.pk), q.identifier, q.text, q.answer_type.upper())), questions) 
+        html = []
+        #html.append(super(TableMultiSelect, self).render(name, value, attrs, choices))
+	
+        html.append( """
+        
+	<div class="form-horizontal" role="form" style="width: 600px;margin: auto;margin-top:150px;">
+        <div id="question_table">
+        <div class="form-group" style="border: 1px solid #ddd">
+        <table id="table1" class="display">
+            <thead>
+            
+                <th>#</th>
+                <th>Code</th>
+                <th>Text</th>
+                <th>Answer Type</th>
+           </thead>
+           <tbody>
+        """
+        )
+        for items in question_items:
+            html.append('<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>' % items)
+        html.append("""
+                </tbody></table></div>
+            
+<script src="/static/jquery.dataTables.min.js" type="text/javascript"></script>
+<script src="/static/jquery-1.11.1.min.js"></script>
+	
+</div>
+            
+<link href="/static/jquerysctipttop.css" rel="stylesheet" type="text/css">
+<link href="/static/jquery.dataTables.css" rel="stylesheet" type="text/css">
+    <link href="/static/bootstrap.min.css" type="text/css" rel="stylesheet">
+
+<script type="text/javascript">
+$(document).ready(function() {
+    var table = $('#table1').DataTable();
+ 
+    $('#table1 tbody').on( 'click', 'tr', function () {
+        $(this).toggleClass('selected');
+    } );
+ 
+    $('#button').click( function () {
+        alert( table.rows('.selected').data().length +' row(s) selected' );
+    } );
+} );
+</script>
+
+        """
+        )
+        return mark_safe("\r\n".join(html))
 
 
 class BatchForm(ModelForm):

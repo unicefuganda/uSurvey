@@ -16,7 +16,7 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.template import RequestContext, loader
 from survey.odk.utils.log import audit_log, Actions, logger
-from survey.odk.utils.odk_helper import get_households, process_submission, disposition_ext_and_date, get_zipped_dir, \
+from survey.odk.utils.odk_helper import get_surveys, process_submission, disposition_ext_and_date, get_zipped_dir, \
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound,\
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_investigator_auth
@@ -25,12 +25,14 @@ from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
 from survey.models import ODKSubmission
+from survey.models.surveys import SurveySampleSizeReached
+from survey.investigator_configs import LEVEL_OF_EDUCATION
 
-def get_survey_xform(household):
-    survey = household.survey
+def get_survey_xform(investigator, survey):
     return render_to_string("odk/survey_form.xml", {
-        'household': household,
-        'survey' : household.survey,
+        'investigator': investigator,
+        'survey' : survey,
+        'educational_levels' : LEVEL_OF_EDUCATION
         })
 
 def base_url(request):
@@ -67,12 +69,12 @@ def form_list(request):
     investigator = request.user
     #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
-    households = get_households(investigator)
+    surveys = get_surveys(investigator)
     audit = {}
     audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, investigator,
           _("Requested forms list. for %s" % investigator.mobile_number), audit, request)
     response = render_to_response("odk/xformsList.xml", {
-    'households': households,
+    'surveys': surveys,
     'investigator' : investigator,
     'base_url' : base_url(request),
     }, mimetype="text/xml; charset=utf-8")
@@ -83,20 +85,19 @@ def form_list(request):
     return response
 
 @http_digest_investigator_auth
-def download_xform(request, household_id):
+def download_xform(request, survey_id):
     investigator = request.user
-    #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
-    #to do - Make fetching households more e
-    household = get_object_or_404(Household, uid=household_id, investigator=investigator)
-    survey_xform = get_survey_xform(household)
+    survey = get_object_or_404(Survey, pk=survey_id)
+    survey_xform = get_survey_xform(investigator, survey)
+    form_id = '%s'% survey_id
     audit = {
-        "xform": household_id
+        "xform": form_id
     }
     audit_log( Actions.FORM_XML_DOWNLOADED, request.user, investigator, 
                 _("Downloaded XML for form '%(id_string)s'.") % {
-                                                        "id_string": household_id
+                                                        "id_string": form_id
                                                     }, audit, request)
-    response = response_with_mimetype_and_name('xml', 'survey%s' %household_id,
+    response = response_with_mimetype_and_name('xml', 'survey%s' %survey_id,
                                                show_date=False)
     response.content = survey_xform
     return response
@@ -120,13 +121,8 @@ def submission(request):
                 _(u"There should be a single XML submission file.")
                 )
         media_files = request.FILES.values()
-        submission_reports = process_submission(investigator, xml_file_list[0],             media_files=media_files)
-        logger.info(submission_reports)
-        if len(submission_reports) == 0:
-            return OpenRosaResponseBadRequest(
-                _(u"Seems there are no forms in your submission.")
-            )                
-        submission_report = submission_reports[0]
+        submission_report = process_submission(investigator, xml_file_list[0],             media_files=media_files)
+        logger.info(submission_report)
         context.message = _(settings.ODK_SUBMISSION_SUCCESS_MSG)
         context.instanceID = u'uuid:%s' % submission_report.instance_id
         context.formid = submission_report.form_id
@@ -142,6 +138,10 @@ def submission(request):
         response.status_code = 201
         response['Location'] = request.build_absolute_uri(request.path)
         return response
+    except SurveySampleSizeReached:
+        return OpenRosaResponseBadRequest(
+            _(u"Max sample size reached for this survey")
+        )
     except Exception:
         return OpenRosaResponseBadRequest(
             _(u"Error encoutered while processing your form.")

@@ -51,7 +51,7 @@ class Survey(BaseModel):
         for survey in Survey.objects.all():
             if survey.is_open(location):
                 open_surveys.append(survey)
-        return None
+        return open_surveys
 
     @classmethod
     def save_sample_size(cls, survey_form):
@@ -71,3 +71,6 @@ class Survey(BaseModel):
 
     def ordered_batches(self):
         return self.batch.all().order_by('order')
+
+class SampleSizeReached(Exception):
+    pass
