@@ -27,8 +27,11 @@ OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
 HTTP_OPEN_ROSA_VERSION_HEADER = 'HTTP_X_OPENROSA_VERSION'
 OPEN_ROSA_VERSION = '1.0'
 DEFAULT_CONTENT_TYPE = 'text/xml; charset=utf-8'
-HOUSEHOLD_SAMPLE_PATH = '//survey/household/houseNumber'
-HOUSEHOLD_MEMBER_PATH = '//survey/household/householdMember'
+NEW_OR_OLD_HOUSEHOLD_CHOICE_PATH = '//survey/chooseExistingHousehold'
+HOUSEHOLD_SELECT_PATH = '//survey/registeredHousehold/household'
+HOUSEHOLD_MEMBER_SELECT_PATH = '//survey/registeredHousehold/householdMember/h{{household_id}}'
+MANUAL_HOUSEHOLD_SAMPLE_PATH = '//survey/household/houseNumber'
+MANUAL_HOUSEHOLD_MEMBER_PATH = '//survey/household/householdMember'
 ANSWER_PATH = '//survey/b{{batch_id}}/q{{question_id}}'
 NON_RESP_ANSWER_PATH = '//survey/b{{batch_id}}/qnr{{question_id}}'
 INSTANCE_ID_PATH = '//survey/meta/instanceID'
@@ -52,18 +55,29 @@ def _get_nodes(search_path, tree=None, xml_string=None): #either tree or xml_str
         logger.error('Error retrieving path: %s, Desc: %s' % (search_path, str(ex)))
 
 def _get_household_members(survey_tree):
-    member_nodes = _get_nodes(HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
+    member_nodes = _get_nodes(MANUAL_HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
     return HouseholdMember.objects.filter(pk__in=[member_node.text for member_node in member_nodes]).all()
 
 def _get_member_attrs(survey_tree):
-    member_nodes = _get_nodes('%s/*' % HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
+    member_nodes = _get_nodes('%s/*' % MANUAL_HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
     return dict([(member_node.tag, member_node.text) for member_node in member_nodes])
 
 def _get_household_sample_number(survey_tree):
-    return _get_nodes(HOUSEHOLD_SAMPLE_PATH, tree=survey_tree)[0].text
+    return _get_nodes(MANUAL_HOUSEHOLD_SAMPLE_PATH, tree=survey_tree)[0].text
 
+def _choosed_existing_household(survey_tree):
+    return _get_nodes(NEW_OR_OLD_HOUSEHOLD_CHOICE_PATH, tree=survey_tree)[0].text == '1'
+
+def _get_selected_household_member(survey_tree):
+    household_id = _get_nodes(HOUSEHOLD_SELECT_PATH, tree=survey_tree)[0].text
+    context = template.Context({'household_id': household_id})
+    hm_path = template.Template(HOUSEHOLD_MEMBER_SELECT_PATH).render(context)    
+    member_id = _get_nodes(hm_path, tree=survey_tree)[0].text
+    return HouseholdMember.objects.get(pk=member_id)
 
 def _get_or_create_household_member(investigator, survey, survey_tree):
+    if _choosed_existing_household(survey_tree):
+        return _get_selected_household_member(survey_tree)
     sample_number = _get_household_sample_number(survey_tree)
     try:
         household = Household.objects.get(investigator=investigator, survey=survey, ea=investigator.ea, random_sample_number=sample_number)

@@ -31,6 +31,7 @@ from survey.investigator_configs import LEVEL_OF_EDUCATION
 def get_survey_xform(investigator, survey):
     return render_to_string("odk/survey_form.xml", {
         'investigator': investigator,
+        'registered_households' : investigator.households.filter(survey=survey, ea=investigator.ea).all(),
         'survey' : survey,
         'educational_levels' : LEVEL_OF_EDUCATION
         })
