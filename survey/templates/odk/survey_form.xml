@@ -173,7 +173,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 				{% endif %}
                 {% if question.group.name == 'NON_RESPONSE' %}
                 <input ref="/survey/b{{batch.pk}}/qnr{{question.pk}}">
-					<label>Please enter non reponse answer</label>
+					<label>Please enter reason for no response</label>
 				</input>
                 {% endif %}
 			{% endfor %}
