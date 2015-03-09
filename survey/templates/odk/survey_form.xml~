@@ -92,10 +92,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<value>0</value>
 				</item>
 			</select1>
-		<input ref="/survey/household/householdNumber/surname">
+		<input ref="/survey/household/householdMember/surname">
 						<label>Enter Surname</label>
 					</input>
-		<input ref="/survey/household/householdNumber/firstName">
+		<input ref="/survey/household/householdMember/firstName">
 						<label>Enter Firstname</label>
 					</input>
         	<select1 ref="/survey/household/householdMember/sex">
@@ -109,16 +109,16 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<value>0</value>
 				</item>
 			</select1>
-        <input ref="/survey/household/householdNumber/dateOfBirth">
+        <input ref="/survey/household/householdMember/dateOfBirth">
 						<label>Choose Date of Birth</label>
 					</input>
-        <input ref="/survey/household/householdNumber/occupation">
+        <input ref="/survey/household/householdMember/occupation">
 						<label>Enter Occupation</label>
 					</input>
-        <input ref="/survey/household/householdNumber/residentSince">
+        <input ref="/survey/household/householdMember/residentSince">
 						<label>Choose date of residency</label>
 					</input>
-		<select1 ref="/survey/household/householdNumber/levelOfEducation">
+		<select1 ref="/survey/household/householdMember/levelOfEducation">
 			<label>Level Of Education</label>
 			{% for e_level in educational_levels %}
 			<item>
