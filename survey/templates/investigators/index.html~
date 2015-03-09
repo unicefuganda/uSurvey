@@ -57,6 +57,9 @@
 	   <td>
 		{{ investigator|open_survey_in_current_loc}}
 	  </td>
+	   <td>
+		{{ investigator|households_for_open_survey}}
+	  </td>
             <td>
                 {% include 'investigators/_action_button.html' with button_size="btn-mini" %}
             </td>

@@ -3,7 +3,7 @@
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
  {% for survey in surveys %}
   <xform>
-    <formID>{{investigator.pk}}_{{ survey.pk }} </formID>
+    <formID>{{ survey.pk }} </formID>
     <name>{{ survey.name }}</name>
     <majorMinorVersion/>
     <version/>

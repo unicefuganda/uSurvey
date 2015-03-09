@@ -9,7 +9,7 @@
     <version/>
     <hash />
     <descriptionText> {{ survey.description }}</descriptionText>
-    <downloadUrl>{{ base_url }}{% url 'download_odk_survey_form' household.uid %}</downloadUrl>
+    <downloadUrl>{{ base_url }}{% url 'download_odk_survey_form' survey.pk %}</downloadUrl>
     <manifestUrl></manifestUrl>
   </xform>
 {% endfor %}

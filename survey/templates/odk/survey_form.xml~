@@ -27,8 +27,7 @@ xmlns:jr="http://openrosa.org/javarosa">
             <isHead>0</isHead>
             <occupation />
             <levelOfEducation />
-            <residentSinceYear />
-            <residentSinceMonth />
+            <residentSince />
         </householdMember>
     </household>
 	{% for batch in survey.ordered_batches %}
