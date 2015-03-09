@@ -89,7 +89,7 @@ class BatchForm(ModelForm):
 
 class BatchQuestionsForm(ModelForm):
     questions = forms.ModelMultipleChoiceField(label=u'', queryset=Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP'),
-                                               widget=TableMultiSelect(attrs={'class': 'multi-select'}))
+                                               widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
 
     class Meta:
         model = Batch
@@ -112,4 +112,3 @@ class BatchQuestionsForm(ModelForm):
         if commit:
             batch.save()
             self.save_question_to_batch(batch)
-

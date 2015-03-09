@@ -19,7 +19,7 @@ class TableMultiSelect(forms.SelectMultiple):
         question_items = []
         map(lambda q: question_items.append((int(q.pk), q.identifier, q.text, q.answer_type.upper())), questions) 
         html = []
-        html.append(super(TableMultiSelect, self).render(name, value, attrs, choices))
+        #html.append(super(TableMultiSelect, self).render(name, value, attrs, choices))
 	
         html.append( """
         
