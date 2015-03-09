@@ -75,7 +75,7 @@ xmlns:jr="http://openrosa.org/javarosa">
         {% if survey.has_sampling %}
             <hint>Please complete this survey for {{ survey.sample_size }} random households only</hint>
         {% endif %}
-		<input ref="/survey/household/householdNumber">
+		<input ref="/survey/household/houseNumber">
 			<label>Enter household number</label>
 		</input>
     <group>
