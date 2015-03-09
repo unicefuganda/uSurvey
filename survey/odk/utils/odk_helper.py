@@ -65,8 +65,9 @@ def _get_household_sample_number(survey_tree):
 
 def _get_or_create_household_member(investigator, survey, survey_tree):
     sample_number = _get_household_sample_number(survey_tree)
-    (household, created) = Household.objects.get_or_create(investigator=investigator, survey=survey, ea=investigator.ea, random_sample_number=sample_number)
-    if not created:
+    try:
+        household = Household.objects.get(investigator=investigator, survey=survey, ea=investigator.ea, random_sample_number=sample_number)
+    except Household.DoesNotExist:
         uid = Household.next_uid(survey)
         household_code_value = LocationCode.get_household_code(investigator) + str(uid)
         household = Household.objects.create(investigator=investigator, ea=investigator.ea,
