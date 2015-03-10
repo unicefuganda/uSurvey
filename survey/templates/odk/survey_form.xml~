@@ -16,7 +16,7 @@ xmlns:jr="http://openrosa.org/javarosa">
      <meta>
        <instanceID/>
      </meta>
-    <chooseExistingHousehold />
+    <chooseExistingHousehold>0</chooseExistingHousehold>
     <registeredHousehold>
         <household />
         <householdMember>
@@ -89,40 +89,41 @@ xmlns:jr="http://openrosa.org/javarosa">
         {% if survey.has_sampling %}
             <hint>Please complete this survey for {{ survey.sample_size }} random households only</hint>
         {% endif %}
-        <select1 ref="/survey/chooseExistingHousehold">
-				<label>Choose from already resgistered household?</label>
-				<item>
-					<label> Yes </label>
-					<value>1</value>
-				</item>
-				<item>
-					<label> No </label>
-					<value>0</value>
-				</item>
-			</select1>
-        
-        <select1 ref="/survey/registeredHousehold/household">
-             <label>Select Household</label>
-             {% for r_household in registered_households %}
-		        <item>
-                   <label>{{r_household.uid}}, {{r_household.get_head.surname}} </label>
-                   <value>{{r_household.pk}}</value>
-                </item>                 
-             {% endfor %}
-        </select1>
-        {% for r_household in registered_households %}
-            {% if len.registered_households > 0 %}
-            <select1 ref="/survey/registeredHousehold/householdMember/h{{r_household.pk}}">
-                <label>Select Household Member</label>
-		        {% for if r_household.all_members %}
-		        <item>
-                   <label>{{member.surname}}, {{member.first_name}} </label>
-                   <value>{{member.pk}}</value>
-                </item>
-		        {% endfor %}
-            </select1>
-            {% endif %}
-       {% endfor %}
+        {% if registered_households.count %}
+		    <select1 ref="/survey/chooseExistingHousehold">
+					<label>Choose from already resgistered household?</label>
+					<item>
+						<label> Yes </label>
+						<value>1</value>
+					</item>
+					<item>
+						<label> No </label>
+						<value>0</value>
+					</item>
+				</select1>
+		    <select1 ref="/survey/registeredHousehold/household">
+		         <label>Select Household</label>
+		         {% for r_household in registered_households %}
+				    <item>
+		               <label>{{r_household.uid}}, {{r_household.get_head.surname}} </label>
+		               <value>{{r_household.pk}}</value>
+		            </item>                 
+		         {% endfor %}
+		    </select1>
+		    {% for r_household in registered_households %}
+		        {% if r_household.all_members %}
+		        <select1 ref="/survey/registeredHousehold/householdMember/h{{r_household.pk}}">
+		            <label>Select Household Member</label>
+				    {% for member in r_household.all_members %}
+				    <item>
+		               <label>{{member.surname}}, {{member.first_name}} </label>
+		               <value>{{member.pk}}</value>
+		            </item>
+				    {% endfor %}
+		        </select1>
+		        {% endif %}
+		   {% endfor %}
+       {% endif %}
 		<input ref="/survey/household/houseNumber">
 			<label>Enter household number</label>
 		</input>
