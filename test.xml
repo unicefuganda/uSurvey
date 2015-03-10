@@ -2,8 +2,16 @@
   <meta>
     <instanceID>uuid:5911e389-d979-4bf6-9bdb-733241686f30</instanceID>
   </meta>
+    <chooseExistingHousehold>0</chooseExistingHousehold>
+    <registeredHousehold>
+        <household>2574</household>
+        <householdMember>
+        
+            <h2574>1078</h2574>
+        </householdMember>
+    </registeredHousehold>
       <household>
-        <houseNumber>23</houseNumber>
+        <houseNumber>31</houseNumber>
 		<householdMember>
             <surname>Bose</surname>
             <firstName>Badmus</firstName>

@@ -22,8 +22,8 @@ xmlns:jr="http://openrosa.org/javarosa">
         <householdMember>
         {% for r_household in registered_households %}
             <h{{r_household.pk}} />
-        </householdMember>
         {% endfor %}
+        </householdMember>
     </registeredHousehold>
 
     <household>

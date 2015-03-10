@@ -104,7 +104,7 @@ xmlns:jr="http://openrosa.org/javarosa">
              <label>Select Household</label>
              {% for r_household in registered_households %}
 		        <item>
-                   <label>{{r_household.uid}}, {{r_household.get_head}} </label>
+                   <label>{{r_household.uid}}, {{r_household.get_head.surname}} </label>
                    <value>{{r_household.pk}}</value>
                 </item>                 
              {% endfor %}

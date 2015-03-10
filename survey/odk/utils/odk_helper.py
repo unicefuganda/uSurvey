@@ -91,7 +91,6 @@ def _get_or_create_household_member(investigator, survey, survey_tree):
     MALE = '1'
     IS_HEAD = '1'
     mem_attrs = _get_member_attrs(survey_tree)
-    print mem_attrs
     kwargs = {}
     kwargs['surname'] = mem_attrs.get('surname')
     kwargs['first_name'] = mem_attrs['firstName']
