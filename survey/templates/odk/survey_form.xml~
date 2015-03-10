@@ -89,7 +89,7 @@ xmlns:jr="http://openrosa.org/javarosa">
         {% if survey.has_sampling %}
             <hint>Please complete this survey for {{ survey.sample_size }} random households only</hint>
         {% endif %}
-        {% if registered_households.count %}
+        {% if registered_households.count > 0 %}
 		    <select1 ref="/survey/chooseExistingHousehold">
 					<label>Choose from already resgistered household?</label>
 					<item>
