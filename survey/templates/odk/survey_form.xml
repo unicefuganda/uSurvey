@@ -100,6 +100,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<value>0</value>
 				</item>
 			</select1>
+        
         <select1 ref="/survey/registeredHousehold/household">
              <label>Select Household</label>
              {% for r_household in registered_households %}
@@ -110,6 +111,7 @@ xmlns:jr="http://openrosa.org/javarosa">
              {% endfor %}
         </select1>
         {% for r_household in registered_households %}
+            {% if r_household.all_members %}
             <select1 ref="/survey/registeredHousehold/householdMember/h{{r_household.pk}}">
                 <label>Select Household Member</label>
 		        {% for member in r_household.all_members %}
@@ -119,6 +121,7 @@ xmlns:jr="http://openrosa.org/javarosa">
                 </item>
 		        {% endfor %}
             </select1>
+            {% endif %}
        {% endfor %}
 		<input ref="/survey/household/houseNumber">
 			<label>Enter household number</label>

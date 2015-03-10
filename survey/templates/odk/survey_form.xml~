@@ -100,25 +100,28 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<value>0</value>
 				</item>
 			</select1>
+        
         <select1 ref="/survey/registeredHousehold/household">
              <label>Select Household</label>
              {% for r_household in registered_households %}
 		        <item>
-                   <label>{{r_household.uid}}, {{r_household.get_head}} </label>
+                   <label>{{r_household.uid}}, {{r_household.get_head.surname}} </label>
                    <value>{{r_household.pk}}</value>
                 </item>                 
              {% endfor %}
         </select1>
         {% for r_household in registered_households %}
+            {% if len.registered_households > 0 %}
             <select1 ref="/survey/registeredHousehold/householdMember/h{{r_household.pk}}">
                 <label>Select Household Member</label>
-		        {% for member in r_household.all_members %}
+		        {% for if r_household.all_members %}
 		        <item>
                    <label>{{member.surname}}, {{member.first_name}} </label>
                    <value>{{member.pk}}</value>
                 </item>
 		        {% endfor %}
             </select1>
+            {% endif %}
        {% endfor %}
 		<input ref="/survey/household/houseNumber">
 			<label>Enter household number</label>
