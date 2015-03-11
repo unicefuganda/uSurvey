@@ -140,11 +140,11 @@ def submission(request):
         response['Location'] = request.build_absolute_uri(request.path)
         return response
     except SurveySampleSizeReached:
-        return OpenRosaResponseBadRequest(
+        return OpenRosaResponseNotAllowed(
             _(u"Max sample size reached for this survey")
         )
     except Exception:
         return OpenRosaResponseBadRequest(
-            _(u"Error encoutered while processing your form.")
+            _(u"Error encountered while processing your form.")
         )
 

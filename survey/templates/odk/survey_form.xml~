@@ -94,13 +94,13 @@ xmlns:jr="http://openrosa.org/javarosa">
         {% endif %}
         {% if registered_households.count > 0 %}
 		    <select1 ref="/survey/chooseExistingHousehold">
-					<label>Choose from already resgistered household?</label>
+					<label>What do you want to do?</label>
 					<item>
-						<label> Yes </label>
+						<label>Select member from existing household</label>
 						<value>1</value>
 					</item>
 					<item>
-						<label> No </label>
+						<label>Register new household member</label>
 						<value>0</value>
 					</item>
 				</select1>
@@ -134,7 +134,7 @@ xmlns:jr="http://openrosa.org/javarosa">
         <label>Household Member Details</label>
 
         	<select1 ref="/survey/household/householdMember/isHead">
-				<label>This is household Head</label>
+				<label>This is household Head (Skip if already assigned for this household) </label>
 				<item>
 					<label> Yes </label>
 					<value>1</value>
