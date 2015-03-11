@@ -145,7 +145,7 @@ def submission(request):
         )
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, investigator, 
-            _("Failed attempted to submit XML for form for investigator: '%(investigator)s'. desc: '%(desc)s'") {
+            _("Failed attempted to submit XML for form for investigator: '%(investigator)s'. desc: '%(desc)s'") % {
                                                         "investigator": investigator.mobile_number,
                                                         "desc" : str(ex)
                                                     }, {'desc' : str(ex)}, request)

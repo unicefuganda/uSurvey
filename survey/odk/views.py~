@@ -146,7 +146,8 @@ def submission(request):
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, investigator, 
             _("Failed attempted to submit XML for form for investigator: '%(investigator)s'. desc: '%(desc)s'") {
-                                                        "investigator": str(ex)
+                                                        "investigator": investigator.mobile_number,
+                                                        "desc" : str(ex)
                                                     }, {'desc' : str(ex)}, request)
         return OpenRosaResponseBadRequest(
             _(u"Error encountered while processing your form.")
