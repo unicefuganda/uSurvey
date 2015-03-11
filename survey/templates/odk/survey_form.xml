@@ -17,6 +17,7 @@ xmlns:jr="http://openrosa.org/javarosa">
        <instanceID/>
      </meta>
     <chooseExistingHousehold>0</chooseExistingHousehold>
+    {% if registered_households.count > 0 %}
     <registeredHousehold>
         <household />
         <householdMember>
@@ -25,7 +26,7 @@ xmlns:jr="http://openrosa.org/javarosa">
         {% endfor %}
         </householdMember>
     </registeredHousehold>
-
+    {% endif %}
     <household>
         <houseNumber />
 		<householdMember>
@@ -55,11 +56,13 @@ xmlns:jr="http://openrosa.org/javarosa">
   <!-- bindings -->
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
-    <bind nodeset="/survey/chooseExistingHousehold" type="select1"  required="true()" />
-   <bind nodeset="/survey/registeredHousehold/household" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'1')" />
-   {% for r_household in registered_households %}
-   <bind nodeset="/survey/registeredHousehold/householdMember/h{{r_household.pk}}" type="select1"  required="true()" relevant="selected(/survey/registeredHousehold/household,'{{r_household.pk}}')" />
-   {% endfor %}
+   {% if registered_households.count > 0 %}
+		<bind nodeset="/survey/chooseExistingHousehold" type="select1"  required="true()" />
+	   <bind nodeset="/survey/registeredHousehold/household" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'1')" />
+	   {% for r_household in registered_households %}
+	   <bind nodeset="/survey/registeredHousehold/householdMember/h{{r_household.pk}}" type="select1"  required="true()" relevant="selected(/survey/registeredHousehold/household,'{{r_household.pk}}')" />
+	   {% endfor %}
+  {% endif %}
   <bind nodeset="/survey/household/houseNumber" type="int"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />

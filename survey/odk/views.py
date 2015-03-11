@@ -99,7 +99,7 @@ def download_xform(request, survey_id):
                                                         "id_string": form_id
                                                     }, audit, request)
     response = response_with_mimetype_and_name('xml', 'survey%s' %survey_id,
-                                               show_date=False)
+                                               show_date=False, full_mime='text/xml')
     response.content = survey_xform
     return response
 
