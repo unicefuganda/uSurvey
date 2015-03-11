@@ -154,10 +154,12 @@ def _get_responses(survey_tree, survey):
         for question in batch.all_questions():
             context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
             answer_path = template.Template(ANSWER_PATH).render(context)
-            resp_text = _get_nodes(answer_path, tree=survey_tree)[0].text
-            if (not resp_text) and question.group.name == 'NON_RESPONSE':
-                nrsp_answer_path = template.Template(NON_RESP_ANSWER_PATH).render(context)
-                resp_text = NonResponseAnswer(_get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
+            resp_text, resp_node = None, _get_nodes(answer_path, tree=survey_tree)
+            if resp_node: #if question is relevant but 
+                resp_text = resp_node[0].text
+                if (not resp_text) and question.group.name == 'NON_RESPONSE': #no response and its a non response question
+                    nrsp_answer_path = template.Template(NON_RESP_ANSWER_PATH).render(context)
+                    resp_text = NonResponseAnswer(_get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
             response_dict[(batch.pk, question.pk)] = resp_text
     return response_dict
                 
