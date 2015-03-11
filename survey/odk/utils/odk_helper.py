@@ -187,9 +187,9 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
     response_dict = _get_responses(survey_tree, survey)
     treated_batches = {}
     for (b_id, q_id), answer in response_dict.items():
+        question = Question.objects.get(pk=q_id)
         batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-        if q_id: #only attempt to handle relevant questions
-            question = Question.objects.get(pk=q_id)
+        if answer is not None:
             if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
                 answer = media_files.get(answer, None)
             created = register_member_answer(investigator, question, member, answer, batch)
