@@ -132,7 +132,7 @@ def submission(request):
         t = loader.get_template('odk/submission.xml')
         audit = {}
         audit_log( Actions.SUBMISSION_CREATED, request.user, investigator, 
-            _("Downloaded XML for form '%(id_string)s'.") % {
+            _("Submitted XML for form '%(id_string)s'.") % {
                                                         "id_string": submission_report.form_id
                                                     }, audit, request)
         response = BaseOpenRosaResponse(t.render(context))
@@ -143,7 +143,9 @@ def submission(request):
         return OpenRosaResponseNotAllowed(
             _(u"Max sample size reached for this survey")
         )
-    except Exception:
+    except Exception, ex:
+        audit_log( Actions.SUBMISSION_REQUESTED, request.user, investigator, 
+            _("Failed attempted to submit XML for formfor %s" % investigator.mobile_number), {'desc' : str(ex)}, request)
         return OpenRosaResponseBadRequest(
             _(u"Error encountered while processing your form.")
         )

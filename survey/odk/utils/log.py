@@ -55,6 +55,7 @@ Actions = Enum(
     SUBMISSION_DELETED="submission-deleted",
     SUBMISSION_ACCESSED="submission-accessed",
     SUBMISSION_EDIT_REQUESTED="submission-edit-requested",
+    SUBMISSION_REQUESTED="submission-requested",
     BAMBOO_LINK_CREATED="bamboo-link-created",
     BAMBOO_LINK_DELETED="bamboo-link-deleted",
     SMS_SUPPORT_ACTIVATED="sms-support-activated",
