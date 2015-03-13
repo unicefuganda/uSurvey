@@ -156,6 +156,7 @@ def is_relevant_odk(context, question, batch, investigator):
                     relevant_q[skip_to_question.pk] = " and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk)
             except ObjectDoesNotExist, e:
                 pass
+    relevant_q.pop(question.pk, None) #if it happens that this is skip to question of a previous one remove it in context
     context['relevant_q'] = relevant_q
     tests = relevant_q.values()
     return mark_safe(' '.join([test for test in relevant_q.values()]))
