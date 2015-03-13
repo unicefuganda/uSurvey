@@ -77,10 +77,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 
 	{% for batch in survey_batches  %}
 		{% for question in batch.all_questions %}
-        {% is_relevant_odk question batch investigator as relevance_context %}
+        
 		<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}" 
 			type="{% if question.answer_type == 'number' %}int{% elif question.answer_type == 'multichoice' %}select1{% elif question.answer_type == 'multiselect' %}select{% elif question.answer_type == 'date' %}date{% elif question.answer_type == 'audio' or question.answer_type == 'image' or question.answer_type == 'video' %}binary{% elif question.answer_type == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} relevant="true(){% if question.group.name == 'GENERAL' %} and selected(/survey/household/householdMember/isHead,'1'){% endif %}{{ relevance_context }}"/>
-                
+                {% is_relevant_odk question batch investigator as relevance_context %}
            {% if question.group.name == 'NON_RESPONSE' %}
              <bind nodeset="/survey/b{{batch.pk}}/qnr{{question.pk}}" type="string" relevant="string-length(/survey/b{{batch.pk}}/q{{question.pk}})=0" />
            {% endif %}
