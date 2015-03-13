@@ -41,7 +41,7 @@ class Household(BaseModel):
 
     def last_question_answered(self):
         answered = []
-        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer',  'multiselectanswer',  'geopointanswer']:
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             answer = getattr(self, related_name).all()
             if answer.exists(): answered.append(answer.latest())
         if answered:
@@ -70,7 +70,7 @@ class Household(BaseModel):
         batches = self.investigator.get_open_batch()
         from survey.models import Question
         questions = Question.objects.filter(batches__in=batches)
-        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer',  'multiselectanswer',  'geopointanswer']:
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             getattr(self, related_name).filter(question__in=questions).delete()
 
     def has_completed_batch(self, batch):
@@ -131,7 +131,7 @@ class Household(BaseModel):
 
     def all_answers(self, batch):
         answers = {}
-        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer',  'multiselectanswer',  'geopointanswer']:
+        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             answers[key] = getattr(self, key).filter(batch=batch, is_old=False).values_list('question', flat=True)
         return answers
 
@@ -317,13 +317,13 @@ class HouseholdMember(BaseModel):
 
     def all_answers(self, batch):
         answers = {}
-        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer',  'multiselectanswer',  'geopointanswer']:
+        for key in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             answers[key] = getattr(self, key).filter(batch=batch, is_old=False).values_list('question', flat=True)
         return answers
 
     def last_question_answered(self):
         answered = []
-        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer',  'multiselectanswer',  'geopointanswer']:
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             answer = getattr(self, related_name).all()
             if answer.exists() and answer.filter(is_old=False).exists(): answered.append(answer.latest())
         if answered:
@@ -353,6 +353,13 @@ class HouseholdMember(BaseModel):
             return question.get_next_question_by_rule(answer, self.household.investigator)
         except ObjectDoesNotExist, e:
             return self.next_question_in_order(batch, question)
+
+    @classmethod
+    def next_odk_question(question, answer=None):
+        try:
+            return question.get_next_question_by_rule(answer, self.household.investigator)
+        except ObjectDoesNotExist, e:
+            return None
 
     def get_next_question_orders(self, last_question_answered, batch=None):
         group_order = 0
@@ -437,7 +444,7 @@ class HouseholdMember(BaseModel):
 
     def mark_past_answers_as_old(self):
         self.completed_member_batches.all().delete()
-        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer',  'multiselectanswer',  'geopointanswer']:
+        for related_name in ['numericalanswer', 'textanswer', 'multichoiceanswer', 'dateanswer', 'audioanswer', 'videoanswer', 'imageanswer', 'multiselectanswer',  'geopointanswer']:
             getattr(self, related_name).all().update(is_old=True)
 
     def answers_for(self, questions, general_group):

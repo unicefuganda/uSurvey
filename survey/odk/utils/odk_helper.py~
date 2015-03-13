@@ -148,9 +148,10 @@ class NonResponseAnswer(Answer):
     def __init__(self, answer):
         self.answer = answer
 
-def _get_responses(survey_tree, survey):
+def _get_responses(survey_tree, investigator, survey):
     response_dict = {}
-    for batch in survey.batch.all():
+    batches = investigator.get_open_batch_for_survey(survey)
+    for batch in batches:
         for question in batch.all_questions():
             context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
             answer_path = template.Template(ANSWER_PATH).render(context)
@@ -189,10 +190,11 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
     for (b_id, q_id), answer in response_dict.items():
         question = Question.objects.get(pk=q_id)
         batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-        if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
-            answer = media_files.get(answer, None)
-        created = register_member_answer(investigator, question, member, answer, batch)
-        member_completion_report[(b_id, q_id)] = created
+        if answer is not None:
+            if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
+                answer = media_files.get(answer, None)
+            created = register_member_answer(investigator, question, member, answer, batch)
+            member_completion_report[(b_id, q_id)] = created
         if b_id not in treated_batches.keys():
             treated_batches[b_id] = batch
     submission = ODKSubmission.objects.create(investigator=investigator, 

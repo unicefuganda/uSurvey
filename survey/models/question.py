@@ -119,6 +119,16 @@ class Question(BaseModel):
 
         raise ObjectDoesNotExist
 
+    def get_odk_next_question(self, answer):
+        all_rules = self.rule.all()
+        for rule in all_rules:
+            if rule.validate(answer):
+                if not rule.action == 'end_interview':
+                    return rule.action_to_take(answer.investigator, answer)
+                else:
+                    return None
+        raise ObjectDoesNotExist
+
     def next_question(self, location, member=None):
         order = self.parent.order if self.subquestion else self.order
         batch = self.parent.batches.all()[0] if self.subquestion else self.batches.all()[0]

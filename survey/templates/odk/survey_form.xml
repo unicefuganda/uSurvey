@@ -1,3 +1,4 @@
+{% load template_tags %}
 <h:html xmlns="http://www.w3.org/2002/xforms"
 xmlns:h="http://www.w3.org/1999/xhtml"
 xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -40,7 +41,7 @@ xmlns:jr="http://openrosa.org/javarosa">
             <residentSince />
         </householdMember>
     </household>
-	{% for batch in survey.ordered_batches %}
+	{% for batch in survey_batches %}
 		<b{{batch.pk}}>
 			{% for question in batch.all_questions %}
 				<q{{question.pk}} />
@@ -74,14 +75,16 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/household/householdMember/residentSince" type="date" relevant="selected(/survey/household/householdMember/isHead,'1')" />
 
 
-	{% for batch in survey.ordered_batches %}
+	{% for batch in survey_batches  %}
 		{% for question in batch.all_questions %}
+        {% is_relevant_odk question batch investigator as relevance_context %}
 		<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}" 
-			type="{% if question.answer_type == 'number' %}int{% elif question.answer_type == 'multichoice' %}select1{% elif question.answer_type == 'multiselect' %}select{% elif question.answer_type == 'date' %}date{% elif question.answer_type == 'audio' or question.answer_type == 'image' or question.answer_type == 'video' %}binary{% elif question.answer_type == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} {% if question.group.name == 'GENERAL' %}relevant="selected(/survey/household/householdMember/isHead,'1')"{% endif %}/>
+			type="{% if question.answer_type == 'number' %}int{% elif question.answer_type == 'multichoice' %}select1{% elif question.answer_type == 'multiselect' %}select{% elif question.answer_type == 'date' %}date{% elif question.answer_type == 'audio' or question.answer_type == 'image' or question.answer_type == 'video' %}binary{% elif question.answer_type == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} relevant="true(){% if question.group.name == 'GENERAL' %} and selected(/survey/household/householdMember/isHead,'1'){% endif %}{{ relevance_context }}"/>
            {% if question.group.name == 'NON_RESPONSE' %}
              <bind nodeset="/survey/b{{batch.pk}}/qnr{{question.pk}}" type="string" relevant="string-length(/survey/b{{batch.pk}}/q{{question.pk}})=0" />
            {% endif %}
 		{% endfor %}
+        
 	{% endfor %}
 
   </model>
@@ -134,7 +137,7 @@ xmlns:jr="http://openrosa.org/javarosa">
         <label>Household Member Details</label>
 
         	<select1 ref="/survey/household/householdMember/isHead">
-				<label>This is household Head?</label>
+				<label>Is this the main respondent of this household?</label>
                 <hint>Skip if already assigned for this household</hint>
 				<item>
 					<label> Yes </label>
@@ -182,7 +185,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		</select1>
 		</group>            
     </group>
-	{% for batch in survey.ordered_batches %}
+	{% for batch in survey_batches %}
 		<group>
 			<label>{{ batch.name }}</label>
 			<hint>{{ batch.description }}</hint>

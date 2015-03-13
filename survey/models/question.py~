@@ -70,7 +70,7 @@ class Question(BaseModel):
             self.subquestion = True
 
     def __unicode__(self):
-        name = '<div><table border="1"><tr><td>%s&nbsp;&nbsp;|</td><td>&nbsp;&nbsp;%s&nbsp;&nbsp;|</td><td>&nbsp;&nbsp;&nbsp;%s</td></tr></table></div>' % (self.identifier, self.text, self.answer_type.upper())
+        name = '%s&nbsp;&nbsp;|&nbsp;&nbsp;%s&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;%s' % (self.identifier, self.text, self.answer_type.upper())
         return mark_safe(name)
 
     def clean(self, *args, **kwargs):
@@ -117,6 +117,18 @@ class Question(BaseModel):
             if rule.validate(answer):
                 return rule.action_to_take(investigator, answer)
 
+        raise ObjectDoesNotExist
+
+    def get_odk_next_question(self, answer):
+        all_rules = self.rule.all()
+        skips = ['skip_to', 'ask_subquestion']
+        for rule in all_rules:
+            if rule.validate(answer):
+                if rule.action in methods:
+                    return rule.action_to_take(answer.investigator, answer)
+                else:
+                    return None
+            
         raise ObjectDoesNotExist
 
     def next_question(self, location, member=None):

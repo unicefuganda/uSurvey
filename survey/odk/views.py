@@ -33,6 +33,7 @@ def get_survey_xform(investigator, survey):
         'investigator': investigator,
         'registered_households' : investigator.households.filter(survey=survey, ea=investigator.ea).all(),
         'survey' : survey,
+        'survey_batches' : investigator.get_open_batch_for_survey(survey, sort=True),
         'educational_levels' : LEVEL_OF_EDUCATION
         })
 

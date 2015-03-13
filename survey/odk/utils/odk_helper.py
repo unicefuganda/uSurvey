@@ -148,9 +148,10 @@ class NonResponseAnswer(Answer):
     def __init__(self, answer):
         self.answer = answer
 
-def _get_responses(survey_tree, survey):
+def _get_responses(investigator, survey_tree, survey):
     response_dict = {}
-    for batch in survey.batch.all():
+    batches = investigator.get_open_batch_for_survey(survey)
+    for batch in batches:
         for question in batch.all_questions():
             context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
             answer_path = template.Template(ANSWER_PATH).render(context)
@@ -184,7 +185,7 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
         raise SurveySampleSizeReached()
     member = _get_or_create_household_member(investigator, survey, survey_tree)
     member_completion_report = {}
-    response_dict = _get_responses(survey_tree, survey)
+    response_dict = _get_responses(investigator, survey_tree, survey)
     treated_batches = {}
     for (b_id, q_id), answer in response_dict.items():
         question = Question.objects.get(pk=q_id)
