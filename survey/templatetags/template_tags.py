@@ -133,9 +133,16 @@ def total_household_members(investigator):
     return sum([household.household_member.count() for household in households])
 
 @register.assignment_tag(takes_context=True)
-def is_relevant_odk(context, question, batch, investigator):
+def clean_odk_relevant_context(context, question, batch, investigator):
     relevant_q = context.get('relevant_q', {})
     relevant_q.pop(question.pk, None) #if it happens that this is skip to question of a previous one remove it in context
+    context['relevant_q'] = relevant_q
+    return ''
+
+@register.assignment_tag(takes_context=True)
+def is_relevant_odk(context, question, batch, investigator):
+    relevant_q = context.get('relevant_q', {})
+#    relevant_q.pop(question.pk, None) #if it happens that this is skip to question of a previous one remove it in context
     if question.answer_type.lower() == 'multichoice' and question.rule.count():
         for option in question.options.all():
             answer = MultiChoiceAnswer()
