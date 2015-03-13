@@ -123,7 +123,7 @@ class Question(BaseModel):
         all_rules = self.rule.all()
         for rule in all_rules:
             if rule.validate(answer):
-                if not rule.action == 'end_interview':
+                if not rule.action == 'END_INTERVIEW':
                     return rule.action_to_take(answer.investigator, answer)
                 else:
                     return None

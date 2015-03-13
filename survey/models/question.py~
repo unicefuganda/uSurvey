@@ -121,14 +121,12 @@ class Question(BaseModel):
 
     def get_odk_next_question(self, answer):
         all_rules = self.rule.all()
-        skips = ['skip_to', 'ask_subquestion']
         for rule in all_rules:
             if rule.validate(answer):
-                if rule.action in methods:
+                if not rule.action == 'end_interview':
                     return rule.action_to_take(answer.investigator, answer)
                 else:
                     return None
-            
         raise ObjectDoesNotExist
 
     def next_question(self, location, member=None):
