@@ -142,7 +142,7 @@ def clean_odk_relevant_context(context, question, batch, investigator):
 @register.assignment_tag(takes_context=True)
 def is_relevant_odk(context, question, batch, investigator):
     relevant_q = context.get('relevant_q', {})
-    exclude_in_present_question = ''
+#    exclude_in_present_question = ''
     if question.answer_type.lower() == 'multichoice' and question.rule.count():
         for option in question.options.all():
             answer = MultiChoiceAnswer()
@@ -154,11 +154,11 @@ def is_relevant_odk(context, question, batch, investigator):
                 skip_to_question = question.get_odk_next_question(answer)
                 if skip_to_question is not None:
                     relevant_q[skip_to_question.pk] = " and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk)
-                    exclude_in_present_question = relevant_q[skip_to_question.pk]
+#                    exclude_in_present_question = relevant_q[skip_to_question.pk]
             except ObjectDoesNotExist, e:
                 pass
     context['relevant_q'] = relevant_q
     tests = relevant_q.values()
-    return mark_safe(' '.join([test for test in relevant_q.values() if not test == exclude_in_present_question]))
+    return mark_safe(' '.join([test for test in relevant_q.values()]))
 
 
