@@ -159,6 +159,6 @@ def is_relevant_odk(context, question, batch, investigator):
                 pass
     context['relevant_q'] = relevant_q
     tests = relevant_q.values()
-    return mark_safe(' '.join([test for test in relevant_q.values() if test.strip() not in exclude_in_present_question]))
+    return mark_safe(' '.join([test for test in relevant_q.values() if test.strip()]))
 
 
