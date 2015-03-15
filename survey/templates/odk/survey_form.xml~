@@ -21,6 +21,7 @@ xmlns:jr="http://openrosa.org/javarosa">
     {% if registered_households.count > 0 %}
     <registeredHousehold>
         <household />
+        <selectedMember />
         <householdMember>
         {% for r_household in registered_households %}
             <h{{r_household.pk}} />
@@ -58,8 +59,10 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
    {% if registered_households.count > 0 %}
-		<bind nodeset="/survey/chooseExistingHousehold" type="select1"  required="true()" />
+	<bind nodeset="/survey/chooseExistingHousehold" type="select1"  required="true()" />
 	   <bind nodeset="/survey/registeredHousehold/household" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'1')" />
+      <bind nodeset="/survey/registeredHousehold/selectedMember" type="string" 
+           readonly="true()" calculate="if(selected(/survey/chooseExistingHousehold,'1'), coalesce({% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}},{% endfor %}'/xyz' ), '')" />
 	   {% for r_household in registered_households %}
 	   <bind nodeset="/survey/registeredHousehold/householdMember/h{{r_household.pk}}" type="select1"  required="true()" relevant="selected(/survey/registeredHousehold/household,'{{r_household.pk}}')" />
 	   {% endfor %}
@@ -77,10 +80,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 
 	{% for batch in survey_batches  %}
 		{% for question in batch.all_questions %}
-        
+        {% is_relevant_odk question batch investigator as relevance_context %}
 		<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}" 
-			type="{% if question.answer_type == 'number' %}int{% elif question.answer_type == 'multichoice' %}select1{% elif question.answer_type == 'multiselect' %}select{% elif question.answer_type == 'date' %}date{% elif question.answer_type == 'audio' or question.answer_type == 'image' or question.answer_type == 'video' %}binary{% elif question.answer_type == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} relevant="true(){% if question.group.name == 'GENERAL' %} and selected(/survey/household/householdMember/isHead,'1'){% endif %}{{ relevance_context }}"/>
-                {% is_relevant_odk question batch investigator as relevance_context %}
+			type="{% if question.answer_type == 'number' %}int{% elif question.answer_type == 'multichoice' %}select1{% elif question.answer_type == 'multiselect' %}select{% elif question.answer_type == 'date' %}date{% elif question.answer_type == 'audio' or question.answer_type == 'image' or question.answer_type == 'video' %}binary{% elif question.answer_type == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} relevant="true() {{ relevance_context }}"/>
+                
            {% if question.group.name == 'NON_RESPONSE' %}
              <bind nodeset="/survey/b{{batch.pk}}/qnr{{question.pk}}" type="string" relevant="string-length(/survey/b{{batch.pk}}/q{{question.pk}})=0" />
            {% endif %}

@@ -29,11 +29,12 @@ from survey.models.surveys import SurveySampleSizeReached
 from survey.investigator_configs import LEVEL_OF_EDUCATION
 
 def get_survey_xform(investigator, survey):
+    registered_households = investigator.households.filter(survey=survey, ea=investigator.ea).all()
     return render_to_string("odk/survey_form.xml", {
         'investigator': investigator,
-        'registered_households' : investigator.households.filter(survey=survey, ea=investigator.ea).all(),
+        'registered_households' : [hs for hs in registered_households if hs.household_member.count() > 0],
         'survey' : survey,
-        'survey_batches' : investigator.get_open_batch_for_survey(survey),
+        'survey_batches' : investigator.get_open_batch_for_survey(survey, sort=True),
         'educational_levels' : LEVEL_OF_EDUCATION
         })
 

@@ -3,11 +3,12 @@ from django.core.urlresolvers import reverse
 from survey.investigator_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
-from survey.models import Survey, Question, Batch, Investigator, MultiChoiceAnswer
+from survey.models import Survey, Question, Batch, Investigator, MultiChoiceAnswer, GroupCondition
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
-
+from dateutils import relativedelta
+from datetime import date
 
 register = template.Library()
 
@@ -140,15 +141,16 @@ def clean_odk_relevant_context(context, question, batch, investigator):
     return ''
 
 @register.assignment_tag(takes_context=True)
-def is_relevant_odk(context, question, batch, investigator):
+def is_relevant_odk(context, question, batch, investigator, registered_households):
     skip_to_ques = context.get('skip_to_ques', {})
     skip_to_ques.pop(question.pk, None)
     sub_ques = context.get('sub_ques', {})
     terminal_ques = context.get('terminal_ques', [])
-    relevance_context = '%s %s %s' % (
+    relevance_context = '%s %s %s %s' % (
                                    ' '.join([test for test in sub_ques.values()]),
                                    ' '.join([test for test in skip_to_ques.values()]),
-                                   ' '.join([test for test in terminal_ques])
+                                   ' '.join([test for test in terminal_ques]),
+                                   is_relevant_by_group(question, registered_households)
                                    )
     sub_ques.pop(question.pk, None)
     if question.answer_type.lower() == 'multichoice' and question.rule.count():
@@ -170,10 +172,48 @@ def is_relevant_odk(context, question, batch, investigator):
                     terminal_ques.append(" and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk))
             except ObjectDoesNotExist, e:
                 pass
+#    else:
+        
             #import pdb; pdb.set_trace()
     context['skip_to_ques'] = skip_to_ques
     context['sub_ques'] = sub_ques    
     context['terminal_ques'] = terminal_ques
     return mark_safe(relevance_context)
 
+
+def is_relevant_by_group(question, registered_households):
+    question_group = question.group
+    relevant_new = []
+    extra = ''
+    if question_group.name == 'GENERAL':
+        extra = " and selected(/survey/household/householdMember/isHead,'1')"
+    MATCHING_METHODS = {
+            'EQUALS': '=',
+            'GREATER_THAN': '&gt;',
+            'LESS_THAN': '&lt;',
+    }
+    for group_condition in question_group.get_all_conditions():
+        method = MATCHING_METHODS.get(group_condition.condition, None)
+        value = group_condition.value
+        if method is not None:
+            if group_condition.attribute == GroupCondition.GROUP_TYPES['AGE']:
+                age_date = date.today() - relativedelta(years=int(value))
+                ref_date_str = date.strftime(age_date, '%Y-%m-%d')
+                relevant_new.append(" /survey/household/householdMember/dateOfBirth %s %s" % (method, ref_date_str))
+            if group_condition.attribute == GroupCondition.GROUP_TYPES['GENDER'] or group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']:
+                is_male = '0'
+                if str(value).lower() == "male" or str(value) == str(True) or (str(value).lower() == "head" and group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']):
+                    is_male = '1'
+                relevant_new.append(" /survey/household/householdMember/sex = %s" % is_male)
+
+    relevant_existing = []
+    for household in registered_households:
+        for member in household.all_members():
+            if member.belongs_to(question_group):
+                relevant_existing.append(" /survey/registeredHousehold/selectedMember = %s " % member.pk)
+    relevant_new = ' and '.join(relevant_new)
+    relevant_existing =  ' or '.join(relevant_existing)
+    return ' %s and ((%s) or (%s))' % (extra, relevant_new, relevant_existing) 
+
+    
 
