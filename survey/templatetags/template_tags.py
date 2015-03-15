@@ -211,9 +211,13 @@ def is_relevant_by_group(question, registered_households):
         for member in household.all_members():
             if member.belongs_to(question_group):
                 relevant_existing.append(" /survey/registeredHousehold/selectedMember = %s " % member.pk)
-    relevant_new = ' and '.join(relevant_new)
-    relevant_existing =  ' or '.join(relevant_existing)
-    return ' %s and ((%s) or (%s))' % (extra, relevant_new, relevant_existing) 
+    relevant_members = []
+    if relevant_new:
+        relevant_members.append('(%s)' % ' and '.join(relevant_new))
+    if relevant_existing:
+        relevant_members.append('(%s)' %  ' or '.join(relevant_existing))
+     
+    return ' %s and (%s)' % (extra, ' or '.join(relevant_members)) 
 
     
 
