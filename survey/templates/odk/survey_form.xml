@@ -61,11 +61,11 @@ xmlns:jr="http://openrosa.org/javarosa">
    {% if registered_households.count > 0 %}
 	<bind nodeset="/survey/chooseExistingHousehold" type="select1"  required="true()" />
 	   <bind nodeset="/survey/registeredHousehold/household" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'1')" />
-      <bind nodeset="/survey/registeredHousehold/selectedMember" type="string" 
-           readonly="true()" calculate="if(selected(/survey/chooseExistingHousehold,'1'), concat({% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}},{% endfor %}'')" />
 	   {% for r_household in registered_households %}
 	   <bind nodeset="/survey/registeredHousehold/householdMember/h{{r_household.pk}}" type="select1"  required="true()" relevant="selected(/survey/registeredHousehold/household,'{{r_household.pk}}')" />
 	   {% endfor %}
+      <bind nodeset="/survey/registeredHousehold/selectedMember" type="string" 
+           readonly="true()" calculate="if(selected(/survey/chooseExistingHousehold,'1'), concat({% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}''), '')" />
   {% endif %}
   <bind nodeset="/survey/household/houseNumber" type="int"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
