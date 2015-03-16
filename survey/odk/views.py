@@ -1,5 +1,5 @@
 from datetime import datetime
-import pytz, os, base64
+import pytz, os, base64, random
 from functools import wraps
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET, require_POST
@@ -26,15 +26,24 @@ from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
 from survey.models import ODKSubmission
 from survey.models.surveys import SurveySampleSizeReached
-from survey.investigator_configs import LEVEL_OF_EDUCATION
+from survey.investigator_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
 
-def get_survey_xform(investigator, survey):
+def get_survey_xform(investigator, survey, household_size):
+    household_size = int(household_size)
+    selectable_households = None
+    if household_size:
+        if survey.has_sampling:
+            selectable_households = random.sample(list(range(1, household_size + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
+            selectable_households.sort()
+        else:
+            selectable_households = range(1, household_size + 1)
     return render_to_string("odk/survey_form.xml", {
         'investigator': investigator,
         'registered_households' : investigator.households.filter(survey=survey, ea=investigator.ea).all(),
         'survey' : survey,
         'survey_batches' : investigator.get_open_batch_for_survey(survey, sort=True),
-        'educational_levels' : LEVEL_OF_EDUCATION
+        'educational_levels' : LEVEL_OF_EDUCATION,
+        'selectable_households' : selectable_households
         })
 
 def base_url(request):
@@ -69,6 +78,7 @@ def form_list(request):
         This is where ODK Collect gets its download list.
     """
     investigator = request.user
+    household_size = request.GET.get('household_size', None)
     #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     surveys = get_surveys(investigator)
@@ -79,6 +89,7 @@ def form_list(request):
     'surveys': surveys,
     'investigator' : investigator,
     'base_url' : base_url(request),
+    'household_size' : household_size
     }, mimetype="text/xml; charset=utf-8")
     response['X-OpenRosa-Version'] = '1.0'
     tz = pytz.timezone(settings.TIME_ZONE)
@@ -87,10 +98,10 @@ def form_list(request):
     return response
 
 @http_digest_investigator_auth
-def download_xform(request, survey_id):
+def download_xform(request, survey_id, household_size=None):
     investigator = request.user
     survey = get_object_or_404(Survey, pk=survey_id)
-    survey_xform = get_survey_xform(investigator, survey)
+    survey_xform = get_survey_xform(investigator, survey, household_size)
     form_id = '%s'% survey_id
     audit = {
         "xform": form_id

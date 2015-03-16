@@ -145,11 +145,12 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
     skip_to_ques = context.get('skip_to_ques', {})
     skip_to_ques.pop(question.pk, None)
     sub_ques = context.get('sub_ques', {})
+#    import pdb;pdb.set_trace()
     terminal_ques = context.get('terminal_ques', [])
     relevance_context = '%s %s %s %s' % (
                                    ' '.join([test for test in sub_ques.values()]),
-                                   ' '.join([test for test in skip_to_ques.values()]),
-                                   ' '.join([test for test in terminal_ques]),
+                                   ' '.join([test for test in skip_to_ques.values() if test.startswith('/survey/b%s/' % batch.pk)]),
+                                   ' '.join([test for test in terminal_ques if test.startswith('/survey/b%s/' % batch.pk)]),
                                    is_relevant_by_group(question, registered_households)
                                    )
     sub_ques.pop(question.pk, None)

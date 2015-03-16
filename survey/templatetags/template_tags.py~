@@ -145,13 +145,17 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
     skip_to_ques = context.get('skip_to_ques', {})
     skip_to_ques.pop(question.pk, None)
     sub_ques = context.get('sub_ques', {})
+#    import pdb;pdb.set_trace()
     terminal_ques = context.get('terminal_ques', [])
-    relevance_context = '%s %s %s %s' % (
+    try:
+        relevance_context = '%s %s %s %s' % (
                                    ' '.join([test for test in sub_ques.values()]),
-                                   ' '.join([test for test in skip_to_ques.values()]),
-                                   ' '.join([test for test in terminal_ques]),
+                                   ' '.join([test for test in skip_to_ques.values() if test.startswith('/survey/b%s/' % batch.pk)]),
+                                   ' '.join([test for test in terminal_ques if test.startswith('/survey/b%s/' % batch.pk)]),
                                    is_relevant_by_group(question, registered_households)
                                    )
+    except Exception, ex:
+        import pdb;pdb.set_trace()
     sub_ques.pop(question.pk, None)
     if question.answer_type.lower() == 'multichoice' and question.rule.count():
         for option in question.options.all():
@@ -217,7 +221,7 @@ def is_relevant_by_group(question, registered_households):
     if relevant_existing:
         relevant_members.append('(%s)' %  ' or '.join(relevant_existing))
      
-    return ' %s and ((%s) or (%s))' % (extra, ' or '.join(relevant_members)) 
+    return ' %s and (%s)' % (extra, ' or '.join(relevant_members)) 
 
     
 
