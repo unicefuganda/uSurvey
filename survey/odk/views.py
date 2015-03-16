@@ -29,9 +29,9 @@ from survey.models.surveys import SurveySampleSizeReached
 from survey.investigator_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
 
 def get_survey_xform(investigator, survey, household_size):
-    household_size = int(household_size)
     selectable_households = None
     if household_size:
+        household_size = int(household_size)
         if survey.has_sampling:
             selectable_households = random.sample(list(range(1, household_size + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
             selectable_households.sort()
@@ -78,7 +78,7 @@ def form_list(request):
         This is where ODK Collect gets its download list.
     """
     investigator = request.user
-    household_size = request.GET.get('household_size', None)
+    household_size = request.GET.get('household_size', '')
     #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     surveys = get_surveys(investigator)

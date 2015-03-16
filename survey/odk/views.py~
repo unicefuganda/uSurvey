@@ -29,10 +29,9 @@ from survey.models.surveys import SurveySampleSizeReached
 from survey.investigator_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
 
 def get_survey_xform(investigator, survey, household_size):
-    household_size = int(household_size)
     selectable_households = None
-#    import pdb;pdb.set_trace()
     if household_size:
+        household_size = int(household_size)
         if survey.has_sampling:
             selectable_households = random.sample(list(range(1, household_size + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
             selectable_households.sort()
