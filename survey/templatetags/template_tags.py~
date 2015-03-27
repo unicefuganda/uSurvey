@@ -147,15 +147,12 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
     sub_ques = context.get('sub_ques', {})
 #    import pdb;pdb.set_trace()
     terminal_ques = context.get('terminal_ques', [])
-    try:
-        relevance_context = '%s %s %s %s' % (
+    relevance_context = '%s %s %s %s' % (
                                    ' '.join([test for test in sub_ques.values()]),
                                    ' '.join([test for test in skip_to_ques.values() if test.startswith('/survey/b%s/' % batch.pk)]),
                                    ' '.join([test for test in terminal_ques if test.startswith('/survey/b%s/' % batch.pk)]),
                                    is_relevant_by_group(question, registered_households)
                                    )
-    except Exception, ex:
-        import pdb;pdb.set_trace()
     sub_ques.pop(question.pk, None)
     if question.answer_type.lower() == 'multichoice' and question.rule.count():
         for option in question.options.all():
@@ -188,7 +185,7 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
 def is_relevant_by_group(question, registered_households):
     question_group = question.group
     relevant_new = []
-    extra = ''
+    extra = ' and True'
     if question_group.name == 'GENERAL':
         extra = " and selected(/survey/household/householdMember/isHead,'1')"
     MATCHING_METHODS = {

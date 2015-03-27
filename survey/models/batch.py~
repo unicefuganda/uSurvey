@@ -57,7 +57,7 @@ class Batch(BaseModel):
 
     def questions_and_subquestions(self):
         from survey.models import BatchQuestionOrder
-        return BatchQuestionOrder.get_ordered_batch_questions_with_subquestions(self, {})
+        return BatchQuestionOrder.get_batch_order_specific_questions(self, {})
 
     def open_for_location(self, location):
         all_related_locations = get_descendants(location, include_self=False)

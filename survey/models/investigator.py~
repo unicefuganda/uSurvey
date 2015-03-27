@@ -243,8 +243,9 @@ class Investigator(BaseModel):
             if household.location != self.location:
                 self.households.remove(household)
 
-    def get_open_batch_for_survey(self,survey):
+    def get_open_batch_for_survey(self,survey, sort=False):
         batches = self.get_open_batch()
+        if sort: batches = sorted(batches, key=lambda batch: batch.order)
         return[batch for batch in batches if batch.survey == survey]
 
     def completed_survey(self, survey):

@@ -139,8 +139,8 @@ xmlns:jr="http://openrosa.org/javarosa">
               <label>Select household</label>
               {% for h_number in selectable_households %}
                  <item>
-					<label>h_number</label>
-					<value>h_number</value>
+					<label>{{ h_number }}</label>
+					<value>{{ h_number }}</value>
 				</item>  
               {% endfor %}
           </select1>
