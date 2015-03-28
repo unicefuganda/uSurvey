@@ -145,15 +145,13 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
     skip_to_ques = context.get('skip_to_ques', {})
     skip_to_ques.pop(question.pk, None)
     sub_ques = context.get('sub_ques', {})
-#    import pdb;pdb.set_trace()
     terminal_ques = context.get('terminal_ques', [])
     relevance_context = '%s %s %s %s' % (
-                                   ' '.join([test for test in sub_ques.values()]),
-                                   ' '.join([test for test in skip_to_ques.values() if test.startswith('/survey/b%s/' % batch.pk)]),
-                                   ' '.join([test for test in terminal_ques if test.startswith('/survey/b%s/' % batch.pk)]),
+                                   sub_ques.pop(question.pk, ''),
+                                   ' '.join([test for test in skip_to_ques.values() if test.find('/survey/b%s/' % batch.pk) > -1]),
+                                   ' '.join([test for test in terminal_ques if test.find('/survey/b%s/' % batch.pk) > -1]),
                                    is_relevant_by_group(question, registered_households)
                                    )
-    sub_ques.pop(question.pk, None)
     if question.answer_type.lower() == 'multichoice' and question.rule.count():
         for option in question.options.all():
             answer = MultiChoiceAnswer()
@@ -172,6 +170,7 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
                 else:
                     terminal_ques.append(" and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk))
             except ObjectDoesNotExist, e:
+                logger.error('error: %s' % str(e))
                 pass
 #    else:
         
@@ -185,7 +184,7 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
 def is_relevant_by_group(question, registered_households):
     question_group = question.group
     relevant_new = []
-    extra = ' and True'
+    extra = ''
     if question_group.name == 'GENERAL':
         extra = " and selected(/survey/household/householdMember/isHead,'1')"
     MATCHING_METHODS = {

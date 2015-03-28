@@ -32,10 +32,4 @@ class BatchQuestionOrder(BaseModel):
                 questions.append(batch_question_order.question)
         return questions
 
-    @classmethod
-    def get_ordered_batch_questions_with_subquestions(cls, batch, filter_condition):
-        batch_question_orders = BatchQuestionOrder.objects.select_related('question__subquestion','question__group').prefetch_related('question__group__conditions').filter(batch=batch, **filter_condition).order_by('order')
-        questions = []
-        for batch_question_order in batch_question_orders:
-            questions.append(batch_question_order.question)
-        return questions
+
