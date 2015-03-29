@@ -200,7 +200,7 @@ def is_relevant_by_group(question, registered_households):
             if group_condition.attribute == GroupCondition.GROUP_TYPES['AGE']:
                 age_date = date.today() - relativedelta(years=int(value))
                 ref_date_str = date.strftime(age_date, '%Y-%m-%d')
-                relevant_new.append(" %s %s /survey/household/householdMember/dateOfBirth" % (ref_date_str, method))
+                relevant_new.append("( %s %s /survey/household/householdMember/dateOfBirth)" % (ref_date_str, method))
             if group_condition.attribute == GroupCondition.GROUP_TYPES['GENDER'] or group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']:
                 is_male = '0'
                 if str(value).lower() == "male" or str(value) == str(True) or (str(value).lower() == "head" and group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']):
@@ -211,7 +211,7 @@ def is_relevant_by_group(question, registered_households):
     for household in registered_households:
         for member in household.all_members():
             if member.belongs_to(question_group):
-                relevant_existing.append(" /survey/registeredHousehold/selectedMember = %s " % member.pk)
+                relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s' " % member.pk)
     relevant_members = []
     if relevant_new:
         relevant_members.append('(%s)' % ' and '.join(relevant_new))
