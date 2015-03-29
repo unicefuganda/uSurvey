@@ -78,7 +78,7 @@ def form_list(request):
         This is where ODK Collect gets its download list.
     """
     investigator = request.user
-    household_size = request.GET.get('household_size', None)
+    household_size = request.GET.get('household_size', '')
     #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     surveys = get_surveys(investigator)
