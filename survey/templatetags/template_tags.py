@@ -198,9 +198,10 @@ def is_relevant_by_group(question, registered_households):
         value = group_condition.value
         if method is not None:
             if group_condition.attribute == GroupCondition.GROUP_TYPES['AGE']:
-#                age_date = date.today() - relativedelta(years=int(value))
-                today_date_str = date.strftime(date.today(), '%Y-%m-%d')
-                relevant_new.append(" (date(%s) - /survey/household/householdMember/dateOfBirth %s %s )" % (today_date_str, method, int(value)))
+                today = date.today()
+                age_date = today - relativedelta(years=int(value))
+                today_date_str = date.strftime(today, '%Y-%m-%d')
+                relevant_new.append(" (date(%s) - /survey/household/householdMember/dateOfBirth %s %s )" % (today_date_str, method, (today-age_date).days))
             if group_condition.attribute == GroupCondition.GROUP_TYPES['GENDER'] or group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']:
                 is_male = '0'
                 if str(value).lower() == "male" or str(value) == str(True) or (str(value).lower() == "head" and group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']):
