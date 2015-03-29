@@ -190,7 +190,7 @@ def is_relevant_by_group(question, registered_households):
         extra = " and selected(/survey/household/householdMember/isHead,'1')"
     MATCHING_METHODS = {
             'EQUALS': '=',
-            'GREATER_THAN': '&gt;',
+            'GREATER_THAN': '>',
             'LESS_THAN': '&lt;',
     }
     for group_condition in question_group.get_all_conditions():
