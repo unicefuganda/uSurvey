@@ -44,7 +44,7 @@ xmlns:jr="http://openrosa.org/javarosa">
     </household>
 	{% for batch in survey_batches %}
 		<b{{batch.pk}}>
-			{% for question in batch.all_questions %}
+			{% for question in batch.questions_and_subquestions %}
 				<q{{question.pk}} />
                 {% if question.group.name == 'NON_RESPONSE' %}
                  <qnr{{question.pk}} />
@@ -205,7 +205,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		<group>
 			<label>{{ batch.name }}</label>
 			<hint>{{ batch.description }}</hint>
-			{% for question in batch.all_questions %}
+			{% for question in batch.questions_and_subquestions %}
 				{% if question.answer_type == 'multichoice' %}
 					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
 						<label>{{question.text}}</label>
