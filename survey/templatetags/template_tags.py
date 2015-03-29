@@ -205,13 +205,13 @@ def is_relevant_by_group(question, registered_households):
                 is_male = '0'
                 if str(value).lower() == "male" or str(value) == str(True) or (str(value).lower() == "head" and group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']):
                     is_male = '1'
-                relevant_new.append(" /survey/household/householdMember/sex = %s" % is_male)
+                relevant_new.append(" selected(/survey/household/householdMember/sex, '%s')" % is_male)
 
     relevant_existing = []
     for household in registered_households:
         for member in household.all_members():
             if member.belongs_to(question_group):
-                relevant_existing.append(" /survey/registeredHousehold/selectedMember = %s " % member.pk)
+                relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s' " % member.pk)
     relevant_members = []
     if relevant_new:
         relevant_members.append('(%s)' % ' and '.join(relevant_new))

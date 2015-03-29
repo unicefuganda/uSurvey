@@ -166,9 +166,9 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
                     if action == 'SKIP_TO':
                         skip_to_ques[next_question.pk] = " and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk)
                     if action =='ASK_SUBQUESTION':
-                        fellow_opts = sub_ques.get(next_question.pk, [])
-                        fellow_opts.append(" and selected(/survey/b%s/q%s,'%s')" % (batch.pk, question.pk, option.pk))
-                        sub_ques[next_question.pk] = fellow_opts
+                        fellows = sub_ques.get(next_question.pk, [])
+                        fellows.append(" and selected(/survey/b%s/q%s,'%s')" % (batch.pk, question.pk, option.pk))
+                        sub_ques[next_question.pk] = fellows
                 else:
                     terminal_ques.append(" and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk))
             except ObjectDoesNotExist, e:
@@ -205,7 +205,7 @@ def is_relevant_by_group(question, registered_households):
                 is_male = '0'
                 if str(value).lower() == "male" or str(value) == str(True) or (str(value).lower() == "head" and group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']):
                     is_male = '1'
-                relevant_new.append(" /survey/household/householdMember/sex = %s" % is_male)
+                relevant_new.append(" selected(/survey/household/householdMember/sex, '%s')" % is_male)
 
     relevant_existing = []
     for household in registered_households:
