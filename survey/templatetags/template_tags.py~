@@ -201,10 +201,10 @@ def is_relevant_by_group(question, registered_households):
                 today = date.today()
                 age_date = today - relativedelta(years=int(value))
                 age_date_str = date.strftime(age_date, '%Y-%m-%d')
-                relevant_new.append(" (%s %s /survey/household/householdMember/dateOfBirth)" % (age_date_str, method))
-            if group_condition.attribute == GroupCondition.GROUP_TYPES['GENDER'] or group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']:
+                relevant_new.append(" (date('%s') %s /survey/household/householdMember/dateOfBirth)" % (age_date_str, method))
+            if group_condition.attribute == GroupCondition.GROUP_TYPES['GENDER']:
                 is_male = '0'
-                if str(value).lower() == "male" or str(value) == str(True) or (str(value).lower() == "head" and group_condition.attribute == GroupCondition.GROUP_TYPES['GENERAL']):
+                if str(value).lower() == "male" or str(value) == str(True)):
                     is_male = '1'
                 relevant_new.append(" selected(/survey/household/householdMember/sex, '%s')" % is_male)
 
