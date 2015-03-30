@@ -82,7 +82,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% for question in batch.questions_and_subquestions %}
         {% is_relevant_odk question batch investigator registered_households as relevance_context %}
 		<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}" 
-			type="{% if question.answer_type == 'number' %}int{% elif question.answer_type == 'multichoice' %}select1{% elif question.answer_type == 'multiselect' %}select{% elif question.answer_type == 'date' %}date{% elif question.answer_type == 'audio' or question.answer_type == 'image' or question.answer_type == 'video' %}binary{% elif question.answer_type == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} relevant="true() {{ relevance_context }}"/>
+			type="{% if question.answer_type.lower == 'number' %}int{% elif question.answer_type.lower == 'multichoice' %}select1{% elif question.answer_type.lower == 'multiselect' %}select{% elif question.answer_type.lower == 'date' %}date{% elif question.answer_type.lower == 'audio' or question.answer_type.lower == 'image' or question.answer_type.lower == 'video' %}binary{% elif question.answer_type.lower == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type.lower != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} relevant="true() {{ relevance_context }}"/>
                 
            {% if question.group.name == 'NON_RESPONSE' %}
              <bind nodeset="/survey/b{{batch.pk}}/qnr{{question.pk}}" type="string" relevant="string-length(/survey/b{{batch.pk}}/q{{question.pk}})=0" />
@@ -208,7 +208,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 			<label>{{ batch.name }}</label>
 			<hint>{{ batch.description }}</hint>
 			{% for question in batch.questions_and_subquestions %}
-				{% if question.answer_type == 'multichoice' %}
+				{% if question.answer_type.lower == 'multichoice' %}
 					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
 						<label>{{question.text}}</label>
 						{% for option in question.options.all %}
@@ -218,7 +218,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 						</item>
 						{% endfor %}
 					</select1>
-				{% elif question.answer_type == 'multiselect' %}
+				{% elif question.answer_type.lower == 'multiselect' %}
 					<select ref="/survey/b{{batch.pk}}/q{{question.pk}}">
 						<label>{{question.text}}</label>
 						{% for option in question.options.all %}
@@ -228,15 +228,15 @@ xmlns:jr="http://openrosa.org/javarosa">
 						</item>
 						{% endfor %}
 					</select>
-				{% elif question.answer_type == 'image' %}
+				{% elif question.answer_type.lower == 'image' %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
 						<label>{{question.text}}</label>
 					</upload>
-				{% elif question.answer_type == 'audio' %}
+				{% elif question.answer_type.lower == 'audio' %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   mediatype="audio/*">
 						<label>{{question.text}}</label>
 					</upload>
-				{% elif question.answer_type == 'video' %}
+				{% elif question.answer_type.lower == 'video' %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}" mediatype="video/*">
 						<label>{{question.text}}</label>
 					</upload>
