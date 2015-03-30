@@ -187,7 +187,7 @@ def is_relevant_by_group(question, registered_households):
     relevant_new = []
     extra = ''
     if question_group.name == 'GENERAL':
-        extra = " and selected(/survey/household/householdMember/isHead,'1')"
+        relevant_new.append(" selected(/survey/household/householdMember/isHead,'1')")
     MATCHING_METHODS = {
             'EQUALS': '=',
             'GREATER_THAN': '&gt;',
@@ -213,14 +213,11 @@ def is_relevant_by_group(question, registered_households):
         for member in household.all_members():
             if member.belongs_to(question_group):
                 relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s' " % member.pk)
-    relevant_members = []
     if relevant_new:
-        relevant_members.append('(%s)' % ' and '.join(relevant_new))
+        relevance_context = '(%s)' % ' and '.join(relevant_new)
     if relevant_existing:
-        relevant_members.append('(%s)' %  ' or '.join(relevant_existing))
-    relevance_context = extra
-    if relevant_members:
-        relevance_context = ' %s and (%s)' % (extra, ' or '.join(relevant_members)) 
+        existing = '(%s)' %  ' or '.join(relevant_existing))
+        relevance_context = ' and (%s or %s)' % ( relevance_context, existing)
     return relevance_context
 
     
