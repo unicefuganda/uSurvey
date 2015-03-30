@@ -37,9 +37,10 @@ def get_survey_xform(investigator, survey, household_size):
             selectable_households.sort()
         else:
             selectable_households = range(1, household_size + 1)
+    registered_households = [hhd for hhd in investigator.households.filter(survey=survey, ea=investigator.ea).all() if hhd.all_members()]
     return render_to_string("odk/survey_form.xml", {
         'investigator': investigator,
-        'registered_households' : investigator.households.filter(survey=survey, ea=investigator.ea).all(),
+        'registered_households' : registered_households,  #investigator.households.filter(survey=survey, ea=investigator.ea).all(),
         'survey' : survey,
         'survey_batches' : investigator.get_open_batch_for_survey(survey, sort=True),
         'educational_levels' : LEVEL_OF_EDUCATION,
