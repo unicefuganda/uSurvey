@@ -218,8 +218,10 @@ def is_relevant_by_group(question, registered_households):
         relevant_members.append('(%s)' % ' and '.join(relevant_new))
     if relevant_existing:
         relevant_members.append('(%s)' %  ' or '.join(relevant_existing))
-     
-    return ' %s and (%s)' % (extra, ' or '.join(relevant_members)) 
+    relevance_context = extra
+    if relevant_members:
+        relevance_context = ' %s and (%s)' % (extra, ' or '.join(relevant_members)) 
+    return relevance_context
 
     
 

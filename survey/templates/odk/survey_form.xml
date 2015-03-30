@@ -179,13 +179,13 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<value>0</value>
 				</item>
 			</select1>
-        <input ref="/survey/household/householdMember/dateOfBirth">
+        <input ref="/survey/household/householdMember/dateOfBirth" appearance="no-calendar">
 						<label>Choose Date of Birth</label>
 					</input>
         <input ref="/survey/household/householdMember/occupation">
 						<label>Enter Occupation</label>
 					</input>
-        <input ref="/survey/household/householdMember/residentSince">
+        <input ref="/survey/household/householdMember/residentSince" appearance="no-calendar">
 						<label>Choose date of residency</label>
 					</input>
 		<select1 ref="/survey/household/householdMember/levelOfEducation">
@@ -236,6 +236,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}" mediatype="video/*">
 						<label>{{question.text}}</label>
 					</upload>
+                {% elif question.answer_type.lower == 'date' %}
+				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}" appearance="no-calendar">
+					<label>{{question.text}}</label>
+				</input>
 				{% else %}
 				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}">
 					<label>{{question.text}}</label>
