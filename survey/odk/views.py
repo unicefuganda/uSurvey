@@ -40,7 +40,7 @@ def get_survey_xform(investigator, survey, household_size):
     registered_households = [hhd for hhd in investigator.households.filter(survey=survey, ea=investigator.ea).all() if hhd.all_members()]
     return render_to_string("odk/survey_form.xml", {
         'investigator': investigator,
-        'registered_households' : registered_households,  #investigator.households.filter(survey=survey, ea=investigator.ea).all(),
+        'registered_households' : registered_households, #investigator.households.filter(survey=survey, ea=investigator.ea).all(),
         'survey' : survey,
         'survey_batches' : investigator.get_open_batch_for_survey(survey, sort=True),
         'educational_levels' : LEVEL_OF_EDUCATION,
@@ -79,7 +79,7 @@ def form_list(request):
         This is where ODK Collect gets its download list.
     """
     investigator = request.user
-    household_size = request.GET.get('household_size', '')
+    household_size = request.GET.get('total_households_ea', '')
     #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     surveys = get_surveys(investigator)
