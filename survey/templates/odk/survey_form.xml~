@@ -15,7 +15,8 @@ xmlns:jr="http://openrosa.org/javarosa">
   <instance>
    <survey id="{{ survey.pk }}" >
      <meta>
-       <instanceID/>
+       <instanceID />
+       <instanceName />
      </meta>
     <chooseExistingHousehold>0</chooseExistingHousehold>
     {% if registered_households  %}
@@ -58,6 +59,8 @@ xmlns:jr="http://openrosa.org/javarosa">
   <!-- bindings -->
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/survey/meta/instanceName" type="string" 
+           readonly="true()" calculate="concat(/survey/household/houseNumber, {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}'', '_', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
    {% if registered_households %}
 	<bind nodeset="/survey/chooseExistingHousehold" type="select1"  required="true()" />
 	   <bind nodeset="/survey/registeredHousehold/household" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'1')" />
@@ -236,6 +239,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}" mediatype="video/*">
 						<label>{{question.text}}</label>
 					</upload>
+                {% elif question.answer_type.lower == 'date' %}
+				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}" appearance="no-calendar">
+					<label>{{question.text}}</label>
+				</input>
 				{% else %}
 				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}">
 					<label>{{question.text}}</label>
