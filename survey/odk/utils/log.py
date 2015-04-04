@@ -1,5 +1,6 @@
 import logging, os
 from datetime import datetime
+from django.conf import settings
 
 APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_FILE = os.path.join(APP_DIR, 'mics_odk.log') 
@@ -8,8 +9,10 @@ handler = logging.FileHandler(LOG_FILE)
 formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
-
+if settings.DEBUG:
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.WARNING)
 
 class Enum(object):
     __name__= "Enum"
@@ -78,14 +81,14 @@ def audit_log(action, request_user, investigator, message, audit, request, level
 
     @param action: Action performed e.g. form-deleted
     @param request_username: User performing the action
-    @param account_username: The formhub account the action was performed on
+    @param account_username: The investigator name the action was performed on
     @param message: The message to be displayed on the log
     @param level: log level
     @param audit: a dict of key/values of other info pertaining to the action e.g. form's id_string, submission uuid
     @return: None
     """
     extra = {
-        'formhub_action': action,
+        'action': action,
         'request_username': str(request_user),
         'account_username': investigator.name if investigator.name
             else str(investigator),

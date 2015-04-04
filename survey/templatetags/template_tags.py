@@ -134,13 +134,6 @@ def total_household_members(investigator):
     return sum([household.household_member.count() for household in households])
 
 @register.assignment_tag(takes_context=True)
-def clean_odk_relevant_context(context, question, batch, investigator):
-    relevant_q = context.get('relevant_q', {})
-    relevant_q.pop(question.pk, None) #if it happens that this is skip to question of a previous one remove it in context
-    context['relevant_q'] = relevant_q
-    return ''
-
-@register.assignment_tag(takes_context=True)
 def is_relevant_odk(context, question, batch, investigator, registered_households):
     skip_to_ques = context.get('skip_to_ques', {})
     skip_to_ques.pop(question.pk, None)
@@ -185,7 +178,6 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
 def is_relevant_by_group(question, registered_households):
     question_group = question.group
     relevant_new = []
-    extra = ''
     if question_group.name == 'GENERAL':
         relevant_new.append(" selected(/survey/household/householdMember/isHead,'1')")
     MATCHING_METHODS = {

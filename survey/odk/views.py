@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
-from django.template import RequestContext, loader
+from django.template import RequestContext, loader, Context
 from survey.odk.utils.log import audit_log, Actions, logger
 from survey.odk.utils.odk_helper import get_surveys, process_submission, disposition_ext_and_date, get_zipped_dir, \
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, \
@@ -86,16 +86,14 @@ def form_list(request):
     audit = {}
     audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, investigator,
           _("Requested forms list. for %s" % investigator.mobile_number), audit, request)
-    response = render_to_response("odk/xformsList.xml", {
+    context= Context({
     'surveys': surveys,
     'investigator' : investigator,
     'base_url' : base_url(request),
     'household_size' : household_size
-    }, mimetype="text/xml; charset=utf-8")
-    response['X-OpenRosa-Version'] = '1.0'
-    tz = pytz.timezone(settings.TIME_ZONE)
-    dt = datetime.now(tz).strftime('%a, %d %b %Y %H:%M:%S %Z')
-    response['Date'] = dt
+    })
+    t = loader.get_template("odk/xformsList.xml")
+    response = BaseOpenRosaResponse(t.render(context))
     return response
 
 @http_digest_investigator_auth
@@ -122,7 +120,6 @@ def download_xform(request, survey_id, household_size=None):
 def submission(request):
     investigator = request.user
     #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
-    context = RequestContext(request)
     submission_date = datetime.now().isoformat()
     xml_file_list = []
     html_response = False
@@ -131,17 +128,17 @@ def submission(request):
     try:
         xml_file_list = request.FILES.pop("xml_submission_file", [])
         if len(xml_file_list) != 1:
-            return OpenRosaResponseBadRequest(
-                _(u"There should be a single XML submission file.")
-                )
+            return OpenRosaResponseBadRequest(u"There should be a single XML submission file.")
         media_files = request.FILES.values()
         submission_report = process_submission(investigator, xml_file_list[0],             media_files=media_files)
         logger.info(submission_report)
-        context.message = _(settings.ODK_SUBMISSION_SUCCESS_MSG)
-        context.instanceID = u'uuid:%s' % submission_report.instance_id
-        context.formid = submission_report.form_id
-        context.submissionDate = submission_date
-        context.markedAsCompleteDate = submission_date
+        context = Context({
+        'message' : settings.ODK_SUBMISSION_SUCCESS_MSG,
+        'instanceID' : u'uuid:%s' % submission_report.instance_id,
+        'formid' : submission_report.form_id,
+        'submissionDate' : submission_date,
+        'markedAsCompleteDate' : submission_date
+        })
         t = loader.get_template('odk/submission.xml')
         audit = {}
         audit_log( Actions.SUBMISSION_CREATED, request.user, investigator, 
@@ -153,16 +150,12 @@ def submission(request):
         response['Location'] = request.build_absolute_uri(request.path)
         return response
     except SurveySampleSizeReached:
-        return OpenRosaResponseNotAllowed(
-            _(u"Max sample size reached for this survey")
-        )
+        return OpenRosaResponseNotAllowed(u"Max sample size reached for this survey")
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, investigator, 
             _("Failed attempted to submit XML for form for investigator: '%(investigator)s'. desc: '%(desc)s'") % {
                                                         "investigator": investigator.mobile_number,
                                                         "desc" : str(ex)
-                                                    }, {'desc' : str(ex)}, request)
-        return OpenRosaResponseBadRequest(
-            _(u"Error encountered while processing your form.")
-        )
+                                                    }, {'desc' : str(ex)}, request, logging.WARNING)
+        return OpenRosaResponseBadRequest(u"Error encountered while processing your form.")
 
