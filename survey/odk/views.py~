@@ -17,8 +17,8 @@ from django.conf import settings
 from django.template import RequestContext, loader, Context
 from survey.odk.utils.log import audit_log, Actions, logger
 from survey.odk.utils.odk_helper import get_surveys, process_submission, disposition_ext_and_date, get_zipped_dir, \
-    response_with_mimetype_and_name, OpenRosaResponseBadRequest, \
-    OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound,\
+    response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, \
+    OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_investigator_auth
 from survey.models import Survey, Investigator, Household
 from django.utils.translation import ugettext as _
@@ -94,6 +94,7 @@ def form_list(request):
     })
     t = loader.get_template("odk/xformsList.xml")
     response = BaseOpenRosaResponse(t.render(context))
+    response.status_code = 200
     return response
 
 @http_digest_investigator_auth
@@ -120,7 +121,6 @@ def download_xform(request, survey_id, household_size=None):
 def submission(request):
     investigator = request.user
     #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
-    context = RequestContext(request)
     submission_date = datetime.now().isoformat()
     xml_file_list = []
     html_response = False
@@ -151,12 +151,12 @@ def submission(request):
         response['Location'] = request.build_absolute_uri(request.path)
         return response
     except SurveySampleSizeReached:
-        return OpenRosaResponseNotAllowed(u"Max sample size reached for this survey")
+        return OpenRosaRequestForbidden(u"Max sample size reached for this survey")
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, investigator, 
             _("Failed attempted to submit XML for form for investigator: '%(investigator)s'. desc: '%(desc)s'") % {
                                                         "investigator": investigator.mobile_number,
                                                         "desc" : str(ex)
                                                     }, {'desc' : str(ex)}, request, logging.WARNING)
-        return OpenRosaResponseBadRequest(u"Error encountered while processing your form.")
+        return OpenRosaServerError(u"Unexpected error while processing your form. Please try again")
 

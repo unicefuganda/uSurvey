@@ -319,6 +319,12 @@ class OpenRosaResponseBadRequest(OpenRosaResponse):
 class OpenRosaResponseNotAllowed(OpenRosaResponse):
     status_code = 405
 
+class OpenRosaRequestForbidden(OpenRosaResponse):
+    status_code = 403
+
+class OpenRosaServerError(OpenRosaResponse):
+    status_code = 500
+
 def http_basic_investigator_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
