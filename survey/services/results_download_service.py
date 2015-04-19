@@ -21,7 +21,7 @@ class ResultComposer:
         try:
             mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [self.user.email, ])
             data = self.results_download_service.generate_report()
-            data = [[unicode('"%s"' % entry) for entry in entries] for entries in data]
+            #data = [[unicode('"%s"' % entry) for entry in entries] for entries in data]
             f = StringIO.StringIO()
             writer = csv.writer(f)
             map(lambda row: writer.writerow(row), data)
