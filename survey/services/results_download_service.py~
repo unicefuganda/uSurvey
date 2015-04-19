@@ -4,6 +4,7 @@ from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from datetime import datetime
+import csv
 
 
 class ResultComposer:
@@ -20,9 +21,14 @@ class ResultComposer:
         try:
             mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [self.user.email, ])
             data = self.results_download_service.generate_report()
-            data = [','.join([unicode('"%s"' % entry) for entry in entries]) for entries in data]
+            writer = csv.writer(f)
+            f = StringIO.StringIO()
+            map(lambda row: writer.writerow(row), data)
+            #data = [','.join([unicode('"%s"' % entry) for entry in entries]) for entries in data]
             print len(data)
-            mail.attach(attachment_name, '\r\n'.join(data), 'text/csv')
+            f.seek(0)
+            mail.attach(attachment_name, f.read(), 'text/csv')
+            f.close()
             sent = mail.send()
             print 'Emailed!! ', sent
         except Exception, ex:
@@ -89,3 +95,4 @@ class ResultsDownloadService(object):
         result= [ancestor.name for ancestor in location_ancestors]
         result.reverse()
         return result
+
