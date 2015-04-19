@@ -4,7 +4,7 @@ from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from datetime import datetime
-import csv
+import csv, StringIO
 
 
 class ResultComposer:
@@ -21,8 +21,8 @@ class ResultComposer:
         try:
             mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [self.user.email, ])
             data = self.results_download_service.generate_report()
-            writer = csv.writer(f)
             f = StringIO.StringIO()
+            writer = csv.writer(f)
             map(lambda row: writer.writerow(row), data)
             #data = [','.join([unicode('"%s"' % entry) for entry in entries]) for entries in data]
             f.seek(0)

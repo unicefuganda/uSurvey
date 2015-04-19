@@ -218,9 +218,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'usurvey.unicef@gmail.com'
-EMAIL_HOST_PASSWORD = 'P@ssw0rdugd'
-DEFAULT_EMAIL_SENDER = 'usurvey.unicef@gmail.com'
+EMAIL_HOST_USER = 'usurvey.global.unicef'
+EMAIL_HOST_PASSWORD = 'usurvey.global.unicef321'
+DEFAULT_EMAIL_SENDER = 'usurvey.global.unicef@gmail.com'
 
 #odk settings
 TOKEN_DEFAULT_SIZE=5
