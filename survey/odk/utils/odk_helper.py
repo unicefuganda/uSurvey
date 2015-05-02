@@ -187,26 +187,27 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
     member_completion_report = {}
     response_dict = _get_responses(investigator, survey_tree, survey)
     treated_batches = {}
-    for (b_id, q_id), answer in response_dict.items():
-        question = Question.objects.get(pk=q_id)
-        batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-        if answer is not None:
-            if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
-                answer = media_files.get(answer, None)
-            created = register_member_answer(investigator, question, member, answer, batch)
-            member_completion_report[(b_id, q_id)] = created
-        if b_id not in treated_batches.keys():
-            treated_batches[b_id] = batch
-    submission = ODKSubmission.objects.create(investigator=investigator, 
-            survey=survey, form_id=form_id,
-            instance_id=_get_instance_id(survey_tree), household_member=member, 
-            xml=etree.tostring(survey_tree, pretty_print=True))
-    submission.save_attachments(media_files.values())
-#    execute.delay(submission.save_attachments, media_files)
-    map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
-    if member.household.completed_currently_open_batches():
-        map(lambda batch: member.household.batch_completed(batch), treated_batches.values())
-    return submission
+    if response_dict:
+        for (b_id, q_id), answer in response_dict.items():
+            question = Question.objects.get(pk=q_id)
+            batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
+            if answer is not None:
+                if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
+                    answer = media_files.get(answer, None)
+                created = register_member_answer(investigator, question, member, answer, batch)
+                member_completion_report[(b_id, q_id)] = created
+            if b_id not in treated_batches.keys():
+                treated_batches[b_id] = batch
+        submission = ODKSubmission.objects.create(investigator=investigator, 
+                survey=survey, form_id=form_id,
+                instance_id=_get_instance_id(survey_tree), household_member=member, 
+                xml=etree.tostring(survey_tree, pretty_print=True))
+        submission.save_attachments(media_files.values())
+    #    execute.delay(submission.save_attachments, media_files)
+        map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
+        if member.household.completed_currently_open_batches():
+            map(lambda batch: member.household.batch_completed(batch), treated_batches.values())
+        return submission
 
 def get_surveys(investigator):
     return Survey.currently_open_surveys(investigator.location)

@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-{% load i18n %}
+{% load template_tags %}
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
  {% for survey in surveys %}
+ {% get_download_url request 'download_odk_survey_form' survey as download_url %}
   <xform>
     <formID>{{ survey.pk }} </formID>
     <name>{{ survey.name }}</name>
@@ -9,7 +10,7 @@
     <version/>
     <hash />
     <descriptionText> {{ survey.description }}</descriptionText>
-    <downloadUrl>{{ base_url }}{% url 'download_odk_survey_form' survey.pk household_size %}</downloadUrl>
+    <downloadUrl>{{ download_url }}</downloadUrl>
     <manifestUrl></manifestUrl>
   </xform>
 {% endfor %}

@@ -38,6 +38,12 @@ def _process_form(investigator_form, request, action_text,
         investigator = investigator_form.save()
         investigator.remove_invalid_households()
         messages.success(request, "Investigator successfully %s " % action_text)
+        #update total number of households in ea if different
+        if contains_key(request.POST, 'total_households'):
+            selected_ea = investigator.ea
+            if selected_ea.total_households != int(request.POST['total_households']):
+                selected_ea.total_households = request.POST['total_households']
+                selected_ea.save()
         return HttpResponseRedirect(redirect_url)
     _add_error_response_message(investigator_form, request,action_text)
     return None

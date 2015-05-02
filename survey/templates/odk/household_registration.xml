@@ -1,0 +1,123 @@
+{% load template_tags %}
+<h:html xmlns="http://www.w3.org/2002/xforms"
+xmlns:h="http://www.w3.org/1999/xhtml"
+xmlns:ev="http://www.w3.org/2001/xml-events"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+<h:title> 
+  Household Registration form
+</h:title>
+  <model>
+  <instance>
+   <survey id="{{ survey.pk }}" >
+     <meta>
+       <instanceID />
+       <instanceName />
+     </meta>
+    <chooseExistingHousehold>0</chooseExistingHousehold>
+    <household>
+        <houseNumber />
+		<householdMember>
+            <surname />
+            <firstName />
+            <sex />
+            <dateOfBirth />
+            <isHead>0</isHead>
+            <occupation />
+            <levelOfEducation />
+            <residentSince />
+        </householdMember>
+    </household>
+   </survey>
+  </instance>
+
+  <!-- bindings -->
+  <bind nodeset="/survey/meta/instanceID" type="string" 
+           readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/survey/meta/instanceName" type="string" 
+           readonly="true()" calculate="concat(/survey/household/houseNumber, ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
+  <bind nodeset="/survey/household/houseNumber" type="{%if selectable_households %}select1{% else %}int{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/dateOfBirth" type="date" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')"/>
+  <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/occupation" type="string" relevant="selected(/survey/household/householdMember/isHead,'1')" />
+  <bind nodeset="/survey/household/householdMember/levelOfEducation" type="select1" relevant="selected(/survey/household/householdMember/isHead,'1')" />
+  <bind nodeset="/survey/household/householdMember/residentSince" type="date" relevant="selected(/survey/household/householdMember/isHead,'1')" />
+
+  </model>
+</h:head>
+<h:body>
+    <group>
+        <label>Household details</label>
+       {% if selectable_households %}
+          <select1 ref="/survey/household/houseNumber">    
+              <label>Select household</label>
+              {% for h_number in selectable_households %}
+                 <item>
+					<label>{{ h_number }}</label>
+					<value>{{ h_number }}</value>
+				</item>  
+              {% endfor %}
+          </select1>
+       {% else %}
+		<input ref="/survey/household/houseNumber">
+			<label>Enter household number</label>
+		</input>
+       {% endif %}
+    <group>
+        <label>Household Member Details</label>
+
+        	<select1 ref="/survey/household/householdMember/isHead">
+				<label>Is this the main respondent of this household?</label>
+                <hint>Skip if already assigned for this household</hint>
+				<item>
+					<label> Yes </label>
+					<value>1</value>
+				</item>
+				<item>
+					<label> No </label>
+					<value>0</value>
+				</item>
+			</select1>
+		<input ref="/survey/household/householdMember/surname">
+						<label>Enter Surname</label>
+					</input>
+		<input ref="/survey/household/householdMember/firstName">
+						<label>Enter Firstname</label>
+					</input>
+        	<select1 ref="/survey/household/householdMember/sex">
+				<label>Enter sex</label>
+				<item>
+					<label> Male </label>
+					<value>1</value>
+				</item>
+				<item>
+					<label> Female </label>
+					<value>0</value>
+				</item>
+			</select1>
+        <input ref="/survey/household/householdMember/dateOfBirth" appearance="no-calendar">
+						<label>Choose Date of Birth</label>
+					</input>
+        <input ref="/survey/household/householdMember/occupation">
+						<label>Enter Occupation</label>
+					</input>
+        <input ref="/survey/household/householdMember/residentSince" appearance="no-calendar">
+						<label>Choose date of residency</label>
+					</input>
+		<select1 ref="/survey/household/householdMember/levelOfEducation">
+			<label>Level Of Education</label>
+			{% for e_level in educational_levels %}
+			<item>
+				<label>{{ e_level.1 }}</label>
+				<value>{{ e_level.0 }}</value>
+			</item>
+			{% endfor %}
+		</select1>
+		</group>            
+    </group>
+</h:body>
+</h:html>

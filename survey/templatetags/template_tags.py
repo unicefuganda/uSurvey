@@ -133,6 +133,10 @@ def total_household_members(investigator):
     households = investigator.households.all()
     return sum([household.household_member.count() for household in households])
 
+@register.assignment_tag
+def  get_download_url(request, url_name, survey):
+    return request.build_absolute_uri(reverse(url_name, args=(survey.pk, )))
+
 @register.assignment_tag(takes_context=True)
 def is_relevant_odk(context, question, batch, investigator, registered_households):
     skip_to_ques = context.get('skip_to_ques', {})

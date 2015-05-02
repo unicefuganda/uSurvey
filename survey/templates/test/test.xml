@@ -1,4 +1,3 @@
-{% load template_tags %}
 <h:html xmlns="http://www.w3.org/2002/xforms"
 xmlns:h="http://www.w3.org/1999/xhtml"
 xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -38,7 +37,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/elderlyTakes" type="select1" relevant="/survey/age &gt; 44"/>
   <bind nodeset="/survey/preferredBeverage" type="select1" relevant="selected(/survey/parentTakes,'1') or selected(/survey/youthTakes,'1') or selected(/survey/elderlyTakes,'1')"/>
   <bind nodeset="/survey/otherPreferredBeverage" type="string" relevant="selected(/survey/preferredBeverage,'2')"/>
-  <bind nodeset="/survey/likeReason" type="string" relevant="(selected(/survey/preferredBeverage,'0') or selected(/survey/preferredBeverage,'1')) and /survey/otherPreferredBeverage"/>
+  <bind nodeset="/survey/likeReason" type="string" relevant="(selected(/survey/preferredBeverage,'0') or selected(/survey/preferredBeverage,'1')) or /survey/otherPreferredBeverage"/>
   <bind nodeset="/survey/onAlcoholTreatment" type="select1" relevant="selected(/survey/elderlyTakes,'0')"/>
   <bind nodeset="/survey/reasonNoAlchohol" type="select1" relevant="selected(/survey/onAlcoholTreatment,'0') or selected(/survey/youthTakes,'0')"/>
   <bind nodeset="/survey/medNature" type="select1" relevant="selected(/survey/onAlcoholTreatment,'1')"/>
@@ -46,7 +45,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 </h:head>
 <h:body>
 
-	<input ref="/survey/age">How old are you?</input>
+	<input ref="/survey/age"><label>How old are you?</label></input>
 	<select1 ref="/survey/parentTakes">
 			<label>Does your parents or guidian take alcohol</label>
 			<item>
@@ -81,7 +80,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 			</item>
 	</select1>
 	<select1 ref="/survey/preferredBeverage">
-			<label>Which of these two </label>
+			<label>Which of these drinks do you prefer? </label>
 			<item>
 				<label>Other</label>
 				<value>2</value>
@@ -95,8 +94,8 @@ xmlns:jr="http://openrosa.org/javarosa">
 				<value>0</value>
 			</item>
 	</select1>
-	<input ref="/survey/otherPreferredBeverage">Why do you prefer the drink?</input>
-	<input ref="/survey/likeReason">Why do you prefer the drink?</input>
+	<input ref="/survey/otherPreferredBeverage"><label>Please enter the exact drink which you prefer</label></input>
+	<input ref="/survey/likeReason"><label>Why do you prefer the drink?</label></input>
 	<select1 ref="/survey/onAlcoholTreatment">
 			<label>Are you currently on alcohol treatment </label>
 			<item>
@@ -108,9 +107,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 				<value>0</value>
 			</item>
 	</select1>
-	<input ref="/survey/medNature">What sort of alcohol treatment are you under going</input>
-	<input ref="/survey/reasonNoAlchohol">Why don't you like alcohol</input>
+	<input ref="/survey/medNature"><label>What sort of alcohol treatment are you under going</label></input>
+	<input ref="/survey/reasonNoAlchohol"><label>Why don't you like alcohol</label></input>
 	
 	
 </h:body>
 </h:html>
+

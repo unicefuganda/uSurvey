@@ -27,4 +27,12 @@
       </div>
   </div>
 </div>
+<div id="ea-widget">
+  <div class="control-group">
+      <label class="control-label" for="widget_ea">No of Households</label>
+      <div class="controls">
+          <input type="text" name="total_households" value="{% if location_data.selected_ea %}{{location_data.selected_ea.total_households}}{% endif %}">
+      </div>
+  </div>
+</div>
 <input type="hidden" name="location" value="{% if selected_location %}{{selected_location.id}}{% endif %}">

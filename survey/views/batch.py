@@ -11,7 +11,7 @@ from survey.investigator_configs import *
 from survey.models import HouseholdMemberGroup, QuestionModule, BatchQuestionOrder
 from survey.models.surveys import Survey
 from survey.models.batch import Batch
-from survey.forms.batch import BatchForm, BatchQuestionsForm
+from survey.forms.batch import BatchForm, TableBatchQuestionsForm
 
 
 @login_required
@@ -131,19 +131,19 @@ def assign(request, batch_id):
         messages.error(request, error_message)
         return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
 
-    batch_questions_form = BatchQuestionsForm(batch=batch)
-
+    batch_questions_form = TableBatchQuestionsForm(batch=batch)
+    #import pdb; pdb.set_trace();
     groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')
     batch = Batch.objects.get(id=batch_id)
     if request.method == 'POST':
-        batch_question_form = BatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
+        batch_question_form = TableBatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
         if batch_question_form.is_valid():
             batch_question_form.save()
             success_message = "Questions successfully assigned to batch: %s." % batch.name.capitalize()
             messages.success(request, success_message)
             return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
     all_modules = QuestionModule.objects.all()
-    context = {'batch_questions_form': batch_questions_form, 'batch': batch,
+    context = {'batch_questions_form': unicode(batch_questions_form), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,
                'modules': all_modules}
 #    import pdb;pdb.set_trace()

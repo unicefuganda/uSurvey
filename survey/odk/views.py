@@ -47,9 +47,6 @@ def get_survey_xform(investigator, survey, household_size):
         'selectable_households' : selectable_households
         })
 
-def base_url(request):
-    return '%s://%s' % (request.META.get('wsgi.url_scheme'), request.META.get('HTTP_HOST')) #Site.objects.get_current().name;
-
 @login_required
 @permission_required('auth.can_view_aggregates')
 def download_submission_attachment(request, submission_id):
@@ -79,27 +76,27 @@ def form_list(request):
         This is where ODK Collect gets its download list.
     """
     investigator = request.user
-    household_size = request.GET.get('total_households_ea', '')
+    household_size = investigator.ea.total_households
     #get_object_or_404(Investigator, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     surveys = get_surveys(investigator)
     audit = {}
     audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, investigator,
           _("Requested forms list. for %s" % investigator.mobile_number), audit, request)
-    context= Context({
+    content = render_to_string("odk/xformsList.xml", {
     'surveys': surveys,
     'investigator' : investigator,
-    'base_url' : base_url(request),
+    'request' : request,
     'household_size' : household_size
     })
-    t = loader.get_template("odk/xformsList.xml")
-    response = BaseOpenRosaResponse(t.render(context))
+    response = BaseOpenRosaResponse(content)
     response.status_code = 200
     return response
 
 @http_digest_investigator_auth
-def download_xform(request, survey_id, household_size=None):
+def download_xform(request, survey_id):
     investigator = request.user
+    household_size = investigator.ea.total_households
     survey = get_object_or_404(Survey, pk=survey_id)
     survey_xform = get_survey_xform(investigator, survey, household_size)
     form_id = '%s'% survey_id
