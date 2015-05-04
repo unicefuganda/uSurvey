@@ -6,6 +6,9 @@ from survey.models.base import BaseModel
 class HouseholdMemberGroup(BaseModel):
     name = models.CharField(max_length=50)
     order = models.PositiveIntegerField(max_length=5, null=False, blank=False, unique=True, default=0)
+    
+    def __unicode__(self):
+        return self.name
 
     def all_questions(self):
         return self.question_group.all()

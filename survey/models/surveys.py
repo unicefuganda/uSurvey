@@ -1,7 +1,6 @@
 from django.db import models
-
 from survey.models.base import BaseModel
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=True)
@@ -9,6 +8,8 @@ class Survey(BaseModel):
     sample_size = models.PositiveIntegerField(max_length=2, null=False, blank=False, default=10, verbose_name="Number of Households in EA/Village")
     type = models.BooleanField(default=False)
     has_sampling = models.BooleanField(default=True)
+    minimum_registered_households = models.IntegerField(verbose_name='Percentage Registered Households', default=80, validators=[MinValueValidator(0), MaxValueValidator(100)],
+                                                        help_text='Enter minimum percentage of total household to be registered before survey can start on ODK channel')
 
     class Meta:
         app_label = 'survey'

@@ -8,7 +8,7 @@ from survey.models.surveys import Survey
 class SurveyForm(ModelForm):
     class Meta:
         model = Survey
-        fields = ['name', 'description', 'type', 'has_sampling', 'sample_size']
+        fields = ['name', 'description', 'type', 'has_sampling', 'sample_size', 'minimum_registered_households']
         widgets = {
             'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
             'type': InlineRadioSelect(choices=((True, 'Aggregate'), (False, 'Roster'))),

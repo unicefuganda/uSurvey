@@ -1,0 +1,21 @@
+ <survey id="hreg18" >
+     <meta>
+       <instanceID>76363</instanceID>
+       <instanceName>Ola</instanceName>
+     </meta>
+     <onlyHousehold>1</onlyHousehold>
+    <chooseExistingHousehold>0</chooseExistingHousehold>
+    <household>
+        <houseNumber>39</houseNumber>
+		<householdMember>
+            <surname>Ola</surname>
+            <firstName>Chuckwudi</firstName>
+            <sex>1</sex>
+            <dateOfBirth>2010-07-09</dateOfBirth>
+            <isHead>0</isHead>
+            <occupation />
+            <levelOfEducation />
+            <residentSince />
+        </householdMember>
+    </household>
+   </survey>

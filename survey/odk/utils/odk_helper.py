@@ -30,12 +30,15 @@ DEFAULT_CONTENT_TYPE = 'text/xml; charset=utf-8'
 NEW_OR_OLD_HOUSEHOLD_CHOICE_PATH = '//survey/chooseExistingHousehold'
 HOUSEHOLD_SELECT_PATH = '//survey/registeredHousehold/household'
 HOUSEHOLD_MEMBER_SELECT_PATH = '//survey/registeredHousehold/householdMember/h{{household_id}}'
+HOUSEHOLD_MEMBER_ID_DELIMITER = '_'
 MANUAL_HOUSEHOLD_SAMPLE_PATH = '//survey/household/houseNumber'
 MANUAL_HOUSEHOLD_MEMBER_PATH = '//survey/household/householdMember'
 ANSWER_PATH = '//survey/b{{batch_id}}/q{{question_id}}'
 NON_RESP_ANSWER_PATH = '//survey/b{{batch_id}}/qnr{{question_id}}'
 INSTANCE_ID_PATH = '//survey/meta/instanceID'
 FORM_ID_PATH = '//survey/@id'
+ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
+HOUSE_REG_FORM_ID_PREFIX = 'hreg'
 MULTI_SELECT_XFORM_SEP = ' '
 GEOPOINT_XFORM_SEP = ' '
 # default content length for submission requests
@@ -53,6 +56,10 @@ def _get_nodes(search_path, tree=None, xml_string=None): #either tree or xml_str
         return tree.xpath(search_path)
     except Exception, ex:
         logger.error('Error retrieving path: %s, Desc: %s' % (search_path, str(ex)))
+
+def only_household_reg(survey_tree):
+    flag_nodes = _get_nodes(ONLY_HOUSEHOLD_PATH, tree=survey_tree)
+    return (flag_nodes and len(flag_nodes) > 0 and flag_nodes[0].text == '1')
 
 def _get_household_members(survey_tree):
     member_nodes = _get_nodes(MANUAL_HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
@@ -72,7 +79,7 @@ def _get_selected_household_member(survey_tree):
     household_id = _get_nodes(HOUSEHOLD_SELECT_PATH, tree=survey_tree)[0].text
     context = template.Context({'household_id': household_id})
     hm_path = template.Template(HOUSEHOLD_MEMBER_SELECT_PATH).render(context)    
-    member_id = _get_nodes(hm_path, tree=survey_tree)[0].text
+    member_id = (_get_nodes(hm_path, tree=survey_tree)[0].text).split(HOUSEHOLD_MEMBER_ID_DELIMITER)[0]
     return HouseholdMember.objects.get(pk=member_id)
 
 def _get_or_create_household_member(investigator, survey, survey_tree):
@@ -170,6 +177,10 @@ def _get_instance_id(survey_tree):
 def _get_form_id(survey_tree):
     return _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
 
+def _get_survey(survey_tree):
+    pk = _get_nodes(FORM_ID_PATH, tree=survey_tree)[0].strip(HOUSE_REG_FORM_ID_PREFIX)
+    return Survey.objects.get(pk=pk)
+
 @transaction.autocommit
 def process_submission(investigator, xml_file, media_files=[], request=None):
     """
@@ -179,7 +190,7 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
     reports =  []
     survey_tree = _get_tree(xml_file)
     form_id = _get_form_id(survey_tree)
-    survey = Survey.objects.get(pk=form_id)
+    survey = _get_survey(survey_tree)
     if survey.has_sampling and Household.objects.filter(survey=survey, ea=investigator.ea).count() >= survey.sample_size:
         #cannot continue if this survey has reached sample size for this ea
         raise SurveySampleSizeReached()
@@ -187,7 +198,7 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
     member_completion_report = {}
     response_dict = _get_responses(investigator, survey_tree, survey)
     treated_batches = {}
-    if response_dict:
+    if response_dict and not only_household_reg(survey_tree):
         for (b_id, q_id), answer in response_dict.items():
             question = Question.objects.get(pk=q_id)
             batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
@@ -198,16 +209,16 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
                 member_completion_report[(b_id, q_id)] = created
             if b_id not in treated_batches.keys():
                 treated_batches[b_id] = batch
-        submission = ODKSubmission.objects.create(investigator=investigator, 
-                survey=survey, form_id=form_id,
-                instance_id=_get_instance_id(survey_tree), household_member=member, 
-                xml=etree.tostring(survey_tree, pretty_print=True))
-        submission.save_attachments(media_files.values())
-    #    execute.delay(submission.save_attachments, media_files)
         map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
         if member.household.completed_currently_open_batches():
             map(lambda batch: member.household.batch_completed(batch), treated_batches.values())
-        return submission
+    submission = ODKSubmission.objects.create(investigator=investigator, 
+                survey=survey, form_id= form_id,
+                instance_id=_get_instance_id(survey_tree), household_member=member, 
+                xml=etree.tostring(survey_tree, pretty_print=True))
+    #    execute.delay(submission.save_attachments, media_files)
+    submission.save_attachments(media_files.values())
+    return submission
 
 def get_surveys(investigator):
     return Survey.currently_open_surveys(investigator.location)

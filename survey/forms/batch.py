@@ -32,13 +32,13 @@ class TableRowForm(forms.Form):
         '''
         if not self.queryset: return '<tr><td>No data...<td></tr>'
         colcount = 0
-        res = ""
-        res += "<tr>"
+        res = ''
+        res += '<div class="plentyThings"><table id="table1" class="display"><thead>'
         for f in self.fields:
             res += "<th>"+self.queryset[0]._meta.get_field_by_name(f)[0].verbose_name.upper()+"</th>"
-        res += "</tr>\n"
+        res += "</thead><tbody>\n"
         for obj in self.queryset:
-            res += '<tr onclick="selectRow(this)">'
+            res += '<tr id="%s-selectable" class="ms-selectable" onclick="selectRow(this)">' % obj.pk
             res += '<td><input style="display:none;" type="checkbox" name="slct" id="%s" value="%s"/>'%(obj.pk,obj.pk)
 
             vals = [getattr(obj, x) for x in self.fields]
@@ -47,9 +47,7 @@ class TableRowForm(forms.Form):
                 res += '%s</td><td>'%(x.encode('ascii', 'ignore'))
             res = res[:-4]
             res += '</tr>\n'
-        res += '<tr><th colspan="%d"><span style="font-size:9pt;"><b>Selctable table:</b> Click a row to select it</span></th></tr>'%(colcount)
-
-        # Add the javascript that implements functionality
+        res += '</tbody></table>'
         res += '''\
         <script>
         // Allows for selectable tablerows in forms
@@ -58,80 +56,53 @@ class TableRowForm(forms.Form):
             // Check/uncheck the checkbox
             var chk = row.getElementsByTagName('input')[0];
             chk.checked = !chk.checked;
-
-            // Color the row in response to the checkbox's boolean value
-            if (chk.checked) {
-                row.style.backgroundColor = 'gray';
-            } else {
-                row.style.backgroundColor = 'white';
-            }
         }
         </script>'''
+        res += '''
+                <script src="/static/jquery.dataTables.min.js" type="text/javascript"></script>
+                <script src="/static/jquery-1.11.1.min.js"></script>
+
+                <link href="/static/jquerysctipttop.css" rel="stylesheet" type="text/css">
+                <link href="/static/jquery.dataTables.css" rel="stylesheet" type="text/css">
+                <link href="/static/bootstrap.min.css" type="text/css" rel="stylesheet">
+                <script type="text/javascript">
+                $(document).ready(function() {
+                    var table = $('#table1').DataTable();
+                    //var table2 = $('#table2').DataTable();
+                  
+                    $('#table1 tbody').on( 'click', 'tr', function () {
+                        //$('#table2').append($(this)) ;
+                        $(this).toggleClass('selected');
+                    } );   
+                     
+                } );
+                </script>
+                <style type="text/css">
+                    div.span6 {
+                        display: block;
+                        float: left;
+                    }
+                    #table1_length label, #table1_filter label {
+                        display: block;
+                        width: 1000px;
+                        float: left;
+                    }
+                    
+                    #table1_length, #table1_filter {
+                      display: block;
+                      width: 100%;
+                    }
+                    
+                    div.span6 input, div.span6 select {
+                        //float: right;
+                        border-left: None;
+                        
+                    }
+                    
+                    
+                </style>
+                </div>'''
         return res
-
-
-
-class TableMultiSelect(forms.SelectMultiple):
-
-    class Media:
-        css = ('css/tablemultiselect.css',)
-        js = ('js/tablemultiselect.js', )    
-
-    def render(self, name, value, attrs=None, choices=()):
-        if attrs is None: attrs = {}
-        questions = Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP')
-        question_items = []
-        map(lambda q: question_items.append((int(q.pk), q.identifier, q.text, q.answer_type.upper())), questions) 
-        html = []
-        #html.append(super(TableMultiSelect, self).render(name, value, attrs, choices))
-	
-        html.append( """
-        
-	<div class="form-horizontal" role="form" style="width: 600px;margin: auto;margin-top:150px;">
-        <div id="question_table">
-        <div class="form-group" style="border: 1px solid #ddd">
-        <table id="table1" class="display">
-            <thead>
-            
-                <th>#</th>
-                <th>Code</th>
-                <th>Text</th>
-                <th>Answer Type</th>
-           </thead>
-           <tbody>
-        """
-        )
-        for items in question_items:
-            html.append('<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>' % items)
-        html.append("""
-                </tbody></table></div>
-            
-<script src="/static/jquery.dataTables.min.js" type="text/javascript"></script>
-<script src="/static/jquery-1.11.1.min.js"></script>
-	
-</div>
-            
-<link href="/static/jquerysctipttop.css" rel="stylesheet" type="text/css">
-<link href="/static/jquery.dataTables.css" rel="stylesheet" type="text/css">
-    <link href="/static/bootstrap.min.css" type="text/css" rel="stylesheet">
-
-<script type="text/javascript">
-$(document).ready(function() {
-    var table = $('#table1').DataTable();
- 
-    $('#table1 tbody').on( 'click', 'tr', function () {
-        $(this).toggleClass('selected');
-    } );
- 
-    $('#button').click( function () {
-        alert( table.rows('.selected').data().length +' row(s) selected' );
-    } );
-} );
-</script>
-
-        """
-        )
-        return mark_safe("\r\n".join(html))
 
 
 class BatchForm(ModelForm):
@@ -184,7 +155,7 @@ class TableBatchQuestionsForm(TableRowForm):
 #                                               widget=forms.SelectMultiple(attrs={'class': 'multi-select'}))
 
     def __init__(self, batch=None, *args, **kwargs):
-        super(TableBatchQuestionsForm, self).__init__(queryset=Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP', batches=batch), fields=('identifier', 'text', 'answer_type'))
+        super(TableBatchQuestionsForm, self).__init__(queryset=Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP', batches=batch), fields=( 'identifier', 'text', ))
         self.questions = Question.objects.filter(subquestion=False).exclude(group__name='REGISTRATION GROUP').exclude(batches=batch)
         if kwargs.get('data', None):
             self.questions = self.questions.filter(pk__in=kwargs.get('data').getlist('slct'))

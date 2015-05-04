@@ -21,8 +21,6 @@
         </select>
     </div>
     <input type="hidden" value="{{ batch.id }}" id="batch_id">
-    <div style="height : 200px; overflow: scroll;">
-    <table>{{batch_questions_form | safe }}</table>
-    </div>
+    {{batch_questions_form | safe }}
     {% include 'naked_form.html' with a_form=batch_questions_form %}
 {% endblock %}

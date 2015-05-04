@@ -6,10 +6,6 @@ jQuery(function ($) {
         load_questions_for_filter();   
     }
 
-    $('#table1_paginate').on( 'mouseup', 'li', function () {
-        load_questions_for_filter();
-    } );  
-
 
 
 

@@ -15,10 +15,11 @@
         <table class="table table-striped table-bordered table-hover table-sort">
             <thead>
             <tr>
-                <th>Investigator</th>
-                <th>Survey</th>
-                <th>Household</th>
+                <th>Enumeration Area</th>
+                <th>Household Number</th>
 				<th>Household Member</th>
+				<th>Investigator</th>
+                <th>Survey</th>
                 <th>Form Id</th>
                 <th>Submission Instance</th>
 		<th>Submission Date</th>
@@ -29,16 +30,19 @@
             {% for submission in submissions %}
                 <tr>
                     <td>
+                        {{ submission.investigator.ea }}
+                    </td>
+                    <td>
+                        {{ submission.household_member.household.random_sample_number }}
+                    </td>
+					<td>
+                        {{ submission.household_member.first_name}}, {{submission.household_member.surname }}
+                    </td>
+                    <td>
                         {{ submission.investigator.name }}
                     </td>
                     <td>
 						{{ submission.survey.name }}
-                    </td>
-                    <td>
-                        {{ submission.household_member.household.uid }}
-                    </td>
-					<td>
-                        {{ submission.household_member.first_name}}, {{submission.household_member.surname }}
                     </td>
                     <td>
                         {{ submission.form_id }}

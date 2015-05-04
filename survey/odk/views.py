@@ -28,24 +28,39 @@ from survey.models import ODKSubmission
 from survey.models.surveys import SurveySampleSizeReached
 from survey.investigator_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
 
-def get_survey_xform(investigator, survey, household_size):
+def get_survey_xform(investigator, survey):
     selectable_households = None
-    if household_size:
-        household_size = int(household_size)
-        if survey.has_sampling:
-            selectable_households = random.sample(list(range(1, household_size + 1)), NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR)
-            selectable_households.sort()
-        else:
-            selectable_households = range(1, household_size + 1)
+    household_size = investigator.ea.total_households
     registered_households = [hhd for hhd in investigator.households.filter(survey=survey, ea=investigator.ea).all() if hhd.all_members()]
-    return render_to_string("odk/survey_form.xml", {
-        'investigator': investigator,
-        'registered_households' : registered_households, #investigator.households.filter(survey=survey, ea=investigator.ea).all(),
-        'survey' : survey,
-        'survey_batches' : investigator.get_open_batch_for_survey(survey, sort=True),
-        'educational_levels' : LEVEL_OF_EDUCATION,
-        'selectable_households' : selectable_households
-        })
+    total_registered = len(registered_households)
+    registration_percent = total_registered * 100 / investigator.ea.total_households
+    #import pdb;pdb.set_trace()
+    if registration_percent >= survey.minimum_registered_households:
+        if survey.has_sampling:
+            selectable_households = []
+            if household_size > survey.sample_size:
+                selectable_households = random.sample(list(range(0, total_registered)), survey.sample_size) #using total_registered in place of the  
+            registered_households = [registered_households[i] for i in selectable_households]
+        registered_households = sorted(registered_households, key=lambda household: household.random_sample_number)
+        return render_to_string("odk/survey_form_without_house_reg.xml", {
+            'investigator': investigator,
+            'registered_households' : registered_households, #investigator.households.filter(survey=survey, ea=investigator.ea).all(),
+            'survey' : survey,
+            'survey_batches' : investigator.get_open_batch_for_survey(survey, sort=True),
+            'educational_levels' : LEVEL_OF_EDUCATION,
+#            'selectable_households' : selectable_households
+            })
+    else:
+        selectable_households = range(1, household_size + 1)
+        already_selected = [ household.random_sample_number for household in registered_households]
+        return render_to_string("odk/household_registration.xml", {
+            'investigator': investigator,
+            #'registered_households' : registered_households, #investigator.households.filter(survey=survey, ea=investigator.ea).all(),
+            'survey' : survey,
+            #'survey_batches' : investigator.get_open_batch_for_survey(survey, sort=True),
+            'educational_levels' : LEVEL_OF_EDUCATION,
+            'selectable_households' : [house_num for house_num in selectable_households if house_num not in already_selected]
+            })
 
 @login_required
 @permission_required('auth.can_view_aggregates')
@@ -63,7 +78,7 @@ def download_submission_attachment(request, submission_id):
 @permission_required('auth.can_view_aggregates')
 def submission_list(request):
     odk_submissions = ODKSubmission.objects.all()
-    search_fields = ['investigator__name', 'survey__name', 'household__uid', 'form_id', 'instance_id']
+    search_fields = ['investigator__name', 'investigator__ea__name', 'survey__name', 'household_member__household__uid', 'form_id', 'instance_id']
     if request.GET.has_key('q'):
         odk_submissions = get_filterset(odk_submissions, request.GET['q'], search_fields)
     return render(request, 'odk/submission_list.html', { 'submissions' : odk_submissions,
@@ -96,9 +111,8 @@ def form_list(request):
 @http_digest_investigator_auth
 def download_xform(request, survey_id):
     investigator = request.user
-    household_size = investigator.ea.total_households
     survey = get_object_or_404(Survey, pk=survey_id)
-    survey_xform = get_survey_xform(investigator, survey, household_size)
+    survey_xform = get_survey_xform(investigator, survey)
     form_id = '%s'% survey_id
     audit = {
         "xform": form_id

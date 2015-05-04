@@ -14,13 +14,14 @@
 {% block pre_form_content %}
 {% endblock %}
 
+
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
   {% csrf_token %}
 
   {% block display_form_fields %}{% endblock %}
 
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary" name="save_button" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+    <button id="button" type="submit" class="btn btn-primary" name="save_button" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
     {% if cancel_url %}
       <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button">Cancel</a>
     {% else %}
