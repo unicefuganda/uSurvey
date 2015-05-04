@@ -182,27 +182,27 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
 def is_relevant_by_group(question, registered_households):
     question_group = question.group
     relevant_new = []
-    if question_group.name == 'GENERAL':
-        relevant_new.append(" selected(/survey/household/householdMember/isHead,'1')")
-    MATCHING_METHODS = {
-            'EQUALS': '=',
-            'GREATER_THAN': '&gt;',
-            'LESS_THAN': '&lt;',
-    }
-    for group_condition in question_group.get_all_conditions():
-        method = MATCHING_METHODS.get(group_condition.condition, None)
-        value = group_condition.value
-        if method is not None:
-            if group_condition.attribute == GroupCondition.GROUP_TYPES['AGE']:
-                today = date.today()
-                age_date = today - relativedelta(years=int(value))
-                age_date_str = date.strftime(age_date, '%Y-%m-%d')
-                relevant_new.append(" (date('%s') %s /survey/household/householdMember/dateOfBirth)" % (age_date_str, method))
-            if group_condition.attribute == GroupCondition.GROUP_TYPES['GENDER']:
-                is_male = '0'
-                if str(value).lower() == "male" or str(value) == str(True):
-                    is_male = '1'
-                relevant_new.append(" selected(/survey/household/householdMember/sex, '%s')" % is_male)
+#     if question_group.name == 'GENERAL':
+#         relevant_new.append(" selected(/survey/household/householdMember/isHead,'1')")
+#     MATCHING_METHODS = {
+#             'EQUALS': '=',
+#             'GREATER_THAN': '&gt;',
+#             'LESS_THAN': '&lt;',
+#     }
+#     for group_condition in question_group.get_all_conditions():
+#         method = MATCHING_METHODS.get(group_condition.condition, None)
+#         value = group_condition.value
+#         if method is not None:
+#             if group_condition.attribute == GroupCondition.GROUP_TYPES['AGE']:
+#                 today = date.today()
+#                 age_date = today - relativedelta(years=int(value))
+#                 age_date_str = date.strftime(age_date, '%Y-%m-%d')
+#                 relevant_new.append(" (date('%s') %s /survey/household/householdMember/dateOfBirth)" % (age_date_str, method))
+#             if group_condition.attribute == GroupCondition.GROUP_TYPES['GENDER']:
+#                 is_male = '0'
+#                 if str(value).lower() == "male" or str(value) == str(True):
+#                     is_male = '1'
+#                 relevant_new.append(" selected(/survey/household/householdMember/sex, '%s')" % is_male)
 
     relevant_existing = []
     for household in registered_households:
