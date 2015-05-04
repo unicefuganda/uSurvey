@@ -46,7 +46,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat(/survey/household/houseNumber, ' | ', {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}''" />
+           readonly="true()" calculate="concat('{{ survey.name}}', /survey/household/houseNumber, ' ', {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}'')" />
 
    {% for r_household in registered_households %}
    <bind nodeset="/survey/registeredHousehold/householdMember/h{{r_household.pk}}" type="select1"  required="true()" relevant="selected(/survey/registeredHousehold/household,'{{r_household.pk}}')" />
