@@ -106,7 +106,7 @@ def form_list(request):
     })
     response = BaseOpenRosaResponse(content)
     response.status_code = 200
-    response['Content-Type'] = 'text/html'
+    response['Content-Type'] = 'text/xml'
     return response
 
 @http_digest_investigator_auth
