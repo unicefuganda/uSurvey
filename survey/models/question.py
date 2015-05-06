@@ -51,10 +51,10 @@ class Question(BaseModel):
     PREVIOUS_PAGE_TEXT = "%s: Back" % getattr(settings,'USSD_PAGINATION',None).get('PREVIOUS')
     NEXT_PAGE_TEXT = "%s: Next" % getattr(settings,'USSD_PAGINATION',None).get('NEXT')
 
-    identifier = models.CharField(max_length=100, blank=False, null=True, unique=True)
+    identifier = models.CharField(verbose_name='Code', max_length=100, blank=False, null=True, unique=True)
     batches = models.ManyToManyField(Batch, null=True, related_name="questions")
     group = models.ForeignKey("HouseholdMemberGroup", null=True, related_name="question_group")
-    text = models.CharField(max_length=150, blank=False, null=False)
+    text = models.CharField(verbose_name='Question', max_length=150, blank=False, null=False)
     answer_type = models.CharField(max_length=15, blank=False, null=False, choices=TYPE_OF_ANSWERS)
     order = models.PositiveIntegerField(max_length=2, null=True)
     subquestion = models.BooleanField(default=False)
