@@ -94,58 +94,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	            </item>
 			    {% endfor %}
 	        </select1>
-	   {% endfor %}
-    <group>
-        <label>Household Member Details</label>
-
-        	<select1 ref="/survey/household/householdMember/isHead">
-				<label>Is this the main respondent of this household?</label>
-                <hint>Skip if already assigned for this household</hint>
-				<item>
-					<label> Yes </label>
-					<value>1</value>
-				</item>
-				<item>
-					<label> No </label>
-					<value>0</value>
-				</item>
-			</select1>
-		<input ref="/survey/household/householdMember/surname">
-						<label>Enter Surname</label>
-					</input>
-		<input ref="/survey/household/householdMember/firstName">
-						<label>Enter Firstname</label>
-					</input>
-        	<select1 ref="/survey/household/householdMember/sex">
-				<label>Enter sex</label>
-				<item>
-					<label> Male </label>
-					<value>1</value>
-				</item>
-				<item>
-					<label> Female </label>
-					<value>0</value>
-				</item>
-			</select1>
-        <input ref="/survey/household/householdMember/dateOfBirth" appearance="no-calendar">
-						<label>Choose Date of Birth</label>
-					</input>
-        <input ref="/survey/household/householdMember/occupation">
-						<label>Enter Occupation</label>
-					</input>
-        <input ref="/survey/household/householdMember/residentSince" appearance="no-calendar">
-						<label>Choose date of residency</label>
-					</input>
-		<select1 ref="/survey/household/householdMember/levelOfEducation">
-			<label>Level Of Education</label>
-			{% for e_level in educational_levels %}
-			<item>
-				<label>{{ e_level.1 }}</label>
-				<value>{{ e_level.0 }}</value>
-			</item>
-			{% endfor %}
-		</select1>
-		</group>            
+	   {% endfor %}            
     </group>
 	{% for batch in survey_batches %}
 		<group>
