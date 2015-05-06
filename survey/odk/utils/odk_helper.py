@@ -191,7 +191,8 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
     survey_tree = _get_tree(xml_file)
     form_id = _get_form_id(survey_tree)
     survey = _get_survey(survey_tree)
-    if survey.has_sampling and Household.objects.filter(survey=survey, ea=investigator.ea).count() >= survey.sample_size:
+    if (not only_household_reg(survey_tree)) and survey.has_sampling and \
+            Household.objects.filter(survey=survey, ea=investigator.ea).count() >= survey.sample_size: #if its not only household registration, make sure sample size is not violated
         #cannot continue if this survey has reached sample size for this ea
         raise SurveySampleSizeReached()
     member = _get_or_create_household_member(investigator, survey, survey_tree)
