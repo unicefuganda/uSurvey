@@ -33,7 +33,7 @@ class TableRowForm(forms.Form):
         if not self.queryset: return '<tr><td>No data...<td></tr>'
         colcount = 0
         res = ''
-        res += '<div class="plentyThings"><table id="table1" class="display"><thead>'
+        res += '<div class="batchQuestions"><table id="table1" class="dataTable display"><thead>'
         for f in self.fields:
             res += "<th>"+self.queryset[0]._meta.get_field_by_name(f)[0].verbose_name.upper()+"</th>"
         res += "</thead><tbody>\n"
@@ -48,6 +48,11 @@ class TableRowForm(forms.Form):
             res = res[:-4]
             res += '</tr>\n'
         res += '</tbody></table>'
+        res += '<div class="plentyThings"><table id="table2" class="dataTable display"><thead>'
+        for f in self.fields:
+            res += "<th>"+self.queryset[0]._meta.get_field_by_name(f)[0].verbose_name.upper()+"</th>"
+        res += "</thead><tbody></tbody></table></div>\n"
+        
         res += '''\
         <script>
         // Allows for selectable tablerows in forms
@@ -59,23 +64,74 @@ class TableRowForm(forms.Form):
         }
         </script>'''
         res += '''
-                <script src="/static/jquery.dataTables.min.js" type="text/javascript"></script>
+                
                 <script src="/static/jquery-1.11.1.min.js"></script>
+                <script src="/static/jquery.dataTables.min.js" type="text/javascript"></script>
 
                 <link href="/static/jquerysctipttop.css" rel="stylesheet" type="text/css">
+                <link href="/static/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
                 <link href="/static/jquery.dataTables.css" rel="stylesheet" type="text/css">
+                
+                
                 <link href="/static/bootstrap.min.css" type="text/css" rel="stylesheet">
                 <script type="text/javascript">
+                
+                
+                
                 $(document).ready(function() {
-                    var table = $('#table1').DataTable();
+                    table1 = $('#table1').DataTable( { paging: false, scrollY: 300,  "order": [[ 1, "asc" ]]});
+                    table2 = $('#table2').DataTable( { paging: false, scrollY: 300, "order": [[ 1, "asc" ]]});
+                    //table = $('#table1').DataTable( { 'ajax' : get_question_url()});
                     //var table2 = $('#table2').DataTable();
                   
-                    $('#table1 tbody').on( 'click', 'tr', function () {
-                        //$('#table2').append($(this)) ;
-                        $(this).toggleClass('selected');
+                    table1.on( 'click', 'tr', function () {
+                        var row = table1.row($(this));
+                        var rowNode = row.node();
+                        row.remove();
+ 
+                        table2
+                            .row.add( rowNode )
+                            .draw();
+                        chk = rowNode.getElementsByTagName('input')[0];
+                        chk.checked = true;
                     } );   
+                    table2.on( 'click', 'tr', function () {
+                        var row = table2.row($(this));
+                        var rowNode = row.node();
+                        row.remove();
+ 
+                        table1
+                            .row.add( rowNode )
+                            .draw();
+                        chk = rowNode.getElementsByTagName('input')[0];
+                        chk.checked = false;
+                    } ); 
                      
                 } );
+                function reload_question_data() {
+                    var group_selected = $('#assign_question_group').val();
+                    var module_selected = $('#assign_module').val();
+                    var batch_id = $("#batch_id").val();
+                    q_url = '/batches/' + batch_id + '/questions/groups/' + group_selected + '/module/' + module_selected + '/';
+                    var jsonData;
+                    $.getJSON(q_url, function (data) { 
+                    $('#table1 .ms-selectable').hide();
+                    $.each(data, function (key, value) {
+                            $('#' + value.id + '-selectable').show();
+                        });
+                    });
+                    return jsonData;
+                      
+                }
+                
+                $('#assign_question_group').on('change', function () {
+                    reload_question_data();
+                    
+                });
+                $('#assign_module').on('change', function () {
+                    reload_question_data();
+                    
+                });
                 </script>
                 <style type="text/css">
                     div.span6 {
@@ -92,7 +148,16 @@ class TableRowForm(forms.Form):
                       display: block;
                       width: 100%;
                     }
+                    #table2_length label, #table2_filter label {
+                        display: block;
+                        width: 1000px;
+                        float: left;
+                    }
                     
+                    #table2_length, #table2_filter {
+                      display: block;
+                      width: 100%;
+                    }
                     div.span6 input, div.span6 select {
                         //float: right;
                         border-left: None;
