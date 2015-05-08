@@ -48,7 +48,7 @@ class TableRowForm(forms.Form):
             res = res[:-4]
             res += '</tr>\n'
         res += '</tbody></table>'
-        res += '<div class="plentyThings"><table id="table2" class="dataTable display"><thead>'
+        res += '<div class="answer"><br /><h3>Selected Questions</h3><table id="table2" class="dataTable display"><thead>'
         for f in self.fields:
             res += "<th>"+self.queryset[0]._meta.get_field_by_name(f)[0].verbose_name.upper()+"</th>"
         res += "</thead><tbody></tbody></table></div>\n"
