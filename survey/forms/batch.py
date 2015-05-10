@@ -73,7 +73,7 @@ class TableRowForm(forms.Form):
                 <link href="/static/jquery.dataTables.css" rel="stylesheet" type="text/css">
                 
                 
-                <link href="/static/bootstrap.min.css" type="text/css" rel="stylesheet">
+                <!-- link href="/static/bootstrap.min.css" type="text/css" rel="stylesheet" -->
                 <script type="text/javascript">
                 
                 
