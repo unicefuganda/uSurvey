@@ -3,57 +3,18 @@ from survey.models.base import BaseModel
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Survey(BaseModel):
-    name = models.CharField(max_length=100, blank=False, null=True)
+    name = models.CharField(max_length=100, blank=False, null=True, unique=True)
     description = models.CharField(max_length=300, blank=True, null=True)
     sample_size = models.PositiveIntegerField(max_length=2, null=False, blank=False, default=10, verbose_name="Number of Households in EA/Village")
     type = models.BooleanField(default=False)
     has_sampling = models.BooleanField(default=True)
-    minimum_registered_households = models.IntegerField(verbose_name='Min % Of Registered Households', default=80, validators=[MinValueValidator(0), MaxValueValidator(100)],
+    min_percent_reg_houses = models.IntegerField(verbose_name='Min % Of Registered Households', default=80, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                                         help_text='Enter minimum percentage of total household to be registered before survey can start on ODK channel')
+
 
     class Meta:
         app_label = 'survey'
-        permissions = ( 
-            ( "view_completed_survey", "Can View Completed Surveys" ),
-        )
-
-    def is_open(self, location=None):
-        all_batches = self.batch.all()
-        for batch in all_batches:
-            batch_open_locations = batch.open_locations.all()
-            all_locations = batch_open_locations.filter(location=location) if location else batch_open_locations
-            if all_locations:
-                return True
-        return False
-
-    def is_open_for(self, location):
-        all_batches = self.batch.all()
-        for batch in all_batches:
-            if batch.is_open_for(location):
-                return True
-        return False
-
-    def get_total_respondents(self):
-        completed_households = 0
-        for batch in self.batch.all():
-            completed_households += batch.batch_completion_households.all().count()
-        return completed_households
-
-    @classmethod
-    def currently_open_survey(cls, location=None):
-        for survey in Survey.objects.all():
-            if survey.is_open(location):
-                return survey
-        return None
-
-    @classmethod
-    def currently_open_surveys(cls, location=None):
-        open_surveys = []
-        for survey in Survey.objects.all():
-            if survey.is_open(location):
-                open_surveys.append(survey)
-        return open_surveys
-
+        
     @classmethod
     def save_sample_size(cls, survey_form):
         survey = survey_form.save(commit=False)
@@ -61,17 +22,6 @@ class Survey(BaseModel):
             survey.sample_size = 0
         survey.save()
 
-    def __unicode__(self):
-        return "%s" % self.name
-
-    def all_questions(self):
-        questions = []
-        for batch in self.batch.all().order_by('order'):
-            questions.extend(batch.all_questions())
-        return questions
-
-    def ordered_batches(self):
-        return self.batch.all().order_by('order')
-
+        
 class SurveySampleSizeReached(Exception):
     pass

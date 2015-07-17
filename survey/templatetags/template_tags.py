@@ -1,14 +1,15 @@
 from django import template
 from django.core.urlresolvers import reverse
-from survey.investigator_configs import MONTHS
+from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
-from survey.models import Survey, Question, Batch, Investigator, MultiChoiceAnswer, GroupCondition
+from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, GroupCondition, Answer
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
 from dateutils import relativedelta
 from datetime import date
+import json, inspect
 
 register = template.Library()
 
@@ -110,35 +111,62 @@ def ancestors_reversed(location):
     return ancestors
 
 @register.filter
-def household_completed_percent(investigator):
+def show_condition(flow):
+    if flow.validation_test:
+        return '%s ( %s )' % (flow.validation_test, ' and '.join(flow.test_arguments))  
+    return ""
+
+@register.filter
+def quest_validation_opts(batch):
+    opts_dict = {}
+    for cls in Answer.__subclasses__():
+        opts = []
+        for validator in cls.validators():
+            opts.append({'display': validator.__name__, 'value': validator.__name__ })
+        opts_dict[cls._meta.verbose_name.title()] = opts
+    return mark_safe(json.dumps(opts_dict));
+
+@register.filter
+def validation_args(batch):
+    args_map = {}
+    for validator in Answer.validators():
+        args_map.update({validator.__name__ : len(inspect.getargspec(validator).args) - 2 }) #validator is a class method, plus answer extra pram
+    return mark_safe(json.dumps(args_map));
+        
+        
+    
+
+@register.filter
+def household_completed_percent(interviewer):
 #    import pdb;pdb.set_trace()
-    households = investigator.households.all()
+    households = interviewer.households.all()
     total = households.count()
     completed = len([hld for hld in households.all() if not hld.survey_completed() and hld.household_member.count() > 0])
     if total > 0:
         return "%s%%" % str(completed*100/total)
 
 @register.filter
-def open_survey_in_current_loc(investigator):
-    return len(Survey.currently_open_surveys(investigator.location)) 
+def open_survey_in_current_loc(interviewer):
+    return len(Survey.currently_open_surveys(interviewer.location)) 
     
 @register.filter
-def households_for_open_survey(investigator):
-    open_survey = Survey.currently_open_surveys(investigator.location)
-    households = investigator.households.filter(survey__in=open_survey).all()
+def households_for_open_survey(interviewer):
+    open_survey = Survey.currently_open_surveys(interviewer.location)
+    households = interviewer.households.filter(survey__in=open_survey).all()
     return len([hs for hs in households if hs.get_head() is not None])
 
 @register.filter
-def total_household_members(investigator):
-    households = investigator.households.all()
+def total_household_members(interviewer):
+    households = interviewer.households.all()
     return sum([household.household_member.count() for household in households])
 
 @register.assignment_tag
 def  get_download_url(request, url_name, survey):
     return request.build_absolute_uri(reverse(url_name, args=(survey.pk, )))
+  
 
 @register.assignment_tag(takes_context=True)
-def is_relevant_odk(context, question, batch, investigator, registered_households):
+def is_relevant_odk(context, question, batch, interviewer, registered_households):
     skip_to_ques = context.get('skip_to_ques', {})
     skip_to_ques.pop(question.pk, None)
     sub_ques = context.get('sub_ques', {})
@@ -152,7 +180,7 @@ def is_relevant_odk(context, question, batch, investigator, registered_household
     if question.answer_type.lower() == 'multichoice' and question.rule.count():
         for option in question.options.all():
             answer = MultiChoiceAnswer()
-            answer.investigator = investigator
+            answer.interviewer = interviewer
             answer.batch = batch
             answer.question = question
             answer.answer = option

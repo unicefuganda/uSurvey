@@ -21,11 +21,11 @@
   {% block display_form_fields %}{% endblock %}
 
   <div class="form-actions">
-    <button id="button" type="submit" class="btn btn-primary" name="save_button" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
     {% if cancel_url %}
-      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button">Cancel</a>
+      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel">Cancel</a>
     {% else %}
-      <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
+      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
     {% endif %}
   </div>
 </form>

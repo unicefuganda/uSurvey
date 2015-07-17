@@ -1,6 +1,6 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
-from survey.models import RandomHouseHoldSelection, Survey
+from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
+from survey.models import Survey
 from survey.ussd.base import USSDBase
 
 
@@ -21,9 +21,7 @@ class HouseHoldSelection(USSDBase):
     def randomly_select_households(self, survey):
         no_of_households = int(self.request['ussdRequestString'].strip())
 
-        if no_of_households >= NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR:
-            RandomHouseHoldSelection.objects.get_or_create(mobile_number=self.mobile_number, survey=survey)[0].generate(
-                no_of_households=no_of_households, survey=survey)
+        if no_of_households >= NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER:
             return self.response_for_survey_type(survey)
         else:
             return {'action': self.ACTIONS['REQUEST'],

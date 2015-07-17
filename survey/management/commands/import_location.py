@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from rapidsms.contrib.locations.models import Location, LocationType
+from rapidsms.contrib.locations.models import LocationType, Location
+# from survey.models.locations import U_Location as Location
 from django.template.defaultfilters import slugify
 import csv
 
@@ -12,7 +13,7 @@ class Command(BaseCommand):
         headers = csv_file.next()
         location_types = []
         for header in headers:
-            header = header.strip().replace("Name", "")
+            header = header.strip().replace("Name", "").upper()
             location_type, created = LocationType.objects.get_or_create(name=header, slug=slugify(header))
             location_types.append(location_type)
         for items in csv_file:

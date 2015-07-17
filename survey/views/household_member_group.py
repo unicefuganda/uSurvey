@@ -19,7 +19,7 @@ def conditions(request):
                   {'conditions': conditions, 'add_condition_url': 'new_group_condition', 'request': request})
 
 
-@permission_required('auth.can_view_investigators')
+@permission_required('auth.can_view_interviewers')
 def index(request):
     groups = HouseholdMemberGroup.objects.all().order_by('order').exclude(name='REGISTRATION GROUP')
     return render(request, 'household_member_groups/index.html', {'groups': groups, 'request': request})

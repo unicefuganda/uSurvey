@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 
-from survey.investigator_configs import *
-from survey.models.investigator import Investigator
+from survey.interviewer_configs import *
+from survey.models.interviewer import Interviewer
 
 
 @login_required
@@ -23,8 +23,8 @@ def send(request):
     params = dict(request.POST)
     if valid_parameters(params, request):
         locations = Location.objects.filter(id__in=params['locations'])
-        Investigator.sms_investigators_in_locations(locations=locations, text=params['text'][0])
-        messages.success(request, "Your message has been sent to investigators.")
+        Interviewer.sms_interviewers_in_locations(locations=locations, text=params['text'][0])
+        messages.success(request, "Your message has been sent to interviewers.")
     return HttpResponseRedirect(reverse('bulk_sms'))
 
 

@@ -12,9 +12,9 @@ class ODKSubmissionListView(ListView):
     template_name = 'odk/submission_list.html'
     context_object_name = 'submissions'
     model = ODKSubmission
-#    search_fields = ['investigator__name', 'survey__name', 'household__uid', 'form_id', 'instance_id']
+#    search_fields = ['interviewer__name', 'survey__name', 'household__uid', 'form_id', 'instance_id']
 
-	@method_decorator(permission_required('auth.can_view_aggregates'))
+    @method_decorator(permission_required('auth.can_view_aggregates'))
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(ODKSubmissionListView, self).dispatch(*args, **kwargs)

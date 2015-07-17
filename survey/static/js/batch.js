@@ -1,18 +1,18 @@
-;
-
-jQuery(function ($) {
-    
-    if ($('#assign_question_group').val()) {
-        load_questions_for_filter();   
-    }
-
-    $('#table1_paginate').on( 'mouseup', 'li', function () {
-        load_questions_for_filter();
-    } );  
+$(function(){
 
 
-
-
+    $('#id_groups').on('change', function () {
+    	reload_questions_lib();
+    });
+    $('#test').on('change', function () {
+    	keyword_reload_questions_lib();
+    });
+    $('#id_modules').on('change', function () {
+    	reload_questions_lib();
+    });
+    $('#id_question_types').on('change', function () {
+    	reload_questions_lib();
+    });
     $('.switch-open-close').on('switch-change', function (e, data) {
         var $this = $(this);
         var nonResponseSwitch = $this.parents("tr").find('.switch-activate-non-response');
@@ -32,11 +32,11 @@ jQuery(function ($) {
             'name': {required: true, remote: '/surveys/' + survey_id + '/batches/check_name/'},
             'description': 'required'
         },
-        messages: {
-            "name": {
-                remote: jQuery.format("Batch with the same name already exists.")
-            }
-        }
+////        messages: {
+////            "name": {
+////                remote: $.format("Batch with the same name already exists.")
+////            }
+//        }
 
     });
 
@@ -48,37 +48,31 @@ jQuery(function ($) {
     });
 
 
-    $('#assign_question_group').on('change', function () {
-        load_questions_for_filter();
-    });
-    $('#assign_module').on('change', function () {
-        load_questions_for_filter();
-    });
 
 });
 
+function reload_questions_lib()
+{
 
-function load_questions_for_filter() {
-    var group_selected = $('#assign_question_group').val();
-    var module_selected = $('#assign_module').val(),
-        batch_id = $("#batch_id").val(),
-        url = '/batches/' + batch_id + '/questions/groups/' + group_selected + '/module/' + module_selected + '/';
-    $.getJSON(url, function (data) {
+	var group_selected = $('#id_groups').val();
+    var module_selected = $('#id_modules').val();
+    var answer_type_selected = $('#id_question_types').val();
+    url = '/question_library/json_filter/';
+    params = { question_types: answer_type_selected, groups : group_selected, modules: module_selected }
+    $.getJSON(url, params, function (data) {
         $('.ms-selectable').hide()
-        //$('.ms-selectable').children().children().hide();
         $.each(data, function () {
             $('#' + this.id + '-selectable').show();
         });
-        
     });
 }
 
-function page_reload_question_filter() {
 
-    
-
+function keyword_reload_questions_lib()
+{
+	alert($('#library_search_form input[text]').val());
+	
 }
-
 function toggleStatus(element, forms_ids, data) {
     element.parent().find('.error').remove();
     var $el = $(data.el), form;

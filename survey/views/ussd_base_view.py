@@ -1,5 +1,5 @@
 import re
-from survey.investigator_configs import HAS_APPLICATION_CODE, APPLICATION_CODE
+from survey.interviewer_configs import HAS_APPLICATION_CODE, APPLICATION_CODE
 from survey.ussd.ussd_report_non_response import USSDReportNonResponse
 from survey.ussd.ussd_survey import USSDSurvey
 from survey.ussd.ussd_register_household import USSDRegisterHousehold
@@ -15,32 +15,32 @@ class USSDBaseView(object):
         'REPORT_NON_RESPONSE': "3",
     }
 
-    def __init__(self, investigator, request):
+    def __init__(self, interviewer, request):
         super(USSDBaseView, self).__init__()
-        self.investigator = investigator
+        self.interviewer = interviewer
         self.request = request.dict()
-        self.ussd_survey = USSDSurvey(investigator, request)
-        self.ussd_register_household = USSDRegisterHousehold(investigator, request)
-        self.ussd_report_non_response = USSDReportNonResponse(investigator, request)
+        self.ussd_survey = USSDSurvey(interviewer, request)
+        self.ussd_register_household = USSDRegisterHousehold(interviewer, request)
+        self.ussd_report_non_response = USSDReportNonResponse(interviewer, request)
         self.is_registering_household = None
         self.is_reporting_non_response = False
         self.set_is_registering_household()
         self.set_is_reporting_non_response()
 
     def set_is_registering_household(self):
-        self.is_registering_household = self.investigator.get_from_cache('IS_REGISTERING_HOUSEHOLD')
+        self.is_registering_household = self.interviewer.get_from_cache('IS_REGISTERING_HOUSEHOLD')
 
     def set_is_reporting_non_response(self):
-        self.is_reporting_non_response = self.investigator.get_from_cache('IS_REPORTING_NON_RESPONSE')
+        self.is_reporting_non_response = self.interviewer.get_from_cache('IS_REPORTING_NON_RESPONSE')
 
     def is_new_request(self):
         return self.request['response'] == 'false'
 
     def response(self):
         answer = self.request['ussdRequestString'].strip()
-        if self.investigator.is_blocked:
+        if self.interviewer.is_blocked:
             return {'action': self.ussd_survey.ACTIONS['END'],
-                    'responseString': self.ussd_survey.MESSAGES['INVESTIGATOR_BLOCKED_MESSAGE']}
+                    'responseString': self.ussd_survey.MESSAGES['Interviewer_BLOCKED_MESSAGE']}
 
         if self.is_new_request_parameter(answer) and self.is_new_request():
             action, response_string = self.ussd_survey.render_welcome_or_resume()
@@ -65,17 +65,17 @@ class USSDBaseView(object):
 
         if self.is_registering_household is None:
             if answer == self.ANSWER['TAKE_SURVEY']:
-                self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', False)
+                self.interviewer.set_in_cache('IS_REGISTERING_HOUSEHOLD', False)
                 action, response_string = self.ussd_survey.start()
                 return {'action': action, 'responseString': response_string}
 
             if answer == self.ANSWER['REGISTER_HOUSEHOLD']:
-                self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
+                self.interviewer.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
                 action, response_string = self.ussd_register_household.start("00")
                 return {'action': action, 'responseString': response_string}
 
             if answer == self.ANSWER['REPORT_NON_RESPONSE']:
-                self.investigator.set_in_cache('IS_REPORTING_NON_RESPONSE', True)
+                self.interviewer.set_in_cache('IS_REPORTING_NON_RESPONSE', True)
                 action, response_string = self.ussd_report_non_response.start("00")
                 return {'action': action, 'responseString': response_string}
 
@@ -93,7 +93,7 @@ class USSDBaseView(object):
 
         if answer == USSDSurvey.ANSWER['YES']:
             action, response_string = self.ussd_register_household.start("00")
-            self.investigator.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
+            self.interviewer.set_in_cache('IS_REGISTERING_HOUSEHOLD', True)
             self.ussd_survey.set_in_session('IS_RESUMING', False)
             return {'action': action, 'responseString': response_string}
 
@@ -119,6 +119,6 @@ class USSDBaseView(object):
         return action, response_string
 
     def clear_HH_caches(self):
-        self.investigator.clear_interview_caches()
+        self.interviewer.clear_interview_caches()
         self.ussd_register_household.set_in_session('HOUSEHOLD', None)
         self.ussd_survey.set_in_session('HOUSEHOLD', None)

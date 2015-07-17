@@ -6,13 +6,13 @@ from hashlib import md5
 from django.core.files.storage import get_storage_class
 from django.db import models
 from survey.models.base import BaseModel
-from survey.models.investigator import Investigator
+from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
 from survey.models.households import HouseholdMember
 
 
 class ODKSubmission(BaseModel):
-    investigator = models.ForeignKey(Investigator, related_name="odk_submissions")
+    interviewer = models.ForeignKey(Interviewer, related_name="odk_submissions")
     survey = models.ForeignKey(Survey, related_name="odk_submissions")
     household_member = models.ForeignKey(HouseholdMember, related_name="odk_submissions")
     form_id = models.CharField(max_length=256)

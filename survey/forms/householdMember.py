@@ -9,7 +9,7 @@ class HouseholdMemberForm(ModelForm):
 
     class Meta:
         model = HouseholdMember
-        fields = ['surname', 'first_name', 'date_of_birth', 'male']
+        fields = ['surname', 'first_name', 'date_of_birth', 'gender']
         widgets = {
             'surname': forms.TextInput(attrs={'placeholder': 'Family Name'}),
             'first_name': forms.TextInput(attrs={'placeholder': 'Other Names'}),

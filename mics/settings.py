@@ -156,6 +156,7 @@ INSTALLED_APPS = (
     'rapidsms.contrib.locations.nested',
     'bootstrap_pagination',
     'survey',
+    'mptt',
     'rapidsms.backends.database',
     'rapidsms.contrib.httptester',
     'djcelery',
@@ -225,6 +226,7 @@ EMAIL_HOST_USER = 'usurvey.global.unicef'
 EMAIL_HOST_PASSWORD = 'usurvey.global.unicef321'
 DEFAULT_EMAIL_SENDER = 'usurvey.global.unicef@gmail.com'
 
+
 #odk settings
 TOKEN_DEFAULT_SIZE=5
 ODK_DEFAULT_TOKEN='12345'
@@ -233,7 +235,9 @@ ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerFiles')
 TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
 ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Processed"
 INVESTIGATOR_EXPORT_HEADERS =  ['name', 'mobile_number', 'age', 'level_of_education', 'language', 'weights', 'is_blocked', 'ea']
-
+AGGREGATORS = []
+TWITTER_URL = 'https://twitter.com/unicefuganda'
+TWITTER_TOKEN = '617036281340657664'
 # Importing server specific settings
 from localsettings import *
 # import sys

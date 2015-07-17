@@ -13,9 +13,9 @@ from django.shortcuts import get_object_or_404
 from djangohttpdigest.digest import Digestor, parse_authorization_header
 from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
-from survey.models import Survey, Investigator, Household, HouseholdMember, HouseholdHead, Question, Batch, ODKSubmission, ODKGeoPoint, RandomHouseHoldSelection, LocationCode, TextAnswer, Answer
+from survey.models import Survey, Interviewer, Household, HouseholdMember, HouseholdHead, Question, Batch, ODKSubmission, ODKGeoPoint, LocationCode, TextAnswer, Answer
 from survey.models.surveys import SurveySampleSizeReached
-from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
+from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.odk.utils.log import logger
 from survey.tasks import execute
 from functools import wraps
@@ -82,16 +82,16 @@ def _get_selected_household_member(survey_tree):
     member_id = (_get_nodes(hm_path, tree=survey_tree)[0].text).split(HOUSEHOLD_MEMBER_ID_DELIMITER)[0]
     return HouseholdMember.objects.get(pk=member_id)
 
-def _get_or_create_household_member(investigator, survey, survey_tree):
+def _get_or_create_household_member(interviewer, survey, survey_tree):
     if _choosed_existing_household(survey_tree):
         return _get_selected_household_member(survey_tree)
     sample_number = _get_household_sample_number(survey_tree)
     try:
-        household = Household.objects.get(investigator=investigator, survey=survey, ea=investigator.ea, random_sample_number=sample_number)
+        household = Household.objects.get(interviewer=interviewer, survey=survey, ea=interviewer.ea, random_sample_number=sample_number)
     except Household.DoesNotExist:
         uid = Household.next_uid(survey)
-        household_code_value = LocationCode.get_household_code(investigator) + str(uid)
-        household = Household.objects.create(investigator=investigator, ea=investigator.ea,
+        household_code_value = LocationCode.get_household_code(interviewer) + str(uid)
+        household = Household.objects.create(interviewer=interviewer, ea=interviewer.ea,
                                      uid=uid, random_sample_number=sample_number,
                                      survey=survey, household_code=household_code_value)
     #now time for member details
@@ -131,11 +131,11 @@ def build_answer(question, response):
         return answer
     return response
 
-def register_member_answer(investigator, question, household_member, answer, batch):
+def register_member_answer(interviewer, question, household_member, answer, batch):
     answer_class = question.answer_class()
     answer = build_answer(question, answer)
     if question.answer_type == Question.MULTISELECT and not isinstance(answer, NonResponseAnswer):
-        created = answer_class.objects.create(investigator=investigator, question=question, householdmember=household_member,
+        created = answer_class.objects.create(interviewer=interviewer, question=question, householdmember=household_member,
                          household=household_member.household, batch=batch)
         created.answer = answer
         created.save()
@@ -143,7 +143,7 @@ def register_member_answer(investigator, question, household_member, answer, bat
         if isinstance(answer, NonResponseAnswer):
             answer_class = TextAnswer
             answer = answer.answer
-        created = answer_class.objects.create(investigator=investigator, question=question, householdmember=household_member,
+        created = answer_class.objects.create(interviewer=interviewer, question=question, householdmember=household_member,
                          answer=answer, household=household_member.household, batch=batch)
     return created
 
@@ -155,9 +155,9 @@ class NonResponseAnswer(Answer):
     def __init__(self, answer):
         self.answer = answer
 
-def _get_responses(investigator, survey_tree, survey):
+def _get_responses(interviewer, survey_tree, survey):
     response_dict = {}
-    batches = investigator.get_open_batch_for_survey(survey)
+    batches = interviewer.get_open_batch_for_survey(survey)
     for batch in batches:
         for question in batch.all_questions():
             context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
@@ -182,7 +182,7 @@ def _get_survey(survey_tree):
     return Survey.objects.get(pk=pk)
 
 @transaction.autocommit
-def process_submission(investigator, xml_file, media_files=[], request=None):
+def process_submission(interviewer, xml_file, media_files=[], request=None):
     """
     extract surveys and for this xml file and for specified household member
     """
@@ -192,12 +192,12 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
     form_id = _get_form_id(survey_tree)
     survey = _get_survey(survey_tree)
     if (not only_household_reg(survey_tree)) and survey.has_sampling and \
-            Household.objects.filter(survey=survey, ea=investigator.ea).count() >= survey.sample_size: #if its not only household registration, make sure sample size is not violated
+            Household.objects.filter(survey=survey, ea=interviewer.ea).count() >= survey.sample_size: #if its not only household registration, make sure sample size is not violated
         #cannot continue if this survey has reached sample size for this ea
         raise SurveySampleSizeReached()
-    member = _get_or_create_household_member(investigator, survey, survey_tree)
+    member = _get_or_create_household_member(interviewer, survey, survey_tree)
     member_completion_report = {}
-    response_dict = _get_responses(investigator, survey_tree, survey)
+    response_dict = _get_responses(interviewer, survey_tree, survey)
     treated_batches = {}
     if response_dict and not only_household_reg(survey_tree):
         for (b_id, q_id), answer in response_dict.items():
@@ -206,14 +206,14 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
             if answer is not None:
                 if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
                     answer = media_files.get(answer, None)
-                created = register_member_answer(investigator, question, member, answer, batch)
+                created = register_member_answer(interviewer, question, member, answer, batch)
                 member_completion_report[(b_id, q_id)] = created
             if b_id not in treated_batches.keys():
                 treated_batches[b_id] = batch
         map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
         if member.household.completed_currently_open_batches():
             map(lambda batch: member.household.batch_completed(batch), treated_batches.values())
-    submission = ODKSubmission.objects.create(investigator=investigator, 
+    submission = ODKSubmission.objects.create(interviewer=interviewer, 
                 survey=survey, form_id= form_id,
                 instance_id=_get_instance_id(survey_tree), household_member=member, 
                 xml=etree.tostring(survey_tree, pretty_print=True))
@@ -221,24 +221,24 @@ def process_submission(investigator, xml_file, media_files=[], request=None):
     submission.save_attachments(media_files.values())
     return submission
 
-def get_surveys(investigator):
-    return Survey.currently_open_surveys(investigator.location)
+def get_surveys(interviewer):
+    return Survey.currently_open_surveys(interviewer.location)
 
-def get_households(investigator):
+def get_households(interviewer):
     """
-        return the households with uncompleted surveys for households assigned to this investigator
+        return the households with uncompleted surveys for households assigned to this interviewer
         #to do: Need to make this retrieval more effecient in the future
     """
-    open_surveys = Survey.currently_open_surveys(investigator.location)
+    open_surveys = Survey.currently_open_surveys(interviewer.location)
     logger.debug('open surveys: %s' % open_surveys)
     households = []
     for open_survey in open_surveys:
         if open_survey.has_sampling:
-            RandomHouseHoldSelection.objects.get_or_create(mobile_number=investigator.mobile_number, survey=open_survey)[0].generate(
-                no_of_households=open_survey.sample_size, survey=open_survey)
-            households.extend(investigator.households.filter(ea=investigator.ea, survey=open_survey, random_sample_number__isnull=False).all())
+#            RandomHouseHoldSelection.objects.get_or_create(mobile_number=interviewer.mobile_number, survey=open_survey)[0].generate(
+#                no_of_households=open_survey.sample_size, survey=open_survey)
+            households.extend(interviewer.households.filter(ea=interviewer.ea, survey=open_survey, random_sample_number__isnull=False).all())
         else:
-            households.extend(investigator.all_households(open_survey=open_survey, non_response_reporting=True))      
+            households.extend(interviewer.all_households(open_survey=open_survey, non_response_reporting=True))      
         logger.debug('households: %s' % len(households))
     return [household for household in households if household.has_pending_survey()] 
 
@@ -338,7 +338,7 @@ class OpenRosaRequestForbidden(OpenRosaResponse):
 class OpenRosaServerError(OpenRosaResponse):
     status_code = 500
 
-def http_basic_investigator_auth(func):
+def http_basic_interviewer_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
         if request.META.has_key('HTTP_AUTHORIZATION'):
@@ -348,14 +348,14 @@ def http_basic_investigator_auth(func):
                 auth = auth.strip().decode('base64')
                 username, password = auth.split(':', 1)
                 try:
-                    request.user = Investigator.objects.get(mobile_number=username, odk_token=password)
+                    request.user = Interviewer.objects.get(mobile_number=username, odk_token=password)
                     return func(request, *args, **kwargs)
-                except Investigator.DoesNotExist:
+                except Interviewer.DoesNotExist:
                     return OpenRosaResponseNotFound()
         return HttpResponseNotAuthorized()
     return _decorator
 
-def http_digest_investigator_auth(func):
+def http_digest_interviewer_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
         realm = Site.objects.get_current().name
@@ -365,12 +365,12 @@ def http_digest_investigator_auth(func):
             try:
                 parsed_header = digestor.parse_authorization_header(request.META['HTTP_AUTHORIZATION'])
                 if parsed_header['realm'] == realm:
-                    investigator = Investigator.objects.get(mobile_number=parsed_header['username'], is_blocked=False)
-                    authenticator = SimpleHardcodedAuthenticator(server_realm=realm, server_username=investigator.mobile_number, server_password=investigator.odk_token)
-                    request.user = investigator
+                    interviewer = Interviewer.objects.get(mobile_number=parsed_header['username'], is_blocked=False)
+                    authenticator = SimpleHardcodedAuthenticator(server_realm=realm, server_username=interviewer.mobile_number, server_password=interviewer.odk_token)
+                    request.user = interviewer
                     if authenticator.secret_passed(digestor):
                         return func(request, *args, **kwargs)
-            except Investigator.DoesNotExist:
+            except Interviewer.DoesNotExist:
                 return OpenRosaResponseNotFound()
             except ValueError, err:
                 return OpenRosaResponseBadRequest()

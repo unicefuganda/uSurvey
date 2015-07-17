@@ -1,17 +1,21 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from rapidsms.contrib.locations.models import Location
+from rapidsms.contrib.locations.models import Location, LocationType, Point
+from mptt.models import MPTTModel, TreeForeignKey 
 from survey.models import BaseModel
 
+# class ULocation(Location):
+#     name = models.CharField(max_length=100)
+    
 
 class LocationCode(BaseModel):
     location = models.ForeignKey(Location, null=False, related_name="code")
     code = models.CharField(max_length=10, null=False, default=0)
 
     @classmethod
-    def get_household_code(cls, investigator):
-        location_hierarchy = investigator.locations_in_hierarchy()
+    def get_household_code(cls, interviewer):
+        location_hierarchy = interviewer.locations_in_hierarchy()
         codes = cls.objects.filter(location__in=location_hierarchy).order_by('location').values_list('code', flat=True)
         return ''.join(codes)
 

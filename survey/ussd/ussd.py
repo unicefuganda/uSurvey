@@ -6,8 +6,8 @@ from survey.ussd.base import USSDBase
 
 
 class USSD(USSDBase):
-    def __init__(self, investigator, request):
-        self.investigator = investigator
+    def __init__(self, interviewer, request):
+        self.interviewer = interviewer
         self.request = request.dict()
         self.action = self.ACTIONS['REQUEST']
         self.responseString = ""
@@ -27,7 +27,7 @@ class USSD(USSDBase):
         self.set_has_chosen_retake()
         self.set_has_answered_retake()
         self.set_can_retake_household()
-        self.clean_investigator_input()
+        self.clean_interviewer_input()
 
 
     def set_attribute_from_session(self, key, attribute):
@@ -38,9 +38,9 @@ class USSD(USSDBase):
         except KeyError:
             pass
 
-    def set_from_investigator_cache(self, key, attribute):
+    def set_from_interviewer_cache(self, key, attribute):
         try:
-            attr_value = self.investigator.get_from_cache(key)
+            attr_value = self.interviewer.get_from_cache(key)
             if attr_value:
                 setattr(self, attribute, attr_value)
         except KeyError:
@@ -85,8 +85,8 @@ class USSD(USSDBase):
         session[key] = value
         cache.set(self.session_string, session)
 
-    def set_investigator_cache(self, key, value):
-        self.investigator.set_in_cache(key, value)
+    def set_interviewer_cache(self, key, value):
+        self.interviewer.set_in_cache(key, value)
 
     def is_pagination_option(self, answer):
         return answer in getattr(settings, 'USSD_PAGINATION', None).values()
@@ -108,7 +108,7 @@ class USSD(USSDBase):
         self.set_in_session('PAGE', current_page)
 
     def question_present_in_cache(self, label):
-        return self.question in self.investigator.get_from_cache(label)
+        return self.question in self.interviewer.get_from_cache(label)
 
     def reanswerable_question(self):
         return self.question_present_in_cache('REANSWER')
@@ -117,22 +117,22 @@ class USSD(USSDBase):
         return self.question_present_in_cache('INVALID_ANSWER')
 
     def get_household_list(self, non_response_reporting=False):
-        open_survey = Survey.currently_open_survey(self.investigator.location)
+        open_survey = Survey.currently_open_survey(self.interviewer.location)
         page = self.get_from_session('PAGE')
         self.responseString += "%s\n%s" % (
             self.MESSAGES['HOUSEHOLD_LIST'],
-            self.investigator.households_list(page, registered=False, open_survey=open_survey,
+            self.interviewer.households_list(page, registered=False, open_survey=open_survey,
                                               non_response_reporting=non_response_reporting))
 
-    def clean_investigator_input(self):
+    def clean_interviewer_input(self):
         if self.is_new_request():
             self.request['ussdRequestString'] = ''
 
     def select_household(self, answer, non_response_reporting=False):
         try:
             answer = int(answer)
-            open_survey = Survey.currently_open_survey(self.investigator.location)
-            self.household = self.investigator.all_households(open_survey, non_response_reporting)[answer - 1]
+            open_survey = Survey.currently_open_survey(self.interviewer.location)
+            self.household = self.interviewer.all_households(open_survey, non_response_reporting)[answer - 1]
             self.set_in_session('HOUSEHOLD', self.household)
         except (ValueError, IndexError) as e:
             self.responseString += "INVALID SELECTION: "
@@ -153,7 +153,7 @@ class USSD(USSDBase):
                                 self.household.members_list(page, reporting_non_response=True))
 
     def render_menu(self):
-        responseString = self.MESSAGES['WELCOME_TEXT'] % self.investigator.name
-        if self.investigator.can_report_non_response():
+        responseString = self.MESSAGES['WELCOME_TEXT'] % self.interviewer.name
+        if self.interviewer.can_report_non_response():
             responseString += self.MESSAGES['NON_RESPONSE_MENU']
         return responseString

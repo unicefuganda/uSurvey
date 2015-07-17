@@ -27,7 +27,7 @@ class HouseholdHeadForm(ModelForm):
 
     class Meta:
         model = HouseholdHead
-        fields = ['surname', 'first_name',  'date_of_birth', 'male', 'resident_since_year',
+        fields = ['surname', 'first_name',  'date_of_birth', 'gender', 'resident_since_year',
                   'level_of_education', 'resident_since_month', 'occupation']
 
         widgets = {

@@ -6,7 +6,7 @@ from django import forms
 class HouseholdForm(ModelForm):
     class Meta:
         model = Household
-        exclude = ['investigator', 'location', 'survey', 'household_code']
+        exclude = ['registrar', 'location', 'survey', 'household_code']
         widgets = {
             'ea': forms.HiddenInput(),
         }

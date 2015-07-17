@@ -8,7 +8,7 @@ from django.shortcuts import render
 from rapidsms.contrib.locations.models import Location, LocationType
 
 from survey.forms.filters import LocationFilterForm
-from survey.models import Survey, Investigator
+from survey.models import Survey, Interviewer
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates, \
     BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.views.location_widget import LocationWidget
@@ -28,13 +28,13 @@ def is_valid(params):
 
 def render_household_details(request, ea, batch):
     context = {'selected_ea': ea}
-    investigator = Investigator.objects.filter(ea=ea)
-    if not investigator.exists():
-        messages.error(request, 'Investigator not registered for this ea.')
+    interviewer = Interviewer.objects.filter(ea=ea)
+    if not interviewer.exists():
+        messages.error(request, 'Interviewer not registered for this ea.')
         return render(request, 'aggregates/household_completion_status.html', context)
     completion_rates = BatchLocationCompletionRates(batch, location=None, ea=ea)
     context.update({'completion_rates': completion_rates,
-                    'investigator': investigator[0]})
+                    'interviewer': interviewer[0]})
     return render(request, 'aggregates/household_completion_status.html', context)
 
 
@@ -80,18 +80,18 @@ def completion_json(request, survey_id):
 
 @login_required
 @permission_required('survey.view_completed_survey')
-def show_investigator_completion_summary(request):
+def show_interviewer_completion_summary(request):
     params = request.GET
     selected_location = None
     selected_ea = None
-    investigators = Investigator.objects.order_by('id')
+    interviewers = Interviewer.objects.order_by('id')
     search_fields = ['name', 'mobile_number']
     if request.GET.has_key('q'):
-        investigators = get_filterset(investigators, request.GET['q'], search_fields)
+        interviewers = get_filterset(interviewers, request.GET['q'], search_fields)
     if params.has_key('status'):
-        investigators = investigators.filter(is_blocked=ast.literal_eval(params['status']))
+        interviewers = interviewers.filter(is_blocked=ast.literal_eval(params['status']))
     location_widget = LocationWidget(selected_location, ea=selected_ea)
-    return render(request, 'aggregates/investigators_summary.html',
-                  {'investigators': investigators,
+    return render(request, 'aggregates/interviewers_summary.html',
+                  {'interviewers': interviewers,
                    'request': request})
 

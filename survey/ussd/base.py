@@ -1,5 +1,5 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-from survey.investigator_configs import NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR
+from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 
 
 class USSDBase(object):
@@ -17,13 +17,13 @@ class USSDBase(object):
         'HOUSEHOLDS_COUNT_QUESTION': "How many households have you listed in your Enumeration Area?",
         'HOUSEHOLD_SELECTION_SMS_MESSAGE': "Thank you. You will receive the household numbers selected for your Enumeration Area",
         'HOUSEHOLD_CONFIRMATION_MESSAGE': "Thank you. Houselist for Enumeration Area is available for member registration.",
-        'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s. How many households have you listed in your Enumeration Area?" % NUMBER_OF_HOUSEHOLD_PER_INVESTIGATOR,
+        'HOUSEHOLDS_COUNT_QUESTION_WITH_VALIDATION_MESSAGE': "Count must be greater than %s. How many households have you listed in your Enumeration Area?" % NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER,
         'MEMBER_SUCCESS_MESSAGE': "Thank you. Would you like to proceed to the next Household Member?\n1: Yes\n2: No",
         'HOUSEHOLD_COMPLETION_MESSAGE': "Thank you. You have completed this household. Would you like to retake this household?\n1: Yes\n2: No",
         'RESUME_MESSAGE': "Would you like to to resume with member question?\n1: Yes\n2: No",
         'SELECT_HEAD_OR_MEMBER': 'Household %s, please select household member to register:\n1: Respondent\n2: Member',
         'END_REGISTRATION': 'Thank you for registering household member. Would you like to register another member?\n1: Yes\n2: No',
-        'INVESTIGATOR_BLOCKED_MESSAGE': 'Sorry. You are not registered for any surveys.',
+        'INTERVIEWER_BLOCKED_MESSAGE': 'Sorry. You are not registered for any surveys.',
         'HEAD_REGISTERED': "Head already registered for this household. Registering members now:\n",
         'NON_RESPONSE_MENU': "\n3: Report non-response",
         'NON_RESPONSE_COMPLETION': "Thank you. You have completed reporting non-responses. Would you like to start again?\n1: Yes\n2: No",

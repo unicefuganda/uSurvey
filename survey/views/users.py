@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
-from survey.investigator_configs import *
+from survey.interviewer_configs import *
 from survey.forms.users import *
 from survey.models.users import UserProfile
 from survey.views.custom_decorators import permission_required_for_perm_or_current_user

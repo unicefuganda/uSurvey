@@ -15,8 +15,8 @@ class USSDRegisterHousehold(USSD):
 
     UNKNOWN = 99
 
-    def __init__(self, investigator, request):
-        super(USSDRegisterHousehold, self).__init__(investigator, request)
+    def __init__(self, interviewer, request):
+        super(USSDRegisterHousehold, self).__init__(interviewer, request)
         self.question = None
         self.household_member = None
         self.is_head = None
@@ -38,16 +38,16 @@ class USSDRegisterHousehold(USSD):
 
     def set_form_in_cache(self):
         try:
-            if not self.investigator.get_from_cache('registration_dict'):
-                self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
+            if not self.interviewer.get_from_cache('registration_dict'):
+                self.interviewer.set_in_cache('registration_dict', self.REGISTRATION_DICT)
             else:
-                self.REGISTRATION_DICT = self.investigator.get_from_cache('registration_dict')
+                self.REGISTRATION_DICT = self.interviewer.get_from_cache('registration_dict')
         except KeyError:
             pass
 
     def set_head_in_cache(self):
         try:
-            is_head = self.investigator.get_from_cache('is_head')
+            is_head = self.interviewer.get_from_cache('is_head')
             if is_head is not None:
                 self.is_head = is_head
         except KeyError:
@@ -55,20 +55,20 @@ class USSDRegisterHousehold(USSD):
 
     def set_is_selecting_member(self):
         try:
-            is_selecting_member = self.investigator.get_from_cache('is_selecting_member')
+            is_selecting_member = self.interviewer.get_from_cache('is_selecting_member')
             if is_selecting_member is not None:
                 self.is_selecting_member = is_selecting_member
         except KeyError:
-            self.investigator.set_in_cache('is_selecting_member', False)
+            self.interviewer.set_in_cache('is_selecting_member', False)
 
     def set_head(self, answer):
         if self.is_head is None or not self.is_head:
             if answer == self.HEAD_ANSWER['HEAD']:
-                self.investigator.set_in_cache('is_head', True)
+                self.interviewer.set_in_cache('is_head', True)
             else:
-                self.investigator.set_in_cache('is_head', False)
-        self.is_head = self.investigator.get_from_cache('is_head')
-        self.investigator.set_in_cache('is_selecting_member', False)
+                self.interviewer.set_in_cache('is_head', False)
+        self.is_head = self.interviewer.get_from_cache('is_head')
+        self.interviewer.set_in_cache('is_selecting_member', False)
 
     def start(self, answer):
         self.register_households(answer)
@@ -85,7 +85,7 @@ class USSDRegisterHousehold(USSD):
         if self.is_invalid_response():
             self.get_household_list()
         else:
-            self.investigator.set_in_cache('HOUSEHOLD', self.household)
+            self.interviewer.set_in_cache('HOUSEHOLD', self.household)
 
     def register_households(self, answer):
         if not self.household and self.is_browsing_households_list(answer):
@@ -101,18 +101,18 @@ class USSDRegisterHousehold(USSD):
                 self.select_household(answer)
                 self.validate_house_selection()
             else:
-                self.household = self.investigator.get_from_cache('HOUSEHOLD')
+                self.household = self.interviewer.get_from_cache('HOUSEHOLD')
 
             if self.household:
                 self.render_questions_based_on_head_selection(answer)
 
     def render_select_member_or_head(self):
-        self.investigator.set_in_cache('is_selecting_member', True)
+        self.interviewer.set_in_cache('is_selecting_member', True)
         self.responseString = self.MESSAGES['SELECT_HEAD_OR_MEMBER'] % str(self.household.random_sample_number)
 
     def render_questions_or_member_selection(self, answer):
         if self.household.get_head():
-            self.investigator.set_in_cache('is_head', False)
+            self.interviewer.set_in_cache('is_head', False)
             self.responseString = USSD.MESSAGES['HEAD_REGISTERED']
             self.responseString += self.render_questions(answer)
 
@@ -123,7 +123,7 @@ class USSDRegisterHousehold(USSD):
         all_questions = Question.objects.filter(group__name="REGISTRATION GROUP").order_by('order')
 
         if not self.question:
-            self.investigator.set_in_cache('INVALID_ANSWER', [])
+            self.interviewer.set_in_cache('INVALID_ANSWER', [])
             self.question = all_questions[0]
         else:
             self.question = self.process_registration_answer(answer)
@@ -135,10 +135,10 @@ class USSDRegisterHousehold(USSD):
     def render_registration_options(self, answer):
         if self.household_member:
             if answer == self.ANSWER['YES']:
-                self.household = self.investigator.get_from_cache('HOUSEHOLD')
+                self.household = self.interviewer.get_from_cache('HOUSEHOLD')
                 self.render_questions_or_member_selection(answer)
             if answer == self.ANSWER['NO']:
-                self.investigator.clear_interview_caches()
+                self.interviewer.clear_interview_caches()
                 self.set_in_session('HOUSEHOLD', None)
                 self.responseString = self.render_menu()
             self.set_in_session('HOUSEHOLD_MEMBER', None)
@@ -148,18 +148,18 @@ class USSDRegisterHousehold(USSD):
     def process_registration_answer(self, answer):
         answer = int(answer) if answer.isdigit() else answer
         if not answer and answer != 0:
-            self.investigator.invalid_answer(self.question)
+            self.interviewer.invalid_answer(self.question)
             return self.question
 
         if self.question.is_multichoice() and self.is_pagination_option(answer):
             self.set_current_page(answer)
-            self.investigator.remove_ussd_variable('INVALID_ANSWER', self.question)
+            self.interviewer.remove_ussd_variable('INVALID_ANSWER', self.question)
             return self.question
 
         age_question = Question.objects.get(text__startswith="Please Enter the age")
 
         if self.is_year_question_answered() and not self.age_validates(answer):
-            self.investigator.invalid_answer(age_question)
+            self.interviewer.invalid_answer(age_question)
             return age_question
         return self.get_next_question(answer)
 
@@ -175,11 +175,11 @@ class USSDRegisterHousehold(USSD):
     def next_question_by_rule(self, answer):
         answer_class = self.question.answer_class()
         if self.question.is_multichoice():
-            answer = self.question.get_option(answer, self.investigator)
+            answer = self.question.get_option(answer, self.interviewer)
             if not answer:
                 return self.question
         _answer = answer_class(answer=answer)
-        next_question = self.question.get_next_question_by_rule(_answer, self.investigator)
+        next_question = self.question.get_next_question_by_rule(_answer, self.interviewer)
         if next_question != self.question:
             next_question.order = self.question.order
         return next_question
@@ -194,12 +194,12 @@ class USSDRegisterHousehold(USSD):
 
     def save_in_registration_dict(self, answer):
         self.REGISTRATION_DICT[self.question.text] = answer
-        self.investigator.set_in_cache('registration_dict', self.REGISTRATION_DICT)
+        self.interviewer.set_in_cache('registration_dict', self.REGISTRATION_DICT)
 
     def save_member_and_clear_cache(self):
         self.save_member_object()
-        self.investigator.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
-        self.investigator.set_in_cache('HOUSEHOLD', self.household)
+        self.interviewer.clear_all_cache_fields_except('IS_REGISTERING_HOUSEHOLD')
+        self.interviewer.set_in_cache('HOUSEHOLD', self.household)
         self.responseString = USSD.MESSAGES['END_REGISTRATION']
 
     def process_member_attributes(self):

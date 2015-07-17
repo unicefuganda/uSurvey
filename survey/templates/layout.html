@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
+	<!--   link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" / -->
     <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
 
     {% block extra_css %}{% endblock %}
@@ -23,36 +24,42 @@
 
 </head>
 <body>
-<header class="container">
+<header class="tbanner">
     <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
+        <div>
             <div class="container">
                 <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse" id="fold-menu">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="brand" href="{% url 'home_page' %}">{{ PROJECT_TITLE }}</a>
-                <div class="nav-collapse collapse">
+{% if user.is_authenticated %}
+{% else %}
+<a class="logopad" href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}img/uSurvey.png" /></a>
+{% endif%} 
+
+                        {% if perms.auth.can_view_interviewers %}
+<div class="nav-collapse collapse">
                     <ul class="nav">
+                        <li>
+                            <a id="about" class="dropdown-toggle" role="button" href="{% url 'main_page' %}">Home</a>
+                        </li>
                         <li>
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
                         </li>
-
-                        {% if perms.auth.can_view_investigators %}
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
                                    role="button" href="#">Survey Administration<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
-                                    <li role="presentation"><a href="{% url 'investigators_page' %}">Investigators</a>
+                                    <li role="presentation"><a href="{% url 'interviewers_page' %}">Interviewers</a>
                                     </li>
-                                    {%if perms.auth.can_view_investigators %}
+                                    {%if perms.auth.can_view_interviewers %}
                                     <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
                                     </li>
 				    {% endif %}
 
                                     {% if perms.auth.can_view_batches %}
-                                        <li role="presentation"><a href="{% url 'list_all_questions' %}">Question
+                                        <li role="presentation"><a href="{% url 'show_question_library' %}">Question
                                             Bank</a></li>
                                         <li role="presentation"><a href="{% url 'survey_list_page' %}">Surveys</a></li>
                                         <li role="presentation"><a href="{% url 'question_module_listing_page' %}">Modules</a>
@@ -74,7 +81,7 @@
                                 <ul aria-labelledby="drop-downloads-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'download_excel' %}">Download
                                         Spreadsheets</a></li>
-                                    <li role="presentation"><a href="{% url 'investigator_report_page' %}">Mobile Money
+                                    <li role="presentation"><a href="{% url 'interviewer_report_page' %}">Mobile Money
                                         Sheet</a></li>
                                 </ul>
                             </li>
@@ -91,7 +98,7 @@
                                     <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion
                                         Rates</a></li>
  {% if perms.survey.view_completed_survey %}
-                                    <li role="presentation"><a href="{% url 'show_investigator_completion_summary' %}">Investigator Completion
+                                    <li role="presentation"><a href="{% url 'show_interviewer_completion_summary' %}">Interviewer Completion
                                         Summary</a></li>
  {% endif %}
                                     <li role="presentation"><a href="{% url 'list_weights_page' %}">Location Weights</a>
@@ -120,8 +127,8 @@
                     {% if user.is_authenticated %}
                         <ul role="navigation" class="nav pull-right">
                             <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle" role="button"
-                                   href="#">Logged in as: {{ user.get_full_name }}<b class="caret"></b></a>
+                                <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle2" role="button"
+                                   href="#">{{ user.get_full_name }}<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'users_edit' user.id %}" id="edit_user"><i
                                             class="icon-pencil"></i> Edit Profile</a></li>
@@ -135,7 +142,7 @@
                     {% else %}
                         <ul role="navigation" class="nav pull-right">
                             <li>
-                                <a class="dropdown-toggle" role="button" href="{% url 'login_page' %}">Login</a>
+                                <a class="dropdown-toggle" role="button" href="{% url 'login_page' %}">LOGIN</a>
                             </li>
                         </ul>
                     {% endif %}
@@ -145,7 +152,7 @@
         </div>
     </div>
 </header>
-
+<br><br>
 <div id="content" class="container">
     <div class="container">
         {% if messages %}
@@ -164,9 +171,18 @@
 <div id="push"></div>
 </div>
 <footer>
-    <hr>
-     <div class="inner-footer">
-         <div class="text-center pull-right"><img src="{{STATIC_URL}}logo/unicef_logo.gif" alt="UNICEF LOGO" height="70" width="70" style="margin-right: 10px">&copy; UNICEF 2013</div>
+     <div>
+         <div class="footer">&copy; Unicef <script language="JavaScript" type="text/javascript"> 
+
+var now = new Date();
+
+var dayNames = new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
+
+var monNames = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
+
+document.write(" "+ now.getFullYear());
+
+      </script></div>
       </div>
 </footer>
 

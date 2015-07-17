@@ -16,14 +16,6 @@ class HouseholdMemberGroup(BaseModel):
     def get_all_conditions(self):
         return self.conditions.all()
 
-    def last_question(self, batch):
-        if not batch:
-            return None
-        all_questions = self.all_questions().exclude(order=None)
-        from survey.models import BatchQuestionOrder
-        last_order_in_batch = BatchQuestionOrder.objects.filter(question__in=all_questions, batch=batch).order_by('-order')
-        return last_order_in_batch[0].question if last_order_in_batch.exists() else None
-
     def maximum_question_order(self):
         all_questions = self.all_questions()
         return all_questions.order_by('order').reverse()[0].order if all_questions else 0
@@ -56,6 +48,10 @@ class HouseholdMemberGroup(BaseModel):
     class Meta:
         app_label = 'survey'
 
+
+def household_member_test(func):
+    func.is_reply_test = True
+    return func
 
 class GroupCondition(BaseModel):
     CONDITIONS = {

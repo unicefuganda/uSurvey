@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-  New Batch
+  {% if title %}{{title}} {% else %}New Batch{% endif %}
 {% endblock %}
 
 {% block content %}

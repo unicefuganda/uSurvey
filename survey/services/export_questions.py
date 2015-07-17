@@ -1,4 +1,4 @@
-from survey.models import Question
+from survey.models import Question, QuestionTemplate
 
 
 class ExportQuestionsService:
@@ -28,3 +28,15 @@ class ExportQuestionsService:
             formatted_response[-1] += '; %s' % options.pop(0).text
             for option in options:
                 formatted_response.append('; ; ; %s'%option.text)
+                
+
+def get_question_template_as_dump():
+    HEADERS = "Question Text; Group; Module; Answer Type"
+    questions = QuestionTemplate.objects.all()
+    _formatted_responses = [HEADERS, ]
+    map(lambda question:
+         _formatted_responses.append('%s; %s; %s; %s' % 
+        (question.text.replace('\r\n', ' '), question.group.name, question.module.name, question.answer_type.upper())
+        ),
+        questions)
+    return _formatted_responses

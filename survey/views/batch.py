@@ -2,16 +2,17 @@ import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 
-from survey.investigator_configs import *
-from survey.models import HouseholdMemberGroup, QuestionModule, BatchQuestionOrder
+from survey.interviewer_configs import *
+from survey.models import HouseholdMemberGroup, QuestionModule
 from survey.models.surveys import Survey
 from survey.models.batch import Batch
-from survey.forms.batch import BatchForm, TableBatchQuestionsForm
+from survey.forms.batch import BatchForm
 
 
 @login_required
@@ -77,32 +78,37 @@ def close(request, batch_id):
 @login_required
 @permission_required('auth.can_view_batches')
 def new(request, survey_id):
-    batch = Batch(survey=Survey.objects.get(id=survey_id))
-    response, batchform = _process_form(request=request, batchform=(BatchForm(instance=batch)), action_str='added')
+    survey=Survey.objects.get(id=survey_id)
+    batch_form = BatchForm(initial={'survey' : survey})
+    response, batchform = _process_form(request, survey_id, action_str='added')
 
     context = {'batchform': batchform, 'button_label': "Create", 'id': 'add-batch-form', 'title': 'New Batch',
                'action': '/surveys/%s/batches/new/' % survey_id, 'cancel_url': '/surveys/'}
     return response or render(request, 'batches/new.html', context)
 
 
-def _process_form(request, batchform, action_str='added'):
+def _process_form(request, survey_id, instance=None, action_str='edited'):
+    batch_form = BatchForm(instance=instance)
+    response = None
     if request.method == 'POST':
-        batchform = BatchForm(data=request.POST, instance=batchform.instance)
-        if batchform.is_valid():
-            batch = batchform.save()
-            _add_success_message(request, action_str)
-            batch_list_url = '/surveys/%s/batches/' % str(batch.survey.id)
-            return HttpResponseRedirect(batch_list_url), batchform
-    return None, batchform
+        batch_form = BatchForm(data=request.POST, instance=instance)
+        if batch_form.is_valid():
+            batch_form.save(**request.POST)
+            messages.success(request, 'Question successfully %sed.' % action_str)
+            response = HttpResponseRedirect(reverse('batch_index_page', args=(survey_id,)))
+        else:
+            messages.error(request, 'Question was not %sed.' % action_str)
+    return response, batch_form
+
 
 
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id, batch_id):
     batch = Batch.objects.get(id=batch_id, survey__id=survey_id)
-    response, batchform = _process_form(request=request, batchform=(BatchForm(instance=batch)), action_str='edited')
+    response, batchform = _process_form(request, survey_id, instance=batch, action_str='edited')
 
-    context = {'batchform': batchform, 'button_label': "Save", 'id': 'edit-batch-form', 'title': 'New Batch',
-               'action': '/surveys/%s/batches/%s/edit/' % (batch.survey.id, batch.id)}
+    context = {'batchform': batchform, 'button_label': "Save", 'id': 'edit-batch-form', 'title': 'Edit Batch',
+               'action': '/surveys/%s/batches/%s/edit/' % (survey_id, batch.id)}
     return response or render(request, 'batches/new.html', context)
 
 
@@ -119,7 +125,7 @@ def delete(request, survey_id, batch_id):
     else:
         batch.delete()
         _add_success_message(request, 'deleted')
-    return HttpResponseRedirect('/surveys/%s/batches/' % survey_id)
+    return HttpResponseRedirect(reverse('batch_index_page', args=(survey_id,)))
 
 
 @permission_required('auth.can_view_batches')

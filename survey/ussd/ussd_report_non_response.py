@@ -5,8 +5,8 @@ from survey.ussd.ussd import USSD
 class USSDReportNonResponse(USSD):
     ANSWER = {"IS_RETAKING":'1'}
 
-    def __init__(self, investigator, request):
-        super(USSDReportNonResponse, self).__init__(investigator, request)
+    def __init__(self, interviewer, request):
+        super(USSDReportNonResponse, self).__init__(interviewer, request)
         self.question = None
         self.household_member = None
         self.household = None
@@ -20,10 +20,10 @@ class USSDReportNonResponse(USSD):
         self.set_can_retake()
 
     def set_household_member(self):
-        self.set_from_investigator_cache('HOUSEHOLD_MEMBER', 'household_member')
+        self.set_from_interviewer_cache('HOUSEHOLD_MEMBER', 'household_member')
 
     def set_household(self):
-        self.set_from_investigator_cache('HOUSEHOLD', 'household')
+        self.set_from_interviewer_cache('HOUSEHOLD', 'household')
 
     def set_can_retake(self):
         self.set_attribute_from_session('CAN_RETAKE', 'can_retake')
@@ -53,7 +53,7 @@ class USSDReportNonResponse(USSD):
                 self.paginates_or_process_household_question(answer)
         else:
             self.select_household(answer, non_response_reporting=True)
-            self.set_investigator_cache('HOUSEHOLD', self.household)
+            self.set_interviewer_cache('HOUSEHOLD', self.household)
             self.reset_page()
             self.render_questions_or_select_member()
 
@@ -90,7 +90,7 @@ class USSDReportNonResponse(USSD):
             self.render_non_response_question(answer)
 
     def save_answer_and_clear_question(self, question_option, household=True):
-        answer_dict = {'investigator': self.investigator, 'answer': question_option, 'question': self.question,
+        answer_dict = {'interviewer': self.interviewer, 'answer': question_option, 'question': self.question,
                        'batch': self.currently_open_batch, 'household':self.household}
         self.save_answer(answer_dict, household)
         self.clear_cached_sessions(household)
@@ -102,12 +102,12 @@ class USSDReportNonResponse(USSD):
 
     def clear_cached_sessions(self, household):
         self.set_in_session("QUESTION", None)
-        self.set_investigator_cache("HOUSEHOLD_MEMBER", None)
+        self.set_interviewer_cache("HOUSEHOLD_MEMBER", None)
         if household:
-            self.set_investigator_cache("HOUSEHOLD", None)
+            self.set_interviewer_cache("HOUSEHOLD", None)
 
     def validate_question_option(self, answer):
-        question_option = self.question.get_option(answer, self.investigator)
+        question_option = self.question.get_option(answer, self.interviewer)
         if question_option:
             return question_option
         else:
@@ -117,7 +117,7 @@ class USSDReportNonResponse(USSD):
         try:
             answer = int(answer)
             self.household_member = self.household.get_non_complete_members()[answer - 1]
-            self.set_investigator_cache("HOUSEHOLD_MEMBER", self.household_member)
+            self.set_interviewer_cache("HOUSEHOLD_MEMBER", self.household_member)
 
             self.reset_page()
             return
@@ -126,7 +126,7 @@ class USSDReportNonResponse(USSD):
             self.render_household_members_list()
 
     def process_member_non_response_answer(self, answer):
-        question_option = self.question.get_option(answer, self.investigator)
+        question_option = self.question.get_option(answer, self.interviewer)
         if not question_option:
             self.responseString = "INVALID ANSWER: "
             self.render_member_non_response_question(answer)
@@ -168,7 +168,7 @@ class USSDReportNonResponse(USSD):
             self.render_non_response_question(answer)
 
     def render_household_list_or_completion_message(self):
-        if self.investigator.completed_non_response_reporting(open_survey=self.currently_open_batch.survey):
+        if self.interviewer.completed_non_response_reporting(open_survey=self.currently_open_batch.survey):
             self.responseString = self.MESSAGES['NON_RESPONSE_COMPLETION']
             self.set_in_session('CAN_RETAKE', True)
         else:
@@ -179,5 +179,5 @@ class USSDReportNonResponse(USSD):
 
     def clear_caches(self):
         super(USSDReportNonResponse, self).clear_caches()
-        self.set_investigator_cache('HOUSEHOLD', None)
-        self.set_investigator_cache('HOUSEHOLD_MEMBER', None)
+        self.set_interviewer_cache('HOUSEHOLD', None)
+        self.set_interviewer_cache('HOUSEHOLD_MEMBER', None)
