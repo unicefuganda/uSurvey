@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block title %}
+    {{ investigator.name }}'s details
+{% endblock %}
+{% block content %}
+{% load template_tags %}
+    <h3 class="offset3">
+        {{ investigator.name|capfirst }}'s Details
+    </h3>
+    <dl class="details offset1">
+        <dt>
+            Name
+        </dt>
+        <dd>
+            {{ investigator.name }}
+        </dd>
+        <dt>
+            Mobile Number
+        </dt>
+        <dd>
+            {{ investigator.mobile_number }}
+        </dd>
+        <dt>
+            ODK Token
+        </dt>
+        <dd>
+            {{ investigator.odk_token }}
+        </dd>
+        <dt>
+            Age
+        </dt>
+        <dd>
+            {{ investigator.age }}
+        </dd>
+        <dt>
+            Sex
+        </dt>
+        <dd>
+            {% if investigator.male %}
+                Male
+            {% else %}
+                Female
+            {% endif %}
+        </dd>
+        <dt>
+            Highest Level of Education
+        </dt>
+        <dd>
+            {{ investigator.level_of_education }}
+        </dd>
+        <dt>
+            Preferred Language of Communication
+        </dt>
+        <dd>
+            {{ investigator.language }}
+        </dd>
+        {% with investigator.location|ancestors_reversed as investigator_parents %}
+            {% for location in investigator_parents %}
+                <dt>
+                    {{ location.type }}
+                </dt>
+                <dd>
+                    {{ location.name }}
+                </dd>
+            {% endfor %}
+        {% endwith %}
+        <dt>
+            {{ investigator.location.type }}
+        </dt>
+        <dd>
+            {{ investigator.location.name }}
+        </dd>
+        <dt>
+            Total Households
+        </dt>
+        <dd>
+            {{ investigator.ea.total_households }}
+        </dd>
+    </dl>
+    <div class="offset3">
+        {% if cancel_url %}
+            <a href="{{ cancel_url }}" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
+        {% else %}
+            <a href="javascript:window.history.back()" class="btn btn-inverse"><i
+                    class="icon-chevron-left icon-white"></i> Back</a>
+        {% endif %}
+        {% include 'investigators/_action_button.html' with button_size="" investigator=investigator %}
+    </div>
+{% endblock %}

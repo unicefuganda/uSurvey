@@ -1,0 +1,691 @@
+body 
+{
+ 
+width: 100%; 
+height: 100%; 
+margin: 0; 
+padding: 0;
+background-color:#E6E6E6;
+
+background-repeat:repeat-y;
+}
+.usocilbg
+{
+background-color:#1B1B1B;
+}
+.whitebg
+{
+background-color:#FFFFFF;
+}
+
+.upad
+{
+text-decoration:none;
+padding-left: 10px;
+}
+.ufeedtxttittle
+{
+
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 20px;
+font-weight:bold;
+color:#373737;
+text-decoration:none;
+}
+
+
+.udiscover
+{
+
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 40px;
+font-weight:bold;
+color:#373737;
+text-decoration:none;
+padding-right: 20px;
+}
+
+.umedia
+{
+
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 40px;
+font-weight:bold;
+color:#E6E6E6;
+text-decoration:none;
+padding-right: 20px;
+}
+.twitterred
+{
+
+FONT-FAMILY: Verdana;
+font-size: 13px;
+color:#FF0000;
+text-decoration:none;
+padding-top:2px;
+
+}
+.uhtxt
+{
+
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 13px;
+color:#2C2C2C;
+text-decoration:none;
+padding-top:5px;
+
+}
+.uhimgs
+{
+
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 16px;
+font-weight:bold;
+color:#373737;
+text-decoration:none;
+
+}
+.utopnav
+{
+
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 17px;
+font-weight:bold;
+color:#8F8F8F;
+text-decoration:none;
+padding-right: 20px;
+}
+.ulogin
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 17px;
+font-weight:bold;
+color:#D65106;
+text-decoration:none;
+    
+}
+.ulogin a:link
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 17px;
+font-weight:bold;
+color:#D65106;
+text-decoration:none;
+    
+}
+
+ulogin a:hover
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 17px;
+font-weight:bold;
+color:#FF0000;
+text-decoration:none;
+    
+}
+
+.ulogin a:visited
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 17px;
+font-weight:bold;
+color:#D65106;
+text-decoration:none;
+    
+}
+
+.tbanner
+{
+background-color:#FFFFFF; opacity: 0.9; filter: alpha(opacity=90); top: 0; position: fixed;  width: 100%; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666; box-shadow: 1px 1px 1px 1px; height: 72px;
+}
+.dashcount
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size:25px;
+color:#FFFFFF;
+text-decoration:none;
+}
+
+.navigation {
+  list-style: none;
+  padding: 0;
+  width: 150px; 
+  height: 20px; 
+  background: #ED302A;
+  position: relative; 
+  z-index: 100;
+}
+.navigation, .navigation a.main {
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+}
+
+.navigation:hover, .navigation:hover a.main {
+  border-radius: 4px 4px 0 0;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  
+}
+
+.navigation a.main {
+  display: block; 
+  height: 40px;
+  font: bold 15px/40px arial, sans-serif; 
+  text-align: center; 
+  text-decoration: none; 
+  color: #FFF;  
+  -webkit-transition: 0.2s ease-in-out;
+  -o-transition: 0.2s ease-in-out;
+  transition: 0.2s ease-in-out;
+  position: relative;
+  z-index: 100;
+}
+
+.navigation:hover a.main {
+  color: rgba(255,255,255,0.6);
+  background: rgba(0,0,0,0.04);
+}
+
+.navigation li { 
+  width: 150px; 
+  height: 40px;
+  background: #F7F7F7;
+  font: normal 12px/40px arial, sans-serif !important; 
+  color: #999;
+  text-align: center;
+  margin: 0;
+  -webkit-transform-origin: 50% 0%;
+  -o-transform-origin: 50% 0%;
+  transform-origin: 50% 0%;
+  -webkit-transform: perspective(350px) rotateX(-90deg);
+  -o-transform: perspective(350px) rotateX(-90deg);
+  transform: perspective(350px) rotateX(-90deg);
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+  -webkit-box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+}
+
+.navigation li:nth-child(even) { background: #F5F5F5; }
+.navigation li:nth-child(odd) { background: #EFEFEF; }
+
+.navigation li.n1 { 
+  -webkit-transition: 0.2s linear 0.8s;
+  -o-transition: 0.2s linear 0.8s;
+  transition: 0.2s linear 0.8s;
+}
+.navigation li.n2 {
+  -webkit-transition: 0.2s linear 0.6s;
+  -o-transition: 0.2s linear 0.6s;
+  transition: 0.2s linear 0.6s;
+}
+.navigation li.n3 {
+  -webkit-transition: 0.2s linear 0.4s;
+  -o-transition: 0.2s linear 0.4s;
+  transition: 0.2s linear 0.4s;
+}
+.navigation li.n4 { 
+  -webkit-transition:0.2s linear 0.2s;
+  -o-transition:0.2s linear 0.2s;
+  transition:0.2s linear 0.2s;
+}
+.navigation li.n5 {
+  border-radius: 0px 0px 4px 4px;
+  -webkit-transition: 0.2s linear 0s;
+  -o-transition: 0.2s linear 0s;
+  transition: 0.2s linear 0s;
+}
+
+.navigation:hover li {
+  -webkit-transform: perspective(350px) rotateX(0deg);
+  -o-transform: perspective(350px) rotateX(0deg);
+  transform: perspective(350px) rotateX(0deg);
+  -webkit-transition:0.2s linear 0s;
+  -o-transition:0.2s linear 0s;
+  transition:0.2s linear 0s;
+}
+.navigation:hover .n2 {
+  -webkit-transition-delay: 0.2s;
+  -o-transition-delay: 0.2s;
+  transition-delay: 0.2s;
+}
+.navigation:hover .n3 {
+  -webkit-transition-delay: 0.4s;
+  -o-transition-delay: 0.4s;
+  transition-delay: 0.4s;
+}
+.navigation:hover .n4 {
+  transition-delay: 0.6s;
+  -o-transition-delay: 0.6s;
+  transition-delay: 0.6s;
+}
+.navigation:hover .n5 {
+  -webkit-transition-delay: 0.8s;
+  -o-transition-delay: 0.8s;
+  transition-delay: 0.8s;
+}
+
+.4homebg
+{
+bottom: 0; position: fixed;
+background-image:url(../images/bodybg.png);
+background-position:right;
+background-repeat:no-repeat;
+}
+
+.tbg {
+background-color:#FFFFFF;
+opacity: 0.9;
+ box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+  -webkit-box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+  -moz-box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+}
+
+.confirmpg3
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size:12px;
+color:#666666;
+text-decoration:none;
+}
+
+.tabstit
+{
+FONT-FAMILY: Candara;
+font-size:20px;
+color:#828282;
+text-decoration:none;
+}
+
+.goodmorning
+{
+    FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 12px;
+font-weight:bold;
+color:#FFFFFF;
+text-decoration:none;
+    
+}
+.confirmpg
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 15px;
+font-weight:bold;
+color:#666666;
+text-decoration:none;
+}
+
+.fordiv
+{
+
+  height:200px; width:71%; 
+  color:white;
+  border-color:maroon; 
+  border-style:solid; 
+  border-width:1px; 
+  border-color:#D0D7D7;
+  float:left; 
+  background-color:#EFF1F1;
+
+}
+
+.loginhome
+{	
+	width:400px; 
+	height:20px;
+	font-family:Verdana; 
+	font-size:10px; 
+	border:1px solid #BFBFBF; 
+}
+
+.loginhome2
+{	
+	width:400px; 
+	height:30px;
+	font-family:Verdana; 
+	font-size:10px; 
+	border:1px solid #BFBFBF; 
+    background-color:#CCCCCC;
+}
+
+.redactived
+{
+FONT-FAMILY: Candara;
+font-size: 44px;
+color:#FF0000;
+text-decoration:none;
+}
+
+.lanbg
+{
+background-image: 
+url('../images/landingbg.jpg');
+background-repeat:repeat-x;
+}
+
+.rfmglogin
+{
+background-image: 
+url('../images/loginform.png');
+background-repeat:repeat-x;
+}
+
+.accountfield
+{
+height:17px; font-family:verdana; font-size:11px; border: solid 1px #666666;width:140px;	background-color:#cccccc; 
+
+}
+.pass
+	{
+	padding-left:10px;
+	padding-right:10px;
+	}
+.aborders
+{
+border:solid 1px; color:#003B59;
+}
+.navx
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 12px;
+font-weight:bold;
+color:#666666;
+padding-left:10px;
+}
+
+.navx a:link
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 12px;
+font-weight:bold;
+color:#666666;
+text-decoration:none;
+}
+
+.navx a:hover
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 12px;
+font-weight:bold;
+color:#666666;
+text-decoration:underline;
+}
+
+
+
+.navx a:visited
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 12px;
+font-weight:bold;
+color:#666666;
+text-decoration:none;
+}
+.footer
+{
+background-color:#CCCCCC; opacity: 0.6; filter: alpha(opacity=40); bottom: 0; position: fixed;  width: 100%; border-bottom:solid 1px #ffffff; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666;
+}
+	.sidelines
+	{
+	border:solid 1px #f4f9fb;
+	
+	}
+.hiddenfield
+{
+height:15px; font-family:verdana;  color:#FFFFFF; font-size:11px; border: solid 1px #666666;width:140px;	background-color:#666666; 
+
+}
+.pp
+{
+padding-left:5px;
+}
+dd
+{
+border-bottom:solid 1px; color:#003B59;
+padding-bottom:3px;
+}
+.heagbg
+{
+background-image: 
+url('../images/topheader.jpg');
+background-attachment: 
+fixed;
+}
+.Dashbg
+{
+background-image: 
+url('../images/dashboardbg.jpg');
+background-attachment: 
+fixed;
+}
+.dashlinks
+{
+ font-family:Arial, Helvetica, verdana; font-size:11px; color: #ffffff; 
+
+}
+.DBreadz
+{
+background-image: 
+url('../images/dbread.jpg');
+background-attachment: 
+fixed;
+font-family:Arial,  Helvetica, sans-serif; font-size:18px; color:#666666;
+padding-left:10px;
+}
+.Dsidenav
+{
+background-image: 
+url('../images/dside.jpg');
+background-attachment: 
+fixed;
+font-family:Arial,  Helvetica, sans-serif; font-size:18px; color:#666666;
+}
+.accesbutton {
+	width:60px; 
+	font-family:Verdana; 
+	font-size:9px; 
+	font-weight:bold;
+    height:30px;
+}
+
+.accesbutton2 {
+	width:150px; 
+	font-family:Verdana; 
+	font-size:9px; 
+	font-weight:bold;
+    height:30px;
+}
+.BrokerContent
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 13px;
+font-weight:bold;
+color:#666666;
+text-decoration:none;
+}
+
+.BrokerContentRed
+{
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 13px;
+font-weight:bold;
+color:#FF0000;
+text-decoration:none;
+}
+
+.line2
+{
+border-top:solid 1px; color:#8B8B8B;
+
+padding-left:10px;
+padding-bottom:10px;
+padding-top:10px;
+height:80px;
+}
+.line
+{
+border-top:solid 1px; color:#8B8B8B;
+border-bottom:solid 1px; color:#8B8B8B;
+padding-left:10px;
+padding-bottom:10px;
+padding-top:10px;
+height:80px;
+}
+.state
+{
+font-family:"arial"; font-size:12px;color:#6A6969/*line-height:18px; 7EA1B7*/;
+background-color:#cccccc;
+}
+.bh
+{
+background-color:#FFFFFF;
+}
+.navdotw{font-family:"arial"; font-size:10px; color:#ffffff; font-weight:bold; border-top:1px #999999 dotted; background-color:#FF9115;}
+.navdotw a:link{ text-decoration:none; font-family:"arial"; font-size:10px; color:#ffffff; font-weight:bold;padding-bottom:8px; padding-top:8px; background-color:#FF9115;}
+.navdotw a:visited{ text-decoration:none; font-family:"arial"; font-size:10px; color:#ffffff; font-weight:bold; padding-bottom:8px; padding-top:8px; background-color:#FF9115;}
+.navdotw a:hover{ text-decoration:none; font-family:"arial"; font-size:10px; color:#ffffff; font-weight:bold; padding-bottom:8px; padding-top:8px; background-color:#FF9115;}
+.tbl2
+{
+background-image: 
+url('../images/fade2.gif');
+background-repeat: 
+repeat;
+}
+.accountfieldadd
+{
+height:80px; font-family:verdana; font-size:11px; border: solid 1px #666666;width:140px;	background-color:#cccccc; 
+
+}
+.PageContent {font-family:"arial"; font-size:11px;color:#6A6969/*line-height:18px; 7EA1B7*/; text-align:justify;}
+.PageContent a:link { text-decoration:none;font-family:"arial"; font-size:11px;color:#6A6969/*line-height:18px; 7EA1B7*/; text-align:justify;}
+.PageContent a:visited { text-decoration:none;font-family:"arial"; font-size:11px;color:#6A6969/*line-height:18px; 7EA1B7*/; text-align:justify;}
+.PageContent a:hover { text-decoration:underline;font-family:"arial"; font-size:11px;color:#6A6969/*line-height:18px; 7EA1B7*/; text-align:justify;}
+.FooterContent {font-family: Verdana; font-size: 11px; color: #092851;padding-right: 9px;	}
+.binfo {
+
+
+	font-family: "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #333333;
+	background-color: #FDE0DF;
+	border: thin solid #7D100B;
+}
+.navdot{font-family:"arial"; font-size:10px; color:#A5A4A4; font-weight:bold; border-top:1px #999999 dotted;}
+.navdot a:link{ text-decoration:none; font-family:"arial"; font-size:10px; color:#A5A4A4; font-weight:bold;padding-bottom:8px; padding-top:8px;}
+.navdot a:visited{ text-decoration:none; font-family:"arial"; font-size:10px; color:#A5A4A4; font-weight:bold; padding-bottom:8px; padding-top:8px;}
+.navdot a:hover{ text-decoration:none; font-family:"arial"; font-size:10px; color:#A5A4A4; font-weight:bold; padding-bottom:8px; padding-top:8px;}
+.divc{padding-bottom:8px; padding-top:8px;}
+.buttompadd1{ padding-right:5px; padding-left:5px;}
+
+.celldot{
+	border-top:1px #999999 dotted; padding-bottom:10px; padding-top:10px;
+	}
+.tbl
+{
+background-color:#ffffff;
+}
+.rround{ border-bottom: outset #003B59; border-left: outset #003B59; border-right: outset #003B59; border-top: outset #003B59;}
+.roundeddiv
+{
+border: 1px solid;
+    padding: 10px;
+    background: #dddddd;
+    border-bottom-left-radius: 2em;
+	}
+	
+.provisioning
+{
+    background-color:#FF0000;
+    font-family:Candara;
+	text-align:center;
+	width:120px; 
+	height:30px;
+	color:#FFFFFF;
+}
+.searchbox1
+{
+	width:600px; 
+	height:40px;
+	font-family:Candara; 
+	font-size:35px; 
+	background-color:#F7F7F7; 
+	border:1px solid #F7F7F7;
+}
+.searchbox2
+{	
+	width:400px; 
+	height:30px;
+	font-family:Candara; 
+	font-size:20px; 
+	background-color:#F7F7F7; 
+	border:1px solid #E8E8E8;
+	text-align:center;
+
+}
+.searchbgz
+{
+background-color:#F7F7F7;
+}
+.ss
+{
+padding-left:10px;
+padding-top:10px;
+}
+td.textcell {  
+	font-family: Verdana, Helvetica, Arial, sans-serif; 
+	font-size: 10px;
+	padding: 10px 15px 20px 15px;
+	vertical-align: top;
+}
+
+h2 {
+	margin: 20px 0px 15px 0px;
+}
+
+h3 {
+	font-family: Verdana, Helvetica, Arial, sans-serif; 
+	font-size: 12px;
+	color: #369;
+	margin-top: 1em;
+}
+
+p {
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+a {
+	font-style: normal;
+	text-decoration: none;
+	color: #369;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+ul {
+	margin: 7px;
+	padding: 7px;
+}
+
+.poster {
+	align: center;
+	padding: 15px 0px;
+}
+
+.bankingtext {
+	color: #6EA47C;
+}
+
+.investmentstext {
+	color: #B19D51;
+}
+
+.wealthmgmttext {
+	color: #AF6F63;
+}
+
+.fineprint {
+	font-size: 85%;
+}

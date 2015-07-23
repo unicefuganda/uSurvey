@@ -1,0 +1,18 @@
+{% extends "form.html" %}
+
+{% block title %}
+  New Question Template
+{% endblock %}
+{% block pre_form_content %}
+    <div class="control-group" style="width: 40%">
+        <label class="control-label"><span id="text-counter" style="float: right;"></span></label>
+    </div>
+{% endblock%}
+{% block display_form_fields %}
+{% include "naked_form.html" with a_form=questionform %}
+{% include "_multiple_options.html" with option_label='Channels' id="question-option-template" name='options'%}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

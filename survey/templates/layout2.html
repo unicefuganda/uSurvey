@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>
+        {% block title %}{% endblock %} | {{ PROJECT_TITLE }}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
+          charset="utf-8">
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
+          charset="utf-8">
+    <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
+    <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
+
+    {% block extra_css %}{% endblock %}
+
+    <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/smoothness/jquery-ui.css"/>
+    <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
+
+</head>
+<body>
+<header class="container">
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse" id="fold-menu">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="brand" href="{% url 'home_page' %}">{{ PROJECT_TITLE }}</a>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li>
+                            <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
+                        </li>
+
+                        {% if perms.auth.can_view_interviewers %}
+                            <li class="dropdown">
+                                <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
+                                   role="button" href="#">Survey Administration<b class="caret"></b></a>
+                                <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
+                                    <li role="presentation"><a href="{% url 'interviewers_page' %}">Interviewers</a>
+                                    </li>
+                                    {%if perms.auth.can_view_interviewers %}
+                                    <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
+                                    </li>
+				    {% endif %}
+
+                                    {% if perms.auth.can_view_batches %}
+                                        <li role="presentation"><a href="{% url 'show_question_library' %}">Question
+                                            Bank</a></li>
+                                        <li role="presentation"><a href="{% url 'survey_list_page' %}">Surveys</a></li>
+                                        <li role="presentation"><a href="{% url 'question_module_listing_page' %}">Modules</a>
+                                        </li>
+                                        <li role="presentation"><a href="{% url 'household_member_groups_page' %}">Groups</a>
+                                        </li>
+                                        <li role="presentation"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
+                                        <li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li>
+                                    {% endif %}
+                                    <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {% if perms.auth.can_view_aggregates %}
+                            <li class="dropdown">
+                                <a data-toggle="dropdown" id="drop-downloads-tab" class="dropdown-toggle" role="button"
+                                   href="#">Downloads<b class="caret"></b></a>
+                                <ul aria-labelledby="drop-downloads-tab" role="menu" class="dropdown-menu">
+                                    <li role="presentation"><a href="{% url 'download_excel' %}">Download
+                                        Spreadsheets</a></li>
+                                    <li role="presentation"><a href="{% url 'interviewer_report_page' %}">Mobile Money
+                                        Sheet</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {% if perms.auth.can_view_batches or perms.survey.view_completed_survey %}
+                            <li class="dropdown">
+                                <a data-toggle="dropdown" id="drop-analysis-tab" class="dropdown-toggle" role="button"
+                                   href="#">Analysis<b class="caret"></b></a>
+                                <ul aria-labelledby="drop-analysis-tab" role="menu" class="dropdown-menu">
+                                   <li role="presentation"><a href="{% url 'odk_submission_list' %}">View ODK submissions</a></li>
+                                    <li role="presentation"><a href="{% url 'list_indicator_page' %}">Indicators</a>
+                                    </li>
+                                    <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion
+                                        Rates</a></li>
+ {% if perms.survey.view_completed_survey %}
+                                    <li role="presentation"><a href="{% url 'show_interviewer_completion_summary' %}">Interviewer Completion
+                                        Summary</a></li>
+ {% endif %}
+                                    <li role="presentation"><a href="{% url 'list_weights_page' %}">Location Weights</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {% if perms.auth.can_view_users %}
+                            <li class="dropdown">
+                                <a data-toggle="dropdown" id="drop-settings-tab" class="dropdown-toggle" role="button"
+                                   href="#">Settings<b class="caret"></b></a>
+                                <ul aria-labelledby="drop-settings-tab" role="menu" class="dropdown-menu">
+                                    <li role="presentation"><a href="{% url 'users_index' %}">Users</a></li>
+                                    <li role="presentation"><a href="{% url 'add_location_hierarchy' %}">Add Location
+                                        Hierarchy</a></li>
+                                    <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations
+                                        CSV</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+                    <!-- login/profile link on the right side -->
+
+                    {% if user.is_authenticated %}
+                        <ul role="navigation" class="nav pull-right">
+                            <li class="dropdown">
+                                <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle" role="button"
+                                   href="#">Logged in as: {{ user.get_full_name }}<b class="caret"></b></a>
+                                <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
+                                    <li role="presentation"><a href="{% url 'users_edit' user.id %}" id="edit_user"><i
+                                            class="icon-pencil"></i> Edit Profile</a></li>
+                                    <li role="presentation"><a href="{% url 'password_change' %}"><i
+                                            class="icon-pencil"></i> Change Password</a></li>
+                                    <li role="presentation"><a href="{% url 'logout_page' %}"><i class="icon-off"></i>
+                                        Logout</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    {% else %}
+                        <ul role="navigation" class="nav pull-right">
+                            <li>
+                                <a class="dropdown-toggle" role="button" href="{% url 'login_page' %}">Login</a>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+                <!--/.nav-collapse -->
+            </div>
+        </div>
+    </div>
+</header>
+
+<div id="content" class="container">
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <ul>
+                        {{ message }}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+<div id="push"></div>
+</div>
+<footer>
+    <hr>
+     <div class="inner-footer">
+         <div class="text-center pull-right"><img src="{{STATIC_URL}}logo/unicef_logo.gif" alt="UNICEF LOGO" height="70" width="70" style="margin-right: 10px">&copy; UNICEF 2013</div>
+      </div>
+</footer>
+
+<script src="{{ STATIC_URL }}js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/highcharts.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/exporting.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+<script src="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/underscore.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/question_options.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/chosen/chosen.jquery.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/application.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/numerical-bar-chart.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/multichoice-bar-chart.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/multichoice-stacked-bar-chart.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/simple_indicator_bar_chart.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/batch.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
+
+
+{% block javascripts %}
+{% endblock %}
+</body>
+</html>

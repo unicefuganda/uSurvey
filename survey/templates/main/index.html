@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>uServey :: Home</title>
+<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script>
+$(function () {
+
+    var counter = 0,
+        divs = $('#div1, #div2, #div3, #div4, #div5, #div6, #div7');
+
+    function showDiv () {
+        divs.hide() // hide all divs
+            .filter(function (index) { return index == counter % 7; }) // figure out correct div to show
+            .show(); // and show it
+
+        counter++;
+    }; // function to loop through divs and show correct div
+
+    showDiv(); // show first div    
+
+    setInterval(function () {
+        showDiv(); // show next div
+    }, 3 * 1000); // do this every 10 seconds    
+
+});
+</script>
+
+<script>
+$(document).ready( function(){	
+	// Click snowman to expand
+	$('.snowman').click(function() {
+		$(this).toggleClass('expanded');
+	});
+});
+</script>
+<script>$( document ).ready( function() {
+      var now = new Date();
+      var currentMonth = now.getMonth();//returns 0-11
+      //based on month hide or show your div
+      if( currentMonth > 0 && currentMonth < 10 ) {
+      $( "#winter-panel").show();
+	  $( "#winter-panel-xmas" ).hide();
+      } 
+      else {
+      $( "#winter-panel-xmas" ).show();
+	   $( "#winter-panel").hide();
+      }
+    });</script>
+<body>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="tbanner">
+      <tr>
+        <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td height="2" align="left" valign="top"></td>
+          </tr>
+          <tr>
+            <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="34%" align="left" valign="top"><img src="{{ STATIC_URL }}img/uSurvey.png" /></td>
+                <td width="66%" align="left" valign="middle"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td width="83%" align="left" valign="top"><table width="100%" border="0" cellspacing="2" cellpadding="0">
+                      <tr>
+                        <td width="4%"><img src="{{ STATIC_URL }}img/home.png" width="19" height="18" /></td>
+                        <td width="96%" align="left" valign="top"> <span class="utopnav"><a href="{% url 'main_page' %}">HOME</a></span> <span class="utopnav">DISCOVER</span> <span class="utopnav"><a href="{% url 'about_page' %}">ABOUT</a></span> <span class="utopnav">CONTACT</span> </td>
+                      </tr>
+                    </table></td>
+
+{% if user.is_authenticated %}
+<td width="17%" align="center" valign="top" class="ulogin"><a href="{% url 'home_page' %}">SURVEY</a></td>
+{% else %}
+<td width="17%" align="center" valign="top" class="ulogin"><a href="{% url 'login_page' %}" class="ulogin">LOGIN</a></td>
+{% endif%}
+                  </tr>
+                </table></td>
+              </tr>
+            </table></td>
+          </tr>
+        </table></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+<!-- Go to www.addthis.com/dashboard to customize your tools -->
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-559606700145ffd2" async="async"></script>
+    <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="left" valign="top"><div id='container'>
+      <div id='div1' class='display' style="background-color: red;"><img src="{{ STATIC_URL }}img/1.jpg" /></div>
+      <div id='div2' class='display' style="background-color: green;"> <img src="{{ STATIC_URL }}img/2.jpg" /></span></div>
+      <div id='div3' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/3.jpg"/></span></div>
+	  <div id='div4' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/4.jpg"/></span></div>
+	  <div id='div5' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/5.jpg"/></span></div>
+	  <div id='div6' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/6.jpg"/></span></div>
+	  <div id='div7' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/7.jpg"/></span></div>
+	  <div></td>
+          </tr>
+          
+        </table></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="left" valign="top">&nbsp;</td>
+          </tr>
+          <tr>
+            <td align="center" valign="top" class="udiscover">DISCOVER</td>
+          </tr>
+          <tr>
+            <td align="left" valign="top">&nbsp;</td>
+          </tr>
+          <tr>
+            <td align="left" valign="top">&nbsp;</td>
+          </tr>
+          <tr>
+            <td align="center" valign="top"><table width="90%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td align="center" valign="middle"><img src="{{ STATIC_URL }}img/imgussd.png" width="203" height="203" /></td>
+                    <td align="center" valign="middle"><img src="{{ STATIC_URL }}img/imgmor.png" width="203" height="203" /></td>
+                    <td align="center" valign="middle"><img src="{{ STATIC_URL }}img/imgsam.png" width="203" height="203" /></td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="middle" class="uhimgs">&nbsp;</td>
+                    <td align="center" valign="middle" class="uhimgs">&nbsp;</td>
+                    <td align="center" valign="middle" class="uhimgs">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="middle" class="uhimgs">USSD AND ODK CHANNELS</td>
+                    <td align="center" valign="middle" class="uhimgs">REAL TIME MONITORING</td>
+                    <td align="center" valign="middle" class="uhimgs">SAMPLE AND NON SAMPLE SURVEY</td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="middle" class="uhtxt">UNICEF Uganda has developed <br />
+                      a mobile-based tool to work <br />
+                      over the USSD technology to <br />
+                      collect household-level.</td>
+                    <td align="center" valign="middle" class="uhtxt">Real time reports are being<br />
+                      generated on the go keeping<br />
+                      previlaged users updated.</td>
+                    <td align="center" valign="middle" class="uhtxt">Data collected from conducted <br />
+                      surveys can be exported into <br />
+                      external systems (eg. Google <br />
+                      Maps, etc) for statistical <br />
+                      analysis.</td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="middle">&nbsp;</td>
+                    <td align="center" valign="middle">&nbsp;</td>
+                    <td align="center" valign="middle">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td align="center" valign="middle"><a href="#"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
+                    <td align="center" valign="middle"><a href="#"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
+                    <td align="center" valign="middle"><a href="#"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
+                  </tr>
+                  
+                </table></td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+              
+            </table></td>
+          </tr>
+          <tr>
+            <td align="left" valign="top">&nbsp;</td>
+          </tr>
+          <tr>
+            <td align="left" valign="top">&nbsp;</td>
+          </tr>
+        </table></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="whitebg">
+      <tr>
+        <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="left" valign="top">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="center" valign="top" class="udiscover">uSurvey Tools </td>
+              </tr>
+              <tr>
+                <td align="left" valign="top">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="center" valign="top"><table width="90%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td align="left" valign="top" class="uhtxt">The  uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups. UNICEF works closely with other household survey programmes, in particular the Demographic and Health Surveys (DHS) programme, to harmonize survey questions and modules and to ensure a coordinated approach to survey implementation, with the objective to provide comparability across surveys and to avoid duplication of efforts. The survey questionnaires are modular tools that can be adapted to the needs of the country.</td>
+                  </tr>
+                </table></td>
+              </tr>
+              <tr>
+                <td align="left" valign="top">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="left" valign="top">&nbsp;</td>
+              </tr>
+            </table></td>
+          </tr>
+        </table></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td align="left" valign="top" class="usocilbg">&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="left" valign="top" class="usocilbg">&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" class="usocilbg"><table width="1000" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="left" valign="top" class="umedia">Media &amp; Social</td>
+      </tr>
+      <tr>
+        <td align="left" valign="top">&nbsp;</td>
+      </tr>
+      <tr>
+        <td align="left" valign="top">&nbsp;</td>
+      </tr>
+      <tr>
+        <td align="center" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="left" valign="top"><table width="450" border="0" cellpadding="0" cellspacing="0">
+              <tr>
+                <td align="left" valign="middle"><table width="90%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="10%" align="left" valign="top">&nbsp;</td>
+                      <td width="90%" align="left" valign="middle" class="upad"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                             <td align="left" valign="top">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td align="left" valign="top" class="uhtxt">
+<a class="twitter-timeline" data-border-color="#E6E6E6" data-tweet-limit="3" width="450px" height="430px" data-theme="dark" data-chrome="noheader nofooter noscrollbar transparent"
+			href="https://twitter.com/unicefuganda" data-widget-id="617036281340657664">Load...</a></span>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                             </td>
+                          </tr>
+                      </table></td>
+                    </tr>
+                </table></td>
+              </tr>
+            </table></td>
+            <td align="right" valign="top"><table width="450" border="0" cellpadding="0" cellspacing="0">
+              <tr>
+                <td align="left" valign="middle"><table width="95%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="10%" align="left" valign="top">&nbsp;</td>
+                      <td width="90%" align="left" valign="middle" class="upad"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td align="left" valign="top">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td align="left" valign="top" class="uhtxt">
+
+<a class="twitter-timeline" data-border-color="#E6E6E6" data-tweet-limit="3" width="450px" height="430px" data-theme="dark" data-chrome="noheader nofooter noscrollbar transparent"
+			href="https://twitter.com/unicefuganda" data-widget-id="617036281340657664">Load...</a></span>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+</td>
+                          </tr>
+                      </table></td>
+                    </tr>
+                </table></td>
+              </tr>
+            </table></td>
+          </tr>         
+                </table></td>
+              </tr>
+            </table></td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" class="usocilbg">&nbsp;</td>
+            <td align="right" valign="top" class="usocilbg">&nbsp;</td>
+          </tr>
+          <tr>
+                    </tr>
+                    </table></td>
+                  </tr>
+                </table></td>
+              </tr>
+            </table></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td align="left" valign="top" class="usocilbg">&nbsp;</td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td align="left" valign="top" class="usocilbg">&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="left" valign="top" class="usocilbg">&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="left" valign="top"><table width="100%" height="40" border="0" cellpadding="0" cellspacing="0" class="footer">
+      <tr>
+        <td align="center" valign="middle"><table width="90%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td width="54%" align="left" valign="bottom">About | Support | Terms  Privacy </td>
+              <td width="46%" align="right" valign="bottom">&copy; Unicef <script language="JavaScript" type="text/javascript"> 
+
+var now = new Date();
+
+var dayNames = new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
+
+var monNames = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
+
+document.write(" "+ now.getFullYear());
+
+      </script> </td>
+            </tr>
+        </table></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

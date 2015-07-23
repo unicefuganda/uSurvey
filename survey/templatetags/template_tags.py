@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
-from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, GroupCondition, Answer
+from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, GroupCondition, Answer, AnswerAccessDefinition
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
@@ -115,6 +115,11 @@ def show_condition(flow):
     if flow.validation_test:
         return '%s ( %s )' % (flow.validation_test, ' and '.join(flow.test_arguments))  
     return ""
+
+@register.filter
+def access_channels(answer_type):
+    channels = AnswerAccessDefinition.objects.filter(answer_type=answer_type).values_list('channel', flat=True).order_by('channel')
+    return ",".join(channels)
 
 @register.filter
 def quest_validation_opts(batch):

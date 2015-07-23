@@ -4,7 +4,8 @@ $(function(){
     $('#id_groups').on('change', function () {
     	reload_questions_lib();
     });
-    $('#test').on('change', function () {
+    $('#library_search_form_button').hide();
+    $('#library_search_form_val').bind("change paste keyup", function () {
     	keyword_reload_questions_lib();
     });
     $('#id_modules').on('change', function () {
@@ -70,7 +71,14 @@ function reload_questions_lib()
 
 function keyword_reload_questions_lib()
 {
-	alert($('#library_search_form input[text]').val());
+	url = '/question_library/json_filter/';
+    params = { q:  $('#library_search_form_val').val()}
+    $.getJSON(url, params, function (data) {
+        $('.ms-selectable').hide()
+        $.each(data, function () {
+            $('#' + this.id + '-selectable').show();
+        });
+    });
 	
 }
 function toggleStatus(element, forms_ids, data) {
