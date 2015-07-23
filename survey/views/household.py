@@ -7,10 +7,9 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required, permission_required
 from rapidsms.contrib.locations.models import *
-
 from survey.forms.householdHead import *
 from survey.forms.household import *
-from survey.models import Survey, LocationCode, EnumerationArea
+from survey.models import Survey, EnumerationArea
 from survey.models.households import Household
 from survey.models.interviewer import Interviewer
 from survey.views.location_widget import LocationWidget
@@ -53,23 +52,23 @@ def validate_interviewer(request, householdform, selected_ea):
     return interviewer, interviewer_form
 
 
-def create_household(householdform, interviewer, valid, uid):
-    is_valid_household = householdform['household'].is_valid()
-
-    if interviewer and is_valid_household:
-        household = householdform['household'].save(commit=False)
-        household.interviewer = interviewer
-        household.ea = interviewer.ea
-        open_survey = Survey.currently_open_survey(interviewer.location)
-        household.household_code = LocationCode.get_household_code(interviewer) + str(Household.next_uid(open_survey))
-        if uid:
-            household.uid = uid
-            household.household_code = LocationCode.get_household_code(interviewer) + str(uid)
-
-        household.survey = open_survey
-        household.save()
-        valid['household'] = True
-    return valid
+# def create_household(householdform, interviewer, valid, uid):
+#     is_valid_household = householdform['household'].is_valid()
+# 
+#     if interviewer and is_valid_household:
+#         household = householdform['household'].save(commit=False)
+#         household.interviewer = interviewer
+#         household.ea = interviewer.ea
+#         open_survey = Survey.currently_open_survey(interviewer.location)
+#         household.household_code = LocationCode.get_household_code(interviewer) + str(Household.next_uid(open_survey))
+#         if uid:
+#             household.uid = uid
+#             household.household_code = LocationCode.get_household_code(interviewer) + str(uid)
+# 
+#         household.survey = open_survey
+#         household.save()
+#         valid['household'] = True
+#     return valid
 
 
 def create_remaining_modelforms(householdform, valid):

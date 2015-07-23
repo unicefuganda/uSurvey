@@ -3,7 +3,7 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
-from rapidsms.contrib.locations.models import Location
+from survey.models import Location
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from survey.interviewer_configs import *

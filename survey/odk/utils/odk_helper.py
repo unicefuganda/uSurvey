@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from djangohttpdigest.digest import Digestor, parse_authorization_header
 from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
-from survey.models import Survey, Interviewer, Household, HouseholdMember, HouseholdHead, Question, Batch, ODKSubmission, ODKGeoPoint, LocationCode, TextAnswer, Answer
+from survey.models import Survey, Interviewer, Household, HouseholdMember, HouseholdHead, Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer
 from survey.models.surveys import SurveySampleSizeReached
 from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.odk.utils.log import logger

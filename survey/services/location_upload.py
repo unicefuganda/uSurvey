@@ -1,6 +1,6 @@
 from django.template.defaultfilters import slugify
-from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import LocationTypeDetails, LocationCode, UploadErrorLog
+# from rapidsms.contrib.locations.models import LocationType, Location
+from survey.models import LocationTypeDetails, UploadErrorLog, Location, LocationType
 from survey.services.csv_uploader import UploadService
 
 
@@ -44,14 +44,14 @@ class UploadLocation(UploadService):
                 self._create_code(index, tree_parent, location_type, code=cell_value[0])
         return tree_parent
 
-    def _create_code(self, index, tree_parent, location_type, code):
-        type_ = location_type['type']
-        location_detail = location_type['detail']
-        if len(code) != location_detail.length_of_code:
-            self.log_error(index+2,
-                               "%sCode is shorter or longer than the required %d digits."%(type_.name,  location_detail.length_of_code))
-        else:
-            LocationCode.objects.create(location=tree_parent, code=code)
+#     def _create_code(self, index, tree_parent, location_type, code):
+#         type_ = location_type['type']
+#         location_detail = location_type['detail']
+#         if len(code) != location_detail.length_of_code:
+#             self.log_error(index+2,
+#                                "%sCode is shorter or longer than the required %d digits."%(type_.name,  location_detail.length_of_code))
+#         else:
+#             LocationCode.objects.create(location=tree_parent, code=code)
 
     def upload(self):
         headers, rows = self.csv_uploader.split_content()

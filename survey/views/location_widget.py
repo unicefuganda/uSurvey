@@ -1,6 +1,6 @@
-from rapidsms.contrib.locations.models import Location, LocationType
+# from rapidsms.contrib.locations.models import Location, LocationType
 from django.utils.datastructures import SortedDict
-from survey.models import LocationTypeDetails, EnumerationArea
+from survey.models import LocationTypeDetails, EnumerationArea, Location, LocationType
 
 
 class LocationWidget(object):
@@ -15,7 +15,7 @@ class LocationWidget(object):
 
     def get_widget_data(self):
         if not self.selected_location:
-            return self.get_tree_parent()
+            return self.get_parent()
         else:
             return self.get_data_for_selected_location(self.selected_location)
 
@@ -47,8 +47,8 @@ class LocationWidget(object):
         data[location.type.slug] = location.get_siblings(include_self=True).order_by('name')
 
     def get_ancestors_data(self, data, location):
-        location = location.tree_parent
-        if location.tree_parent is None:
+        location = location.parent
+        if location.parent is None:
             return
         self.selected_locations.append(location)
         self.get_siblings_data(data, location)
@@ -59,9 +59,9 @@ class LocationWidget(object):
         if location:
             self.get_siblings_data(data, location[0])
 
-    def get_tree_parent(self):
+    def get_parent(self):
         the_country = LocationTypeDetails.the_country
-        locations = Location.objects.filter(tree_parent=the_country).order_by('name')
+        locations = Location.objects.filter(parent=the_country).order_by('name')
         return self.sorted_by_hierarchy({locations[0].type.slug: locations }) if locations else {}
 
     def next_type_in_hierarchy(self):

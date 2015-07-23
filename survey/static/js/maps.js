@@ -9,6 +9,14 @@ var map = L.map('completion_map').setView([1.34,32.683525], 7, {zoomControl: tru
 map.addLayer(layer);
    
 $(function(){
+    $.getJSON("/static/map_resources/uganda_districts_2011_005.json", function (data) {
+    	$.each(data, function(element){
+      	   data.features.map(function(feature){
+            feature.properties.rate = 90;
+          })
+        });
+     geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
+    });
     $("#surveys").on('change', function(){
         getCompletionFor($(this).val())
 
@@ -19,6 +27,7 @@ function getCompletionFor(survey_id){
     $.getJSON("/survey/"+ survey_id +"/completion/json/", function (rate_data) {
         $.getJSON("/static/map_resources/uganda_districts_2011_005.json", function (data) {
           $.each(data, function(element){
+        	  
              data.features.map(function(feature){
               feature.properties.rate = rate_data[feature.properties['DNAME_2010']]
             })
@@ -75,8 +84,8 @@ var legend = L.control({position: 'bottomright'});
 legend.onAdd = function (map) {
     var div = L.DomUtil.create('div', 'info legend'),
         grades = [0,20, 40, 60, 80, 100];
-    div.innerHTML += "<h1>Key</h1>"
-        + '<i style="background:' + getColorFor(-1) + '"></i>'+ " Survey not opened<br/>";
+//    div.innerHTML += "<h1>Key</h1>"
+//        + '<i style="background:' + getColorFor(-1) + '"></i>'+ " Survey not opened<br/>";
     for (var i = 0; i < grades.length; i++) {
         div.innerHTML +=
             '<i style="background:' + getColorFor(grades[i] + 1) + '"></i> ';

@@ -11,7 +11,7 @@ from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.access_channels import InterviewerAccess
 from survey.models.location_weight import LocationWeight
-from survey.models.locations import LocationAutoComplete, LocationCode
+# from survey.models.locations import LocationAutoComplete, LocationCode
 from survey.models.surveys import Survey
 from survey.models.unknown_dob_attribute import UnknownDOBAttribute
 from survey.models.upload_error_logs import UploadErrorLog
@@ -23,9 +23,12 @@ from survey.models.about_us_content import AboutUs
 from survey.models.odk_submission import ODKSubmission, Attachment
 from survey.models.formula import Formula 
 from survey.models.interviews import AnswerAccessDefinition
+from survey.models.locations import Location, LocationType
 
 __all__ = [
 #     'ULocation'
+    'Location',
+    'LocationType',
     'AnswerAccessDefinition',
     'Answer',
     'TextAnswer',

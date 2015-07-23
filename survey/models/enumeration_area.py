@@ -1,4 +1,5 @@
-from rapidsms.contrib.locations.models import Location
+# from rapidsms.contrib.locations.models import Location
+from survey.models.locations import Location
 from survey.models import BaseModel
 from django.db import models
 
