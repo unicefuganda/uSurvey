@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.conf import settings
-from survey.investigator_configs import LEVEL_OF_EDUCATION, MONTHS
+from survey.interviewer_configs import LEVEL_OF_EDUCATION, MONTHS
 from survey.models.base import BaseModel
 from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
