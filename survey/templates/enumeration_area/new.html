@@ -1,0 +1,17 @@
+{% extends "form.html" %}
+
+{% block title %}
+  New Enumeration Area
+{% endblock %}
+{% block pre_form_content %}
+    <div class="control-group" style="width: 40%">
+        <label class="control-label"><span id="text-counter" style="float: right;"></span></label>
+    </div>
+{% endblock%}
+{% block display_form_fields %}
+{% include "naked_form.html" with a_form=enumeration_area_form %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

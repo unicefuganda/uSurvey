@@ -21,11 +21,6 @@ class Interviewer(BaseModel):
                                 blank=False, default='English', verbose_name="Preferred language of communication")
     weights = models.FloatField(default=0, blank=False)
     
-    def __init__(self, *args, **kwargs):
-        super(Interviewer, self).__init__(*args, **kwargs)
-        self.identity = COUNTRY_PHONE_CODE + self.mobile_number
-        self.cache_key = "Investigator-%s" % self.pk
-        self.generate_cache()
 
     class Meta:
         app_label = 'survey'

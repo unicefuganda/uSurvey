@@ -10,6 +10,10 @@ from survey.models import BaseModel
 class LocationType(MPTTModel, BaseModel):
     name = models.CharField(max_length=200)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='sub_types', db_index=True)
+    slug = models.SlugField()
+    
+    def __unicode__(self):
+        return self.name
     
     class Meta:
         app_label = 'survey'
@@ -22,6 +26,9 @@ class Location(MPTTModel, BaseModel):
     
     class MPTTMeta:
         order_insertion_by = ['name']
+        
+    def __unicode__(self):
+        return self.name
         
     @property
     def tree_parent(self):
