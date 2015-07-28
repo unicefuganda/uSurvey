@@ -1,56 +1,75 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 from django.conf import settings
 from survey.models import EnumerationArea, Location, LocationType
 
-
 class EnumerationAreaForm(ModelForm):
-
-#     locations = forms.ModelMultipleChoiceField(queryset=Location.objects.all(),
-#                                                widget=forms.SelectMultiple(attrs={'class': 'multi-select enumeration_area', 'id': 'ea-locations'}))
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, locations=None, *args, **kwargs):
         super(EnumerationAreaForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder = ['name', 'total_households']
-        location_type = LocationType.objects.all()[0].get_leafnodes()[0] #I'll allow this to fail if no Location type has been defined
-        self.fields['locations'].queryset = Location.objects.filter(type=location_type)
+        locations = locations or LocationsFilterForm().get_locations()
+#         import pdb; pdb.set_trace()
+        self.fields['locations'].queryset = locations
         self.fields.keyOrder.append('locations')
 
     class Meta:
         model = EnumerationArea
-
         widgets = {
             'name': forms.TextInput(attrs={"id": 'ea_name', "class": 'enumeration_area'}),
             'total_households' : forms.TextInput({'id' : 'total_households',  "class": 'enumeration_area'}),
             'locations': forms.SelectMultiple(attrs={'class': 'multi-select enumeration_area', 'id': 'ea-locations'})
         }
 
-class EnumerationAreaFilterForm(ModelForm):
+class LocationsFilterForm(Form):
+    '''
+        1. Used to filter out locations under a given main location (eg states under a country)
+        2. Also to filter out locations under given ea if defined
+    '''
     
     def __init__(self, *args, **kwargs):
-        super(EnumerationAreaForm, self).__init__(*args, **kwargs)
+        include_ea = kwargs.pop('include_ea', False)
+        super(LocationsFilterForm, self).__init__(*args, **kwargs)
         for location_type in LocationType.objects.all():
-            if location_type.is_leaf_node() == false:
+            if location_type.parent is not None and location_type.is_leaf_node() == False:
                 choices = [(loc.pk, loc.name) for loc in Location.objects.filter(type=location_type)]
                 choices.insert(0, ('', '--------------------------------'))
-                self.fields[location_type.name] = forms.ChoiceField(choices=choices)  
-
-    class Meta:
-        model = EnumerationArea
+                self.fields[location_type.name] = forms.ChoiceField(choices=choices)
+                self.fields[location_type.name].required = False
+                self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filter chzn-select'
+        if include_ea:
+            choices = [(ea.pk, ea.name) for ea in EnumerationArea.objects.all()]
+            choices.insert(0, ('', '--------------------------------'))
+            self.fields['enumeration_area'] = forms.ChoiceField(choices=choices)
+            self.fields['enumeration_area'].widget.attrs['class'] = 'location_filter chzn-select'
+            self.fields['enumeration_area'].required = False
     
-    def filter(self, locations):
-        query_dict = None
+    def get_locations(self):
+        loc = None
+        ea = None
         if self.is_valid():
             for key in self.fields.keys():
-                query_dict['key'] = self.cleaned_data[key]
-            for key, val in query_dict.items():
-                if val == 'All' or not val:
-                    del query_dict[key]
-        if query_dict is None:
-            for key in self.fields.keys():
-                query_dict['%s__in'%key] = [key for key, val in  self.fields[key].choices if not val == '']
-        return locations.filter(**query_dict)
+                if key is not 'enumeration_area':
+                    val = self.cleaned_data[key]
+                    if val: 
+                        loc = val
+                if key is 'enumeration_area':
+                    ea = self.cleaned_data[key]
+        return get_leaf_locs(loc, ea)
+
+    def get_enumerations(self):
+        return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct()
+    
+def get_leaf_locs(loc_id=None, ea=None):
+    if loc_id is None:
+        location = Location.objects.get(parent=None)
+    else:
+        location = Location.objects.get(pk=loc_id)
+    locations = location.get_leafnodes(True)
+    if ea:
+        locations = locations.filter(enumeration_areas__pk__in=ea)
+    return locations.distinct()
 
 # 
 #     def save(self, commit=True, **kwargs):

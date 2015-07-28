@@ -8,7 +8,7 @@ from survey.models import BaseModel
 
 
 class LocationType(MPTTModel, BaseModel):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='sub_types', db_index=True)
     slug = models.SlugField()
     
@@ -18,8 +18,16 @@ class LocationType(MPTTModel, BaseModel):
     class Meta:
         app_label = 'survey'
     
+    @classmethod
+    def smallest_unit(cls):
+        try:
+            root_node = cls.objects.get(parent=None)
+            return root_node.get_leafnodes(True)[0]
+        except cls.DoesNotExist:
+            return None
+    
 class Location(MPTTModel, BaseModel):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     type = models.ForeignKey(LocationType, related_name='locations')
     parent = TreeForeignKey('self', null=True, blank=True, related_name='sub_locations', db_index=True)
     coordinates = models.ManyToManyField(Point, related_name='admin_struct_locations') #would use this in the future. But ignore for now

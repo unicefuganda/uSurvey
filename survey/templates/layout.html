@@ -56,7 +56,7 @@
                                     {%if perms.auth.can_view_interviewers %}
                                     <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
                                     </li>
-				    {% endif %}
+				                  {% endif %}
 
                                     {% if perms.auth.can_view_batches %}
                                         <li role="presentation"><a href="{% url 'show_question_library' %}">Question
@@ -67,6 +67,7 @@
                                         <li role="presentation"><a href="{% url 'household_member_groups_page' %}">Groups</a>
                                         </li>
                                         <li role="presentation"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
+                                        <li role="presentation"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
                                         <li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li>
                                     {% endif %}
                                     <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>

@@ -10,7 +10,7 @@
     Interviewers List
   </h3>
   <form id="aggregates-form" action="{% url 'interviewers_page' %}" method="get" class="padded-bottom">
-    {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
+    {% include "horizontal_naked_form.html" with a_form=locations_filter %}
     <button class="btn btn-primary" id="a-interviewer-list" href="{% url 'interviewers_page' %}"> Refresh List</button>
   </form>
   <br/>
@@ -32,10 +32,13 @@
             Name
           </th>
           <th>
-            Mobile Number
+            USSD
+          </th>
+          <th>
+            ODK
           </th>
 	 <th>
-          Open surveys in current location
+          Enumeration Area
 	</th>
      <th style="background-image: None;">
             Actions
@@ -49,10 +52,13 @@
               <a href="{% url 'show_interviewer_page' interviewer.pk %}">{{ interviewer.name }}</a>
             </td>
             <td>
-              {{ interviewer.mobile_number }}
+              {{ interviewer.ussd_access | display_list}}
+            </td>
+            <td>
+              {{ interviewer.odk_access | display_list}}
             </td>
 	   <td>
-		{{ interviewer|open_survey_in_current_loc}}
+		{{ interviewer.ea.name}}
 	  </td>
             <td>
                 {% include 'interviewers/_action_button.html' with button_size="btn-mini" %}
@@ -68,4 +74,38 @@
 {% block javascripts %}
   <script src="{{STATIC_URL}}/js/interviewer.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+  //$("#a-interviewer-list").hide();
+  {% for location_type in location_filter_types %}
+	  $('#id_{{ location_type }}').on('change', function () {
+	  	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+	  	url = "{% url 'location_sub_types' %}";
+	      $.getJSON(url, params, function (data) {
+	 			$('#id_' + data.sub_type +' option').hide();
+	 			$('#id_' + data.sub_type +' option[value=""]').show();
+	  		$.each(data.locations, function () {
+	              $('#id_' + data.sub_type +' option[value='+this.id+']').show();
+	          });
+	      });
+	  });
+	{% endfor %}
+    $('.ea_filter').on('change', function () {
+    	{% for location_type in location_filter_types %}
+    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
+    	{% endfor %}
+    	url = "{% url 'enumeration_area_filter' %}";
+        params = { 
+        		{% for location_type in location_filter_types %}
+        			{{ location_type }} : {{ location_type }}_selected,
+ 	    		{% endfor %}	
+        }
+        $.getJSON(url, params, function (data) {
+        	$('#id_enumeration_area option').hide();
+        	$('#id_enumeration_area' +' option[value=""]').show();
+            $.each(data, function () {
+            	$('#id_enumeration_area' +' option[value='+this.id+']').show();
+            });
+        });
+    });
+  </script>
 {% endblock %}

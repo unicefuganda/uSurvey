@@ -1,7 +1,11 @@
 {% extends "form.html" %}
 
 {% block title %}
+ {% if enumeration_area_form.instance %}
+ 	Change Enumeration Area
+ {% else %}
   New Enumeration Area
+ {% endif %}
 {% endblock %}
 {% block pre_form_content %}
     <div class="control-group" style="width: 40%">
@@ -9,9 +13,49 @@
     </div>
 {% endblock%}
 {% block display_form_fields %}
+{% include "horizontal_naked_form.html" with a_form=locations_filter %}
 {% include "naked_form.html" with a_form=enumeration_area_form %}
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+	    $('.location_filter').on('change', function () {
+	    	{% for location_type in location_filter_types %}
+	    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
+	    	{% endfor %}
+	    	url = "{% url 'location_filter' %}";
+	        params = { 
+	        		{% for location_type in location_filter_types %}
+	        			{{ location_type }} : {{ location_type }}_selected,
+	 	    		{% endfor %}	
+	        }
+	        $.getJSON(url, params, function (data) {
+	        	$('#ms-ea-locations .ms-elem-selectable').hide();
+	            $('#ea-locations option').hide();
+	            $.each(data, function () {
+	                $('#ea-locations option[value='+this.id+']').show();
+	                $('#'+this.id+'-selectable').show();
+	            });
+	        });
+	    });
+	    
+	    
+	   
+	    
+	    {% for location_type in location_filter_types %}
+	    $('#id_{{ location_type }}').on('change', function () {
+	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+	    	url = "{% url 'location_sub_types' %}";
+	        $.getJSON(url, params, function (data) {
+       			$('#id_' + data.sub_type +' option').hide();
+       			$('#id_' + data.sub_type +' option[value=""]').show();
+        		$.each(data.locations, function () {
+	                $('#id_' + data.sub_type +' option[value='+this.id+']').show();
+	            });
+        
+	        });
+ 	  		 
+	    });
+ 		{% endfor %}
+    </script>
 {% endblock %}

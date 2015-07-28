@@ -13,6 +13,13 @@ import json, inspect
 
 register = template.Library()
 
+@register.assignment_tag
+def next(value, arg):
+    try:
+        return value[int(arg)+1]
+    except:
+        return None
+
 @register.filter
 def is_location_selected(locations_data, location):
     if locations_data.has_location_selected(location):
@@ -47,7 +54,7 @@ def is_radio(field):
 @register.filter
 def display_list(list):
     new_list = [str(item) for item in list]
-    return ', '.join(new_list)
+    return mark_safe(', '.join(new_list))
 
 @register.filter
 def get_value(dict, key):

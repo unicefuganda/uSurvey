@@ -1,37 +1,45 @@
 from django import forms
 from django.forms import ModelForm
-from survey.models import Interviewer
+from survey.models import Interviewer, ODKAccess, USSDAccess
+from django.forms.models import inlineformset_factory
+
 
 
 class InterviewerForm(ModelForm):
 
-    confirm_mobile_number = forms.CharField( widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'class':'no-paste',
-                                                                            'style':"width:172px;" , 'maxlength':'10'}))
     def __init__(self, *args, **kwargs):
         super(InterviewerForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder=['name', 'male', 'age', 'level_of_education', 'language',  'ea']
-
-#     def clean(self):
-#         cleaned_data = super(InterviewerForm, self).clean()
-#         mobile_number = cleaned_data.get("mobile_number")
-#         confirm_mobile_number = cleaned_data.get("confirm_mobile_number")
-# 
-#         if mobile_number != confirm_mobile_number:
-#             message = "Mobile numbers don't match."
-#             self._errors["confirm_mobile_number"] = self.error_class([message])
-#             raise forms.ValidationError(message)
-# 
-#         return cleaned_data
+        self.fields.keyOrder=['name', 'gender', 'age', 'level_of_education', 'language',  'ea']
 
     class Meta:
         model = Interviewer
-        fields = ['name',  'age', 'level_of_education', 'language',  'ea']
+        fields = ['name',  'age', 'gender', 'level_of_education', 'language',  'ea']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
- #           'mobile_number': forms.TextInput(attrs={'placeholder': 'Format: 771234567', 'style':"width:172px;", 'maxlength':'10'}),
-            'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
+            'gender': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
             'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':18, 'max':50 }),
-            'location': forms.HiddenInput(),
-            'ea': forms.HiddenInput(),
+            'ea': forms.Select(attrs={'class' : 'chzn-select'}),
         }
+    
+#     def is_valid(self):
+#         super(InterviewerForm, self).is_valid()
+#         super(InterviewerForm, self).clean()
+#         if self.cleaned_data:
+#             return True
+#         else:
+#             return False
 
+class USSDAccessForm(ModelForm):
+    user_identifier = forms.CharField(label='Mobile Number')
+    
+    class Meta:
+        model = USSDAccess
+        exclude = ['reponse_timeout', 'duration', 'interviewer']
+        
+
+
+class ODKAccessForm(ModelForm):
+    class Meta:
+        model = ODKAccess
+        exclude = ['reponse_timeout', 'duration', 'interviewer']
+        

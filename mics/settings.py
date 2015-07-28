@@ -236,7 +236,8 @@ ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerFiles')
 TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
 ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Processed"
 INVESTIGATOR_EXPORT_HEADERS =  ['name', 'mobile_number', 'age', 'level_of_education', 'language', 'weights', 'is_blocked', 'ea']
-AGGREGATORS = []
+AGGREGATORS = [('testAggregator', 'testAggregator'), ]
+DEFAULT_AGGREGATOR = 'testAggregator'
 TWITTER_URL = 'https://twitter.com/unicefuganda'
 TWITTER_TOKEN = '617036281340657664'
 # Importing server specific settings

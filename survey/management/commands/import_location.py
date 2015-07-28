@@ -22,6 +22,7 @@ class Command(BaseCommand):
             for index, item in enumerate(items):
                 if index == 0:
                     location = None
+                print 'loading item ', item
                 location, _ = Location.objects.get_or_create(name=item.strip(), type=location_types[index], parent=location)
                 print 'loading ', location
         self.stdout.write('Successfully imported!')

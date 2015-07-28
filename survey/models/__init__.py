@@ -9,7 +9,7 @@ from survey.models.enumeration_area import EnumerationArea
 from survey.models.household_batch_completion import HouseholdMemberBatchCompletion, HouseholdMemberBatchCompletion, HouseholdBatchCompletion
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import Household, HouseholdHead, HouseholdMember
-from survey.models.access_channels import InterviewerAccess
+from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
 from survey.models.location_weight import LocationWeight
 # from survey.models.locations import LocationAutoComplete, LocationCode
 from survey.models.surveys import Survey
@@ -30,6 +30,8 @@ __all__ = [
     'Location',
     'LocationType',
     'AnswerAccessDefinition',
+    'ODKAccess',
+    'USSDAccess',
     'Answer',
     'TextAnswer',
     'NumericalAnswer',
