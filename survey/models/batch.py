@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Max
-from rapidsms.contrib.locations.models import Location
+from survey.models.locations import Location
 from survey.models.surveys import Survey
 from survey.models.base import BaseModel
 from survey.utils.views_helper import get_descendants
@@ -41,6 +41,25 @@ class Batch(BaseModel):
     def answer_types(self):
         access_channels = self.access_channels.values_list('channel', flat=True)
         return set(AnswerAccessDefinition.objects.filter(channel__in=access_channels).values_list('answer_type', flat=True))
+    
+    def get_non_response_active_locations(self):
+        non_response_active_batch_location_status = self.open_locations.filter(non_response=True)
+        locations = []
+        map(lambda batch_status: locations.append(batch_status.location), non_response_active_batch_location_status)
+        return locations
+    
+    def other_surveys_with_open_batches_in(self, location):
+        batch_ids = location.open_batches.all().exclude(batch__survey=self.survey).values_list('batch',flat=True)
+        return Survey.objects.filter(batch__id__in = batch_ids)
+    
+    def open_for_location(self, location):
+        all_related_locations = location.get_descendants(True)
+        for related_location in all_related_locations:
+            self.open_locations.get_or_create(batch=self, location=related_location)
+        return self.open_locations.get_or_create(batch=self, location=location)
+    
+    def close_for_location(self, location):
+        self.open_locations.filter(batch=self).delete()
     
 #     @property
 #     def batch_questions(self):

@@ -21,13 +21,6 @@ class InterviewerForm(ModelForm):
             'ea': forms.Select(attrs={'class' : 'chzn-select'}),
         }
     
-#     def is_valid(self):
-#         super(InterviewerForm, self).is_valid()
-#         super(InterviewerForm, self).clean()
-#         if self.cleaned_data:
-#             return True
-#         else:
-#             return False
 
 class USSDAccessForm(ModelForm):
     user_identifier = forms.CharField(label='Mobile Number')

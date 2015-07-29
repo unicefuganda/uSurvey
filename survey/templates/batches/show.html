@@ -20,6 +20,19 @@
 		        </li>
 		    </ul>
 	</div>
+	<div class="bulk-actions">
+		
+		<form action="{% url 'batch_all_locs' batch.pk %}" method="POST" accept-charset="utf-8" id="open-for-location-form">
+			
+              {% csrf_token %}
+              {% if open_locations.count > 0 %}
+              	<input type="submit" name="action" value="Close All">
+              {% endif %}
+              {% if all_locations.count > open_locations.count %}
+              	<input type="submit" name="action" value="Open All">
+              {% endif %}
+        </form>
+	</div>
   <table class="table table-striped table-bordered table-hover table-sort">
     <thead>
       <tr>

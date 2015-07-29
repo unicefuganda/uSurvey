@@ -1,42 +1,58 @@
 {% extends "layout.html" %}
 {% block title %}
-    {{ investigator.name }}'s details
+    {{ interviewer.name }}'s details
 {% endblock %}
 {% block content %}
 {% load template_tags %}
     <h3 class="offset3">
-        {{ investigator.name|capfirst }}'s Details
+        {{ interviewer.name|capfirst }}'s Details
     </h3>
     <dl class="details offset1">
         <dt>
             Name
         </dt>
         <dd>
-            {{ investigator.name }}
+            {{ interviewer.name }}
+        </dd>
+        {% for access in interviewer.ussd_access %}
+        <dt>
+            Aggregator
+        </dt>
+        <dd>
+            {{access.aggregator}}
         </dd>
         <dt>
             Mobile Number
         </dt>
         <dd>
-            {{ investigator.mobile_number }}
+            {{ access.user_identifier }}
+        </dd>
+        {% endfor %}
+        {% for access in interviewer.odk_access %}
+        <dt>
+            ODK ID
+        </dt>
+        <dd>
+            {{ access.user_identifier }}
         </dd>
         <dt>
             ODK Token
         </dt>
         <dd>
-            {{ investigator.odk_token }}
+            {{ access.odk_token }}
         </dd>
+        {% endfor %}
         <dt>
             Age
         </dt>
         <dd>
-            {{ investigator.age }}
+            {{ interviewer.age }}
         </dd>
         <dt>
             Sex
         </dt>
         <dd>
-            {% if investigator.male %}
+            {% if interviewer.gender %}
                 Male
             {% else %}
                 Female
@@ -46,35 +62,25 @@
             Highest Level of Education
         </dt>
         <dd>
-            {{ investigator.level_of_education }}
+            {{ interviewer.level_of_education }}
         </dd>
         <dt>
             Preferred Language of Communication
         </dt>
         <dd>
-            {{ investigator.language }}
+            {{ interviewer.language }}
         </dd>
-        {% with investigator.location|ancestors_reversed as investigator_parents %}
-            {% for location in investigator_parents %}
-                <dt>
-                    {{ location.type }}
-                </dt>
-                <dd>
-                    {{ location.name }}
-                </dd>
-            {% endfor %}
-        {% endwith %}
         <dt>
-            {{ investigator.location.type }}
+            Enumeration Area
         </dt>
         <dd>
-            {{ investigator.location.name }}
+            {{ interviewer.ea }}
         </dd>
         <dt>
             Total Households
         </dt>
         <dd>
-            {{ investigator.ea.total_households }}
+            {{ interviewer.ea.total_households }}
         </dd>
     </dl>
     <div class="offset3">
@@ -84,6 +90,6 @@
             <a href="javascript:window.history.back()" class="btn btn-inverse"><i
                     class="icon-chevron-left icon-white"></i> Back</a>
         {% endif %}
-        {% include 'investigators/_action_button.html' with button_size="" investigator=investigator %}
+        {% include 'interviewers/_action_button.html' with button_size="" interviewer=interviewer %}
     </div>
 {% endblock %}

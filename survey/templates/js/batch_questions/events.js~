@@ -188,4 +188,7 @@ $('#edit_edge').click(function(evt) {
    	}
 	 $('#validation_arg').hide();
 	 $('#batch_questions').hide();
+	 $('#question_form').show();
+     $('#side_bar').show();
+     $('#filz').show();
 	 });

@@ -4,13 +4,11 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from rapidsms.contrib.locations.models import Location, LocationType
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
-
 from survey.interviewer_configs import *
 from survey.models import HouseholdMemberGroup, QuestionModule
-from survey.models.surveys import Survey
+from survey.models import Survey, Location, LocationType
 from survey.models.batch import Batch
 from survey.forms.batch import BatchForm
 
@@ -36,7 +34,7 @@ def index(request, survey_id):
 @permission_required('auth.can_view_batches')
 def show(request, survey_id, batch_id):
     batch = Batch.objects.get(id=batch_id)
-    prime_location_type = LocationType.objects.get(name=PRIME_LOCATION_TYPE)
+    prime_location_type = LocationType.largest_unit()
     locations = Location.objects.filter(type=prime_location_type).order_by('name')
     batch_location_ids = batch.open_locations.values_list('location_id', flat=True)
     open_locations = Location.objects.filter(id__in=batch_location_ids)
@@ -44,13 +42,28 @@ def show(request, survey_id, batch_id):
         if request.GET['status'] == 'open':
             locations = locations.filter(id__in=batch_location_ids)       
         else:
-            locations = locations.exclude(id__in=batch_location_ids)       
+            locations = locations.exclude(id__in=batch_location_ids)     
+#     import pdb; pdb.set_trace()  
     context = {'batch': batch,
                'locations': locations,
                'open_locations': open_locations,
+               'all_locations' : Location.objects.exclude(parent=None),
                'non_response_active_locations': batch.get_non_response_active_locations()}
     return render(request, 'batches/show.html', context)
 
+@login_required
+@permission_required('auth.can_view_batches')
+def all_locs(request, batch_id):
+    batch = Batch.objects.get(id=batch_id)
+    action = request.POST['action']
+    locations = Location.objects.filter(type=LocationType.largest_unit()).order_by('name')
+    if action.lower() == 'open all':
+        for location in locations:
+            batch.open_for_location(location)
+    if action.lower() == 'close all':
+        for location in locations:
+            batch.close_for_location(location)
+    return HttpResponseRedirect(reverse('batch_show_page', args=(batch.survey.id, batch_id, )))
 
 @login_required
 @permission_required('auth.can_view_batches')
@@ -58,10 +71,6 @@ def open(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     location = Location.objects.get(id=request.POST['location_id'])
     other_surveys = batch.other_surveys_with_open_batches_in(location)
-
-    if other_surveys.count() > 0:
-        message = "%s has already open batches from survey %s" % (location.name, other_surveys[0].name)
-        return HttpResponse(json.dumps(message), content_type="application/json")
     batch.open_for_location(location)
     return HttpResponse(json.dumps(""), content_type="application/json")
 

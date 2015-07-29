@@ -10,26 +10,52 @@ body {
 
 #questions_container {
   height: 70%;
-  width: 70%;
+  width: 100%;
 }
+
+#question-filter-form {
+	
+}
+
+#question-filter-form select {
+  background: transparent;
+  width: 150px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  height: 34px;
+}
+
 
 #batch_questions {
   height: 100%;
-  width: 70%; 
- /* width: 1280px; */
+  width: 100%; 
+ /* width: 1280px; 
+  overflow: scroll;*/
   position: absolute;
-  left: 20%;
-  top: 30%;
-  background-color: #EFF3F7;
-  z-index: 100000000;
-  overflow: scroll;
+  left: 0;
+  top: 25%;
+  background-image:url({{ STATIC_URL }}img/symphony.png);
 
 }
 
+#batch_questions:before, #batch_questions:after
+{
+	content:"";
+    position:absolute; 
+    z-index:-1;
+    background-image:url({{ STATIC_URL }}img/symphony.png);
+}
+
 #side_bar {
-	display: block;
-	width: 30%;
+
+	width: 100%;
 	float: left;
+	display: block;
+}
+
+#filz {
+
+	display: block;
 }
 
 #question_form {
@@ -49,27 +75,26 @@ body {
 }
 
 #submit_action {
-	display: none;
+	display: block;
+    float: right;
 }
 
 #question_flow_form .validation_arg {
 	display: none;
 }
 
-#node_actions, #edge_actions {
+#hideall {
 	display: none;
 }
  		
  	</style>
 {% endblock %}
-{% block title %}
-    Questions List
-{% endblock %}
+
 
 {% block pre_form_content %}
-
-	<div class="filters">
-	{% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" filter_id="question-filter-form" a_form=question_filter_form filter_button_name="Refresh Library" %}
+<br><br><br>
+	<div class="filters" id='filz'>
+	{% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" filter_id="question-filter-form" a_form=question_filter_form filter_button_name="Reload" %}
     </div>
      <div id="submit_action">
        		<form id="question_subm_form" action="{% url 'batch_questions_submission' batch.pk %}" method="post">
@@ -79,15 +104,22 @@ body {
        		</form>
        </div>
        <br class="clear" />
+
     <div class="canvas_actions" id="canvas_actions">
+<table style="width:38%">
+  <tr>
+<td align="left">
        <div id="node_actions">
 	    	<a  class="btn edit" href="#">Edit</a>
 	    	<a  class="btn remove" href="#">Remove</a>
-    	</div>
+    	</div></td>
+<td align="left">
     	<div id="edge_actions">
     		<a id="edit_edge" class="btn edit" href="#">Edit Flow</a>
     		<a id="remove_edge" class="btn remove" href="#">Remove Flow</a>
-    	</div>
+    	</div></td>
+  </tr>
+</table>
     </div>
     <div id="side_bar">
     	{% include "search_form.html" with id="library_search_form"%}
@@ -102,19 +134,18 @@ body {
     
 {% endblock %}
 {% block display_form_fields %}
-  <div id="quest_flow_form_cont">
+  <div id="quest_flow_form_cont" visibility="hidden">
 		     {% include "naked_form.html" with a_form=question_flow_form %}
   </div>
-  <div id="quest_form_cont">
+  <div id="quest_form_cont" visibility="hidden">
     {% include "naked_form.html" with a_form=question_form %}
    </div>
-	
 {% endblock %}
 {% block non_form_content %}
 
-   
-	<div id="batch_questions">
-		</div>
+<br><br>
+<div id="batch_questions">
+</div>
 {% endblock %}
 
 {% block javascripts %}

@@ -22,9 +22,18 @@ class LocationType(MPTTModel, BaseModel):
     def smallest_unit(cls):
         try:
             root_node = cls.objects.get(parent=None)
-            return root_node.get_leafnodes(True)[0]
-        except cls.DoesNotExist:
+            return root_node.get_leafnodes(False)[0]
+        except cls.DoesNotExist, IndexError:
             return None
+    
+    @classmethod
+    def largest_unit(cls):
+        try:
+            root_node = cls.objects.get(parent=None)
+            return root_node.get_children()[0]
+        except cls.DoesNotExist, IndexError:
+            return None
+    
     
 class Location(MPTTModel, BaseModel):
     name = models.CharField(max_length=50)

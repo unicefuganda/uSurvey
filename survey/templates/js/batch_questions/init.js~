@@ -29,7 +29,7 @@ cy = cytoscape({
         'padding-left': '10px',
         'padding-bottom': '10px',
         'padding-right': '10px',
-        'background-color' : 'grey',
+        'background-color' : 'black',
 
       }
     },
@@ -37,7 +37,7 @@ cy = cytoscape({
         selector: '$node[^parent]',
         css: {
       	  'content': 'data(name)',
-      	  'text-valign': 'top',     
+      	  'text-valign': 'left',     
         }
       },  
       {
