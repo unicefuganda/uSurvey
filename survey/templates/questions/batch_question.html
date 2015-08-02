@@ -152,13 +152,13 @@ body {
     {% if batch %}
 
        
-       <script src="{{ STATIC_URL }}js/cytoscapejs/lib/jquery.js"></script>
-       <script src="{{STATIC_URL}}/js/cytoscapejs/build/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+       <script src="{{ STATIC_URL }}js/cytoscapejs/jquery.js"></script>
+       <script src="{{STATIC_URL}}/js/cytoscapejs/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
 		<script src="{{ STATIC_URL }}js/jquery-ui/jquery-ui.js"></script>
-		<script src="{{ STATIC_URL }}js/cytoscapejs/build/dagre.min.js"></script>
-		<script src="{{ STATIC_URL }}js/cytoscapejs/build/cytoscape.min.js"></script>
+		<script src="{{ STATIC_URL }}js/cytoscapejs/dagre.min.js"></script>
+		<script src="{{ STATIC_URL }}js/cytoscapejs/cytoscape.min.js"></script>
         <script type="text/javascript">
-        {% include 'js/batch_questions//batch_questions.js' with batch_question_tree=batch_question_tree batch=batch %}
+        {% include 'js/batch_questions/batch_questions.js' with batch_question_tree=batch_question_tree batch=batch %}
         </script>
         
         <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
