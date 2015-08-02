@@ -18,7 +18,6 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
 ) + survey_urls
 
-
 #Static content serving for development
 if settings.DEBUG:
     urlpatterns += patterns('',

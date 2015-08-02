@@ -10,6 +10,9 @@ class ExportInterviewersService:
     def formatted_responses(self):
         _formatted_responses = [','.join([entry.upper() for entry in self.HEADERS])]
         for interviewer in self.interviewers:
-            _formatted_responses.append(','.join(["%s"%str(interviewer.__dict__.get(entry, '')) for entry in self.HEADERS]))
+            info = interviewer.__dict__
+            info['ussd'] = ','.join([access.user_identifier for access in interviewer.ussd_access])
+            info['odk'] = ','.join([access.user_identifier for access in interviewer.odk_access])
+            _formatted_responses.append(','.join(['"%s"'%str(info.get(entry, '')) for entry in self.HEADERS]))
         return _formatted_responses
 

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.utils.timezone import utc
 from survey.models import UploadErrorLog
 
-from survey.investigator_configs import UPLOAD_ERROR_LOG_EXPIRY
+from survey.interviewer_configs import UPLOAD_ERROR_LOG_EXPIRY
 
 
 FIRST_LINE = 0

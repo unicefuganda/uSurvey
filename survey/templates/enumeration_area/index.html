@@ -83,12 +83,12 @@
 	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
 	    	url = "{% url 'location_sub_types' %}";
 	        $.getJSON(url, params, function (data) {
-       			$('#id_' + data.sub_type +' option').hide();
-       			$('#id_' + data.sub_type +' option[value=""]').show();
+	        	$('#id_' + data.sub_type +' option').hide();
+	        	$('#id_' + data.sub_type +' option[value=""]').show();
         		$.each(data.locations, function () {
 	                $('#id_' + data.sub_type +' option[value='+this.id+']').show();
 	            });
-        
+        		$(' .chzn-select').trigger("liszt:updated");  
 	        });
  	  		 
 	    });

@@ -86,6 +86,7 @@
 	  		$.each(data.locations, function () {
 	              $('#id_' + data.sub_type +' option[value='+this.id+']').show();
 	          });
+	  		$(' .chzn-select').trigger("liszt:updated");  
 	      });
 	  });
 	{% endfor %}

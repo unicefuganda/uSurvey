@@ -33,4 +33,9 @@ class Interviewer(BaseModel):
     @property
     def odk_access(self):
         return ODKAccess.objects.filter(interviewer=self)
+    
+    def get_ussd_access(self, mobile_number):
+        return USSDAccess.objects.get(interviewer=self, user_identifier=mobile_number)
 
+    def get_odk_access(self, identifier):
+        return ODKAccess.objects.get(interviewer=self, user_identifier=identifier)

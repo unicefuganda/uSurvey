@@ -6,6 +6,7 @@ from survey.models.interviewer import Interviewer
 from survey.models.access_channels import InterviewerAccess
 from survey.models.base import BaseModel
 from rapidsms.contrib.locations.models import Point
+from django import template
 
 
 def reply_test(cls, func):
@@ -14,7 +15,7 @@ def reply_test(cls, func):
  
 class Interview(BaseModel):
     interviewer = models.ForeignKey(Interviewer, null=True, related_name="%(class)s")
-    householdmember = models.ForeignKey("HouseholdMember", null=True, related_name="%(class)s")
+    householdmember = models.ForeignKey("HouseholdMember", null=True, related_name="interviews")
     batch = models.ForeignKey("Batch", related_name='interviews')
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
@@ -39,6 +40,10 @@ class Interview(BaseModel):
                     break
             self.last_question = reponse
             self.save()
+            question_context = template.Context(dict([(field.verbose_name.upper(), 
+                                                            getattr(self.householdmember, field.name))         
+                                                                    for field in self.householdmember._meta.fields]))
+            response.text = template.Template(response.text).render(question_context)
             return response 
         except:
             raise
@@ -48,6 +53,10 @@ class Interview(BaseModel):
             return self.start()
         else:
             return self.get_next_question(msg)
+        
+    class Meta:
+        app_label = 'survey'
+        unique_together = ['interviewer', 'householdmember', 'batch']
          
  
 class Answer(BaseModel):

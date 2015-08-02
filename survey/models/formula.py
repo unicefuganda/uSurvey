@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Sum
 from survey.models.base import BaseModel
 from survey.models.interviewer import Interviewer
-from survey.models.question import Question, QuestionOption
+from survey.models.questions import Question, QuestionOption
 
 
 class Formula(BaseModel):

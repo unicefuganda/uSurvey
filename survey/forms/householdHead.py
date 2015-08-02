@@ -2,8 +2,7 @@ from datetime import datetime
 from django import forms
 from django.forms import ModelForm, DateInput
 from survey.models.households import HouseholdHead
-
-from survey.investigator_configs import OCCUPATION, MONTHS
+from survey.interviewer_configs import OCCUPATION, MONTHS
 from widgets import InlineRadioSelect
 
 
