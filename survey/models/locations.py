@@ -4,7 +4,7 @@ from django.db import models
 # from rapidsms.contrib.locations.models import Location, LocationType, Point
 from rapidsms.contrib.locations.models import Point
 from mptt.models import MPTTModel, TreeForeignKey 
-from survey.models import BaseModel
+from survey.models.base import BaseModel
 
 
 class LocationType(MPTTModel, BaseModel):

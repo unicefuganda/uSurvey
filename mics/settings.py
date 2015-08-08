@@ -38,6 +38,28 @@ CACHES = {
         }
     }
 }
+
+CACHES = {
+        'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': [
+        '127.0.0.1:6379',
+        ],
+    'TIMEOUT' : 500,
+    'OPTIONS': {
+            'DB': 1,
+            'PASSWORD': 'yadayada',
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+            'CONNECTION_POOL_CLASS_KWARGS': {
+            'max_connections': 50,
+            'timeout': 20,
+        },
+            'MAX_CONNECTIONS': 1000,
+            'PICKLE_VERSION': -1,
+        },
+    },
+}
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []

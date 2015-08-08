@@ -6,7 +6,7 @@ from survey.models.base import BaseModel
 from survey.utils.views_helper import get_descendants
 from survey.models.questions import Question
 from survey.models.access_channels import InterviewerAccess
-from survey.models.enumeration_area import EnumerationArea
+# from survey.models.enumeration_area import EnumerationArea
 from survey.models.interviews import AnswerAccessDefinition
 
 
@@ -14,8 +14,8 @@ class Batch(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
     name = models.CharField(max_length=100, blank=False, null=True)
     description = models.CharField(max_length=300, blank=True, null=True)
-    survey = models.ForeignKey(Survey, null=True, related_name="batch")
-    eas = models.ManyToManyField(EnumerationArea, related_name='batches', null=True) #enumeration areas for which this Batch is open
+    survey = models.ForeignKey(Survey, null=True, related_name="batches")
+#     eas = models.ManyToManyField(EnumerationArea, related_name='batches', null=True) #enumeration areas for which this Batch is open
     group = models.ForeignKey("HouseholdMemberGroup", null=True, related_name="question_group")
     start_question = models.OneToOneField(Question, related_name='starter_batch', null=True, blank=True, on_delete=models.SET_NULL)
     BATCH_IS_OPEN_MESSAGE = "Batch cannot be deleted because it is open in %s."

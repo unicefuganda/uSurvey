@@ -5,6 +5,8 @@
         {% block title %}{% endblock %} | {{ PROJECT_TITLE }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
+          charset="utf-8">
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
           charset="utf-8">
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
@@ -13,7 +15,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
-	<!--   link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" / -->
+	<link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
 
     {% block extra_css %}{% endblock %}
@@ -171,9 +173,7 @@
     </div>
 <div id="push"></div>
 </div>
-<footer>
-     <div>
-         <div class="footer">&copy; Unicef <script language="JavaScript" type="text/javascript"> 
+<div class="footer">&copy; Unicef <script language="JavaScript" type="text/javascript"> 
 
 var now = new Date();
 
@@ -184,9 +184,7 @@ var monNames = new Array("January","February","March","April","May","June","July
 document.write(" "+ now.getFullYear());
 
       </script></div>
-      </div>
-</footer>
-
+         
 <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/highcharts.js" type="text/javascript" charset="utf-8"></script>

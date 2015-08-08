@@ -4,9 +4,22 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>uServey :: Home</title>
 <link href="{{ STATIC_URL }}css/style.css" rel="stylesheet" type="text/css" />
-</head>
-
 <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
+          charset="utf-8">
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
+          charset="utf-8">
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
+          charset="utf-8">
+    <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
+	<link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
+
+
 <script>
 $(function () {
 
@@ -51,7 +64,16 @@ $(document).ready( function(){
 	   $( "#winter-panel").hide();
       }
     });</script>
+</head>
 <body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.4";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="tbanner">
@@ -267,9 +289,15 @@ $(document).ready( function(){
                           </tr>
                           <tr>
                             <td align="left" valign="top" class="uhtxt">
-<a class="twitter-timeline" data-border-color="#E6E6E6" data-tweet-limit="3" width="450px" height="430px" data-theme="dark" data-chrome="noheader nofooter noscrollbar transparent"
-			href="https://twitter.com/unicefuganda" data-widget-id="617036281340657664">Load...</a></span>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+<div class="fb-page" data-href="https://www.facebook.com/unicefuganda"
+data-width="370" data-height="430" data-small-header="true"
+data-adapt-container-width="false" style="background-color:#000000"
+data-hide-cover="true" data-show-facepile="false"
+data-show-posts="true" colorscheme="dark"><div
+class="fb-xfbml-parse-ignore"><blockquote
+cite="https://www.facebook.com/unicefuganda"><a
+href="https://www.facebook.com/unicefuganda">UNICEF
+Uganda</a></blockquote></div></div>
 
                              </td>
                           </tr>

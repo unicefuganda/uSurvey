@@ -14,7 +14,7 @@ def reply_test(cls, func):
     return func
  
 class Interview(BaseModel):
-    interviewer = models.ForeignKey(Interviewer, null=True, related_name="%(class)s")
+    interviewer = models.ForeignKey(Interviewer, null=True, related_name="interviews")
     householdmember = models.ForeignKey("HouseholdMember", null=True, related_name="interviews")
     batch = models.ForeignKey("Batch", related_name='interviews')
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')

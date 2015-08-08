@@ -5,6 +5,7 @@ from django.db import models
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PHONE_CODE
 from survey.models.base import BaseModel
 from survey.models.access_channels import USSDAccess, ODKAccess
+from survey.models.surveys import Survey
 
 
 class Interviewer(BaseModel):
@@ -39,3 +40,11 @@ class Interviewer(BaseModel):
 
     def get_odk_access(self, identifier):
         return ODKAccess.objects.get(interviewer=self, user_identifier=identifier)
+
+class SurveyAllocation(BaseModel):
+    interviewer = models.ForeignKey(Interviewer, related_name='assignments')
+    survey = models.ForeignKey(Survey, related_name='work_allocation')
+    completed = models.BooleanField(default=False)
+    
+    class Meta:
+        app_label = 'survey'

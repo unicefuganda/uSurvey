@@ -114,9 +114,7 @@ def set_household_form(uid=None, data=None, is_edit=False, instance=None):
     household_form = {}
     if not is_edit:
         household_form['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
-
     open_survey = Survey.currently_open_survey()
-
     household_form['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid,
                                                 survey=open_survey, auto_id='household-%s', label_suffix='')
     return household_form
