@@ -1,4 +1,4 @@
-from rapidsms.contrib.locations.models import Location
+from survey.models import Location
 from survey.models import Household
 
 
@@ -58,14 +58,13 @@ class BatchHighLevelLocationsCompletionRates(BatchCompletionRates):
             _completion_rates.append(attribute)
         return _completion_rates
 
-
 class BatchSurveyCompletionRates:
     def __init__(self, location_type):
         self.location_type = location_type
         self.locations = Location.objects.filter(type=location_type)
 
     def get_completion_formatted_for_json(self, survey):
-        all_batches = survey.batch.all()
+        all_batches = survey.batches.all()
         completion_rates_dict = {}
         number_of_batches = len(all_batches)
 

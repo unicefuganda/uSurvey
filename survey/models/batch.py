@@ -59,6 +59,12 @@ class Batch(BaseModel):
     
     def close_for_location(self, location):
         self.open_locations.filter(batch=self).delete()
+        
+    def is_closed_for(self, location):
+        return self.open_locations.filter(location=location).count() == 0
+
+    def is_open_for(self, location):
+        return not self.is_closed_for(location)
     
 #     @property
 #     def batch_questions(self):

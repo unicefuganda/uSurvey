@@ -25,6 +25,12 @@ class Survey(BaseModel):
             survey.sample_size = 0
         survey.save()
 
+    def is_open_for(self, location):
+        all_batches = self.batches.all()
+        for batch in all_batches:
+            if batch.is_open_for(location):
+                return True
+        return False
         
 class SurveySampleSizeReached(Exception):
     pass

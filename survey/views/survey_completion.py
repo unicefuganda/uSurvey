@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
-from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models import Location, LocationType
 
 from survey.forms.filters import LocationFilterForm
 from survey.models import Survey, Interviewer
@@ -73,7 +73,7 @@ def show(request):
 
 def completion_json(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
-    location_type = LocationType.objects.get(name='District')
+    location_type = LocationType.largest_unit()
     completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
     json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')

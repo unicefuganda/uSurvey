@@ -56,6 +56,13 @@ class Household(BaseModel):
         for household in households:
             household.related_locations = household.get_related_location()
         return households
+    
+    @classmethod
+    def all_households_in(cls, location, survey, ea=None):
+        all_households = Household.objects.filter(survey=survey)
+        if ea:
+            return all_households.filter(ea=ea)
+        return all_households.filter(ea__locations__in=location.get_descendants(include_self=True))
 
 class HouseholdMember(BaseModel):
     MALE = 1
