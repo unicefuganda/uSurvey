@@ -39,27 +39,19 @@ CACHES = {
     }
 }
 
+
+
 CACHES = {
-        'default': {
-        'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': [
-        '127.0.0.1:6379',
-        ],
-    'TIMEOUT' : 500,
-    'OPTIONS': {
-            'DB': 1,
-            'PASSWORD': 'yadayada',
-            'PARSER_CLASS': 'redis.connection.HiredisParser',
-            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
-            'CONNECTION_POOL_CLASS_KWARGS': {
-            'max_connections': 50,
-            'timeout': 20,
-        },
-            'MAX_CONNECTIONS': 1000,
-            'PICKLE_VERSION': -1,
-        },
-    },
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
 }
+
+
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -262,6 +254,16 @@ AGGREGATORS = [('testAggregator', 'testAggregator'), ]
 DEFAULT_AGGREGATOR = 'testAggregator'
 TWITTER_URL = 'https://twitter.com/unicefuganda'
 TWITTER_TOKEN = '617036281340657664'
+
+###USSD config ##
+USSD_NEXT = '*'
+USSD_PREVIOUS = '#'
+USSD_ITEMS_PER_PAGE = 10
+USSD_RESTART = '00'
+# USSD_STARTER = 'survey.ussd.flows.Start'
+
+
+##end USSD config ##
 # Importing server specific settings
 from localsettings import *
 # import sys

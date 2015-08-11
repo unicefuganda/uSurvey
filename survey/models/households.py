@@ -10,13 +10,14 @@ from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
 from survey.models.interviews import Answer
 from survey.models.access_channels import InterviewerAccess
+from django.core.exceptions import ValidationError
 
 
 class Household(BaseModel):
     REGISTRATION_CHANNELS = [(name, name) for name in InterviewerAccess.access_channels()]
     ea = models.ForeignKey("EnumerationArea", null=True, related_name="household_enumeration_area")
-    uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Interviewer Unique Identification for the Household")
-    random_sample_number = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Household Random Sample Number")
+#     uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Interviewer Unique Identification for the Household")
+    house_number = models.PositiveIntegerField(verbose_name="Household Number in EA")
     household_code = models.CharField(max_length=100, null=True, verbose_name="Household Code")
     registrar = models.ForeignKey(Interviewer, related_name='registered_households')
     survey = models.ForeignKey(Survey, related_name='registered_households')
@@ -24,6 +25,19 @@ class Household(BaseModel):
     
     class Meta:
         app_label = 'survey'
+        unique_together = [('survey', 'house_number'), ]
+    
+    def __unicode__(self):
+        return 'HH-%s-%s' % (self.house_number, self.head.surname)
+    
+    def clean(self):
+        super(Household, self).clean()
+        if self.house_number > self.total_households:
+             raise ValidationError('Household number has exceeded total households in the Enumeration area')
+    
+    @property
+    def head(self):
+        return HouseholdHead.objects.get(household=self)
 
     def _get_related_location_name(self, key, location_hierarchy):
         location_object = location_hierarchy.get(key, None)
@@ -34,11 +48,7 @@ class Household(BaseModel):
 
     def get_related_location(self):
         location_hierarchy = self.location_hierarchy()
-        keys = ['District', 'County', 'Subcounty', 'Parish', 'Village']
         related_location = SortedDict()
-        for key in keys:
-            related_location[key] = self._get_related_location_name(key, location_hierarchy)
-
         return related_location
     
     @classmethod
@@ -58,6 +68,9 @@ class HouseholdMember(BaseModel):
 #     registrar = models.ForeignKey(Interviewer, related_name='registered_household_members')
 #     registration_channel = models.ForeignKey(InterviewerAccess, related_name='registered_household_members')
 
+    def __unicode__(self):
+        return '%s, %s' % (self.surname, self.first_name)
+
     def answers(self, batch):
         answers = []
         map(lambda answer_class: 
@@ -76,11 +89,10 @@ class HouseholdHead(HouseholdMember):
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary',
                                           verbose_name="Highest level of education completed")
-    resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
-                                                      null=False, default=1984)
-    resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
+    resident_since = models.DateField(auto_now=False) #typically only month and year would be filled
+#     resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
+#                                                       null=False, default=1984)
+#     resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
 
     class Meta:
         app_label = 'survey'
-
-    

@@ -22,10 +22,14 @@ class InterviewerAccess(BaseModel):
     
     class Meta:
         app_label = 'survey'
+
+    @classmethod
+    def choice_name(cls):
+        return cls._meta.verbose_name.title()
      
     @classmethod    
     def access_channels(cls):
-        return [cl._meta.verbose_name.title() for cl in cls.__subclasses__()]
+        return [cl.choice_name() for cl in cls.__subclasses__()]
     
     def __unicode__(self):
         name = '<span style="color: %s;">%s</span>' % ('green' if self.is_active else 'red', self.user_identifier)
@@ -36,6 +40,8 @@ class USSDAccess(InterviewerAccess):
     
     class Meta:
         app_label = 'survey'
+        
+
     
     
 class ODKAccess(InterviewerAccess):
