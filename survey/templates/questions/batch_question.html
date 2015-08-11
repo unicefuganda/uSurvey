@@ -33,7 +33,7 @@ body {
   overflow: scroll;*/
   position: absolute;
   left: 0;
-  top: 25%;
+  top: 35%;
   background-image:url({{ STATIC_URL }}img/symphony.png);
 
 }
@@ -46,12 +46,6 @@ body {
     background-image:url({{ STATIC_URL }}img/symphony.png);
 }
 
-#side_bar {
-
-	width: 100%;
-	float: left;
-	display: block;
-}
 
 #filz {
 
@@ -66,8 +60,8 @@ body {
 	display: none;
 }
 
-#node_actions, #edge_actions {
-	display: block;
+#canvas_actions, #node_actions, #edit_actions {
+	display: none;
 }
 
 #lib_questions .answer_type {
@@ -76,7 +70,6 @@ body {
 
 #submit_action {
 	display: block;
-    float: right;
 }
 
 #question_flow_form .validation_arg {
@@ -92,38 +85,41 @@ body {
 
 
 {% block pre_form_content %}
-<br><br><br>
-	<div class="filters" id='filz'>
-	{% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" filter_id="question-filter-form" a_form=question_filter_form filter_button_name="Reload" %}
+	<div id="pre_questions">
+		<div class="filters lib_questions" id='filz'>
+		{% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" filter_id="question-filter-form" a_form=question_filter_form filter_button_name="Reload" %}
+	    </div>
+	     <div class="canvas_actions" id="canvas_actions">
+			<table style="width:38%">
+			  <tr>
+				<td align="left" id="node_actions">
+				       <div class="node_actions">
+					    	<a  class="btn edit" href="#">Edit</a>
+					    	<a  class="btn remove" href="#">Remove</a>
+				    	</div>
+				 </td>
+				<td align="left" id="edge_actions">
+				    	<div class="edge_actions">
+				    		<a id="edit_edge" class="btn edit" href="#">Edit Flow</a>
+				    		<a id="remove_edge" class="btn remove" href="#">Remove Flow</a>
+				    	</div>
+				   </td>
+				   <td alight="right" id="submit_action">
+				   		<div class="submit_action">
+				       		<form id="question_subm_form" action="{% url 'batch_questions_submission' batch.pk %}" method="post">
+				       			{% csrf_token %}
+				       			<input type="hidden" id="questions_data" name="questions_data" value="" />
+				       			<input type="submit" class="btn" name="" value="Save Batch Question" /> 
+				       		</form>
+					    </div>
+				   </td>
+			  </tr>
+			</table>
+	    </div>
     </div>
-     <div id="submit_action">
-       		<form id="question_subm_form" action="{% url 'batch_questions_submission' batch.pk %}" method="post">
-       			{% csrf_token %}
-       			<input type="hidden" id="questions_data" name="questions_data" value="" />
-       			<input type="submit" class="btn" name="" value="Save Batch Question" /> 
-       		</form>
-       </div>
-       <br class="clear" />
-
-    <div class="canvas_actions" id="canvas_actions">
-<table style="width:38%">
-  <tr>
-<td align="left">
-       <div id="node_actions">
-	    	<a  class="btn edit" href="#">Edit</a>
-	    	<a  class="btn remove" href="#">Remove</a>
-    	</div></td>
-<td align="left">
-    	<div id="edge_actions">
-    		<a id="edit_edge" class="btn edit" href="#">Edit Flow</a>
-    		<a id="remove_edge" class="btn remove" href="#">Remove Flow</a>
-    	</div></td>
-  </tr>
-</table>
-    </div>
-    <div id="side_bar">
+    <div id="lib_questions" class="lib_questions">
     	{% include "search_form.html" with id="library_search_form"%}
-    	<table id="lib_questions" class="table table-striped table-bordered table-hover">
+    	<table id="lib_questions_table" class="table table-striped table-bordered table-hover">
     		<thead><th class="question_identifier">ID</th><th class="question_text">TEXT</th><th class="answer_type">ANSWER TYPE</th><th class="access_channels">CHANNELS</th></thead><tbody>
 	    {% for question in question_library %}
 	    	<tr id="{{question.id}}-selectable" class="ms-selectable "><td class="question_identifier">{{question.identifier}}</td><td class="question_text">{{question.text}}</td><td  class="answer_type">{{question.answer_type}}</td><td  class="access_channels">{{question.answer_type | access_channels}}</td></tr>
@@ -143,7 +139,6 @@ body {
 {% endblock %}
 {% block non_form_content %}
 
-<br><br>
 <div id="batch_questions">
 </div>
 {% endblock %}
@@ -157,6 +152,7 @@ body {
 		<script src="{{ STATIC_URL }}js/jquery-ui/jquery-ui.js"></script>
 		<script src="{{ STATIC_URL }}js/cytoscapejs/dagre.min.js"></script>
 		<script src="{{ STATIC_URL }}js/cytoscapejs/cytoscape.min.js"></script>
+		<script src="{{ STATIC_URL }}js/cytoscapejs/cytoscape-edgehandles.js"></script>
         <script type="text/javascript">
         {% include 'js/batch_questions/batch_questions.js' with batch_question_tree=batch_question_tree batch=batch %}
         </script>

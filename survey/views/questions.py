@@ -1,5 +1,6 @@
 import json
 import re
+from django.core.urlresolvers import reverse
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
@@ -54,8 +55,8 @@ def submit(request, batch_id):
                                                                            batch=batch
                                                                            )
             if item.get('source', False):
-                targets.append(item['target'].strip('q_'))
-                source_identifier = item['source'].strip('q_')
+                targets.append(item['target'])
+                source_identifier = item['source']
                 flows = connections.get(source_identifier, [])
                 flows.append(item)
                 connections[source_identifier] = flows
@@ -75,7 +76,7 @@ def submit(request, batch_id):
 #         import pdb; pdb.set_trace()
         batch.start_question = nodes[root_question_id]
         batch.save()
-    return HttpResponse(data);
+    return HttpResponseRedirect(reverse('batch_questions_page', args=(batch_id)))
 
 def export_all_questions(request):
     pass

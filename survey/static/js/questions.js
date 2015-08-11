@@ -32,20 +32,6 @@ $(function(){
         }
       });
      
-//     $('#question_flow_form').validate({
-//   	  submitHandler: function(form) { 
-//   		  var new_condition = {
-//   			validation_test : form.validation_test.value.trim(),
-//   			validation_arg: [form.validation_arg.value.trim(), ]
-//   		  }
-//   		  handle_edge(new_condition)
-//   		  	
-//   	  },
-//     rules: {
-//       'validation_test' : { required : false },
-//       'validation_arg' : {required : false, 'depends': true },
-//       }
-//     });
 
            
 });
