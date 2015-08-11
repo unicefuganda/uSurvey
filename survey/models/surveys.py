@@ -15,6 +15,9 @@ class Survey(BaseModel):
     class Meta:
         app_label = 'survey'
         
+    def __unicode__(self):
+        return self.name
+    
     @classmethod
     def save_sample_size(cls, survey_form):
         survey = survey_form.save(commit=False)

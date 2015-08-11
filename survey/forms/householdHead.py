@@ -26,8 +26,8 @@ class HouseholdHeadForm(ModelForm):
 
     class Meta:
         model = HouseholdHead
-        fields = ['surname', 'first_name',  'date_of_birth', 'gender', 'resident_since_year',
-                  'level_of_education', 'resident_since_month', 'occupation']
+        fields = ['surname', 'first_name',  'date_of_birth', 'gender',
+                  'level_of_education', 'resident_since', 'occupation']
 
         widgets = {
             'surname': forms.TextInput(attrs={'placeholder': 'Family Name'}),

@@ -1,6 +1,6 @@
 from django import forms
 from rapidsms.contrib.locations.models import Location
-from survey.models import HouseholdMemberGroup, QuestionModule, Question, Batch, Survey, EnumerationArea
+from survey.models import HouseholdMemberGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, SurveyAllocation
 from django.contrib.auth.handlers.modwsgi import groups_for_user
 MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
 DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE =20
@@ -87,7 +87,8 @@ class LocationFilterForm(forms.Form):
         survey_id = self.data.get('survey', None)
         survey_id = survey_id if str(survey_id).isdigit() else self.fields['survey'].queryset[0].id
         self.fields['batch'].queryset = Batch.objects.filter(survey=survey_id)
-        self.fields['ea'].queryset = EnumerationArea.objects.filter(survey=survey_id)
+        ea = SurveyAllocation.objects.get(survey=survey_id).interviewer.ea
+        self.fields['ea'].queryset = EnumerationArea.objects.filter(pk=ea.pk)
 
 
 class SurveyBatchFilterForm(forms.Form):

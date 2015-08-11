@@ -130,7 +130,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.media",
     "django.core.context_processors.static",
     "django.contrib.messages.context_processors.messages",
-    "survey.context_processor.project_title"
+    "survey.context_processor.project_title",
+    "django.core.context_processors.request"
 )
 
 MIDDLEWARE_CLASSES = (
@@ -140,6 +141,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'bootstrap_pagination.middleware.PaginationMiddleware',
+    'breadcrumbs.middleware.BreadcrumbsMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )

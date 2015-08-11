@@ -10,6 +10,7 @@ from survey.models.base import BaseModel
 class LocationType(MPTTModel, BaseModel):
     name = models.CharField(max_length=200, unique=True)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='sub_types', db_index=True)
+    location_code = models.PositiveIntegerField(null=True, blank=True)
     slug = models.SlugField()
     
     def __unicode__(self):

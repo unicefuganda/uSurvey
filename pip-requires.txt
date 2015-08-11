@@ -22,4 +22,5 @@ xlwt
 django-celery
 selenium==2.35.0
 django-model-utils==2.2
-django-redis-cache
+django-redis-cache==1.5.5
+django-breadcrumbs==1.1.3

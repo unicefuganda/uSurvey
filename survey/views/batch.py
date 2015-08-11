@@ -22,7 +22,9 @@ def index(request, survey_id):
         batches = batches.values('id', 'name').order_by('name')
         json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
         return HttpResponse(json_dump, mimetype='application/json')
-
+    request.breadcrumbs([
+        ('survey list', reverse('survey_list_page')),
+    ])
     context = {'batches': batches, 'survey': survey,
                'request': request, 'batchform': BatchForm(instance=Batch(survey=survey)),
                'action': '/surveys/%s/batches/new/' % survey_id, }
@@ -43,6 +45,11 @@ def show(request, survey_id, batch_id):
             locations = locations.filter(id__in=batch_location_ids)       
         else:
             locations = locations.exclude(id__in=batch_location_ids)     
+    request.breadcrumbs([
+        ('survey list', reverse('survey_list_page')),
+        (batch.survey.name, reverse('survey.views.batch.index', args=(batch.survey.pk, ))),
+#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
+    ])
 #     import pdb; pdb.set_trace()  
     context = {'batch': batch,
                'locations': locations,
@@ -90,7 +97,10 @@ def new(request, survey_id):
     survey=Survey.objects.get(id=survey_id)
     batch_form = BatchForm(initial={'survey' : survey})
     response, batchform = _process_form(request, survey_id, action_str='added')
-
+    request.breadcrumbs([
+        ('survey list', reverse('survey_list_page')),
+#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
+    ])
     context = {'batchform': batchform, 'button_label': "Create", 'id': 'add-batch-form', 'title': 'New Batch',
                'action': '/surveys/%s/batches/new/' % survey_id, 'cancel_url': '/surveys/'}
     return response or render(request, 'batches/new.html', context)
@@ -115,7 +125,16 @@ def _process_form(request, survey_id, instance=None, action_str='edited'):
 def edit(request, survey_id, batch_id):
     batch = Batch.objects.get(id=batch_id, survey__id=survey_id)
     response, batchform = _process_form(request, survey_id, instance=batch, action_str='edited')
-
+    request.breadcrumbs([
+        ('survey list', reverse('survey_list_page')),
+        (batch.survey.name, reverse('survey.views.batch.index', args=(batch.survey.pk, ))),
+#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
+    ])
+    request.breadcrumbs([
+        ('survey list', reverse('survey_list_page')),
+        (batch.survey.name, reverse('survey.views.batch.index', args=(batch.survey.pk, ))),
+#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
+    ])
     context = {'batchform': batchform, 'button_label': "Save", 'id': 'edit-batch-form', 'title': 'Edit Batch',
                'action': '/surveys/%s/batches/%s/edit/' % (survey_id, batch.id)}
     return response or render(request, 'batches/new.html', context)
@@ -192,6 +211,9 @@ def list_batches(request):
         batches = Batch.objects.values('id', 'name').order_by('name')
         json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
         return HttpResponse(json_dump, mimetype='application/json')
+    request.breadcrumbs([
+        ('survey list', reverse('survey_list_page')),
+    ])
     return render(request, 'layout.html')
 
 

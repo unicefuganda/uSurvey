@@ -1,4 +1,4 @@
-from survey.models.interviewer import Interviewer
+from survey.models.interviewer import Interviewer, SurveyAllocation
 from survey.models.interviews import NumericalAnswer, Interview, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, Answer, ODKGeoPoint, DateAnswer, VideoAnswer, ImageAnswer, AudioAnswer
 from survey.models.backend import Backend
 from survey.models.questions import Question, QuestionOption, QuestionFlow, TextArgument
@@ -27,6 +27,7 @@ from survey.models.locations import Location, LocationType
 
 __all__ = [
 #     'ULocation'
+    'SurveyAllocation',
     'Location',
     'LocationType',
     'AnswerAccessDefinition',

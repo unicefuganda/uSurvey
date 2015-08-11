@@ -5,7 +5,6 @@
 {% block content %}
 {% load template_tags %}
     <h3>Upload Geographical Locations</h3>
-    {% if country_name %}
     <form action="{{ action }}" enctype="multipart/form-data" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
         {% csrf_token %}
         <div class="control-group">
@@ -26,30 +25,34 @@
         <div class="accordion-inner">
             <table class="table-bordered table">
                 <tr>
-                {% for detail in location_types_details %}
-                    {% if detail.has_code %}
-                        <th>
-                            {{ detail.location_type.name.capitalize }}Code
-                        </th>
-                    {% endif %}
-
-                    <th>
-                        {{ detail.location_type.name.capitalize }}Name
-                    </th>
+                {% for location_type in location_types %}
+					{% if location_type.parent %}                
+	                    {% if location_type.code %}
+	                        <th>
+	                            {{ location_type.name.capitalize }}Code
+	                        </th>
+	                    {% endif %}
+	
+	                    <th>
+	                        {{ location_type.name.capitalize }}Name
+	                    </th>
+	                {% endif %}
                 {% endfor %}
                 </tr>
                 {% for row_count in range %}
                     <tr>
-                    {% for detail in location_types_details %}
-                        {% if detail.has_code %}
-                            <td>
-                                {{ '0'|repeat_string:detail.length_of_code }}{{ row_count }}
-                            </td>
-                        {% endif %}
-
-                        <td>
-                            {{ detail.location_type.name.lower }}{{ row_count }}
-                        </td>
+                    {% for location_type in location_types %}
+     					{% if location_type.parent %}                  
+	                        {% if location_type.code %}
+	                            <td>
+	                                {{ '0'|repeat_string:location_type.length_of_code }}{{ row_count }}
+	                            </td>
+	                        {% endif %}
+	
+	                        <td>
+	                            {{ location_type.name.lower }}{{ row_count }}
+	                        </td>
+	                    {% endif %}
                     {% endfor %}
                     </tr>
                 {% endfor %}
@@ -59,16 +62,13 @@
             <span class="red">Please note:</span>
             <ul>
                 <li> Column headers have to be exactly as shown above.</li>
-                {% for detail in location_types_details %}
-                    {% if detail.has_code %}
-                        <li>Each <span class="bold">{{ detail.location_type.name.capitalize }} code</span> have to be exactly <span class="bold">{{ detail.length_of_code }} digits</span>.</li>
+                {% for location_type in location_types %}
+                    {% if location_type.code %}
+                        <li>Each <span class="bold">{{ location_type.name.capitalize }} code</span> have to be exactly <span class="bold">{{ location_type.length_of_code }} digits</span>.</li>
                     {% endif %}
                 {% endfor %}
             </ul>
         </div>
     </div>
 
-    {% else %}
-        <a href="{% url 'add_location_hierarchy' %}" class="btn btn-primary" name="add_hierarchy">Add Hierarchy</a>
-    {% endif %}
 {% endblock %}

@@ -3,12 +3,9 @@ body
 background-color:#E6E6E6;
 background-size:cover;
 background-repeat:no-repeat;
-padding:0;
+background-position:center:
 }
-.logopad
-{
-padding-left: 0;
-}
+
 .usocilbg
 {
 background-color:#1B1B1B;
@@ -162,7 +159,14 @@ color:#D65106;
 text-decoration:none;
     
 }
+.zndex{
+   position: relative;
+}
 
+.okoyejr
+{
+background-color:#33CCFF; opacity: 0.9; filter: alpha(opacity=90); top: 0; position: fixed;  width: 100%; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#FFFFFF; box-shadow: 1px 1px 1px 1px; height: 72px;
+}
 .tbanner
 {
 background-color:#FFFFFF; opacity: 0.9; filter: alpha(opacity=90); top: 0; position: fixed;  width: 100%; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666; box-shadow: 1px 1px 1px 1px; height: 72px;
