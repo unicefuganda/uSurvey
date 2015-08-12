@@ -152,11 +152,14 @@ edit_question = function(selected, edit_data)
 
 handle_node = function(elem_data){
 	var all_nodes = cy.$('node');
-//	var selected_nodes = cy.$('node:selected');
+//	var selected_nodes = cy.$('node:selected, edge:selected');
 	var result = null;
-	if(all_nodes.length>0 && LAST_SELECTED == undefined)
+	if(all_nodes.length>0 && LAST_SELECTED_EDGE === undefined && LAST_SELECTED_NODE === undefined)
 		return flash_message('No node selected');
-	selected = LAST_SELECTED;
+	if(LAST_SELECTED_EDGE === undefined)
+		selected = LAST_SELECTED_NODE;
+	else
+		selected = LAST_SELECTED_EDGE;
 	switch(true)
 	{
 	case (all_nodes.length == 0):

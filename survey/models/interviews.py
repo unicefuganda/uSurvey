@@ -56,12 +56,14 @@ class Interview(BaseModel):
         
     class Meta:
         app_label = 'survey'
-        unique_together = ['interviewer', 'householdmember', 'batch']
+        unique_together = [('interviewer', 'householdmember', 'batch'), ]
          
  
 class Answer(BaseModel):
     interview = models.ForeignKey(Interview, related_name='%(class)s')
-    question = models.OneToOneField("Question", null=True, related_name="%(class)s")
+#     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
+#                                                             #value shall hold the exact worth of the response
+    flow = models.OneToOneField("QuestionFlow", null=True, related_name="%(class)s")
      
     @classmethod
     def answer_types(cls):
@@ -128,7 +130,7 @@ class Answer(BaseModel):
  
  
 class NumericalAnswer(Answer):
-    value = models.PositiveIntegerField(max_length=5, null=True)
+    value = models.PositiveIntegerField(max_length=5, null=True) 
      
     @classmethod
     def validators(cls):
@@ -270,4 +272,4 @@ class AnswerAccessDefinition(BaseModel):
             
     class Meta:
         app_label = 'survey'
-        unique_together = ('answer_type', 'channel')
+        unique_together = [('answer_type', 'channel'), ]

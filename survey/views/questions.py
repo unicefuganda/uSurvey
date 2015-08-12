@@ -40,22 +40,24 @@ def index(request, batch_id):
 def submit(request, batch_id):
     if request.method == 'POST':
         batch = get_object_or_404(Batch, pk=batch_id)
-        if batch.start_question: 
-            batch.start_question.delete()
         data = request.POST.get('questions_data')
         question_graph = json.loads(data)
         nodes = {}
         connections = {}
         targets = []
+        root_question = None
         for item in question_graph:
             if item.get('identifier', False):
-                nodes[item['identifier']], _ = Question.objects.get_or_create(identifier=item['identifier'], 
-                                                                           text=item['text'], 
-                                                                           answer_type=item['answer_type'],
-                                                                           batch=batch
-                                                                           )
+                question, _ = Question.objects.get_or_create(identifier=item['identifier'], 
+                                                                           batch=batch)
+                question.text=item['text']                                 
+                question.answer_type=item['answer_type']     
+                question.save()                      
+                nodes[item['identifier']] = question                             
+                if int(item.get('level', -1)) == 0:
+                    batch.start_question = question
+                    batch.save()
             if item.get('source', False):
-                targets.append(item['target'])
                 source_identifier = item['source']
                 flows = connections.get(source_identifier, [])
                 flows.append(item)
@@ -64,18 +66,13 @@ def submit(request, batch_id):
             for flow in flows:
                 #import pdb; pdb.set_trace()
                 f, _ = QuestionFlow.objects.get_or_create(question=nodes[source_identifier], 
-                                                   next_question=nodes[flow['target'].strip('q_')],
+                                                   next_question=nodes[flow['target']],
                                                    validation_test=flow['validation_test']
                                                )
                 ##now create test arguments
                 for idx, arg in enumerate(flow['validation_arg']):
                     if arg.strip():
                         TextArgument.objects.get_or_create(flow=f, position=idx, param=arg)
-        source_question_ids = connections.keys()
-        root_question_id = set(source_question_ids).difference(targets).pop()
-#         import pdb; pdb.set_trace()
-        batch.start_question = nodes[root_question_id]
-        batch.save()
     return HttpResponseRedirect(reverse('batch_questions_page', args=(batch_id)))
 
 def export_all_questions(request):

@@ -73,7 +73,10 @@ cy = cytoscape({
       nodes: [
           		{% for q_node in batch_question_tree %}
           		    { data: { id: 'c_{{q_node.identifier}}', name: '{{q_node.identifier}}'} },
-               	    { data: {id: '{{q_node.identifier}}', identifier: '{{q_node.identifier}}', parent: '{{q_node.identifier}}', text: '{{ q_node.text }}',  key: '{{q_node.pk}}' , answer_type:'{{q_node.answer_type}}'},},
+               	    { data: {id: '{{q_node.identifier}}', identifier: '{{q_node.identifier}}', parent: 'c_{{q_node.identifier}}', 
+               	    	text: '{{ q_node.text }}',  key: '{{q_node.pk}}' , answer_type:'{{q_node.answer_type}}',
+               	    	{% if batch.start_question.pk == q_node.pk%}level: 0, {% endif %}	
+               	    },},
               {% endfor %}
 	          
             ],
@@ -81,7 +84,13 @@ cy = cytoscape({
   	           {% if batch_question_tree %}              
 	          		{% for q_node in batch_question_tree %}
 	          			{% for flow in q_node.flows.all %}
-	          	        	{ data: { id: "{{q_node.identifier}}_{{flow.next_question.identifier}}", source: "{{q_node.identifier}}", target: "{{flow.next_question.identifier}}", condition: "{{ flow | show_condition }}", }, },
+	          	        	{ data: { id: "{{q_node.identifier}}_{{flow.next_question.identifier}}", source: "{{q_node.identifier}}", target: "{{flow.next_question.identifier}}", condition: "{{ flow | show_condition }}", 
+	          	        		validation_test: "{{flow.validation_test}}",
+	          	        		validation_arg: [
+	          	        		                 {% for arg in flow.test_arguments %}    
+	          	        		                 	"{{arg.param}}"
+	          	        		                 {% endfor %}
+	          	        		                 ]}, },
 	          	        {% endfor %}
 	               	{% endfor %}
 		      {% endif %}

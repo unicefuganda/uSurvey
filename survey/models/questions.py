@@ -16,17 +16,21 @@ class Question(BaseModel):
 
     class Meta:
         app_label = 'survey'        
-        unique_together = ['identifier', 'batch']
+        unique_together = [('identifier', 'batch'), ]
 
     def __unicode__(self):
         return "%s - %s: (%s)" % (self.identifier, self.text, self.answer_type.upper())
-
     
 class QuestionFlow(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__) for validator in Answer.validators()]
     question = models.ForeignKey(Question, related_name='flows')
     validation_test = models.CharField(max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)    
+    name = models.CharField(max_length=200, null=True, blank=True, unique=True) #if validation passes, classify this flow response as having this value  
     next_question = models.ForeignKey(Question, related_name='connecting_flows')
+    
+    class Meta:
+        app_label = 'survey'        
+        unique_together = [('question', 'next_question'),]
     
     @property
     def test_arguments(self):
@@ -64,7 +68,6 @@ class DateArgument(TestArgument):
         
     class Meta:
         app_label = 'survey'
-
 
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")

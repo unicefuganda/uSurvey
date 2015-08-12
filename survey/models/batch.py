@@ -23,7 +23,7 @@ class Batch(BaseModel):
 
     class Meta:
         app_label = 'survey'
-        unique_together = ('survey', 'name',)
+        unique_together = [('survey', 'name',) ]
         
     def save(self, *args, **kwargs):
         last_order = Batch.objects.aggregate(Max('order'))['order__max']

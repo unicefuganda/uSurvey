@@ -1,15 +1,13 @@
 {% load template_tags %}
-LAST_SELECTED = undefined;
-TAPPED_BEFORE = null;
+LAST_SELECTED_NODE = undefined;
+LAST_SELECTED_EDGE = undefined;
 cy.on('select', 'node[parent]', function(evt) { //show node actions when node is selected
 	var source = evt.cyTarget;
-	if(source !== LAST_SELECTED && LAST_SELECTED !== undefined)
-		LAST_SELECTED.unselect();
-	LAST_SELECTED = source;
-	var source_id = source.data('id');
+	if(source !== LAST_SELECTED_NODE && LAST_SELECTED_NODE !== undefined)
+		LAST_SELECTED_NODE.unselect();
+	LAST_SELECTED_NODE = source;
 	$('#canvas_actions').show(); 
-	var node_edges = source.neighborhood('edge[target="'+source_id+'"]'); //root nodes are never edge target
-	if(node_edges.length == 0)
+	if(source.data('level') === 0)
 	{
 		$('#node_actions .remove').hide(); //you cannot remove the root node only edit
 	}
@@ -26,7 +24,11 @@ cy.on('unselect', 'node[parent]', function(evt) {
 	});
 
 cy.on('select', 'edge', function(evt) { //edge actions when node is selected
-	$('#canvas_actions').show(); 
+	var edge = evt.cyTarget;
+	if(edge !== LAST_SELECTED_EDGE && LAST_SELECTED_EDGE !== undefined)
+		LAST_SELECTED_EDGE.unselect();
+	LAST_SELECTED_EDGE = edge;
+	 $('#canvas_actions').show(); 
 	 $('#edge_actions').show(); 
 	 $('#node_actions').hide();
 	});
@@ -40,7 +42,7 @@ cy.on('tap', function(event){
 	
 //	var nodes = cy.$('node:selected[parent]');
 	//alert('all nodes!='+ all_nodes.length + ' my nodes '+ nodes.length);
-	if(all_nodes.length > 0 && LAST_SELECTED === undefined)
+	if(all_nodes.length > 0 && LAST_SELECTED_NODE === undefined)
 		return;
 	var evtTarget = event.cyTarget;
 	  if( evtTarget === cy )
@@ -54,10 +56,10 @@ cy.on('tap', function(event){
 	      else
 	    	  {
 	    	  		$('#p_question').remove();
-	    	     	LAST_SELECTED.select();
-	    	     	insert_previous_question(LAST_SELECTED.data());
-	    	     	enable_question_flow(LAST_SELECTED.data());
-	    	     	build_new_question(LAST_SELECTED.data());
+	    	     	LAST_SELECTED_NODE.select();
+	    	     	insert_previous_question(LAST_SELECTED_NODE.data());
+	    	     	enable_question_flow(LAST_SELECTED_NODE.data());
+	    	     	build_new_question(LAST_SELECTED_NODE.data());
 	    	  }
 	      $('#canvas_actions').hide(); 
 	      $('.lib_questions').show(); 
@@ -68,7 +70,7 @@ cy.on('tap', function(event){
 $("#lib_questions tr.ms-selectable").click(function(evt)
 {
 	var all_nodes = cy.$('node');
-	if(all_nodes.length > 0 && LAST_SELECTED === undefined)
+	if(all_nodes.length > 0 && LAST_SELECTED_NODE === undefined)
 		return flash_message('First select the node to connect to');
 	 var identifier = $( this ).children("td.question_identifier").text();
 	 if(identify_is_available(identifier))
@@ -82,7 +84,7 @@ $("#lib_questions tr.ms-selectable").click(function(evt)
 	     {
 	   	  first_question(new_question);
 	     }
-	     else build_question_from_lib(LAST_SELECTED.data(), new_question);
+	     else build_question_from_lib(LAST_SELECTED_NODE.data(), new_question);
 	}
 	else flash_message('identifier is already in use');
 });
@@ -97,18 +99,14 @@ $('#question_subm_form').submit(function(evt){
 	}
 	$('#questions_data').val(JSON.stringify(graph));
 	$('#submission_form').submit();
-	flash_message($('#questions_data').val());
+//	flash_message($('#questions_data').val());
  });
 
 $('#node_actions .remove').click(function(evt) {
 	 elems = cy.$('node:selected[parent]');
 	 source = elems[0];
-	 var source_id = source.data('id');
-	var node_edges = source.neighborhood('edge[target="'+source_id+'"]'); //root nodes are never edge target
-	if(node_edges == 0)
-	{
-		return;  //should not be able to remove root node
-	}
+	 if(source.data('level') === 0) //root node
+		 return
 	 cy.batch(function(){
 		    parent_nodes = elems.parent();
 		    elems.remove();
@@ -137,14 +135,8 @@ $('#cancel_question_form').click(function(evt) {
 $('#node_actions .edit').click(function(evt) {
 	 $('#batch_questions').hide();
 	 $('#quest_flow_form_cont').hide();
-	 node = cy.$('node:selected[parent]')[0];
-	 $('#question_form #question').val(node.data('text'));
-	 $('#question_form #identifier').val(node.data('identifier'));
-	 $('#question_form #answer_type').val(node.data('answer_type'));
+	 start_question_form(LAST_SELECTED_NODE.data());
 	 $('#question_form').attr('edit', 'true');
-	 $('#question_form').show();
-     $('#side_bar').show();
-     $('#filz').show();
 	 });
 
 $('#edit_edge').click(function(evt) {

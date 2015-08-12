@@ -8,7 +8,7 @@ $(function(){
 	}, "No validation parameter");
 	$.validator.addMethod("condition_is_available", function(val){
 		var condition = get_condition($('#validation_test').val(), [$('#validation_arg').val(), ]);
-		return condition_is_available(LAST_SELECTED, condition);
+		return condition_is_available(LAST_SELECTED_NODE, condition);
 	}, "Condition already assigned");
 	$('#question_form').validate({
     	  submitHandler: function(form) { 
