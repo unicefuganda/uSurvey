@@ -73,6 +73,8 @@ def submit(request, batch_id):
                 for idx, arg in enumerate(flow['validation_arg']):
                     if arg.strip():
                         TextArgument.objects.get_or_create(flow=f, position=idx, param=arg)
+        #remove strayed questions
+        batch.batch_questions.exclude(identifier__in=nodes.keys()).delete()
     return HttpResponseRedirect(reverse('batch_questions_page', args=(batch_id)))
 
 def export_all_questions(request):
