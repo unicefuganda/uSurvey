@@ -1,6 +1,6 @@
 $(function(){
 
-
+	 reload_questions_lib();
     $('#id_groups').on('change', function () {
     	reload_questions_lib();
     });
@@ -54,7 +54,6 @@ $(function(){
 
 function reload_questions_lib()
 {
-
 	var group_selected = $('#id_groups').val();
     var module_selected = $('#id_modules').val();
     var answer_type_selected = $('#id_question_types').val();
