@@ -5,41 +5,21 @@
 {% endblock %}
 
 {% block display_form_fields %}
-{% include "vertical_location_widget.html" with location_data=locations default_text="" form=householdform %}
-<input type="hidden" name="location" value="{% if selected_location %}{{selected_location.id}}{% endif %}">
+
 <div class="control-group">
-  <label class="control-label" for="investigator">Investigator</label>
+  <label class="control-label" for="interviewer">Interviewer</label>
   <div class="controls">
-   <select name="investigator" id="household-investigator"  data-placeholder="Select or Type Investigator "  single class="chzn-select" required>
-      <option value={{investigator_form.value}} selected>{{investigator_form.text}}</option>
-      {% for investigator in investigator_form.options %}
-        <option value="{{investigator.id}}">{{investigator.name}}</option>
+   <select name="interviewer" id="household-interviewer"  data-placeholder="Select or Type Interviewer "  single class="chzn-select" required>
+      <option value={{interviewer_form.value}} selected>{{interviewer_form.text}}</option>
+      {% for interviewer in interviewer_form.options %}
+        <option value="{{interviewer.id}}">{{interviewer.name}}</option>
       {% endfor %}
-    </select><label class="error">{{ investigator_form.error }}</label>
+    </select><label class="error">{{ interviewer_form.error }}</label>
   </div>
 </div>
 {% if not is_edit %}
 <h4>Head of Household's Information</h4>
     {% include "naked_form.html" with a_form=headform %}
-    <div class="control-group">
-  <label class="control-label" for="resident_since">Since when have you lived here</label>
-  <div class="controls">
-   <select name="extra_resident_since_month" id="household-extra_resident_since_month"  data-placeholder="Month"  single class="chzn-select" required>
-      <option value="{{months_choices.selected_value}}">{{months_choices.selected_text}}</option>
-      {% for month in months_choices.choices %}
-        <option value="{{month.value}}">{{month.text}}</option>
-      {% endfor %}
-    </select><label class="error">{{ headform.resident_since_month.error }}</label>
-
-    <select name="extra_resident_since_year" id="household-extra_resident_since_year"  data-placeholder="Year"  single class="chzn-select" required>
-      <option value="{{years_choices.selected_value}}">{{years_choices.selected_text}}</option>
-       {% for year in years_choices.choices %}
-         <option value="{{year}}">{{year}}</option>
-       {% endfor %}
-     </select><label class="error">{{ headform.resident_since_year.error }}</label>
-
-  </div>
-</div>
 {% endif %}
 
 <h4>Household Information</h4>
@@ -55,5 +35,8 @@
   <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
     {% if not is_edit %}
          <script src="{{STATIC_URL}}/js/new_household.js" type="text/javascript" charset="utf-8"></script>
+         <script type="text/javascript">
+    		$("#household-resident_since").addClass("datepicker");
+		</script>
     {% endif %}
 {% endblock %}

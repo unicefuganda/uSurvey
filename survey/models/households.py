@@ -1,5 +1,4 @@
 import datetime
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -28,16 +27,18 @@ class Household(BaseModel):
         unique_together = [('survey', 'house_number'), ]
     
     def __unicode__(self):
-        return 'HH-%s-%s' % (self.house_number, self.head.surname)
+        return 'HH-%s' % self.house_number
     
     def clean(self):
         super(Household, self).clean()
         if self.house_number > self.total_households:
              raise ValidationError('Household number has exceeded total households in the Enumeration area')
     
-    @property
-    def head(self):
-        return HouseholdHead.objects.get(household=self)
+    def get_head(self):
+        try:
+            return HouseholdHead.objects.get(household=self)
+        except HouseholdHead.DoesNotExist:
+            return None
 
     def _get_related_location_name(self, key, location_hierarchy):
         location_object = location_hierarchy.get(key, None)
@@ -96,7 +97,7 @@ class HouseholdHead(HouseholdMember):
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary',
                                           verbose_name="Highest level of education completed")
-    resident_since = models.DateField(auto_now=False) #typically only month and year would be filled
+    resident_since = models.DateField(auto_now=False, verbose_name='Since when have you lived here') #typically only month and year would be filled
 #     resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
 #                                                       null=False, default=1984)
 #     resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)

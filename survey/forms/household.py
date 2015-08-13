@@ -1,31 +1,35 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from survey.models.households import Household
+from survey.models import WebAccess
 from django import forms
 
 class HouseholdForm(ModelForm):
+    
     class Meta:
         model = Household
-        exclude = ['registrar', 'location', 'survey', 'household_code']
+        exclude = ['registrar', 'ea', 'survey', 'household_code']
         widgets = {
             'ea': forms.HiddenInput(),
+            'registration_channel': forms.HiddenInput()
         }
 
     def __init__(self, is_edit=False, uid=None,  survey=None, *args, **kwargs):
         super(HouseholdForm, self).__init__(*args, **kwargs)
         self.is_editing = is_edit
+        self.fields['registration_channel'].initial = WebAccess.__name__
 
-        if not self.is_editing:
-            self.fields['uid'].initial = Household.next_uid(survey)
-        else:
-            self.fields['uid'].initial = self.instance.uid
-            self.fields['uid'].widget.attrs['disabled'] = 'disabled'
+#         if not self.is_editing:
+#             self.fields['uid'].initial = Household.next_uid(survey)
+#         else:
+#             self.fields['uid'].initial = self.instance.uid
+#             self.fields['uid'].widget.attrs['disabled'] = 'disabled'
 
     def clean_uid(self):
         if not self.is_editing:
             try:
-                uid = self.cleaned_data['uid']
-                household = Household.objects.filter(uid=int(uid))
+                uid = self.cleaned_data['house_number']
+                household = Household.objects.filter(house_number=int(uid))
                 if household:
                     raise ValidationError("Household with this Household Unique Identification already exists.")
             except TypeError:

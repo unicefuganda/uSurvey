@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required, permission_required
-from rapidsms.contrib.locations.models import *
+from survey.models import Location, LocationType
 from survey.forms.householdHead import *
 from survey.forms.household import *
 from survey.models import Survey, EnumerationArea
@@ -15,6 +15,7 @@ from survey.models.interviewer import Interviewer
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
 from survey.utils.query_helper import get_filterset
+from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''
@@ -50,25 +51,6 @@ def validate_interviewer(request, householdform, selected_ea):
         interviewer_form['error'] = message
         householdform.errors['__all__'] = householdform.error_class([message])
     return interviewer, interviewer_form
-
-
-# def create_household(householdform, interviewer, valid, uid):
-#     is_valid_household = householdform['household'].is_valid()
-# 
-#     if interviewer and is_valid_household:
-#         household = householdform['household'].save(commit=False)
-#         household.interviewer = interviewer
-#         household.ea = interviewer.ea
-#         open_survey = Survey.currently_open_survey(interviewer.location)
-#         household.household_code = LocationCode.get_household_code(interviewer) + str(Household.next_uid(open_survey))
-#         if uid:
-#             household.uid = uid
-#             household.household_code = LocationCode.get_household_code(interviewer) + str(uid)
-# 
-#         household.survey = open_survey
-#         household.save()
-#         valid['household'] = True
-#     return valid
 
 
 def create_remaining_modelforms(householdform, valid):
@@ -114,7 +96,7 @@ def set_household_form(uid=None, data=None, is_edit=False, instance=None):
     household_form = {}
     if not is_edit:
         household_form['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
-    open_survey = Survey.currently_open_survey()
+    open_survey = None #Survey.currently_open_survey()
     household_form['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid,
                                                 survey=open_survey, auto_id='household-%s', label_suffix='')
     return household_form
@@ -145,12 +127,7 @@ def new(request):
             selected_location = selected_ea.locations.all()
             if selected_location:
                 selected_location = selected_location[0]
-
         response, householdform, interviewer, interviewer_form = create(request, selected_ea)
-        month_choices = {'selected_text': MONTHS[int(request.POST['resident_since_month'])][1],
-                         'selected_value': request.POST['resident_since_month']}
-        year_choices = {'selected_text': request.POST['resident_since_year'],
-                        'selected_value': request.POST['resident_since_year']}
 
     household_head = householdform['householdHead']
 
@@ -160,8 +137,6 @@ def new(request):
                'interviewer_form': interviewer_form,
                'headform': household_head,
                'householdform': householdform,
-               'months_choices': household_head.resident_since_month_choices(month_choices),
-               'years_choices': household_head.resident_since_year_choices(year_choices),
                'action': "/households/new/",
                'heading': "New Household",
                'id': "create-household-form",
@@ -189,36 +164,37 @@ def _remove_duplicates(all_households):
 
 @permission_required('auth.can_view_households')
 def list_households(request):
-    selected_location = None
-    selected_ea = None
-    all_households = Household.objects.order_by('household_member__householdhead__surname')
-
-    params = request.GET
-    if params.has_key('location') and params['location'].isdigit():
-        selected_location = Location.objects.get(id=int(params['location']))
-        corresponding_locations = selected_location.get_descendants(include_self=True)
-        all_households = all_households.filter(ea__locations__in=corresponding_locations)
-
-    if params.has_key('ea') and params['ea'].isdigit():
-        selected_ea = EnumerationArea.objects.get(id=int(params['ea']))
-        all_households = all_households.filter(ea=selected_ea)
-    search_fields = ['uid', 'ea__name', 'interviewer__name', 'interviewer__mobile_number', 'survey__name', ]
+    locations_filter = LocationsFilterForm(request.GET, include_ea=True)
+    enumeration_areas = locations_filter.get_enumerations()
+    all_households = Household.objects.filter(ea__in=enumeration_areas).order_by('household_member__householdhead__surname')
+    search_fields = [ 'ea__name', 'registrar__name', 'survey__name', ]
     if request.GET.has_key('q'):
         all_households = get_filterset(all_households, request.GET['q'], search_fields)
     households = _remove_duplicates(all_households)
-    households = Household.set_related_locations(households)
     if not households:
-        location_type = selected_location.type.name.lower() if selected_location and selected_location.type else 'location'
-        messages.error(request, "There are  no households currently registered  for this %s." % location_type)
-
+        messages.error(request, "There are  no households currently registered for present location" )
     return render(request, 'households/index.html',
-                  {'households': households, 'location_data': LocationWidget(selected_location, ea=selected_ea), 'request': request})
+                  {'households': households, 
+                   'locations_filter' : locations_filter, 
+                   'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk),
+                   'Largest Unit' : LocationType.largest_unit(),
+                   'request': request})
 
+@permission_required('auth.can_view_batches')
+def household_filter(request):
+    locations_filter = LocationsFilterForm(request.GET, include_ea=True)
+    enumeration_areas = locations_filter.get_enumerations()
+    all_households = Household.objects.filter(ea__in=enumeration_areas).order_by('household_member__householdhead__surname')
+    search_fields = [ 'ea__name', 'registrar__name', 'survey__name', ]
+    if request.GET.has_key('q'):
+        all_households = get_filterset(all_households, request.GET['q'], search_fields)
+    all_households =  all_households.values('id', 'house_number', ).order_by('name')
+    json_dump = json.dumps(list(all_households), cls=DjangoJSONEncoder)
+    return HttpResponse(json_dump, mimetype='application/json')
 
 def view_household(request, household_id):
     household = Household.objects.get(id=household_id)
     return render(request, 'households/show.html', {'household': household})
-
 
 def edit_household(request, household_id):
     household_selected = Household.objects.get(id=household_id)

@@ -5,6 +5,7 @@ from survey.models.base import BaseModel
 # from survey.models.interviewer import Interviewer
 from model_utils.managers import InheritanceManager
 from django.utils.safestring import mark_safe
+from django.contrib.auth.models import User
 
 
 class InterviewerAccess(BaseModel):
@@ -46,6 +47,12 @@ class USSDAccess(InterviewerAccess):
     
 class ODKAccess(InterviewerAccess):
     odk_token = models.CharField(max_length=10, default="12345")
+    
+    class Meta:
+        app_label = 'survey'
+        
+class WebAccess(InterviewerAccess):
+    pass
     
     class Meta:
         app_label = 'survey'

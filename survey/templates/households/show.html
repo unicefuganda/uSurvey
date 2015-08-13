@@ -25,13 +25,13 @@
                 Age
             </dt>
             <dd>
-                {{ head.get_age }}
+                {{ head.date_of_birth|format_date }}
             </dd>
             <dt>
                 Gender
             </dt>
             <dd>
-                {% if head.male %}
+                {% if head.gender == 1 %}
                     Male
                 {% else %}
                     Female
@@ -53,7 +53,7 @@
                 Since when have you lived here
             </dt>
             <dd>
-                {{ head.resident_since_month|get_month }} {{ head.resident_since_year }}
+                {{ head.resident_since.month|get_month }} {{ head.resident_since.year }}
             </dd>
         </dl>
     {% endwith %}
