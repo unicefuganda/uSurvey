@@ -317,7 +317,7 @@ class RegisterMember(Task):
     def _get_residency_date(self, message=None):
         error_prompt = None
         current_val = None
-        _get_residency_date__PROMPTS = OrderedDict([ ('year', 'Please enter year of birth YYYY\n'),
+        _get_residency_date__PROMPTS = OrderedDict([ ('year', 'Please enter year you started living here (YYYY)\n'),
                                     ('month', '\n'.join(month_prompt)),
                                     ('day', 'Please enter day of birth:\n'),
                                     ])

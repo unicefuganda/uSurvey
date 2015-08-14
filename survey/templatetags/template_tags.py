@@ -68,7 +68,8 @@ def get_month(index):
 
 @register.filter
 def format_date(date):
-    return date.strftime("%b %d, %Y")
+    if date:
+        return date.strftime("%b %d, %Y")
 
 @register.filter
 def get_url_with_ids(args, url_name):
