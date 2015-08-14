@@ -2,10 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>{{ PROJECT_TITLE }}</title>
+<title>uServey :: Home</title>
 <link href="{{ STATIC_URL }}css/style.css" rel="stylesheet" type="text/css" />
 <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
-
+<script src="{{ STATIC_URL }}css/jquery.flexslider-min.js"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
           charset="utf-8">
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
@@ -14,33 +14,24 @@
           charset="utf-8">
     <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/flexslider.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
     <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
 
-
-<script>
-$(function () {
-
-    var counter = 0,
-        divs = $('#div1, #div2, #div3, #div4, #div5, #div6, #div7');
-
-    function showDiv () {
-        divs.hide() // hide all divs
-            .filter(function (index) { return index == counter % 7; }) // figure out correct div to show
-            .show(); // and show it
-
-        counter++;
-    }; // function to loop through divs and show correct div
-
-    showDiv(); // show first div    
-
-    setInterval(function () {
-        showDiv(); // show next div
-    }, 3 * 1000); // do this every 10 seconds    
-
-});
-</script>
+<script type="text/javascript">
+        var $j = jQuery.noConflict();
+        $j(window).load(function() {
+            $j('.flexslider').flexslider({
+                animation: "slide",
+                slideshow: true,
+                slideshowSpeed: 10000,
+                pauseOnHover: true,
+                animationSpeed: 1000,
+                controlNav: true
+            });
+        });
+    </script>
 
 <script>
 $(document).ready( function(){	
@@ -108,30 +99,70 @@ $(document).ready( function(){
       </tr>
     </table></td>
   </tr>
+<tr><td><div class="breadnavbar"></div></td></tr>
   <tr>
 <!-- Go to www.addthis.com/dashboard to customize your tools -->
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-559606700145ffd2" async="async"></script>
-    <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
+    <td align="center" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
       <tr>
-        <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td align="left" valign="top"><div id='container'>
-      <div id='div1' class='display' style="background-color: red;"><img src="{{ STATIC_URL }}img/1.jpg" /></div>
-      <div id='div2' class='display' style="background-color: green;"> <img src="{{ STATIC_URL }}img/2.jpg" /></span></div>
-      <div id='div3' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/3.jpg"/></span></div>
-	  <div id='div4' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/4.jpg"/></span></div>
-	  <div id='div5' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/5.jpg"/></span></div>
-	  <div id='div6' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/6.jpg"/></span></div>
-	  <div id='div7' class='display' style="background-color: blue;"><img src="{{ STATIC_URL }}img/7.jpg"/></span></div>
-	  <div></td>
-          </tr>
-          
-        </table></td>
-      </tr>
-    </table></td>
-  </tr>
-  <tr>
-    <td align="left" valign="top">&nbsp;</td>
+        <td valign="top">
+<div class="container-fluid slides">
+    <section class="row-fluid">
+        <div class="slider">
+            <div class="flexslider custom-flexslider">
+                <ul class="slides">
+                    
+                    <li>
+                        <img src="{{ STATIC_URL }}img/u1.jpg" class="img-responsive" alt="" />
+<div class="forleft">
+                            <h1>Welcome To Usurvey Uganda.</h1>
+
+                            <div class="clearfix"></div>
+                            <h4><p>uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups.</p></h4>
+                            <a href="#">Get Started</a>
+                        </div>
+                    </li>
+                    <li>
+                        <img src="{{ STATIC_URL }}img/u2.jpg" class="img-responsive" alt="" />
+<div class="forleft">
+                            <h1>Welcome To Usurvey Uganda.</h1>
+
+                            <div class="clearfix"></div>
+                            <h4><p>uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups.</p></h4>
+                            <a href="#">Get Started</a>
+                        </div>
+
+                    </li>
+                    <li>
+                        <img src="{{ STATIC_URL }}img/u3.jpg" class="img-responsive" alt="" />
+<div class="forleft">
+                            <h1>Welcome To Usurvey Uganda.</h1>
+
+                            <div class="clearfix"></div>
+                            <h4><p>uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups.</p></h4>
+                            <a href="#">Get Started</a>
+                        </div>
+
+                    </li>
+                    <li>
+                        <img src="{{ STATIC_URL }}img/u4.jpg" class="img-responsive" alt="" />
+<div class="forleft">
+                            <h1>Welcome To Usurvey Uganda.</h1>
+
+                            <div class="clearfix"></div>
+                            <h4><p>uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups.</p></h4>
+                            <a href="#">Get Started</a>
+                        </div>
+                    </li>
+                  </ul>
+            </div>
+        </div>
+    </section>
+</div>
+</td>
+ </tr>
+</table>
+    </td>
   </tr>
   <tr>
     <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
