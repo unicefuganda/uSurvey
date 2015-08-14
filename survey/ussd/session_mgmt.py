@@ -20,7 +20,7 @@ def ussd_login_required(func):
 #             trnx_id = request.get('transactionId')
 #             msisdn = request.get('msisdn')
 #             request_string = request.get('ussdRequestString')
-            access = USSDAccess.objects.get(user_identifier=msisdn)
+            access = USSDAccess.objects.get(user_identifier=msisdn, is_active=True)
             kwargs['access'] = access
             return func(msisdn, *args, **kwargs)
         except USSDAccess.DoesNotExist:

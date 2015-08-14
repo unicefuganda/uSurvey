@@ -17,7 +17,7 @@ class HouseholdForm(ModelForm):
     def __init__(self, is_edit=False, uid=None,  survey=None, *args, **kwargs):
         super(HouseholdForm, self).__init__(*args, **kwargs)
         self.is_editing = is_edit
-        self.fields['registration_channel'].initial = WebAccess.__name__
+        self.fields['registration_channel'].initial = WebAccess.choice_name()
 
 #         if not self.is_editing:
 #             self.fields['uid'].initial = Household.next_uid(survey)
