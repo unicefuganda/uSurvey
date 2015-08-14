@@ -58,13 +58,13 @@ cy = cytoscape({
       }
     },
     {
-      selector: ':selected',
-      css: {
-        'background-color': '#EFF1F1',
-        'line-color': '#EFF1F1',
-        'target-arrow-color': '#FFFFFF',
-        'source-arrow-color': '#FFFFFF'
-      }
+        selector: ':selected',
+        css: {
+          'background-color': 'green',
+          'line-color': '#FF0000',
+          'target-arrow-color': '#FF0000',
+          'source-arrow-color': '#FF0000'
+        }
     }
     
   ],
