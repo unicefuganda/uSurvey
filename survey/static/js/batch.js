@@ -60,9 +60,9 @@ function reload_questions_lib()
     url = '/question_library/json_filter/';
     params = { question_types: answer_type_selected, groups : group_selected, modules: module_selected }
     $.getJSON(url, params, function (data) {
-        $('.ms-selectable').hide()
+        $('#lib_questions_table .ms-selectable').hide()
         $.each(data, function () {
-            $('#' + this.id + '-selectable').show();
+            $('#lib_questions_table #' + this.id + '-selectable').show();
         });
     });
 }
@@ -73,9 +73,9 @@ function keyword_reload_questions_lib()
 	url = '/question_library/json_filter/';
     params = { q:  $('#library_search_form_val').val()}
     $.getJSON(url, params, function (data) {
-        $('.ms-selectable').hide()
+        //$('.ms-selectable').hide()
         $.each(data, function () {
-            $('#' + this.id + '-selectable').show();
+            $('#lib_questions_table  #' + this.id + '-selectable').show();
         });
     });
 	
