@@ -185,7 +185,7 @@ class MemberOrHead(Task):
  
     @property
     def _intro_speech(self):
-        if self._household.head is None:
+        if self._household.get_head() is None:
             context = template.Context({'household': self._household})
             return template.Template(MESSAGES['SELECT_HEAD_OR_MEMBER']).render(context)
         else:
