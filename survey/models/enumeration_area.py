@@ -15,11 +15,20 @@ class EnumerationArea(BaseModel):
    
     def open_surveys(self):
         location_registry =  BatchLocationStatus.objects.filter(location__in=self.locations.all())
-        return Survey.objects.filter(pk__in=[reg.batch.survey.pk for reg in location_registry])
+        return list(Survey.objects.filter(pk__in=[reg.batch.survey.pk for reg in location_registry]))
     
-    def open_batches(self, survey):
+    def open_batches(self, survey, house_member=None):
         location_registry =  BatchLocationStatus.objects.filter(location__in=self.locations.all())
-        return Batch.objects.filter(pk__in=[reg.batch.pk for reg in location_registry], survey=survey).order_by('order')
+        batches = list(survey.batches.filter(pk__in=[reg.batch.pk for reg in location_registry]).order_by('order'))
+        if house_member is not None:
+            applicable = []
+            for batch in batches:
+                if batch.is_applicable(house_member):
+                   applicable.append(batch)
+            batches = applicable
+        return batches
+        
+            
         
 #     def validate_unique(self, *args, **kwargs):
 #         super(EnumerationArea, self).validate_unique(*args, **kwargs)

@@ -1,4 +1,5 @@
-import datetime
+from datetime import date, datetime
+import dateutils
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -39,6 +40,10 @@ class Household(BaseModel):
             return HouseholdHead.objects.get(household=self)
         except HouseholdHead.DoesNotExist:
             return None
+    
+    @property
+    def members(self):
+        return HouseholdMember.objects.filter(household=self)
 
     def _get_related_location_name(self, key, location_hierarchy):
         location_object = location_hierarchy.get(key, None)
@@ -63,7 +68,7 @@ class Household(BaseModel):
         all_households = Household.objects.filter(survey=survey)
         if ea:
             return all_households.filter(ea=ea)
-        return all_households.filter(ea__locations__in=location.get_descendants(include_self=True))
+        return all_households.filter(ea__locations__in=location.get_descendants(include_self=True)) 
 
 class HouseholdMember(BaseModel):
     MALE = 1
@@ -76,6 +81,9 @@ class HouseholdMember(BaseModel):
 #     registrar = models.ForeignKey(Interviewer, related_name='registered_household_members')
 #     registration_channel = models.ForeignKey(InterviewerAccess, related_name='registered_household_members')
 
+    def is_head(self):
+        return False
+
     def __unicode__(self):
         return '%s, %s' % (self.surname, self.first_name)
 
@@ -85,6 +93,20 @@ class HouseholdMember(BaseModel):
             answers.extend(answer_class.objects.filter(householdmember=self, batch=batch)), 
             Answer.answer_types)
         return answers
+    
+    @property
+    def age(self):
+        return dateutils.relativedelta(datetime.utcnow().date(), self.date_of_birth).years
+    
+    def belongs_to(self, member_group):
+        attributes = {'AGE': self.age,
+                      'GENDER': self.gender,
+                      'GENERAL': self.is_head()
+                      }
+        for condition in member_group.get_all_conditions():
+            if not condition.matches(attributes):
+                return False
+        return True
 
     class Meta:
         app_label = 'survey'
@@ -101,6 +123,9 @@ class HouseholdHead(HouseholdMember):
 #     resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
 #                                                       null=False, default=1984)
 #     resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
+
+    def is_head(self):
+        return False
 
     class Meta:
         app_label = 'survey'

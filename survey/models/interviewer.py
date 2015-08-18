@@ -40,8 +40,18 @@ class Interviewer(BaseModel):
     def get_odk_access(self, identifier):
         return ODKAccess.objects.get(interviewer=self, user_identifier=identifier)
     
-    def present_households(self):
-        return self.registered_households.filter(ea=self.ea)
+    def present_households(self, survey=None):
+        if survey is None:
+            return self.registered_households.filter(ea=self.ea)
+        else:
+            return self.registered_households.filter(ea=self.ea, survey=survey)
+    
+    def generate_survey_households(self, survey):
+        if survey.has_sampling:
+            #random select households as per sample size
+            pass
+        else:
+            return present_households(survey)
 
 class SurveyAllocation(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name='assignments')

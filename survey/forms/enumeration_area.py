@@ -34,13 +34,13 @@ class LocationsFilterForm(Form):
         for location_type in LocationType.objects.all():
             if location_type.parent is not None and location_type.is_leaf_node() == False:
                 choices = [(loc.pk, loc.name) for loc in Location.objects.filter(type=location_type)]
-                choices.insert(0, ('', '--------------------------------'))
+                choices.insert(0, ('', '--- Select %s ---' % location_type.name))
                 self.fields[location_type.name] = forms.ChoiceField(choices=choices)
                 self.fields[location_type.name].required = False
                 self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filter chzn-select'
         if include_ea:
             choices = [(ea.pk, ea.name) for ea in EnumerationArea.objects.all()]
-            choices.insert(0, ('', '--------------------------------'))
+            choices.insert(0, ('', '--- Select EA ---'))
             self.fields['enumeration_area'] = forms.ChoiceField(choices=choices)
             self.fields['enumeration_area'].widget.attrs['class'] = 'location_filter chzn-select'
             self.fields['enumeration_area'].required = False

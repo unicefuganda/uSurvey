@@ -22,6 +22,7 @@ def ussd_login_required(func):
 #             request_string = request.get('ussdRequestString')
             access = USSDAccess.objects.get(user_identifier=msisdn, is_active=True)
             kwargs['access'] = access
+            cache.set('/interviewer/%s/access' % access.interviewer.pk, access)
             return func(msisdn, *args, **kwargs)
         except USSDAccess.DoesNotExist:
             return flows.MESSAGES['USER_NOT_REGISTERED']
@@ -32,8 +33,8 @@ def manage(msisdn, trnx_id, request_string, access=None):
     ongoing_command_name = cache.get('/interviewer/%s/ongoing' % access.interviewer.pk, None)
     if ongoing_command_name is None:
         cache.set('/interviewer/%s/ongoing' % access.interviewer.pk, 'Start')
-        return flows.Start(access.interviewer).intro()
+        return flows.Start(access).intro()
     else:
         print ongoing_command_name
         ongoing_command = getattr(flows, ongoing_command_name)
-        return ongoing_command(access.interviewer).respond(request_string)
+        return ongoing_command(access).respond(request_string)
