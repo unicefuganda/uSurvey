@@ -24,7 +24,7 @@
           Type
         </th>
         <th>
-          Number of Households
+          Sample Size
         </th>
         <th  style="background-image: None;">
           Actions
@@ -35,7 +35,7 @@
       {% for survey in surveys %}
         <tr>
           <td>
-            <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
+            {{ survey.name }}
           </td>
           <td>
             {{ survey.description }}
@@ -50,7 +50,7 @@
             <div class="btn-group">
                 <a class="btn btn-small" href='{% url "edit_survey_page" survey.id %}'><i class="icon-pencil"></i> Edit</a>
 {#                {% if not survey.is_open %}<a class="btn btn-small " data-toggle="modal" href="#delete_survey_{{survey.id}}"><i class="icon-trash"></i> Delete</a> {% endif %}#}
-                <a class="add_batch btn btn-small" href='{% url 'new_batch_page' survey.pk %}'><i class="icon-plus"></i> Add Batch</a>
+                <a class="add_batch btn btn-small" href='{% url 'batch_index_page' survey.id %}'>View Batches</a>
             </div>
           {% include "base/delete_modal.html" with object_name=survey.name id=survey.id name="Survey" url=survey.id|get_url_with_ids:"delete_survey" %}
           </td>

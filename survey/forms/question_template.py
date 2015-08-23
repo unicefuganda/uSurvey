@@ -9,6 +9,10 @@ from survey.models import HouseholdMemberGroup
 
 class QuestionTemplateForm(ModelForm):
     
+    def __init__(self, *args, **kwargs):
+        super(QuestionTemplateForm, self).__init__(*args, **kwargs)
+        self.fields.keyOrder = ['module', 'text', 'identifier', 'group', 'answer_type']
+    
     class Meta:
         model = QuestionTemplate
         MODULE_CHOICES = [(module.id, module.name) for module in QuestionModule.objects.all()]

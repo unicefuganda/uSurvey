@@ -27,7 +27,7 @@ class USSDAccessForm(ModelForm):
     
     class Meta:
         model = USSDAccess
-        exclude = ['reponse_timeout', 'duration', 'interviewer']
+        exclude = ['reponse_timeout', 'duration', 'interviewer', 'aggregator']
         
 
 

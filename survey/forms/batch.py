@@ -19,7 +19,7 @@ class BatchForm(ModelForm):
 
     class Meta:
         model = Batch
-        fields = ['name', 'description', 'survey', 'group']
+        fields = ['name', 'description', 'survey', ]
 
         widgets = {
             'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),

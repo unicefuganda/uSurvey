@@ -6,6 +6,7 @@ from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PH
 from survey.models.base import BaseModel
 from survey.models.access_channels import USSDAccess, ODKAccess
 from survey.models.surveys import Survey
+import random
 
 
 class Interviewer(BaseModel):
@@ -47,11 +48,13 @@ class Interviewer(BaseModel):
             return self.registered_households.filter(ea=self.ea, survey=survey)
     
     def generate_survey_households(self, survey):
+        survey_households = list(present_households(survey))
         if survey.has_sampling:
             #random select households as per sample size
-            pass
-        else:
-            return present_households(survey)
+            #first shuffle registered households and select up to sample number
+            random.shuffle(survey_households)
+            survey_households = survey_households[:survey.sample_size]
+        return sorted(survey_households, key=lambda household: household.house_number)
 
 class SurveyAllocation(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name='assignments')

@@ -22,8 +22,7 @@ REMOVE_QUESTION_FROM_OPEN_BATCH_ERROR_MESSAGE = "Question cannot be removed from
 def index(request, batch_id):
     batch = get_object_or_404(Batch, pk=batch_id)
     data = dict(request.GET)
-    data['groups'] = batch.group.id
-    question_filter_form = QuestionFilterForm(data=data, read_only=['groups'], batch=batch)
+    question_filter_form = QuestionFilterForm(data=data, batch=batch)
     question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
     question_form = QuestionForm(batch)
     question_flow_form = QuestionFlowForm()

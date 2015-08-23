@@ -6,7 +6,7 @@ from survey.models.question_templates import QuestionTemplate
 from survey.models.base import BaseModel
 from survey.models.batch import Batch, BatchLocationStatus, BatchChannel
 from survey.models.enumeration_area import EnumerationArea
-from survey.models.household_batch_completion import HouseholdMemberBatchCompletion, HouseholdMemberBatchCompletion, HouseholdBatchCompletion
+from survey.models.household_batch_completion import HouseholdMemberBatchCompletion, HouseholdMemberBatchCompletion, HouseholdBatchCompletion, HouseMemberSurveyCompletion
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import Household, HouseholdHead, HouseholdMember
 from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess, WebAccess
@@ -57,6 +57,7 @@ __all__ = [
     'Household',
     'HouseholdHead',
     'HouseholdMemberBatchCompletion',
+    'HouseMemberSurveyCompletion',
     'GroupCondition',
     'Interviewer',
     'LocationAutoComplete',

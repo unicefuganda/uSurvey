@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from survey.models.interviews import Answer
+from survey.models.householdgroups import HouseholdMemberGroup
 from survey.models.base import BaseModel
 from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
@@ -12,6 +13,7 @@ class Question(BaseModel):
     identifier = models.CharField(max_length=100, blank=False, null=True, verbose_name='Variable Name')
     text = models.CharField(max_length=150, blank=False, null=False)
     answer_type = models.CharField(max_length=100, blank=False, null=False, choices=ANSWER_TYPES)
+    member_group = models.ForeignKey(HouseholdMemberGroup, related_name='questions')
     batch = models.ForeignKey('Batch', related_name='batch_questions')
 
     class Meta:

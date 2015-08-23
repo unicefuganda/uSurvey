@@ -16,7 +16,7 @@ class Batch(BaseModel):
     description = models.CharField(max_length=300, blank=True, null=True)
     survey = models.ForeignKey(Survey, null=True, related_name="batches")
 #     eas = models.ManyToManyField(EnumerationArea, related_name='batches', null=True) #enumeration areas for which this Batch is open
-    group = models.ForeignKey("HouseholdMemberGroup", null=True, related_name="question_group")
+#     group = models.ForeignKey("HouseholdMemberGroup", null=True, related_name="question_group")
     start_question = models.OneToOneField(Question, related_name='starter_batch', null=True, blank=True, on_delete=models.SET_NULL)
     BATCH_IS_OPEN_MESSAGE = "Batch cannot be deleted because it is open in %s."
     BATCH_HAS_ANSWERS_MESSAGE = "Batch cannot be deleted because it has responses."

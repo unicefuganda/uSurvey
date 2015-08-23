@@ -310,3 +310,5 @@ class AnswerAccessDefinition(BaseModel):
     class Meta:
         app_label = 'survey'
         unique_together = [('answer_type', 'channel'), ]
+        
+# class 

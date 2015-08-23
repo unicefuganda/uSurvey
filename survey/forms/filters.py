@@ -23,7 +23,6 @@ class QuestionFilterForm(forms.Form):
         else:
             map(lambda question_type: question_type_choices.append(question_type), 
                 [(name, name) for name in batch.answer_types ])
-            self.fields['groups'].initial = batch.group
         self.fields['groups'].choices = group_choices
         self.fields['modules'].choices = module_choices
         self.fields['question_types'].choices = question_type_choices

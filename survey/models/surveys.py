@@ -5,7 +5,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=True, unique=True)
     description = models.CharField(max_length=300, blank=True, null=True)
-    sample_size = models.PositiveIntegerField(max_length=2, null=False, blank=False, default=10, verbose_name="Number of Households in EA/Village")
+    sample_size = models.PositiveIntegerField(max_length=2, null=False, blank=False, default=10)
     type = models.BooleanField(default=False)
     has_sampling = models.BooleanField(default=True)
     min_percent_reg_houses = models.IntegerField(verbose_name='Min % Of Registered Households', default=80, validators=[MinValueValidator(0), MaxValueValidator(100)],

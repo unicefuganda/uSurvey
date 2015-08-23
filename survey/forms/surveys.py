@@ -11,7 +11,7 @@ class SurveyForm(ModelForm):
         fields = ['name', 'description', 'type', 'has_sampling', 'sample_size', 'min_percent_reg_houses']
         widgets = {
             'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
-            'type': InlineRadioSelect(choices=((True, 'Aggregate'), (False, 'Roster'))),
+            'type': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census'))),
         }
 
     has_sampling = forms.BooleanField(label="Enable Sampling", required=False, initial=True)
