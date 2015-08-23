@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from survey.models.surveys import Survey
@@ -42,7 +43,9 @@ def new(request):
                'action': "/surveys/new/",
                'cancel_url': '/surveys/',
                }
-
+    request.breadcrumbs([
+        ('Surveys', reverse('survey_list_page')),
+    ])
     return response or render(request, 'surveys/new.html', context)
 
 @handle_object_does_not_exist(message="Survey does not exist.")
@@ -64,6 +67,9 @@ def edit(request, survey_id):
                'cancel_url': '/surveys/',
                'action': '/surveys/%s/edit/' %survey_id
                }
+    request.breadcrumbs([
+        ('Surveys', reverse('survey_list_page')),
+    ])
     return render(request, 'surveys/new.html', context)
 
 @handle_object_does_not_exist(message="Survey does not exist.")

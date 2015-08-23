@@ -15,6 +15,7 @@ from survey.models.interviewer import Interviewer
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
 from survey.utils.query_helper import get_filterset
+from django.core.urlresolvers import reverse
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 
 
@@ -142,6 +143,9 @@ def new(request):
                'id': "create-household-form",
                'button_label': "Create",
                'loading_text': "Creating..."}
+    request.breadcrumbs([
+        ('Households', reverse('list_household_page')),
+    ])
     return response or render(request, 'households/new.html', context)
 
 
@@ -194,6 +198,9 @@ def household_filter(request):
 
 def view_household(request, household_id):
     household = Household.objects.get(id=household_id)
+    request.breadcrumbs([
+        ('Households', reverse('list_household_page')),
+    ])
     return render(request, 'households/show.html', {'household': household})
 
 def edit_household(request, household_id):
@@ -217,6 +224,9 @@ def edit_household(request, household_id):
         response, household_form, interviewer, interviewer_form = create(request, selected_location,
                                                                            instance=household_selected, is_edit=True,
                                                                            uid=uid)
+    request.breadcrumbs([
+        ('Households', reverse('list_household_page')),
+    ])
     return response or render(request, 'households/new.html', {'selected_location': selected_location,
                                                                'locations': LocationWidget(selected_location, ea=selected_ea),
                                                                'interviewer_form': interviewer_form,

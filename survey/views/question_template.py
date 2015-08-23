@@ -57,7 +57,9 @@ def _render_question_view(request, instance=None):
 
     if request.method == 'POST':
         response, question_form = _process_question_form(request, response, instance)
-
+    request.breadcrumbs([
+        ('Question Library', reverse('show_question_library')),
+    ])
     context = {'button_label': button_label,
                'id': 'add-question-form',
                'request': request,

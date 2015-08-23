@@ -25,6 +25,9 @@ def _add_error_response_message(interviewer, request,action_text):
     messages.error(request, error_message + "See errors below.")
 
 def _create_or_edit(request, action_text, interviewer=None, extra=1):
+    request.breadcrumbs([
+        ('Interviewers', reverse('interviewers_page')),
+    ])
     interviewer_form = InterviewerForm(instance=interviewer)
     locations_filter = LocationsFilterForm(request.GET)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)

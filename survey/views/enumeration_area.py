@@ -27,6 +27,10 @@ def new(request):
             messages.success(request, "Enumeration Area successfully created.")
             return HttpResponseRedirect(reverse('enumeration_area_home', args=()))
         messages.error(request, "Enumeration area was not created.")
+    request.breadcrumbs([
+        ('Enumeration Areas', reverse('enumeration_area_home')),
+#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
+    ])
     return render(request, 'enumeration_area/new.html',
                   {'enumeration_area_form': enumeration_area_form, 'locations_filter' : locations_filter, 'title': 'New Enumeration Area', 'button_label': 'Create',
                    'action': reverse('new_enumeration_area_page', args=()), 
@@ -90,6 +94,10 @@ def edit(request, ea_id):
             messages.success(request, "Enumeration Area successfully Changed.")
             return HttpResponseRedirect(reverse('enumeration_area_home', args=()))
         messages.error(request, "Enumeration area was not Changed.")
+    request.breadcrumbs([
+        ('Enumeration Areas', reverse('enumeration_area_home')),
+#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
+    ])
     return render(request, 'enumeration_area/new.html',
                   {'enumeration_area_form': enumeration_area_form, 'locations_filter' : locations_filter, 'title': 'New Enumeration Area', 'button_label': 'Create',
                    'action': reverse('edit_enumeration_area_page', args=(ea_id, )), 

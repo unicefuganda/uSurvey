@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-
+from django.core.urlresolvers import reverse
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.forms.group_condition import GroupConditionForm
 from survey.forms.household_member_group import HouseholdMemberGroupForm
@@ -98,7 +98,9 @@ def add_group(request):
                'cancel_url': '/groups/',
                'condition_form': GroupConditionForm(),
                'condition_title': "New Eligibility Criteria"}
-
+    request.breadcrumbs([
+        ('Member Groups', reverse('household_member_groups_page')),
+    ])
     return response or render(request, 'household_member_groups/new.html', context)
 
 
@@ -160,7 +162,9 @@ def edit_group(request, group_id):
                'action': "/groups/%s/edit/" % group_id,
                'condition_form': GroupConditionForm(),
                'condition_title': "New Criteria"}
-
+    request.breadcrumbs([
+        ('Member Groups', reverse('household_member_groups_page')),
+    ])
     return response or render(request, 'household_member_groups/new.html', context)
 
 
