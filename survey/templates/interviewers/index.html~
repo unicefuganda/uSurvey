@@ -1,25 +1,25 @@
 {% extends "layout.html" %}
 {% load template_tags %}
 {% block title %}
-  Investigators List
+  Interviewers List
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate investigators 50 %}
+{% autopaginate interviewers 50 %}
   <h3>
-    Investigators List
+    Interviewers List
   </h3>
-  <form id="aggregates-form" action="{% url 'investigators_page' %}" method="get" class="padded-bottom">
-    {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
-    <button class="btn btn-primary" id="a-investigator-list" href="{% url 'investigators_page' %}"> Refresh List</button>
+  <form id="aggregates-form" action="{% url 'interviewers_page' %}" method="get" class="padded-bottom">
+    {% include "horizontal_naked_form.html" with a_form=locations_filter %}
+    <button class="btn btn-primary" id="a-interviewer-list" href="{% url 'interviewers_page' %}"> Refresh List</button>
   </form>
   <br/>
 <div class="form-actions">
-	<form accept-charset="utf-8" action="{% url 'download_investigators' %}" method="get" id="download_investigators" class="pull-right">
+	<form accept-charset="utf-8" action="{% url 'download_interviewers' %}" method="get" id="download_interviewers" class="pull-right">
                 {% csrf_token %}
-                <button class="btn btn_primary" id="export_question">Export Investigators</button>
+                <button class="btn btn_primary" id="export_question">Export Interviewers</button>
             </form>
-    <a href="{% url 'new_investigator_page' %}" class="btn btn_primary pull-right" id="add-investigator"><i class="icon-plus"></i> Add Investigator</a>
+    <a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-plus"></i> Add Interviewer</a>
   
  {% include "search_form.html" %}
 </div>
@@ -32,36 +32,36 @@
             Name
           </th>
           <th>
-            Mobile Number
+            USSD
+          </th>
+          <th>
+            ODK
           </th>
 	 <th>
-          Open surveys in current location
+          Enumeration Area
 	</th>
-	 <th>
-          Households for open surveys
-	</th>
-          <th style="background-image: None;">
+     <th style="background-image: None;">
             Actions
-          </th>
+      </th>
         </tr>
       </thead>
       <tbody>
-        {% for investigator in investigators %}
+        {% for interviewer in interviewers %}
           <tr>
             <td>
-              <a href="{% url 'show_investigator_page' investigator.pk %}">{{ investigator.name }}</a>
+              <a href="{% url 'show_interviewer_page' interviewer.pk %}">{{ interviewer.name }}</a>
             </td>
             <td>
-              {{ investigator.mobile_number }}
+              {{ interviewer.ussd_access | display_list}}
+            </td>
+            <td>
+              {{ interviewer.odk_access | display_list}}
             </td>
 	   <td>
-		{{ investigator|open_survey_in_current_loc}}
-	  </td>
-	   <td>
-		{{ investigator|households_for_open_survey}}
+		{{ interviewer.ea.name}}
 	  </td>
             <td>
-                {% include 'investigators/_action_button.html' with button_size="btn-mini" %}
+                {% include 'interviewers/_action_button.html' with button_size="btn-mini" %}
             </td>
           </tr>
         {% endfor %}
@@ -72,6 +72,41 @@
 {% endblock %}
 
 {% block javascripts %}
-  <script src="{{STATIC_URL}}/js/investigator.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}/js/interviewer.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+  //$("#a-interviewer-list").hide();
+  {% for location_type in location_filter_types %}
+	  $('#id_{{ location_type }}').on('change', function () {
+	  	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+	  	url = "{% url 'location_sub_types' %}";
+	      $.getJSON(url, params, function (data) {
+	 			$('#id_' + data.sub_type +' option').hide();
+	 			$('#id_' + data.sub_type +' option[value=""]').show();
+	  		$.each(data.locations, function () {
+	              $('#id_' + data.sub_type +' option[value='+this.id+']').show();
+	          });
+	  		$(' .chzn-select').trigger("liszt:updated");  
+	      });
+	  });
+	{% endfor %}
+    $('.ea_filter').on('change', function () {
+    	{% for location_type in location_filter_types %}
+    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
+    	{% endfor %}
+    	url = "{% url 'enumeration_area_filter' %}";
+        params = { 
+        		{% for location_type in location_filter_types %}
+        			{{ location_type }} : {{ location_type }}_selected,
+ 	    		{% endfor %}	
+        }
+        $.getJSON(url, params, function (data) {
+        	$('#id_enumeration_area option').hide();
+        	$('#id_enumeration_area' +' option[value=""]').show();
+            $.each(data, function () {
+            	$('#id_enumeration_area' +' option[value='+this.id+']').show();
+            });
+        });
+    });
+  </script>
 {% endblock %}

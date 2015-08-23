@@ -2,14 +2,10 @@
 {% block title %}
     Questions Library
 {% endblock %}
-
 {% block content %}
     {% load pagination_tags %}
     {% autopaginate questions 50 %}
     {% load template_tags %}
- <h3>
-     Template List
- </h3>
  {% include "questions/_question_filter_form.html" with action="" a_form=question_filter_form %}
  <div class="question-button pull-right">
      <form accept-charset="utf-8" action="{% url 'export_template_questions' %}" method="post" id="export_questions_form">

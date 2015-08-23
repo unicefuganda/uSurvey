@@ -6,9 +6,6 @@
     {% load pagination_tags %}
     {% load template_tags %}
     {% autopaginate households 50 %}
-    <h3>
-        Households List
-    </h3>
     <form action="" method="get">
     	{% include "horizontal_naked_form.html" with a_form=locations_filter %}
     	<button class="btn btn-primary" id="a-ea-list">Refresh List</button>
@@ -30,7 +27,7 @@
                     Household Head
                 </th>
                 <th>
-                	Registrar
+                	Registra
                 </th>
                 <th>
                 	Registration Channel

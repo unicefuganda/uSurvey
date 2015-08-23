@@ -248,10 +248,10 @@ background-color:#33CCFF; opacity: 0.9; filter: alpha(opacity=90); top: 0;  widt
 }
 
 .breadnavbar {
-  width: auto;
-  box-shadow: 1px 1px 1px #BEBEBE;
+ width: auto;
+ box-shadow: 1px 1px 1px #BEBEBE;
 padding-bottom: 10px;
-  padding-top: 40px;
+ padding-top: 40px;
 padding-left: 60px;
 height:60px;
 color:#808080;

@@ -5,8 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <h3>Enumeration Area Lists</h3>
-    <a href="{% url 'new_enumeration_area_page' %}" class="btn btn_primary pull-right" id="add-module"><i class="icon-plus"></i> Add Enumeration Area</a>
+    <br><a href="{% url 'new_enumeration_area_page' %}" class="btn btn_primary pull-right" id="add-module"><i class="icon-plus"></i> Add Enumeration Area</a>
     <br class="clear"/>
     <form action="" method="get">
     {% include "horizontal_naked_form.html" with a_form=locations_filter %}

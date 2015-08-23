@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>
-        {% block title %}{% endblock %} | {{ PROJECT_TITLE }}
+        {{ PROJECT_TITLE }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
@@ -18,13 +18,7 @@
 	<link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
 
-    {% block extra_css %}
-		<style>
-		header {
-			z-index: 1000;
-		}
-		</style>
-	{% endblock %}
+    {% block extra_css %}{% endblock %}
 
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/smoothness/jquery-ui.css"/>
@@ -64,7 +58,7 @@
                                     {%if perms.auth.can_view_interviewers %}
                                     <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
                                     </li>
-				                  {% endif %}
+				    {% endif %}
 
                                     {% if perms.auth.can_view_batches %}
                                         <li role="presentation"><a href="{% url 'show_question_library' %}">Question
@@ -75,8 +69,8 @@
                                         <li role="presentation"><a href="{% url 'household_member_groups_page' %}">Groups</a>
                                         </li>
                                         <li role="presentation"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
+                                        <!--  li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li -->
                                         <li role="presentation"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
-                                        <li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li>
                                     {% endif %}
                                     <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
                                 </ul>
@@ -122,8 +116,6 @@
                                    href="#">Settings<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-settings-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'users_index' %}">Users</a></li>
-                                    <li role="presentation"><a href="{% url 'add_location_hierarchy' %}">Add Location
-                                        Hierarchy</a></li>
                                     <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations
                                         CSV</a></li>
                                 </ul>
@@ -137,7 +129,7 @@
                         <ul role="navigation" class="nav pull-right">
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle2" role="button"
-                                   href="#">{{ user.get_full_name }}<b class="caret"></b></a>
+                                   href="#">{{ user.get_full_name }} <b class="caret"></b></a>
                                 <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'users_edit' user.id %}" id="edit_user"><i
                                             class="icon-pencil"></i> Edit Profile</a></li>
@@ -161,7 +153,12 @@
         </div>
     </div>
 </header>
-<br><br>
+<div class="breadnavbar">
+{% for breadcrumb in request.breadcrumbs %}
+&raquo;<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>
+{% endfor %}
+<div class="container">Where You Are :: Top Menu :: <span class="breadnavbarblue">{% block title %}{% endblock %}</span></div></div>
+<br>
 <div id="content" class="container">
     <div class="container">
         {% if messages %}
@@ -211,7 +208,6 @@ document.write(" "+ now.getFullYear());
 <script src="{{ STATIC_URL }}/js/multichoice-bar-chart.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/multichoice-stacked-bar-chart.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/simple_indicator_bar_chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/batch.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>

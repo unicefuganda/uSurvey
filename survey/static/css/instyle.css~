@@ -77,6 +77,26 @@ color:#373737;
 text-decoration:none;
 
 }
+
+.horititle
+{
+
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+font-size: 12px;
+font-weight:bold;
+color:#000000;
+text-decoration:none;
+}
+
+.horiselect
+{
+	width:100px; 
+	height:35px;
+	font-size:13px; 
+	border:1px solid #F7F7F7;
+FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+}
+
 .utopnav
 {
 
@@ -128,7 +148,7 @@ text-decoration:none;
 
 .tbanner
 {
-background-color:#33CCFF; opacity: 0.9; filter: alpha(opacity=90); top: 0; position: fixed;  width: 100%; font-family:Arial, Helvetica, sans-serif; font-size:17px; color:#FFFFFF; box-shadow: 1px 1px 1px 1px; height: 72px;
+background-color:#33CCFF; opacity: 0.9; filter: alpha(opacity=90); top: 0; position: fixed;  width: 100%; font-size:17px; color:#FFFFFF; box-shadow: 1px 1px 1px 1px; height: 72px; z-index: 10000;
 }
 .dashcount
 {

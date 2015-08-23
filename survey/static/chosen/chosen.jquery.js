@@ -282,7 +282,7 @@ Copyright (c) 2011 by Harvest
           }
           break;
         case 27:
-          if (this.results_showing) {
+          if (this.results_	) {
             this.results_hide();
           }
           return true;

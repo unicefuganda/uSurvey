@@ -157,9 +157,7 @@
 {% for breadcrumb in request.breadcrumbs %}
 &raquo;<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>
 {% endfor %}
-<div class="container">Where You Are :: {% block title %}{% endblock %}</div></div>
-<br><br>
-
+<div class="container">Where You Are :: Top Menu :: <span class="breadnavbarblue">{% block title %}{% endblock %}</span></div></div>
 <div id="content" class="container">
     <div class="container">
         {% if messages %}

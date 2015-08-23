@@ -1,4 +1,10 @@
 <form id="{{ filter_id }}" action="{{ action }}" method="get" class="pull-left padded-bottom" accept-charset="utf-8">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td width="90%" align="left" valign="bottom">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td width="100%" align="left" valign="bottom">
     <div>
         <ul id="horizontal-filter">
             {% for field in a_form.visible_fields %}
@@ -9,10 +15,11 @@
                     </ul>
                 </li>
             {% endfor %}
-
-            <li>
-                {% block submit_button %}{% endblock %}
-            </li>
         </ul>
-    </div>
+</div></td>
+    </tr></table>
+</td>
+<td width="10%" align="left" valign="middle">{% block submit_button %}{% endblock %}</td>
+</tr>
+</table>
 </form>

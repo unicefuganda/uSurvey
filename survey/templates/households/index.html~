@@ -9,9 +9,9 @@
     <h3>
         Households List
     </h3>
-    <form id="aggregates-form" action="{% url 'list_household_page' %}" method="get">
-        {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
-        <button class="btn btn-primary" id="a-investigator-list" href="{% url 'list_household_page' %}"> Refresh List</button>
+    <form action="" method="get">
+    	{% include "horizontal_naked_form.html" with a_form=locations_filter %}
+    	<button class="btn btn-primary" id="a-ea-list">Refresh List</button>
     </form>
 <br />
 <div class="form-actions">
@@ -20,65 +20,54 @@
 </div>
     <br/>
     {% if households %}
-        <table class="table table-striped table-bordered table-hover">
+        <table class="table table-striped table-bordered table-hover table-sort">
             <thead>
             <tr>
-                <th>
-                    Household ID
-                </th>
+            	<th>
+            		House Humber
+            	</th>
                 <th>
                     Household Head
                 </th>
                 <th>
-                    District
+                	Registra
                 </th>
                 <th>
-                    County
+                	Registration Channel
                 </th>
                 <th>
-                    Sub County
+                	Survey
                 </th>
                 <th>
-                    Parish
-                </th>
-                <th>
-                    Village
-                </th>
-                <th>
-                    Investigator
+                	Enumeration Area
                 </th>
             </tr>
             </thead>
             <tbody>
             {% for household in households %}
                 <tr>
-                    <td>
-                        <a href="{% url 'view_household_page' household.id %}">{{ household.uid }}</a>
-                    </td>
+					<td>
+						<a href="{% url 'view_household_page' household.id %}">{{ household.house_number }}</a>
+						
+					</td>
                     <td>
                         {% with household.get_head as head %}
                            {% if head.first_name %} {{ head.first_name|capfirst }} {% endif %} {{ head.surname|capfirst }}
                         {% endwith %}
-                    </td>
+                    </td>                    
                     <td>
-                        {{ household.related_locations|get_value:"District" }}
-                    </td>
-                    <td>
-                        {{ household.related_locations|get_value:"County" }}
-                    </td>
-                    <td>
-                        {{ household.related_locations|get_value:"Subcounty" }}
-                    </td>
-                    <td>
-                        {{ household.related_locations|get_value:"Parish" }}
-                    </td>
-                    <td>
-                        {{ household.related_locations|get_value:"Village" }}
-                    </td>
-                    <td>
-                        {% if household.investigator %}
-                            <a href="{% url 'show_investigator_page' household.investigator.pk %}">{{ household.investigator.name }}</a>
+                        {% if household.registrar %}
+                            <a href="{% url 'show_interviewer_page' household.registrar.pk %}">{{ household.registrar.name }}</a>
                         {% endif %}
+                    </td>
+                    <td>
+                    	{{ household.registration_channel}}
+                    </td>
+                    <td>
+                    	{{ household.survey.name}}
+                    </td>
+                    <td>
+                    	{{ household.ea.name}}
                     </td>
                 </tr>
             {% endfor %}
@@ -89,5 +78,40 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+  //$("#a-interviewer-list").hide();
+  {% for location_type in location_filter_types %}
+	  $('#id_{{ location_type }}').on('change', function () {
+	  	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+	  	url = "{% url 'location_sub_types' %}";
+	      $.getJSON(url, params, function (data) {
+	 			$('#id_' + data.sub_type +' option').hide();
+	 			$('#id_' + data.sub_type +' option[value=""]').show();
+	  		$.each(data.locations, function () {
+	              $('#id_' + data.sub_type +' option[value='+this.id+']').show();
+	          });
+	  		$(' .chzn-select').trigger("liszt:updated");  
+	      });
+	  });
+	{% endfor %}
+    $('.ea_filter').on('change', function () {
+    	{% for location_type in location_filter_types %}
+    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
+    	{% endfor %}
+    	url = "{% url 'enumeration_area_filter' %}";
+        params = { 
+        		{% for location_type in location_filter_types %}
+        			{{ location_type }} : {{ location_type }}_selected,
+ 	    		{% endfor %}	
+        }
+        $.getJSON(url, params, function (data) {
+        	$('#id_enumeration_area option').hide();
+        	$('#id_enumeration_area' +' option[value=""]').show();
+            $.each(data, function () {
+            	$('#id_enumeration_area' +' option[value='+this.id+']').show();
+            });
+        });
+    });
+  </script>
+
 {% endblock %}
