@@ -23,7 +23,14 @@
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/smoothness/jquery-ui.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+$(function(){
 
+  $('.chzn-select').chosen();
+$('.chosen-drop').css({minWidth: '100%', width: 'auto'});
+
+});
+</script>
 </head>
 <body>
 <header class="tbanner">
@@ -154,11 +161,14 @@
     </div>
 </header>
 <div class="breadnavbar">
-{% for breadcrumb in request.breadcrumbs %}
-&raquo;<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>
+
+<div class="container"> 
+<a href="/home/">Home</a> &raquo;
+{% for breadcrumb in request.breadcrumbs %} 
+<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>&raquo;
 {% endfor %}
-<div class="container">Where You Are :: Top Menu :: <span class="breadnavbarblue">{% block title %}{% endblock %}</span></div></div>
-<br>
+<span class="breadnavbarblue">{% block title %}{% endblock %}</span></div></div>
+<br />
 <div id="content" class="container">
     <div class="container">
         {% if messages %}
