@@ -16,7 +16,7 @@
                 {% csrf_token %}
                 <button class="btn btn_primary" id="export_question">Export Interviewers</button>
             </form>
-    <a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-minus"></i> Add Interviewer</a>
+    <a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-plus"></i> Add Interviewer</a>
   
  {% include "search_form.html" %}
 </div>
