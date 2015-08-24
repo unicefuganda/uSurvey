@@ -4,7 +4,7 @@ from survey.models.locations import Location
 from survey.models.surveys import Survey
 from survey.models.base import BaseModel
 from survey.utils.views_helper import get_descendants
-from survey.models.questions import Question
+from survey.models.questions import Question, QuestionFlow
 from survey.models.access_channels import InterviewerAccess
 # from survey.models.enumeration_area import EnumerationArea
 from survey.models.interviews import AnswerAccessDefinition
@@ -68,6 +68,21 @@ class Batch(BaseModel):
     
     def is_applicable(self, house_member):
         return house_member.belongs_to(self.group)
+    
+    def is_open(self):
+        return self.open_locations.all().exists()
+    
+    def last_question_inline(self):
+        qflows = QuestionFlow.objects.filter(question__batch=batch, validation_test__isnull=True)
+        if self.start_question:
+            return last_inline(self.start_question, qflows)
+
+def  last_inline(question, flows):
+    qflows = flows.filter(question__batch=question, validation_test__isnull=True)
+    if qflows.exists():
+        return last_inline(question, qflows)
+    else:
+        return question
     
 #     @property
 #     def batch_questions(self):

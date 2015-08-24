@@ -165,7 +165,7 @@ $('.chzn-drop').css({"width": "80px"});
 <div class="container"> 
 <a href="/home/">Home</a> &raquo;
 {% for breadcrumb in request.breadcrumbs %} 
-<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>&raquo;
+<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
 {% endfor %}
 <span class="breadnavbarblue">{% block title %}{% endblock %}</span></div></div>
 <br />

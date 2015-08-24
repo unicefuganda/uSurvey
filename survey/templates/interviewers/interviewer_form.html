@@ -8,8 +8,10 @@
 {% endblock %}
 {% block display_form_fields %}
   {% include "naked_form.html" with a_form=form %}
+  <legend>ODK Access</legend>
+  {% include "naked_form.html" with a_form=odk_access_form %}
   {% include "formset.html" with formset=ussd_access_form legend='USSD Access' class='ussd_form' %}
-   {% include "formset.html" with formset=odk_access_form legend='ODK Access' class='odk_form' %}
+  
 {% endblock %}
 
 {% block javascripts %}

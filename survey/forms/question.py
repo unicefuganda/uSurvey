@@ -6,10 +6,9 @@ from survey.models.householdgroups import HouseholdMemberGroup
 
 
 class QuestionForm(ModelForm):
-    text = forms.CharField(label='Respond with ', max_length=150, 
-                                    widget=forms.Textarea(attrs={"id" : "question", "rows":4, "cols":100,"maxlength":"150", "class": "batch_questions question_form"})
-                                    )
-    identifier = forms.CharField(label='Save reply as', max_length=100, widget=forms.TextInput(attrs={"id": 'identifier', "class": "batch_questions  question_form"}))
+    text = forms.HiddenInput()
+    identifier = forms.HiddenInput()
+    answer_type = forms.HiddenInput()
 #     answer_type = forms.CharField(widget=forms.Select(attrs={"id": 'answer_type', "class": "batch_questions question_form"}))
     
     def __init__(self, batch, data=None, initial=None, instance=None):

@@ -2,25 +2,74 @@
 {% block title %}
     Select Questions for {{ batch.survey.name.capitalize }} - {{ batch.name.capitalize }}
 {% endblock %}
-{% block display_form_fields %}
-    <div class="filter-form">
-        <label for="assign_question_group"></label>
-        <span class="add-on">Groups</span>
-        <select name="group" id="assign_question_group">
-            <option value="All">All</option>
-            {% for group in groups %}
-                <option value="{{ group.id }}">{{ group.name }}</option>
-            {% endfor %}
-        </select>
-        <span class="add-on">Modules</span>
-        <select name="group" id="assign_module">
-            <option value="All">All</option>
-            {% for module in modules %}
-                <option value="{{ module.id }}">{{ module.name }}</option>
-            {% endfor %}
-        </select>
+{% block extra_css %}
+	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css">
+{% endblock %}
+{% block pre_form_content %}
+	<div class="filter-form">
+		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
+        
     </div>
-    <input type="hidden" value="{{ batch.id }}" id="batch_id">
-    {{batch_questions_form | safe }}
-    {% include 'naked_form.html' with a_form=batch_questions_form %}
+    <div class="search">
+    	{% include "search_form.html" with id="library_search_form" %} 
+    </div>
+       <div id="redips-drag" class="clear">
+       	<br />
+  		<table id="lib_questions_table">
+		<thead  class="redips-mark">
+			<th  class="redips-mark"  colspan="2">Identifier</th>
+			<th class="redips-mark">Text</th>
+			<th class="redips-mark">Answer Type</th>
+		</thead>
+		<tbody>
+			{% for question in library_questions %} 
+				<tr class="rd ms-selectable" id="{{question.pk}}-selectable">
+					<td class="redips-rowhandler"><div class="redips-drag redips-row"></div>
+					<input type="hidden" names="identifier[]" value="{{question.identifier}}" />
+					<input type="hidden" names="text[]" value="{{question.text}}" />
+					<input type="hidden" names="answer_type[]" value="{{question.answer_type}}" /></td>
+					<td>{{question.identifier}}</td>
+					<td>{{question.text}}</td>
+					<td>{{question.answer_type}}</td>
+				</tr>
+			{% endfor %}
+				<tr class="rd">
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			<tr>
+				<td colspan="6" class="redips-mark"><span id="msg">Message line</span></td>
+			</tr>
+		</tbody>
+	</table>
+		<br/>
+{% endblock %}
+{% block display_form_fields %}
+    			<table id="batch_questions">
+					<thead  class="redips-mark">
+						<th colspan="4"  class="redips-mark">Drop Questions Here</th>
+					</thead>
+					<tbody>
+						<tr class="rd">
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td colspan="4" class="redips-mark"></td>
+						</tr>
+					</tbody>
+				</table>
+				<input type="hidden" value="{{ batch.id }}" id="batch_id">
+{% endblock %}
+{% block non_form_content %}
+</div>
+{% endblock %}
+{% block javascripts %}
+		<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/redips-drag-min.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/script.js"></script>
 {% endblock %}

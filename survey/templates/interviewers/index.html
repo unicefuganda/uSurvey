@@ -29,10 +29,10 @@
             Name
           </th>
           <th>
-            USSD
+            Mobile Numbers
           </th>
           <th>
-            ODK
+            ODK ID
           </th>
 	 <th>
           Enumeration Area
@@ -49,6 +49,19 @@
               <a href="{% url 'show_interviewer_page' interviewer.pk %}">{{ interviewer.name }}</a>
             </td>
             <td>
+            	<!--  a href="#" onclick="$( '#interviewer_{{interviewer.pk}}' ).dialog()">view</a>
+                	<table id="interviewer_{{interviewer.pk}}" class="interviewer_locations hide">
+                		<thead>
+                			<th>{{interviewer.name}} Mobile Numbers</th>
+                		</thead>
+                		<tbody>
+	                		{% for access in interviewer.ussd_access %} 
+	                			<tr>
+	                				<td>{{ access }}<td>
+	                			</tr>
+	                		{% endfor %}
+                		</tbody>
+                	</table -->
               {{ interviewer.ussd_access | display_list}}
             </td>
             <td>

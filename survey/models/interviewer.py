@@ -1,20 +1,30 @@
-import datetime
+from datetime import date, timedelta
 from django.conf import settings
 from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
-from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PHONE_CODE
+from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PHONE_CODE, INTERVIEWER_MIN_AGE, INTERVIEWER_MAX_AGE
 from survey.models.base import BaseModel
 from survey.models.access_channels import USSDAccess, ODKAccess
 from survey.models.surveys import Survey
 import random
+from django.core.exceptions import ValidationError
+from dateutil.relativedelta import relativedelta
 
+def validate_min_date_of_birth(value):
+    if date.today() - relativedelta(years=INTERVIEWER_MIN_AGE) < value:
+        raise ValidationError('interviewers must be at most %s years' % INTERVIEWER_MIN_AGE)
+
+def validate_max_date_of_birth(value):
+    if  date.today() - relativedelta(years=INTERVIEWER_MAX_AGE) > value:
+        raise ValidationError('interviewers must not be at more than %s years' % INTERVIEWER_MAX_AGE)
 
 class Interviewer(BaseModel):
     MALE = '1'
     FEMALE = '0'
     name = models.CharField(max_length=100, blank=False, null=False)
     gender = models.CharField(default=MALE, verbose_name="Sex", choices=[(MALE, "M"), (FEMALE, "F")], max_length=10)
-    age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
+#     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
+    date_of_birth = models.DateField(null=True, validators=[validate_min_date_of_birth, validate_max_date_of_birth])
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary',
                                           verbose_name="Highest level of education completed")

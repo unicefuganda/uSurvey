@@ -9,15 +9,15 @@ class InterviewerForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(InterviewerForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder=['name', 'gender', 'age', 'level_of_education', 'language',  'ea']
+        self.fields.keyOrder=['name', 'gender', 'date_of_birth', 'level_of_education', 'language',  'ea']
 
     class Meta:
         model = Interviewer
-        fields = ['name',  'age', 'gender', 'level_of_education', 'language',  'ea']
+        fields = ['name',  'date_of_birth', 'gender', 'level_of_education', 'language',  'ea']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
             'gender': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
-            'age': forms.TextInput(attrs={'placeholder': 'Age', 'min':18, 'max':50 }),
+            'date_of_birth': forms.TextInput(attrs={'placeholder': 'Date Of Birth', 'min':18, 'max':50 , 'class': 'datepicker'}),
             'ea': forms.Select(attrs={'class' : 'chzn-select'}),
         }
     
