@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
-from survey.forms.filters import QuestionFilterForm
+from survey.forms.filters import QuestionFilterForm,  MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models import Question, Batch, QuestionTemplate, QuestionFlow, TextArgument
 from survey.forms.question import QuestionForm, QuestionFlowForm
 from survey.utils.query_helper import get_filterset
@@ -17,9 +17,31 @@ ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE = "Logics cannot be added while the batch 
 ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE = "Subquestions cannot be added while batch is open."
 REMOVE_QUESTION_FROM_OPEN_BATCH_ERROR_MESSAGE = "Question cannot be removed from a batch while the batch is open."
 
+def _max_number_of_question_per_page(number_sent_in_request):
+    max_question_per_page_supplied = number_sent_in_request or 0
+    given_max_per_page = min(int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
+    return max(given_max_per_page, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
 
 @permission_required('auth.can_view_batches')
 def index(request, batch_id):
+    batch = get_object_or_404(Batch, pk=batch_id)
+    data = dict(request.GET)
+    question_filter_form = QuestionFilterForm(data=data, batch=batch)
+    questions = question_filter_form.filter(batch.batch_questions.all())
+    #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
+    max_per_page = _max_number_of_question_per_page(data.get('number_of_questions_per_page', 0))
+    question_form = QuestionForm(batch)
+
+    if batch.start_question is None:
+        messages.error(request, 'There are no questions associated with this batch yet.')
+
+    question_rules_for_batch = {}
+    context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page':max_per_page,
+               'question_filter_form': question_filter_form, 'rules_for_batch': question_rules_for_batch}
+    return render(request, 'questions/index.html', context)
+
+@permission_required('auth.can_view_batches')
+def _index(request, batch_id):
     batch = get_object_or_404(Batch, pk=batch_id)
     data = dict(request.GET)
     question_filter_form = QuestionFilterForm(data=data, batch=batch)

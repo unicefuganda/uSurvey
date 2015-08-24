@@ -8,15 +8,19 @@
     {% load template_tags %}
  {% include "questions/_question_filter_form.html" with action="" a_form=question_filter_form %}
  <div class="question-button pull-right">
-     <form accept-charset="utf-8" action="{% url 'export_template_questions' %}" method="post" id="export_questions_form">
+<table width="100%" height="20px" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td width="20%"align="left" valign="bottom">{% include "search_form.html" %}
+ </td>
+<td width="80%" align="right" valign="top">
+ <form accept-charset="utf-8" action="{% url 'export_template_questions' %}" method="post" id="export_questions_form">
          {% csrf_token %}
          <button class="btn btn_primary" id="export_question">Export Questions</button>
      </form>
      <a href="{% url 'new_question_template' %}" class="btn btn_primary" id="add_question">Create New Question</a>
- </div>
- {% include "search_form.html" %}
+</td>
+</tr></table>
 </div>
-
 <table class="table table-striped table-bordered table-hover clear table-sort" id="questions_table">
     <thead>
     <tr>

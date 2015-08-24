@@ -495,19 +495,21 @@ fixed;
 font-family:Arial,  Helvetica, sans-serif; font-size:18px; color:#666666;
 }
 .accesbutton {
-	width:60px; 
-	font-family:Verdana; 
-	font-size:9px; 
-	font-weight:bold;
+	width:70px; 
+	font-family:Arial,  Helvetica, sans-serif; font-size:18px;
+	font-size:13px; 
     height:30px;
+    background-color:#0000FF;
+    color:#FFFFFF;
 }
 
 .accesbutton2 {
 	width:150px; 
-	font-family:Verdana; 
-	font-size:9px; 
-	font-weight:bold;
+	font-family:Arial,  Helvetica, sans-serif; font-size:18px;
+	font-size:13px; 
     height:30px;
+    background-color:#0000FF;
+    color:#FFFFFF;
 }
 .BrokerContent
 {

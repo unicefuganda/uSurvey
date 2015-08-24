@@ -58,7 +58,7 @@
         <th>
             Group
         </th>
-        <th  style="background-image: None;" onclick="return false;">
+        <th  style="background-image: None;">
             Actions
         </th>
     </tr>

@@ -4,7 +4,6 @@
 {% endblock %}
 {% block content %}
 {% load template_tags %}
-    <h3>Upload Geographical Locations</h3>
     <form action="{{ action }}" enctype="multipart/form-data" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
         {% csrf_token %}
         <div class="control-group">

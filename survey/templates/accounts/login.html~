@@ -56,14 +56,13 @@ var image_array = new Array();
 <style>
 .forright {
     position: relative;
-    width: 400px;
-    height: 200px;
-    border: 3px solid #8AC007;
+    top: 30px;
+	right:30;
 } 
 
 .forleft {
     position: absolute;
-    top: 200px;
+    top: 250px;
     left: 30;
 	width: 400px;
     FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
@@ -83,7 +82,7 @@ var image_array = new Array();
 <br>
 - To make it possible to deploy remotely to mobiles and track survey work in real time taking advantage of prompt review of data quality thus ensuring a quicker audit and respondent tracking process.
 </div>
-  <div align="right"><form class="login-form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+  <div class="forright"><form class="login-form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
       <span>Type your username and password to login</span>
       <hr>
     {% csrf_token %}

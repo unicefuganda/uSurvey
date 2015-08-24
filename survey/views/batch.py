@@ -187,6 +187,7 @@ def update_orders(request, batch_id):
     new_orders = request.POST.getlist('order_information', None)
     if len(new_orders) > 0:
         for new_order in new_orders:
+            print 'this order', new_order
             BatchQuestionOrder.update_question_order(new_order, batch)
         success_message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
         messages.success(request, success_message)

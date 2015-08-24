@@ -4,7 +4,6 @@
 {% endblock %}
 {% load template_tags %}
 {% block content %}
-    <h3>Indicator List</h3>
     {% include "indicator/_indicator_filter_form.html" with action="" filter_id="question-filter-form" a_form=indicator_filter_form %}
     <a href="{% url 'new_indicator_page' %}" class="btn btn_primary pull-right" id="add_indicator">Add Indicator</a>
     <br class="clear"/>

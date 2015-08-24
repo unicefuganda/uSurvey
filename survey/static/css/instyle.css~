@@ -1,4 +1,6 @@
-
+#form_paciente{
+    width: 100% !important;
+}
 .usocilbg{
 background-color:#1B1B1B;
 }
@@ -493,19 +495,23 @@ fixed;
 font-family:Arial,  Helvetica, sans-serif; font-size:18px; color:#666666;
 }
 .accesbutton {
-	width:60px; 
-	font-family:Verdana; 
-	font-size:9px; 
+	width:70px; 
+	font-family:Arial,  Helvetica, sans-serif; font-size:18px;
+	font-size:13px; 
 	font-weight:bold;
     height:30px;
+    background-color:#0000FF;
+    color:#FFFFFF;
 }
 
 .accesbutton2 {
 	width:150px; 
-	font-family:Verdana; 
-	font-size:9px; 
+	font-family:Arial,  Helvetica, sans-serif; font-size:18px;
+	font-size:13px; 
 	font-weight:bold;
     height:30px;
+    background-color:#0000FF;
+    color:#FFFFFF;
 }
 .BrokerContent
 {

@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block title %}
-  Surveys
+  Survey List
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
 {% autopaginate surveys 50 %}
 {% load template_tags %}
-<br><a href="#new_survey" data-toggle="modal" class="btn btn_primary pull-right padded-bottom" id="add_survey">Create New Survey</a>
+<a href="#new_survey" data-toggle="modal" class="btn btn_primary pull-right padded-bottom" id="add_survey">Create New Survey</a>
  <br />
   <table class="table table-striped table-bordered table-hover table-sort">
     <thead>

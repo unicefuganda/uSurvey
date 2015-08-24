@@ -6,7 +6,6 @@
 {% load pagination_tags %}
 {% autopaginate users 30 %}
 {% load template_tags %}
-    <h3>Users List</h3>
 <div class="form-actions">
     <a href="{% url 'new_user_page' %}" class="btn btn_primary pull-right" id="add-user"><i class="icon-plus"></i> Add User</a>
     {% include "search_form.html" %}

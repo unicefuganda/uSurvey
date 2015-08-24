@@ -3,9 +3,6 @@
   Bulk Notifications
 {% endblock %}
 {% block content %}
-  <h3>
-    Bulk Notifications
-  </h3>
   <form action="{% url 'send_bulk_sms' %}" method="POST" accept-charset="utf-8" id="bulk-sms-form" class="form-vertical">
     {% csrf_token %}
     <div class="control-group">
