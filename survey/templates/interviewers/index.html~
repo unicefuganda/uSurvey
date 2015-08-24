@@ -18,7 +18,7 @@
             </form>
     <a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-plus"></i> Add Interviewer</a>
   
- {% include "search_form.html" %}
+ 
 </div>
   <br />
 

@@ -6,10 +6,7 @@ Apr, 2011.
 
 */
 
-body {
-	font-family: arial;
-	margin: 0px;
-}
+
 
 /* make drag container visible */
 /*
@@ -24,9 +21,16 @@ body {
 
 /* styles for first two tables */
 #lib_questions_table, #batch_questions{
-	width: 580px;
+	width: 100%;
 	border-collapse: collapse;
 	margin-bottom: 17px;
+border: 1px solid #eee;
+  border-bottom: 2px solid #00cccc;
+  box-shadow: 0px 0px 20px rgba(0,0,0,0.10),
+     0px 10px 20px rgba(0,0,0,0.05),
+     0px 20px 20px rgba(0,0,0,0.05),
+     0px 30px 20px rgba(0,0,0,0.05);
+
 }
 
 /* set table row height */
@@ -79,8 +83,8 @@ div#redips-drag th {
 .redips-row {
 	width: 20px;
 	margin: 2px;
-	border-color: SteelBlue;
-	background-color: SteelBlue;
+	border-color: Red;
+	background-color: Red;
 	/* round corners */
 	border-radius: 14px; /* Opera, Chrome */
 	-moz-border-radius: 14px; /* FF */
@@ -94,8 +98,9 @@ div#redips-drag th {
 /* marked cells (forbidden access for header and message line) */
 .redips-mark {
 	color: white;
-	background-color: #aaa;
+	background-color: #33CCFF;opacity: 0.9; filter: alpha(opacity=90);box-shadow: 1px 1px 1px 1px;
 	text-align: center;
+
 }
 
 /* row dark */
