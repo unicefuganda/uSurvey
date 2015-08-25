@@ -20,6 +20,7 @@ class Question(BaseModel):
     class Meta:
         app_label = 'survey'        
         unique_together = [('identifier', 'batch'), ]
+    
 
     def __unicode__(self):
         return "%s - %s: (%s)" % (self.identifier, self.text, self.answer_type.upper())
