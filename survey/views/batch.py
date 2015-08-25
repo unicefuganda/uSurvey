@@ -175,6 +175,11 @@ def assign(request, batch_id):
     all_modules = QuestionModule.objects.all()
     used_identifiers = [question.identifier for question in batch.batch_questions.all()]
     library_questions = QuestionTemplate.objects.exclude(identifier__in=used_identifiers)
+    request.breadcrumbs([
+        ('Surveys', reverse('survey_list_page')),
+        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
+#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
+    ])
     context = {'batch_questions_form': unicode(batch_questions_form), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,
                'library_questions' : library_questions,
