@@ -23,8 +23,7 @@ body {
 */
 
 /* styles for first two tables */
-#tbl1,
-#tbl2 {
+#lib_questions_table, #batch_questions{
 	width: 580px;
 	border-collapse: collapse;
 	margin-bottom: 17px;

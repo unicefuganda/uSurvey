@@ -74,15 +74,15 @@ class Batch(BaseModel):
     
     def last_question_inline(self):
         qflows = QuestionFlow.objects.filter(question__batch=batch, validation_test__isnull=True)
-        if qflows.exists():
-            pass
-        else:
-            self.start_question
+        if self.start_question:
+            return last_inline(self.start_question, qflows)
 
-# def  last_inline(question, flows):
-#     qflows = flows.filter(question__batch=question, validation_test__isnull=True)
-#     if qflows.exists():
-#         return 
+def  last_inline(question, flows):
+    qflows = flows.filter(question__batch=question, validation_test__isnull=True)
+    if qflows.exists():
+        return last_inline(question, qflows)
+    else:
+        return question
     
 #     @property
 #     def batch_questions(self):
