@@ -39,10 +39,33 @@
           </tr>
         </thead>
         <tbody>
+        
         {% for ea in enumeration_areas %}
             <tr id="ea-{{ea.pk}}" class="eas">
                 <td>{{ ea.name }}</td>
-                <td>{% for location in ea.locations.all %} {{ location.name }}, {% endfor %}</td>
+                <td>
+                	<a href="#ea_{{ea.pk}}" data-toggle="modal" class="add_batch">view</a>
+                	  <div class="modal fade hide" id="ea_{{ea.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
+					    <div class="modal-dialog">
+					        <div class="modal-content">
+					          <div class="modal-header">
+					            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					            <h4 class="modal-title">{{ea.name}} Locations</h4>
+					          </div>
+					          <div class="modal-body">
+					            <table id="ea_{{ea.pk}}" class="ea_locations">
+		                			{% for location in ea.locations.all %} 
+			                			<tr>
+			                				<td>{{ location.name }}<td>
+			                			</tr>
+			                		{% endfor %}
+			                	</table>
+					          </div>
+					        </div><!-- /.modal-content -->
+					    </div><!-- /.modal-dialog -->
+					</div><!-- /.modal -->
+                
+                </td>
                 <td> {{ ea.total_households }} </td>
                 <td>
                 <div class="btn-group">
@@ -61,7 +84,7 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script type="text/javascript" charset="utf-8">
+	<script type="text/javascript" charset="utf-8">
 	    $("#a-ea-list").hide();
 	    
 	    $('.location_filter').on('change', function () {

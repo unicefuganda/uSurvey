@@ -9,8 +9,9 @@ from django.contrib import messages
 from survey.interviewer_configs import *
 from survey.models import HouseholdMemberGroup, QuestionModule
 from survey.models import Survey, Location, LocationType
+from survey.models import Survey, Batch, QuestionTemplate
 from survey.models.batch import Batch
-from survey.forms.batch import BatchForm
+from survey.forms.batch import BatchForm, BatchQuestionsForm
 
 
 @login_required
@@ -155,26 +156,28 @@ def delete(request, survey_id, batch_id):
 @permission_required('auth.can_view_batches')
 def assign(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
-
+    
     if batch.is_open():
         error_message = "Questions cannot be assigned to open batch: %s." % batch.name.capitalize()
         messages.error(request, error_message)
         return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
-
-    batch_questions_form = TableBatchQuestionsForm(batch=batch)
-    #import pdb; pdb.set_trace();
-    groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')
+    
+    batch_questions_form = BatchQuestionsForm(batch=batch)
     batch = Batch.objects.get(id=batch_id)
+    groups = HouseholdMemberGroup.objects.all()
     if request.method == 'POST':
-        batch_question_form = TableBatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
-        if batch_question_form.is_valid():
+        batch_questions_form = BatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
+        if batch_questions_form.is_valid():
             batch_question_form.save()
             success_message = "Questions successfully assigned to batch: %s." % batch.name.capitalize()
             messages.success(request, success_message)
             return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
     all_modules = QuestionModule.objects.all()
+    used_identifiers = [question.identifier for question in batch.batch_questions.all()]
+    library_questions = QuestionTemplate.objects.exclude(identifier__in=used_identifiers)
     context = {'batch_questions_form': unicode(batch_questions_form), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,
+               'library_questions' : library_questions,
                'modules': all_modules}
 #    import pdb;pdb.set_trace()
     return render(request, 'batches/assign.html',

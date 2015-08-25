@@ -69,6 +69,9 @@ class Batch(BaseModel):
     def is_applicable(self, house_member):
         return house_member.belongs_to(self.group)
     
+    def is_open(self):
+        return self.open_locations.all().exists()
+    
 #     @property
 #     def batch_questions(self):
 #         flows = self.flows.all()

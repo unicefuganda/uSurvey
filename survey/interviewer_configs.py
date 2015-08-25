@@ -58,3 +58,5 @@ PRIME_LOCATION_TYPE = 'District'
 HAS_APPLICATION_CODE = True
 APPLICATION_CODE = '10'
 UPLOAD_ERROR_LOG_EXPIRY = 30 # all upload error logs older than this (in days) will be automatically cleared
+INTERVIEWER_MIN_AGE = 18
+INTERVIEWER_MAX_AGE = 60

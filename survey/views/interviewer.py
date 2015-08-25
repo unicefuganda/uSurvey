@@ -31,24 +31,31 @@ def _create_or_edit(request, action_text, interviewer=None, extra=1):
     interviewer_form = InterviewerForm(instance=interviewer)
     locations_filter = LocationsFilterForm(request.GET)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
-    ODKAccessFormSet = inlineformset_factory(Interviewer, ODKAccess, form=ODKAccessForm, extra=extra)
+#     ODKAccessFormSet = inlineformset_factory(Interviewer, ODKAccess, form=ODKAccessForm, extra=1)
     ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)
-    odk_access_form = ODKAccessFormSet(prefix='odk_access', instance=interviewer)
+    #ODKAccessFormSet(prefix='odk_access', instance=interviewer)
     response = None
     redirect_url = reverse('interviewers_page')
     title = 'New Interviewer'
+    odk_instance = None
     if interviewer:
         title = 'Edit Interviewer'
+        odk_accesses = interviewer.odk_access
+        if odk_accesses.exists():
+            odk_instance = odk_accesses[0]
+    odk_access_form = ODKAccessForm(instance=odk_instance)     
     if request.method == 'POST':
         interviewer_form = InterviewerForm(request.POST, instance=interviewer)
         ussd_access_form = USSDAccessFormSet(request.POST, prefix='ussd_access', instance=interviewer)
-        odk_access_form = ODKAccessFormSet(request.POST, prefix='odk_access', instance=interviewer)
+#         odk_access_form = ODKAccessFormSet(request.POST, prefix='odk_access', instance=interviewer)
+        odk_access_form = ODKAccessForm(request.POST, instance=odk_instance)
         if interviewer_form.is_valid() and ussd_access_form.is_valid() and odk_access_form.is_valid():
             interviewer = interviewer_form.save()
             ussd_access_form.instance = interviewer
             ussd_access_form.save()
-            odk_access_form.instance = interviewer
-            odk_access_form.save()
+            odk_access = odk_access_form.save(commit=False) 
+            odk_access.interviewer = interviewer
+            odk_access.save()
             messages.success(request, "Interviewer successfully %sed." % action_text )
             return HttpResponseRedirect(redirect_url)
     
