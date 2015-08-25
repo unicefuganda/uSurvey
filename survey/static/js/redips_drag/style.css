@@ -83,16 +83,14 @@ div#redips-drag th {
 .redips-row {
 	width: 20px;
 	margin: 2px;
-	border-color: Red;
-	background-color: Red;
-	/* round corners */
-	border-radius: 14px; /* Opera, Chrome */
-	-moz-border-radius: 14px; /* FF */
+	padding:1px;
+
 }
 
 /* row handler TD background color */
 .redips-rowhandler {
-	background-color: #76ACDA;
+	/*background-color: #76ACDA;*/
+
 }
 
 /* marked cells (forbidden access for header and message line) */

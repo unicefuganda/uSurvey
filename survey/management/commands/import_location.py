@@ -9,16 +9,15 @@ class Command(BaseCommand):
     help = 'Populates locations from a csv file'
     EA_INDEX = 6
     DEFAULT_TOTAL_HOUSEHOLDS = 1000
-#     TOTAL_EA_HOUSEHOLDS = -1
     def handle(self, *args, **kwargs):
         csv_file = csv.reader(open(args[0],"rb"))
         headers = csv_file.next()
         location_types = []
         location_type = None
         has_ea = False
+
         print 'ea index ', headers[self.EA_INDEX].strip()
         if headers[self.EA_INDEX].strip().replace("Name", "").upper() == 'EA':
-            print 'poped ea'
             headers.pop(self.EA_INDEX) 
             has_ea = True
         for header in headers:
@@ -26,6 +25,7 @@ class Command(BaseCommand):
             location_type, _ = LocationType.objects.get_or_create(parent=location_type, name=header, slug=slugify(header))
             print 'loading ', location_type
             location_types.append(location_type)
+
         for items in csv_file:
             for index, item in enumerate(items):
                 if index == 0:

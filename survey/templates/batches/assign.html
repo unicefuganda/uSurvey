@@ -24,7 +24,7 @@
 		<tbody>
 			{% for question in library_questions %} 
 				<tr class="rd ms-selectable" id="{{question.pk}}-selectable">
-					<td class="redips-rowhandler"><div class="redips-drag redips-row"></div>
+					<td align="center" width="35px"><div class="redips-drag redips-row"><img src="{{ STATIC_URL }}img/drag.png" class="img-responsive" alt="" /></div>
 					<input type="hidden" name="identifier" value="{{question.identifier}}" />
 					<input type="hidden" name="text" value="{{question.text}}" />
 					<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
