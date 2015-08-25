@@ -21,7 +21,7 @@ class HouseholdMemberGroup(BaseModel):
         return all_questions.order_by('order').reverse()[0].order if all_questions else 0
 
     def remove_related_questions(self):
-        self.question_group.clear()
+        self.question_templates.clear()
 
     def household_members_count_per_location_in(self, locations, survey):
         data = SortedDict()
