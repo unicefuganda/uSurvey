@@ -21,6 +21,8 @@ class Question(BaseModel):
         app_label = 'survey'        
         unique_together = [('identifier', 'batch'), ]
     
+    def conditional_flows(self):
+        return self.flows.filter( validation_test__isnull=False)
 
     def __unicode__(self):
         return "%s - %s: (%s)" % (self.identifier, self.text, self.answer_type.upper())

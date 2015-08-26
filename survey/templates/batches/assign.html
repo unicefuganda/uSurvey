@@ -25,9 +25,12 @@
 			{% for question in library_questions %} 
 				<tr class="rd ms-selectable" id="{{question.pk}}-selectable">
 					<td class="redips-rowhandler"><div class="redips-drag redips-row"></div>
-					<input type="hidden" names="identifier[]" value="{{question.identifier}}" />
-					<input type="hidden" names="text[]" value="{{question.text}}" />
-					<input type="hidden" names="answer_type[]" value="{{question.answer_type}}" /></td>
+					<input type="hidden" name="identifier" value="{{question.identifier}}" />
+					<input type="hidden" name="text" value="{{question.text}}" />
+					<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
+					<input type="hidden" name="module" value="{{question.module}}" />
+					<input type="hidden" name="group" value="{{question.group}}" />
+					</td>
 					<td>{{question.identifier}}</td>
 					<td>{{question.text}}</td>
 					<td>{{question.answer_type}}</td>
@@ -40,7 +43,7 @@
 					<td></td>
 				</tr>
 			<tr>
-				<td colspan="6" class="redips-mark"><span id="msg">Message line</span></td>
+				<td colspan="6" class="redips-mark"><span id="msg"></span></td>
 			</tr>
 		</tbody>
 	</table>
@@ -69,6 +72,9 @@
 </div>
 {% endblock %}
 {% block javascripts %}
+		<script type="text/javascript">
+			$('#assign-question-to-batch-form').submit(function(){alert($(this).serialize());});
+		</script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/redips-drag-min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/script.js"></script>

@@ -68,16 +68,16 @@
         <tr>
             <td>{{ question.identifier }}</td>
             <td class="span8">
-                {% if question.get_subquestions %}
+                {% if question.conditional_flows %}
                     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
                        href="#collapse_question_{{ question.id }}">{{ question.text }}</a>
                     <div id="collapse_question_{{ question.id }}" class="accordion-body collapse">
                         <div class="accordion-inner">
                             <span class="muted">Subquestion:</span>
                             <ul>
-                                {% for subquestion in question.get_subquestions %}
+                                {% for flow in question.conditional_flows %}
                                     <li>
-                                        {{ subquestion.text }} &nbsp;&nbsp;
+                                        {{ flow.next_question.text }} &nbsp;&nbsp;
                                         <a href="#delete_subquestion_{{ subquestion.id }}" data-toggle="modal"
                                            id="delete_subquestion">Delete</a>
                                         &nbsp;&nbsp;

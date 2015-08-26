@@ -9,7 +9,7 @@ from django.contrib import messages
 from survey.interviewer_configs import *
 from survey.models import HouseholdMemberGroup, QuestionModule
 from survey.models import Survey, Location, LocationType
-from survey.models import Survey, Batch, QuestionTemplate
+from survey.models import Survey, Batch, QuestionTemplate, Question, QuestionFlow
 from survey.models.batch import Batch
 from survey.forms.batch import BatchForm, BatchQuestionsForm
 from survey.forms.filters import QuestionFilterForm
@@ -101,7 +101,7 @@ def new(request, survey_id):
     response, batchform = _process_form(request, survey_id, action_str='added')
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
-        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
+        (batch.survey.name, reverse('batch_index_page', args=(survey.pk, ))),
 #         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
     ])
     context = {'batchform': batchform, 'button_label': "Create", 'id': 'add-batch-form', 'title': 'New Batch',
@@ -165,13 +165,31 @@ def assign(request, batch_id):
     batch_questions_form = BatchQuestionsForm(batch=batch)
     batch = Batch.objects.get(id=batch_id)
     groups = HouseholdMemberGroup.objects.all()
+    groups.exists()
+    modules = QuestionModule.objects.all()
+    modules.exists()
     if request.method == 'POST':
-        batch_questions_form = BatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
-        if batch_questions_form.is_valid():
-            batch_question_form.save()
-            success_message = "Questions successfully assigned to batch: %s." % batch.name.capitalize()
-            messages.success(request, success_message)
-            return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
+        data = dict(request.POST)
+        last_question = batch.last_question_inline()
+        if data.has_key('identifier'):
+            for idx, identifier in enumerate(data['identifier']):
+                question =  Question.objects.create(identifier=identifier, 
+                                                    text=data['text'][idx],
+                                                    answer_type=data['answer_type'][idx],
+                                                    group=groups.get(name__iexact=data['group'][idx]),
+                                                    module=modules.get(name__iexact=data['module'][idx]),
+                                                    batch=batch
+                                                    )
+                if last_question:
+                    QuestionFlow.objects.create(question=last_question, next_question=question)
+                else:
+                    batch.start_question = question
+                    batch.save()
+                last_question = question
+#         batch_questions_form = BatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
+        success_message = "Questions successfully assigned to batch: %s." % batch.name.capitalize()
+        messages.success(request, success_message)
+        return HttpResponseRedirect(reverse("batch_questions_page",  args=(batch_id, )))
     all_modules = QuestionModule.objects.all()
     used_identifiers = [question.identifier for question in batch.batch_questions.all()]
     library_questions = QuestionTemplate.objects.exclude(identifier__in=used_identifiers)

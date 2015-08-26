@@ -73,16 +73,34 @@ class Batch(BaseModel):
         return self.open_locations.all().exists()
     
     def last_question_inline(self):
-        qflows = QuestionFlow.objects.filter(question__batch=batch, validation_test__isnull=True)
-        if self.start_question:
+        qflows = QuestionFlow.objects.filter(question__batch=self, validation_test__isnull=True)
+        if qflows.exists():
             return last_inline(self.start_question, qflows)
+        else:
+            return self.start_question
+        
+    def questions_inline(self):
+        qflows = QuestionFlow.objects.filter(question__batch=self, validation_test__isnull=True)
+        if self.start_question:
+            return inline_questions(self.start_question, qflows)
+        else:
+            return []
 
 def  last_inline(question, flows):
-    qflows = flows.filter(question__batch=question, validation_test__isnull=True)
-    if qflows.exists():
-        return last_inline(question, qflows)
-    else:
+    try:
+        qflow = flows.get(question=question, validation_test__isnull=True)
+        return last_inline(qflow.next_question, flows)
+    except QuestionFlow.DoesNotExist:
         return question
+    
+def inline_questions(question, flows):
+    questions = [question, ]
+    try:
+        qflow = flows.get(question=question, validation_test__isnull=True)
+        questions.extend(inline_questions(qflow.next_question, flows))
+    except QuestionFlow.DoesNotExist:
+        pass
+    return questions
     
 #     @property
 #     def batch_questions(self):
