@@ -6,7 +6,6 @@
 {% block content %}
 {% load pagination_tags %}
 {% autopaginate interviewers 50 %}
-<br>
   <form id="aggregates-form" action="{% url 'interviewers_page' %}" method="get" class="padded-bottom">
     {% include "horizontal_naked_form.html" with a_form=locations_filter %}
     <button class="btn btn-primary" id="a-interviewer-list" href="{% url 'interviewers_page' %}"> Refresh List</button>
@@ -17,7 +16,7 @@
                 {% csrf_token %}
                 <button class="btn btn_primary" id="export_question">Export Interviewers</button>
             </form>
-    <a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-plus"></i> Add Interviewer</a>
+    <a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-minus"></i> Add Interviewer</a>
   
  {% include "search_form.html" %}
 </div>
@@ -30,10 +29,10 @@
             Name
           </th>
           <th>
-            USSD
+            Mobile Numbers
           </th>
           <th>
-            ODK
+            ODK ID
           </th>
 	 <th>
           Enumeration Area
@@ -50,6 +49,19 @@
               <a href="{% url 'show_interviewer_page' interviewer.pk %}">{{ interviewer.name }}</a>
             </td>
             <td>
+            	<!--  a href="#" onclick="$( '#interviewer_{{interviewer.pk}}' ).dialog()">view</a>
+                	<table id="interviewer_{{interviewer.pk}}" class="interviewer_locations hide">
+                		<thead>
+                			<th>{{interviewer.name}} Mobile Numbers</th>
+                		</thead>
+                		<tbody>
+	                		{% for access in interviewer.ussd_access %} 
+	                			<tr>
+	                				<td>{{ access }}<td>
+	                			</tr>
+	                		{% endfor %}
+                		</tbody>
+                	</table -->
               {{ interviewer.ussd_access | display_list}}
             </td>
             <td>
