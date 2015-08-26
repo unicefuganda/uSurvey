@@ -47,7 +47,7 @@
                 } else {
                     // Otherwise, just insert the remove button as the
                     // last child element of the form's container:
-                    row.append('<a class="btn btn_primary pull-right" href="javascript:void(0)"><i class="icon-minus"></i> ' + options.deleteText +'</a>');
+                    row.append('<a class="btn btn_primary pull-right" href="javascript:void(0)"><i class="icon-minus"></i>' + options.deleteText +'</a>');
                 }
                 row.find('a.' + options.deleteCssClass).click(function() {
                     var row = $(this).parents('.' + options.formCssClass),
