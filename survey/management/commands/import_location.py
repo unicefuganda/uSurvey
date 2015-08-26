@@ -7,9 +7,9 @@ import csv
 class Command(BaseCommand):
     args = 'name_of_the_csv.file'
     help = 'Populates locations from a csv file'
-    EA_INDEX = -2
+    EA_INDEX = 6
     DEFAULT_TOTAL_HOUSEHOLDS = 1000
-    TOTAL_EA_HOUSEHOLDS = -1
+#     TOTAL_EA_HOUSEHOLDS = -1
     def handle(self, *args, **kwargs):
         csv_file = csv.reader(open(args[0],"rb"))
         headers = csv_file.next()
@@ -20,6 +20,7 @@ class Command(BaseCommand):
         if headers[self.EA_INDEX].strip().replace("Name", "").upper() == 'EA':
             print 'poped ea'
             headers.pop(self.EA_INDEX) 
+            has_ea = True
         for header in headers:
             header = header.strip().replace("Name", "").upper()
             location_type, _ = LocationType.objects.get_or_create(parent=location_type, name=header, slug=slugify(header))
@@ -29,10 +30,11 @@ class Command(BaseCommand):
             for index, item in enumerate(items):
                 if index == 0:
                     location = None
-                if has_ea and index == len(items) + self.EA_INDEX:
+                print 'current index: ', index
+                if has_ea and index == self.EA_INDEX:
                     print 'loading EA ', item.strip()
-                    ea = EnumerationArea.objects.get_or_create(name=item.strip(), 
-                                                          total_location=DEFAULT_TOTAL_HOUSEHOLDS)
+                    ea, _ = EnumerationArea.objects.get_or_create(name=item.strip(), 
+                                                          total_households=self.DEFAULT_TOTAL_HOUSEHOLDS)
                     ea.locations.add(location)
                     ea.save()
                     break
