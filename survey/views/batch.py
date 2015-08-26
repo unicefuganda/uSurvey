@@ -101,7 +101,7 @@ def new(request, survey_id):
     response, batchform = _process_form(request, survey_id, action_str='added')
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
-        (batch.survey.name, reverse('batch_index_page', args=(survey.pk, ))),
+        (survey.name, reverse('batch_index_page', args=(survey.pk, ))),
 #         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
     ])
     context = {'batchform': batchform, 'button_label': "Create", 'id': 'add-batch-form', 'title': 'New Batch',
