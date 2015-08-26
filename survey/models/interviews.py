@@ -100,7 +100,7 @@ class Answer(BaseModel):
      
     @classmethod
     def answer_types(cls):
-        return [cl._meta.verbose_name.title() for cl in Answer.__subclasses__()]
+        return [cl.choice_name() for cl in Answer.__subclasses__()]
     
     @classmethod
     def get_class(cls, verbose_name):
@@ -109,6 +109,11 @@ class Answer(BaseModel):
             if cl._meta.verbose_name.title() == verbose_name:
                 return cl
         ValueError('unknown class')
+    
+    
+    @classmethod
+    def choice_name(cls):
+        return cls._meta.verbose_name.title()
 
     @classmethod
     def contains(cls, answer, txt):

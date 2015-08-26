@@ -205,6 +205,15 @@ def assign(request, batch_id):
                'modules': all_modules}
     return render(request, 'batches/assign.html',
                   context)
+    
+@permission_required('auth.can_view_batches')
+def add_question(request, question_id):
+    question = Question.objects.filter(id=question_id)
+    if not question:
+        messages.error(request, "Question does not exist.")
+        return HttpResponseRedirect('/questions/')
+    response, context = _render_question_view(request, question[0])
+    return response or render(request, 'questions/new.html', context)
 
 
 @permission_required('auth.can_view_batches')
@@ -212,9 +221,28 @@ def update_orders(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     new_orders = request.POST.getlist('order_information', None)
     if len(new_orders) > 0:
-        for new_order in new_orders:
-            print 'this order', new_order
-            BatchQuestionOrder.update_question_order(new_order, batch)
+        #wipe off present inline flows
+        inlines = batch.questions_inline()
+        start_question = inlines.pop(0)
+        question = start_question
+        for next_question in inlines:
+            QuestionFlow.objects.get(question=question, next_question=next_question).delete()
+            question = next_question
+        order_details = []
+        map(lambda order: order_details.append(order.split('-')), new_orders)
+        order_details = sorted(order_details, key=lambda detail: int(detail[0]))
+        #recreate the flows
+        questions = batch.batch_questions.all()
+        if questions: #so all questions can be fetched once and cached
+            question_id = order_details.pop(0)[1]
+            start_question = questions.get(pk=question_id)
+            for order, next_question_id in order_details:
+                QuestionFlow.objects.create(question=questions.get(pk=question_id), 
+                                            next_question=questions.get(pk=next_question_id))
+                question_id = next_question_id
+            batch.start_question = start_question
+            batch.save()
+            
         success_message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
         messages.success(request, success_message)
     else:

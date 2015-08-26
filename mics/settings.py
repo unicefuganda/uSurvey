@@ -263,6 +263,7 @@ USSD_PREVIOUS = '#'
 USSD_ITEMS_PER_PAGE = 10
 USSD_RESTART = '00'
 # USSD_STARTER = 'survey.ussd.flows.Start'
+USSD_IGNORED_CHARACTERS = "*!#';&"
 
 
 ##end USSD config ##

@@ -19,7 +19,8 @@
                 <button class="btn btn_primary" id="export_question">Export Questions</button>
             </form>
             {% if not batch.is_open %}
-                <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary" id="add_question">Select Question</a>
+            	<a href="{% url 'new_batch_question_page' batch.id %}" class="btn btn_primary" id="add_question">Add Question</a>
+                <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary" id="select_question">Select Question</a>
             {% endif %}
         </div>
         <input type="hidden" value="{{ batch.id }}" id="batch_id">
@@ -81,19 +82,11 @@
                                         <a href="#delete_subquestion_{{ subquestion.id }}" data-toggle="modal"
                                            id="delete_subquestion">Delete</a>
                                         &nbsp;&nbsp;
-                                        {% if batch %}
-                                            <a href="{% url 'edit_batch_subquestion_page' batch.id subquestion.id %}"
-                                               id="edit_subquestion_{{ subquestion.id }}">Edit</a>
-                                        {% else %}
-                                            <a href="{% url 'edit_subquestion_page' subquestion.id %}"
-                                               id="edit_subquestion_{{ subquestion.id }}">Edit</a>
-                                        {% endif %}
+                                           <a href="{% url 'edit_batch_subquestion_page' batch.id subquestion.id %}"
+                                              id="edit_subquestion_{{ flow.next_question.id }}">Edit</a>
                                     </li>
-                                    {% if batch %}
-                                        {% include "base/delete_modal.html" with object_name=subquestion.text id=subquestion.id name="Subquestion" url=batch.id|add_string:subquestion.id|get_url_with_ids:"delete_batch_question_page" %}
-                                    {% else %}
-                                        {% include "base/delete_modal.html" with object_name=subquestion.text id=subquestion.id name="Subquestion" url=subquestion.id|get_url_with_ids:"delete_question_page" %}
-                                    {% endif %}
+                                    {% include "base/delete_modal.html" with object_name=flow.next_question.text id=flow.next_question.id name="Subquestion" url=flow.next_question.id|get_url_with_ids:"delete_question_page" %}
+                                    
                                 {% endfor %}
                             </ul>
                         </div>
@@ -114,22 +107,12 @@
             <td>
                 <div class="btn-group">
                     {% if  batch and not batch.is_open %}
-                        <a class="btn btn-small" href="{% url 'add_batch_subquestion_page' batch.pk question.pk %}"
-                           id="add_batch_sub_question"><i class="icon-plus"></i>Add Subquestion</a>
                         <a class="btn btn-small" href="{% url 'edit_question_page' question.pk %}" id="edit_question"><i
                                 class="icon-pencil"></i> Edit</a>
                         <a href="{% url 'add_question_logic_page' batch.pk question.pk %}" class="btn btn-small"><i
                                 class="icon-plus"></i> Add Logic</a>
                         <a class="btn btn-small" href="#remove_question_{{ question.pk }}" data-toggle="modal"
                            id="remove_question"><i class="icon-trash"></i> Remove</a>
-
-                    {% elif not batch %}
-                        <a class="btn btn-small" href="{% url 'add_subquestion_page' question.pk %}"
-                           id="add_sub_question"><i class="icon-plus"></i>Add Subquestion</a>
-                        <a class="btn btn-small" href="{% url 'edit_question_page' question.pk %}" id="edit_question"><i
-                                class="icon-pencil"></i> Edit</a>
-                        <a class="btn btn-small" href="#delete_question_{{ question.pk }}" data-toggle="modal"
-                           id="delete_question"><i class="icon-trash"></i> Delete</a>
                     {% endif %}
                     {% if question.options.all %}
                         <a class="btn btn-small" href="#view_options_{{ question.id }}" data-toggle="modal"><i

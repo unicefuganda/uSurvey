@@ -23,6 +23,9 @@ class Question(BaseModel):
     
     def conditional_flows(self):
         return self.flows.filter( validation_test__isnull=False)
+    
+    def preceeding_conditional_flows(self):
+        return self.connecting_flows.filter( validation_test__isnull=False)
 
     def __unicode__(self):
         return "%s - %s: (%s)" % (self.identifier, self.text, self.answer_type.upper())
@@ -43,6 +46,11 @@ class QuestionFlow(BaseModel):
         args = TestArgument.objects.filter(flow=self).select_subclasses()
         args = sorted(args, key=lambda arg: arg.position)
         return [arg.param for arg in args]
+    
+    def save(self, *args, **kwargs):
+        if self.name is None:
+            self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", self.next_question.identifier)
+        super(QuestionFlow, self).save(*args, **kwargs) 
 
 class TestArgument(models.Model):
     objects = InheritanceManager()
@@ -78,6 +86,7 @@ class DateArgument(TestArgument):
 class QuestionOption(BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
     text = models.CharField(max_length=150, blank=False, null=False)
+    order = models.PositiveIntegerField()
  
     class Meta:
         app_label = 'survey'

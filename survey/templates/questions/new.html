@@ -1,15 +1,46 @@
 {% extends "form.html" %}
+
 {% block title %}
+  {% if parent_question %}
+    {{ heading }}
+  {% else %}
     New Question
+  {% endif %}
 {% endblock %}
 {% block pre_form_content %}
+  {% if parent_question %}
+     <h4> to question: {{parent_question.text}} <h4>
+  {% endif %}
     <p>Please note that the following special characters will be removed [* ! # ' ; &]</p>
     <div class="control-group" style="width: 40%">
         <label class="control-label"><span id="text-counter" style="float: right;"></span></label>
     </div>
 {% endblock%}
 {% block display_form_fields %}
-{% include "naked_form.html" with a_form=questionform%}
+{% include "naked_form.html" with a_form=questionform %}
+{% if options %}
+  {% for option in options %}
+   {% if option %}
+    <div class="control-group options question-option">
+        <label class="control-label">Option <span class="number"> {{ forloop.counter }}</span></label>
+        <div class="controls">
+            <input type="text" maxlength="100" name="options" value="{{ option }}">
+            <a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>
+            <a href="javascript:;" class="add-on btn btn_primary remove-option"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+{% endif %}
+{% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
+{% if parent_question %}
+<script type="text/template" id="question-group-template">
+    <select id="id_group" name="group">
+      <option value="{{parent_question.group.pk}}" selected="selected">{{parent_question.group.name}}</option>
+    </select>
+</script>
+{% endif %}
 
 {% endblock %}
 
