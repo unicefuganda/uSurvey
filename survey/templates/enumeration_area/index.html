@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 {% load template_tags %}
+{% load pagination_tags %}
+{% autopaginate interviewers 50 %}
 {% block title %}
     Enumeration Area Lists
 {% endblock %}
