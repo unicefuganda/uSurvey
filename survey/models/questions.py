@@ -47,10 +47,10 @@ class QuestionFlow(BaseModel):
         args = sorted(args, key=lambda arg: arg.position)
         return [arg.param for arg in args]
     
-    def save(self, *args, **kwargs):
-        if self.name is None:
-            self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", self.next_question.identifier)
-        super(QuestionFlow, self).save(*args, **kwargs) 
+#     def save(self, *args, **kwargs):
+#         if self.name is None:
+#             self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", self.next_question.identifier)
+#         super(QuestionFlow, self).save(*args, **kwargs) 
 
 class TestArgument(models.Model):
     objects = InheritanceManager()

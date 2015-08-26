@@ -8,6 +8,7 @@ class Command(BaseCommand):
     args = 'name_of_the_csv.file'
     help = 'Populates locations from a csv file'
     EA_INDEX = -2
+    DEFAULT_TOTAL_HOUSEHOLDS = 1000
     TOTAL_EA_HOUSEHOLDS = -1
     def handle(self, *args, **kwargs):
         csv_file = csv.reader(open(args[0],"rb"))
@@ -15,8 +16,10 @@ class Command(BaseCommand):
         location_types = []
         location_type = None
         has_ea = False
+        print 'ea index ', headers[self.EA_INDEX].strip()
         if headers[self.EA_INDEX].strip().replace("Name", "").upper() == 'EA':
-           headers.pop(self.EA_INDEX) 
+            print 'poped ea'
+            headers.pop(self.EA_INDEX) 
         for header in headers:
             header = header.strip().replace("Name", "").upper()
             location_type, _ = LocationType.objects.get_or_create(parent=location_type, name=header, slug=slugify(header))
@@ -27,9 +30,9 @@ class Command(BaseCommand):
                 if index == 0:
                     location = None
                 if has_ea and index == len(items) + self.EA_INDEX:
+                    print 'loading EA ', item.strip()
                     ea = EnumerationArea.objects.get_or_create(name=item.strip(), 
-                                                          total_location=int(items[self.TOTAL_EA_HOUSEHOLDS]
-                                                                             ))
+                                                          total_location=DEFAULT_TOTAL_HOUSEHOLDS)
                     ea.locations.add(location)
                     ea.save()
                     break
