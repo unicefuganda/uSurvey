@@ -1,12 +1,11 @@
 {% extends "layout.html" %}
-{% load template_tags %}
-{% load pagination_tags %}
-{% autopaginate interviewers 50 %}
 {% block title %}
-    Enumeration Area Lists
+  Enumeration Area Lists
 {% endblock %}
-
 {% block content %}
+{% load pagination_tags %}
+{% autopaginate enumeration_areas 5 %}
+{% load template_tags %}
     <form action="" method="get">
     {% include "horizontal_naked_form.html" with a_form=locations_filter %}
     <button class="btn btn-primary" id="a-ea-list">Refresh List</button>
@@ -83,6 +82,7 @@
         {% endfor %}
         </tbody>
     </table>
+{% paginate %}
 {% endblock %}
 
 {% block javascripts %}
