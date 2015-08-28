@@ -100,5 +100,4 @@ class SurveyBatchFilterForm(forms.Form):
 
     def constrain_batch_choices_to_survey(self):
         survey_id = self.data.get('survey', None)
-        survey_id = survey_id if str(survey_id).isdigit() else self.fields['survey'].queryset[0].id
-        self.fields['batch'].queryset = Batch.objects.filter(survey=survey_id).order_by('name')
+        self.fields['batch'].queryset = Batch.objects.filter(survey__pk=survey_id).order_by('name')

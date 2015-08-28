@@ -169,7 +169,7 @@ def assign(request, batch_id):
     if request.method == 'POST':
         data = dict(request.POST)
         last_question = batch.last_question_inline()
-        lib_questions = QuestionTemplate.objects.filter(identifier__in=data['identifier'])
+        lib_questions = QuestionTemplate.objects.filter(identifier__in=data.get('identifier', ''))
         if lib_questions:
             for lib_question in lib_questions:
                 question =  Question.objects.create(identifier=lib_question.identifier, 

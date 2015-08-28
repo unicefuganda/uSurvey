@@ -34,7 +34,7 @@ def _process_form(indicator_filter_form, indicators):
         elif batch_id.isdigit() and not module_id.isdigit():
             indicators = indicators.filter(batch=batch_id)
         elif survey_id.isdigit():
-            batches = Survey.objects.get(id=survey_id).batch.all()
+            batches = Survey.objects.get(id=survey_id).batches.all()
             indicators = indicators.filter(batch__in=batches)
     return indicators
 
