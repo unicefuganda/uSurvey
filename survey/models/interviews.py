@@ -109,6 +109,7 @@ class Interview(BaseModel):
         app_label = 'survey'
         unique_together = [('householdmember', 'batch'), ]
 
+
 class Answer(BaseModel):
     interview = models.ForeignKey(Interview, related_name='%(class)s')
 #     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
@@ -327,6 +328,20 @@ class GeopointAnswer(Answer):
     def validators(cls):
         return [cls.equals]
 
+
+class NonResponseAnswer(Answer):
+    value = models.CharField(max_length=100, blank=False, null=False)
+
+    def __init__(self, flow, answer, *args, **kwargs):
+        super(TextAnswer, self).__init__()
+        self.value = answer
+        self.flow = flow
+
+    @classmethod
+    def validators(cls):
+        return []
+
+
 class AnswerAccessDefinition(BaseModel):
     ACCESS_CHANNELS = [(name, name) for name in InterviewerAccess.access_channels()]
     ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
@@ -347,4 +362,3 @@ class AnswerAccessDefinition(BaseModel):
     @classmethod
     def answer_types(cls, channel):
         return set(AnswerAccessDefinition.objects.filter(channel=channel).values_list('answer_type', flat=True))
-# class
