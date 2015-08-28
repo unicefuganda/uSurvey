@@ -84,10 +84,16 @@ class LocationFilterForm(forms.Form):
 
     def constrain_batch_and_ea_choices_to_survey(self):
         survey_id = self.data.get('survey', None)
-        survey_id = survey_id if str(survey_id).isdigit() else self.fields['survey'].queryset[0].id
-        self.fields['batch'].queryset = Batch.objects.filter(survey=survey_id)
-        ea = SurveyAllocation.objects.get(survey=survey_id).interviewer.ea
-        self.fields['ea'].queryset = EnumerationArea.objects.filter(pk=ea.pk)
+        self.fields['batch'].queryset = Batch.objects.none()
+        self.fields['ea'].queryset = EnumerationArea.objects.none()
+        try:
+            survey_id = survey_id if str(survey_id).isdigit() else self.fields['survey'].queryset[0].id
+            ea = SurveyAllocation.objects.get(survey=survey_id).interviewer.ea
+            self.fields['batch'].queryset = Batch.objects.filter(survey=survey_id)
+            self.fields['ea'].queryset = EnumerationArea.objects.filter(pk=ea.pk)
+        except:
+            pass
+
 
 
 class SurveyBatchFilterForm(forms.Form):
