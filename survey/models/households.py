@@ -11,7 +11,7 @@ from survey.models.surveys import Survey
 from survey.models.interviews import Answer
 from survey.models.access_channels import InterviewerAccess
 from survey.models.householdgroups import HouseholdMemberGroup
-from survey.models.household_batch_completion import HouseSurveyCompletion
+from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
 from django.core.exceptions import ValidationError
 
 
@@ -74,6 +74,13 @@ class Household(BaseModel):
 
     def has_completed(self, survey):
         return HouseSurveyCompletion.objects.filter(household=self, survey=survey).count() > 0
+
+    def has_completed_batch(self, batch):
+        try:
+            HouseholdBatchCompletion.objects.get(household=self, batch=batch)
+            return True
+        except HouseholdBatchCompletion.DoesNotExist:
+            return False
 
 class HouseholdMember(BaseModel):
     MALE = 1
