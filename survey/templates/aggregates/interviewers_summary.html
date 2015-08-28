@@ -1,15 +1,21 @@
 {% extends "layout.html" %}
 {% load template_tags %}
 {% block title %}
-  Investigators List
+  Interviewers List
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate investigators 50 %}
+{% autopaginate interviewers 50 %}
   <h3>
-    Investigators Summary
+    Interviewers Summary
   </h3>
-  
+  <div class="filters">
+      <form id="aggregates-form" action="{% url 'interviewers_page' %}" method="get" class="padded-bottom">
+      {% include "horizontal_naked_form.html" with a_form=locations_filter %}
+      <button class="btn btn-primary" id="a-interviewer-list" href="{% url 'interviewers_page' %}">Refresh List</button>
+    </form>
+  <br/>
+  </div>
  {% include "search_form.html" %}
 </div>
   <br />
@@ -26,13 +32,13 @@
         </tr>
       </thead>
       <tbody>
-        {% for investigator in investigators %}
+        {% for interviewer in interviewers %}
           <tr>
             <td>
-              <a href="{% url 'investigator_completion_summary' investigator.pk %}">{{ investigator.name }}</a>
+              <a href="{% url 'interviewer_completion_summary' interviewer.pk %}">{{ interviewer.name }}</a>
             </td>
             <td>
-              {{ investigator.mobile_number }}
+              {{ interviewer.mobile_number }}
             </td>
           </tr>
         {% endfor %}
@@ -43,6 +49,6 @@
 {% endblock %}
 
 {% block javascripts %}
-  <script src="{{STATIC_URL}}/js/investigator.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}/js/interviewer.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

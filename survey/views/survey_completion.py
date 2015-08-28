@@ -1,12 +1,11 @@
-import json
-
+import json, ast
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
 from survey.models import Location, LocationType
-
+from survey.forms.enumeration_area import LocationsFilterForm as LocFilterForm
 from survey.forms.filters import LocationFilterForm
 from survey.models import Survey, Interviewer
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates, \
@@ -85,13 +84,17 @@ def show_interviewer_completion_summary(request):
     selected_location = None
     selected_ea = None
     interviewers = Interviewer.objects.order_by('id')
-    search_fields = ['name', 'mobile_number']
+    search_fields = ['name', ]
     if request.GET.has_key('q'):
         interviewers = get_filterset(interviewers, request.GET['q'], search_fields)
     if params.has_key('status'):
-        interviewers = interviewers.filter(is_blocked=ast.literal_eval(params['status']))
-    location_widget = LocationWidget(selected_location, ea=selected_ea)
+        interviewers = interviewers.intervieweraccess.filter(is_active=ast.literal_eval(params['status']))
+    locations_filter = LocFilterForm(request.GET, include_ea=True)
+    if locations_filter.is_valid():
+        interviewers = interviewers.filter(ea__in=locations_filter.get_enumerations()).order_by('name')
+    # location_widget = LocationWidget(selected_location, ea=selected_ea)
     return render(request, 'aggregates/interviewers_summary.html',
                   {'interviewers': interviewers,
+                    'locations_filter' : locations_filter,
                    'request': request})
 
