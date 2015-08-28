@@ -27,7 +27,7 @@
             Name
           </th>
           <th>
-            Mobile Number
+            Interview IDs
           </th>
         </tr>
       </thead>
@@ -38,7 +38,7 @@
               <a href="{% url 'interviewer_completion_summary' interviewer.pk %}">{{ interviewer.name }}</a>
             </td>
             <td>
-              {{ interviewer.mobile_number }}
+              {{ interviewer.access_ids }}
             </td>
           </tr>
         {% endfor %}
