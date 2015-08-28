@@ -38,7 +38,7 @@
               <a href="{% url 'interviewer_completion_summary' interviewer.pk %}">{{ interviewer.name }}</a>
             </td>
             <td>
-              {{ interviewer.access_ids }}
+              {{ interviewer.access_ids | display_list }}
             </td>
           </tr>
         {% endfor %}
