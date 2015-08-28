@@ -8,9 +8,10 @@ class IndicatorForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
-        self.fields['batch'].choices = map(lambda batch: (batch.id, batch.name),
-                                           Batch.objects.filter(survey=self.fields['survey'].queryset[0]))
-        self.fields['module'].choices = map(lambda module: (module.id, module.name), QuestionModule.objects.all())
+        if kwargs.get('instance'):
+            survey = kwargs['instance'].survey
+            self.fields['batch'].choices.queryset = survey.batches
+        self.fields['module'].choices.queryset = QuestionModule.objects.all()
         self.fields['name'].label = 'Indicator'
 
     def clean(self):
