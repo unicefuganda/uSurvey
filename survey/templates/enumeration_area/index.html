@@ -1,12 +1,17 @@
 {% extends "layout.html" %}
+<<<<<<< HEAD
 {% load template_tags %}
 {% load pagination_tags %}
 {% autopaginate enumeration_areas %}
+=======
+>>>>>>> 6cc9f904ad7404aa71616b3011be6dd01b47ebf1
 {% block title %}
-    Enumeration Area Lists
+  Enumeration Area Lists
 {% endblock %}
-
 {% block content %}
+{% load pagination_tags %}
+{% autopaginate enumeration_areas 5 %}
+{% load template_tags %}
     <form action="" method="get">
     {% include "horizontal_naked_form.html" with a_form=locations_filter %}
     <button class="btn btn-primary" id="a-ea-list">Refresh List</button>
