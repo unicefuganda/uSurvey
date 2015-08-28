@@ -15,7 +15,6 @@ class ResultComposer:
     def send_mail(self):
         attachment_name = '%s.csv' % (self.results_download_service.batch.name if self.results_download_service.batch  \
         else self.results_download_service.survey.name)
-        import pdb; pdb.set_trace()
         subject = 'Completion report for %s'  % attachment_name
         text = 'Completion report for %s. Date: %s'  % (attachment_name, datetime.now())
         print 'commencing...'
@@ -45,7 +44,9 @@ class ResultsDownloadService(object):
     def _set_survey_and_questions(self, survey):
         if self.batch:
             return self.batch.survey, self.batch.batch_questions.all()
-        return survey, survey.all_questions()
+        survey_questions = []
+        map(lambda batch: survey_questions.extend(list(batch.batch_questions.all())), survey.batches.all())
+        return survey, survey_questions
 
     def set_report_headers(self):
         header = list(LocationTypeDetails.get_ordered_types().exclude(name__iexact="country").values_list('name', flat=True))

@@ -816,3 +816,7 @@ ul {
 .fineprint {
 	font-size: 85%;
 }
+
+.location_filter {
+    width: 100px;
+}

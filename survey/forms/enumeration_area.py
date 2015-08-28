@@ -38,12 +38,16 @@ class LocationsFilterForm(Form):
                 self.fields[location_type.name] = forms.ChoiceField(choices=choices)
                 self.fields[location_type.name].required = False
                 self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filter chzn-select'
+                self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
+
         if include_ea:
             choices = [(ea.pk, ea.name) for ea in EnumerationArea.objects.all()]
             choices.insert(0, ('', '--- Select EA ---'))
             self.fields['enumeration_area'] = forms.ChoiceField(choices=choices)
             self.fields['enumeration_area'].widget.attrs['class'] = 'location_filter chzn-select'
+            self.fields['enumeration_area'].widget.attrs['style'] = 'width: 100px;'
             self.fields['enumeration_area'].required = False
+
     
     def get_locations(self):
         loc = None
