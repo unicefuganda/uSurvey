@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from rapidsms.contrib.locations.models import LocationType, Location
+from survey.models import LocationType, Location
 
 from survey.forms.upload_csv_file import UploadWeightsForm
 from survey.models import LocationWeight, LocationTypeDetails, UploadErrorLog, Survey
