@@ -95,6 +95,13 @@ class Batch(BaseModel):
     def zombie_questions(self):
         return Question.zombies(self)
 
+    def survey_questions(self):
+        zombies = self.zombie_questions()
+        inline_ques = self.questions_inline()
+        other_quests = self.batch_questions.exclude(pk__in=[q.pk for q in (list(zombies) + inline_ques)]).order_by('pk')
+        inline_ques.extend(other_quests)
+        return inline_ques
+
 
 def next_inline_question(question, flows, groups=None, answer_types=[]):
     try:

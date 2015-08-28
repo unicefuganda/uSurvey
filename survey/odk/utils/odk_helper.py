@@ -4,7 +4,9 @@ import os
 import zipfile
 import pytz
 from lxml import etree
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse, HttpResponseNotFound
+from django.core.servers.basehttp import FileWrapper
+from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.shortcuts import render
 from django import template
@@ -13,7 +15,8 @@ from django.shortcuts import get_object_or_404
 from djangohttpdigest.digest import Digestor, parse_authorization_header
 from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
-from survey.models import Survey, Interviewer, Household, HouseholdMember, HouseholdHead, Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer
+from survey.models import Survey, Interviewer, SurveyAllocation, ODKAccess, Household, HouseholdMember, HouseholdHead, \
+            Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer
 from survey.models.surveys import SurveySampleSizeReached
 from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.odk.utils.log import logger
@@ -147,13 +150,6 @@ def register_member_answer(interviewer, question, household_member, answer, batc
                          answer=answer, household=household_member.household, batch=batch)
     return created
 
-class NonResponseAnswer(Answer):
-    '''
-    Basically place holder for non response answers. only used to extract the non response text answer
-    '''
-    answer = ''
-    def __init__(self, answer):
-        self.answer = answer
 
 def _get_responses(interviewer, survey_tree, survey):
     response_dict = {}
@@ -222,7 +218,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     return submission
 
 def get_surveys(interviewer):
-    return Survey.currently_open_surveys(interviewer.location)
+    return [SurveyAllocation.get_allocation(interviewer), ]
 
 def get_households(interviewer):
     """
@@ -348,9 +344,10 @@ def http_basic_interviewer_auth(func):
                 auth = auth.strip().decode('base64')
                 username, password = auth.split(':', 1)
                 try:
-                    request.user = Interviewer.objects.get(mobile_number=username, odk_token=password)
+                    request.user = ODKAccess.objects.get(user_identifier=username, odk_token=password, is_active=True).interviewer
+                    #Interviewer.objects.get(mobile_number=username, odk_token=password)
                     return func(request, *args, **kwargs)
-                except Interviewer.DoesNotExist:
+                except ODKAccess.DoesNotExist:
                     return OpenRosaResponseNotFound()
         return HttpResponseNotAuthorized()
     return _decorator
@@ -365,12 +362,15 @@ def http_digest_interviewer_auth(func):
             try:
                 parsed_header = digestor.parse_authorization_header(request.META['HTTP_AUTHORIZATION'])
                 if parsed_header['realm'] == realm:
-                    interviewer = Interviewer.objects.get(mobile_number=parsed_header['username'], is_blocked=False)
-                    authenticator = SimpleHardcodedAuthenticator(server_realm=realm, server_username=interviewer.mobile_number, server_password=interviewer.odk_token)
-                    request.user = interviewer
+                    odk_access = ODKAccess.objects.get(user_identifier=parsed_header['username'], is_active=True)
+                    # interviewer = Interviewer.objects.get(mobile_number=parsed_header['username'], is_blocked=False)
+                    authenticator = SimpleHardcodedAuthenticator(server_realm=realm,
+                                                                 server_username=odk_access.user_identifier,
+                                                                 server_password=odk_access.odk_token)
                     if authenticator.secret_passed(digestor):
+                        request.user = odk_access.interviewer
                         return func(request, *args, **kwargs)
-            except Interviewer.DoesNotExist:
+            except ODKAccess.DoesNotExist:
                 return OpenRosaResponseNotFound()
             except ValueError, err:
                 return OpenRosaResponseBadRequest()

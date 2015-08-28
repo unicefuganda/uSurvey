@@ -1,5 +1,5 @@
 from datetime import datetime
-import pytz, os, base64, random
+import pytz, os, base64, random, logging
 from functools import wraps
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET, require_POST
@@ -24,42 +24,33 @@ from survey.models import Survey, Interviewer, Household
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
-from survey.models import ODKSubmission
+from survey.models import ODKSubmission, Answer
 from survey.models.surveys import SurveySampleSizeReached
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
+from survey.interviewer_configs import MESSAGES
 
 def get_survey_xform(interviewer, survey):
     selectable_households = None
     household_size = interviewer.ea.total_households
-    registered_households = [hhd for hhd in interviewer.households.filter(survey=survey, ea=interviewer.ea).all() if hhd.all_members()]
-    total_registered = len(registered_households)
-    registration_percent = total_registered * 100 / interviewer.ea.total_households
-    #import pdb;pdb.set_trace()
-    if registration_percent >= survey.minimum_registered_households:
-        if survey.has_sampling:
-            selectable_households = []
-            if household_size > survey.sample_size:
-                selectable_households = random.sample(list(range(0, total_registered)), survey.sample_size) #using total_registered in place of the  
-            registered_households = [registered_households[i] for i in selectable_households]
-        registered_households = sorted(registered_households, key=lambda household: household.random_sample_number)
+    if interviewer.may_commence(survey):
+        registered_households = interviewer.generate_survey_households(survey)
         return render_to_string("odk/survey_form_without_house_reg.xml", {
             'interviewer': interviewer,
-            'registered_households' : registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
+            'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
             'survey' : survey,
-            'survey_batches' : interviewer.get_open_batch_for_survey(survey, sort=True),
+            'survey_batches' : interviewer.ea.open_batches(survey),
             'educational_levels' : LEVEL_OF_EDUCATION,
+            'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
 #            'selectable_households' : selectable_households
             })
     else:
         selectable_households = range(1, household_size + 1)
-        already_selected = [ household.random_sample_number for household in registered_households]
         return render_to_string("odk/household_registration.xml", {
             'interviewer': interviewer,
-            #'registered_households' : registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
             'survey' : survey,
-            #'survey_batches' : interviewer.get_open_batch_for_survey(survey, sort=True),
             'educational_levels' : LEVEL_OF_EDUCATION,
-            'selectable_households' : [house_num for house_num in selectable_households if house_num not in already_selected]
+            'selectable_households' : selectable_households,
+            'messages' : MESSAGES,
             })
 
 @login_required
@@ -97,7 +88,7 @@ def form_list(request):
     surveys = get_surveys(interviewer)
     audit = {}
     audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
-          _("Requested forms list. for %s" % interviewer.mobile_number), audit, request)
+          _("Requested forms list. for %s" % interviewer.name), audit, request)
     content = render_to_string("odk/xformsList.xml", {
     'surveys': surveys,
     'interviewer' : interviewer,
@@ -166,7 +157,7 @@ def submission(request):
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer, 
             _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
-                                                        "interviewer": interviewer.mobile_number,
+                                                        "interviewer": interviewer.name,
                                                         "desc" : str(ex)
                                                     }, {'desc' : str(ex)}, request, logging.WARNING)
         return OpenRosaServerError(u"Unexpected error while processing your form. Please try again")

@@ -89,7 +89,7 @@ class HouseholdMember(BaseModel):
     first_name = models.CharField(max_length=25, blank=True, null=True, verbose_name="Other Names")
     gender = models.BooleanField(default=True, verbose_name="Sex", choices=[(MALE, 'M'), (FEMALE, 'F')])
     date_of_birth = models.DateField(auto_now=False)
-    household = models.ForeignKey(Household, related_name='household_member')
+    household = models.ForeignKey(Household, related_name='household_members')
 #     registrar = models.ForeignKey(Interviewer, related_name='registered_household_members')
 #     registration_channel = models.ForeignKey(InterviewerAccess, related_name='registered_household_members')
 

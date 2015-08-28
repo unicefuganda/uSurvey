@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from survey.forms.filters import SurveyBatchFilterForm
 from survey.models import Survey, Interviewer
-from survey.models.batch import Batch
+from survey.models import Batch, LocationType
 from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 from survey.utils.views_helper import contains_key
 from survey.tasks import email_task
@@ -56,7 +56,10 @@ def completed_interviewer(request):
         batch = Batch.objects.get(id=params['batch'])
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="interviewer.csv"'
-    data = survey.generate_completion_report(batch=batch)
+    header = ['Interviewer', 'Access Channels']
+    header.extend(LocationType.objects.all().values_list('name', flat=True))
+    data = [header]
+    data.extend(survey.generate_completion_report(batch=batch))
     writer = csv.writer(response)
     for row in data:
         writer.writerow(row)

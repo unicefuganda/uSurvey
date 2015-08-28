@@ -71,6 +71,11 @@ class Interviewer(BaseModel):
             return self.registered_households.filter(ea=self.ea)
         else:
             return self.registered_households.filter(ea=self.ea, survey=survey)
+
+    def may_commence(self, survey):
+        total_registered = self.present_households(survey).count()
+        registration_percent = total_registered * 100 / self.ea.total_households
+        return registration_percent >= survey.min_percent_reg_houses
     
     def generate_survey_households(self, survey):
         survey_households = list(self.present_households(survey))

@@ -52,10 +52,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 </h:head>
 <h:body>
     <group>
-        <label>Household details</label>
+        <label>Household Details</label>
        {% if selectable_households %}
           <select1 ref="/survey/household/houseNumber">    
-              <label>Select household</label>
+              <label>{{messages.HOUSEHOLD_LIST}}</label>
               {% for h_number in selectable_households %}
                  <item>
 					<label>{{ h_number }}</label>

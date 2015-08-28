@@ -5,6 +5,7 @@ from django.db import models
 from survey.models.interviewer import Interviewer
 from survey.models.access_channels import InterviewerAccess
 from survey.models.base import BaseModel
+from dateutil.parser import parse as extract_date
 from rapidsms.contrib.locations.models import Point
 from django import template
 from survey.models.access_channels import ODKAccess
@@ -36,22 +37,21 @@ class Interview(BaseModel):
                     next_question = self.last_question
                 else:
                     print 'last question is ', self.last_question
+                    answer_class = Answer.get_class(self.last_question.answer_type)
+                    answer = answer_class(self.last_question, reply)
+                    answer.interview = self
+                    answer.save()
+                    #after answering the question, lets see if it leads us anywhere
                     flows = self.last_question.flows.all()
                     resulting_flow = None
-                    last_resort = None
                     for flow in flows:
                         if flow.validation_test:
-                            if getattr(Answer, flow.validation_test)(reply, *flow.test_arguments) == True:
+                            if getattr(answer_class, flow.validation_test)(reply, *flow.test_arguments) == True:
                                 resulting_flow = flow
                                 break
                         else:
-                            last_resort = flow
-                    resulting_flow = resulting_flow or last_resort
+                            resulting_flow = flow
                     if resulting_flow:
-                        answer_class = Answer.get_class(self.last_question.answer_type)
-                        answer = answer_class(resulting_flow, reply)
-                        answer.interview = self
-                        answer.save()
                         next_question = resulting_flow.next_question
                  #confirm if next question is applicable
                 if next_question and (self.householdmember.belongs_to(next_question.group) and  \
@@ -84,7 +84,7 @@ class Interview(BaseModel):
 
     @classmethod
     def interviews(cls, house_member, interviewer, survey):
-        available_batches = ea.open_batches(survey, house_member)
+        available_batches = interviewer.ea.open_batches(survey, house_member)
         interviews = Interview.objects.filter(householdmember=house_member, batch__in=available_batches)
         #return (completed_interviews, pending_interviews)
         return (interviews.filter(closure_date__isnull=False), interviews.filter(closure_date__isnull=True))
@@ -93,12 +93,6 @@ class Interview(BaseModel):
 
     def members_with_open_batches(self):
         pass
-
-
-    def delete(self, using=None):
-        for name in Answer.supported_answers():
-            getattr(self, '%s'%name.lower()).all().delete()
-        super(Interview, self).delete()
 
 
 #     @property
@@ -114,15 +108,15 @@ class Answer(BaseModel):
     interview = models.ForeignKey(Interview, related_name='%(class)s')
 #     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
 #                                                             #value shall hold the exact worth of the response
-    flow = models.ForeignKey("QuestionFlow", null=True, related_name="%(class)s")
+    question = models.ForeignKey("Question", null=True, related_name="%(class)s", on_delete=models.PROTECT)
 
     @classmethod
     def supported_answers(cls):
-        return [cl.__name__ for cl in Answer.__subclasses__()]
+        return Answer.__subclasses__()
 
     @classmethod
     def answer_types(cls):
-        return [cl.choice_name() for cl in Answer.__subclasses__()]
+        return [cl.choice_name() for cl in Answer.__subclasses__() if cl is not NonResponseAnswer]
 
     @classmethod
     def get_class(cls, verbose_name):
@@ -202,12 +196,12 @@ class NumericalAnswer(Answer):
     def validators(cls):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(NumericalAnswer, self).__init__()
         try:
             self.value = int(answer)
         except Exception: raise
-        self.flow = flow
+        self.question = question
 
 class ODKGeoPoint(Point):
     altitude = models.DecimalField(decimal_places=3, max_digits=10)
@@ -219,10 +213,10 @@ class ODKGeoPoint(Point):
 class TextAnswer(Answer):
     value = models.CharField(max_length=100, blank=False, null=False)
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(TextAnswer, self).__init__()
         self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):
@@ -237,12 +231,12 @@ class TextAnswer(Answer):
 class MultiChoiceAnswer(Answer):
     value = models.ForeignKey("QuestionOption", null=True)
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(MultiChoiceAnswer, self).__init__()
         if isinstance(answer, basestring):
-            self.value = flow.question.options.get(text__iexact=answer)
+            self.value = question.options.get(text__iexact=answer)
         else: self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):
@@ -255,10 +249,10 @@ class MultiChoiceAnswer(Answer):
 class MultiSelectAnswer(Answer):
     value = models.ManyToManyField("QuestionOption", null=True)
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(MultiSelectAnswer, self).__init__()
         self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):
@@ -271,10 +265,12 @@ class MultiSelectAnswer(Answer):
 class DateAnswer(Answer):
     value = models.DateField(null=True)
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(DateAnswer, self).__init__()
+        if isinstance(answer, basestring):
+            answer = extract_date(answer, fuzzy=True)
         self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):
@@ -283,10 +279,10 @@ class DateAnswer(Answer):
 class AudioAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(AudioAnswer, self).__init__()
         self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):
@@ -295,10 +291,10 @@ class AudioAnswer(Answer):
 class VideoAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(VideoAnswer, self).__init__()
         self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):
@@ -307,10 +303,10 @@ class VideoAnswer(Answer):
 class ImageAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(ImageAnswer, self).__init__()
         self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):
@@ -319,10 +315,10 @@ class ImageAnswer(Answer):
 class GeopointAnswer(Answer):
     value = models.ForeignKey(ODKGeoPoint, null=True)
 
-    def __init__(self, flow, answer, *args, **kwargs):
+    def __init__(self, question, answer, *args, **kwargs):
         super(GeopointAnswer, self).__init__()
         self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):
@@ -332,10 +328,10 @@ class GeopointAnswer(Answer):
 class NonResponseAnswer(Answer):
     value = models.CharField(max_length=100, blank=False, null=False)
 
-    def __init__(self, flow, answer, *args, **kwargs):
-        super(TextAnswer, self).__init__()
+    def __init__(self, question, answer, *args, **kwargs):
+        super(NonResponseAnswer, self).__init__()
         self.value = answer
-        self.flow = flow
+        self.question = question
 
     @classmethod
     def validators(cls):

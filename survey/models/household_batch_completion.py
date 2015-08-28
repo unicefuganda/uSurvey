@@ -4,7 +4,6 @@ from survey.models.base import BaseModel
 from survey.models.batch import Batch
 
 class HouseholdMemberBatchCompletion(BaseModel):
-    household = models.ForeignKey('Household', null=True, related_name="completed_batches")
     householdmember = models.ForeignKey('HouseholdMember', null=True, related_name="completed_member_batches")
     batch = models.ForeignKey(Batch, null=True, related_name="completed_households")
     interviewer = models.ForeignKey(Interviewer, null=True, related_name="completed_batches")
@@ -12,7 +11,7 @@ class HouseholdMemberBatchCompletion(BaseModel):
 class HouseholdBatchCompletion(BaseModel):
     household = models.ForeignKey('Household', null=True, related_name="batch_completion_batches")
     batch = models.ForeignKey(Batch, null=True, related_name="batch_completion_households")
-    interviewer = models.ForeignKey(Interviewer, null=True, related_name="batch_completion_completed_households")
+    interviewer = models.ForeignKey(Interviewer, null=True, related_name="batch_completed_households")
     
 class HouseMemberSurveyCompletion(BaseModel):
     householdmember = models.ForeignKey('HouseholdMember', null=True, related_name="completion_register")

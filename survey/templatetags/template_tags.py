@@ -190,27 +190,27 @@ def is_relevant_odk(context, question, batch, interviewer, registered_households
                                    ' '.join([test for test in terminal_ques if test.find('/survey/b%s/' % batch.pk) > -1]),
                                    is_relevant_by_group(question, registered_households)
                                    )
-    if question.answer_type.lower() == 'multichoice' and question.rule.count():
-        for option in question.options.all():
-            answer = MultiChoiceAnswer()
-            answer.interviewer = interviewer
-            answer.batch = batch
-            answer.question = question
-            answer.answer = option
-            try:
-                next_question = question.get_odk_next_question(answer)
-                if next_question is not None:
-                    action = next_question.parent_question_rules.get(validate_with_option=answer.answer).action
-                    if action == 'SKIP_TO':
-                        skip_to_ques[next_question.pk] = " and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk)
-                    if action =='ASK_SUBQUESTION':
-                        fellows = sub_ques.get(next_question.pk, [])
-                        fellows.append(" and selected(/survey/b%s/q%s,'%s')" % (batch.pk, question.pk, option.pk))
-                        sub_ques[next_question.pk] = fellows
-                else:
-                    terminal_ques.append(" and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk))
-            except ObjectDoesNotExist, e:
-                pass
+    # if question.flows.count():
+    #     for option in question.options.all():
+    #         answer = MultiChoiceAnswer()
+    #         answer.interviewer = interviewer
+    #         answer.batch = batch
+    #         answer.question = question
+    #         answer.answer = option
+            # try:
+            #     next_question = question.get_odk_next_question(answer)
+            #     if next_question is not None:
+            #         action = next_question.parent_question_rules.get(validate_with_option=answer.answer).action
+            #         if action == 'SKIP_TO':
+            #             skip_to_ques[next_question.pk] = " and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk)
+            #         if action =='ASK_SUBQUESTION':
+            #             fellows = sub_ques.get(next_question.pk, [])
+            #             fellows.append(" and selected(/survey/b%s/q%s,'%s')" % (batch.pk, question.pk, option.pk))
+            #             sub_ques[next_question.pk] = fellows
+            #     else:
+            #         terminal_ques.append(" and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk))
+            # except ObjectDoesNotExist, e:
+            #     pass
 #    else:
         
             #import pdb; pdb.set_trace()
@@ -247,7 +247,7 @@ def is_relevant_by_group(question, registered_households):
 
     relevant_existing = []
     for household in registered_households:
-        for member in household.all_members():
+        for member in household.members.all():
             if member.belongs_to(question_group):
                 relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s_%s_%s' " % (member.pk, member.surname, member.first_name))
     relevance_builder = []

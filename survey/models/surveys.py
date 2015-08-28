@@ -34,13 +34,11 @@ class Survey(BaseModel):
         return False
 
     def generate_completion_report(self, batch=None):
-        header = ['Interviewer', 'Access Channels']
-        header.extend(LocationType.objects.all().values_list('name', flat=True))
-        data = [header]
+        data = []
         all_interviewers = Interviewer.objects.all()
         # import pdb; pdb.set_trace()
         for interviewer in all_interviewers:
-            if interviewer.present_households(self).count() and interviewer.completed_batch_or_survey(self, batch):
+            if interviewer.present_households(self).count() and interviewer.batch_completed_households.filter(batch=batch):
                 row = [interviewer.name, ','.join(interviewer.access_ids)]
                 if interviewer.ea:
                     row.extend(interviewer.locations_in_hierarchy().values_list('name', flat=True))
