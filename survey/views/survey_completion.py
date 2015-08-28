@@ -38,7 +38,7 @@ def render_household_details(request, ea, batch):
 
 
 def __get_parent_level_locations():
-    return Location.objects.filter(type__in=LocationType.largest_unit())
+    return Location.objects.filter(type=LocationType.largest_unit())
 
 @login_required
 @permission_required('auth.can_view_aggregates')
