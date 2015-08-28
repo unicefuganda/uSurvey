@@ -155,7 +155,7 @@ class Start(Task):
         return self._intro_speech
         
     def _respond(self, message):
-        if int(message.strip()) == self.RESGISTER_HOUSEHOLDS:
+        if message.isdigit() and int(message) == self.RESGISTER_HOUSEHOLDS:
             return RegisterHousehold(self.access).intro()
         if int(message.strip()) == self.TAKE_SURVEY:
             return StartSurvey(self.access).intro()
