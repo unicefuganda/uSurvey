@@ -155,12 +155,12 @@ class Start(Task):
         return self._intro_speech
         
     def _respond(self, message):
-        if message.isdigit() and int(message) == self.RESGISTER_HOUSEHOLDS:
-            return RegisterHousehold(self.access).intro()
-        if int(message.strip()) == self.TAKE_SURVEY:
-            return StartSurvey(self.access).intro()
-        else:
-            return self.intro()
+        if message.isdigit():
+            if int(message) == self.RESGISTER_HOUSEHOLDS:
+                return RegisterHousehold(self.access).intro()
+            elif int(message.strip()) == self.TAKE_SURVEY:
+                return StartSurvey(self.access).intro()
+        return self.intro()
         
 class SelectHousehold(Task):
 
