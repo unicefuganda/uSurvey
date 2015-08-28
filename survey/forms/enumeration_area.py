@@ -54,8 +54,8 @@ class LocationsFilterForm(Form):
                     val = self.cleaned_data[key]
                     if val: 
                         loc = val
-                if key is 'enumeration_area':
-                    ea = self.cleaned_data[key]
+                else:
+                    ea = self.cleaned_data[key] or None
         return get_leaf_locs(loc, ea)
 
     def get_enumerations(self):

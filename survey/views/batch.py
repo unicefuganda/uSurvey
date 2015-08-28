@@ -1,5 +1,4 @@
 import json
-
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
@@ -9,7 +8,7 @@ from django.contrib import messages
 from survey.interviewer_configs import *
 from survey.models import HouseholdMemberGroup, QuestionModule
 from survey.models import Survey, Location, LocationType
-from survey.models import Survey, Batch, QuestionTemplate, Question, QuestionFlow
+from survey.models import Survey, Batch, QuestionTemplate, Question, QuestionFlow, QuestionOption
 from survey.models.batch import Batch
 from survey.forms.batch import BatchForm, BatchQuestionsForm
 from survey.forms.filters import QuestionFilterForm
@@ -160,8 +159,7 @@ def assign(request, batch_id):
     if batch.is_open():
         error_message = "Questions cannot be assigned to open batch: %s." % batch.name.capitalize()
         messages.error(request, error_message)
-        return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
-    
+        return HttpResponseRedirect("/batches/%s/questions/" % batch_id)    
     batch_questions_form = BatchQuestionsForm(batch=batch)
     batch = Batch.objects.get(id=batch_id)
     groups = HouseholdMemberGroup.objects.all()
@@ -171,15 +169,19 @@ def assign(request, batch_id):
     if request.method == 'POST':
         data = dict(request.POST)
         last_question = batch.last_question_inline()
-        if data.has_key('identifier'):
-            for idx, identifier in enumerate(data['identifier']):
-                question =  Question.objects.create(identifier=identifier, 
-                                                    text=data['text'][idx],
-                                                    answer_type=data['answer_type'][idx],
-                                                    group=groups.get(name__iexact=data['group'][idx]),
-                                                    module=modules.get(name__iexact=data['module'][idx]),
+        lib_questions = QuestionTemplate.objects.filter(identifier__in=data['identifier'])
+        if lib_questions:
+            for lib_question in lib_questions:
+                question =  Question.objects.create(identifier=lib_question.identifier, 
+                                                    text=lib_question.text,
+                                                    answer_type=lib_question.answer_type,
+                                                    group=lib_question.group,
+                                                    module=lib_question.module,
                                                     batch=batch
                                                     )
+                #assign the options
+                for option in lib_question.options.all():
+                    QuestionOption.objects.create(question=question, text=option.text, order=option.order)
                 if last_question:
                     QuestionFlow.objects.create(question=last_question, next_question=question)
                 else:
@@ -198,6 +200,7 @@ def assign(request, batch_id):
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
+        (batch.survey.name, reverse('batch_questions_page', args=(batch.survey.pk, ))),
     ])
     context = {'batch_questions_form': unicode(batch_questions_form), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,

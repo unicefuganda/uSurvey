@@ -1,5 +1,6 @@
 import json
 import re
+from collections import OrderedDict
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
@@ -11,6 +12,7 @@ from survey.forms.question_template import QuestionTemplateForm
 from survey.services.export_questions import get_question_template_as_dump
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 @permission_required('auth.can_view_batches')
 def index(request):
@@ -54,7 +56,8 @@ def _render_question_view(request, instance=None):
     response = None
     if instance:
         button_label = 'Save'
-
+        options = instance.options.all()
+        options = [option.text for option in options] if options else None
     if request.method == 'POST':
         response, question_form = _process_question_form(request, response, instance)
     request.breadcrumbs([
@@ -66,6 +69,10 @@ def _render_question_view(request, instance=None):
                'class': 'question-form',
                'cancel_url': reverse('show_question_library'),
                'questionform': question_form}
+
+    if options:
+        options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
+        context['options'] = map(lambda option: re.sub("  ", ' ', option), options)
     return response, context
 
 @permission_required('auth.can_view_batches')

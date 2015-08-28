@@ -88,7 +88,10 @@ def edit_interviewer(request, interviewer_id):
 def list_interviewers(request):
     params = request.GET
     locations_filter = LocationsFilterForm(request.GET, include_ea=True)
-    interviewers = Interviewer.objects.filter(ea__in=locations_filter.get_enumerations()).order_by('name')
+    if locations_filter.is_valid():
+        interviewers = Interviewer.objects.filter(ea__in=locations_filter.get_enumerations()).order_by('name')
+    else:
+        interviewers = Interviewer.objects.all()
 #     import pdb; pdb.set_trace()
     search_fields = ['name', 'mobile_number']
     if request.GET.has_key('q'):

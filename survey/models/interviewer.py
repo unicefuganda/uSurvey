@@ -58,7 +58,7 @@ class Interviewer(BaseModel):
             return self.registered_households.filter(ea=self.ea, survey=survey)
     
     def generate_survey_households(self, survey):
-        survey_households = list(present_households(survey))
+        survey_households = list(self.present_households(survey))
         if survey.has_sampling:
             #random select households as per sample size
             #first shuffle registered households and select up to sample number
@@ -85,6 +85,6 @@ class SurveyAllocation(BaseModel):
             available = [survey for survey in open_surveys if survey not in allocated_surveys]
             if available:
                 survey = available[0]
-                cls.object.create(interviewer=interviewer, survey=survey)
+                cls.objects.create(interviewer=interviewer, survey=survey)
                 return survey
         return None

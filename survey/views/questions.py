@@ -13,6 +13,7 @@ from survey.models import Question, Batch, QuestionTemplate, QuestionFlow, TextA
 from survey.forms.question import QuestionForm #, QuestionFlowForm
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
+from survey.forms.logic import LogicForm
 from django.conf import settings
 
 
@@ -42,7 +43,10 @@ def index(request, batch_id):
 
     if batch.start_question is None:
         messages.error(request, 'There are no questions associated with this batch yet.')
-
+    request.breadcrumbs([
+        ('Surveys', reverse('survey_list_page')),
+        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
+    ])
     question_rules_for_batch = {}
     context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page':max_per_page,
                'question_filter_form': question_filter_form, 'rules_for_batch': question_rules_for_batch}
@@ -105,8 +109,7 @@ def add_logic(request, batch_id, question_id):
     logic_form = LogicForm(question=question, batch=batch)
     response = None
     question_rules_for_batch = {}
-    question_rules_for_batch[question] = question.rules_for_batch(batch)
-
+#     question_rules_for_batch[question] = question.rules_for_batch(batch)
     if request.method == "POST":
         logic_form = LogicForm(data=request.POST, question=question, batch=batch)
         if logic_form.is_valid():
@@ -116,7 +119,7 @@ def add_logic(request, batch_id, question_id):
 
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'rules_for_batch': question_rules_for_batch,
-               'questionform': QuestionForm(parent_question=question),
+               'questionform': QuestionForm(parent_question=question, batch=batch),
                'modal_action': '/questions/%s/sub_questions/new/' % question.id,
                'class': 'question-form', 'batch_id': batch_id, 'batch': batch,
                'cancel_url': '/batches/%s/questions/' % batch_id}
@@ -138,7 +141,7 @@ def new(request, batch_id):
     response, context = _render_question_view(request, batch)
     return response or render(request, 'questions/new.html', context)
 
-def _process_question_form(request, batch, options, response, instance=None):
+def _process_question_form(request, batch, response, instance=None):
     question_form = QuestionForm(batch, data=request.POST, instance=instance)
     action_str = 'edit' if instance else 'add'
     if question_form.is_valid():
@@ -147,8 +150,8 @@ def _process_question_form(request, batch, options, response, instance=None):
         response = HttpResponseRedirect(reverse('batch_questions_page', args=(batch.pk, )))
     else:
         messages.error(request, 'Question was not %sed.' % action_str)
-        options = dict(request.POST).get('options', None)
-    return response, options, question_form
+#         options = dict(request.POST).get('options', None)
+    return response, question_form
 
 
 def _render_question_view(request, batch, instance=None):
@@ -162,7 +165,7 @@ def _render_question_view(request, batch, instance=None):
         options = [option.text for option in options] if options else None
 
     if request.method == 'POST':
-        response, options, question_form = _process_question_form(request, batch, options, response, instance)
+        response, question_form = _process_question_form(request, batch, response, instance)
 
     context = {'button_label': button_label,
                'id': 'add-question-form',
@@ -184,9 +187,7 @@ def _render_question_view(request, batch, instance=None):
                                 redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def remove(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
-    question = Question.objects.get(id=question_id, batches__id=batch_id)
-    AnswerRule.objects.filter(question=question, batch=batch).delete()
-    question.de_associate_from(batch)
+    get_object_or_404(Question, id=question_id, batch__id=batch_id).delete()
     messages.success(request, "Question successfully removed from %s." % batch.name)
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 

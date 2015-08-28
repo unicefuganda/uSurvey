@@ -10,6 +10,7 @@ from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
 from survey.models.interviews import Answer
 from survey.models.access_channels import InterviewerAccess
+from survey.models.householdgroups import HouseholdMemberGroup
 from django.core.exceptions import ValidationError
 
 
@@ -107,6 +108,12 @@ class HouseholdMember(BaseModel):
             if not condition.matches(attributes):
                 return False
         return True
+
+    @property
+    def groups(self):
+        groups = HouseholdMemberGroup.objects.all()
+        groups = filter(lambda group: self.belongs_to(group), groups)
+        return groups
 
     class Meta:
         app_label = 'survey'

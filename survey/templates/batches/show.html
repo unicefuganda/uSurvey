@@ -23,10 +23,10 @@
 			
               {% csrf_token %}
               {% if open_locations.count > 0 %}
-              	<input type="submit" name="action" value="Close All">
+              	<input type="submit" name="action" value="Close All" class="btn right">
               {% endif %}
               {% if all_locations.count > open_locations.count %}
-              	<input type="submit" name="action" value="Open All">
+              	<input type="submit" name="action" value="Open All" class="btn right">
               {% endif %}
         </form>
 	</div>

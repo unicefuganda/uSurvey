@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from survey.models import AnswerRule
+from survey.models import MultiChoiceAnswer, MultiSelectAnswer
+# from survey.models import AnswerRule
 from survey.models.helper_constants import CONDITIONS
 
 
@@ -20,10 +21,10 @@ class LogicForm(forms.Form):
         action_sent = data.get('action', None) if data else None
 
         if batch and question:
-            is_multichoice = question.is_multichoice()
+            is_multichoice = question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()] 
             self.fields['condition'].choices = self.choices_for_condition_field(is_multichoice)
             question_choices = []
-            for next_question in batch.all_questions():
+            for next_question in batch.batch_questions.all():
                 if next_question.id != question.id:
                     question_choices.append((next_question.id, next_question.text))
 
@@ -43,7 +44,7 @@ class LogicForm(forms.Form):
                 self.fields['validate_with_question'].choices = question_choices
 
             if action_sent and action_sent == 'ASK_SUBQUESTION':
-                question_choices = map(lambda next_question: (next_question.id, next_question.text), question.get_subquestions())
+                question_choices = map(lambda next_question: (next_question.id, next_question.text), question.batch.zombie_questions())
 
             self.fields['next_question'].choices = question_choices
 
@@ -134,15 +135,15 @@ class LogicForm(forms.Form):
         field_name = ""
         rule = []
 
-        if self.question.is_multichoice():
-            rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_option=self.data['option'])
+        if self.question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()] :
+            #rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_option=self.data['option'])
             field_name = 'option'
         else:
             if self.data.get('value',None):
-                rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_value=self.data['value'], condition=self.data['condition'])
+                #rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_value=self.data['value'], condition=self.data['condition'])
                 field_name = 'value with %s criteria' %self.data['condition']
             elif self.data.get('validate_with_question',None):
-                rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_question=self.data['validate_with_question'], condition=self.data['condition'])
+                #rule = AnswerRule.objects.filter(batch=self.batch, question=self.question, validate_with_question=self.data['validate_with_question'], condition=self.data['condition'])
                 field_name = 'question value with %s criteria' %self.data['condition']
 
             if not self._validate_max_greater_than_min():

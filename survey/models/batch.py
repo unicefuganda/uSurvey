@@ -8,6 +8,7 @@ from survey.models.questions import Question, QuestionFlow
 from survey.models.access_channels import InterviewerAccess
 # from survey.models.enumeration_area import EnumerationArea
 from survey.models.interviews import AnswerAccessDefinition
+from survey.models.access_channels import ODKAccess
 
 
 class Batch(BaseModel):
@@ -67,8 +68,13 @@ class Batch(BaseModel):
         return not self.is_closed_for(location)
     
     def is_applicable(self, house_member):
-        return house_member.belongs_to(self.group)
-    
+        return True #probably might be used later
+
+    def next_inline(self, question, groups=None, channel=ODKAccess.choice_name()):
+        qflows = QuestionFlow.objects.filter(question__batch=self, validation_test__isnull=True)
+        if qflows.exists():
+            return next_inline_question(question, qflows, groups, AnswerAccessDefinition.answer_types(channel))
+
     def is_open(self):
         return self.open_locations.all().exists()
     
@@ -85,14 +91,31 @@ class Batch(BaseModel):
             return inline_questions(self.start_question, qflows)
         else:
             return []
+        
+    def zombie_questions(self):
+        return Question.zombies(self)
 
-def  last_inline(question, flows):
+
+def next_inline_question(question, flows, groups=None, answer_types=[]):
+    try:
+        qflow = flows.get(question=question, validation_test__isnull=True)
+        next_question = qflow.next_question
+        if groups is None or (next_question.group in groups and next_question.anwser_type in answer_types):
+            return next_question
+        else:
+            return next_inline_question(next_question, flows, groups)
+    except QuestionFlow.DoesNotExist:
+        return None
+
+
+def last_inline(question, flows):
     try:
         qflow = flows.get(question=question, validation_test__isnull=True)
         return last_inline(qflow.next_question, flows)
     except QuestionFlow.DoesNotExist:
         return question
-    
+
+
 def inline_questions(question, flows):
     questions = [question, ]
     try:
@@ -112,6 +135,7 @@ def inline_questions(question, flows):
 
 #     map(lambda flow: question_map.update({flow.next_question.identifier: flow.next_question}), flows)
 #     compute()
+
 
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")

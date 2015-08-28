@@ -10,7 +10,22 @@
 {% endblock%}
 {% block display_form_fields %}
 {% include "naked_form.html" with a_form=questionform %}
-{% include "_multiple_options.html" with option_label='Channels' id="question-option-template" name='options'%}
+{% if options %}
+  {% for option in options %}
+   {% if option %}
+    <div class="control-group options question-option">
+        <label class="control-label">Option <span class="number"> {{ forloop.counter }}</span></label>
+        <div class="controls">
+            <input type="text" maxlength="100" name="options" value="{{ option }}">
+            <a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>
+            <a href="javascript:;" class="add-on btn btn_primary remove-option"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+{% endif %}
+{% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
 {% endblock %}
 
 {% block javascripts %}

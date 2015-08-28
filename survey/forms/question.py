@@ -12,41 +12,19 @@ class QuestionForm(ModelForm):
 
     def __init__(self, batch, data=None, initial=None, parent_question=None, instance=None):
         super(QuestionForm, self).__init__(data=data, initial=initial, instance=instance)
-        self.fields['answer_type'].choices = list(Question.ANSWER_TYPES)
-        self.fields['module'].choices = map(lambda question_module: (question_module.id, question_module.name), QuestionModule.objects.filter())
         self.fields['identifier'].label = "Variable name"
         self.fields['batch'].widget = forms.HiddenInput()
         self.fields['batch'].initial = batch.pk
+        #depending on type of ussd/odk access of batch restrict the answer type
+        self.fields['answer_type'].choices = [choice for choice in self.fields['answer_type'].choices \
+                                                    if choice[0] in batch.answer_types or choice[0] == '' ]
         self.parent_question = parent_question
-        self.parent_has_module = False
-        self.parent_has_group = False
-        self._set_group_choices()
-        self._set_module_choices()
-
-    def _set_group_choices(self):
-        groups = []
-        if self.parent_question and self.parent_question.group:
-            groups = [self.parent_question.group]
-            self.parent_has_group = True
-        if not self.parent_question:
-            groups = HouseholdMemberGroup.objects.all()
-        self.fields['group'].choices = [(group.id, group.name) for group in groups]
-
-    def _set_module_choices(self):
-        if self.parent_question and self.parent_question.module:
-            modules = [self.parent_question.module]
-            self.parent_has_module = True
-        else:
-            modules = QuestionModule.objects.filter()
-        self.fields['module'].choices = [(question_module.id, question_module.name) for question_module in modules]
-
+        
     class Meta:
         model = Question
         fields =['batch', 'module', 'text', 'identifier', 'group', 'answer_type']
-
         widgets ={
             'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"}),
-            'module': forms.Select(choices=[])
         }
 
     def clean_options(self):
@@ -57,22 +35,6 @@ class QuestionForm(ModelForm):
             options = map(lambda option: re.sub("  ", ' ', option), options)
             self.cleaned_data['options'] = options
         return options
-
-    def clean_module(self):
-        module = self.cleaned_data.get('module', None)
-        if module and self.parent_has_module and module.id != self.parent_question.module.id:
-            message = "Subquestions cannot have a different module from its parent."
-            self._errors['module'] = self.error_class([message])
-            del self.cleaned_data['module']
-        return module
-
-    def clean_group(self):
-        group = self.cleaned_data.get('group', None)
-        if group and self.parent_has_group and group.id != self.parent_question.group.id:
-            message = "Subquestions cannot have a different group from its parent."
-            self._errors['group'] = self.error_class([message])
-            del self.cleaned_data['group']
-        return group
 
     def clean(self):
         answer_type = self.cleaned_data.get('answer_type', None)

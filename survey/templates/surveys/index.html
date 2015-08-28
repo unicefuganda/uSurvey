@@ -21,7 +21,7 @@
           Type
         </th>
         <th>
-          Number of Households
+          Sample Size
         </th>
         <th  style="background-image: None;">
           Actions
@@ -38,7 +38,7 @@
             {{ survey.description }}
           </td>
           <td>
-              {% if survey.type %}Aggregate{% else %}Roster{% endif %}
+              {% if survey.has_sampling %}Sampled{% else %}Census{% endif %}
           </td>
           <td>
               {{ survey.sample_size }}

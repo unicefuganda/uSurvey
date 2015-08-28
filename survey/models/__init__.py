@@ -2,7 +2,7 @@ from survey.models.interviewer import Interviewer, SurveyAllocation
 from survey.models.interviews import NumericalAnswer, Interview, TextAnswer, MultiChoiceAnswer, MultiSelectAnswer, Answer, ODKGeoPoint, DateAnswer, VideoAnswer, ImageAnswer, AudioAnswer
 from survey.models.backend import Backend
 from survey.models.questions import Question, QuestionOption, QuestionFlow, TextArgument
-from survey.models.question_templates import QuestionTemplate
+from survey.models.question_templates import QuestionTemplate, TemplateOption
 from survey.models.base import BaseModel
 from survey.models.batch import Batch, BatchLocationStatus, BatchChannel
 from survey.models.enumeration_area import EnumerationArea
@@ -27,6 +27,7 @@ from survey.models.locations import Location, LocationType
 
 __all__ = [
 #     'ULocation'
+    'TemplateOption',
     'WebAccess',
     'SurveyAllocation',
     'Location',
@@ -43,7 +44,7 @@ __all__ = [
     'DateAnswer', 
     'VideoAnswer', 
     'ImageAnswer', 
-    'AudioAnswer'
+    'AudioAnswer',
     'Interview',
     'Question',
     'QuestionOption',
@@ -60,15 +61,15 @@ __all__ = [
     'HouseMemberSurveyCompletion',
     'GroupCondition',
     'Interviewer',
-    'LocationAutoComplete',
+#     'LocationAutoComplete',
     'Survey',
     'UserProfile',
     'QuestionModule',
     'QuestionFlow',
     'TextArgument',
     'LocationTypeDetails',
-    'BatchQuestionOrder',
-    'LocationCode',
+#     'BatchQuestionOrder',
+#     'LocationCode',
     'Indicator',
     'LocationWeight',
     'UploadErrorLog',

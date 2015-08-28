@@ -23,14 +23,7 @@
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/smoothness/jquery-ui.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript">
-$(function(){
 
-  $('.chzn-select').chosen();
-$('.chzn-drop').css({"width": "80px"});
-
-});
-</script>
 </head>
 <body>
 <header class="tbanner">
@@ -222,7 +215,10 @@ document.write(" "+ now.getFullYear());
 <script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
-
+<script type="text/javascript">
+	$('.chzn-select').chosen();
+	$('.chzn-drop').css({"width": "250px"});
+</script>
 
 {% block javascripts %}
 {% endblock %}

@@ -385,7 +385,7 @@ class RegisterMember(Task):
         current_val = None
         _get_residency_date__PROMPTS = OrderedDict([ ('year', 'Please enter year you started living here (YYYY)\n'),
                                     ('month', '\n'.join(month_prompt)),
-                                    ('day', 'Please enter day of birth:\n'),
+                                    ('day', 'Please enter the day:\n'),
                                     ])
         prompts = self._retrieve('_get_residency_date().prompts', ['year', 'month', 'day'])
         params = self._retrieve('_get_residency_date().params', {})
@@ -717,13 +717,14 @@ class ConfirmContinue(Interviews):
                 interview = self._ongoing_interview
                 house_member = self._ongoing_interview.householdmember
                 if selection == self.RESTART_INTERVIEW:
+                    self._ongoing_interview.delete()
                     interview = Interview.objects.create(interviewer=self.interviewer, 
                                                     householdmember=house_member,
                                                     batch=self._ongoing_interview.batch,
                                                     interview_channel=self.access)
-                    self._ongoing_interview.delete()
+                    self._ongoing_interview = interview
                 task = StartInterview(self.access)
-#                 task._ongoing_interview = interview
+                # task._ongoing_interview = interview
 #                 task._pending_batches = open_batches
                 return task.intro()
         else:
@@ -748,11 +749,12 @@ class StartInterview(Interviews):
     def _respond(self, message):
         if message:
             ongoing_interview = self._ongoing_interview
-            response = ongoing_interview.respond(message)
+            response = ongoing_interview.respond(message, channel=USSDAccess.choice_name())
             self._ongoing_interview = ongoing_interview #probably something may have happened to the interview instance in db
             if response is None:
                 self._ongoing_interview.closure_date = datetime.now()
                 self._ongoing_interview.save()
+                house_member = self._ongoing_interview.householdmember
                 if self._has_next:
                     batches = self._pending_batches
                     present_batch = batches.pop(0)
@@ -769,8 +771,7 @@ class StartInterview(Interviews):
                         task._pending_batches = batches
                         return task.intro()
                 else:
-                    house_member = self._ongoing_interview.householdmember
-                    HouseMemberSurveyCompletion.objects.create(householdmember=house_member, 
+                    HouseMemberSurveyCompletion.objects.create(householdmember=house_member,
                                                            interviewer=self.interviewer,
                                                            survey=self.ongoing_survey)
                     task = EndMemberSurvey(self.access)
