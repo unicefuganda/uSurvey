@@ -38,12 +38,7 @@ def render_household_details(request, ea, batch):
 
 
 def __get_parent_level_locations():
-    country = LocationType.objects.filter(name__iexact='country')
-    if country:
-        return Location.objects.filter(tree_parent__type=country[0]).order_by('name')
-
-    return Location.objects.filter(tree_parent=None).order_by('name')
-
+    return Location.objects.filter(type__in=LocationType.largest_unit())
 
 @login_required
 @permission_required('auth.can_view_aggregates')
