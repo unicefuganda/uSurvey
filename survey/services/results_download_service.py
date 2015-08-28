@@ -1,5 +1,4 @@
-from rapidsms.contrib.locations.models import Location
-from survey.models import LocationTypeDetails, Household, HouseholdMemberGroup
+from survey.models import LocationTypeDetails, Location, Household, HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer
 from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -59,28 +58,28 @@ class ResultsDownloadService(object):
         header = []
         for question in self.questions:
             header.append(question.identifier)
-            if question.is_multichoice():
+            if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
                 header.append('')
         return header
 
     def get_summarised_answers(self):
         data = []
-        all_households = Household.objects.filter(survey=self.survey)
-        locations = list(set(all_households.values_list('ea__locations', flat=True)))
-        general_group = HouseholdMemberGroup.objects.get(name="GENERAL")
-        for location_id in locations:
-            households_in_location = all_households.filter(ea__locations=location_id)
-            household_location = households_in_location[0].location
-            location_ancestors = self._get_ancestors_names(household_location, exclude_type='country')
-            for household in households_in_location:
-                for member in household.all_members():
-                    member_gender = 'Male' if member.male else 'Female'
-                    answers = location_ancestors
-                    answers = answers + [household.household_code, member.surname, str(int(member.get_age())),
-                                         str(member.get_month_of_birth()), str(member.get_year_of_birth()),
-                                         member_gender]
-                    answers = answers + member.answers_for(self.questions, general_group)
-                    data.append(answers)
+        # all_households = Household.objects.filter(survey=self.survey)
+        # locations = list(set(all_households.values_list('ea__locations', flat=True)))
+        # general_group = HouseholdMemberGroup.objects.get(name="GENERAL")
+        # for location_id in locations:
+        #     households_in_location = all_households.filter(ea__locations=location_id)
+        #     household_location = households_in_location[0].location
+        #     location_ancestors = self._get_ancestors_names(household_location, exclude_type='country')
+        #     for household in households_in_location:
+        #         for member in household.all_members():
+        #             member_gender = 'Male' if member.male else 'Female'
+        #             answers = location_ancestors
+        #             answers = answers + [household.household_code, member.surname, str(int(member.get_age())),
+        #                                  str(member.get_month_of_birth()), str(member.get_year_of_birth()),
+        #                                  member_gender]
+        #             answers = answers + member.answers_for(self.questions, general_group)
+        #             data.append(answers)
         return data
 
     def generate_report(self):

@@ -30,11 +30,14 @@ def download(request):
     if request.GET:
         survey_batch_filter_form = SurveyBatchFilterForm(request.GET)
         if survey_batch_filter_form.is_valid():
-            batch = survey_batch_filter_form.cleaned_data['batch']
-            survey = survey_batch_filter_form.cleaned_data['survey']
-            composer = ResultComposer(request.user, ResultsDownloadService(batch=batch, survey=survey))
-            email_task.delay(composer)
-            messages.warning(request, "Email would be sent to you shortly. This could take a while.")
+            if request.GET.get('action') == 'Email Spreadsheet':
+                batch = survey_batch_filter_form.cleaned_data['batch']
+                survey = survey_batch_filter_form.cleaned_data['survey']
+                composer = ResultComposer(request.user, ResultsDownloadService(batch=batch, survey=survey))
+                email_task.delay(composer)
+                messages.warning(request, "Email would be sent to you shortly. This could take a while.")
+            else:
+                return _process_export(survey_batch_filter_form)
     return render(request, 'aggregates/download_excel.html', {'survey_batch_filter_form': survey_batch_filter_form})
 
 @login_required
