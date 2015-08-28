@@ -229,7 +229,7 @@ def update_orders(request, batch_id):
         start_question = inlines.pop(0)
         question = start_question
         for next_question in inlines:
-            QuestionFlow.objects.get(question=question, next_question=next_question).delete()
+            QuestionFlow.objects.filter(question=question, next_question=next_question).delete()
             question = next_question
         order_details = []
         map(lambda order: order_details.append(order.split('-')), new_orders)
