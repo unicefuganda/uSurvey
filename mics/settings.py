@@ -251,7 +251,7 @@ SUBMISSION_UPLOAD_BASE=os.path.join(BASE_DIR, 'submissions')
 ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerFiles')
 TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
 ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Processed"
-INTERVIEWER_EXPORT_HEADERS =  ['name', 'age', 'level_of_education', 'language', 'weights', 'ea', 'ussd', 'odk']
+INTERVIEWER_EXPORT_HEADERS =  ['name', 'age', 'level_of_education', 'language', 'weights', 'ea', 'mobile_numbers', 'odk_id']
 AGGREGATORS = [('testAggregator', 'testAggregator'), ]
 DEFAULT_AGGREGATOR = 'testAggregator'
 TWITTER_URL = 'https://twitter.com/unicefuganda'
@@ -264,7 +264,7 @@ USSD_ITEMS_PER_PAGE = 10
 USSD_RESTART = '00'
 # USSD_STARTER = 'survey.ussd.flows.Start'
 USSD_IGNORED_CHARACTERS = "*!#';&"
-
+MAX_DISPLAY_PER_PAGE = 50
 
 ##end USSD config ##
 # Importing server specific settings

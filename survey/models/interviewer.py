@@ -5,7 +5,7 @@ from django.db import models
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PHONE_CODE, INTERVIEWER_MIN_AGE, INTERVIEWER_MAX_AGE
 from survey.models.base import BaseModel
 from survey.models.access_channels import USSDAccess, ODKAccess
-from survey.models.surveys import Survey
+from survey.models.locations import Location
 import random
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
@@ -36,10 +36,25 @@ class Interviewer(BaseModel):
 
     class Meta:
         app_label = 'survey'
-        
+
+    def locations_in_hierarchy(self):
+        locs = self.ea.locations.all()
+        if locs:
+            return locs[0].get_ancestors(include_self=False)
+        else:
+            Location.objects.none()
+
     @property
     def ussd_access(self):
         return USSDAccess.objects.filter(interviewer=self)
+
+    @property
+    def access_ids(self):
+        accesses = self.intervieweraccess.all()
+        ids = []
+        if accesses.exists():
+            ids = [acc.user_identifier for acc in accesses]
+        return ids
 
     @property
     def odk_access(self):
@@ -68,7 +83,7 @@ class Interviewer(BaseModel):
 
 class SurveyAllocation(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name='assignments')
-    survey = models.ForeignKey(Survey, related_name='work_allocation')
+    survey = models.ForeignKey('Survey', related_name='work_allocation')
     completed = models.BooleanField(default=False)
     
     class Meta:

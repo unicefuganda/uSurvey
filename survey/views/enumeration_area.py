@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from survey.models import EnumerationArea, LocationType, Location
 from django.utils.timezone import utc
 from survey.forms.upload_csv_file import UploadEAForm
@@ -46,7 +47,8 @@ def index(request):
         enumeration_areas = get_filterset(enumeration_areas, request.GET['q'], search_fields)
     context = {'enumeration_areas': enumeration_areas,
                'locations_filter' : locations_filter,
-               'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk)}
+               'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk,),
+               'max_display_per_page': settings.MAX_DISPLAY_PER_PAGE}
     return render(request, "enumeration_area/index.html", context)
 
 @permission_required('auth.can_view_batches')

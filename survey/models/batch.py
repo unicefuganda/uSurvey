@@ -100,7 +100,7 @@ def next_inline_question(question, flows, groups=None, answer_types=[]):
     try:
         qflow = flows.get(question=question, validation_test__isnull=True)
         next_question = qflow.next_question
-        if groups is None or (next_question.group in groups and next_question.anwser_type in answer_types):
+        if groups is None or (next_question.group in groups and next_question.answer_type in answer_types):
             return next_question
         else:
             return next_inline_question(next_question, flows, groups)

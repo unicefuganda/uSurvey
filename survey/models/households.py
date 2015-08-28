@@ -11,6 +11,7 @@ from survey.models.surveys import Survey
 from survey.models.interviews import Answer
 from survey.models.access_channels import InterviewerAccess
 from survey.models.householdgroups import HouseholdMemberGroup
+from survey.models.household_batch_completion import HouseSurveyCompletion
 from django.core.exceptions import ValidationError
 
 
@@ -69,7 +70,10 @@ class Household(BaseModel):
         all_households = Household.objects.filter(survey=survey)
         if ea:
             return all_households.filter(ea=ea)
-        return all_households.filter(ea__locations__in=location.get_descendants(include_self=True)) 
+        return all_households.filter(ea__locations__in=location.get_descendants(include_self=True))
+
+    def has_completed(self, survey):
+        return HouseSurveyCompletion.objects.filter(household=self, survey=survey).count() > 0
 
 class HouseholdMember(BaseModel):
     MALE = 1

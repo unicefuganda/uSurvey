@@ -64,8 +64,7 @@ def index(request):
                                     username=request.GET['username'])
     if request.GET.has_key('email'):
         return check_user_attribute(email=request.GET['email'])
-        
-    userlist = User.objects.all() 
+    userlist = User.objects.exclude(is_superuser=True)
     search_fields = ['first_name', 'last_name', 'groups__name']
     if request.GET.has_key('q'):
         userlist = get_filterset(userlist, request.GET['q'], search_fields)

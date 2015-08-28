@@ -95,6 +95,12 @@ class Interview(BaseModel):
         pass
 
 
+    def delete(self, using=None):
+        for name in Answer.supported_answers():
+            getattr(self, '%s'%name.lower()).all().delete()
+        super(Interview, self).delete()
+
+
 #     @property
 #     def first_question(self):
 #         question = self.batch.start_question
@@ -107,7 +113,11 @@ class Answer(BaseModel):
     interview = models.ForeignKey(Interview, related_name='%(class)s')
 #     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
 #                                                             #value shall hold the exact worth of the response
-    flow = models.OneToOneField("QuestionFlow", null=True, related_name="%(class)s")
+    flow = models.ForeignKey("QuestionFlow", null=True, related_name="%(class)s")
+
+    @classmethod
+    def supported_answers(cls):
+        return [cl.__name__ for cl in Answer.__subclasses__()]
 
     @classmethod
     def answer_types(cls):

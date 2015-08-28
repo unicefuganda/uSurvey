@@ -554,7 +554,7 @@ class StartSurvey(SelectHousehold):
     @property
     def houselist(self):
         #if list exists in cache fetch, else get from db and put in cache
-        total_households = self.registered_households.count()
+        total_households = len(self.house_roaster.keys())
         start_from = self.current_page * settings.USSD_ITEMS_PER_PAGE+1
         start_to = start_from+settings.USSD_ITEMS_PER_PAGE
         if start_to > total_households:
@@ -601,11 +601,11 @@ class SelectMember(Interviews):
     
     @property
     def _household(self):
-        return self._get_param('household')
+        return self._retrieve('household')
         
     @_household.setter
     def _household(self, hs):
-        self._set_param('household', hs)
+        self._set('household', hs)
 
     @property
     def _intro_speech(self):
@@ -639,14 +639,14 @@ class SelectMember(Interviews):
         
     @property
     def _house_members(self):
-        members = self._get_param("house_members", None)
+        members = self._retrieve("house_members", None)
         if members is None:
             completion_records = HouseMemberSurveyCompletion.objects.filter(householdmember__household=self._household, 
                                                        interviewer=self.interviewer,
                                                        survey=self.ongoing_survey)
             members = self._household.members.exclude(pk__in=[c_r.householdmember.pk 
                                                               for c_r in completion_records]).order_by('first_name')
-            self._set_param('house_members', members) #better to cache this list to prevent changes before response from affecting
+            self._set('house_members', members) #better to cache this list to prevent changes before response from affecting
         return members
         
     @property

@@ -1,6 +1,8 @@
 from django.db import models
 from survey.models.base import BaseModel
 from django.core.validators import MinValueValidator, MaxValueValidator
+from survey.models.locations import Location, LocationType
+from survey.models.interviewer import Interviewer
 
 class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=True, unique=True)
@@ -30,6 +32,20 @@ class Survey(BaseModel):
             if batch.is_open_for(location):
                 return True
         return False
+
+    def generate_completion_report(self, batch=None):
+        header = ['Interviewer', 'Access Channels']
+        header.extend(LocationType.objects.all().values_list('name', flat=True))
+        data = [header]
+        all_interviewers = Interviewer.objects.all()
+        # import pdb; pdb.set_trace()
+        for interviewer in all_interviewers:
+            if interviewer.present_households(self).count() and interviewer.completed_batch_or_survey(self, batch):
+                row = [interviewer.name, ','.join(interviewer.access_ids)]
+                if interviewer.ea:
+                    row.extend(interviewer.locations_in_hierarchy().values_list('name', flat=True))
+                data.append(row)
+        return data
         
 class SurveySampleSizeReached(Exception):
     pass

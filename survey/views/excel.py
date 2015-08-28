@@ -56,7 +56,7 @@ def completed_interviewer(request):
         batch = Batch.objects.get(id=params['batch'])
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="interviewer.csv"'
-    data = Interviewer.generate_completion_report(survey, batch=batch)
+    data = survey.generate_completion_report(batch=batch)
     writer = csv.writer(response)
     for row in data:
         writer.writerow(row)
