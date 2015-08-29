@@ -160,8 +160,8 @@ def get_interviewers(request):
 
 
 def _remove_duplicates(all_households):
-    households_without_heads = list(all_households.filter(household_member__householdhead__surname=None).distinct())
-    households = list(all_households.exclude(household_member__householdhead__surname=None).distinct('household_member__householdhead__surname'))
+    households_without_heads = list(all_households.filter(household_members__householdhead__surname=None).distinct())
+    households = list(all_households.exclude(household_members__householdhead__surname=None).distinct('household_members__householdhead__surname'))
     households.extend(households_without_heads)
     return households
 
@@ -170,7 +170,7 @@ def _remove_duplicates(all_households):
 def list_households(request):
     locations_filter = LocationsFilterForm(request.GET, include_ea=True)
     enumeration_areas = locations_filter.get_enumerations()
-    all_households = Household.objects.filter(ea__in=enumeration_areas).order_by('household_member__householdhead__surname')
+    all_households = Household.objects.filter(ea__in=enumeration_areas).order_by('household_members__householdhead__surname')
     search_fields = [ 'ea__name', 'registrar__name', 'survey__name', ]
     if request.GET.has_key('q'):
         all_households = get_filterset(all_households, request.GET['q'], search_fields)
