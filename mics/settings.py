@@ -286,6 +286,7 @@ USSD_RESTART = '00'
 # USSD_STARTER = 'survey.ussd.flows.Start'
 USSD_IGNORED_CHARACTERS = "*!#';&"
 MAX_DISPLAY_PER_PAGE = 50
+DEFAULT_TOTAL_HOUSEHOLDS_IN_EA = 1000
 
 ##end USSD config ##
 # Importing server specific settings

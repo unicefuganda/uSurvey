@@ -1,14 +1,12 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
-from rapidsms.contrib.locations.models import LocationType
+from survey.models import Location, LocationType
 from survey.models import Survey, LocationTypeDetails
 from survey.services.csv_uploader import CSVUploader, UploadService
 from survey.services.location_upload import UploadLocation
 from survey.services.location_weights_upload import UploadLocationWeights
 from survey.services.ea_upload import UploadEA
-
-
 
 class UploadCSVFileForm(forms.Form):
     file = forms.FileField(label='Location Input File', required=True)
@@ -47,18 +45,23 @@ class UploadLocationsForm(UploadCSVFileForm):
     def clean_headers(self):
         _file = self.cleaned_data['file']
         headers = CSVUploader(_file).headers()
+        headers = [header for header in headers if header]
+        #
+        if headers[-2].lower().replace('name', '') == 'ea':
+            # import pdb;pdb.set_trace()
+            EA_INDEX = len(headers) - 2
+            headers.pop(EA_INDEX)
+            headers.pop(EA_INDEX ) #this is total households
         for index, header in enumerate(headers):
             header = header.strip()
             if not header.endswith('Code'):
                 header = header.replace('Name', '')
                 location_type= self.clean_location_type(header)
-                location_detail = self.clean_location_detail(location_type, header)
-                self.clean_has_code(location_type, location_detail, headers, index)
         self.clean_headers_location_type_order(headers)
         return self.cleaned_data
 
     def clean_location_type(self, header):
-        location_type = LocationType.objects.filter(name=header, slug=slugify(header))
+        location_type = LocationType.objects.filter(name__iexact=header, slug=slugify(header))
         if not location_type.exists():
             raise ValidationError('Location type - %s not found.' % header)
         return location_type[0]
@@ -79,8 +82,11 @@ class UploadLocationsForm(UploadCSVFileForm):
 
     def clean_headers_location_type_order(self, headers):
         headers = UploadService.remove_trailing('Name', in_array=headers, exclude='Code')
-        ordered_types = [type.name for type in LocationTypeDetails.get_ordered_types().exclude(name__iexact='country')]
-        if not ordered_types == headers:
+        headers = [header.upper() for header in headers]
+        if headers[0] == 'COUNTRY':
+            headers.pop(0)
+        location_types = [loc.name.upper() for loc in LocationType.all().exclude(name__iexact='COUNTRY')]
+        if not location_types == headers:
             raise ValidationError('Location types not in order. Please refer to input file format.')
 
 
