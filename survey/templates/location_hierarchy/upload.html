@@ -37,22 +37,28 @@
 	                    </th>
 	                {% endif %}
                 {% endfor %}
+                        <th>
+	                        EAName
+	                    </th>
+                        <th>
+	                        TotalHouseholds
+	                    </th>
                 </tr>
                 {% for row_count in range %}
                     <tr>
                     {% for location_type in location_types %}
      					{% if location_type.parent %}                  
-	                        {% if location_type.code %}
-	                            <td>
-	                                {{ '0'|repeat_string:location_type.length_of_code }}{{ row_count }}
-	                            </td>
-	                        {% endif %}
-	
-	                        <td>
+	                       <td>
 	                            {{ location_type.name.lower }}{{ row_count }}
 	                        </td>
 	                    {% endif %}
                     {% endfor %}
+                            <td>
+	                            EA{{ row_count }}
+	                        </td>
+                            <td>
+	                            TotalHouseholds{{ row_count }}
+	                        </td>
                     </tr>
                 {% endfor %}
 

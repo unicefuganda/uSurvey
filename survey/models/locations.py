@@ -18,6 +18,10 @@ class LocationType(MPTTModel, BaseModel):
     
     class Meta:
         app_label = 'survey'
+
+    @classmethod
+    def all(cls):
+        return cls.objects.all().order_by('level')
     
     @classmethod
     def smallest_unit(cls):

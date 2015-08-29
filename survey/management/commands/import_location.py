@@ -18,7 +18,8 @@ class Command(BaseCommand):
 
         print 'ea index ', headers[self.EA_INDEX].strip()
         if headers[self.EA_INDEX].strip().replace("Name", "").upper() == 'EA':
-            headers.pop(self.EA_INDEX) 
+            headers.pop(self.EA_INDEX)
+            headers.pop(self.EA_INDEX)
             has_ea = True
         for header in headers:
             header = header.strip().replace("Name", "").upper()
@@ -41,4 +42,7 @@ class Command(BaseCommand):
                 print 'loading item ', item
                 location, _ = Location.objects.get_or_create(name=item.strip(), type=location_types[index], parent=location)
                 print 'loading ', location
+        #clean up... delete locations and types having no name
+        LocationType.objects.filter(name='').delete()
+        Location.objects.filter(name='').delete()
         self.stdout.write('Successfully imported!')

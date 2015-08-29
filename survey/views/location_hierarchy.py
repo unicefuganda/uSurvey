@@ -20,6 +20,7 @@ def upload(request):
     if request.method == 'POST':
         upload_form = UploadLocationsForm(request.POST, request.FILES)
         if upload_form.is_valid():
+            #upload_form.upload()
             upload_task.delay(upload_form)
             messages.warning(request, "Upload in progress. This could take a while.")
             return HttpResponseRedirect('/locations/upload/')
