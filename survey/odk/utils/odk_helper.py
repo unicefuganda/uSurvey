@@ -15,8 +15,9 @@ from django.shortcuts import get_object_or_404
 from djangohttpdigest.digest import Digestor, parse_authorization_header
 from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
-from survey.models import Survey, Interviewer, SurveyAllocation, ODKAccess, Household, HouseholdMember, HouseholdHead, \
-            Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer
+from survey.models import Survey, Interviewer, Interview, SurveyAllocation, ODKAccess, Household, HouseholdMember, HouseholdHead, \
+            Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer, \
+            VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer, GeopointAnswer
 from survey.models.surveys import SurveySampleSizeReached
 from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.odk.utils.log import logger
@@ -37,7 +38,8 @@ HOUSEHOLD_MEMBER_ID_DELIMITER = '_'
 MANUAL_HOUSEHOLD_SAMPLE_PATH = '//survey/household/houseNumber'
 MANUAL_HOUSEHOLD_MEMBER_PATH = '//survey/household/householdMember'
 ANSWER_PATH = '//survey/b{{batch_id}}/q{{question_id}}'
-NON_RESP_ANSWER_PATH = '//survey/b{{batch_id}}/qnr{{question_id}}'
+IS_NON_RESPONSE_PATH ='//survey/bnr{{batch.pk}}'
+NON_RESP_ANSWER_PATH = '//survey/qnr{{question_id}}'
 INSTANCE_ID_PATH = '//survey/meta/instanceID'
 FORM_ID_PATH = '//survey/@id'
 ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
@@ -47,6 +49,7 @@ GEOPOINT_XFORM_SEP = ' '
 # default content length for submission requests
 DEFAULT_CONTENT_LENGTH = 10000000
 MAX_DISPLAY_PER_COLLECTOR = 1000
+NON_RESPONSE = '1'
 
 
 def _get_tree(xml_file):
@@ -115,55 +118,32 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
         return HouseholdHead.objects.create(**kwargs)
     else:
         return HouseholdMember.objects.create(**kwargs)
-    
-def build_answer(question, response):
-    logger.debug('question: %s, response: %s' % (question.pk, response))
-    if isinstance(response, NonResponseAnswer):
-        return response
-    if question.answer_type == Question.MULTICHOICE:
-        return question.options.get(pk=response)
-    if question.answer_type == Question.MULTISELECT:
-        return question.options.filter(pk__in=response.split(MULTI_SELECT_XFORM_SEP))
-    if question.answer_type == Question.DATE:
-        return datetime.strptime(response, '%Y-%m-%d')
-    if question.answer_type == Question.GEOPOINT:
-        answer = ODKGeoPoint()
-        (answer.latitude, answer.longitude, answer.altitude, answer.precision) = response.split(GEOPOINT_XFORM_SEP)
-        answer.save()
-        return answer
-    return response
 
-def register_member_answer(interviewer, question, household_member, answer, batch):
-    answer_class = question.answer_class()
-    answer = build_answer(question, answer)
-    if question.answer_type == Question.MULTISELECT and not isinstance(answer, NonResponseAnswer):
-        created = answer_class.objects.create(interviewer=interviewer, question=question, householdmember=household_member,
-                         household=household_member.household, batch=batch)
-        created.answer = answer
-        created.save()
-    else:
-        if isinstance(answer, NonResponseAnswer):
-            answer_class = TextAnswer
-            answer = answer.answer
-        created = answer_class.objects.create(interviewer=interviewer, question=question, householdmember=household_member,
-                         answer=answer, household=household_member.household, batch=batch)
-    return created
-
+def record_interview_answer(interview, question, answer):
+    if not isinstance(answer, NonResponseAnswer):
+        answer_class = Answer.get_class(question.answer_type)
+        answer = answer_class(question, answer)
+    answer.interview = interview
+    return answer.save()
 
 def _get_responses(interviewer, survey_tree, survey):
     response_dict = {}
-    batches = interviewer.get_open_batch_for_survey(survey)
+    batches = interviewer.ea.open_batches(survey)
     for batch in batches:
-        for question in batch.all_questions():
-            context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
-            answer_path = template.Template(ANSWER_PATH).render(context)
-            resp_text, resp_node = None, _get_nodes(answer_path, tree=survey_tree)
-            if resp_node: #if question is relevant but 
-                resp_text = resp_node[0].text
-                if (not resp_text) and question.group.name == 'NON_RESPONSE': #no response and its a non response question
-                    nrsp_answer_path = template.Template(NON_RESP_ANSWER_PATH).render(context)
-                    resp_text = NonResponseAnswer(_get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
-            response_dict[(batch.pk, question.pk)] = resp_text
+        context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
+        non_response_node = template.Template(IS_NON_RESPONSE_PATH).render(context)
+        if non_response_node and non_response_node[0].text.strip() == NON_RESPONSE:
+            nrsp_answer_path = template.Template(NON_RESP_ANSWER_PATH).render(context)
+            resp_text = NonResponseAnswer(batch.start_question, _get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
+            response_dict[(batch.pk, batch.start_question.pk)] = resp_text
+        else:
+            for question in batch.survey_questions():
+                # context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
+                answer_path = template.Template(ANSWER_PATH).render(context)
+                resp_text, resp_node = None, _get_nodes(answer_path, tree=survey_tree)
+                if resp_node: #if question is relevant but
+                    resp_text = resp_node[0].text
+                response_dict[(batch.pk, question.pk)] = resp_text
     return response_dict
                 
 def _get_instance_id(survey_tree):
@@ -191,23 +171,32 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
         #cannot continue if this survey has reached sample size for this ea
         raise SurveySampleSizeReached()
     member = _get_or_create_household_member(interviewer, survey, survey_tree)
-    member_completion_report = {}
     response_dict = _get_responses(interviewer, survey_tree, survey)
     treated_batches = {}
+    interviews = {}
     if response_dict and not only_household_reg(survey_tree):
         for (b_id, q_id), answer in response_dict.items():
             question = Question.objects.get(pk=q_id)
             batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
             if answer is not None:
-                if question.answer_type in [Question.AUDIO, Question.IMAGE, Question.VIDEO]:
+                if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(), VideoAnswer.choice_name()]:
                     answer = media_files.get(answer, None)
-                created = register_member_answer(interviewer, question, member, answer, batch)
-                member_completion_report[(b_id, q_id)] = created
+                interview = interviews.get(b_id,
+                                           Interview.objects.get_or_create(
+                                               interviewer=interviewer,
+                                               householdmember=member,
+                                               batch=batch,
+                                               interview_channel=interviewer.odk_access()[0]
+                                           )[0])
+                interviews[b_id] = interview
+                created = record_interview_answer(interview, question, answer)
             if b_id not in treated_batches.keys():
                 treated_batches[b_id] = batch
         map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
-        if member.household.completed_currently_open_batches():
+        member.survey_completed()
+        if member.household.has_completed():
             map(lambda batch: member.household.batch_completed(batch), treated_batches.values())
+            member.household.survey_completed()
     submission = ODKSubmission.objects.create(interviewer=interviewer, 
                 survey=survey, form_id= form_id,
                 instance_id=_get_instance_id(survey_tree), household_member=member, 
@@ -222,25 +211,6 @@ def get_surveys(interviewer):
     if allocation:
         surveys.append(allocation)
     return surveys
-
-def get_households(interviewer):
-    """
-        return the households with uncompleted surveys for households assigned to this interviewer
-        #to do: Need to make this retrieval more effecient in the future
-    """
-    open_surveys = Survey.currently_open_surveys(interviewer.location)
-    logger.debug('open surveys: %s' % open_surveys)
-    households = []
-    for open_survey in open_surveys:
-        if open_survey.has_sampling:
-#            RandomHouseHoldSelection.objects.get_or_create(mobile_number=interviewer.mobile_number, survey=open_survey)[0].generate(
-#                no_of_households=open_survey.sample_size, survey=open_survey)
-            households.extend(interviewer.households.filter(ea=interviewer.ea, survey=open_survey, random_sample_number__isnull=False).all())
-        else:
-            households.extend(interviewer.all_households(open_survey=open_survey, non_response_reporting=True))      
-        logger.debug('households: %s' % len(households))
-    return [household for household in households if household.has_pending_survey()] 
-
 
 class SubmissionReport:
     form_id = None

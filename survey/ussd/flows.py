@@ -557,7 +557,7 @@ class StartSurvey(SelectHousehold):
         if selection is None:
             return self.intro()
         else:
-            household = Household.objects.get(registrar=self.interviewer, 
+            household = Household.objects.get(registrar=self.interviewer,
                                                            ea=self.enumeration_area,
                                                            registration_channel=USSDAccess.choice_name(),
                                                            survey=self.ongoing_survey,
@@ -728,9 +728,7 @@ class StartInterview(Interviews):
                 self._ongoing_interview.closure_date = datetime.now()
                 self._ongoing_interview.save()
                 house_member = self._ongoing_interview.householdmember
-                HouseholdMemberBatchCompletion.objects.create(householdmember=house_member,
-                                                              batch=ongoing_interview.batch,
-                                                              interviewer=ongoing_interview.interviewer)
+                house_member.batch_completed(ongoing_interview.batch)
                 if self._has_next:
                     batches = self._pending_batches
                     present_batch = batches.pop(0)
@@ -747,9 +745,7 @@ class StartInterview(Interviews):
                         task._pending_batches = batches
                         return task.intro()
                 else:
-                    HouseMemberSurveyCompletion.objects.create(householdmember=house_member,
-                                                           interviewer=self.interviewer,
-                                                           survey=self.ongoing_survey)
+                    house_member.survey_completed()
                     task = EndMemberSurvey(self.access)
                     task._household = house_member.household
                     task.intro()

@@ -1,7 +1,7 @@
 from survey.models.interviewer import Interviewer, SurveyAllocation
 from survey.models.interviews import NumericalAnswer, Interview, TextAnswer, MultiChoiceAnswer, \
         MultiSelectAnswer, Answer, ODKGeoPoint, DateAnswer, VideoAnswer, \
-        ImageAnswer, AudioAnswer, NonResponseAnswer
+        ImageAnswer, AudioAnswer, GeopointAnswer, NonResponseAnswer
 from survey.models.backend import Backend
 from survey.models.questions import Question, QuestionOption, QuestionFlow, TextArgument
 from survey.models.question_templates import QuestionTemplate, TemplateOption
@@ -43,7 +43,8 @@ __all__ = [
     'MultiChoiceAnswer',
     'MultiSelectAnswer',
     'ODKGeoPoint', 
-    'DateAnswer', 
+    'DateAnswer',
+    'GeopointAnswer',
     'VideoAnswer', 
     'ImageAnswer', 
     'AudioAnswer',
