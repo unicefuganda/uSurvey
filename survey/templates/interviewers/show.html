@@ -16,12 +16,6 @@
         </dd>
         {% for access in interviewer.ussd_access %}
         <dt>
-            Aggregator
-        </dt>
-        <dd>
-            {{access.aggregator}}
-        </dd>
-        <dt>
             Mobile Number
         </dt>
         <dd>
@@ -43,10 +37,10 @@
         </dd>
         {% endfor %}
         <dt>
-            Age
+            Date Of Birth
         </dt>
         <dd>
-            {{ interviewer.age }}
+            {{ interviewer.date_of_birth |format_date }}
         </dd>
         <dt>
             Sex
