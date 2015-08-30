@@ -205,7 +205,6 @@ def is_relevant_odk(context, question, interviewer, registered_households):
 
 def is_relevant_by_group(context, question, registered_households):
     question_group = question.group
-    relevant_new = []
     relevant_existing = []
     for household in registered_households:
         for member in household.members.all():
@@ -219,12 +218,9 @@ def is_relevant_by_group(context, question, registered_households):
                     next_q_context = context.get(next_question.pk, ['false()', ])
                     next_q_context.append("string-length(%s) > 0" % node_path)
                     context[next_question.pk] = next_q_context
-    relevance_builder = []
-    if relevant_new:
-        relevance_builder.append('(%s)' % ' and '.join(relevant_new))
-    existing = ''
+    relevance_builder = ['false()', ]
     if relevant_existing:
-        relevance_builder.append('(%s)' %  ' or '.join(relevant_existing))
+        relevance_builder.append('(%s)' % ' or '.join(relevant_existing))
     if relevance_builder:
         return ' and (%s)' % ' or '.join(relevance_builder)
     else: return ''
