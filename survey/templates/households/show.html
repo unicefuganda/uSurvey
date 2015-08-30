@@ -6,56 +6,64 @@
 {% load template_tags %}
     {% with household.get_head as head %}
         <h3 class="offset3">
-            {{ household.get_head.surname|capfirst }}'s Household Details
+            {{ household.get_head.surname|capfirst }} Household Details (House {{household.house_number}})
         </h3>
-        <dl class="details offset1">
-            <dt>
-                Family Name
-            </dt>
-            <dd>
-                {{ household.get_head.surname }}
-            </dd>
-            <dt>
-                Other Names
-            </dt>
-            <dd>
-                {{ head.first_name }}
-            </dd>
-            <dt>
-                Age
-            </dt>
-            <dd>
-                {{ head.date_of_birth|format_date }}
-            </dd>
-            <dt>
-                Gender
-            </dt>
-            <dd>
-                {% if head.gender == 1 %}
-                    Male
-                {% else %}
-                    Female
-                {% endif %}
-            </dd>
-            <dt>
-                Highest level of education completed
-            </dt>
-            <dd>
-                {{ head.level_of_education }}
-            </dd>
-            <dt>
-                Occupation / Main Livelihood
-            </dt>
-            <dd>
-                {{ head.occupation }}
-            </dd>
-            <dt>
-                Since when have you lived here
-            </dt>
-            <dd>
-                {{ head.resident_since.month|get_month }} {{ head.resident_since.year }}
-            </dd>
-        </dl>
+        <div class="details offset1">
+            {% if household.get_head %}
+            <dl class="details offset1">
+                <dt>
+                    Family Name
+                </dt>
+                <dd>
+                    {{ household.get_head.surname }}
+                </dd>
+                <dt>
+                    Other Names
+                </dt>
+                <dd>
+                    {{ head.first_name }}
+                </dd>
+                <dt>
+                    Age
+                </dt>
+                <dd>
+                    {{ head.date_of_birth|format_date }}
+                </dd>
+                <dt>
+                    Gender
+                </dt>
+                <dd>
+                    {% if head.gender == 1 %}
+                        Male
+                    {% else %}
+                        Female
+                    {% endif %}
+                </dd>
+                <dt>
+                    Highest level of education completed
+                </dt>
+                <dd>
+                    {{ head.level_of_education }}
+                </dd>
+                <dt>
+                    Occupation / Main Livelihood
+                </dt>
+                <dd>
+                    {{ head.occupation }}
+                </dd>
+                <dt>
+                    Since when have you lived here
+                </dt>
+                <dd>
+                    {{ head.resident_since.month|get_month }} {{ head.resident_since.year }}
+                </dd>
+            </dl>
+            {% else %}
+                <div class="alert alert-error" style="clear:both;">
+                <ul> There is head member registered for this household.</ul>
+                </div>
+            {% endif %}
+        </div>
     {% endwith %}
 
     <div class="container offset1">
@@ -104,7 +112,7 @@
           </table>
         {% else %}
           <div class="alert alert-error" style="clear:both;">
-            <ul> There are no members registered for {{ household.head.surname|capfirst }}'s households. </ul>
+            <ul> There are no members registered for this household. </ul>
           </div>
         {% endif %}
       </div>

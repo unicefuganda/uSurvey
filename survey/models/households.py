@@ -12,7 +12,8 @@ from survey.models.surveys import Survey
 from survey.models.interviews import Answer
 from survey.models.access_channels import InterviewerAccess
 from survey.models.householdgroups import HouseholdMemberGroup
-from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
+from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion, \
+            HouseholdMemberBatchCompletion, HouseMemberSurveyCompletion
 from django.core.exceptions import ValidationError
 
 
@@ -74,14 +75,19 @@ class Household(BaseModel):
         return all_households.filter(ea__locations__in=location.get_descendants(include_self=True))
 
     def has_completed(self):
-        return HouseSurveyCompletion.objects.filter(household=self, survey=self.survey).count() > 0
+        completion_recs = HouseMemberSurveyCompletion.objects.filter(householdmember__household=self, survey=self.survey).distinct()
+        return completion_recs.count() < self.members.count()
 
     def has_completed_batch(self, batch):
-        try:
-            HouseholdBatchCompletion.objects.get(household=self, batch=batch)
-            return True
-        except HouseholdBatchCompletion.DoesNotExist:
-            return False
+        completion_recs = HouseholdBatchCompletion.objects.filter(householdmember__household=self, batch=batch).distinct()
+        return completion_recs.count() < self.members.count()
+
+    def survey_completed(self):
+        return HouseSurveyCompletion.objects.create(household=self, survey=self.survey, interviewer=self.registrar)
+
+    def batch_completed(self, batch):
+        return HouseholdBatchCompletion.objects.create(household=self, batch=batch, interviewer=self.registrar)
+
 
 class HouseholdMember(BaseModel):
     MALE = 1
@@ -127,6 +133,16 @@ class HouseholdMember(BaseModel):
         groups = filter(lambda group: self.belongs_to(group), groups)
         return groups
 
+    def batch_completed(self, batch):
+        return HouseholdMemberBatchCompletion.objects.create(householdmember=self,
+                                                              batch=batch,
+                                                              interviewer=self.household.registrar)
+
+    def survey_completed(self):
+        return HouseMemberSurveyCompletion.objects.create(householdmember=self,
+                                                           interviewer=self.household.registrar,
+                                                           survey=self.household.survey)
+
     class Meta:
         app_label = 'survey'
         get_latest_by = 'created'
@@ -139,9 +155,6 @@ class HouseholdHead(HouseholdMember):
                                           blank=False, default='Primary',
                                           verbose_name="Highest level of education completed")
     resident_since = models.DateField(auto_now=False, verbose_name='Since when have you lived here') #typically only month and year would be filled
-#     resident_since_year = models.PositiveIntegerField(validators=[MinValueValidator(1930), MaxValueValidator(2100)],
-#                                                       null=False, default=1984)
-#     resident_since_month = models.PositiveIntegerField(null=False, choices=MONTHS, blank=False, default=5)
 
     def is_head(self):
         return False
