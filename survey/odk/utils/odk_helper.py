@@ -72,7 +72,7 @@ def _get_member_attrs(survey_tree):
     member_nodes = _get_nodes('%s/*' % MANUAL_HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
     return dict([(member_node.tag, member_node.text) for member_node in member_nodes])
 
-def _get_household_sample_number(survey_tree):
+def _get_household_house_number(survey_tree):
     return _get_nodes(MANUAL_HOUSEHOLD_SAMPLE_PATH, tree=survey_tree)[0].text
 
 def _choosed_existing_household(survey_tree):
@@ -88,15 +88,15 @@ def _get_selected_household_member(survey_tree):
 def _get_or_create_household_member(interviewer, survey, survey_tree):
     if _choosed_existing_household(survey_tree):
         return _get_selected_household_member(survey_tree)
-    sample_number = _get_household_sample_number(survey_tree)
+    house_number = _get_household_house_number(survey_tree)
     try:
-        household = Household.objects.get(interviewer=interviewer, survey=survey, ea=interviewer.ea, random_sample_number=sample_number)
+        household = Household.objects.get(interviewer=interviewer, survey=survey, ea=interviewer.ea, house_number=house_number)
     except Household.DoesNotExist:
-        uid = Household.next_uid(survey)
-        household_code_value = LocationCode.get_household_code(interviewer) + str(uid)
-        household = Household.objects.create(interviewer=interviewer, ea=interviewer.ea,
-                                     uid=uid, random_sample_number=sample_number,
-                                     survey=survey, household_code=household_code_value)
+        household = Household.objects.create(registrar=interviewer,
+                                                           ea=interviewer.enumeration_area,
+                                                           registration_channel=ODKAccess.choice_name(),
+                                                           survey=survey,
+                                                           house_number=house_number)
     #now time for member details
     MALE = '1'
     IS_HEAD = '1'
@@ -110,9 +110,8 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
     if mem_attrs['isHead'] == IS_HEAD:
         kwargs['occupation'] = mem_attrs.get('occupation', '')
         kwargs['level_of_education'] = mem_attrs.get('levelOfEducation', '')
-        resident_since = datetime.strptime(mem_attrs.get('residentSince', '0000-00-00'), '%Y-%m-%d')
-        kwargs['resident_since_year']=resident_since.year
-        kwargs['resident_since_month']=resident_since.month
+        resident_since = datetime.strptime(mem_attrs.get('residentSince', '1900-01-01'), '%Y-%m-%d')
+        kwargs['resident_since']=resident_since
         return HouseholdHead.objects.create(**kwargs)
     else:
         return HouseholdMember.objects.create(**kwargs)
