@@ -9,6 +9,7 @@ from survey.models.locations import Location
 import random
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
+from survey.models.household_batch_completion import HouseSurveyCompletion
 
 def validate_min_date_of_birth(value):
     if date.today() - relativedelta(years=INTERVIEWER_MIN_AGE) < value:
@@ -36,6 +37,14 @@ class Interviewer(BaseModel):
 
     class Meta:
         app_label = 'survey'
+
+    def total_households_completed(self):
+        try:
+            survey = self.assignments.get(completed=False).survey
+            present_houses = self.present_households(survey)
+            return HouseSurveyCompletion.objects.filter(household__pk__in=[h.pk for h in present_houses], survey=survey, interviewer=self).distinct().count()
+        except:
+            return None
 
     def locations_in_hierarchy(self):
         locs = self.ea.locations.all()

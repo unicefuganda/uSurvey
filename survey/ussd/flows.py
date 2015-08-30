@@ -746,6 +746,8 @@ class StartInterview(Interviews):
                         return task.intro()
                 else:
                     house_member.survey_completed()
+                    if house_member.household.has_completed():
+                        house_member.household.survey_completed()
                     task = EndMemberSurvey(self.access)
                     task._household = house_member.household
                     task.intro()

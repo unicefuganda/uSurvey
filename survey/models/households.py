@@ -76,11 +76,11 @@ class Household(BaseModel):
 
     def has_completed(self):
         completion_recs = HouseMemberSurveyCompletion.objects.filter(householdmember__household=self, survey=self.survey).distinct()
-        return completion_recs.count() < self.members.count()
+        return completion_recs.count() == self.members.count()
 
     def has_completed_batch(self, batch):
         completion_recs = HouseholdBatchCompletion.objects.filter(householdmember__household=self, batch=batch).distinct()
-        return completion_recs.count() < self.members.count()
+        return completion_recs.count() == self.members.count()
 
     def survey_completed(self):
         return HouseSurveyCompletion.objects.create(household=self, survey=self.survey, interviewer=self.registrar)
