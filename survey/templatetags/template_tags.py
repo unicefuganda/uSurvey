@@ -214,10 +214,11 @@ def is_relevant_by_group(context, question, registered_households):
             else:
             #get next inline question... This is another flow leading to the next inline question in case current is not applicable
                 next_question = question.batch.next_inline(question, groups=member.groups, channel=ODKAccess.choice_name())
-                node_path = '/survey/b%s/q%s' % (question.batch.pk, question.pk)
-                next_q_context = context.get(next_question.pk, ['false()', ])
-                next_q_context.append("string-length(%s) > 0" % node_path)
-                context[next_question.pk] = next_q_context
+                if next_question:
+                    node_path = '/survey/b%s/q%s' % (question.batch.pk, question.pk)
+                    next_q_context = context.get(next_question.pk, ['false()', ])
+                    next_q_context.append("string-length(%s) > 0" % node_path)
+                    context[next_question.pk] = next_q_context
     relevance_builder = []
     if relevant_new:
         relevance_builder.append('(%s)' % ' and '.join(relevant_new))
