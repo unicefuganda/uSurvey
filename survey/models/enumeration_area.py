@@ -12,23 +12,33 @@ class EnumerationArea(BaseModel):
 
     def __unicode__(self):
         return self.name
-   
+
+    def get_survey_openings(self, survey=None):
+        parent_locations = set()
+        ea_locations = self.locations.all()
+        if ea_locations:
+            map(lambda loc: parent_locations.update(loc.get_ancestors(include_self=True)), ea_locations)
+        kwargs = {'location__pk__in' : [loc.pk for loc in parent_locations]}
+        if survey:
+            kwargs['batch__survey'] = survey
+        location_registry =  BatchLocationStatus.objects.filter(**kwargs)
+        return location_registry
+
     def open_surveys(self):
-        location_registry =  BatchLocationStatus.objects.filter(location__in=self.locations.all())
+        location_registry = self.get_survey_openings()
         return list(Survey.objects.filter(pk__in=[reg.batch.survey.pk for reg in location_registry]))
     
     def open_batches(self, survey, house_member=None):
-        location_registry =  BatchLocationStatus.objects.filter(location__in=self.locations.all())
-        batches = list(survey.batches.filter(pk__in=[reg.batch.pk for reg in location_registry]).order_by('order'))
+        location_registry = self.get_survey_openings(survey)
+        batches = list([reg.batch for reg in location_registry])
         if house_member is not None:
             applicable = []
             for batch in batches:
                 if batch.is_applicable(house_member):
                    applicable.append(batch)
             batches = applicable
-        return batches
-        
-            
+        return sorted(batches, key=lambda batch: batch.order)
+
         
 #     def validate_unique(self, *args, **kwargs):
 #         super(EnumerationArea, self).validate_unique(*args, **kwargs)

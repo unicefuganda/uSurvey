@@ -3,7 +3,8 @@ from django.core.urlresolvers import reverse
 from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
-from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, GroupCondition, Answer, AnswerAccessDefinition
+from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
+    GroupCondition, Answer, AnswerAccessDefinition, ODKAccess
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
@@ -176,80 +177,47 @@ def total_household_members(interviewer):
 @register.assignment_tag
 def  get_download_url(request, url_name, survey):
     return request.build_absolute_uri(reverse(url_name, args=(survey.pk, )))
-  
 
 @register.assignment_tag(takes_context=True)
-def is_relevant_odk(context, question, batch, interviewer, registered_households):
-    skip_to_ques = context.get('skip_to_ques', {})
-    skip_to_ques.pop(question.pk, None)
-    sub_ques = context.get('sub_ques', {})
-    terminal_ques = context.get('terminal_ques', [])
-    relevance_context = '%s %s %s %s' % (
-                                   ' '.join(sub_ques.pop(question.pk, [])),
-                                   ' '.join([test for test in skip_to_ques.values() if test.find('/survey/b%s/' % batch.pk) > -1]),
-                                   ' '.join([test for test in terminal_ques if test.find('/survey/b%s/' % batch.pk) > -1]),
-                                   is_relevant_by_group(question, registered_households)
-                                   )
-    # if question.flows.count():
-    #     for option in question.options.all():
-    #         answer = MultiChoiceAnswer()
-    #         answer.interviewer = interviewer
-    #         answer.batch = batch
-    #         answer.question = question
-    #         answer.answer = option
-            # try:
-            #     next_question = question.get_odk_next_question(answer)
-            #     if next_question is not None:
-            #         action = next_question.parent_question_rules.get(validate_with_option=answer.answer).action
-            #         if action == 'SKIP_TO':
-            #             skip_to_ques[next_question.pk] = " and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk)
-            #         if action =='ASK_SUBQUESTION':
-            #             fellows = sub_ques.get(next_question.pk, [])
-            #             fellows.append(" and selected(/survey/b%s/q%s,'%s')" % (batch.pk, question.pk, option.pk))
-            #             sub_ques[next_question.pk] = fellows
-            #     else:
-            #         terminal_ques.append(" and not(selected(/survey/b%s/q%s,'%s'))" % (batch.pk, question.pk, option.pk))
-            # except ObjectDoesNotExist, e:
-            #     pass
-#    else:
-        
-            #import pdb; pdb.set_trace()
-    context['skip_to_ques'] = skip_to_ques
-    context['sub_ques'] = sub_ques    
-    context['terminal_ques'] = terminal_ques
+def is_relevant_odk(context, question, interviewer, registered_households):
+    batch = question.batch
+    if question.pk == batch.start_question.pk:
+        default_relevance = 'true()'
+    else:
+        default_relevance = 'false()'
+    relevance_context = ' and (%s) %s' % (
+                                ' or '.join(context.get(question.pk, [default_relevance, ])),
+                                is_relevant_by_group(context, question, registered_households)
+                                )
+    flows = question.flows.all()
+    if flows:
+        for flow in flows:
+            node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
+            next_question = flow.next_question
+            next_q_context = context.get(next_question.pk, ['false()', ])
+            if flow.validation_test:
+                next_q_context.append(Answer.print_odk_validation(node_path, flow.validation_test, *flow.test_arguments))
+            else:
+                next_q_context.append("string-length(%s) > 0" % node_path)
+            context[next_question.pk] = next_q_context
     return mark_safe(relevance_context)
 
 
-def is_relevant_by_group(question, registered_households):
+def is_relevant_by_group(context, question, registered_households):
     question_group = question.group
     relevant_new = []
-#     if question_group.name == 'GENERAL':
-#         relevant_new.append(" selected(/survey/household/householdMember/isHead,'1')")
-#     MATCHING_METHODS = {
-#             'EQUALS': '=',
-#             'GREATER_THAN': '&gt;',
-#             'LESS_THAN': '&lt;',
-#     }
-#     for group_condition in question_group.get_all_conditions():
-#         method = MATCHING_METHODS.get(group_condition.condition, None)
-#         value = group_condition.value
-#         if method is not None:
-#             if group_condition.attribute == GroupCondition.GROUP_TYPES['AGE']:
-#                 today = date.today()
-#                 age_date = today - relativedelta(years=int(value))
-#                 age_date_str = date.strftime(age_date, '%Y-%m-%d')
-#                 relevant_new.append(" (date('%s') %s /survey/household/householdMember/dateOfBirth)" % (age_date_str, method))
-#             if group_condition.attribute == GroupCondition.GROUP_TYPES['GENDER']:
-#                 is_male = '0'
-#                 if str(value).lower() == "male" or str(value) == str(True):
-#                     is_male = '1'
-#                 relevant_new.append(" selected(/survey/household/householdMember/sex, '%s')" % is_male)
-
     relevant_existing = []
     for household in registered_households:
         for member in household.members.all():
             if member.belongs_to(question_group):
                 relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s_%s_%s' " % (member.pk, member.surname, member.first_name))
+            else:
+            #get next inline question... This is another flow leading to the next inline question in case current is not applicable
+                next_question = question.batch.next_inline(question, groups=member.groups, channel=ODKAccess.choice_name())
+                node_path = '/survey/b%s/q%s' % (question.batch.pk, question.pk)
+                next_q_context = context.get(next_question.pk, ['false()', ])
+                next_q_context.append("string-length(%s) > 0" % node_path)
+                context[next_question.pk] = next_q_context
     relevance_builder = []
     if relevant_new:
         relevance_builder.append('(%s)' % ' and '.join(relevant_new))
