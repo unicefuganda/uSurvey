@@ -218,7 +218,11 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     return submission
 
 def get_surveys(interviewer):
-    return [SurveyAllocation.get_allocation(interviewer), ]
+    surveys = []
+    allocation = SurveyAllocation.get_allocation(interviewer)
+    if allocation:
+        surveys.append(allocation)
+    return surveys
 
 def get_households(interviewer):
     """

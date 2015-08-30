@@ -29,6 +29,7 @@ from survey.models.surveys import SurveySampleSizeReached
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.interviewer_configs import MESSAGES
 
+
 def get_survey_xform(interviewer, survey):
     selectable_households = None
     household_size = interviewer.ea.total_households
@@ -41,7 +42,6 @@ def get_survey_xform(interviewer, survey):
             'survey_batches' : interviewer.ea.open_batches(survey),
             'educational_levels' : LEVEL_OF_EDUCATION,
             'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
-#            'selectable_households' : selectable_households
             })
     else:
         selectable_households = range(1, household_size + 1)

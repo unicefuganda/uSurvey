@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from django.utils.datastructures import SortedDict
 import dateutils
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -72,8 +73,8 @@ class Household(BaseModel):
             return all_households.filter(ea=ea)
         return all_households.filter(ea__locations__in=location.get_descendants(include_self=True))
 
-    def has_completed(self, survey):
-        return HouseSurveyCompletion.objects.filter(household=self, survey=survey).count() > 0
+    def has_completed(self):
+        return HouseSurveyCompletion.objects.filter(household=self, survey=self.survey).count() > 0
 
     def has_completed_batch(self, batch):
         try:

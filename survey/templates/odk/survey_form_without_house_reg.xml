@@ -30,14 +30,16 @@ xmlns:jr="http://openrosa.org/javarosa">
         </householdMember>
     </registeredHousehold>
 	{% for batch in survey_batches %}
-		<b{{batch.pk}}>
+		{% if interviewer.ea in batch.non_response_eas %}
+	   		<bnr{{batch.pk}}>0</bnr{{batch.pk}}>
+	   		<qnr{{batch.pk}} />
+		{% endif %}
+	   <b{{batch.pk}}>
 			{% for question in batch.survey_questions %}
 				<q{{question.pk}} />
-                {% if question.group.name == 'NON_RESPONSE' %}
-                 <qnr{{question.pk}} />
-                {% endif %}
 			{% endfor %}
 		</b{{batch.pk}}>
+
 	{% endfor %}
    </survey>
   </instance>
@@ -56,15 +58,15 @@ xmlns:jr="http://openrosa.org/javarosa">
 
 	{% for batch in survey_batches  %}
 		{% for question in batch.survey_questions %}
-        {% is_relevant_odk question batch investigator registered_households as relevance_context %}
-		<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}" 
-			type="{% if question.answer_type.lower == 'number' %}int{% elif question.answer_type.lower == 'multichoice' %}select1{% elif question.answer_type.lower == 'multiselect' %}select{% elif question.answer_type.lower == 'date' %}date{% elif question.answer_type.lower == 'audio' or question.answer_type.lower == 'image' or question.answer_type.lower == 'video' %}binary{% elif question.answer_type.lower == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type.lower != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} relevant="true() {{ relevance_context }}"/>
-                
-           {% if question.group.name == 'NON_RESPONSE' %}
-             <bind nodeset="/survey/b{{batch.pk}}/qnr{{question.pk}}" type="string" relevant="string-length(/survey/b{{batch.pk}}/q{{question.pk}})=0" />
-           {% endif %}
+		{% is_relevant_odk question interviewer registered_households as relevance_context %}
+			<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}"
+				type="{% if question.answer_type.lower == answer_types.number %}int{% elif question.answer_type.lower == answer_types.multichoice %}select1{% elif question.answer_type.lower == answer_types.multiselect %}select{% elif question.answer_type.lower == answer_types.date %}date{% elif question.answer_type.lower == answer_types.audio or answer_type == answer_types.image or answer_type == answer_types.video %}binary{% elif question.answer_type.lower == answer_types.geopoint %}geopoint{% else %}string{% endif %}"
+			relevant="{% if interviewer.ea in batch.non_response_eas %}selected(/survey/bnr{{batch.pk}}, '0'){% else %}true(){% endif %} {{ relevance_context }}"/>
+        	{% if interviewer.ea in batch.non_response_eas %}
+				<bind nodeset="/survey/bnr{{batch.pk}}" type="select1" />
+	    		<bind nodeset="/survey/qnr{{batch.pk}}" type="string" relevant="selected(/survey/bnr{{batch.pk}}, '1')" required="selected(/survey/bnr{{batch.pk}}, '1')" />
+			{% endif %}
 		{% endfor %}
-        
 	{% endfor %}
 
   </model>
@@ -100,6 +102,22 @@ xmlns:jr="http://openrosa.org/javarosa">
 		<group>
 			<label>{{ batch.name }}</label>
 			<hint>{{ batch.description }}</hint>
+			{% if interviewer.ea in batch.non_response_eas %}
+                <select1  ref="/survey/bnr{{batch.pk}}">
+					<label>Member is available to respond</label>
+					<item>
+						<label>Yes</label>
+						<value>0</value>
+					</item>
+					<item>
+						<label>No</label>
+						<value>1</value>
+					</item>
+				</select1>
+				<input ref="/survey/qnr{{batch.pk}}">
+					<label>Enter reason for non response</label>
+				</input>
+			{% endif %}
 			{% for question in batch.survey_questions %}
 				{% if question.answer_type.lower == answer_types.multichoice %}
 					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
@@ -142,11 +160,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<label>{{question.text}}</label>
 				</input>
 				{% endif %}
-                {% if question.group.name == 'NON_RESPONSE' %}
-                <input ref="/survey/b{{batch.pk}}/qnr{{question.pk}}">
-					<label>Please enter reason for no response</label>
-				</input>
-                {% endif %}
+
 			{% endfor %}
 		</group>
 	{% endfor %}

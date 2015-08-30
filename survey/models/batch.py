@@ -9,6 +9,7 @@ from survey.models.access_channels import InterviewerAccess
 # from survey.models.enumeration_area import EnumerationArea
 from survey.models.interviews import AnswerAccessDefinition
 from survey.models.access_channels import ODKAccess
+from ordered_set import OrderedSet
 
 
 class Batch(BaseModel):
@@ -37,32 +38,46 @@ class Batch(BaseModel):
     def can_be_deleted(self):
         return True, ''
 
+    def non_response_enabled(self, ea):
+        locations = set()
+        ea_locations = ea.locations.all()
+        if ea_locations:
+            map(lambda loc: locations.update(loc.get_ancestors(include_self=True)), ea_locations)
+        return self.open_locations.filter(non_response=True, location__pk__in=[location.pk for location in locations]).exists()
+
     @property
     def answer_types(self):
         access_channels = self.access_channels.values_list('channel', flat=True)
         return set(AnswerAccessDefinition.objects.filter(channel__in=access_channels).values_list('answer_type', flat=True))
     
     def get_non_response_active_locations(self):
-        non_response_active_batch_location_status = self.open_locations.filter(non_response=True)
-        locations = []
-        map(lambda batch_status: locations.append(batch_status.location), non_response_active_batch_location_status)
+        locations = set()
+        locations_register = self.open_locations.filter(non_response=True)
+        if locations_register:
+            map(lambda reg: locations.update(reg.location.get_descendants(include_self=True)), locations_register)
         return locations
+
+    @property
+    def non_response_eas(self):
+        eas = set()
+        locations = self.get_non_response_active_locations()
+        map(lambda loc: eas.update(loc.enumeration_areas.all()), locations)
+        return eas
     
     def other_surveys_with_open_batches_in(self, location):
         batch_ids = location.open_batches.all().exclude(batch__survey=self.survey).values_list('batch',flat=True)
         return Survey.objects.filter(batch__id__in = batch_ids)
     
     def open_for_location(self, location):
-        all_related_locations = location.get_descendants(True)
-        for related_location in all_related_locations:
-            self.open_locations.get_or_create(batch=self, location=related_location)
         return self.open_locations.get_or_create(batch=self, location=location)
     
     def close_for_location(self, location):
-        self.open_locations.filter(batch=self).delete()
+        self.open_locations.filter(batch=self, location=location).delete()
         
     def is_closed_for(self, location):
-        return self.open_locations.filter(location=location).count() == 0
+        #its closed if its closed in any parent loc or self
+        locations = location.get_ancestors(include_self=True)
+        return self.open_locations.filter(location__pk__in=locations).count() == 0
 
     def is_open_for(self, location):
         return not self.is_closed_for(location)
@@ -96,11 +111,25 @@ class Batch(BaseModel):
         return Question.zombies(self)
 
     def survey_questions(self):
-        zombies = self.zombie_questions()
         inline_ques = self.questions_inline()
-        other_quests = self.batch_questions.exclude(pk__in=[q.pk for q in (list(zombies) + inline_ques)]).order_by('pk')
-        inline_ques.extend(other_quests)
-        return inline_ques
+        questions = OrderedSet(inline_ques)
+        other_flows = QuestionFlow.objects.exclude(validation_test__isnull=True, question__pk__in=[q.pk for q in inline_ques])
+        for ques in inline_ques:
+            map(lambda q: questions.add(q), sub_questions(ques, other_flows))
+        return questions
+
+def sub_questions(question, flows):
+    questions = OrderedSet()
+    try:
+        qflows = flows.filter(question=question)
+        if qflows:
+            for flow in qflows:
+                questions.add(flow.next_question)
+                subsequent = sub_questions(flow.next_question, flows)
+                map(lambda q: questions.add(q), subsequent)
+    except QuestionFlow.DoesNotExist:
+        return OrderedSet()
+    return questions
 
 
 def next_inline_question(question, flows, groups=None, answer_types=[]):
@@ -131,7 +160,18 @@ def inline_questions(question, flows):
     except QuestionFlow.DoesNotExist:
         pass
     return questions
-    
+
+def inline_flows(question, flows):
+    flows = []
+    try:
+        qflow = flows.get(question=question, validation_test__isnull=True)
+        flows.append(qflow)
+        flows.extend(inline_questions(qflow.next_question, flows))
+    except QuestionFlow.DoesNotExist:
+        pass
+    return flows
+
+
 #     @property
 #     def batch_questions(self):
 #         flows = self.flows.all()

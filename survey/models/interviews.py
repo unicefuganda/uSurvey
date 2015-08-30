@@ -140,11 +140,17 @@ class Answer(BaseModel):
         except ValueError:
             return False
 
+    @classmethod
+    def odk_contains(cls, node_path, value):
+        return "regex(%s, '.*(%s).*')" % (node_path, value)
 
     @classmethod
     def equals(cls, answer, value):
         return answer == value
 
+    @classmethod
+    def odk_equals(cls, node_path, value):
+        return "%s = '%s'" % (node_path, value)
 
     @classmethod
     def starts_with(cls, answer, txt):
@@ -152,6 +158,9 @@ class Answer(BaseModel):
         txt = txt.lower()
         return answer.startswith(txt)
 
+    @classmethod
+    def odk_starts_with(cls, node_path, value):
+        return "regex(%s, '^(%s).*'" % (node_path, value)
 
     @classmethod
     def ends_with(cls, answer, txt):
@@ -159,21 +168,38 @@ class Answer(BaseModel):
         txt = txt.lower()
         return answer.endswith(txt)
 
+    @classmethod
+    def odk_ends_with(cls, node_path, value):
+        return "regex(%s, '.*(%s)$'" % (node_path, value)
 
     @classmethod
     def greater_than(cls, answer, value):
         return answer > value
 
+    @classmethod
+    def odk_greater_than(cls, node_path, value):
+        return "%s > '%s'" % (node_path, value)
 
     @classmethod
     def less_than(cls, answer, value):
         return answer < value
 
+    @classmethod
+    def odk_less_than(cls, node_path, value):
+        return "%s < '%s'" % (node_path, value)
 
     @classmethod
     def between(cls, answer, lowerlmt, upperlmt):
         return upperlmt > answer >= lowerlmt
 
+    @classmethod
+    def odk_between(cls, node_path, lowerlmt, upperlmt):
+        return "(%s > '%s') and (%s < '%s')" % (node_path, lowerlmt, node_path, upperlmt)
+
+    @classmethod
+    def print_odk_validation(cls, validator_name, node_path, *args):
+        printer = getattr(cls, 'odk_%s', validator_name)
+        return printer(node_path, *args)
 
     @classmethod
     def passes_test(cls, text_exp):

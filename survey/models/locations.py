@@ -55,7 +55,10 @@ class Location(MPTTModel, BaseModel):
     @property
     def tree_parent(self):
         return self.parent
-        
+
+    def is_sub_location(self, location):
+        return location.is_ancestor_of(self)
+
     class Meta:
         app_label = 'survey'
         
