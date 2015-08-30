@@ -1,7 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from survey.models import MultiChoiceAnswer, MultiSelectAnswer
-# from survey.models import AnswerRule
 from survey.models.helper_constants import CONDITIONS
 
 
