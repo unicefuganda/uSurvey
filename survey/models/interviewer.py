@@ -110,9 +110,9 @@ class SurveyAllocation(BaseModel):
         except cls.DoesNotExist:
             #allocate next unalocated survey
             open_surveys = interviewer.ea.open_surveys()
-            allocated_surveys = cls.objects.filter(survey__pk__in=[survey.pk for survey in open_surveys])
-            if allocated_surveys:
-                available = [survey for survey in open_surveys if survey not in allocated_surveys]
+            allocations = cls.objects.filter(survey__pk__in=[survey.pk for survey in open_surveys]).values_list('survey', flat=True)
+            if allocations:
+                available = [survey for survey in open_surveys if survey.pk not in allocations]
             else:
                 available = open_surveys
             if available:
