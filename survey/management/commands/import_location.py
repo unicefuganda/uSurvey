@@ -26,7 +26,8 @@ class Command(BaseCommand):
             location_type, _ = LocationType.objects.get_or_create(parent=location_type, name=header, slug=slugify(header))
             print 'loading ', location_type
             location_types.append(location_type)
-
+        existing_locs = dict([((loc.name, loc.parent.pk), loc) for loc in Location.objects.all() if loc.parent])
+        existing_eas = dict([(ea.name, ea) for ea in EnumerationArea.objects.all()])
         for items in csv_file:
             for index, item in enumerate(items):
                 if index == 0:
@@ -34,13 +35,21 @@ class Command(BaseCommand):
                 print 'current index: ', index
                 if has_ea and index == self.EA_INDEX:
                     print 'loading EA ', item.strip()
-                    ea, _ = EnumerationArea.objects.get_or_create(name=item.strip(), 
-                                                          total_households=self.DEFAULT_TOTAL_HOUSEHOLDS)
+                    ea = existing_eas.get(item.strip(),
+                                          EnumerationArea.objects.create(name=item.strip(),
+                                                    total_households=self.DEFAULT_TOTAL_HOUSEHOLDS)
+                                          )
                     ea.locations.add(location)
                     ea.save()
                     break
                 print 'loading item ', item
-                location, _ = Location.objects.get_or_create(name=item.strip(), type=location_types[index], parent=location)
+                if location:
+                    location = existing_locs.get((item.strip(), location.pk),
+                                          Location.objects.create(name=item.strip(),
+                                                                  type=location_types[index], parent=location)
+                                          )
+                else:
+                    location, _ = Location.objects.get_or_create(name=item.strip(), type=location_types[index], parent=location)
                 print 'loading ', location
         #clean up... delete locations and types having no name
         LocationType.objects.filter(name='').delete()
