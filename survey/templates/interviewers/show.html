@@ -64,6 +64,14 @@
         <dd>
             {{ interviewer.language }}
         </dd>
+        {% for loc in interviewer.ea.parent_locations %}
+          <dt>
+		    {{ loc.type.name}}
+	      </dt>
+        <dd>
+		    {{ loc.name}}
+	      </dd>
+        {% endfor %}
         <dt>
             Enumeration Area
         </dt>
