@@ -63,7 +63,7 @@ class LocationsFilterForm(Form):
         return get_leaf_locs(loc, ea)
 
     def get_enumerations(self):
-        return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct()
+        return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct().order_by('name')
     
 def get_leaf_locs(loc_id=None, ea=None):
     if loc_id is None:
