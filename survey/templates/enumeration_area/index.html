@@ -30,6 +30,11 @@
             <th>
               Name
             </th>
+			{% for loc_type in location_filter_types %}
+           	<th>
+            	{{ loc_type.name }}
+          	</th>
+        {% endfor %}
             <th>
               Locations
             </th>
@@ -46,6 +51,11 @@
         {% for ea in enumeration_areas %}
             <tr id="ea-{{ea.pk}}" class="eas">
                 <td>{{ ea.name }}</td>
+				{% for loc in ea.parent_locations %}
+				  <td>
+					{{ loc.name }}
+				  </td>
+				{% endfor %}
                 <td>
                 	<a href="#ea_{{ea.pk}}" data-toggle="modal" class="add_batch">view ({{ea.locations.count}})</a>
                 	  <div class="modal fade hide" id="ea_{{ea.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
