@@ -44,7 +44,7 @@ def index(request):
     enumeration_areas = locations_filter.get_enumerations()
     search_fields = ['name', 'locations__name', ]
     if request.GET.has_key('q'):
-        enumeration_areas = get_filterset(enumeration_areas, request.GET['q'], search_fields).order_by('name')
+        enumeration_areas = get_filterset(enumeration_areas, request.GET['q'], search_fields)
     context = {'enumeration_areas': enumeration_areas,
                'locations_filter' : locations_filter,
                'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk,),
