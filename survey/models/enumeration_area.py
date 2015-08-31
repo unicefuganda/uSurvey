@@ -13,6 +13,12 @@ class EnumerationArea(BaseModel):
     def __unicode__(self):
         return self.name
 
+    def parent_locations(self):
+        #now this assumes ea locations are made from smallest units belonging to same group
+        if self.locations.exists():
+            location = self.locations.all()[0]
+            return location.get_ancestors().exclude(parent__isnull=True)
+
     def get_survey_openings(self, survey=None):
         parent_locations = set()
         ea_locations = self.locations.all()

@@ -33,6 +33,11 @@
           <th>
             ODK ID
           </th>
+        {% for loc_type in location_filter_types %}
+           <th>
+            {{ loc_type.name }}
+          </th>
+        {% endfor %}
 	 <th>
           Enumeration Area
 	</th>
@@ -48,24 +53,16 @@
               <a href="{% url 'show_interviewer_page' interviewer.pk %}">{{ interviewer.name }}</a>
             </td>
             <td>
-            	<!--  a href="#" onclick="$( '#interviewer_{{interviewer.pk}}' ).dialog()">view</a>
-                	<table id="interviewer_{{interviewer.pk}}" class="interviewer_locations hide">
-                		<thead>
-                			<th>{{interviewer.name}} Mobile Numbers</th>
-                		</thead>
-                		<tbody>
-	                		{% for access in interviewer.ussd_access %} 
-	                			<tr>
-	                				<td>{{ access }}<td>
-	                			</tr>
-	                		{% endfor %}
-                		</tbody>
-                	</table -->
               {{ interviewer.ussd_access | display_list}}
             </td>
             <td>
               {{ interviewer.odk_access | display_list}}
             </td>
+        {% for loc in interviewer.ea.parent_locations %}
+          <td>
+		    {{ loc.name }}
+	      </td>
+        {% endfor %}
 	   <td>
 		{{ interviewer.ea.name}}
 	  </td>

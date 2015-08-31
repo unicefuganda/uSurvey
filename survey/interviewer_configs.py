@@ -77,6 +77,7 @@ MESSAGES = {
     'HEAD_REGISTERED': "Head already registered for this household. Registering members now:\n",
     'NON_RESPONSE_MENU': "\n3: Report non-response",
     'NON_RESPONSE_COMPLETION': "Thank you. You have completed reporting non-responses. Would you like to start again?\n1: Yes\n2: No",
+    'NON_RESPONSE_MSG' : 'Enter reason for non response'
 }
 
 COUNTRY_PHONE_CODE = "256"

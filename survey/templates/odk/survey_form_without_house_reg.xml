@@ -49,7 +49,7 @@ xmlns:jr="http://openrosa.org/javarosa">
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/meta/instanceName" type="string" 
            readonly="true()" calculate="concat('{{ survey.name}}', /survey/household/houseNumber, ' ', {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}'')" />
-	<bind nodeset="/survey/registeredHousehold/household" type="select1" required="true()"/>
+	<bind nodeset="/survey/bnr{{batch.pk}}" type="select1" />
    {% for r_household in registered_households %}
    <bind nodeset="/survey/registeredHousehold/householdMember/h{{r_household.pk}}" type="select1"  required="true()" relevant="selected(/survey/registeredHousehold/household,'{{r_household.pk}}')" />
    {% endfor %}
@@ -116,7 +116,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					</item>
 				</select1>
 				<input ref="/survey/qnr{{batch.pk}}">
-					<label>Enter reason for non response</label>
+					<label>{{messages.NON_RESPONSE_MSG}}</label>
 				</input>
 			{% endif %}
 			{% for question in batch.survey_questions %}

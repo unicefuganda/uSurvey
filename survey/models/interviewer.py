@@ -37,6 +37,9 @@ class Interviewer(BaseModel):
 
     class Meta:
         app_label = 'survey'
+        permissions = (
+            ("can_view_interviewers", "Can view interviewers"),
+        )
 
     def total_households_completed(self, survey=None):
         try:

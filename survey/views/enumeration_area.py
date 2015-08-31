@@ -45,9 +45,10 @@ def index(request):
     search_fields = ['name', 'locations__name', ]
     if request.GET.has_key('q'):
         enumeration_areas = get_filterset(enumeration_areas, request.GET['q'], search_fields)
+    loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk,).exclude(parent__isnull=True)
     context = {'enumeration_areas': enumeration_areas,
                'locations_filter' : locations_filter,
-               'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk,),
+               'location_filter_types' : loc_types,
                'max_display_per_page': settings.MAX_DISPLAY_PER_PAGE}
     return render(request, "enumeration_area/index.html", context)
 

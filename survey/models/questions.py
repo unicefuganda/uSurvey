@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
 from survey.models.householdgroups import HouseholdMemberGroup
+from survey.models.access_channels import USSDAccess
 from survey.models.base import BaseModel
 from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
@@ -20,6 +21,18 @@ class Question(BaseModel):
     class Meta:
         app_label = 'survey'        
         unique_together = [('identifier', 'batch'), ]
+
+    def display_text(self, channel=None):
+        text = self.text
+        if channel and channel== USSDAccess.choice_name() and self.answer_type == MultiChoiceAnswer.choice_name():
+            extras = []
+            #append question options
+            for option in self.options.all():
+                extras.append(option.text)
+            text = '%s\n%s' % (text, '\n'.join(extras))
+        return text
+
+
     
     def conditional_flows(self):
         return self.flows.filter( validation_test__isnull=False)

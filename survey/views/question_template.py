@@ -109,7 +109,8 @@ def delete(request, question_id):
 
 def export_questions(request):
     filename =  'library_questions'
-    formatted_responses = get_question_template_as_dump()
+    questions = QuestionTemplate.objects.all()
+    formatted_responses = get_question_template_as_dump(questions)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))
