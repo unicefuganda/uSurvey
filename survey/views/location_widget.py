@@ -1,4 +1,3 @@
-# from rapidsms.contrib.locations.models import Location, LocationType
 from django.utils.datastructures import SortedDict
 from survey.models import LocationTypeDetails, EnumerationArea, Location, LocationType
 
@@ -27,10 +26,10 @@ class LocationWidget(object):
         return data
 
     def get_all_location_types(self):
-        all_types = LocationTypeDetails.objects.order_by('order')
+        types = LocationType.objects.exclude(parent__isnull=True)
         if not self.level:
-            return list(all_types.values_list('location_type', flat=True))[1:-1]
-        return all_types.filter(order__lte=self.level).values_list('location_type', flat=True)[1:]
+            return list(types.exclude(pk=LocationType.smallest_unit().pk))
+        return types.filter(level__lte=self.level)[1:]
 
     def has_location_selected(self, location):
         return location in self.selected_locations
