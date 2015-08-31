@@ -150,7 +150,9 @@ text-decoration:none;
 
 .tbanner
 {
-background-color:#33CCFF; opacity: 0.9; filter: alpha(opacity=90); top: 0; position: fixed;  width: 100%; font-size:17px; color:#FFFFFF; box-shadow: 1px 1px 1px 1px; height: 72px; z-index: 10000;
+background-color:#33CCFF; opacity: 0.9; filter: alpha(opacity=90); top: 0; position: fixed;
+width: 100%; font-size:17px; color:#FFFFFF; box-shadow: 1px 1px 1px 1px; height: 72px;
+z-index: 10000;
 }
 .dashcount
 {

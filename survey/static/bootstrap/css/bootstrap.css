@@ -12,6 +12,25 @@
   *zoom: 1;
 }
 
+.btnforall
+{
+height: 30px;
+color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #33CCFF;
+   background-image: -moz-linear-gradient(top, #33CCFF, #33CCFF);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#33CCFF), to(#33CCFF));
+  background-image: -webkit-linear-gradient(top, #33CCFF, #33CCFF);
+  background-image: -o-linear-gradient(top, #33CCFF, #33CCFF);
+  background-image: linear-gradient(to bottom, #33CCFF, #33CCFF);
+  background-repeat: repeat-x;
+  border-color: #0044cc #0044cc #002a80;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+}
+
+
 .clearfix:before,
 .clearfix:after {
   display: table;
@@ -289,7 +308,7 @@ a:focus {
 .navbar-static-top .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
-  width: 940px;
+  width: 1000px;
 }
 
 .span12 {
@@ -3360,7 +3379,7 @@ input[type="button"].btn-block {
 .btn-primary {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #006dcc;
+  background-color: #0099FF;
   *background-color: #0044cc;
   background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
@@ -3381,13 +3400,13 @@ input[type="button"].btn-block {
 .btn-primary.disabled,
 .btn-primary[disabled] {
   color: #ffffff;
-  background-color: #0044cc;
+  background-color: #0099FF;
   *background-color: #003bb3;
 }
 
 .btn-primary:active,
 .btn-primary.active {
-  background-color: #003399 \9;
+  background-color: #0099FF;
 }
 
 .btn-warning {
@@ -3770,7 +3789,7 @@ input[type="submit"].btn.btn-mini {
 }
 
 .btn-group.open .btn-primary.dropdown-toggle {
-  background-color: #0044cc;
+  background-color: #0099FF;
 }
 
 .btn-group.open .btn-warning.dropdown-toggle {
@@ -4373,15 +4392,15 @@ input[type="submit"].btn.btn-mini {
  width: auto;
 box-shadow: 1px 1px 1px #BEBEBE;
 padding-bottom: 10px;
-  padding-top: 40px;
-padding-left: 60px;
+padding-top: 40px;
+
 color:#808080;
 background-color:#FFFFFF; opacity: 0.9; filter: alpha(opacity=90);
 
 }
 .breadnavbarblue
 {
-color:#FF0000;
+color:#0099FF;
 font-weight:bold;
 }
 .brandlogo
@@ -4597,7 +4616,7 @@ color:#ffffff;
 .navbar-static-top .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
-  width: 940px;
+  width: 1000px;
 }
 
 .navbar-fixed-top {
