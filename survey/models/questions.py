@@ -112,3 +112,6 @@ class QuestionOption(BaseModel):
  
     def to_text(self):
         return "%d: %s" % (self.order, self.text)
+
+    def __unicode__(self):
+        return self.text

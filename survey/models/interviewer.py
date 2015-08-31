@@ -9,7 +9,7 @@ from survey.models.locations import Location
 import random
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
-from survey.models.household_batch_completion import HouseSurveyCompletion
+from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
 
 def validate_min_date_of_birth(value):
     if date.today() - relativedelta(years=INTERVIEWER_MIN_AGE) < value:
@@ -38,18 +38,27 @@ class Interviewer(BaseModel):
     class Meta:
         app_label = 'survey'
 
-    def total_households_completed(self):
+    def total_households_completed(self, survey=None):
         try:
-            survey = self.assignments.get(completed=False).survey
-            present_houses = self.present_households(survey)
-            return HouseSurveyCompletion.objects.filter(household__pk__in=[h.pk for h in present_houses], survey=survey, interviewer=self).distinct().count()
+            if survey is None:
+                survey = self.assignments.get(completed=False).survey
+            return HouseSurveyCompletion.objects.filter(survey=survey, interviewer=self).distinct().count()
         except:
-            return None
+            return 0
+
+    def total_households_batch_completed(self, batch):
+        return HouseholdBatchCompletion.objects.filter(batch=batch, interviewer=self).distinct().count()
+
+
+    def completed_batch_or_survey(self, survey, batch):
+        if survey and not batch:
+            return self.total_households_completed(survey) > 0
+        return self.total_households_batch_completed(batch) > 0
 
     def locations_in_hierarchy(self):
-        locs = self.ea.locations.all()
+        locs = self.ea.locations.all() #this should evaluate to country
         if locs:
-            return locs[0].get_ancestors(include_self=False)
+            return locs[0].get_ancestors(include_self=True)
         else:
             Location.objects.none()
 
