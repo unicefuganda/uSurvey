@@ -15,6 +15,9 @@ class Survey(BaseModel):
 
     class Meta:
         app_label = 'survey'
+        permissions = (
+            ("view_completed_survey", "Can view Completed interviewers"),
+        )
         
     def __unicode__(self):
         return self.name
