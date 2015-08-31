@@ -79,7 +79,7 @@ class Household(BaseModel):
         return completion_recs.count() == self.members.count()
 
     def has_completed_batch(self, batch):
-        completion_recs = HouseholdBatchCompletion.objects.filter(householdmember__household=self, batch=batch).distinct()
+        completion_recs = HouseholdMemberBatchCompletion.objects.filter(householdmember__household=self, batch=batch).distinct()
         return completion_recs.count() == self.members.count()
 
     def survey_completed(self):
