@@ -8,6 +8,7 @@ from survey.models.base import BaseModel
 from dateutil.parser import parse as extract_date
 from rapidsms.contrib.locations.models import Point
 from django import template
+from survey.interviewer_configs import MESSAGES
 
 
 def reply_test(cls, func):
@@ -67,14 +68,8 @@ class Interview(BaseModel):
             question_context = template.Context(dict([(field.verbose_name.upper().replace(' ', '_'),
                                                             getattr(self.householdmember, field.name))
                                                                     for field in self.householdmember._meta.fields]))
-            response_text =  template.Template(next_question.text).render(question_context)
+            response_text =  template.Template(next_question.display_text(USSDAccess.choice_name())).render(question_context)
             print 'response text is: ', response_text
-            if next_question.answer_type == MultiChoiceAnswer.choice_name() and channel == USSDAccess.choice_name():
-                extras = []
-                #append question options
-                for option in next_question.options.all():
-                    extras.append(option.text)
-                response_text = '%s\n%s' % (response_text, '\n'.join(extras))
             return response_text
         print 'nothing here mehn', next_question
 
