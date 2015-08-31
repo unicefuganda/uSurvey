@@ -2,9 +2,8 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from rapidsms.contrib.locations.models import Location
+from survey.models import Location
 from django.contrib.auth.decorators import permission_required
-
 from survey.forms.formula import FormulaForm
 from survey.models import Indicator
 from survey.models.formula import Formula
@@ -48,8 +47,11 @@ def new(request, indicator_id):
             _process_new_request(request, formula_form, new_formula_url, indicator)
 
         form_title = 'Formula for Indicator %s' % indicator.name
+        request.breadcrumbs([
+        ('Indicator List', reverse('list_indicator_page')),
+        ])
         return render(request, 'formula/new.html', {'action': new_formula_url,
-                                                    'cancel_url': '/indicators/', 'formula_form': formula_form,
+                                                    'cancel_url': reverse('list_indicator_page'), 'formula_form': formula_form,
                                                     'button_label': 'Create', 'title': form_title,
                                                     'existing_formula': indicator.formula.all(),
                                                     'indicator': indicator})

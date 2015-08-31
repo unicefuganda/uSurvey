@@ -3,12 +3,11 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from survey.models.interviewer import Interviewer
-from survey.models.access_channels import InterviewerAccess
+from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
 from survey.models.base import BaseModel
 from dateutil.parser import parse as extract_date
 from rapidsms.contrib.locations.models import Point
 from django import template
-from survey.models.access_channels import ODKAccess
 
 
 def reply_test(cls, func):
@@ -70,6 +69,12 @@ class Interview(BaseModel):
                                                                     for field in self.householdmember._meta.fields]))
             response_text =  template.Template(next_question.text).render(question_context)
             print 'response text is: ', response_text
+            if next_question.answer_type == MultiChoiceAnswer.choice_name() and channel == USSDAccess.choice_name():
+                extras = []
+                #append question options
+                for option in next_question.options.all():
+                    extras.append(option.text)
+                response_text = '%s\n%s' % (response_text, '\n'.join(extras))
             return response_text
         print 'nothing here mehn', next_question
 

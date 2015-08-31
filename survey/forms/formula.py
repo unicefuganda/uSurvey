@@ -20,7 +20,7 @@ class FormulaForm(ModelForm):
 
         question_choices = []
         if indicator.batch:
-            for question in indicator.batch.all_questions():
+            for question in indicator.batch.survey_questions():
                 if question.module == indicator.module:
                     question_choices.append((question.id, question.text))
 

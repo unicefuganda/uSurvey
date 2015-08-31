@@ -60,7 +60,7 @@ def completed_interviewer(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="interviewer.csv"'
     header = ['Interviewer', 'Access Channels']
-    header.extend(LocationType.objects.all().values_list('name', flat=True))
+    header.extend(LocationType.objects.exclude(name__iexact='country').values_list('name', flat=True))
     data = [header]
     data.extend(survey.generate_completion_report(batch=batch))
     writer = csv.writer(response)

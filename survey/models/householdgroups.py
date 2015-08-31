@@ -25,12 +25,12 @@ class HouseholdMemberGroup(BaseModel):
 
     def household_members_count_per_location_in(self, locations, survey):
         data = SortedDict()
-        all_households = survey.survey_household.all()
+        all_households = survey.registered_households.all()
         from survey.models import HouseholdMember
         for location in locations:
             location_descendants = location.get_descendants(include_self=True).values_list('id', flat=True)
             households = all_households.filter(ea__locations__in=location_descendants).values_list('id', flat=True)
-            all_members = HouseholdMember.objects.filter(household__id__in=households).select_subclasses()
+            all_members = HouseholdMember.objects.filter(household__id__in=households)
             qualified_members = filter(lambda member: member.belongs_to(self), all_members)
             data[location] = {self.name: len(qualified_members)}
         return data

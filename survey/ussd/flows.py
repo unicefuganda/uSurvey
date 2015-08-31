@@ -711,7 +711,7 @@ class StartInterview(Interviews):
     @property
     def _intro_speech(self):
         ongoing_interview = self._ongoing_interview
-        speech = ongoing_interview.respond()
+        speech = ongoing_interview.respond(channel=USSDAccess.choice_name())
         self._ongoing_interview = ongoing_interview
         return speech
     
@@ -729,6 +729,8 @@ class StartInterview(Interviews):
                 self._ongoing_interview.save()
                 house_member = self._ongoing_interview.householdmember
                 house_member.batch_completed(ongoing_interview.batch)
+                if house_member.household.has_completed_batch():
+                    house_member.household.batch_completed(ongoing_interview.batch)
                 if self._has_next:
                     batches = self._pending_batches
                     present_batch = batches.pop(0)

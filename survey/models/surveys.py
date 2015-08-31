@@ -38,7 +38,7 @@ class Survey(BaseModel):
         all_interviewers = Interviewer.objects.all()
         # import pdb; pdb.set_trace()
         for interviewer in all_interviewers:
-            if interviewer.present_households(self).count() and interviewer.batch_completed_households.filter(batch=batch):
+            if interviewer.completed_batch_or_survey(self, batch=batch):
                 row = [interviewer.name, ','.join(interviewer.access_ids)]
                 if interviewer.ea:
                     row.extend(interviewer.locations_in_hierarchy().values_list('name', flat=True))
