@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from dateutil.parser import parse
 from django.utils.timezone import utc
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
@@ -62,8 +62,8 @@ def error_logs(request):
     selected_to_date = today
     params = request.GET
     if params.get('from_date', None) and params.get('to_date', None):
-        selected_from_date = datetime.strptime(params['from_date']+ " 00:00", '%Y-%m-%d %H:%M').replace(tzinfo=utc)
-        selected_to_date = datetime.strptime(params['to_date']+ " 23:59", '%Y-%m-%d %H:%M').replace(tzinfo=utc)
+        selected_from_date = parse(params['from_date'], dayfirst=False, fuzzy=True).replace(tzinfo=utc)
+        selected_to_date = parse(params['to_date'], dayfirst=False, fuzzy=True).replace(tzinfo=utc)
 
         location_weights_error_logs = location_weights_error_logs.filter(created__range=[selected_from_date,
                                                                                          selected_to_date])
