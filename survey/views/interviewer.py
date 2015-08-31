@@ -29,7 +29,7 @@ def _create_or_edit(request, action_text, interviewer=None, extra=1):
         ('Interviewers', reverse('interviewers_page')),
     ])
     interviewer_form = InterviewerForm(instance=interviewer)
-    locations_filter = LocationsFilterForm(request.GET)
+    # locations_filter = LocationsFilterForm(request.GET)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
 #     ODKAccessFormSet = inlineformset_factory(Interviewer, ODKAccess, form=ODKAccessForm, extra=1)
     ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)
@@ -38,11 +38,15 @@ def _create_or_edit(request, action_text, interviewer=None, extra=1):
     redirect_url = reverse('interviewers_page')
     title = 'New Interviewer'
     odk_instance = None
+    filter_initial = request.GET
     if interviewer:
         title = 'Edit Interviewer'
         odk_accesses = interviewer.odk_access
         if odk_accesses.exists():
             odk_instance = odk_accesses[0]
+        parent_locations = interviewer.ea.parent_locations()
+        filter_initial = dict([(loc.type.name, loc.pk) for loc in parent_locations])
+    locations_filter = LocationsFilterForm(initial=filter_initial)
     odk_access_form = ODKAccessForm(instance=odk_instance)     
     if request.method == 'POST':
         interviewer_form = InterviewerForm(request.POST, instance=interviewer)
@@ -58,8 +62,7 @@ def _create_or_edit(request, action_text, interviewer=None, extra=1):
             odk_access.save()
             messages.success(request, "Interviewer successfully %sed." % action_text )
             return HttpResponseRedirect(redirect_url)
-    
-
+    loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(name__iexact='country')
     return response or render(request, 'interviewers/interviewer_form.html', {'country_phone_code': COUNTRY_PHONE_CODE,
                                                                   'form': interviewer_form,
                                                                   'ussd_access_form' : ussd_access_form,
@@ -70,7 +73,7 @@ def _create_or_edit(request, action_text, interviewer=None, extra=1):
                                                                   'button_label': "Save",
                                                                   'cancel_url': redirect_url,
                                                                   'locations_filter': locations_filter,
-                                                                  'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk),
+                                                                  'location_filter_types' : loc_types,
                                                                   'loading_text': "Creating..."})
 
 @login_required
@@ -98,10 +101,11 @@ def list_interviewers(request):
         interviewers = get_filterset(interviewers, request.GET['q'], search_fields)
     if params.has_key('status'):
         interviewers = interviewers.filter(is_blocked=ast.literal_eval(params['status']))
+    loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(name__iexact='country')
     return render(request, 'interviewers/index.html',
                   {'interviewers': interviewers,
                    'locations_filter' : locations_filter,
-                   'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk),
+                   'location_filter_types' : loc_types,
                    'request': request})
 
 
