@@ -11,18 +11,36 @@
 .clearfix {
   *zoom: 1;
 }
-
+.btnforallxlarge
+{
+height: 50px;
+padding-left: 20px;
+padding-right: 20px;
+color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #0099FF;
+   background-image: -moz-linear-gradient(top, #0099FF, #0099FF);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0099FF), to(#0099FF));
+  background-image: -webkit-linear-gradient(top, #0099FF, #0099FF);
+  background-image: -o-linear-gradient(top, #0099FF, #0099FF);
+  background-image: linear-gradient(to bottom, #0099FF, #0099FF);
+  background-repeat: repeat-x;
+  border-color: #0044cc #0044cc #002a80;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+}
 .btnforall
 {
 height: 30px;
 color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #33CCFF;
-   background-image: -moz-linear-gradient(top, #33CCFF, #33CCFF);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#33CCFF), to(#33CCFF));
-  background-image: -webkit-linear-gradient(top, #33CCFF, #33CCFF);
-  background-image: -o-linear-gradient(top, #33CCFF, #33CCFF);
-  background-image: linear-gradient(to bottom, #33CCFF, #33CCFF);
+ text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #0099FF;
+   background-image: -moz-linear-gradient(top, #0099FF, #0099FF);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0099FF), to(#0099FF));
+  background-image: -webkit-linear-gradient(top, #0099FF, #0099FF);
+  background-image: -o-linear-gradient(top, #0099FF, #0099FF);
+  background-image: linear-gradient(to bottom, #0099FF, #0099FF);
   background-repeat: repeat-x;
   border-color: #0044cc #0044cc #002a80;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
