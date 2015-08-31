@@ -6,19 +6,18 @@
 {% block content %}
 {% load pagination_tags %}
 {% autopaginate interviewers 50 %}
-  <form id="aggregates-form" action="{% url 'interviewers_page' %}" method="get" class="padded-bottom">
+  <form id="aggregates-form" action="{% url 'interviewers_page' %}" method="get">
     {% include "horizontal_naked_form.html" with a_form=locations_filter %}
-    <button class="btn btn-primary" id="a-interviewer-list" href="{% url 'interviewers_page' %}"> Refresh List</button>
+    <button class="btnforall" id="a-interviewer-list" href="{% url 'interviewers_page' %}"> Refresh List</button>
   </form>
-  <br/>
-<div class="form-actions">
+<br>
+<div>
 	<form accept-charset="utf-8" action="{% url 'download_interviewers' %}" method="get" id="download_interviewers" class="pull-right">
                 {% csrf_token %}
                 <button class="btn btn_primary" id="export_question">Export Interviewers</button>
             </form>
     <a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-plus"></i> Add Interviewer</a>
-  
- {% include "search_form.html" %}
+    {% include "search_form.html" %}
 </div>
   <br />
 
