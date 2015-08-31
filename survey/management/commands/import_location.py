@@ -35,21 +35,21 @@ class Command(BaseCommand):
                 print 'current index: ', index
                 if has_ea and index == self.EA_INDEX:
                     print 'loading EA ', item.strip()
-                    ea = existing_eas.get(item.strip(),
-                                          EnumerationArea.objects.create(name=item.strip(),
+                    ea = existing_eas.get(item.strip(), None)
+                    if ea is None:
+                        ea = EnumerationArea.objects.create(name=item.strip(),
                                                     total_households=self.DEFAULT_TOTAL_HOUSEHOLDS)
-                                          )
-                    ea.locations.add(location)
-                    ea.save()
+                        ea.locations.add(location)
+                        ea.save()
                     break
                 print 'loading item ', item
-                if location:
+                if location is None:
+                    location, _ = Location.objects.get_or_create(name=item.strip(), type=location_types[index], parent=location)
+                else:
                     location = existing_locs.get((item.strip(), location.pk),
                                           Location.objects.create(name=item.strip(),
                                                                   type=location_types[index], parent=location)
                                           )
-                else:
-                    location, _ = Location.objects.get_or_create(name=item.strip(), type=location_types[index], parent=location)
                 print 'loading ', location
         #clean up... delete locations and types having no name
         LocationType.objects.filter(name='').delete()
