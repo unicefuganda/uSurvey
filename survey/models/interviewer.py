@@ -41,6 +41,9 @@ class Interviewer(BaseModel):
             ("can_view_interviewers", "Can view interviewers"),
         )
 
+    def __unicode__(self):
+        return self.name
+
     def total_households_completed(self, survey=None):
         try:
             if survey is None:

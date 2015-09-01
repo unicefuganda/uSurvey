@@ -2,30 +2,24 @@
 {% block title %}
   {{ heading }}
 {% endblock %}
-
-{% block display_form_fields %}
-
-<div class="control-group">
-  <label class="control-label" for="interviewer">Interviewer</label>
-  <div class="controls">
-   <select name="interviewer" id="household-interviewer"  data-placeholder="Select or Type Interviewer "  single class="chzn-select" required>
-      <option value={{interviewer_form.value}} selected>{{interviewer_form.text}}</option>
-      {% for interviewer in interviewer_form.options %}
-        <option value="{{interviewer.id}}">{{interviewer.name}}</option>
-      {% endfor %}
-    </select><label class="error">{{ interviewer_form.error }}</label>
-  </div>
+{% block pre_form_content %}
+<div class="filter">
+    <form action="" method="get">
+        {% include "horizontal_naked_form.html" with a_form=locations_filter %}
+        <button class="btnforall" id="a-ea-list">Refresh List</button>
+    </form>
 </div>
+{% endblock %}
+{% block display_form_fields %}
+<h4>Household Information</h4>
+{% include "naked_form.html" with a_form=householdform %}
+  {% if is_edit %}
+      <input type="hidden" name="uid" value="{{ uid }}"/>
+  {% endif %}
 {% if not is_edit %}
 <h4>Head of Household's Information</h4>
     {% include "naked_form.html" with a_form=headform %}
 {% endif %}
-
-<h4>Household Information</h4>
-{% include "naked_form.html" with a_form=householdform.household %}
-  {% if is_edit %}
-      <input type="hidden" name="uid" value="{{ uid }}"/>
-  {% endif %}
 
 {% endblock %}
 
@@ -38,4 +32,41 @@
     		$("#household-resident_since").addClass("datepicker");
 		</script>
     {% endif %}
+  <!-- script type="text/javascript">
+  //$("#a-interviewer-list").hide();
+  {% for location_type in location_filter_types %}
+	  $('#id_{{ location_type }}').on('change', function () {
+	  	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+	  	url = "{% url 'location_sub_types' %}";
+	      $.getJSON(url, params, function (data) {
+	 			$('#id_' + data.sub_type +' option').hide();
+	 			$('#id_' + data.sub_type +' option[value=""]').show();
+	  		$.each(data.locations, function () {
+	              $('#id_' + data.sub_type +' option[value='+this.id+']').show();
+	          });
+	  		$(' .chzn-select').trigger("liszt:updated");
+	      });
+	  });
+	{% endfor %}
+    $('.ea_filter').on('change', function () {
+    	{% for location_type in location_filter_types %}
+    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
+    	{% endfor %}
+    	url = "{% url 'enumeration_area_filter' %}";
+        params = {
+        		{% for location_type in location_filter_types %}
+        			{{ location_type }} : {{ location_type }}_selected,
+ 	    		{% endfor %}
+        }
+        $.getJSON(url, params, function (data) {
+        	$('#id_enumeration_area option').hide();
+        	$('#id_enumeration_area' +' option[value=""]').show();
+            $.each(data, function () {
+            	$('#id_enumeration_area' +' option[value='+this.id+']').show();
+            });
+        });
+    });
+  </script -->
+
+
 {% endblock %}
