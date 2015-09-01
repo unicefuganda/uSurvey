@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required, permission_required
-from survey.models import Location, LocationType
+from survey.models import Location, LocationType, SurveyAllocation
 from survey.forms.householdHead import *
 from survey.forms.household import *
 from survey.models import Survey, EnumerationArea
@@ -33,27 +33,6 @@ def _add_error_response_message(householdform, request):
                 messages.error(request, error_message + str(err))
 
 
-def validate_interviewer(request, householdform, selected_ea):
-    interviewer_form = {'value': '', 'text': '', 'error': '',
-                         'options': Interviewer.objects.filter(ea=selected_ea)}
-    interviewer = None
-    try:
-        interviewer = Interviewer.objects.get(id=int(request.POST['interviewer']))
-        interviewer_form['text'] = interviewer.name
-        interviewer_form['value'] = interviewer.id
-    except MultiValueDictKeyError:
-        message = "No interviewer provided."
-        interviewer_form['error'] = message
-        householdform.errors['__all__'] = householdform.error_class([message])
-    except (ObjectDoesNotExist, ValueError):
-        interviewer_form['text'] = request.POST['interviewer']
-        interviewer_form['value'] = request.POST['interviewer']
-        message = "You provided an unregistered interviewer."
-        interviewer_form['error'] = message
-        householdform.errors['__all__'] = householdform.error_class([message])
-    return interviewer, interviewer_form
-
-
 def create_remaining_modelforms(householdform, valid):
     if valid.get('household', None):
         householdform['householdHead'].instance.household = householdform['household'].instance
@@ -69,85 +48,24 @@ def delete_created_modelforms(householdform, valid):
     for key in valid.keys():
         householdform[key].instance.delete()
 
+def create_household(householdform, interviewer, valid, uid):
+    is_valid_household = householdform['household'].is_valid()
 
-def _process_form(householdform, interviewer, request, is_edit=False, uid=None):
-    valid = {}
-    valid = create_household(householdform, interviewer, valid, uid)
-
-    if not is_edit:
-        valid = create_remaining_modelforms(householdform, valid)
-
-    if valid.values().count(True) == len(householdform.keys()):
-
-        redirect_url = "/households/new"
-        action_text = 'registered'
-        if is_edit:
-            action_text = 'edited'
-            redirect_url = "/households/"
-
-        messages.success(request, "Household successfully %s." % action_text)
-        return HttpResponseRedirect(redirect_url)
-
-    delete_created_modelforms(householdform, valid)
-    _add_error_response_message(householdform, request)
-    return None
-
-
-def set_household_form(uid=None, data=None, is_edit=False, instance=None):
-    household_form = {}
-    if not is_edit:
-        household_form['householdHead'] = HouseholdHeadForm(data=data, auto_id='household-%s', label_suffix='')
-    open_survey = None #Survey.currently_open_survey()
-    household_form['household'] = HouseholdForm(data=data, instance=instance, is_edit=is_edit, uid=uid,
-                                                survey=open_survey, auto_id='household-%s', label_suffix='')
-    return household_form
-
-
-def create(request, selected_ea, instance=None, is_edit=False, uid=None):
-    household_form = set_household_form(uid=uid, data=request.POST, instance=instance, is_edit=is_edit)
-    interviewer, interviewer_form = validate_interviewer(request, household_form['household'], selected_ea)
-    response = _process_form(household_form, interviewer, request, is_edit=is_edit, uid=uid)
-    return response, household_form, interviewer, interviewer_form
+    if interviewer and is_valid_household:
+        household = householdform['household'].save(commit=False)
+        household.registrar = interviewer
+        household.ea = interviewer.ea
+        open_survey = SurveyAllocation.get_allocation(interviewer)
+        household.survey = open_survey
+        household.save()
+        valid['household'] = True
+    return valid
 
 
 @login_required
 @permission_required('auth.can_view_households')
 def new(request):
-    selected_location = None
-    selected_ea = None
-    response = None
-
-    householdform = set_household_form(data=None)
-    interviewer_form = {'value': '', 'text': '', 'options': '', 'error': ''}
-    month_choices = {'selected_text': '', 'selected_value': ''}
-    year_choices = {'selected_text': '', 'selected_value': ''}
-
-    if request.method == 'POST':
-        selected_ea = EnumerationArea.objects.get(id=request.POST['ea']) if contains_key(request.POST, 'ea') else None
-        if selected_ea:
-            selected_location = selected_ea.locations.all()
-            if selected_location:
-                selected_location = selected_location[0]
-        response, householdform, interviewer, interviewer_form = create(request, selected_ea)
-
-    household_head = householdform['householdHead']
-
-    del householdform['householdHead']
-    context = {'selected_location': selected_location,
-               'locations': LocationWidget(selected_location, ea=selected_ea),
-               'interviewer_form': interviewer_form,
-               'headform': household_head,
-               'householdform': householdform,
-               'action': "/households/new/",
-               'heading': "New Household",
-               'id': "create-household-form",
-               'button_label': "Create",
-               'loading_text': "Creating..."}
-    request.breadcrumbs([
-        ('Households', reverse('list_household_page')),
-    ])
-    return response or render(request, 'households/new.html', context)
-
+    return save(request, instance=None)
 
 @login_required
 def get_interviewers(request):
@@ -205,35 +123,44 @@ def view_household(request, household_id):
 
 def edit_household(request, household_id):
     household_selected = Household.objects.get(id=household_id)
-    selected_location = household_selected.location
-    selected_ea = household_selected.ea
-    response = None
-    uid = household_selected.uid
-    household_form = set_household_form(is_edit=True, instance=household_selected)
-    interviewers = Interviewer.objects.filter(ea=selected_ea, is_blocked=False)
-    interviewer_form = {'value': '', 'text': '',
-                         'options': interviewers,
-                         'error': ''}
+    return save(request, instance=household_selected)
 
+def save(request, instance=None):
+    head = None
+    if instance:
+        handler = reverse('edit_household_page', args=(instance.pk, ))
+        head = instance.get_head()
+    else:
+        handler = reverse('new_household_page')
+    locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
+    householdform = HouseholdForm(instance=instance)
+    headform = HouseholdHeadForm(instance=head)
     if request.method == 'POST':
-        uid = request.POST.get('uid', None)
-
-        selected_location = Location.objects.get(id=request.POST['location']) if contains_key(request.POST,
-                                                                                              'location') else None
-        selected_ea = EnumerationArea.objects.get(id=request.POST['ea']) if contains_key(request.POST, 'ea') else None
-        response, household_form, interviewer, interviewer_form = create(request, selected_location,
-                                                                           instance=household_selected, is_edit=True,
-                                                                           uid=uid)
+        householdform = HouseholdForm(data=request.POST, instance=instance)
+        headform = HouseholdHeadForm(data=request.POST, instance=head)
+        if householdform.is_valid():
+            household = householdform.save(commit=False)
+            household.ea = household.registrar.ea
+            household.survey = SurveyAllocation.get_allocation(household.registrar)
+            household.save()
+            householdform = HouseholdForm()
+            if headform.is_valid():
+                head = headform.save(commit=False)
+                head.household = household
+                head.save()
+                headform = HouseholdHeadForm()
+            messages.info(request, 'Household %s saved successfully' % household.house_number)
+            handler = reverse('new_household_page')
+    context = {
+               'headform': headform,
+               'householdform': householdform,
+               'action': handler,
+               'heading': "Edit Household",
+               'id': "create-household-form",
+               'button_label': "Save",
+               'loading_text': "Creating...",
+               'locations_filter' : locations_filter}
     request.breadcrumbs([
         ('Households', reverse('list_household_page')),
     ])
-    return response or render(request, 'households/new.html', {'selected_location': selected_location,
-                                                               'locations': LocationWidget(selected_location, ea=selected_ea),
-                                                               'interviewer_form': interviewer_form,
-                                                               'householdform': household_form,
-                                                               'action': "/households/%s/edit/" % household_id,
-                                                               'id': "add-household-form",
-                                                               'button_label': "Save",
-                                                               'heading': "Edit Household",
-                                                               'uid': uid,
-                                                               'loading_text': "Updating...", 'is_edit': True})
+    return render(request, 'households/new.html', context)

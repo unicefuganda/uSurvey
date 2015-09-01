@@ -31,9 +31,15 @@ class LocationsFilterForm(Form):
     def __init__(self, *args, **kwargs):
         include_ea = kwargs.pop('include_ea', False)
         super(LocationsFilterForm, self).__init__(*args, **kwargs)
+        data = kwargs.get('data', {})
+        # import pdb; pdb.set_trace()
         for location_type in LocationType.objects.all():
             if location_type.parent is not None and location_type.is_leaf_node() == False:
-                choices = [(loc.pk, loc.name) for loc in Location.objects.filter(type=location_type)]
+                kw = {'type':location_type}
+                parent_selection = data.get(location_type.parent.name, None)
+                if parent_selection:
+                    kw['parent__pk'] = parent_selection
+                choices = [(loc.pk, loc.name) for loc in Location.objects.filter(**kw)]
                 choices.insert(0, ('', '--- Select %s ---' % location_type.name))
                 self.fields[location_type.name] = forms.ChoiceField(choices=choices)
                 self.fields[location_type.name].required = False
@@ -41,7 +47,13 @@ class LocationsFilterForm(Form):
                 self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
 
         if include_ea:
-            choices = [(ea.pk, ea.name) for ea in EnumerationArea.objects.all()]
+            loc_ids = dict(choices).keys() #use the next to last level choices
+            loc_ids.pop(0)
+            locations = Location.objects.filter(parent__pk__in=loc_ids)
+            eas = EnumerationArea.objects.filter(locations__in=locations).order_by('name')
+            choices = [(ea.pk, ea.name) for ea in eas]
+
+
             choices.insert(0, ('', '--- Select EA ---'))
             self.fields['enumeration_area'] = forms.ChoiceField(choices=choices)
             self.fields['enumeration_area'].widget.attrs['class'] = 'location_filter chzn-select'

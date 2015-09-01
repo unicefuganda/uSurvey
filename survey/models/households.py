@@ -21,9 +21,9 @@ class Household(BaseModel):
     REGISTRATION_CHANNELS = [(name, name) for name in InterviewerAccess.access_channels()]
     ea = models.ForeignKey("EnumerationArea", null=True, related_name="household_enumeration_area")
 #     uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Interviewer Unique Identification for the Household")
-    house_number = models.PositiveIntegerField(verbose_name="Household Number in EA")
+    house_number = models.PositiveIntegerField(verbose_name="Household Number")
     household_code = models.CharField(max_length=100, null=True, verbose_name="Household Code")
-    registrar = models.ForeignKey(Interviewer, related_name='registered_households')
+    registrar = models.ForeignKey(Interviewer, related_name='registered_households', verbose_name='Interviewer')
     survey = models.ForeignKey(Survey, related_name='registered_households')
     registration_channel = models.CharField(max_length=100, choices=REGISTRATION_CHANNELS)
     
@@ -34,10 +34,10 @@ class Household(BaseModel):
     def __unicode__(self):
         return 'HH-%s' % self.house_number
     
-    def clean(self):
-        super(Household, self).clean()
-        if self.house_number > self.total_households:
-             raise ValidationError('Household number has exceeded total households in the Enumeration area')
+    # def clean(self):
+    #     super(Household, self).clean()
+    #     if self.house_number > self.ea.total_households:
+    #          raise ValidationError('Household number has exceeded total households in the Enumeration area')
     
     def get_head(self):
         try:
