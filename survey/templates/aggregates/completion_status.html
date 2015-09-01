@@ -15,7 +15,7 @@
      <div>
         {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
      </div>
-    <button class="btn btn-primary">Refresh status</button>
+    <button class="btnforall">Refresh status</button>
   </form>
   {% if completion_rates %}
     {% autopaginate completion_rates.attributes 50 %}
