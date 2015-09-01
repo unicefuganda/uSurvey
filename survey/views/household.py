@@ -1,5 +1,5 @@
 import json
-
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib import messages
@@ -18,7 +18,6 @@ from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 
-
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''
 
 
@@ -31,36 +30,6 @@ def _add_error_response_message(householdform, request):
         if form.non_field_errors():
             for err in form.non_field_errors():
                 messages.error(request, error_message + str(err))
-
-
-def create_remaining_modelforms(householdform, valid):
-    if valid.get('household', None):
-        householdform['householdHead'].instance.household = householdform['household'].instance
-        is_valid_form = householdform['householdHead'].is_valid()
-
-        if is_valid_form:
-            householdform['householdHead'].save()
-            valid['householdHead'] = True
-    return valid
-
-
-def delete_created_modelforms(householdform, valid):
-    for key in valid.keys():
-        householdform[key].instance.delete()
-
-def create_household(householdform, interviewer, valid, uid):
-    is_valid_household = householdform['household'].is_valid()
-
-    if interviewer and is_valid_household:
-        household = householdform['household'].save(commit=False)
-        household.registrar = interviewer
-        household.ea = interviewer.ea
-        open_survey = SurveyAllocation.get_allocation(interviewer)
-        household.survey = open_survey
-        household.save()
-        valid['household'] = True
-    return valid
-
 
 @login_required
 @permission_required('auth.can_view_households')
@@ -77,22 +46,15 @@ def get_interviewers(request):
     return HttpResponse(json.dumps(interviewer_hash), content_type="application/json")
 
 
-def _remove_duplicates(all_households):
-    households_without_heads = list(all_households.filter(household_members__householdhead__surname=None).distinct())
-    households = list(all_households.exclude(household_members__householdhead__surname=None).distinct('household_members__householdhead__surname'))
-    households.extend(households_without_heads)
-    return households
-
-
 @permission_required('auth.can_view_households')
 def list_households(request):
     locations_filter = LocationsFilterForm(request.GET, include_ea=True)
     enumeration_areas = locations_filter.get_enumerations()
-    all_households = Household.objects.filter(ea__in=enumeration_areas).order_by('household_members__householdhead__surname')
-    search_fields = [ 'ea__name', 'registrar__name', 'survey__name', ]
+    households = Household.objects.filter(ea__in=enumeration_areas).order_by('household_members__householdhead__surname').distinct()
+    search_fields = ['ea__name', 'registrar__name', 'survey__name', ]
     if request.GET.has_key('q'):
-        all_households = get_filterset(all_households, request.GET['q'], search_fields)
-    households = _remove_duplicates(all_households)
+        all_households = get_filterset(households, request.GET['q'], search_fields)
+    # households = _remove_duplicates(all_households)
     if not households:
         messages.error(request, "There are  no households currently registered for present location" )
     return render(request, 'households/index.html',
@@ -130,10 +92,12 @@ def save(request, instance=None):
     if instance:
         handler = reverse('edit_household_page', args=(instance.pk, ))
         head = instance.get_head()
+        heading = 'Edit Household'
     else:
         handler = reverse('new_household_page')
+        heading = 'New Household'
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
-    householdform = HouseholdForm(instance=instance)
+    householdform = HouseholdForm(instance=instance, eas=locations_filter.get_enumerations())
     headform = HouseholdHeadForm(instance=head)
     if request.method == 'POST':
         householdform = HouseholdForm(data=request.POST, instance=instance)
@@ -155,7 +119,7 @@ def save(request, instance=None):
                'headform': headform,
                'householdform': householdform,
                'action': handler,
-               'heading': "Edit Household",
+               'heading':heading,
                'id': "create-household-form",
                'button_label': "Save",
                'loading_text': "Creating...",

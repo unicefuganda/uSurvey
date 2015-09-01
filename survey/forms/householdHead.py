@@ -21,4 +21,5 @@ class HouseholdHeadForm(ModelForm):
         }
 
     date_of_birth = forms.DateField(label="Date of birth", widget=DateInput(attrs={'class':'datepicker'}), required=True, input_formats=["%Y-%m-%d"])
+    resident_since = forms.DateField(widget=DateInput(attrs={'class':'datepicker'}), required=True, input_formats=["%Y-%m-%d"])
 

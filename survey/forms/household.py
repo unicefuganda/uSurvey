@@ -6,6 +6,7 @@ from django import forms
 
 class HouseholdForm(ModelForm):
 
+
     class Meta:
         model = Household
         exclude = ['ea', 'survey', 'household_code']
@@ -14,12 +15,12 @@ class HouseholdForm(ModelForm):
             'registration_channel': forms.HiddenInput()
         }
 
-    def __init__(self, is_edit=False, ea=None,  survey=None, *args, **kwargs):
+    def __init__(self, is_edit=False, eas=[],  survey=None, *args, **kwargs):
         super(HouseholdForm, self).__init__(*args, **kwargs)
         self.is_editing = is_edit
         self.fields['registration_channel'].initial = WebAccess.choice_name()
-        if ea is not None:
-            self.fields['registrar'].queryset = Interviewer.objects.filter(ea__pk=ea)
+        if eas:
+            self.fields['registrar'].queryset = Interviewer.objects.filter(ea__pk__in=[ea.pk for ea in eas])
 
 #         if not self.is_editing:
 #             self.fields['uid'].initial = Household.next_uid(survey)
