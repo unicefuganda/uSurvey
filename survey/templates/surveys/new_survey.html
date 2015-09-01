@@ -5,11 +5,11 @@
   {% csrf_token %}
   {% include "naked_form.html" with a_form=survey_form %}
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary" name="save_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+    <button type="submit" class="btnforall" name="save_button"  data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
         {% if cancel_url %}
             <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button">Cancel</a>
         {% else %}
-            <button class="btn btn-primary" data-dismiss="modal">Cancel</button>
+            <button class="btnforall" data-dismiss="modal">Cancel</button>
         {% endif %}
   </div>
 </form>
