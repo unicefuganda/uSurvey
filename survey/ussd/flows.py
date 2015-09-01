@@ -116,7 +116,7 @@ class Start(Task):
     @property
     def _survey_can_start(self):
         can_start = self._retrieve("_survey_can_start", None)
-        if can_start is None:
+        if can_start is None and self.ongoing_survey:
             total_ea_households = self.enumeration_area.total_households
             min_percent_reg_houses = self.ongoing_survey.min_percent_reg_houses
             if self.registered_households.count()*100.0/total_ea_households >= min_percent_reg_houses:
