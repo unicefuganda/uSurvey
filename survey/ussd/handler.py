@@ -10,9 +10,9 @@ def handle(request):
         data = request.GET
     else:
         data = request.POST
-    trnx_id = data.get('transactionId').strip()
-    msisdn = data.get('msisdn').strip()
-    request_string = data.get('ussdRequestString').strip()
+    trnx_id = data.get('transactionId', '').strip()
+    msisdn = data.get('msisdn', '').strip()
+    request_string = data.get('ussdRequestString', '').strip()
     res = manage(msisdn, trnx_id, request_string)
     action = 0
     if res:
