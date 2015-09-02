@@ -40,9 +40,10 @@
 <a class="logopad" href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}img/uSurvey.png" /></a>
 {% endif%} 
 
-                        {% if perms.auth.can_view_interviewers %}
+
 <div class="nav-collapse collapse">
                     <ul class="nav">
+                        {% if perms.auth.can_view_interviewers %}
                         <li>
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'main_page' %}">Home</a>
                         </li>
@@ -69,9 +70,11 @@
                                         <li role="presentation"><a href="{% url 'household_member_groups_page' %}">Groups</a>
                                         </li>
                                         <li role="presentation"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
+
                                         <!--  li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li -->
                                         <li role="presentation"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
                                     {% endif %}
+
                                     {% if perms.auth.can_enter_data %}
                                     <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
                                     {% endif %}
