@@ -58,6 +58,11 @@ def display_list(list):
     return mark_safe(', '.join(new_list))
 
 @register.filter
+def join_list(list, delimiter):
+    new_list = ['<span class="muted">%s</span>' % str(item) for item in list]
+    return mark_safe(delimiter.join(new_list))
+
+@register.filter
 def get_value(dict, key):
     return dict.get(key, "")
 
@@ -136,15 +141,15 @@ def quest_validation_opts(batch):
     for cls in Answer.__subclasses__():
         opts = []
         for validator in cls.validators():
-            opts.append({'display': validator.__name__, 'value': validator.__name__ })
-        opts_dict[cls._meta.verbose_name.title()] = opts
+            opts.append({'display': validator.__name__, 'value': validator.__name__.upper() })
+        opts_dict[cls.choice_name()] = opts
     return mark_safe(json.dumps(opts_dict));
 
 @register.filter
 def validation_args(batch):
     args_map = {}
     for validator in Answer.validators():
-        args_map.update({validator.__name__ : len(inspect.getargspec(validator).args) - 2 }) #validator is a class method, plus answer extra pram
+        args_map.update({validator.__name__.upper() : len(inspect.getargspec(validator).args) - 2 }) #validator is a class method, plus answer extra pram
     return mark_safe(json.dumps(args_map));
         
         

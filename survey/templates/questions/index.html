@@ -160,13 +160,14 @@
                         </div>
                     </div>
                 {% endif %}
+                {% include "base/delete_modal.html" with object_name=question.text id=question.id name="Question" url=question.id|get_url_with_ids:"delete_question_page" %}
+                {% if batch %}
+                    {% include "base/remove_modal.html" with object_name=question.text id=question.id name="Question" url=batch.id|add_string:question.id|get_url_with_ids:"remove_question_page" %}
+                {% endif %}
             </td>
 
         </tr>
-        {% include "base/delete_modal.html" with object_name=question.text id=question.id name="Question" url=question.id|get_url_with_ids:"delete_question_page" %}
-        {% if batch %}
-            {% include "base/remove_modal.html" with object_name=question.text id=question.id name="Question" url=batch.id|add_string:question.id|get_url_with_ids:"remove_question_page" %}
-        {% endif %}
+
     {% endfor %}
     </tbody>
 </table>

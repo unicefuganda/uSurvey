@@ -24,6 +24,11 @@ class InterviewerForm(ModelForm):
 
 class USSDAccessForm(ModelForm):
     user_identifier = forms.CharField(label='Mobile Number')
+    # is_active = forms.ChoiceField(label='', widget=forms.CheckboxInput)
+
+    def __init__(self, *args, **kwargs):
+        super(USSDAccessForm, self).__init__(*args, **kwargs)
+        self.fields.keyOrder=['is_active', 'user_identifier',  ]
     
     class Meta:
         model = USSDAccess
@@ -32,7 +37,14 @@ class USSDAccessForm(ModelForm):
 
 
 class ODKAccessForm(ModelForm):
+    is_active = forms.ChoiceField(label='', widget=forms.CheckboxInput)
+
+    def __init__(self, *args, **kwargs):
+        super(ODKAccessForm, self).__init__(*args, **kwargs)
+        self.fields.keyOrder=['is_active', 'user_identifier', 'odk_token', ]
+
+
     class Meta:
         model = ODKAccess
         exclude = ['reponse_timeout', 'duration', 'interviewer']
-        
+

@@ -82,7 +82,7 @@ class QuestionForm(ModelForm):
             order += 1
             QuestionOption.objects.create(question=question, text=text, order=order)
 
-    def save(self, commit=True, **kwargs):
+    def save(self, commit=True, zombie=False, **kwargs):
         question = super(QuestionForm, self).save(commit=False)
         if commit:
             if question.pk is None:
@@ -92,7 +92,8 @@ class QuestionForm(ModelForm):
                 batch = question.batch
                 last_question = batch.last_question_inline()
                 if last_question:
-                    QuestionFlow.objects.get_or_create(question=last_question, next_question=question)
+                    if zombie is False:
+                        QuestionFlow.objects.get_or_create(question=last_question, next_question=question)
                 else:
                     batch.start_question = question
                     batch.save()
