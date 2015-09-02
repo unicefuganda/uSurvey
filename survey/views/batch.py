@@ -200,7 +200,7 @@ def assign(request, batch_id):
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
-        (batch.survey.name, reverse('batch_questions_page', args=(batch.survey.pk, ))),
+        (batch.name, reverse('batch_questions_page', args=(batch.pk, ))),
     ])
     context = {'batch_questions_form': unicode(batch_questions_form), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,

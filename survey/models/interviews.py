@@ -9,6 +9,7 @@ from dateutil.parser import parse as extract_date
 from rapidsms.contrib.locations.models import Point
 from django import template
 from survey.interviewer_configs import MESSAGES
+from survey.utils.decorators import static_var
 
 
 def reply_test(cls, func):
@@ -268,9 +269,11 @@ class MultiChoiceAnswer(Answer):
     def validators(cls):
         return [cls.equals, ]
 
-#     @classmethod
-#     def equals(cls, answer, txt):
-#         return answer.text.lower() == txt.lower()
+
+    @classmethod
+    @static_var('label', 'Option equals')
+    def equals(cls, answer, txt):
+        return super(MultiChoiceAnswer, cls).equals(answer, txt)
 
 class MultiSelectAnswer(Answer):
     value = models.ManyToManyField("QuestionOption", null=True)

@@ -1,12 +1,13 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from survey.models import MultiChoiceAnswer, MultiSelectAnswer
+from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer
 from survey.models.helper_constants import CONDITIONS
 
 
 class LogicForm(forms.Form):
-    def __init__(self, data=None, initial=None, question=None, batch=None):
+    def __init__(self, data=None, initial=None, question=None):
         super(LogicForm, self).__init__(data=data, initial=initial)
+        batch = question.batch
         ACTIONS = {
             'END_INTERVIEW': 'END INTERVIEW',
             'SKIP_TO': 'SKIP TO',
@@ -15,37 +16,13 @@ class LogicForm(forms.Form):
         }
 
         self.fields['action'].choices = ACTIONS.items()
+        self.fields['condition'].choices = [(validator.__name__, validator.__name__.upper()) \
+                                           for validator in Answer.get_class(question.answer_type).validators()]
+        self.fields['attribute'].choices = [(validator.__name__, getattr(validator.label.upper() or validator.__name__) \
+                                           for validator in Answer.get_class(question.answer_type).validators()]
         self.question = question
         self.batch = batch
         action_sent = data.get('action', None) if data else None
-
-        if batch and question:
-            is_multichoice = question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()] 
-            self.fields['condition'].choices = self.choices_for_condition_field(is_multichoice)
-            question_choices = []
-            for next_question in batch.batch_questions.all():
-                if next_question.id != question.id:
-                    question_choices.append((next_question.id, next_question.text))
-
-            if is_multichoice:
-                del self.fields['value']
-                del self.fields['min_value']
-                del self.fields['max_value']
-                del self.fields['validate_with_question']
-
-                all_options = question.options.all()
-                self.fields['option'].choices = map(lambda option: (option.id, option.text), all_options)
-                self.fields['attribute'].choices = [('option', 'Option')]
-            else:
-                del self.fields['option']
-                self.fields['attribute'].choices = [('value', 'Value'), ('validate_with_question', "Question")]
-                self.fields['condition'].initial = 'EQUALS'
-                self.fields['validate_with_question'].choices = question_choices
-
-            if action_sent and action_sent == 'ASK_SUBQUESTION':
-                question_choices = map(lambda next_question: (next_question.id, next_question.text), question.batch.zombie_questions())
-
-            self.fields['next_question'].choices = question_choices
 
     def choices_for_condition_field(self, is_multichoice):
         condition_choices = {}
@@ -69,66 +46,6 @@ class LogicForm(forms.Form):
         if (self.cleaned_data['condition'] == 'BETWEEN') and len(self.cleaned_data['max_value'].strip()) == 0:
             raise ValidationError("Field is required.")
         return self.cleaned_data['max_value']
-
-    def _validate_max_value(self, field_name, rule):
-        if self.data.get('max_value', None) and not rule:
-            try:
-                max_value = int(self.data['max_value'])
-                if max_value < 0:
-                    rule = [1]
-                    field_name = 'Max value %s invalid, must be greater than zero.' % (self.data['max_value'])
-                else:
-                    rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
-                                             validate_with_min_value__lte=self.data['max_value'],
-                                             validate_with_max_value__gte=self.data['max_value'],
-                                             condition=self.data['condition'])
-                    field_name = 'condition %s with max value %s is within existing range that' % (
-                        self.data['condition'], self.data['max_value'])
-            except ValueError:
-                rule = [1]
-                field_name = 'Max value %s invalid, must be an integer.' % (self.data['max_value'])
-
-        return field_name, rule
-
-    def _validate_min_value(self, field_name, rule):
-        if self.data.get('min_value', None):
-            try:
-                min_value = int(self.data['min_value'])
-                if min_value < 0:
-                    rule = [1]
-                    field_name = 'Min value %s invalid, must be greater than zero.' % (self.data['min_value'])
-                else:
-                    rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
-                                             validate_with_min_value__lte=self.data['min_value'],
-                                             validate_with_max_value__gte=self.data['min_value'],
-                                             condition=self.data['condition'])
-                    field_name = 'condition %s with min value %s is within existing range that' % (self.data['condition'], self.data['min_value'])
-            except ValueError:
-                rule = [1]
-                field_name = 'Min value %s invalid, must be an integer.' % (self.data['min_value'])
-
-        return field_name, rule
-
-    def _validate_min_and_max_range(self, field_name, rule):
-        if self.data.get('max_value', None) and self.data.get('min_value', None) and not rule:
-            rule = AnswerRule.objects.filter(batch=self.batch, question=self.question,
-                                             validate_with_min_value__gte=self.data['min_value'],
-                                             validate_with_max_value__lte=self.data['max_value'],
-                                             condition=self.data['condition'])
-            field_name = 'condition %s within range %s - %s' % (self.data['condition'], self.data['min_value'], self.data['max_value'])
-        return field_name, rule
-
-    def _validate_max_greater_than_min(self):
-        minimum_value = self.data.get('min_value', None)
-        maximum_value = self.data.get('max_value', None)
-
-        if minimum_value and maximum_value:
-            try:
-                return int(maximum_value) > int(minimum_value)
-            except:
-                return True
-
-        return True
 
     def clean(self):
         field_name = ""
@@ -166,6 +83,6 @@ class LogicForm(forms.Form):
     value = forms.CharField(label='', required=False)
     min_value = forms.CharField(label='', required=False,widget=forms.TextInput(attrs={'placeholder': 'Min Value'}))
     max_value = forms.CharField(label='', required=False,widget=forms.TextInput(attrs={'placeholder': 'Max Value'}))
-    validate_with_question = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=False)
+    # validate_with_question = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=False)
     action = forms.ChoiceField(label='Then', choices=[], widget=forms.Select, required=True)
     next_question = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=False)

@@ -42,7 +42,7 @@
                     <h4 class="modal-title">New Sub Question</h4>
                 </div>
                 <div class="modal-body">
-                     {% include 'questions/_add_question.html' with title="" button_label="Save" id="add-question-form" class="sub_question_modal question-form"%}
+                     {% include 'questions/_add_question.html' with title="" button_label="Save" id="add-question-form" class="sub_question_modal question-form" %}
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -54,6 +54,10 @@
 
 
 {% block javascripts %}
-    <script src="{{STATIC_URL}}/js/logic.js" type="text/javascript" charset="utf-8"></script>
-    <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        QUES_VALIDATION_OPTS = {{ batch | quest_validation_opts }}
+        QUES_VALIDATION_PARAMS = {{ batch | validation_args }}
+    </script>
+    <!-- script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script -->
+    <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

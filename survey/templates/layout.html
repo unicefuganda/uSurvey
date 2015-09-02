@@ -55,10 +55,10 @@
                                 <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'interviewers_page' %}">Interviewers</a>
                                     </li>
-                                    {%if perms.auth.can_view_interviewers %}
+                                    {% if perms.auth.can_enter_data %}
                                     <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
                                     </li>
-				    {% endif %}
+                                    {% endif %}
 
                                     {% if perms.auth.can_view_batches %}
                                         <li role="presentation"><a href="{% url 'show_question_library' %}">Question
@@ -72,7 +72,9 @@
                                         <!--  li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li -->
                                         <li role="presentation"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
                                     {% endif %}
+                                    {% if perms.auth.can_enter_data %}
                                     <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
+                                    {% endif %}
                                 </ul>
                             </li>
                         {% endif %}
@@ -90,7 +92,7 @@
                             </li>
                         {% endif %}
 
-                        {% if perms.auth.can_view_batches or perms.survey.view_completed_survey %}
+                        {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-analysis-tab" class="dropdown-toggle" role="button"
                                    href="#">Analysis<b class="caret"></b></a>
@@ -100,7 +102,7 @@
                                     </li>
                                     <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion
                                         Rates</a></li>
- {% if perms.survey.view_completed_survey %}
+ {% if perms.auth.view_completed_survey %}
                                     <li role="presentation"><a href="{% url 'show_interviewer_completion_summary' %}">Interviewer Completion
                                         Summary</a></li>
  {% endif %}
@@ -214,11 +216,6 @@ document.write(" "+ now.getFullYear());
 <script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript">
-	$('.chzn-select').chosen();
-	$('.chzn-drop').css({"width": "250px"});
-</script>
-
 {% block javascripts %}
 {% endblock %}
 </body>
