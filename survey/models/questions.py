@@ -67,7 +67,7 @@ class QuestionFlow(BaseModel):
     validation_test = models.CharField(max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)    
     name = models.CharField(max_length=200, null=True, blank=True, unique=True) #if validation passes, classify this flow response as having this value  
     desc = models.CharField(max_length=200, null=True, blank=True) #this would provide a brief description of this flow
-    next_question = models.ForeignKey(Question, related_name='connecting_flows', null=True, blank=True)
+    next_question = models.ForeignKey(Question, related_name='connecting_flows', null=True, blank=True, on_delete=models.SET_NULL)
     
     class Meta:
         app_label = 'survey'        

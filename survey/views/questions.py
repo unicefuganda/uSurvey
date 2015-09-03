@@ -126,7 +126,7 @@ def delete(request, question_id, batch_id=None):
     next_question = batch.next_inline(question)
     previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
     if previous_inline:
-        QuestionFlow.objects.create(question=previous_inline, next_question=next_question)
+        QuestionFlow.objects.create(question=previous_inline[0], next_question=next_question)
     else:
         batch.start_question = next_question
         batch.save()
