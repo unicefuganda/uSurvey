@@ -115,23 +115,7 @@ def edit_subquestion(request, question_id, batch_id=None):
 
 @permission_required('auth.can_view_batches')
 def delete(request, question_id, batch_id=None):
-    question = get_object_or_404(Question, pk=question_id)
-    batch = question.batch
-    redirect_url = '/batches/%s/questions/' % batch_id if batch_id else reverse('batch_questions_page', args=(batch.pk, ))
-    if question:
-        success_message = "Question successfully deleted."
-        messages.success(request, success_message) #% ("Sub question" if question.subquestion else "Question"))
-    else:
-        messages.error(request, "Question / Subquestion does not exist.")
-    next_question = batch.next_inline(question)
-    previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
-    if previous_inline:
-        QuestionFlow.objects.create(question=previous_inline[0], next_question=next_question)
-    else:
-        batch.start_question = next_question
-        batch.save()
-    question.delete()
-    return HttpResponseRedirect(redirect_url)
+    return _remove(request, batch_id, question_id)
 
 @permission_required('auth.can_view_batches')
 @not_allowed_when_batch_is_open(message=ADD_LOGIC_ON_OPEN_BATCH_ERROR_MESSAGE,
@@ -236,10 +220,28 @@ def _render_question_view(request, batch, instance=None):
 @not_allowed_when_batch_is_open(message=REMOVE_QUESTION_FROM_OPEN_BATCH_ERROR_MESSAGE,
                                 redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def remove(request, batch_id, question_id):
-    batch = Batch.objects.get(id=batch_id)
-    get_object_or_404(Question, id=question_id, batch__id=batch_id).delete()
-    messages.success(request, "Question successfully removed from %s." % batch.name)
-    return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
+    return _remove(request, batch_id, question_id)
+
+def _remove(request, batch_id, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    batch = question.batch
+    redirect_url = '/batches/%s/questions/' % batch_id if batch_id else reverse('batch_questions_page', args=(batch.pk, ))
+    if question:
+        success_message = "Question successfully deleted."
+        messages.success(request, success_message) #% ("Sub question" if question.subquestion else "Question"))
+    else:
+        messages.error(request, "Question / Subquestion does not exist.")
+    next_question = batch.next_inline(question)
+    previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
+    if previous_inline.exists():
+        QuestionFlow.objects.create(question=previous_inline[0].question, next_question=next_question)
+    else:
+        batch.start_question = next_question
+        batch.save()
+    question.connecting_flows.all().delete()
+    question.flows.all().delete()
+    question.delete()
+    return HttpResponseRedirect(redirect_url)
 
 @permission_required('auth.can_view_batches')
 def _index(request, batch_id):
