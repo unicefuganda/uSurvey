@@ -70,7 +70,9 @@ def _save_subquestion(request, batch_id, instance=None):
                 zombify = False
             else:
                 zombify = True
-            questionform.save(zombie=zombify)
+            question = questionform.save(zombie=zombify)
+            if request.is_ajax():
+                return HttpResponse(json.dumps({'id' : question.pk, 'text' : question.text}), mimetype='application/json')
             messages.info(request, 'Sub Question saved')
     if instance:
         heading = 'Edit Subquestion'
@@ -98,7 +100,8 @@ def get_sub_questions_for_question(request, question_id):
 
 def get_questions_for_batch(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
-    questions = batch.questions_inline().exclude(pk=question_id)
+    questions = batch.questions_inline()
+    questions = [q for q in questions if int(q.pk) is not int(question_id)]
     return _create_question_hash_response(questions)
 
 def _create_question_hash_response(questions):
@@ -123,7 +126,7 @@ def delete(request, question_id, batch_id=None):
     next_question = batch.next_inline(question)
     previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
     if previous_inline:
-        QuestionFlow.objects.create(question=previous_inline, next_question=next_question)
+        QuestionFlow.objects.create(question=previous_inline[0], next_question=next_question)
     else:
         batch.start_question = next_question
         batch.save()

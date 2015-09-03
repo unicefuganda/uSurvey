@@ -139,11 +139,9 @@ function clear_attribute_dropdown_and_append_right_option(condition_selected){
 function fill_questions_or_subquestions_in_next_question_field(action_value){
     var show_questions = ['SKIP_TO'];
     var show_sub_questions = ['ASK_SUBQUESTION'];
-
     var question_id = $('#id_question').val();
     var batch_id = $('#id_batch').val()
     var questions_url = "";
-
     if(show_questions.indexOf(action_value) != -1)
     {
         questions_url = '/batches/'+ batch_id+'/questions/' + question_id +'/questions_json/'
@@ -213,8 +211,8 @@ jQuery(function($){
         var post = $.post(url, data);
 
         post.done(function(data){
-            if(subquestion_saved(data)){
-                $('#id_next_question').append("<option value=" + $.parseJSON(data)['id'] + ">" + $.parseJSON(data)['text'] + "</option>");
+            if(data){
+                $('#id_next_question').append("<option value=" + data['id'] + ">" + data['text'] + "</option>");
                 $('#close_modal').click();
             } else{
                 append_error_to_text(data);
