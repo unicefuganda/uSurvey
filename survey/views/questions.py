@@ -99,9 +99,6 @@ def get_sub_questions_for_question(request, question_id):
 def get_questions_for_batch(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
     questions = batch.questions_inline().exclude(pk=question_id)
-    question  = Question.objects.get(pk=question_id)
-    existing_flows = question.flows.all()
-    questions = questions.exclude(pk__in=[f.next_question.pk for f in existing_flows if f.next_question])
     return _create_question_hash_response(questions)
 
 def _create_question_hash_response(questions):
