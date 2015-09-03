@@ -103,7 +103,10 @@ class Batch(BaseModel):
     def questions_inline(self):
         qflows = QuestionFlow.objects.filter(question__batch=self, validation_test__isnull=True)
         if self.start_question:
-            return inline_questions(self.start_question, qflows)
+            inlines = inline_questions(self.start_question, qflows)
+            if inlines and inlines[-1] is None:
+                inlines.pop(-1)
+            return inlines
         else:
             return []
         
