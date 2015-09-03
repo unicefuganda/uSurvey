@@ -4,7 +4,7 @@
 {{ title }}
 {% endblock %}
 {% block pre_form_content %}
-{% include "horizontal_naked_form.html" with a_form=locations_filter %}
+{% include "horizontal_filter_form.html" with a_form=locations_filter %}
 {% endblock %}
 {% block display_form_fields %}
   {% include "naked_form.html" with a_form=form %}
@@ -29,42 +29,57 @@
         })
     </script>
   <script type="text/javascript">
-  //$("#a-interviewer-list").hide();
-  {% for location_type in location_filter_types %}
-	  $('#id_{{ location_type }}').on('change', function () {
-	  	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
-	  	url = "{% url 'location_sub_types' %}";
-	      $.getJSON(url, params, function (data) {
-	 			$('#id_' + data.sub_type +' option').hide();
-	 			$('#id_' + data.sub_type +' option[value=""]').show();
-	  		$.each(data.locations, function () {
-	              $('#id_' + data.sub_type +' option[value='+this.id+']').show();
+  $('.ea_filter').on('change', function () {
+        var ea_id = $('#id_ea');
+        url = "{% url 'open_surveys_in_ea_area' %}";
+        params = {"ea_id" : ea_id.val() }
+        $.getJSON(url, params, function (data) {
+                $('#id_survey option').hide();
+	 			$('#id_survey option[value=""]').show();
+	  		    $.each(data, function () {
+	              $('#id_survey option[value='+this.id+']').show();
 	          });
 	      });
-	  });
-	{% endfor %}
-    $('.ea_filter').on('change', function () {
-    	{% for location_type in location_filter_types %}
-    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
-    	{% endfor %}
-    	url = "{% url 'enumeration_area_filter' %}";
-        params = { 
-        		{% for location_type in location_filter_types %}
-        			{{ location_type }} : {{ location_type }}_selected,
- 	    		{% endfor %}	
-        }
-        $.getJSON(url, params, function (data) {
-        	$('#id_ea_chzn li').hide();
-        	$('#id_ea option').hide();
-        	$('#id_ea' +' option[value=""]').show();
-        	$('#id_ea_chzn_o_0').show();
-        	$.each(data, function () {
-            	$('#id_ea' +' option[value='+this.id+']').show();
-            	$('#id_ea_chzn_o_'+this.id).show();
-            	
-            });
-        });
-    });
+
+  });
+
+  	{% for location_type in location_filter_types %}
+	$('#id_{{ location_type }}').on('change', function () {
+	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+	    	url = "{% url 'location_sub_types' %}";
+	        $.getJSON(url, params, function (data) {
+	        	$('#id_' + data.sub_type +' option').hide();
+	        	$('#id_' + data.sub_type +' option[value=""]').show();
+        		$.each(data.locations, function () {
+	                $('#id_' + data.sub_type +' option[value='+this.id+']').show();
+	            });
+        		$(' .chzn-select').trigger("liszt:updated");
+	        });
+
+	    });
+  	{% endfor %}
+    <!--$('.ea_filter').on('change', function () {-->
+    	<!--{% for location_type in location_filter_types %}-->
+    	   <!--var {{ location_type }}_selected = $('#id_{{ location_type }}').val();-->
+    	<!--{% endfor %}-->
+    	<!--url = "{% url 'enumeration_area_filter' %}";-->
+        <!--params = {-->
+        		<!--{% for location_type in location_filter_types %}-->
+        			<!--{{ location_type }} : {{ location_type }}_selected,-->
+ 	    		<!--{% endfor %}-->
+        <!--}-->
+        <!--$.getJSON(url, params, function (data) {-->
+        	<!--$('#id_ea_chzn li').hide();-->
+        	<!--$('#id_ea option').hide();-->
+        	<!--$('#id_ea' +' option[value=""]').show();-->
+        	<!--$('#id_ea_chzn_o_0').show();-->
+        	<!--$.each(data, function () {-->
+            	<!--$('#id_ea' +' option[value='+this.id+']').show();-->
+            	<!--$('#id_ea_chzn_o_'+this.id).show();-->
+            	 <!-- -->
+            <!--});-->
+        <!--});-->
+    <!--});-->
   </script>
 
 {% endblock %}

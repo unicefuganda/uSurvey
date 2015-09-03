@@ -19,7 +19,7 @@ from survey.utils.query_helper import get_filterset
 @login_required
 @permission_required('auth.can_view_batches')
 def new(request):
-    locations_filter = LocationsFilterForm(request.GET)
+    locations_filter = LocationsFilterForm(data=request.GET)
     enumeration_area_form = EnumerationAreaForm(locations=locations_filter.get_locations())
     if request.method == 'POST':
         enumeration_area_form = EnumerationAreaForm(data=request.POST)
@@ -30,7 +30,6 @@ def new(request):
         messages.error(request, "Enumeration area was not created.")
     request.breadcrumbs([
         ('Enumeration Areas', reverse('enumeration_area_home')),
-#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
     ])
     return render(request, 'enumeration_area/new.html',
                   {'enumeration_area_form': enumeration_area_form, 'locations_filter' : locations_filter, 'title': 'New Enumeration Area', 'button_label': 'Create',
@@ -40,7 +39,7 @@ def new(request):
 
 @permission_required('auth.can_view_batches')
 def index(request):
-    locations_filter = LocationsFilterForm(request.GET)
+    locations_filter = LocationsFilterForm(data=request.GET)
     enumeration_areas = locations_filter.get_enumerations()
     search_fields = ['name', 'locations__name', ]
     if request.GET.has_key('q'):
@@ -54,14 +53,22 @@ def index(request):
 
 @permission_required('auth.can_view_batches')
 def location_filter(request):
-    locations_filter = LocationsFilterForm(request.GET)
+    locations_filter = LocationsFilterForm(data=request.GET)
     locations =  locations_filter.get_locations().values('id', 'name', ).order_by('name')
     json_dump = json.dumps(list(locations), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, mimetype='application/json')
 
 @permission_required('auth.can_view_batches')
+def open_surveys(request):
+    ea_id = request.GET['ea_id']
+    ea = get_object_or_404(EnumerationArea, pk=ea_id)
+    open_surveys = [dict([('id', s.pk), ('name', s.name)]) for s in  ea.open_surveys()]
+    json_dump = json.dumps(open_surveys, cls=DjangoJSONEncoder)
+    return HttpResponse(json_dump, mimetype='application/json')
+
+@permission_required('auth.can_view_batches')
 def enumeration_area_filter(request):
-    locations_filter = LocationsFilterForm(request.GET)
+    locations_filter = LocationsFilterForm(data=request.GET)
     enumeration_areas = locations_filter.get_enumerations()
     eas =  enumeration_areas.values('id', 'name', ).order_by('name')
     json_dump = json.dumps(list(eas), cls=DjangoJSONEncoder)
@@ -86,7 +93,7 @@ def delete(request, ea_id):
 
 @permission_required('auth.can_view_batches')
 def edit(request, ea_id):
-    locations_filter = LocationsFilterForm(request.GET)
+    locations_filter = LocationsFilterForm(data=request.GET)
     ea = get_object_or_404(EnumerationArea, pk=ea_id)
     enumeration_area_form = EnumerationAreaForm(instance=ea, locations=locations_filter.get_locations())
     if request.method == 'POST':

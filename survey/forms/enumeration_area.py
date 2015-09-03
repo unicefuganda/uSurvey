@@ -39,25 +39,20 @@ class LocationsFilterForm(Form):
                 parent_selection = data.get(location_type.parent.name, None)
                 if parent_selection:
                     kw['parent__pk'] = parent_selection
-                choices = [(loc.pk, loc.name) for loc in Location.objects.filter(**kw)]
+                locations = Location.objects.filter(**kw)
+                choices = [(loc.pk, loc.name) for loc in locations]
                 choices.insert(0, ('', '--- Select %s ---' % location_type.name))
                 self.fields[location_type.name] = forms.ChoiceField(choices=choices)
                 self.fields[location_type.name].required = False
                 self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filter chzn-select'
-                self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
-
+                # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
         if include_ea:
-            loc_ids = dict(choices).keys() #use the next to last level choices
-            loc_ids.pop(0)
-            locations = Location.objects.filter(parent__pk__in=loc_ids)
             eas = EnumerationArea.objects.filter(locations__in=locations).order_by('name')
             choices = [(ea.pk, ea.name) for ea in eas]
-
-
             choices.insert(0, ('', '--- Select EA ---'))
             self.fields['enumeration_area'] = forms.ChoiceField(choices=choices)
             self.fields['enumeration_area'].widget.attrs['class'] = 'location_filter chzn-select'
-            self.fields['enumeration_area'].widget.attrs['style'] = 'width: 100px;'
+            # self.fields['enumeration_area'].widget.attrs['style'] = 'width: 100px;'
             self.fields['enumeration_area'].required = False
 
     

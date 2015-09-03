@@ -221,5 +221,12 @@ document.write(" "+ now.getFullYear());
 <script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
 {% block javascripts %}
 {% endblock %}
+<script type="text/javascript">
+     $('.datepicker').datepicker({
+     changeMonth: true,
+     changeYear: true,
+     dateFormat: 'dd-mm-yy'
+     });
+</script>
 </body>
 </html>
