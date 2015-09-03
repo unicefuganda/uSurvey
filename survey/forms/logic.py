@@ -9,7 +9,7 @@ class LogicForm(forms.Form):
     SKIP_TO = 'SKIP_TO'
     END_INTERVIEW = 'END_INTERVIEW'
     REANSWER = 'REANSWER'
-    ASK_SUBQUESTION = 'ASK SUBQUESTION'
+    ASK_SUBQUESTION = 'ASK_SUBQUESTION'
     def __init__(self, initial=None, question=None, *args, **kwargs):
         super(LogicForm, self).__init__(initial=initial, *args, **kwargs)
         data = kwargs.get('data', None)

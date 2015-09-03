@@ -172,7 +172,7 @@ def assign(request, batch_id):
         lib_questions = QuestionTemplate.objects.filter(identifier__in=data.get('identifier', ''))
         if lib_questions:
             for lib_question in lib_questions:
-                question =  Question.objects.create(identifier=lib_question.identifier, 
+                question = Question.objects.create(identifier=lib_question.identifier,
                                                     text=lib_question.text,
                                                     answer_type=lib_question.answer_type,
                                                     group=lib_question.group,
