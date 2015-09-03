@@ -33,7 +33,7 @@
                 {% endif %}
             </td>
             <td>
-                <a class="btn btn-small" data-toggle="modal" href="#delete_logic_{{rule.id}}"><i class="icon-trash" id="delete-icon-{{rule.id}}"></i></a>
+                <a class="btn btn-small" data-toggle="modal" href="#delete_logic_{{flow.id}}"><i class="icon-trash" id="delete-icon-{{flow.id}}"></i></a>
             </td>
             {% include "base/delete_modal.html" with object_name="" id=flow.id name="Logic" url=batch.id|add_string:flow.id|get_url_with_ids:"delete_question_logic_page" %}
         </tr>

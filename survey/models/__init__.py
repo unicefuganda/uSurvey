@@ -3,7 +3,7 @@ from survey.models.interviews import NumericalAnswer, Interview, TextAnswer, Mul
         MultiSelectAnswer, Answer, ODKGeoPoint, DateAnswer, VideoAnswer, \
         ImageAnswer, AudioAnswer, GeopointAnswer, NonResponseAnswer
 from survey.models.backend import Backend
-from survey.models.questions import Question, QuestionOption, QuestionFlow, TextArgument
+from survey.models.questions import Question, QuestionOption, QuestionFlow, TextArgument, TestArgument
 from survey.models.question_templates import QuestionTemplate, TemplateOption
 from survey.models.base import BaseModel
 from survey.models.batch import Batch, BatchLocationStatus, BatchChannel
@@ -73,6 +73,7 @@ __all__ = [
     'QuestionModule',
     'QuestionFlow',
     'TextArgument',
+    'TestArgument',
     'LocationTypeDetails',
 #     'BatchQuestionOrder',
 #     'LocationCode',

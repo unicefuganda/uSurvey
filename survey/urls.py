@@ -72,7 +72,7 @@ urlpatterns = patterns('',
 ############
     url(r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/add_logic/$', 'survey.views.questions.add_logic', name='add_question_logic_page'),
     url(r'^batches/(?P<batch_id>\d+)/questions/delete_logic/(?P<flow_id>\d+)/$', 'survey.views.questions.delete_logic', name='delete_question_logic_page'),
-#    url(r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/questions_json/$', 'survey.views.questions.get_questions_for_batch', name='batch_questions_json_page'),
+    url(r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/questions_json/$', 'survey.views.questions.get_questions_for_batch', name='batch_questions_json_page'),
     url(r'^batches/(?P<batch_id>\d+)/questions/sub_questions/new/$', 'survey.views.questions.new_subquestion', name='add_batch_subquestion_page'),
     url(r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/sub_questions/edit/$', 'survey.views.questions.edit_subquestion', name='edit_batch_subquestion_page'),
 #    url(r'^batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/delete/$', 'survey.views.questions.delete', name='delete_batch_question_page'),

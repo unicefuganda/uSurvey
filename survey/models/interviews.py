@@ -271,7 +271,7 @@ class MultiChoiceAnswer(Answer):
 
 
     @classmethod
-    @static_var('label', 'Option equals')
+    @static_var('label', 'Equals Option')
     def equals(cls, answer, txt):
         return super(MultiChoiceAnswer, cls).equals(answer, txt)
 
@@ -280,7 +280,10 @@ class MultiSelectAnswer(Answer):
 
     def __init__(self, question, answer, *args, **kwargs):
         super(MultiSelectAnswer, self).__init__()
-        self.value = answer
+        if isinstance(answer, list):
+            self.value = question.options.filter(options__in=list)
+        else:
+            self.value = answer
         self.question = question
 
     @classmethod
