@@ -707,3 +707,31 @@ ul {
 .fineprint {
 	font-size: 85%;
 }
+
+
+dl.margins-removed
+{
+	margin: 0;
+	padding: 0;
+}
+
+.margins-removed dt
+{
+	margin: 0;
+	padding: 0;
+	font-weight: bold;
+}
+
+.margins-removed dd
+{
+	margin: 0 0 1em 0;
+	padding: 0;
+}
+dd, dt, dl {
+    border-style: none;
+    border-bottom-style: none;
+}
+
+dl, dt {
+  color: #005580
+}

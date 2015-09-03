@@ -28,28 +28,23 @@ def _create_or_edit(request, action_text, interviewer=None, extra=1):
     request.breadcrumbs([
         ('Interviewers', reverse('interviewers_page')),
     ])
-    interviewer_form = InterviewerForm(instance=interviewer)
-    # locations_filter = LocationsFilterForm(request.GET)
+
+    locations_filter = LocationsFilterForm(data=request.GET)
+    interviewer_form = InterviewerForm(ea_q_set=locations_filter.get_enumerations(), instance=interviewer)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
-#     ODKAccessFormSet = inlineformset_factory(Interviewer, ODKAccess, form=ODKAccessForm, extra=1)
     ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)
-    #ODKAccessFormSet(prefix='odk_access', instance=interviewer)
     response = None
     redirect_url = reverse('interviewers_page')
     title = 'New Interviewer'
     odk_instance = None
-    filter_initial = request.GET
     if interviewer:
         title = 'Edit Interviewer'
         odk_accesses = interviewer.odk_access
         if odk_accesses.exists():
             odk_instance = odk_accesses[0]
-        parent_locations = interviewer.ea.parent_locations()
-        filter_initial = dict([(loc.type.name, loc.pk) for loc in parent_locations])
-    locations_filter = LocationsFilterForm(initial=filter_initial)
-    odk_access_form = ODKAccessForm(instance=odk_instance)     
+    odk_access_form = ODKAccessForm(instance=odk_instance)
     if request.method == 'POST':
-        interviewer_form = InterviewerForm(request.POST, instance=interviewer)
+        interviewer_form = InterviewerForm(request.POST, instance=interviewer, ea_q_set=locations_filter.get_enumerations())
         ussd_access_form = USSDAccessFormSet(request.POST, prefix='ussd_access', instance=interviewer)
 #         odk_access_form = ODKAccessFormSet(request.POST, prefix='odk_access', instance=interviewer)
         odk_access_form = ODKAccessForm(request.POST, instance=odk_instance)
@@ -90,7 +85,7 @@ def edit_interviewer(request, interviewer_id):
 @permission_required('auth.can_view_interviewers')
 def list_interviewers(request):
     params = request.GET
-    locations_filter = LocationsFilterForm(request.GET, include_ea=True)
+    locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     if locations_filter.is_valid():
         interviewers = Interviewer.objects.filter(ea__in=locations_filter.get_enumerations()).order_by('name')
     else:

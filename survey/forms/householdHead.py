@@ -4,6 +4,7 @@ from django.forms import ModelForm, DateInput
 from survey.models.households import HouseholdHead
 from survey.interviewer_configs import OCCUPATION, MONTHS
 from widgets import InlineRadioSelect
+from django.conf import settings
 
 
 class HouseholdHeadForm(ModelForm):
@@ -20,6 +21,6 @@ class HouseholdHeadForm(ModelForm):
             'occupation': forms.Select(choices= OCCUPATION),
         }
 
-    date_of_birth = forms.DateField(label="Date of birth", widget=DateInput(attrs={'class':'datepicker'}), required=True, input_formats=["%Y-%m-%d"])
-    resident_since = forms.DateField(widget=DateInput(attrs={'class':'datepicker'}), required=True, input_formats=["%Y-%m-%d"])
+    date_of_birth = forms.DateField(label="Date of birth", widget=DateInput(attrs={'class':'datepicker'}), required=True, input_formats=[settings.DATE_FORMAT,])
+    resident_since = forms.DateField(widget=DateInput(attrs={'class':'datepicker'}), required=True, input_formats=[settings.DATE_FORMAT,])
 

@@ -1,6 +1,7 @@
 from django.forms import ModelForm, DateInput
 from django import forms
 from survey.models.households import HouseholdMember
+from django.conf import settings
 
 
 class HouseholdMemberForm(ModelForm):
@@ -17,4 +18,4 @@ class HouseholdMemberForm(ModelForm):
         }
 
     date_of_birth = forms.DateField(label="Date of birth", widget=DateInput(attrs={'class': 'datepicker'}),
-                                    required=True, input_formats=["%Y-%m-%d"])
+                                    required=True, input_formats=[settings.DATE_FORMAT,])

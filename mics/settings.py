@@ -267,6 +267,7 @@ USSD_RESTART = '00'
 USSD_IGNORED_CHARACTERS = "*!#';&"
 MAX_DISPLAY_PER_PAGE = 50
 DEFAULT_TOTAL_HOUSEHOLDS_IN_EA = 1000
+DATE_FORMAT = "%d-%m-%Y"
 
 ##end USSD config ##
 # Importing server specific settings

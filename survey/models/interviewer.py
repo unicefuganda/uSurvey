@@ -110,6 +110,9 @@ class Interviewer(BaseModel):
             survey_households = survey_households[:survey.sample_size]
         return sorted(survey_households, key=lambda household: household.house_number)
 
+    def has_survey(self):
+        return self.assignments.filter(completed=True).count() > 0
+
 class SurveyAllocation(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name='assignments')
     survey = models.ForeignKey('Survey', related_name='work_allocation')
