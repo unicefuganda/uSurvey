@@ -15,11 +15,12 @@ class InterviewerForm(ModelForm):
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
         self.fields.keyOrder=['name', 'gender', 'date_of_birth', 'level_of_education', 'language',  'ea']
-        choices = dict([(b.batch.survey.pk, b.batch.survey.name) for b in BatchLocationStatus.objects.all()]).items()
-        choices.insert(0, ('', ' --- Select Survey ---'))
-        self.fields['survey'] = forms.ChoiceField()
-        self.fields['survey'].choices = choices
-        self.fields['survey'].required = False
+        # most_principal_locs =
+        # choices = dict([(b.batch.survey.pk, b.batch.survey.name) for b in BatchLocationStatus.objects.all()]).items()
+        # choices.insert(0, ('', ' --- Select Survey ---'))
+        # self.fields['survey'] = forms.ChoiceField()
+        # self.fields['survey'].choices = choices
+        # self.fields['survey'].required = False
         if eas:
             self.fields['ea'].queryset = eas
 
@@ -33,13 +34,6 @@ class InterviewerForm(ModelForm):
             'ea': forms.Select(attrs={'class' : 'chzn-select ea_filter'}),
         }
 
-    def clean_ea(self):
-        ea = self.cleaned_data['ea']
-        #check if interviewer is already active with survey in current EA
-        if self.instance is not None and ea.pk != self.instance.ea.pk and self.instance.has_survey():
-            raise ValidationError('Interviewer is having an active survey')
-        return self.cleaned_data['ea']
-
     def clean_survey(self):
         ea = self.cleaned_data['ea']
         survey_pk = self.cleaned_data['survey']
@@ -47,6 +41,13 @@ class InterviewerForm(ModelForm):
             if survey_pk.strip() not in [s.pk for s in ea.open_surveys()]:
                 raise ValidationError('Survey does not belong to that Enumeration Area')
             return Survey.objects.get(pk=survey_pk)
+
+    def clean(self):
+        ea = self.cleaned_data['ea']
+        #check if interviewer is already active with survey in current EA
+        if self.instance and self.instance.pk and ea.pk != self.instance.ea.pk and self.instance.has_survey():
+            raise ValidationError('Interviewer is having an active survey')
+        return self.cleaned_data
 
 
 class USSDAccessForm(ModelForm):
