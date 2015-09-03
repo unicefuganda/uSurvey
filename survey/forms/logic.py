@@ -45,6 +45,7 @@ class LogicForm(forms.Form):
         existing_nexts = [f.next_question.pk for f in flows if f.next_question]
         next_q_choices = [(q.pk, q.text) for q in batch.questions_inline() if q.pk is not self.question.pk
                           and q.pk not in existing_nexts]
+        next_q_choices.extend([(q.pk, q.text) for q in batch.zombie_questions()])
         self.fields['next_question'] = forms.ChoiceField(label='', choices=next_q_choices, widget=forms.Select, required=False)
         self.fields['action'].choices = self.ACTIONS.items()
 

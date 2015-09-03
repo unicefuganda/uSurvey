@@ -70,7 +70,9 @@ def _save_subquestion(request, batch_id, instance=None):
                 zombify = False
             else:
                 zombify = True
-            questionform.save(zombie=zombify)
+            question = questionform.save(zombie=zombify)
+            if request.is_ajax():
+                return HttpResponse(json.dumps({'id' : question.pk, 'text' : question.text}), mimetype='application/json')
             messages.info(request, 'Sub Question saved')
     if instance:
         heading = 'Edit Subquestion'

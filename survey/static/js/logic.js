@@ -152,8 +152,6 @@ function fill_questions_or_subquestions_in_next_question_field(action_value){
         questions_url = '/questions/' + question_id +'/sub_questions_json/'
         $('#add_subquestion').show();
     }
-    alert(action_value);
-    alert(questions_url);
     replace_next_question_with_right_data(questions_url);
 }
 
@@ -213,8 +211,8 @@ jQuery(function($){
         var post = $.post(url, data);
 
         post.done(function(data){
-            if(subquestion_saved(data)){
-                $('#id_next_question').append("<option value=" + $.parseJSON(data)['id'] + ">" + $.parseJSON(data)['text'] + "</option>");
+            if(data){
+                $('#id_next_question').append("<option value=" + data['id'] + ">" + data['text'] + "</option>");
                 $('#close_modal').click();
             } else{
                 append_error_to_text(data);
