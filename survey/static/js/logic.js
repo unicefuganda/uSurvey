@@ -19,7 +19,7 @@ function hide_between_value_fields() {
 function show_between_value_fields(){
     var min_value_field = $('#id_min_value');
     var max_value_field = $('#id_max_value');
-    var validate_with_question_field = $('#id_validate_with_question');
+//    var validate_with_question_field = $('#id_validate_with_question');
     var value_field = $('#id_value');
 
 
@@ -28,35 +28,29 @@ function show_between_value_fields(){
         max_value_field.show();
         max_value_field.attr('disabled', false);
 
-        validate_with_question_field.hide();
-        validate_with_question_field.attr('disabled', 'disabled');
+  //      validate_with_question_field.hide();
+   //     validate_with_question_field.attr('disabled', 'disabled');
         value_field.hide();
         value_field.attr('disabled', 'disabled');
 }
 
 function show_or_hide_attribute_fields(attribute_value){
-    var validate_with_question_field = $('#id_validate_with_question');
+   // var validate_with_question_field = $('#id_validate_with_question');
     var value_field = $('#id_value');
 
     hide_between_value_fields();
 
-    if ($('#id_condition').val() != 'BETWEEN'){
+    if ($('#id_condition').val().toUpperCase() != 'BETWEEN'){
         hide_between_value_fields()
         if(attribute_value == 'value'){
-            validate_with_question_field.hide();
-            validate_with_question_field.attr('disabled', 'disabled');
+     //       validate_with_question_field.hide();
+       ///     validate_with_question_field.attr('disabled', 'disabled');
             value_field.show();
             value_field.attr('disabled', false);
         }
-        if(attribute_value == 'validate_with_question')
-        {
-            validate_with_question_field.show();
-            validate_with_question_field.attr('disabled', false);
-            value_field.hide();
-            value_field.attr('disabled', 'disabled');
-        }
+
     }
-    if ($('#id_condition').val() == 'BETWEEN'){
+    if ($('#id_condition').val().toUpperCase() == 'BETWEEN'){
         show_between_value_fields()
     }
 }
@@ -102,35 +96,41 @@ function replace_next_question_with_right_data(questions_url) {
 }
 
 function append_attribute_option(key, value) {
-    $('#id_attribute').append("<option value=" + key + ">" + value + "</option>");
+    //$('#id_attribute').append("<option value=" + key + ">" + value + "</option>");
 }
 
 function clear_attribute_dropdown_and_append_right_option(condition_selected){
-    var value_fields = ['GREATER_THAN_VALUE', 'LESS_THAN_VALUE', 'BETWEEN'];
-    var question_fields = ['GREATER_THAN_QUESTION', 'LESS_THAN_QUESTION'];
-    var value_and_question_conditions = ['EQUALS']
-    var value_key = 'value';
-    var value_string = 'Value';
-    var question_key = 'validate_with_question';
-    var question_string = 'Question';
-    $('#id_attribute').find('option')
-        .remove()
-        .end();
-
-    if(value_fields.indexOf(condition_selected) != -1){
-        append_attribute_option(value_key, value_string);
-    }
-
-    if(question_fields.indexOf(condition_selected) != -1){
-        append_attribute_option(question_key, question_string);
-    }
-
-    if(value_and_question_conditions.indexOf(condition_selected)!= -1){
-        append_attribute_option(value_key, value_string);
-        append_attribute_option(question_key, question_string)
-    }
+    condition_selected = condition_selected.toUpperCase()
+//    var value_fields = ['GREATER_THAN', 'LESS_THAN', 'BETWEEN'];
+////    var question_fields = ['GREATER_THAN_QUESTION', 'LESS_THAN_QUESTION'];
+//    var value_and_question_conditions = ['EQUALS']
+//    var value_key = 'value';
+//    var value_string = 'Value';
+//    var question_key = 'validate_with_question';
+////    var question_string = 'Question';
+//    $('#id_attribute').find('option')
+//        .remove()
+//        .end();
+//
+//    if(value_fields.indexOf(condition_selected) != -1){
+//        append_attribute_option(value_key, value_string);
+//    }
+//
+////    if(question_fields.indexOf(condition_selected) != -1){
+////        append_attribute_option(question_key, question_string);
+////    }
+//
+//    if(value_and_question_conditions.indexOf(condition_selected)!= -1){
+//        append_attribute_option(value_key, value_string);
+////        append_attribute_option(question_key, question_string)
+//    }
     if(condition_selected == "BETWEEN"){
         $("#id_value").hide();
+        show_between_value_fields();
+    }
+    else {
+        $("#id_value").show();
+        hide_between_value_fields();
     }
 
 
@@ -184,7 +184,7 @@ jQuery(function($){
     $('#add_subquestion').hide();
 
     condition.on('change', function(){
-        clear_attribute_dropdown_and_append_right_option(condition.val());
+//        clear_attribute_dropdown_and_append_right_option(condition.val());
         show_or_hide_attribute_fields(attribute.val());
     });
 

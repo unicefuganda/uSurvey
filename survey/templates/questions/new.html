@@ -1,7 +1,7 @@
 {% extends "form.html" %}
 
 {% block title %}
-  {% if parent_question %}
+  {% if parent_question or heading %}
     {{ heading }}
   {% else %}
     New Question

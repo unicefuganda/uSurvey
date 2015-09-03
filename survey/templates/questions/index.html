@@ -74,19 +74,19 @@
                        href="#collapse_question_{{ question.id }}">{{ question.text }}</a>
                     <div id="collapse_question_{{ question.id }}" class="accordion-body collapse">
                         <div class="accordion-inner">
-                            <span class="muted">Subquestion:</span>
                             <ul>
                                 {% for flow in question.conditional_flows %}
-                                    <li>
-                                        {{ flow.next_question.text }} &nbsp;&nbsp;
-                                        <a href="#delete_subquestion_{{ subquestion.id }}" data-toggle="modal"
-                                           id="delete_subquestion">Delete</a>
-                                        &nbsp;&nbsp;
-                                           <a href="{% url 'edit_batch_subquestion_page' batch.id subquestion.id %}"
-                                              id="edit_subquestion_{{ flow.next_question.id }}">Edit</a>
-                                    </li>
-                                    {% include "base/delete_modal.html" with object_name=flow.next_question.text id=flow.next_question.id name="Subquestion" url=flow.next_question.id|get_url_with_ids:"delete_question_page" %}
-                                    
+                                   {% if flow.next_question %}
+                                        <li><span class="muted">Subquestion:</span>
+                                            {{ flow.next_question.text }} &nbsp;&nbsp;
+                                            <a href="#delete_subquestion_{{ flow.next_question.id }}" data-toggle="modal"
+                                               id="delete_subquestion">Delete</a>
+                                            &nbsp;&nbsp;
+                                               <a href="{% url 'edit_batch_subquestion_page' batch.id flow.next_question.id %}"
+                                                  id="edit_subquestion_{{ flow.next_question.id }}">Edit</a>
+                                        </li>
+                                        {% include "base/delete_modal.html" with object_name=flow.next_question.text id=flow.next_question.id name="Subquestion" url=flow.next_question.id|get_url_with_ids:"delete_question_page" %}
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>

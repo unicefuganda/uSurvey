@@ -46,7 +46,7 @@ class Question(BaseModel):
     def save(self, *args, **kwargs):
         if self.answer_type not in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
             self.options.all().delete()
-        return super(Question, self).save(*args, **kwargs) 
+        return super(Question, self).save(*args, **kwargs)
     
     @classmethod
     def zombies(cls,  batch):
@@ -56,7 +56,7 @@ class Question(BaseModel):
             if batch_questions:
                 batch_flows = QuestionFlow.objects.filter(question__batch=batch)
                 if batch_flows:
-                    batch_questions = batch_questions.exclude(pk__in=[f.next_question.pk for f in batch_flows])
+                    batch_questions = batch_questions.exclude(pk__in=[f.next_question.pk for f in batch_flows if f.next_question])
                 return batch_questions
         return cls.objects.none()
         
@@ -67,21 +67,26 @@ class QuestionFlow(BaseModel):
     validation_test = models.CharField(max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)    
     name = models.CharField(max_length=200, null=True, blank=True, unique=True) #if validation passes, classify this flow response as having this value  
     desc = models.CharField(max_length=200, null=True, blank=True) #this would provide a brief description of this flow
-    next_question = models.ForeignKey(Question, related_name='connecting_flows')
+    next_question = models.ForeignKey(Question, related_name='connecting_flows', null=True, blank=True)
     
     class Meta:
         app_label = 'survey'        
-        unique_together = [('question', 'next_question'),]
-    
+        unique_together = [('question', 'next_question', 'desc'),]
+
+    @property
+    def text_arguments(self):
+        return TextArgument.objects.filter(flow=self).order_by('position')
+
     @property
     def test_arguments(self):
-        args = TestArgument.objects.filter(flow=self).select_subclasses()
-        args = sorted(args, key=lambda arg: arg.position)
-        return [arg.param for arg in args]
+        return TestArgument.objects.filter(flow=self).select_subclasses().order_by('position')
     
     def save(self, *args, **kwargs):
         if self.name is None:
-            self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", self.next_question.identifier)
+            if self.next_question:
+                identifier = self.next_question.identifier
+            else: identifier = ''
+            self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", identifier)
         return super(QuestionFlow, self).save(*args, **kwargs) 
 
 class TestArgument(models.Model):
@@ -92,6 +97,9 @@ class TestArgument(models.Model):
     @classmethod
     def argument_types(cls):
         return [cl.__name__ for cl in cls.__subclasses__()]
+
+    def __unicode__(self):
+        return self.param
     
     class Meta:
         app_label = 'survey'

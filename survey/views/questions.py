@@ -57,27 +57,52 @@ def index(request, batch_id):
 @not_allowed_when_batch_is_open(message=ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE,
                                 redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def new_subquestion(request, batch_id):
+    return _save_subquestion(request, batch_id)
+
+def _save_subquestion(request, batch_id, instance=None):
     #possible subquestions are questions not bound to any interviewer yet
     batch = get_object_or_404(Batch, pk=batch_id)
+    questionform = QuestionForm(batch, instance=instance)
     if request.method == 'POST':
-        questionform = QuestionForm(batch, data=request.POST)
+        questionform = QuestionForm(batch, data=request.POST, instance=instance)
         if questionform.is_valid():
-            questionform.save(zombie=True)
-            messages.info(request, 'Sub Question added')
+            if instance:
+                zombify = False
+            else:
+                zombify = True
+            questionform.save(zombie=zombify)
+            messages.info(request, 'Sub Question saved')
+    if instance:
+        heading = 'Edit Subquestion'
+    else:
+        heading = 'New Subquestion'
     context = {'questionform': questionform, 'button_label': 'Create', 'id': 'add-sub_question-form',
                'save_url' : reverse('add_batch_subquestion_page', args=(batch.pk, )),
                'cancel_url': reverse('batch_questions_page', args=(batch.pk, )), 'class': 'question-form',
-               'heading': 'Add SubQuestion'}
-
+               'heading': heading}
+    request.breadcrumbs([
+        ('Surveys', reverse('survey_list_page')),
+        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
+        (batch.name, reverse('batch_questions_page', args=(batch.pk, ))),
+    ])
     template_name = 'questions/new.html'
     if request.is_ajax():
         template_name = 'questions/_add_question.html'
-
-    return render(request, template_name, context)
+        return render(request, template_name, context)
+    else:
+        return HttpResponseRedirect(reverse('batch_questions_page', args=(batch.pk, )))
 
 def get_sub_questions_for_question(request, question_id):
     question = Question.objects.get(id=question_id)
     return _create_question_hash_response(Question.zombies(question.batch))
+
+def get_questions_for_batch(request, batch_id, question_id):
+    batch = Batch.objects.get(id=batch_id)
+    questions = batch.questions_inline().exclude(pk=question_id)
+    question  = Question.objects.get(pk=question_id)
+    existing_flows = question.flows.all()
+    questions = questions.exclude(pk__in=[f.next_question.pk for f in existing_flows if f.next_question])
+    return _create_question_hash_response(questions)
 
 def _create_question_hash_response(questions):
     questions_to_display = map(lambda question: {'id': str(question.id), 'text': question.text}, questions)
@@ -86,28 +111,25 @@ def _create_question_hash_response(questions):
 @permission_required('auth.can_view_batches')
 def edit_subquestion(request, question_id, batch_id=None):
     question = Question.objects.get(pk=question_id)
-    questionform = QuestionForm(instance=question)
-    response = None
-    if request.method == 'POST':
-        questionform = QuestionForm(request.POST, instance=question)
-        response = __process_sub_question_form(request, questionform, question.parent, 'edited', batch_id)
-    context = {'questionform': questionform, 'button_label': 'Save', 'id': 'add-sub_question-form',
-               'cancel_url': reverse('batch_questions_page', args=(batch.pk, )), 'parent_question': question.parent, 'class': 'question-form',
-               'heading': 'Edit Subquestion'}
-
-    template_name = 'questions/new.html'
-
-    return response or render(request, template_name, context)
+    return _save_subquestion(request, batch_id, instance=question)
 
 @permission_required('auth.can_view_batches')
 def delete(request, question_id, batch_id=None):
-    question = Question.objects.filter(pk=question_id)
+    question = get_object_or_404(Question, pk=question_id)
+    batch = question.batch
     redirect_url = '/batches/%s/questions/' % batch_id if batch_id else reverse('batch_questions_page', args=(batch.pk, ))
     if question:
-        success_message = "%s successfully deleted."
-        messages.success(request, success_message % ("Sub question" if question[0].subquestion else "Question"))
+        success_message = "Question successfully deleted."
+        messages.success(request, success_message) #% ("Sub question" if question.subquestion else "Question"))
     else:
         messages.error(request, "Question / Subquestion does not exist.")
+    next_question = batch.next_inline(question)
+    previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
+    if previous_inline:
+        QuestionFlow.objects.create(question=previous_inline, next_question=next_question)
+    else:
+        batch.start_question = next_question
+        batch.save()
     question.delete()
     return HttpResponseRedirect(redirect_url)
 
@@ -117,14 +139,14 @@ def delete(request, question_id, batch_id=None):
 def add_logic(request, batch_id, question_id):
     question = Question.objects.get(id=question_id)
     batch = Batch.objects.get(id=batch_id)
-    logic_form = LogicForm(question=question)
     response = None
+    logic_form = LogicForm(question=question)
     question_rules_for_batch = {}
 #     question_rules_for_batch[question] = question.rules_for_batch(batch)
     if request.method == "POST":
         logic_form = LogicForm(data=request.POST, question=question)
         if logic_form.is_valid():
-            pass
+            logic_form.save()
             messages.success(request, 'Logic successfully added.')
             response = HttpResponseRedirect('/batches/%s/questions/' % batch_id)
     request.breadcrumbs([
@@ -132,6 +154,7 @@ def add_logic(request, batch_id, question_id):
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
         (batch.name, reverse('batch_questions_page', args=(batch.pk, ))),
     ])
+
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'rules_for_batch': question_rules_for_batch,
                'questionform': QuestionForm(parent_question=question, batch=batch),
