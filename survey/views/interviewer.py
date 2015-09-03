@@ -30,7 +30,7 @@ def _create_or_edit(request, action_text, interviewer=None, extra=1):
     ])
 
     locations_filter = LocationsFilterForm(data=request.GET)
-    interviewer_form = InterviewerForm(ea_q_set=locations_filter.get_enumerations(), instance=interviewer)
+    interviewer_form = InterviewerForm(locations_filter.get_enumerations(), instance=interviewer)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
     ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)
     response = None
@@ -44,7 +44,7 @@ def _create_or_edit(request, action_text, interviewer=None, extra=1):
             odk_instance = odk_accesses[0]
     odk_access_form = ODKAccessForm(instance=odk_instance)
     if request.method == 'POST':
-        interviewer_form = InterviewerForm(request.POST, instance=interviewer, ea_q_set=locations_filter.get_enumerations())
+        interviewer_form = InterviewerForm(locations_filter.get_enumerations(), data=request.POST, instance=interviewer)
         ussd_access_form = USSDAccessFormSet(request.POST, prefix='ussd_access', instance=interviewer)
 #         odk_access_form = ODKAccessFormSet(request.POST, prefix='odk_access', instance=interviewer)
         odk_access_form = ODKAccessForm(request.POST, instance=odk_instance)

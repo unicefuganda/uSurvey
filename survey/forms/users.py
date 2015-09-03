@@ -20,6 +20,7 @@ class UserForm(UserCreationForm):
         self.fields.keyOrder= ['username', 'password1', 'password2', 'first_name', 'last_name',
                                 'mobile_number', 'email', 'groups']
 
+
     def _clean_attribute(self, Klass, **kwargs):
         attribute_name = kwargs.keys()[0]
         data_attr = kwargs[attribute_name]
