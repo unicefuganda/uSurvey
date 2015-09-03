@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 import re
+from django.core.exceptions import ValidationError
 from survey.models import Question, QuestionOption, Batch, Answer, QuestionModule, \
             HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow
 from django.conf import settings
@@ -15,6 +16,7 @@ class QuestionForm(ModelForm):
         self.fields['identifier'].label = "Variable name"
         self.fields['batch'].widget = forms.HiddenInput()
         self.fields['batch'].initial = batch.pk
+        self.batch = batch
         #depending on type of ussd/odk access of batch restrict the answer type
         self.fields['answer_type'].choices = [choice for choice in self.fields['answer_type'].choices \
                                                     if choice[0] in batch.answer_types or choice[0] == '' ]
@@ -35,6 +37,11 @@ class QuestionForm(ModelForm):
             options = map(lambda option: re.sub("  ", ' ', option), options)
             self.cleaned_data['options'] = options
         return options
+
+    def clean_identifier(self):
+        if Question.objects.filter(identifier=self.cleaned_data['identifier'], batch=self.batch).exists():
+            raise ValidationError('Identifier already in use for this batch')
+        return self.cleaned_data['identifier']
 
     def clean(self):
         answer_type = self.cleaned_data.get('answer_type', None)
