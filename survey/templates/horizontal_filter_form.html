@@ -1,21 +1,32 @@
+{% load template_tags %}
 <form id="{{ filter_id }}" action="{{ action }}" method="get" class="pull-left padded-bottom" accept-charset="utf-8">
-    <div>
-        <ul id="horizontal-filter">
+
+    <table class="{{ class }} horizontal-filter">
+        <tr id="control-group">
             {% for field in a_form.visible_fields %}
-                <li>
-                    <ul class="inner-field-list">
-                        <li><b>{{ field.label }}</b></li>
-                        <li>{{ field}}</li>
-                    </ul>
-                </li>
+                <td valign="top">
+                  <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label>
+                 {% if field.label_tag|is_mobile_number %}
+                   <div class="input-prepend">
+                       <span class="add-on">{{ country_phone_code }}</span>
+                  {% endif %}
+                   <span class="horiselect">{{field}}</span>
+                   <label class="error">
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                {{ error}}
+                            {% endfor %}
+                        {% endif %}
+                </td>
             {% endfor %}
-            <li>
-                <ul class="inner-field-list">
-                    <li></li>
-                    <li>
-                {% if not no_button %}<button class="btnforall" id="a-question-list"> {%if filter_button_name %}{{filter_button_name}}{% else %}Refresh List{% endif %}{% endif %}</button></li></ul>
-        </li></ul>
- </div>
+            {% if not no_button %}
+            <td>
+                <button class="btnforall" id="a-question-list"> {%if filter_button_name %}{{filter_button_name}}{% else %}Refresh List{% endif %}</button>
+            </td>
+            {% endif %}
+        </tr>
+
+</table>
 </form>
     <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
@@ -27,3 +38,4 @@
         {% endfor %}
         });
     </script>
+<br class="clear" />

@@ -7,7 +7,7 @@
 {% load pagination_tags %}
 {% autopaginate interviewers 50 %}
   <form id="aggregates-form" action="{% url 'interviewers_page' %}" method="get">
-    {% include "horizontal_naked_form.html" with a_form=locations_filter %}
+    {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
     <button class="btnforall" id="a-interviewer-list" href="{% url 'interviewers_page' %}"> Refresh List</button>
   </form>
 <br>
