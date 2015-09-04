@@ -149,8 +149,10 @@ def add_logic(request, batch_id, question_id):
 
 @permission_required('auth.can_view_batches')
 def delete_logic(request, batch_id, flow_id):
+    batch = get_object_or_404(Batch, pk=batch_id)
     flow = QuestionFlow.objects.get(id=flow_id)
     flow.delete()
+    batch.zombie_questions().delete()
     messages.success(request, "Logic successfully deleted.")
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
@@ -231,13 +233,11 @@ def _remove(request, batch_id, question_id):
         messages.success(request, success_message) #% ("Sub question" if question.subquestion else "Question"))
     else:
         messages.error(request, "Question / Subquestion does not exist.")
+    # import pdb; pdb.set_trace()
     next_question = batch.next_inline(question)
     previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
     if previous_inline.exists():
         QuestionFlow.objects.create(question=previous_inline[0].question, next_question=next_question)
-    else:
-        batch.start_question = next_question
-        batch.save()
     question.connecting_flows.all().delete()
     question.flows.all().delete()
     question.delete()

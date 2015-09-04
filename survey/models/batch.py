@@ -125,7 +125,7 @@ class Batch(BaseModel):
 def sub_questions(question, flows):
     questions = OrderedSet()
     try:
-        qflows = flows.filter(question=question)
+        qflows = flows.filter(question=question).exclude(next_question=question)
         if qflows:
             for flow in qflows:
                 questions.add(flow.next_question)

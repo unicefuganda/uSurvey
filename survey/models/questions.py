@@ -59,7 +59,7 @@ class QuestionFlow(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__) for validator in Answer.validators()]
     question = models.ForeignKey(Question, related_name='flows')
     validation_test = models.CharField(max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)    
-    name = models.CharField(max_length=200, null=True, blank=True, unique=True) #if validation passes, classify this flow response as having this value  
+    name = models.CharField(max_length=200, null=True, blank=True) #if validation passes, classify this flow response as having this value
     desc = models.CharField(max_length=200, null=True, blank=True) #this would provide a brief description of this flow
     next_question = models.ForeignKey(Question, related_name='connecting_flows', null=True, blank=True, on_delete=models.SET_NULL)
     
@@ -76,11 +76,11 @@ class QuestionFlow(BaseModel):
         return TestArgument.objects.filter(flow=self).select_subclasses().order_by('position')
     
     def save(self, *args, **kwargs):
-        if self.name is None:
-            if self.next_question:
-                identifier = self.next_question.identifier
-            else: identifier = ''
-            self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", identifier)
+        # if self.name is None:
+        #     if self.next_question:
+        #         identifier = self.next_question.identifier
+        #     else: identifier = ''
+        #     self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", identifier)
         return super(QuestionFlow, self).save(*args, **kwargs) 
 
 class TestArgument(models.Model):
