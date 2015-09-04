@@ -77,15 +77,18 @@
                             <ul>
                                 {% for flow in question.conditional_flows %}
                                    {% if flow.next_question %}
-                                        <li><span class="muted">Subquestion:</span>
+                                        <li>
+                                            <h5 class="muted"><span>{{ flow.validation_test }}</span>&nbsp;&nbsp;{{ flow.text_arguments | display_list }}</h5>
+                                            <span class="muted">{{ flow.desc }}</span>
                                             {{ flow.next_question.text }} &nbsp;&nbsp;
                                             <a href="#delete_subquestion_{{ flow.next_question.id }}" data-toggle="modal"
                                                id="delete_subquestion">Delete</a>
                                             &nbsp;&nbsp;
-                                               <a href="{% url 'edit_batch_subquestion_page' batch.id flow.next_question.id %}"
+                                               <a href="{% url 'edit_question_page' flow.next_question.id %}"
                                                   id="edit_subquestion_{{ flow.next_question.id }}">Edit</a>
+                                            {% include "base/delete_modal.html" with object_name=flow.next_question.text id=flow.next_question.id name=flow.desc url=flow.next_question.id|get_url_with_ids:"delete_question_page" %}
                                         </li>
-                                        {% include "base/delete_modal.html" with object_name=flow.next_question.text id=flow.next_question.id name="Subquestion" url=flow.next_question.id|get_url_with_ids:"delete_question_page" %}
+
                                     {% endif %}
                                 {% endfor %}
                             </ul>

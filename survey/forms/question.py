@@ -39,8 +39,12 @@ class QuestionForm(ModelForm):
         return options
 
     def clean_identifier(self):
-        if Question.objects.filter(identifier=self.cleaned_data['identifier'], batch=self.batch).exists():
-            raise ValidationError('Identifier already in use for this batch')
+        identifier = self.cleaned_data['identifier']
+        if Question.objects.filter(identifier=identifier, batch=self.batch).exists():
+            if self.instance and self.instance.identifier == identifier:
+                pass
+            else:
+                raise ValidationError('Identifier already in use for this batch')
         return self.cleaned_data['identifier']
 
     def clean(self):
