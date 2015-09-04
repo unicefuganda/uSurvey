@@ -58,7 +58,7 @@ class Question(BaseModel):
                 if batch_flows:
                     batch_questions = batch_questions.exclude(pk__in=[f.next_question.pk for f in batch_flows if f.next_question])
                 return batch_questions
-        return cls.objects.none()
+        return batch.batch_questions.all()
         
     
 class QuestionFlow(BaseModel):
