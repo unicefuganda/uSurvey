@@ -51,14 +51,8 @@ class Question(BaseModel):
     @classmethod
     def zombies(cls,  batch):
         #these are the batch questions that do not belong to any flow in any way
-        if batch.start_question:
-            batch_questions = batch.batch_questions.exclude(pk=batch.start_question.pk)
-            if batch_questions:
-                batch_flows = QuestionFlow.objects.filter(question__batch=batch)
-                if batch_flows:
-                    batch_questions = batch_questions.exclude(pk__in=[f.next_question.pk for f in batch_flows if f.next_question])
-                return batch_questions
-        return batch.batch_questions.all()
+        survey_questions = batch.survey_questions
+        return batch.batch_questions.exclude(pk__in=[q.pk for q in survey_questions])
         
     
 class QuestionFlow(BaseModel):

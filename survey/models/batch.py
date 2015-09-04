@@ -113,6 +113,7 @@ class Batch(BaseModel):
     def zombie_questions(self):
         return Question.zombies(self)
 
+    @property
     def survey_questions(self):
         inline_ques = self.questions_inline()
         questions = OrderedSet(inline_ques)
