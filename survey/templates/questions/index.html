@@ -78,9 +78,9 @@
                                 {% for flow in question.conditional_flows %}
                                    {% if flow.next_question %}
                                         <li>
-                                            <h5 class="muted"><span>{{ flow.validation_test }}</span>&nbsp;&nbsp;{{ flow.text_arguments | display_list }}</h5>
-                                            <span class="muted">{{ flow.desc }}</span>
-                                            {{ flow.next_question.text }} &nbsp;&nbsp;
+                                            <h5 class="muted validation"><span>{{ flow.validation_test }}</span>&nbsp;&nbsp;{{ flow.text_arguments | display_list }}</h5>
+                                            <span class="muted flow_desc">{{ flow.desc }}</span>
+                                            <span class="next_quest">{{ flow.next_question.text }} </span>&nbsp;&nbsp;
                                             <a href="#delete_subquestion_{{ flow.next_question.id }}" data-toggle="modal"
                                                id="delete_subquestion">Delete</a>
                                             &nbsp;&nbsp;
