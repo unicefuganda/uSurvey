@@ -22,7 +22,6 @@ class LogicForm(forms.Form):
             self.REANSWER: 'RECONFIRM',
             self.ASK_SUBQUESTION: 'ASK SUBQUESTION',
         }
-        # import pdb; pdb.set_trace()
         self.fields['condition'] = forms.ChoiceField(label='Eligibility criteria', choices=[], widget=forms.Select,
                                   required=False)
         self.fields['attribute'] = forms.ChoiceField(label='Attribute', choices=[('value', 'Value'), ], widget=forms.Select, required=False)
@@ -53,7 +52,8 @@ class LogicForm(forms.Form):
 
     def clean_value(self):
 
-        if self.cleaned_data['condition'] != 'between' and len(self.cleaned_data['value'].strip()) == 0:
+        if self.question.answer_type not in  [MultiSelectAnswer.choice_name(), MultiChoiceAnswer.choice_name()] \
+                            and self.cleaned_data['condition'] != 'between' and len(self.cleaned_data['value'].strip()) == 0:
             raise ValidationError("Field is required.")
         value = self.cleaned_data.get('value', '')
         if value:
@@ -121,6 +121,9 @@ class LogicForm(forms.Form):
             TextArgument.objects.create(flow=flow, position=0, param=self.cleaned_data['min_value'])
             TextArgument.objects.create(flow=flow, position=1, param=self.cleaned_data['max_value'])
         else:
-            TextArgument.objects.create(flow=flow, position=0, param=self.cleaned_data['value'])
+            value = self.cleaned_data['value']
+            if self.question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
+                value = self.cleaned_data['option']
+            TextArgument.objects.create(flow=flow, position=0, param=value)
         #clean up now, remove all zombie questions
         self.question.batch.zombie_questions().delete()
