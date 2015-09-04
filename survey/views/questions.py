@@ -233,7 +233,6 @@ def _remove(request, batch_id, question_id):
         messages.success(request, success_message) #% ("Sub question" if question.subquestion else "Question"))
     else:
         messages.error(request, "Question / Subquestion does not exist.")
-    # import pdb; pdb.set_trace()
     next_question = batch.next_inline(question)
     previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
     if previous_inline.exists():
