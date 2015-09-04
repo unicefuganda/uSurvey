@@ -15,11 +15,11 @@
     </div>
        <div id="redips-drag" class="clear">
        	<br />
-  		<table id="lib_questions_table" width ="100%">
-		<thead>
-			<th colspan="2">Identifier</th>
-			<th>Text</th>
-			<th>Answer Type</th>
+  		<table id="lib_questions_table" class="left"  style="width: 45%;">
+		<thead  class="redips-mark">
+			<th  class="redips-mark"  colspan="2">Identifier</th>
+			<th class="redips-mark">Text</th>
+			<th class="redips-mark">Answer Type</th>
 		</thead>
 		<tbody>
 			{% for question in library_questions %} 
@@ -36,14 +36,23 @@
 					<td>{{question.answer_type}}</td>
 				</tr>
 			{% endfor %}
+				<tr class="rd">
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			<tr>
+				<td colspan="6" class="redips-mark"><span id="msg"></span></td>
+			</tr>
 		</tbody>
 	</table>
 		<br/>
 {% endblock %}
 {% block display_form_fields %}
-    			<table id="batch_questions" width ="100%">
-					<thead>
-						<th colspan="4">Drop Questions Here</th>
+    			<table id="batch_questions" style="width: 50%; margin-left: 2%;" class="left">
+					<thead  class="redips-mark">
+						<th colspan="4"  class="redips-mark">Drop Questions Here</th>
 					</thead>
 					<tbody>
 						<tr class="rd">
@@ -52,28 +61,20 @@
 							<td></td>
 							<td></td>
 						</tr>
-						</tbody>
+						<tr>
+							<td colspan="4" class="redips-mark"></td>
+						</tr>
+					</tbody>
 				</table>
 				<input type="hidden" value="{{ batch.id }}" id="batch_id">
+		   	<br class="clear" />
+
 {% endblock %}
 {% block non_form_content %}
 </div>
 {% endblock %}
 {% block javascripts %}
 		<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
-		<script type="text/javascript">
-			$('#lib_questions_table tr').click(function(){
-				$(this).clone().appendTo('#batch_questions tbody');
-				$(this).remove();
-				alert($('#batch_questions').html());
-				alert($('#lib_questions_table').html());
-			});
-
-			$('#batch_questions tr').click(function(){
-				$(this).clone().appendTo('#lib_questions_table tbody');
-				$(this).remove();
-
-			});
-		</script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/redips-drag-min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/script.js"></script>
 {% endblock %}
