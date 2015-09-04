@@ -1,8 +1,8 @@
 import os
+from datetime import datetime
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
-from survey.models.interviewer import Interviewer
 from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
 from survey.models.base import BaseModel
 from dateutil.parser import parse as extract_date
@@ -17,7 +17,7 @@ def reply_test(cls, func):
     return func
 
 class Interview(BaseModel):
-    interviewer = models.ForeignKey(Interviewer, null=True, related_name="interviews")
+    interviewer = models.ForeignKey("Interviewer", null=True, related_name="interviews")
     householdmember = models.ForeignKey("HouseholdMember", null=True, related_name="interviews")
     batch = models.ForeignKey("Batch", related_name='interviews')
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')
@@ -27,7 +27,12 @@ class Interview(BaseModel):
     def start(self):
         return self.batch.start_question
 
+    def is_closed(self):
+        return self.closure_date is not None
+
     def respond(self, reply=None, channel=ODKAccess.choice_name()):
+        if self.is_closed():
+            return
         #get last question
         next_question = None
         try:
@@ -47,7 +52,8 @@ class Interview(BaseModel):
                     resulting_flow = None
                     for flow in flows:
                         if flow.validation_test:
-                            if getattr(answer_class, flow.validation_test)(reply, *flow.test_arguments) == True:
+                            test_values = [arg.param for arg in flow.text_arguments]
+                            if getattr(answer_class, flow.validation_test)(reply, *test_values) == True:
                                 resulting_flow = flow
                                 break
                         else:
@@ -57,7 +63,7 @@ class Interview(BaseModel):
                  #confirm if next question is applicable
                 if next_question and (self.householdmember.belongs_to(next_question.group) and  \
                                     AnswerAccessDefinition.is_valid(channel, next_question.answer_type)) is False:
-                    next_question = self.batch.next_inline(next_question, groups=self.householdmember.groups, channel=channel) #if not get next line question
+                    next_question = self.batch.next_inline(self.last_question, groups=self.householdmember.groups, channel=channel) #if not get next line question
         except Exception, ex:
             print 'error %s occurred', str(ex)
             next_question = self.last_question
@@ -72,6 +78,9 @@ class Interview(BaseModel):
             response_text =  template.Template(next_question.display_text(USSDAccess.choice_name())).render(question_context)
             print 'response text is: ', response_text
             return response_text
+        # #if there is nothing left to ask, just close this survey
+        # self.closure_date = datetime.now()
+        # self.save()
         print 'nothing here mehn', next_question
 
     @classmethod
@@ -383,7 +392,7 @@ class AnswerAccessDefinition(BaseModel):
     @classmethod
     def is_valid(cls, channel, answer_type):
         try:
-            cls.objects.get(answer_type=answer_type, channel=channel) is not None
+            return cls.objects.get(answer_type=answer_type, channel=channel) is not None
         except cls.DoesNotExist:
             return False
 

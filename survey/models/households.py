@@ -7,8 +7,6 @@ from django.db import models
 from django.conf import settings
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, MONTHS
 from survey.models.base import BaseModel
-from survey.models.interviewer import Interviewer
-from survey.models.surveys import Survey
 from survey.models.interviews import Answer
 from survey.models.access_channels import InterviewerAccess
 from survey.models.householdgroups import HouseholdMemberGroup
@@ -23,8 +21,8 @@ class Household(BaseModel):
 #     uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Interviewer Unique Identification for the Household")
     house_number = models.PositiveIntegerField(verbose_name="Household Number")
     household_code = models.CharField(max_length=100, null=True, verbose_name="Household Code")
-    registrar = models.ForeignKey(Interviewer, related_name='registered_households', verbose_name='Interviewer')
-    survey = models.ForeignKey(Survey, related_name='registered_households')
+    registrar = models.ForeignKey('Interviewer', related_name='registered_households', verbose_name='Interviewer')
+    survey = models.ForeignKey('Survey', related_name='registered_households')
     registration_channel = models.CharField(max_length=100, choices=REGISTRATION_CHANNELS)
     
     class Meta:

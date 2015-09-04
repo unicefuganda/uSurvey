@@ -58,7 +58,7 @@ jQuery(function(){
   });
 
   function ussd_submit () {
-    $.post('/ussd', simulator.serializeArray(), function(data){
+    $.get('/ussd', simulator.serializeArray(), function(data){
       if (timeout_true.is(':checked'))
         startTimer();
       var response = data.split("&action=")[0];

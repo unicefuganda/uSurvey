@@ -94,7 +94,12 @@ class Task(object):
         if self.ongoing_survey:
             message = message.strip()
             if message == settings.USSD_RESTART:
-                response = Start(self.access).intro()
+                access = self.access
+                cache.delete_pattern('%s*'%self.VARIABLE_SPACE)
+                cache.delete_pattern('%s*'%self.GLOBALS_SPACE)
+                if getattr(self, 'INVERVIEW_SPACE', None):
+                    cache.delete_pattern('%s*'%self.INVERVIEW_SPACE)
+                response = Start(access).intro()
             else:
                 response = self._respond(message)
         else:
@@ -115,8 +120,8 @@ class Start(Task):
             
     @property
     def _survey_can_start(self):
-        can_start = self._retrieve("_survey_can_start", None)
-        if can_start is None and self.ongoing_survey:
+        can_start = self._retrieve("_survey_can_start", False)
+        if can_start is False and self.ongoing_survey:
             total_ea_households = self.enumeration_area.total_households
             min_percent_reg_houses = self.ongoing_survey.min_percent_reg_houses
             if self.registered_households.count()*100.0/total_ea_households >= min_percent_reg_houses:
@@ -557,9 +562,10 @@ class StartSurvey(SelectHousehold):
         if selection is None:
             return self.intro()
         else:
-            household = Household.objects.get(registrar=self.interviewer,
+            household = Household.objects.get(
+                                                        registrar=self.interviewer,  #might have been registered by some other interviewer
                                                            ea=self.enumeration_area,
-                                                           registration_channel=USSDAccess.choice_name(),
+                                                           # registration_channel=USSDAccess.choice_name(), #might have been registed from another chanel
                                                            survey=self.ongoing_survey,
                                                            house_number=selection
                                                            )
@@ -729,12 +735,13 @@ class StartInterview(Interviews):
                 self._ongoing_interview.save()
                 house_member = self._ongoing_interview.householdmember
                 house_member.batch_completed(ongoing_interview.batch)
+                import pdb; pdb.set_trace()
+                batches = self._pending_batches
+                present_batch = batches.pop(0)
+                self._pending_batches = batches
                 if house_member.household.has_completed_batch():
                     house_member.household.batch_completed(ongoing_interview.batch)
-                if self._has_next:
-                    batches = self._pending_batches
-                    present_batch = batches.pop(0)
-                    self._pending_batches = batches
+                if self._pending_batches:
                     #start next batch and respond
                     interview, created = Interview.objects.get_or_create(interviewer=self.interviewer, 
                                                     householdmember=house_member,
