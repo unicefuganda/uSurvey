@@ -10,6 +10,7 @@ import random
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
+from survey.models.households import Household
 
 def validate_min_date_of_birth(value):
     if date.today() - relativedelta(years=INTERVIEWER_MIN_AGE) < value:
@@ -92,9 +93,9 @@ class Interviewer(BaseModel):
     
     def present_households(self, survey=None):
         if survey is None:
-            return self.registered_households.filter(ea=self.ea)
+            return Household.objects.filter(ea=self.ea)
         else:
-            return self.registered_households.filter(ea=self.ea, survey=survey)
+            return Household.objects.filter(ea=self.ea, survey=survey)
 
     def may_commence(self, survey):
         total_registered = self.present_households(survey).count()
@@ -128,7 +129,7 @@ class SurveyAllocation(BaseModel):
         except cls.DoesNotExist:
             #allocate next unalocated survey
             open_surveys = interviewer.ea.open_surveys()
-            allocations = cls.objects.filter(survey__pk__in=[survey.pk for survey in open_surveys]).values_list('survey', flat=True)
+            allocations = cls.objects.filter(survey__pk__in=[survey.pk for survey in open_surveys], interviewer__ea=interviewer.ea).values_list('survey', flat=True)
             if allocations:
                 available = [survey for survey in open_surveys if survey.pk not in allocations]
             else:
