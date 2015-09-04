@@ -40,7 +40,6 @@ def show(request, survey_id, batch_id):
     prime_location_type = LocationType.largest_unit()
     locations = Location.objects.filter(type=prime_location_type).order_by('name')
     batch_location_ids = batch.open_locations.values_list('location_id', flat=True)
-    open_locations = Location.objects.filter(id__in=batch_location_ids)
     if request.GET.has_key('status'):
         if request.GET['status'] == 'open':
             locations = locations.filter(id__in=batch_location_ids)       
@@ -49,13 +48,11 @@ def show(request, survey_id, batch_id):
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
-#         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
     ])
-#     import pdb; pdb.set_trace()  
+    open_locations = locations.filter(id__in=batch_location_ids)
     context = {'batch': batch,
                'locations': locations,
                'open_locations': open_locations,
-               'all_locations' : Location.objects.exclude(parent=None),
                'non_response_active_locations': batch.get_non_response_active_locations()}
     return render(request, 'batches/show.html', context)
 
@@ -78,7 +75,6 @@ def all_locs(request, batch_id):
 def open(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     location = Location.objects.get(id=request.POST['location_id'])
-    other_surveys = batch.other_surveys_with_open_batches_in(location)
     batch.open_for_location(location)
     return HttpResponse(json.dumps(""), content_type="application/json")
 
@@ -208,15 +204,6 @@ def assign(request, batch_id):
                'modules': all_modules}
     return render(request, 'batches/assign.html',
                   context)
-    
-@permission_required('auth.can_view_batches')
-def add_question(request, question_id):
-    question = Question.objects.filter(id=question_id)
-    if not question:
-        messages.error(request, "Question does not exist.")
-        return HttpResponseRedirect('/questions/')
-    response, context = _render_question_view(request, question[0])
-    return response or render(request, 'questions/new.html', context)
 
 
 @permission_required('auth.can_view_batches')
