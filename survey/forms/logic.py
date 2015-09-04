@@ -121,7 +121,7 @@ class LogicForm(forms.Form):
             TextArgument.objects.create(flow=flow, position=0, param=self.cleaned_data['min_value'])
             TextArgument.objects.create(flow=flow, position=1, param=self.cleaned_data['max_value'])
         else:
-            value = self.cleaned_data('value', '')
+            value = self.cleaned_data.get('value', '')
             if self.question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
                 value = self.cleaned_data['option']
             TextArgument.objects.create(flow=flow, position=0, param=value)
