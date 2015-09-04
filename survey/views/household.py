@@ -50,7 +50,7 @@ def get_interviewers(request):
 def list_households(request):
     locations_filter = LocationsFilterForm(request.GET, include_ea=True)
     enumeration_areas = locations_filter.get_enumerations()
-    households = Household.objects.filter(ea__in=enumeration_areas).order_by('household_members__householdhead__surname').distinct()
+    households = Household.objects.filter(ea__in=enumeration_areas).order_by('house_number')
     search_fields = ['ea__name', 'registrar__name', 'survey__name', ]
     if request.GET.has_key('q'):
         all_households = get_filterset(households, request.GET['q'], search_fields)
