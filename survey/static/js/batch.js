@@ -73,7 +73,7 @@ function keyword_reload_questions_lib()
 	url = '/question_library/json_filter/';
     params = { q:  $('#library_search_form_val').val()}
     $.getJSON(url, params, function (data) {
-    	$('.ms-selectable').hide()
+    	$('#lib_questions_table .ms-selectable').hide()
         $.each(data, function () {
             $('#lib_questions_table  #' + this.id + '-selectable').show();
         });
