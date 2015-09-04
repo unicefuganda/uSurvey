@@ -7,10 +7,9 @@ from django.core.exceptions import ValidationError
 
 
 class InterviewerForm(ModelForm):
-
-    # survey = forms.ChoiceField(choices=)
-    date_of_birth = forms.DateField(input_formats=[settings.DATE_FORMAT,],
-                                    widget=forms.TextInput(attrs={'placeholder': 'Date Of Birth', 'min':18, 'max':50 , 'class': 'datepicker'}))
+    date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT,],
+                                    widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
+                                                                  'class': 'datepicker'}, format=settings.DATE_FORMAT))
 
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
@@ -30,12 +29,11 @@ class InterviewerForm(ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
             'gender': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
-            # 'date_of_birth': forms.TextInput(attrs={'placeholder': 'Date Of Birth', 'min':18, 'max':50 , 'class': 'datepicker'}),
             'ea': forms.Select(attrs={'class' : 'chzn-select ea_filter'}),
         }
 
     def clean_survey(self):
-        ea = self.cleaned_data['ea']
+        ea = self.cleaned_data.get('ea', '')
         survey_pk = self.cleaned_data['survey']
         if survey_pk.strip():
             if survey_pk.strip() not in [s.pk for s in ea.open_surveys()]:
@@ -43,7 +41,7 @@ class InterviewerForm(ModelForm):
             return Survey.objects.get(pk=survey_pk)
 
     def clean(self):
-        ea = self.cleaned_data['ea']
+        ea = self.cleaned_data.get('ea')
         #check if interviewer is already active with survey in current EA
         if self.instance and self.instance.pk and ea.pk != self.instance.ea.pk and self.instance.has_survey():
             raise ValidationError('Interviewer is having an active survey')
@@ -51,7 +49,13 @@ class InterviewerForm(ModelForm):
 
 
 class USSDAccessForm(ModelForm):
-    user_identifier = forms.CharField(label='Mobile Number')
+    user_identifier = forms.CharField(label='Mobile Number',
+                                      max_length=settings.MOBILE_NUM_MAX_LENGTH,
+                                      min_length=settings.MOBILE_NUM_MIN_LENGTH,
+                                      widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
+                                                                   'style':"width:172px;" ,
+                                                                   'maxlength':settings.MOBILE_NUM_MAX_LENGTH,
+                                                                    'minlength' : settings.MOBILE_NUM_MIN_LENGTH}))
 
     def __init__(self, *args, **kwargs):
         super(USSDAccessForm, self).__init__(*args, **kwargs)
@@ -64,6 +68,7 @@ class USSDAccessForm(ModelForm):
 
 
 class ODKAccessForm(ModelForm):
+    user_identifier = forms.CharField(label='ODK Id')
 
     def __init__(self, *args, **kwargs):
         super(ODKAccessForm, self).__init__(*args, **kwargs)

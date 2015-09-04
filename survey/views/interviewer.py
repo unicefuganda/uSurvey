@@ -24,24 +24,26 @@ def _add_error_response_message(interviewer, request,action_text):
     error_message = "Interviewer not %s. " % action_text
     messages.error(request, error_message + "See errors below.")
 
-def _create_or_edit(request, action_text, interviewer=None, extra=1):
+def _create_or_edit(request, action_text, interviewer=None):
     request.breadcrumbs([
         ('Interviewers', reverse('interviewers_page')),
     ])
-
+    title = 'New Interviewer'
+    odk_instance = None
+    if interviewer:
+        extra = 0
+        title = 'Edit Interviewer'
+        odk_accesses = interviewer.odk_access
+        if odk_accesses.exists():
+            odk_instance = odk_accesses[0]
+    else:
+        extra = 1
     locations_filter = LocationsFilterForm(data=request.GET)
     interviewer_form = InterviewerForm(locations_filter.get_enumerations(), instance=interviewer)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
     ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)
     response = None
     redirect_url = reverse('interviewers_page')
-    title = 'New Interviewer'
-    odk_instance = None
-    if interviewer:
-        title = 'Edit Interviewer'
-        odk_accesses = interviewer.odk_access
-        if odk_accesses.exists():
-            odk_instance = odk_accesses[0]
     odk_access_form = ODKAccessForm(instance=odk_instance)
     if request.method == 'POST':
         interviewer_form = InterviewerForm(locations_filter.get_enumerations(), data=request.POST, instance=interviewer)

@@ -4,7 +4,7 @@
 {{ title }}
 {% endblock %}
 {% block pre_form_content %}
-{% include "horizontal_filter_form.html" with a_form=locations_filter %}
+{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
 {% endblock %}
 {% block display_form_fields %}
   {% include "naked_form.html" with a_form=form %}
