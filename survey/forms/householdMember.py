@@ -16,6 +16,6 @@ class HouseholdMemberForm(ModelForm):
             'first_name': forms.TextInput(attrs={'placeholder': 'Other Names'}),
             'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
         }
-
-    date_of_birth = forms.DateField(label="Date of birth", widget=DateInput(attrs={'class': 'datepicker'}),
-                                    required=True, input_formats=[settings.DATE_FORMAT,])
+    date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT,],
+                                    widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
+                                                                  'class': 'datepicker'}, format=settings.DATE_FORMAT))

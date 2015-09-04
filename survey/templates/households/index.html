@@ -6,10 +6,7 @@
     {% load pagination_tags %}
     {% load template_tags %}
     {% autopaginate households 50 %}
-    <form action="" method="get">
-    	{% include "horizontal_naked_form.html" with a_form=locations_filter %}
-    	<button class="btnforall" id="a-ea-list">Refresh List</button>
-    </form>
+        {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
 <br />
 <div class="form-actions">
     <a href="{% url 'new_household_page' %}" class="btn btn_primary pull-right" id="add-household"><i class="icon-plus"></i> Add Household</a>
