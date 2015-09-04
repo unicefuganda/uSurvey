@@ -30,6 +30,7 @@ from survey.models.locations import Location, LocationType
 
 __all__ = [
 #     'ULocation'
+    'InterviewerAccess',
     'TemplateOption',
     'WebAccess',
     'SurveyAllocation',
