@@ -17,7 +17,7 @@ class InterviewerAccess(BaseModel):
     REPONSE_TIMEOUT_DURATIONS = [(DAYS, 'Days'), (HOURS, 'Hours'), (MINUTES, 'Minutes'), (SECONDS, 'Seconds')]
     interviewer = models.ForeignKey('Interviewer', related_name='%(class)s')
     user_identifier = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, verbose_name='Activated')
     reponse_timeout = models.PositiveIntegerField(default=1000, help_text='Max time to wait for response before ending interview', null=True, blank=True)
     duration = models.CharField(default=HOURS, choices=REPONSE_TIMEOUT_DURATIONS, max_length=100, null=True, blank=True)
     

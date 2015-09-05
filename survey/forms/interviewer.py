@@ -68,7 +68,7 @@ class USSDAccessForm(ModelForm):
 
 
 class ODKAccessForm(ModelForm):
-    user_identifier = forms.CharField(label='ODK Id')
+    user_identifier = forms.CharField(label='ODK ID')
 
     def __init__(self, *args, **kwargs):
         super(ODKAccessForm, self).__init__(*args, **kwargs)
