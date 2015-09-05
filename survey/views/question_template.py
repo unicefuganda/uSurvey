@@ -19,7 +19,7 @@ def index(request):
     '''
         show all library questions
     '''
-    question_filter_form = QuestionFilterForm(data=request.GET)
+    question_filter_form = QuestionFilterForm(data=request.GET or None)
     questions =  question_filter_form.filter(QuestionTemplate.objects.all())
     search_fields = ['identifier', 'group__name', 'text', ]
     if request.GET.has_key('q'):

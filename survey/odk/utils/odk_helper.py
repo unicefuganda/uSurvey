@@ -137,7 +137,7 @@ def _get_responses(interviewer, survey_tree, survey):
             resp_text = NonResponseAnswer(batch.start_question, _get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
             response_dict[(batch.pk, batch.start_question.pk)] = resp_text
         else:
-            for question in batch.survey_questions():
+            for question in batch.survey_questions:
                 # context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
                 answer_path = template.Template(ANSWER_PATH).render(context)
                 resp_text, resp_node = None, _get_nodes(answer_path, tree=survey_tree)
