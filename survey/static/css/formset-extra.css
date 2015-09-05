@@ -1,0 +1,34 @@
+.add-row {
+      float:: right;
+      display:block;
+      background:url(/static/img/add.png) no-repeat left center;
+      width:16px;
+      height:16px;
+  }
+  .delete-row {
+      display:block;
+      background:url(/static/img/delete.png) no-repeat left center;
+      margin-top: -30px;
+      width:16px;
+      height:16px;
+  }
+
+  span.add-on {
+       margin-top: 5px;
+  }
+
+  td.horizontal-formset {
+    background-color: #fff;
+  }
+
+  label {
+      text-align: center;
+  }
+
+  .control-label label, .controls {
+    height: 40px;
+  }
+
+  .radio_field {
+    margin-top: -10px;
+  }

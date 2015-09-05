@@ -5,13 +5,16 @@
 {% endblock %}
 {% block pre_form_content %}
 {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
+<br class="break" />
+<br class="break" />
 {% endblock %}
 {% block display_form_fields %}
   {% include "naked_form.html" with a_form=form %}
   <legend>ODK Access</legend>
   {% include "horizontal_naked_form.html" with a_form=odk_access_form %}
-  {% include "formset.html" with formset=ussd_access_form legend='USSD Access' class='ussd_form' %}
-  
+<br class="break" />
+  {% include "horizontal-formset.html" with formset=ussd_access_form legend='USSD Access' class='ussd_form' %}
+
 {% endblock %}
 
 {% block javascripts %}
@@ -22,10 +25,10 @@
         $(function() {
             $(".ussd_form").formset({
                 prefix: "{{ ussd_access_form.prefix}}",
-            })
-            $(".odk_form").formset({
-                prefix: "{{ odk_access_form.prefix}}",
-            })
+                deleteText: "",
+                addText: "",
+                extraClasses: ['row1', 'row2', 'row3']
+            });
         })
     </script>
   <script type="text/javascript">
