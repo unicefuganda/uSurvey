@@ -306,7 +306,7 @@ def export_all_questions(request):
 def export_batch_questions(request, batch_id):
     batch = Batch.objects.get(pk=batch_id)
     filename =  '%s_questions' % batch.name
-    formatted_responses = get_question_template_as_dump(batch.survey_questions())
+    formatted_responses = get_question_template_as_dump(batch.survey_questions)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))
