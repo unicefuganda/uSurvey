@@ -64,6 +64,12 @@ class USSDAccessForm(ModelForm):
     class Meta:
         model = USSDAccess
         exclude = ['reponse_timeout', 'duration', 'interviewer', 'aggregator']
+
+    def clean_user_identifier(self):
+        identifier = self.cleaned_data.get('user_identifier', '')
+        if identifier.isdigit() == False:
+            raise ValidationError('Mobile number must contain only numbers')
+        return self.cleaned_data['user_identifier']
         
 
 
