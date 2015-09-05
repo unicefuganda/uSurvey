@@ -8,10 +8,7 @@
 {% load pagination_tags %}
 {% autopaginate enumeration_areas max_display_per_page %}
 {% load template_tags %}
-    <form action="" method="get">
-    {% include "horizontal_filter_form.html" with a_form=locations_filter %}
-
-    </form>
+	{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
     <br class="clear"/>
 <table width="100%" height="20px" border="0" cellspacing="0" cellpadding="0">
             <tr>
