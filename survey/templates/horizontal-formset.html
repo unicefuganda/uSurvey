@@ -9,7 +9,7 @@
 					{% for form in formset %}
 						{% if forloop.first %}
 							{% for field in form.visible_fields %}
-								<th>{{field.label}}</th>
+								<td class="horititle">{{field.label}}</td>
 							{% endfor %}
 						{% endif %}
 					{% endfor %}
