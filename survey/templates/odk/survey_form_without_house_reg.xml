@@ -1,9 +1,9 @@
-{% load template_tags %}
 <h:html xmlns="http://www.w3.org/2002/xforms"
 xmlns:h="http://www.w3.org/1999/xhtml"
 xmlns:ev="http://www.w3.org/2001/xml-events"
 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 xmlns:jr="http://openrosa.org/javarosa">
+{% load template_tags %}
 <h:head>
 <h:title> 
   {{survey.name}} 
