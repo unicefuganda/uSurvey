@@ -21,11 +21,7 @@ fieldset td.horizontal-formset {
     background-color: #fff;
   }
 
-fieldset .horititle {
+ .horititle {
       text-align: center;
   }
 
-
- .radio_field {
-    margin-top: -10px;
-  }

@@ -128,9 +128,10 @@ def sub_questions(question, flows):
         qflows = flows.filter(question=question).exclude(next_question=question)
         if qflows:
             for flow in qflows:
-                questions.add(flow.next_question)
-                subsequent = sub_questions(flow.next_question, flows)
-                map(lambda q: questions.add(q), subsequent)
+                if flow.next_question:
+                    questions.add(flow.next_question)
+                    subsequent = sub_questions(flow.next_question, flows)
+                    map(lambda q: questions.add(q), subsequent)
     except QuestionFlow.DoesNotExist:
         return OrderedSet()
     return questions
@@ -143,7 +144,7 @@ def next_inline_question(question, flows, groups=None, answer_types=[]):
         if groups is None or (next_question and next_question.group in groups and next_question.answer_type in answer_types):
             return next_question
         else:
-            return next_inline_question(next_question, flows, groups)
+            return next_inline_question(next_question, flows, groups=groups, answer_types=answer_types)
     except QuestionFlow.DoesNotExist:
         return None
 

@@ -3,6 +3,13 @@
 {% block title %}
 {{ title }}
 {% endblock %}
+{% block extra_css %}
+<style type="text/css">
+	.radio_field {
+		margin-top: -10px;
+	  }
+</style>
+{% endblock %}
 {% block pre_form_content %}
 {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
 <br class="break" />

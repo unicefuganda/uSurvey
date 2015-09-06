@@ -74,7 +74,7 @@ function show_or_hide_next_question(action_value) {
 function append_to_next_question_dropdown(data) {
     counter=0;
     $.each(data, function () {
-        $('#id_next_question').append("<option value=" + data[counter]['id'] + ">" + data[counter]['text'] + "</option>");
+        $('#id_next_question').append("<option value=" + data[counter]['id'] + ">(" + data[counter]['identifier'] + "!) "+ data[counter]['text'] + "</option>");
         counter++;
     });
 }
@@ -212,7 +212,7 @@ jQuery(function($){
 
         post.done(function(data){
             if(data){
-                $('#id_next_question').append("<option value=" + data['id'] + ">" + data['text'] + "</option>");
+                 $('#id_next_question').append("<option value=" + data['id'] + ">(" + data['identifier'] + "!) "+ data['text'] + "</option>");
                 $('#close_modal').click();
             } else{
                 append_error_to_text(data);

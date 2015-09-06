@@ -11,7 +11,7 @@ class QuestionForm(ModelForm):
 
     options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
 
-    def __init__(self, batch, data=None, initial=None, instance=None):
+    def __init__(self, batch, data=None, initial=None, parent_question=None, instance=None):
         super(QuestionForm, self).__init__(data=data, initial=initial, instance=instance)
         self.fields['identifier'].label = "Variable name"
         self.fields['batch'].widget = forms.HiddenInput()
@@ -20,6 +20,7 @@ class QuestionForm(ModelForm):
         #depending on type of ussd/odk access of batch restrict the answer type
         self.fields['answer_type'].choices = [choice for choice in self.fields['answer_type'].choices \
                                                     if choice[0] in batch.answer_types or choice[0] == '' ]
+        self.parent_question = parent_question
         
     class Meta:
         model = Question
@@ -52,6 +53,7 @@ class QuestionForm(ModelForm):
         text = self.cleaned_data.get('text', None)
         self._check__multichoice_and_options_compatibility(answer_type, options)
         self._strip_special_characters_for_ussd(text)
+        self._prevent_duplicate_subquestions(text)
         return self.cleaned_data
 
     def _check__multichoice_and_options_compatibility(self, answer_type, options):
@@ -67,6 +69,15 @@ class QuestionForm(ModelForm):
         if text:
             text = re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', text)
             self.cleaned_data['text'] = re.sub("  ", ' ', text)
+
+    def _prevent_duplicate_subquestions(self, text):
+        if self.parent_question:
+            duplicate_sub_question = self.parent_question.get_subquestions().filter(text__iexact=text)
+            has_instance_id_different = (self.instance.id and self.instance.id != duplicate_sub_question[0].id)
+
+            if duplicate_sub_question.exists() and (not self.instance.id or has_instance_id_different):
+                self._errors['text'] = self.error_class(["Sub question for this question with this text already exists."])
+                del self.cleaned_data['text']
 
     def kwargs_has_batch(self, **kwargs):
         return kwargs.has_key('batch') and isinstance(kwargs['batch'], Batch)

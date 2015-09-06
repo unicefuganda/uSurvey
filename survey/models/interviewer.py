@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from django.conf import settings
 from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -14,11 +14,11 @@ from survey.models.households import Household
 from rapidsms.router import send
 
 def validate_min_date_of_birth(value):
-    if date.today() - relativedelta(years=INTERVIEWER_MIN_AGE) < value:
+    if relativedelta(datetime.utcnow().date(), value).years < INTERVIEWER_MIN_AGE:
         raise ValidationError('interviewers must be at most %s years' % INTERVIEWER_MIN_AGE)
 
 def validate_max_date_of_birth(value):
-    if  date.today() - relativedelta(years=INTERVIEWER_MAX_AGE) > value:
+    if relativedelta(datetime.utcnow().date(), value).years > value:
         raise ValidationError('interviewers must not be at more than %s years' % INTERVIEWER_MAX_AGE)
 
 class Interviewer(BaseModel):
@@ -45,6 +45,10 @@ class Interviewer(BaseModel):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def age(self):
+        return relativedelta(datetime.utcnow().date(), self.date_of_birth).years
 
     def total_households_completed(self, survey=None):
         try:

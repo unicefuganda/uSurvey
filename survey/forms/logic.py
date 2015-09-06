@@ -117,6 +117,10 @@ class LogicForm(forms.Form):
                                                validation_test=self.cleaned_data['condition'],
                                                next_question=next_question,
                                                 desc=self.ACTIONS[self.cleaned_data['action']])
+        if self.cleaned_data['action'] == self.ASK_SUBQUESTION:
+            #connect back to next inline question of the main
+            QuestionFlow.objects.create(question=next_question,
+                                               next_question=self.batch.next_inline(self.question))
         if self.cleaned_data['condition'] == 'between':
             TextArgument.objects.create(flow=flow, position=0, param=self.cleaned_data['min_value'])
             TextArgument.objects.create(flow=flow, position=1, param=self.cleaned_data['max_value'])
