@@ -216,7 +216,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
 def get_surveys(interviewer):
     surveys = []
     allocation = SurveyAllocation.get_allocation(interviewer)
-    if allocation:
+    if allocation and interviewer.ea.open_batches(allocation):
         surveys.append(allocation)
     return surveys
 
