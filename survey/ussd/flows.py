@@ -739,9 +739,11 @@ class StartInterview(Interviews):
             response = ongoing_interview.respond(message, channel=USSDAccess.choice_name())
             self._ongoing_interview = ongoing_interview #probably something may have happened to the interview instance in db
             if response is None:
-                self._ongoing_interview.closure_date = datetime.now()
-                self._ongoing_interview.save()
-                house_member = self._ongoing_interview.householdmember
+                interview = self._ongoing_interview
+                interview.closure_date = datetime.now()
+                interview.save()
+                #import pdb; pdb.set_trace()
+                house_member = interview.householdmember
                 house_member.batch_completed(ongoing_interview.batch)
                 batches = self._pending_batches
                 present_batch = batches.pop(0)
