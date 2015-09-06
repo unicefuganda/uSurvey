@@ -197,14 +197,16 @@ def is_relevant_odk(context, question, interviewer, registered_households):
     flows = question.flows.all()
     if flows:
         for flow in flows:
-            node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
-            next_question = flow.next_question
-            next_q_context = context.get(next_question.pk, ['false()', ])
-            if flow.validation_test:
-                next_q_context.append(Answer.print_odk_validation(node_path, flow.validation_test, *flow.test_arguments))
-            else:
-                next_q_context.append("string-length(%s) > 0" % node_path)
-            context[next_question.pk] = next_q_context
+            if flow.next_question:
+                node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
+                next_question = flow.next_question
+                next_q_context = context.get(next_question.pk, ['false()', ])
+                if flow.validation_test:
+                    text_params = [t.param for t in flow.text_arguments]
+                    next_q_context.append(Answer.print_odk_validation(node_path, flow.validation_test, *text_params))
+                else:
+                    next_q_context.append("string-length(%s) > 0" % node_path)
+                context[next_question.pk] = next_q_context
     return mark_safe(relevance_context)
 
 

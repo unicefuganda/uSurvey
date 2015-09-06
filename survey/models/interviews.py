@@ -204,8 +204,8 @@ class Answer(BaseModel):
         return "(%s > '%s') and (%s < '%s')" % (node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
-    def print_odk_validation(cls, validator_name, node_path, *args):
-        printer = getattr(cls, 'odk_%s', validator_name)
+    def print_odk_validation(cls, node_path, validator_name, *args):
+        printer = getattr(cls, 'odk_%s'%validator_name)
         return printer(node_path, *args)
 
     @classmethod
@@ -287,9 +287,12 @@ class MultiSelectAnswer(Answer):
     def __init__(self, question, answer, *args, **kwargs):
         super(MultiSelectAnswer, self).__init__()
         if isinstance(answer, list):
-            self.value = question.options.filter(options__in=list)
+            selected = [a.lower() for a in answer]
+            options = question.options.all()
+            chosen = [op.pk for op in options if op.text.lower() in selected]
+            self.selected = question.options.filter(pk__in=chosen)
         else:
-            self.value = answer
+            self.selected = answer
         self.question = question
 
     @classmethod
@@ -299,6 +302,8 @@ class MultiSelectAnswer(Answer):
     @classmethod
     def equals(cls, answer, txt):
         return answer.text.lower() == txt.lower()
+
+
 
 class DateAnswer(Answer):
     value = models.DateField(null=True)
