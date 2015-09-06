@@ -100,7 +100,7 @@
                           {{ household_member.date_of_birth|format_date }}
                       </td>
                       <td>
-                         {% if household_member.male %}Male{% else %}Female{% endif %}
+                         {% if household_member.gender == 1 %}Male{% else %}Female{% endif %}
                       </td>
                       <td>
                          <a href="{% url 'edit_household_member_page' household.id household_member.id %}">Edit</a> <a data-toggle="modal" href="#delete_member_{{household_member.id}}">Delete</a>

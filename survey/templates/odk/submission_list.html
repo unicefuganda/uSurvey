@@ -15,7 +15,7 @@
                 <th>Enumeration Area</th>
                 <th>Household Number</th>
 				<th>Household Member</th>
-				<th>Investigator</th>
+				<th>Interviewer</th>
                 <th>Survey</th>
                 <th>Form Id</th>
                 <th>Submission Instance</th>
@@ -27,16 +27,16 @@
             {% for submission in submissions %}
                 <tr>
                     <td>
-                        {{ submission.investigator.ea }}
+                        {{ submission.household_member.household.ea }}
                     </td>
                     <td>
-                        {{ submission.household_member.household.random_sample_number }}
+                        {{ submission.household_member.household.house_number }}
                     </td>
 					<td>
                         {{ submission.household_member.first_name}}, {{submission.household_member.surname }}
                     </td>
                     <td>
-                        {{ submission.investigator.name }}
+                        {{ submission.interviewer.name }}
                     </td>
                     <td>
 						{{ submission.survey.name }}
