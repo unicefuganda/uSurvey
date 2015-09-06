@@ -93,10 +93,10 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
         return _get_selected_household_member(survey_tree)
     house_number = _get_household_house_number(survey_tree)
     try:
-        household = Household.objects.get(interviewer=interviewer, survey=survey, ea=interviewer.ea, house_number=house_number)
+        household = Household.objects.get(registrar=interviewer, survey=survey, ea=interviewer.ea, house_number=house_number)
     except Household.DoesNotExist:
         household = Household.objects.create(registrar=interviewer,
-                                                           ea=interviewer.enumeration_area,
+                                                           ea=interviewer.ea,
                                                            registration_channel=ODKAccess.choice_name(),
                                                            survey=survey,
                                                            house_number=house_number)
@@ -107,7 +107,7 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
     kwargs = {}
     kwargs['surname'] = mem_attrs.get('surname')
     kwargs['first_name'] = mem_attrs['firstName']
-    kwargs['male'] = (mem_attrs['sex'] == MALE)
+    kwargs['gender'] = (mem_attrs['sex'] == MALE)
     kwargs['date_of_birth'] = datetime.strptime(mem_attrs['dateOfBirth'], '%Y-%m-%d')
     kwargs['household'] = household
     if mem_attrs['isHead'] == IS_HEAD:
@@ -130,14 +130,16 @@ def _get_responses(interviewer, survey_tree, survey):
     response_dict = {}
     batches = interviewer.ea.open_batches(survey)
     for batch in batches:
-        context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
-        non_response_node = template.Template(IS_NON_RESPONSE_PATH).render(context)
+        context = template.Context({'batch_id': batch.pk, })
+        non_response_path = template.Template(IS_NON_RESPONSE_PATH).render(context)
+        non_response_node = _get_nodes(non_response_path, tree=survey_tree)
         if non_response_node and non_response_node[0].text.strip() == NON_RESPONSE:
             nrsp_answer_path = template.Template(NON_RESP_ANSWER_PATH).render(context)
-            resp_text = NonResponseAnswer(batch.start_question, _get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
-            response_dict[(batch.pk, batch.start_question.pk)] = resp_text
+            resp = NonResponseAnswer(batch.start_question, _get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
+            response_dict[(batch.pk, batch.start_question.pk)] = resp
         else:
             for question in batch.survey_questions:
+                context['question_id'] = question.pk
                 # context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
                 answer_path = template.Template(ANSWER_PATH).render(context)
                 resp_text, resp_node = None, _get_nodes(answer_path, tree=survey_tree)
