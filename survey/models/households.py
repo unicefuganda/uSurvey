@@ -27,7 +27,7 @@ class Household(BaseModel):
     
     class Meta:
         app_label = 'survey'
-        unique_together = [('survey', 'house_number'), ]
+        unique_together = [('survey', 'house_number', 'ea'), ]
     
     def __unicode__(self):
         return 'HH-%s' % self.house_number
