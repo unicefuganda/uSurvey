@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
 from survey.models.households import Household
+from rapidsms.router import send
 
 def validate_min_date_of_birth(value):
     if date.today() - relativedelta(years=INTERVIEWER_MIN_AGE) < value:
@@ -112,7 +113,14 @@ class Interviewer(BaseModel):
         return sorted(survey_households, key=lambda household: household.house_number)
 
     def has_survey(self):
-        return self.assignments.filter(completed=True).count() > 0
+        return self.assignments.filter(completed=False).count() > 0
+
+    @classmethod
+    def sms_interviewers_in_locations(cls, locations, text):
+        interviewers = []
+        for location in locations:
+            interviewers.extend(Interviewer.lives_under_location(location))
+        send(text, interviewers)
 
 class SurveyAllocation(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name='assignments')
