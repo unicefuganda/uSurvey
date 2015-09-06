@@ -9,11 +9,9 @@
   <h3>
     Interviewers Summary
   </h3>
+
   <div class="filters">
-      <form id="aggregates-form" action="{% url 'interviewers_page' %}" method="get" class="padded-bottom">
-      {% include "horizontal_naked_form.html" with a_form=locations_filter %}
-      <button class="btn btn-primary" id="a-interviewer-list" href="{% url 'interviewers_page' %}">Refresh List</button>
-    </form>
+      {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='locations_filter' %}
   <br/>
   </div>
  {% include "search_form.html" %}
