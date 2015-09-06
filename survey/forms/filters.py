@@ -47,9 +47,9 @@ class QuestionFilterForm(forms.Form):
             
 
 class IndicatorFilterForm(forms.Form):
-    survey = forms.ChoiceField(label='Survey', widget=forms.Select(attrs={'id': 'id_filter_survey'}), choices=[])
-    batch = forms.ChoiceField(label='Batch', widget=forms.Select(), choices=[])
-    module = forms.ChoiceField(label='Module', widget=forms.Select(), choices=[])
+    survey = forms.ChoiceField(label='Survey', widget=forms.Select(attrs={'id': 'id_filter_survey'}), choices=[], required=False)
+    batch = forms.ChoiceField(label='Batch', widget=forms.Select(), choices=[], required=False)
+    module = forms.ChoiceField(label='Module', widget=forms.Select(), choices=[], required=False)
 
     def __init__(self, data=None,initial=None):
         super(IndicatorFilterForm, self).__init__(data=data, initial=initial)
