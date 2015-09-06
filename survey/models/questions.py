@@ -68,6 +68,10 @@ class QuestionFlow(BaseModel):
         unique_together = [('question', 'next_question', 'desc'),]
 
     @property
+    def test_params(self):
+        return [t.param for t in self.text_arguments]
+
+    @property
     def text_arguments(self):
         return TextArgument.objects.filter(flow=self).order_by('position')
 
