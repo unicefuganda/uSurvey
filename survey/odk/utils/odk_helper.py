@@ -121,10 +121,16 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
 
 def record_interview_answer(interview, question, answer):
     if not isinstance(answer, NonResponseAnswer):
+        if question.answer_type == MultiSelectAnswer.choice_name():
+            answer = answer.split(MULTI_SELECT_XFORM_SEP)
         answer_class = Answer.get_class(question.answer_type)
         answer = answer_class(question, answer)
     answer.interview = interview
-    return answer.save()
+    answer.save()
+    if question.answer_type == MultiSelectAnswer.choice_name():
+        for an in answer.selected:
+            answer.value.add(an)
+        answer.save()
 
 def _get_responses(interviewer, survey_tree, survey):
     response_dict = {}
@@ -188,7 +194,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                                                interviewer=interviewer,
                                                householdmember=member,
                                                batch=batch,
-                                               interview_channel=interviewer.odk_access()[0]
+                                               interview_channel=interviewer.odk_access[0]
                                            )[0])
                 interviews[b_id] = interview
                 created = record_interview_answer(interview, question, answer)
