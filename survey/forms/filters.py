@@ -8,8 +8,8 @@ DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE =20
 class QuestionFilterForm(forms.Form):
 
     groups = forms.ChoiceField(label='Group', widget=forms.Select(), choices=[], required=False)
-    modules = forms.ChoiceField(label='Module', widget=forms.Select(), choices=[])
-    question_types = forms.ChoiceField(label='Question Type', widget=forms.Select(), choices=[])
+    modules = forms.ChoiceField(label='Module', widget=forms.Select(), choices=[], required=False)
+    question_types = forms.ChoiceField(label='Question Type', widget=forms.Select(), choices=[], required=False)
 
     def __init__(self, data=None,initial=None, read_only=[], batch=None):
         super(QuestionFilterForm, self).__init__(data=data, initial=initial)
