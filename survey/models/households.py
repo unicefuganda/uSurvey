@@ -13,6 +13,7 @@ from survey.models.householdgroups import HouseholdMemberGroup
 from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion, \
             HouseholdMemberBatchCompletion, HouseMemberSurveyCompletion
 from django.core.exceptions import ValidationError
+from django import template
 
 
 class Household(BaseModel):
@@ -140,6 +141,12 @@ class HouseholdMember(BaseModel):
         return HouseMemberSurveyCompletion.objects.create(householdmember=self,
                                                            interviewer=self.household.registrar,
                                                            survey=self.household.survey)
+
+    def get_composed(self, raw_text):
+        question_context = template.Context(dict([(field.verbose_name.upper().replace(' ', '_'),
+                                                            getattr(self, field.name))
+                                                                    for field in self._meta.fields]))
+        return template.Template(raw_text).render(question_context)
 
     class Meta:
         app_label = 'survey'

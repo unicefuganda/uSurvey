@@ -72,10 +72,7 @@ class Interview(BaseModel):
             self.last_question = next_question
             print 'last question now is ', next_question
             self.save()
-            question_context = template.Context(dict([(field.verbose_name.upper().replace(' ', '_'),
-                                                            getattr(self.householdmember, field.name))
-                                                                    for field in self.householdmember._meta.fields]))
-            response_text =  template.Template(next_question.display_text(USSDAccess.choice_name())).render(question_context)
+            response_text = self.householdmember.get_composed(next_question.display_text(USSDAccess.choice_name()))
             print 'response text is: ', response_text
             return response_text
         # #if there is nothing left to ask, just close this survey
