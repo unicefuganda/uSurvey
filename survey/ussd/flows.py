@@ -201,12 +201,20 @@ class RegisterHousehold(SelectHousehold):
     def _respond(self, message):
         selection = self._select(message)
         if selection is not None:
-            household, _ = Household.objects.get_or_create(registrar=self.interviewer, 
+            try:
+                household = Household.objects.get(
                                                            ea=self.enumeration_area,
-                                                           registration_channel=USSDAccess.choice_name(),
                                                            survey=self.ongoing_survey,
                                                            house_number=selection
                                                            )
+            except Household.DoesNotExist:
+                household = Household.objects.create(
+                                       registrar = self.interviewer,
+                                       registration_channel = USSDAccess.choice_name(),
+                                       ea=self.enumeration_area,
+                                       survey=self.ongoing_survey,
+                                       house_number=selection
+                                       )
             task = MemberOrHead(self.access)
             task._household =  household
             return task.intro()
@@ -563,7 +571,7 @@ class StartSurvey(SelectHousehold):
             return self.intro()
         else:
             household = Household.objects.get(
-                                                        registrar=self.interviewer,  #might have been registered by some other interviewer
+                                                        #registrar=self.interviewer,  #might have been registered by some other interviewer
                                                            ea=self.enumeration_area,
                                                            # registration_channel=USSDAccess.choice_name(), #might have been registed from another chanel
                                                            survey=self.ongoing_survey,
@@ -735,7 +743,6 @@ class StartInterview(Interviews):
                 self._ongoing_interview.save()
                 house_member = self._ongoing_interview.householdmember
                 house_member.batch_completed(ongoing_interview.batch)
-                import pdb; pdb.set_trace()
                 batches = self._pending_batches
                 present_batch = batches.pop(0)
                 self._pending_batches = batches

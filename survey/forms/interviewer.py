@@ -60,7 +60,7 @@ class USSDAccessForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(USSDAccessForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder=['is_active', 'user_identifier',  ]
-    
+
     class Meta:
         model = USSDAccess
         exclude = ['reponse_timeout', 'duration', 'interviewer', 'aggregator']
@@ -69,6 +69,9 @@ class USSDAccessForm(ModelForm):
         identifier = self.cleaned_data.get('user_identifier', '')
         if identifier.isdigit() == False:
             raise ValidationError('Mobile number must contain only numbers')
+        accesses = USSDAccess.objects.filter(user_identifier=identifier)
+        if accesses.exists():
+            raise ValidationError('This id mobile number is already in use by %s' % accesses[0].interviewer.name)
         return self.cleaned_data['user_identifier']
         
 
