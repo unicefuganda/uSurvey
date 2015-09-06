@@ -185,7 +185,7 @@ class Answer(BaseModel):
 
     @classmethod
     def odk_greater_than(cls, node_path, value):
-        return "%s > '%s'" % (node_path, value)
+        return "%s &gt; '%s'" % (node_path, value)
 
     @classmethod
     def less_than(cls, answer, value):
@@ -193,7 +193,7 @@ class Answer(BaseModel):
 
     @classmethod
     def odk_less_than(cls, node_path, value):
-        return "%s < '%s'" % (node_path, value)
+        return "%s &lt; '%s'" % (node_path, value)
 
     @classmethod
     def between(cls, answer, lowerlmt, upperlmt):
@@ -201,7 +201,7 @@ class Answer(BaseModel):
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):
-        return "(%s > '%s') and (%s < '%s')" % (node_path, lowerlmt, node_path, upperlmt)
+        return "(%s &gt; '%s') and (%s &lt; '%s')" % (node_path, lowerlmt, node_path, upperlmt)
 
     @classmethod
     def print_odk_validation(cls, node_path, validator_name, *args):
