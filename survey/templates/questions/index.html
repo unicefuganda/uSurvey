@@ -12,7 +12,8 @@
     </h3>
     {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
 
-    <div class="actions">
+    <div class="search">
+        <input type="hidden" value="{{ batch.id }}" id="batch_id">
         {% include "search_form.html" %}
         <div class="question-button pull-right">
             <form accept-charset="utf-8" action="{% url 'export_questions_in_batch' batch.id %}" method="post" id="export_questions_form">
@@ -73,8 +74,9 @@
                                             &nbsp;&nbsp;
                                                <a href="{% url 'edit_question_page' flow.next_question.id %}"
                                                   id="edit_subquestion_{{ flow.next_question.id }}">Edit</a>&nbsp;&nbsp;
-                                            <a href="{% url 'add_question_logic_page' batch.pk  flow.next_question.pk %}" class="add-logic">Add Logic</a>
-                                            {% include "base/delete_modal.html" with object_name=flow.next_question.text id=flow.next_question.id name=flow.desc url=flow.next_question.id|get_url_with_ids:"delete_question_page" %}
+                                            <!-- disabled this for now -->
+                                            <!-- a href="{% url 'add_question_logic_page' batch.pk  flow.next_question.pk %}" class="add-logic">Add Logic</a -->
+                                            {% include "base/delete_modal.html" with object_name=flow.next_question.text id=flow.next_question.id name='Subquestion' url=flow.next_question.id|get_url_with_ids:"delete_question_page" %}
                                         </li>
 
                                     {% endif %}

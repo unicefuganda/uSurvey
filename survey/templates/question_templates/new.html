@@ -4,11 +4,14 @@
   New Question Template
 {% endblock %}
 {% block pre_form_content %}
-    <div class="control-group" style="width: 40%">
-        <label class="control-label"><span id="text-counter" style="float: right;"></span></label>
-    </div>
 {% endblock%}
 {% block display_form_fields %}
+<div class="control-group">
+        <label class="control-label" for="text_counter"></label>
+        <div class="controls">
+            <span id="text-counter"></span>
+        </div>
+  </div>
 {% include "naked_form.html" with a_form=questionform %}
 {% if options %}
   {% for option in options %}

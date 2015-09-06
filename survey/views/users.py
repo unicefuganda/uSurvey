@@ -11,6 +11,7 @@ from survey.forms.users import *
 from survey.models.users import UserProfile
 from survey.views.custom_decorators import permission_required_for_perm_or_current_user
 from survey.utils.query_helper import get_filterset
+from django.core.urlresolvers import reverse
 
 
 def _add_error_messages(userform, request, action_str='registered'):
@@ -18,11 +19,11 @@ def _add_error_messages(userform, request, action_str='registered'):
     messages.error(request, error_message + "See errors below.")
 
 
-def _process_form(userform, request, action_success="registered", redirect_url="/users/new/"):
+def _process_form(userform, request, action_success="registered"):
     if userform.is_valid():
         userform.save()
         messages.success(request, "User successfully %s." % action_success)
-        return HttpResponseRedirect(redirect_url)
+        return HttpResponseRedirect(reverse('users_index'))
     _add_error_messages(userform, request, action_success)
     return None
 
@@ -34,10 +35,13 @@ def new(request):
     if request.method == 'POST':
         userform = UserForm(request.POST)
         response = _process_form(userform, request)
-
+    request.breadcrumbs([
+        ('User list', reverse('users_index')),
+    ])
     template_variables = {'userform': userform,
                           'country_phone_code':COUNTRY_PHONE_CODE,
-                          'action': "/users/new/",
+                          'action': reverse('new_user_page'),
+                          'cancel_url' : reverse('users_index'),
                           'id': "create-user-form",
                           'class': "user-form",
                           'button_label': "Create",
@@ -83,9 +87,13 @@ def edit(request, user_id):
     response = None
     if request.method == 'POST':
         userform = EditUserForm(data=request.POST, user= request.user, instance=user, initial=initial)
-        response = _process_form(userform, request, 'edited', '/users/'+ str(user_id)+'/edit/')
+        response = _process_form(userform, request, 'edited')
+    request.breadcrumbs([
+        ('User list', reverse('users_index')),
+    ])
     context_variables = {'userform': userform,
-                        'action' : '/users/%s/edit/'%user_id,
+                        'action' : reverse('users_edit', args=(user_id, )),
+                         'cancel_url' : reverse('users_index'),
                         'id': 'edit-user-form','class': 'user-form', 'button_label' : 'Save',
                         'loading_text' : 'Saving...',
                         'country_phone_code': COUNTRY_PHONE_CODE,
