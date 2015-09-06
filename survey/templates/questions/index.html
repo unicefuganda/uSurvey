@@ -7,38 +7,25 @@
     {% load pagination_tags %}
     {% autopaginate questions max_question_per_page %}
     {% load template_tags %}
-    {% if batch %}
-        <h3>
-            {{ batch.name.capitalize }} Questions
-        </h3>
-        {% include "questions/_question_filter_form.html" with action=batch.id|get_url_with_ids:"batch_questions_page" filter_id="question-filter-form" a_form=question_filter_form %}
-<div class="form-actions">
+    <h3>
+        {{ batch.name.capitalize }} Questions
+    </h3>
+    {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
+
+    <div class="actions">
+        {% include "search_form.html" %}
         <div class="question-button pull-right">
             <form accept-charset="utf-8" action="{% url 'export_questions_in_batch' batch.id %}" method="post" id="export_questions_form">
                 {% csrf_token %}
                 <button class="btn btn_primary" id="export_question">Export Questions</button>
             </form>
             {% if not batch.is_open %}
-            	<a href="{% url 'new_batch_question_page' batch.id %}" class="btn btn_primary" id="add_question">Add Question</a>
+                <a href="{% url 'new_batch_question_page' batch.id %}" class="btn btn_primary" id="add_question">Add Question</a>
                 <a href="{% url 'assign_questions_page' batch.id %}" class="btn btn_primary" id="select_question">Select Question</a>
             {% endif %}
         </div>
-        <input type="hidden" value="{{ batch.id }}" id="batch_id">
-    {% else %}
-        <h3>
-            Questions List
-        </h3>
-        {% include "questions/_question_filter_form.html" with action="/questions/" a_form=question_filter_form %}
-        <div class="question-button pull-right">
-            <form accept-charset="utf-8" action="{% url 'export_all_questions' %}" method="post" id="export_questions_form">
-                {% csrf_token %}
-                <button class="btn btn_primary" id="export_question">Export Questions</button>
-            </form>
-            <a href="{% url 'new_question_page' %}" class="btn btn_primary" id="add_question">Create New Question</a>
-        </div>
-    {% endif %}
- {% include "search_form.html" %}
-</div>
+
+    </div>
     {% if batch %}
         <form method="post" accept-charset="utf-8" action="{% url 'update_question_order_page' batch.id %}">
         {% csrf_token %}
@@ -120,8 +107,8 @@
                     {% endif %}
                     {% if question.options.all %}
                         <a class="btn btn-small" href="#view_options_{{ question.id }}" data-toggle="modal"><i
-                                class="icon-list"></i>View options{% if rules_for_batch|get_value:question %}/Logic{% endif %}</a>
-                    {% elif rules_for_batch|get_value:question %}
+                                class="icon-list"></i>View options{% if question.conditional_flows %}/Logic{% endif %}</a>
+                    {% elif question.conditional_flows %}
                         <a class="btn btn-small" href="#view_logic_{{ question.id }}" data-toggle="modal"><i
                                 class="icon-list"></i>View Logic</a>
                     {% endif %}

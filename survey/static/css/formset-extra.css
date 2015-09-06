@@ -1,11 +1,11 @@
-.add-row {
+fieldset .add-row {
       float:: right;
       display:block;
       background:url(/static/img/add.png) no-repeat left center;
       width:16px;
       height:16px;
   }
-  .delete-row {
+fieldset  .delete-row {
       display:block;
       background:url(/static/img/delete.png) no-repeat left center;
       margin-top: -30px;
@@ -13,22 +13,19 @@
       height:16px;
   }
 
-  span.add-on {
+fieldset span.add-on {
        margin-top: 5px;
   }
 
-  td.horizontal-formset {
+fieldset td.horizontal-formset {
     background-color: #fff;
   }
 
-  .horititle {
+fieldset .horititle {
       text-align: center;
   }
 
-  .control-label label, .controls {
-    height: 40px;
-  }
 
-  .radio_field {
+ .radio_field {
     margin-top: -10px;
   }

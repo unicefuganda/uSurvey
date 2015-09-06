@@ -30,16 +30,18 @@ def _max_number_of_question_per_page(number_sent_in_request):
 @permission_required('auth.can_view_batches')
 def index(request, batch_id):
     batch = get_object_or_404(Batch, pk=batch_id)
-    data = dict(request.GET)
     questions = batch.questions_inline()
-    if data:
-        question_filter_form = QuestionFilterForm(data=data, batch=batch)
-        questions = batch.batch_questions.filter(pk__in=[q.pk for q in questions])
-        questions = question_filter_form.filter(questions)
+    max_per_page = None
+    if request.method == 'GET':
+        question_filter_form = QuestionFilterForm(data=request.GET, batch=batch)
+        relevant_questions = question_filter_form.filter(batch.batch_questions.all())
+        questions = [q for q in questions if q in relevant_questions]
+        #now maintain same inline other exclusing questions in
+        max_per_page = _max_number_of_question_per_page(request.GET.get('number_of_questions_per_page', 0))
     else:
         question_filter_form = QuestionFilterForm(batch=batch)
     #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
-    max_per_page = _max_number_of_question_per_page(data.get('number_of_questions_per_page', 0))
+
     question_form = QuestionForm(batch)
 
     if batch.start_question is None:
@@ -48,9 +50,8 @@ def index(request, batch_id):
         ('Surveys', reverse('survey_list_page')),
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
     ])
-    question_rules_for_batch = {}
     context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page':max_per_page,
-               'question_filter_form': question_filter_form, 'rules_for_batch': question_rules_for_batch}
+               'question_filter_form': question_filter_form, }
     return render(request, 'questions/index.html', context)
 
 @permission_required('auth.can_view_batches')
