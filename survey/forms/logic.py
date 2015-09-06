@@ -29,7 +29,7 @@ class LogicForm(forms.Form):
                                            for validator in Answer.get_class(question.answer_type).validators()]
         if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
             self.fields['option'] = forms.ChoiceField(label='', choices=[], widget=forms.Select, required=True)
-            self.fields['option'].choices = [(option.pk, option.text) for option in question.options.all()]
+            self.fields['option'].choices = [(option.text, option.text) for option in question.options.all()]
         else:
             self.fields['value'] = forms.CharField(label='', required=False)
             self.fields['min_value'] = forms.CharField(label='', required=False,widget=forms.TextInput(attrs={'placeholder': 'Min Value'}))
