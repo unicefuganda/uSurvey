@@ -100,7 +100,7 @@ class USSDAccessForm(ModelForm):
             raise ValidationError('Mobile number must contain only numbers')
         accesses = USSDAccess.objects.filter(user_identifier=identifier)
         if self.instance:
-            accesses.exclude(pk=self.instance.pk)
+            accesses.exclude(interviewer=self.instance.interviewer)
         if accesses.exists():
             raise ValidationError('This id mobile number is already in use by %s' % accesses[0].interviewer.name)
         return self.cleaned_data['user_identifier']
