@@ -39,15 +39,15 @@
         })
     </script>
   <script type="text/javascript">
-  $('.ea_filter').on('change', function () {
-        var ea_id = $('#id_ea');
+  $('#id_ea').on('change', function () {
+  		var ea_id = $('#id_ea');
         url = "{% url 'open_surveys_in_ea_area' %}";
         params = {"ea_id" : ea_id.val() }
         $.getJSON(url, params, function (data) {
                 $('#id_survey option').hide();
 	 			$('#id_survey option[value=""]').show();
 	  		    $.each(data, function () {
-	              $('#id_survey option[value='+this.id+']').show();
+	             $('#id_survey option[value='+this.id+']').show();
 	          });
 	      });
 

@@ -18,7 +18,7 @@ def validate_min_date_of_birth(value):
         raise ValidationError('interviewers must be at most %s years' % INTERVIEWER_MIN_AGE)
 
 def validate_max_date_of_birth(value):
-    if relativedelta(datetime.utcnow().date(), value).years > value:
+    if relativedelta(datetime.utcnow().date(), value).years > INTERVIEWER_MAX_AGE:
         raise ValidationError('interviewers must not be at more than %s years' % INTERVIEWER_MAX_AGE)
 
 class Interviewer(BaseModel):
@@ -39,9 +39,6 @@ class Interviewer(BaseModel):
 
     class Meta:
         app_label = 'survey'
-        permissions = (
-            ("can_view_interviewers", "Can view interviewers"),
-        )
 
     def __unicode__(self):
         return self.name
@@ -126,28 +123,24 @@ class Interviewer(BaseModel):
             interviewers.extend(Interviewer.lives_under_location(location))
         send(text, interviewers)
 
+    def allocated_surveys(self):
+        return self.assignments.filter(completed=False)
+
 class SurveyAllocation(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name='assignments')
     survey = models.ForeignKey('Survey', related_name='work_allocation')
+    allocation_ea = models.ForeignKey('EnumerationArea', related_name='survey_allocations')
     completed = models.BooleanField(default=False)
     
     class Meta:
         app_label = 'survey'
+
+    def __unicode__(self):
+        return self.survey.name
     
     @classmethod
     def get_allocation(cls, interviewer):
         try:
-            return cls.objects.get(interviewer=interviewer, completed=False).survey
+            return cls.objects.get(interviewer=interviewer, allocation_ea=interviewer.ea, completed=False).survey
         except cls.DoesNotExist:
-            #allocate next unalocated survey
-            open_surveys = interviewer.ea.open_surveys()
-            allocations = cls.objects.filter(survey__pk__in=[survey.pk for survey in open_surveys], interviewer__ea=interviewer.ea).values_list('survey', flat=True)
-            if allocations:
-                available = [survey for survey in open_surveys if survey.pk not in allocations]
-            else:
-                available = open_surveys
-            if available:
-                survey = available[0]
-                cls.objects.create(interviewer=interviewer, survey=survey)
-                return survey
-        return None
+            return None
