@@ -1,25 +1,34 @@
 from django import forms
 from django.forms import ModelForm
-from survey.models import Interviewer, ODKAccess, USSDAccess, BatchLocationStatus, Survey
+from survey.models import Interviewer, ODKAccess, USSDAccess, BatchLocationStatus, Survey, EnumerationArea, SurveyAllocation
 from django.forms.models import inlineformset_factory
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
 
 class InterviewerForm(ModelForm):
+    survey = forms.ChoiceField()
     date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT,],
                                     widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                   'class': 'datepicker'}, format=settings.DATE_FORMAT))
 
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
-        self.fields.keyOrder=['name', 'gender', 'date_of_birth', 'level_of_education', 'language',  'ea']
-        # most_principal_locs =
-        # choices = dict([(b.batch.survey.pk, b.batch.survey.name) for b in BatchLocationStatus.objects.all()]).items()
-        # choices.insert(0, ('', ' --- Select Survey ---'))
-        # self.fields['survey'] = forms.ChoiceField()
-        # self.fields['survey'].choices = choices
-        # self.fields['survey'].required = False
+        self.fields.keyOrder=['name', 'gender', 'date_of_birth', 'level_of_education', 'language',  'ea', 'survey']
+        survey_choices = [('', 'Select Survey')]
+        if data and data.get('ea'):
+            ea = EnumerationArea.objects.get(pk=data['ea'])
+            open_surveys = ea.open_surveys()
+            survey_choices.extend([(survey.pk, survey.name) for survey in open_surveys])
+        else:
+            extras = dict([(b.batch.survey.pk, b.batch.survey.name) for b in BatchLocationStatus.objects.all()]).items()
+            survey_choices.extend(extras)
+        self.fields['survey'].choices = survey_choices
+        if self.instance:
+            try:
+                self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance, completed=False)[0].survey.pk
+            except IndexError:
+                pass
         if eas:
             self.fields['ea'].queryset = eas
 
@@ -36,9 +45,19 @@ class InterviewerForm(ModelForm):
         ea = self.cleaned_data.get('ea', '')
         survey_pk = self.cleaned_data['survey']
         if survey_pk.strip():
-            if survey_pk.strip() not in [s.pk for s in ea.open_surveys()]:
+            if str(survey_pk.strip()) not in [str(s.pk) for s in ea.open_surveys()]:
                 raise ValidationError('Survey does not belong to that Enumeration Area')
-            return Survey.objects.get(pk=survey_pk)
+            survey = Survey.objects.get(pk=survey_pk)
+            #check if this has already been allocated to someone else
+            allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
+                                               interviewer__ea=ea,
+                                               allocation_ea=ea)
+            if self.instance:
+                allocs.exclude(interviewer=self.instance)
+            if allocs.exists():
+                raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
+            return survey
+
 
     def clean(self):
         ea = self.cleaned_data.get('ea')
@@ -46,6 +65,16 @@ class InterviewerForm(ModelForm):
         if self.instance and self.instance.pk and ea.pk != self.instance.ea.pk and self.instance.has_survey():
             raise ValidationError('Interviewer is having an active survey')
         return self.cleaned_data
+
+    def save(self, commit=True, **kwargs):
+        interviewer = super(InterviewerForm, self).save(commit=commit, **kwargs)
+        if commit:
+            survey = self.cleaned_data['survey']
+            ea = self.cleaned_data['ea']
+            SurveyAllocation.objects.create(survey=survey,
+                                                   interviewer=interviewer,
+                                                   allocation_ea=ea)
+        return interviewer
 
 
 class USSDAccessForm(ModelForm):
