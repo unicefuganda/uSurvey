@@ -38,6 +38,9 @@
 	 <th>
           Enumeration Area
 	</th>
+     <th>
+          Allocated Surveys
+	</th>
      <th style="background-image: None;">
             Actions
       </th>
@@ -62,6 +65,9 @@
         {% endfor %}
 	   <td>
 		{{ interviewer.ea.name}}
+	  </td>
+         <td>
+		{{ interviewer.allocated_surveys | display_list }}
 	  </td>
             <td>
                 {% include 'interviewers/_action_button.html' with button_size="btn-mini" %}
