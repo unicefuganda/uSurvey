@@ -180,8 +180,8 @@ def total_household_members(interviewer):
     return sum([household.household_member.count() for household in households])
 
 @register.assignment_tag
-def  get_download_url(request, url_name, survey):
-    return request.build_absolute_uri(reverse(url_name, args=(survey.pk, )))
+def  get_download_url(request, url_name, instance):
+    return request.build_absolute_uri(reverse(url_name, args=(instance.pk, )))
 
 @register.assignment_tag(takes_context=True)
 def is_relevant_odk(context, question, interviewer, registered_households):
