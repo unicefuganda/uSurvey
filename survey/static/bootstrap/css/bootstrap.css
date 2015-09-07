@@ -26,7 +26,11 @@ padding-left: 20px;
 padding-right: 20px;
 font-weight
 }
-
+.ccode
+{
+ font-size:14px;
+ color:#0066FF;
+  }
 .btnforallxlarge
 {
 height: 50px;
