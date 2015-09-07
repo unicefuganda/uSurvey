@@ -53,7 +53,7 @@ class InterviewerForm(ModelForm):
                                                interviewer__ea=ea,
                                                allocation_ea=ea)
             if self.instance:
-                allocs.exclude(interviewer=self.instance)
+                allocs = allocs.exclude(interviewer=self.instance)
             if allocs.exists():
                 raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
             return survey
