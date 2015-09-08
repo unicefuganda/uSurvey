@@ -527,14 +527,15 @@ class Interviews(Task):
             return StartSurvey(self.access).respond(message)
     
     
-class StartSurvey(SelectHousehold):
+class StartSurvey(SelectHousehold, Interviews):
     
     @property
     def house_roaster(self):
-        registered = self._retrieve('house_register', None)
+        registered = self._get_param('house_register', None)
         if registered is None:
-            registered = dict([(int(h.house_number), unicode(h)) for h in self.registered_households if h.members.count()>0])
-            self._set('house_register', registered)
+            survey_households = self.interviewer.generate_survey_households(self.ongoing_survey)
+            registered = dict([(int(h.house_number), unicode(h)) for h in survey_households if h.members.count()>0])
+            self._set_param('house_register', registered)
         return registered
     
     @property

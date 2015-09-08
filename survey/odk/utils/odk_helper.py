@@ -213,12 +213,8 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     submission.save_attachments(media_files.values())
     return submission
 
-def get_surveys(interviewer):
-    surveys = []
-    allocation = SurveyAllocation.get_allocation(interviewer)
-    if allocation and interviewer.ea.open_batches(allocation):
-        surveys.append(allocation)
-    return surveys
+def get_survey(interviewer):
+    return SurveyAllocation.get_allocation(interviewer)
 
 class SubmissionReport:
     form_id = None

@@ -124,7 +124,7 @@ class Interviewer(BaseModel):
         send(text, interviewers)
 
     def allocated_surveys(self):
-        return self.assignments.filter(completed=False)
+        return self.assignments.filter(completed=False, allocation_ea=self.ea)
 
 class SurveyAllocation(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name='assignments')

@@ -16,30 +16,30 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.template import RequestContext, loader, Context
 from survey.odk.utils.log import audit_log, Actions, logger
-from survey.odk.utils.odk_helper import get_surveys, process_submission, disposition_ext_and_date, get_zipped_dir, \
+from survey.odk.utils.odk_helper import get_survey, process_submission, disposition_ext_and_date, get_zipped_dir, \
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth
-from survey.models import Survey, Interviewer, Household
+from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
-from survey.models import ODKSubmission, Answer
 from survey.models.surveys import SurveySampleSizeReached
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.interviewer_configs import MESSAGES
 
 
-def get_survey_xform(interviewer, survey):
+def get_survey_xform(interviewer, batch):
     selectable_households = None
     household_size = interviewer.ea.total_households
-    if interviewer.may_commence(survey):
-        registered_households = interviewer.generate_survey_households(survey)
+    if interviewer.may_commence(batch.survey):
+        registered_households = interviewer.generate_survey_households(batch.survey)
         return render_to_string("odk/survey_form_without_house_reg.xml", {
             'interviewer': interviewer,
             'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
-            'survey' : survey,
-            'survey_batches' : interviewer.ea.open_batches(survey),
+            'title' : '%s - %s' % (batch.survey, batch),
+            'survey' : batch.survey,
+            'survey_batches' : [batch, ],
             'educational_levels' : LEVEL_OF_EDUCATION,
             'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
             })
@@ -47,7 +47,7 @@ def get_survey_xform(interviewer, survey):
         selectable_households = range(1, household_size + 1)
         return render_to_string("odk/household_registration.xml", {
             'interviewer': interviewer,
-            'survey' : survey,
+            'survey' : batch.survey,
             'educational_levels' : LEVEL_OF_EDUCATION,
             'selectable_households' : selectable_households,
             'messages' : MESSAGES,
@@ -85,12 +85,12 @@ def form_list(request):
     household_size = interviewer.ea.total_households
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
-    surveys = get_surveys(interviewer)
+    survey = get_survey(interviewer)
     audit = {}
     audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
           _("Requested forms list. for %s" % interviewer.name), audit, request)
     content = render_to_string("odk/xformsList.xml", {
-    'surveys': surveys,
+    'batches': interviewer.ea.open_batches(survey),
     'interviewer' : interviewer,
     'request' : request,
     'household_size' : household_size
@@ -100,11 +100,11 @@ def form_list(request):
     return response
 
 @http_digest_interviewer_auth
-def download_xform(request, survey_id):
+def download_xform(request, batch_id):
     interviewer = request.user
-    survey = get_object_or_404(Survey, pk=survey_id)
-    survey_xform = get_survey_xform(interviewer, survey)
-    form_id = '%s'% survey_id
+    batch = get_object_or_404(Batch, pk=batch_id)
+    survey_xform = get_survey_xform(interviewer, batch)
+    form_id = '%s'% batch_id
     audit = {
         "xform": form_id
     }
@@ -112,7 +112,7 @@ def download_xform(request, survey_id):
                 _("Downloaded XML for form '%(id_string)s'.") % {
                                                         "id_string": form_id
                                                     }, audit, request)
-    response = response_with_mimetype_and_name('xml', 'survey%s' %survey_id,
+    response = response_with_mimetype_and_name('xml', 'survey-%s' %batch_id,
                                                show_date=False, full_mime='text/xml')
     response.content = survey_xform
     return response
@@ -160,5 +160,5 @@ def submission(request):
                                                         "interviewer": interviewer.name,
                                                         "desc" : str(ex)
                                                     }, {'desc' : str(ex)}, request, logging.WARNING)
-        return OpenRosaServerError(u"Unexpected error while processing your form. Please try again")
+        return OpenRosaServerError(u"An error occurred. Please try again")
 

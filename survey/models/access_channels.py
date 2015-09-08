@@ -37,7 +37,7 @@ class InterviewerAccess(BaseModel):
         return mark_safe(name)
 
 class USSDAccess(InterviewerAccess):
-    aggregator = models.CharField(choices=settings.AGGREGATORS, max_length=100)
+    aggregator = models.CharField(choices=settings.AGGREGATORS, max_length=100, null=True, blank=True)
     
     class Meta:
         app_label = 'survey'
