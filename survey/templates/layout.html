@@ -20,7 +20,8 @@
     <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css" />
 
     {% block extra_css %}{% endblock %}
-
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/background.cycle.js"></script>
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
@@ -202,10 +203,9 @@ document.write(" "+ now.getFullYear());
 <script src="{{ STATIC_URL }}/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/highcharts.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/exporting.js" type="text/javascript" charset="utf-8"></script>
-
 <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
-<script src="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/underscore.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/question_options.js" type="text/javascript" charset="utf-8"></script>
