@@ -1,3 +1,12 @@
+<script language="JavaScript" type="text/javascript">
+$(document).ready(function() {
+    $('#example').DataTable( {
+        "scrollY":        "200px",
+        "scrollCollapse": true,
+        "paging":         false
+    } );
+} );
+</script>
 {% extends 'form.html' %}
 {% block title %}
     Select Questions for {{ batch.survey.name.capitalize }} - {{ batch.name.capitalize }}
@@ -36,12 +45,6 @@
 					<td>{{question.answer_type}}</td>
 				</tr>
 			{% endfor %}
-				<tr class="rd">
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-				</tr>
 			<tr>
 				<td colspan="6" class="redips-mark"><span id="msg"></span></td>
 			</tr>

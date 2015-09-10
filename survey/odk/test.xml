@@ -1,0 +1,214 @@
+
+<h:html xmlns="http://www.w3.org/2002/xforms"
+xmlns:h="http://www.w3.org/1999/xhtml"
+xmlns:ev="http://www.w3.org/2001/xml-events"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+<h:title>
+  ELQS
+   for
+  10 random households only
+
+</h:title>
+  <model>
+  <instance>
+   <survey id="1" >
+     <meta>
+       <instanceID />
+       <instanceName />
+     </meta>
+     <chooseExistingHousehold>1</chooseExistingHousehold>
+    <registeredHousehold>
+        <household />
+        <selectedMember />
+        <selectedMemberName />
+        <householdMember>
+
+            <h1 />
+
+        </householdMember>
+    </registeredHousehold>
+
+
+	   <b1>
+
+				<q7 />
+
+				<q8 />
+
+				<q6 />
+
+				<q12 />
+
+				<q11 />
+
+		</b1>
+
+
+   </survey>
+  </instance>
+
+  <!-- bindings -->
+  <bind nodeset="/survey/meta/instanceID" type="string"
+           readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/survey/meta/instanceName" type="string"
+           readonly="true()" calculate="concat('ELQS', /survey/household/houseNumber, ' ', /survey/registeredHousehold/householdMember/h1, '')" />
+	<bind nodeset="/survey/bnr" type="select1" />
+
+   <bind nodeset="/survey/registeredHousehold/householdMember/h1" type="select1"  required="true()" relevant="selected(/survey/registeredHousehold/household,'1')" />
+
+  <bind nodeset="/survey/registeredHousehold/selectedMember" type="string"
+       readonly="true()" calculate="concat(/survey/registeredHousehold/householdMember/h1, '')" />
+
+
+
+
+			<bind nodeset="/survey/b1/q7"
+				type="select1"
+				required="true()"
+				relevant="true()  and (true())  and (false() or ( /survey/registeredHousehold/selectedMember = '2_Ojoba_Kehinde'  or  /survey/registeredHousehold/selectedMember = '4_Bala_Ademola'  or  /survey/registeredHousehold/selectedMember = '5_Philip_Jack' ))"/>
+
+
+
+			<bind nodeset="/survey/b1/q8"
+				type="int"
+				required="true()"
+				relevant="true()  and (false() or /survey/b1/q7 = '4' or string-length(/survey/b1/q7) > 0)  and (false())"/>
+
+
+
+			<bind nodeset="/survey/b1/q6"
+				type="int"
+				required="true()"
+				relevant="true()  and (false() or string-length(/survey/b1/q8) > 0 or string-length(/survey/b1/q8) > 0 or string-length(/survey/b1/q8) > 0 or string-length(/survey/b1/q8) > 0)  and (false() or ( /survey/registeredHousehold/selectedMember = '2_Ojoba_Kehinde'  or  /survey/registeredHousehold/selectedMember = '4_Bala_Ademola'  or  /survey/registeredHousehold/selectedMember = '5_Philip_Jack' ))"/>
+
+
+
+			<bind nodeset="/survey/b1/q12"
+				type="string"
+				required="true()"
+				relevant="true()  and (false() or /survey/b1/q7 = '3')  and (false() or ( /survey/registeredHousehold/selectedMember = '2_Ojoba_Kehinde'  or  /survey/registeredHousehold/selectedMember = '4_Bala_Ademola'  or  /survey/registeredHousehold/selectedMember = '5_Philip_Jack' ))"/>
+
+
+
+			<bind nodeset="/survey/b1/q11"
+				type="select1"
+				required="true()"
+				relevant="true()  and (false() or /survey/b1/q6 < '40')  and (false() or ( /survey/registeredHousehold/selectedMember = '2_Ojoba_Kehinde'  or  /survey/registeredHousehold/selectedMember = '4_Bala_Ademola'  or  /survey/registeredHousehold/selectedMember = '5_Philip_Jack' ))"/>
+
+
+
+
+  </model>
+</h:head>
+<h:body>
+    <group>
+        <label>Household details</label>
+
+            <hint>Please complete this survey for 10 random households only</hint>
+
+	    <select1 ref="/survey/registeredHousehold/household">
+	         <label>Select Household</label>
+
+			    <item>
+	               <label>HH-1, Ojoba</label>
+	               <value>1</value>
+	            </item>
+
+	    </select1>
+
+	        <select1 ref="/survey/registeredHousehold/householdMember/h1">
+	            <label>Select Household Member</label>
+
+			    <item>
+	               <label>Ojoba, Kehinde </label>
+	               <value>2_Ojoba_Kehinde</value>
+	            </item>
+
+			    <item>
+	               <label>Bala, Ademola </label>
+	               <value>4_Bala_Ademola</value>
+	            </item>
+
+			    <item>
+	               <label>Philip, Jack </label>
+	               <value>5_Philip_Jack</value>
+	            </item>
+
+	        </select1>
+
+    </group>
+
+		<group>
+			<label>Test Batch1</label>
+			<hint>Test batch</hint>
+
+
+
+					<select1 ref="/survey/b1/q7">
+						<label>Have you attended school before?</label>
+
+						<item>
+							<label>Yes</label>
+							<value>4</value>
+						</item>
+
+						<item>
+							<label>No</label>
+							<value>3</value>
+						</item>
+
+					</select1>
+
+
+
+
+				<input ref="/survey/b1/q8">
+					<label>How frequently do you go for medical checkup</label>
+				</input>
+
+
+
+
+				<input ref="/survey/b1/q6">
+					<label>How old are you?</label>
+				</input>
+
+
+
+
+				<input ref="/survey/b1/q12">
+					<label>How did you learn how to speak english</label>
+				</input>
+
+
+
+
+					<select1 ref="/survey/b1/q11">
+						<label>Are you married yet?</label>
+
+						<item>
+							<label>Not interested</label>
+							<value>11</value>
+						</item>
+
+						<item>
+							<label>Yes</label>
+							<value>10</value>
+						</item>
+
+						<item>
+							<label>No</label>
+							<value>9</value>
+						</item>
+
+					</select1>
+
+
+
+		</group>
+
+
+</h:body>
+</h:html>
