@@ -1,0 +1,38 @@
+   <survey id="1" >
+     <meta>
+       <instanceID>657</instanceID>
+       <instanceName />
+     </meta>
+     <chooseExistingHousehold>1</chooseExistingHousehold>
+    <registeredHousehold>
+        <household>17</household>
+        <selectedMember>20_Jerry_Ghana</selectedMember>
+        <selectedMemberName />
+        <householdMember>
+        
+            <h17>20_Jerry_Ghana</h17>
+        
+        </householdMember>
+    </registeredHousehold>
+	
+		
+	   <b1>
+			
+		</b1>
+
+	
+		
+	   <b2>
+			
+				<q93>16</q93>
+			
+				<q94>1995-11-03</q94>
+			
+				<q95>Yes No</q95>
+			
+				<q98>How far</q98>
+			
+		</b2>
+
+	
+   </survey>
