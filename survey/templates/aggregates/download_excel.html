@@ -7,5 +7,5 @@
   <h4>
     Choose which reports you would like to export to excel
   </h4>
-  {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-csv-form" a_form=survey_batch_filter_form no_button=False %}
+  {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-csv-form" a_form=survey_batch_filter_form no_button=False no_auto_refresh=True %}
 {% endblock %}

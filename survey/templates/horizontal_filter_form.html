@@ -30,14 +30,18 @@
 
 </table>
 </form>
-    <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
-    <script type="text/javascript">
-    $(function(){
-        {% for field in a_form.visible_fields %}
-            $('#{{ field.auto_id }}').on('change', function () {
-                $('#{{ filter_id }}').submit();
+{% if not no_auto_refresh %}
+    {% block auto_refresh %}
+        <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+        $(function(){
+            {% for field in a_form.visible_fields %}
+                $('#{{ field.auto_id }}').on('change', function () {
+                    $('#{{ filter_id }}').submit();
+                });
+            {% endfor %}
             });
-        {% endfor %}
-        });
-    </script>
+        </script>
+    {% endblock %}
+{% endif %}
 <br class="clear" />
