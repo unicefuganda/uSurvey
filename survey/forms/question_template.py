@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, ValidationError
 import re
 from django.conf import settings
 from survey.models import QuestionTemplate, TemplateOption, Answer, QuestionModule, \
@@ -19,6 +19,12 @@ class QuestionTemplateForm(ModelForm):
         widgets ={
             'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"}),
         }
+        
+    def clean_identifier(self):
+        answer_type = self.cleaned_data.get('identifier', None)
+        if QuestionTemplate.objects.filter(identifier=answer_type).exists():
+            raise ValidationError('Identifier already in use the question library')
+        return self.cleaned_data['identifier']
         
     def clean_options(self):
         options = dict(self.data).get('options')
