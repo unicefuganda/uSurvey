@@ -37,7 +37,7 @@ $(function(){
         counter = $('#text-counter'),
         maxlength = parseInt(text_area.attr('maxlength')),
         current_length = 0,
-        counter_text = "/" + maxlength;
+        counter_text = " of " + maxlength + " characters";
 
     text_area.on('keyup', function(){
         current_length = $(this).val().length;
