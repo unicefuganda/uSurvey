@@ -24,7 +24,7 @@ class QuestionTemplateForm(ModelForm):
         answer_type = self.cleaned_data.get('identifier', None)
         qts = QuestionTemplate.objects.filter(identifier=answer_type)
         if qts.exists():
-            if not self.instance or self.instance.identifier is not answer_type:
+            if not self.instance or not (self.instance.identifier == answer_type):
                 raise ValidationError('Identifier already in use the question library')
         return self.cleaned_data['identifier']
         
