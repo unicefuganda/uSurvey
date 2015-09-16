@@ -22,8 +22,10 @@ class QuestionTemplateForm(ModelForm):
         
     def clean_identifier(self):
         answer_type = self.cleaned_data.get('identifier', None)
-        if QuestionTemplate.objects.filter(identifier=answer_type).exists():
-            raise ValidationError('Identifier already in use the question library')
+        qts = QuestionTemplate.objects.filter(identifier=answer_type)
+        if qts.exists():
+            if not self.instance or self.instance.identifier is not answer_type:
+                raise ValidationError('Identifier already in use the question library')
         return self.cleaned_data['identifier']
         
     def clean_options(self):
