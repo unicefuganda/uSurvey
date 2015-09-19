@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+{% block title %}
+    {{ interviewer.name }}'s details
+{% endblock %}
+{% block content %}
+{% load template_tags %}
+    <h3 class="offset3">
+        {{ interviewer.name|capfirst }}'s Details
+    </h3>
+    <dl class="details offset1">
+        <dt>
+            Name
+        </dt>
+        <dd>
+            {{ interviewer.name }}
+        </dd>
+        {% for access in interviewer.ussd_access %}
+        <dt>
+            Mobile Number
+        </dt>
+        <dd>
+            {{ access.user_identifier }}
+        </dd>
+        {% endfor %}
+        {% for access in interviewer.odk_access %}
+        <dt>
+            ODK ID
+        </dt>
+        <dd>
+            {{ access.user_identifier }}
+        </dd>
+        <dt>
+            ODK Token
+        </dt>
+        <dd>
+            {{ access.odk_token }}
+        </dd>
+        {% endfor %}
+        <dt>
+            Date Of Birth
+        </dt>
+        <dd>
+            {{ interviewer.date_of_birth |format_date }}
+        </dd>
+        <dt>
+            Sex
+        </dt>
+        <dd>
+            {% if interviewer.gender %}
+                Male
+            {% else %}
+                Female
+            {% endif %}
+        </dd>
+        <dt>
+            Highest Level of Education
+        </dt>
+        <dd>
+            {{ interviewer.level_of_education }}
+        </dd>
+        <dt>
+            Preferred Language of Communication
+        </dt>
+        <dd>
+            {{ interviewer.language }}
+        </dd>
+        {% for loc in interviewer.ea.parent_locations %}
+          <dt>
+		    {{ loc.type.name}}
+	      </dt>
+        <dd>
+		    {{ loc.name}}
+	      </dd>
+        {% endfor %}
+        <dt>
+            Enumeration Area
+        </dt>
+        <dd>
+            {{ interviewer.ea }}
+        </dd>
+        <dt>
+            Total Households
+        </dt>
+        <dd>
+            {{ interviewer.ea.total_households }}
+        </dd>
+    </dl>
+    <div class="offset3">
+        {% if cancel_url %}
+            <a href="{{ cancel_url }}" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
+        {% else %}
+            <a href="javascript:window.history.back()" class="btn btn-inverse"><i
+                    class="icon-chevron-left icon-white"></i> Back</a>
+        {% endif %}
+        {% include 'interviewers/_action_button.html' with button_size="" interviewer=interviewer %}
+    </div>
+{% endblock %}
