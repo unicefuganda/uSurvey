@@ -4,6 +4,8 @@ fieldset .add-row {
       background:url(/static/img/add.png) no-repeat left center;
       width:16px;
       height:16px;
+      margin-left: 100px;
+      
   }
 fieldset  .delete-row {
       display:block;
