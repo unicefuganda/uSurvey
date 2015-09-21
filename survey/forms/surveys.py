@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
 from survey.forms.widgets import InlineRadioSelect
-from survey.models.surveys import Survey, BatchCommencement
+from survey.models import Survey, BatchCommencement, SurveyHouseholdListing
 
 
 class SurveyForm(ModelForm):
@@ -21,6 +21,11 @@ class SurveyForm(ModelForm):
         super(SurveyForm, self).__init__(*args, **kwargs)
         if kwargs.get('instance', None) and kwargs['instance'].batches_enabled():
             del self.fields['preferred_listing']
+        else:
+            preferred_listings = [('', '------ None -------'), ]
+            survey_listings = SurveyHouseholdListing.objects.all()
+            preferred_listings.extend([(l.survey.pk, l.survey.name) for l in survey_listings])
+            self.fields['preferred_listing'].choices = preferred_listings
 
 
     def clean(self):
