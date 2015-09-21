@@ -117,8 +117,8 @@ class Interviewer(BaseModel):
     def sms_interviewers_in_locations(cls, locations, text):
         interviewers = []
         for location in locations:
-            interviewers.extend(Interviewer.lives_under_location(location))
-        send(text, interviewers)
+            interviewers.extend(Interviewer.objects.filter(ea__locations__in=location.get_leafnodes(True)))
+        # send(text, interviewers)
 
     def allocated_surveys(self):
         return self.assignments.filter(completed=False, allocation_ea=self.ea)
