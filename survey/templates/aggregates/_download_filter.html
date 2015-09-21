@@ -1,7 +1,11 @@
-{% extends "horizontal_filter_form.html" %}
-{% block submit_button %}
-<td valign="center">
-    <input type="submit" name="action" value="Email Spreadsheet" class="accesbutton2" id="email_excel" />
-     <input type="submit" name="action"  value="Download Spreadsheet" class="accesbutton2" id="download_excel" />
+<table width="100%">
+    <tr><td  valign="bottom">{% extends "horizontal_filter_form.html" %}</td>
+        <td align="left" valign="bottom">{% block submit_button %}
+            <td valign="middle" class="downbutton">
+    <input type="submit" name="action" value="Email Spreadsheet" class="btnforall" id="email_excel" />
+     <input type="submit" name="action"  value="Download Spreadsheet" class="btnforall" id="download_excel" />
 </td>
-{% endblock %}
+            {% endblock %}
+</td></tr>
+    </table>
+
