@@ -19,8 +19,8 @@ class SurveyForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(SurveyForm, self).__init__(*args, **kwargs)
-        if kwargs.get('instance', None) and kwargs['instance'].batches_started():
-            self.fields['survey_listing'].widgets.attrs['class'] = 'hide'
+        if kwargs.get('instance', None) and kwargs['instance'].batches_enabled():
+            del self.fields['preferred_listing']
 
 
     def clean(self):
