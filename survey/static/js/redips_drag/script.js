@@ -34,6 +34,8 @@ redips.init = function () {
 	};
 	// row row_dropped
 	rd.event.rowDropped = function () {
+		if(rd.obj.getAttribute("id") == 'lib_questions_table')
+			rd.objOld.style = "display:none;";
 		msg.innerHTML = 'Dropped';
 	};
 	// row was dropped to the source - event handler
