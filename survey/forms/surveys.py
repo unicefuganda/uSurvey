@@ -22,7 +22,7 @@ class SurveyForm(ModelForm):
         if kwargs.get('instance', None) and kwargs['instance'].batches_enabled():
             del self.fields['preferred_listing']
         else:
-            preferred_listings = [('', '------ None -------'), ]
+            preferred_listings = [('', '------ None, Create new -------'), ]
             survey_listings = SurveyHouseholdListing.objects.all()
             preferred_listings.extend([(l.survey.pk, l.survey.name) for l in survey_listings])
             self.fields['preferred_listing'].choices = preferred_listings
