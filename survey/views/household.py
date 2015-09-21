@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required, permission_required
-from survey.models import Location, LocationType, SurveyAllocation
+from survey.models import Location, LocationType, SurveyAllocation, SurveyHouseholdListing
 from survey.forms.householdHead import *
 from survey.forms.household import *
 from survey.models import Survey, EnumerationArea
@@ -50,7 +50,7 @@ def get_interviewers(request):
 def list_households(request):
     locations_filter = LocationsFilterForm(request.GET, include_ea=True)
     enumeration_areas = locations_filter.get_enumerations()
-    households = Household.objects.filter(ea__in=enumeration_areas).order_by('house_number')
+    households = Household.objects.filter(listing__ea__in=enumeration_areas).order_by('house_number')
     search_fields = ['ea__name', 'registrar__name', 'survey__name', ]
     if request.GET.has_key('q'):
         all_households = get_filterset(households, request.GET['q'], search_fields)
@@ -93,9 +93,11 @@ def save(request, instance=None):
         handler = reverse('edit_household_page', args=(instance.pk, ))
         head = instance.get_head()
         heading = 'Edit Household'
+        cancel_url = reverse('view_household_page', args=(instance.pk, ))
     else:
         handler = reverse('new_household_page')
         heading = 'New Household'
+        cancel_url = reverse('list_household_page')
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     householdform = HouseholdForm(instance=instance, eas=locations_filter.get_enumerations())
     headform = HouseholdHeadForm(instance=head)
@@ -104,21 +106,30 @@ def save(request, instance=None):
         headform = HouseholdHeadForm(data=request.POST, instance=head)
         if householdform.is_valid():
             household = householdform.save(commit=False)
-            household.ea = household.registrar.ea
-            household.survey = SurveyAllocation.get_allocation(household.registrar)
-            household.save()
-            householdform = HouseholdForm()
-            if headform.is_valid():
-                head = headform.save(commit=False)
-                head.household = household
-                head.save()
-                headform = HouseholdHeadForm()
-            messages.info(request, 'Household %s saved successfully' % household.house_number)
-            handler = reverse('new_household_page')
+            interviewer = household.last_registrar
+            survey = SurveyAllocation.get_allocation(interviewer)
+            if survey:
+                survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+                household.listing = survey_listing.listing
+                household.save()
+                householdform = HouseholdForm()
+                if headform.is_valid():
+                    head = headform.save(commit=False)
+                    head.household = household
+                    head.save()
+                    if household.head_desc is not head.surname:
+                        household.head_desc = head.surname
+                        household.save()
+                    messages.info(request, 'Household %s saved successfully' % household.house_number)
+                    return HttpResponseRedirect(reverse('view_household_page', args=(household.pk, )))
+                handler = reverse('new_household_page')
+            else:
+                messages.error(request, 'No open survey for %s' % interviewer.name)
     context = {
                'headform': headform,
                'householdform': householdform,
                'action': handler,
+                'cancel_url' : cancel_url,
                'heading':heading,
                'id': "create-household-form",
                'button_label': "Save",

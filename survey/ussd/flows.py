@@ -5,8 +5,8 @@
 from calendar import monthrange
 from django.core import serializers
 from survey.models import Interviewer, Interview, Survey, EnumerationArea, \
-            Household, HouseholdMember, HouseholdHead, USSDAccess, SurveyAllocation, \
-            HouseMemberSurveyCompletion, HouseholdMemberBatchCompletion, HouseholdBatchCompletion
+            Household, HouseholdMember, HouseholdHead, USSDAccess, SurveyAllocation, SurveyHouseholdListing, \
+            HouseMemberSurveyCompletion, HouseholdMemberBatchCompletion, HouseholdBatchCompletion, ODKAccess
 from django import template
 from django.core.cache import cache
 from django.conf import settings
@@ -31,17 +31,37 @@ class Task(object):
     
     def _retrieve_global(self, name, fallback=None):
         return cache.get('%s/%s' % (self.GLOBALS_SPACE, name), fallback)
+
+    @property
+    def house_listing(self):
+        house_listing = self._retrieve_global('house_listing', None)
+        if house_listing is None:
+            survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(self.interviewer, self.ongoing_survey)
+            if survey_listing:
+                house_listing = survey_listing.listing
+                self._set_global('house_listing', house_listing)
+        return house_listing
+
+    @house_listing.setter
+    def house_listing(self, listing):
+        self._set_global('house_listing', listing)
+
+    @property
+    def survey_allocation(self):
+        allocation = self._retrieve_global('survey_allocation', None)
+        if allocation is None:
+            try:
+                allocation = SurveyAllocation.get_allocation_details(self.interviewer)
+                self._set_global('survey_allocation', allocation)
+            except SurveyAllocation.DoesNotExist:
+                pass
+        return allocation
     
     @property
     def ongoing_survey(self):
-        ongoing = self._retrieve_global('ongoing_survey', None)
-        if ongoing is None:
-            try:
-                ongoing = SurveyAllocation.get_allocation(self.interviewer)
-                self._set_global('ongoing_survey', ongoing)
-            except SurveyAllocation.DoesNotExist:
-                pass
-        return ongoing
+        allocation = self.survey_allocation
+        if allocation:
+            return allocation.survey
     
     @property
     def enumeration_area(self):
@@ -79,8 +99,10 @@ class Task(object):
     
     def _intro(self):
         restart_prompt = '%s:Restart'%settings.USSD_RESTART
-        intro_speech = self._intro_speech.strip(restart_prompt)
-        return '\n'.join([intro_speech, restart_prompt]) 
+        intro_speech = self._intro_speech
+        if not intro_speech.endswith(restart_prompt):
+            intro_speech = '\n'.join([intro_speech, restart_prompt])
+        return intro_speech
 
     def _set(self, name, val):
         return cache.set('%s/%s' % (self.VARIABLE_SPACE, name), val)
@@ -115,19 +137,8 @@ class Start(Task):
         super(Start, self).__init__(ussd_access)
         context = template.Context({'interviewer': self.interviewer.name, 'survey':  self.ongoing_survey})
         self._intro_speech = template.Template(MESSAGES['START']).render(context)
-        if self._survey_can_start:
+        if self.survey_allocation.batches_enabled():
             self._intro_speech = '%s\n%s' % (self._intro_speech, MESSAGES['START_SURVEY'])
-            
-    @property
-    def _survey_can_start(self):
-        can_start = self._retrieve("_survey_can_start", False)
-        if can_start is False and self.ongoing_survey:
-            total_ea_households = self.enumeration_area.total_households
-            min_percent_reg_houses = self.ongoing_survey.min_percent_reg_houses
-            if self.registered_households.count()*100.0/total_ea_households >= min_percent_reg_houses:
-                can_start = True
-                self._set("_survey_can_start", True)
-        return can_start
             
     def _intro(self):
         return self._intro_speech
@@ -135,11 +146,33 @@ class Start(Task):
     def _respond(self, message):
         if message.isdigit():
             if int(message) == self.RESGISTER_HOUSEHOLDS:
-                return RegisterHousehold(self.access).intro()
-            elif self._survey_can_start and int(message.strip()) == self.TAKE_SURVEY:
+                return ListHouseholds(self.access).intro()
+            elif self.survey_allocation.batches_enabled() and int(message.strip()) == self.TAKE_SURVEY:
                 return StartSurvey(self.access).intro()
         return self.intro()
-        
+
+
+
+class ListHouseholds(Task):
+
+    @property
+    def _intro_speech(self):
+        if self.house_listing.total_households is None:
+            return MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
+        else:
+            return RegisterHousehold(self.access).intro()
+
+    def _respond(self, message):
+        if message.isdigit():
+            house_listing = self.house_listing
+            house_listing.total_households = int(message)
+            house_listing.save()
+            self.house_listing = house_listing
+            return RegisterHousehold(self.access).intro()
+        else:
+            return self.intro()
+
+
 class SelectHousehold(Task):
 
     @property
@@ -154,7 +187,7 @@ class SelectHousehold(Task):
     
     @property
     def total_households(self):
-        return self.enumeration_area.total_households
+        return self.house_listing.total_households
     
     @property
     def current_page(self):
@@ -203,16 +236,15 @@ class RegisterHousehold(SelectHousehold):
         if selection is not None:
             try:
                 household = Household.objects.get(
-                                                           ea=self.enumeration_area,
-                                                           survey=self.ongoing_survey,
+                                                    listing__ea=self.enumeration_area,
+                                                           listing__survey_houselistings__survey=self.ongoing_survey,
                                                            house_number=selection
                                                            )
             except Household.DoesNotExist:
                 household = Household.objects.create(
-                                       registrar = self.interviewer,
+                                       last_registrar = self.interviewer,
                                        registration_channel = USSDAccess.choice_name(),
-                                       ea=self.enumeration_area,
-                                       survey=self.ongoing_survey,
+                                       listing=self.house_listing,
                                        house_number=selection
                                        )
             task = MemberOrHead(self.access)
@@ -456,6 +488,10 @@ class RegisterMember(Task):
     
     def end_registration(self):
         household_member = self._household_member
+        household_member.survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(self.interviewer,
+                                                                                              self.ongoing_survey)
+        household_member.registration_channel = ODKAccess.choice_name()
+        household_member.last_registrar = self.interviewer
         household_member.save()
         task = EndRegistration(self.access) 
         task._household = household_member.household
@@ -571,11 +607,8 @@ class StartSurvey(SelectHousehold, Interviews):
         if selection is None:
             return self.intro()
         else:
-            household = Household.objects.get(
-                                                        #registrar=self.interviewer,  #might have been registered by some other interviewer
-                                                           ea=self.enumeration_area,
-                                                           # registration_channel=USSDAccess.choice_name(), #might have been registed from another chanel
-                                                           survey=self.ongoing_survey,
+            household = Household.objects.get(#might have been registered by some other interviewer
+                                                           listing=self.house_listing,
                                                            house_number=selection
                                                            )
             task = SelectMember(self.access)
@@ -743,7 +776,6 @@ class StartInterview(Interviews):
                 interview = self._ongoing_interview
                 interview.closure_date = datetime.now()
                 interview.save()
-                #import pdb; pdb.set_trace()
                 house_member = interview.householdmember
                 house_member.batch_completed(ongoing_interview.batch)
                 batches = self._pending_batches

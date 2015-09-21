@@ -11,11 +11,11 @@ from survey.models.enumeration_area import EnumerationArea
 from survey.models.household_batch_completion import HouseholdMemberBatchCompletion, HouseholdMemberBatchCompletion, \
     HouseholdBatchCompletion, HouseMemberSurveyCompletion, HouseSurveyCompletion
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
-from survey.models.households import Household, HouseholdHead, HouseholdMember
+from survey.models.households import Household, HouseholdHead, HouseholdMember, HouseholdListing, SurveyHouseholdListing
 from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess, WebAccess
 from survey.models.location_weight import LocationWeight
 # from survey.models.locations import LocationAutoComplete, LocationCode
-from survey.models.surveys import Survey
+from survey.models.surveys import Survey, BatchCommencement
 from survey.models.unknown_dob_attribute import UnknownDOBAttribute
 from survey.models.upload_error_logs import UploadErrorLog
 from survey.models.users import UserProfile
@@ -68,6 +68,8 @@ __all__ = [
     'HouseSurveyCompletion',
     'GroupCondition',
     'Interviewer',
+    'BatchCommencement',
+    'SurveyHouseholdListing',
 #     'LocationAutoComplete',
     'Survey',
     'UserProfile',
@@ -86,6 +88,7 @@ __all__ = [
     'BatchLocationStatus',
     'HouseholdMember',
     'HouseholdBatchCompletion',
+    'HouseholdListing',
     'AboutUs',
     'EnumerationArea'
 ]

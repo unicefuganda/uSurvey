@@ -1,9 +1,9 @@
-{% load template_tags %}
 <h:html xmlns="http://www.w3.org/2002/xforms"
 xmlns:h="http://www.w3.org/1999/xhtml"
 xmlns:ev="http://www.w3.org/2001/xml-events"
 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 xmlns:jr="http://openrosa.org/javarosa">
+{% load template_tags %}
 <h:head>
 <h:title> 
   {{survey.name}} 
@@ -37,6 +37,7 @@ xmlns:jr="http://openrosa.org/javarosa">
             <firstName />
             <sex />
             <dateOfBirth />
+			<age />
             <isHead>0</isHead>
             <occupation />
             <levelOfEducation />
@@ -70,11 +71,13 @@ xmlns:jr="http://openrosa.org/javarosa">
       <bind nodeset="/survey/registeredHousehold/selectedMember" type="string" 
            readonly="true()" calculate="if(selected(/survey/chooseExistingHousehold,'1'), concat({% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}''), '')" />
   {% endif %}
-  <bind nodeset="/survey/household/houseNumber" type="{%if selectable_households %}select1{% else %}int{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/houseNumber" type="{%if registered_households %}select1{% else %}int{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/dateOfBirth" type="date" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')"/>
+	<bind nodeset="/survey/household/householdMember/age" type="int" readonly="true()"
+		  calculate="int((decimal-date-time(/survey/household/householdMember/dateOfBirth) - decimal-date-time(today())) div 365.4)"/>
   <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/occupation" type="string" relevant="selected(/survey/household/householdMember/isHead,'1')" />
   <bind nodeset="/survey/household/householdMember/levelOfEducation" type="select1" relevant="selected(/survey/household/householdMember/isHead,'1')" />
@@ -82,16 +85,17 @@ xmlns:jr="http://openrosa.org/javarosa">
 
 
 	{% for batch in survey_batches  %}
-		{% for question in batch.questions_and_subquestions %}
-        {% is_relevant_odk question batch investigator registered_households as relevance_context %}
-		<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}" 
-			type="{% if question.answer_type.lower == 'number' %}int{% elif question.answer_type.lower == 'multichoice' %}select1{% elif question.answer_type.lower == 'multiselect' %}select{% elif question.answer_type.lower == 'date' %}date{% elif question.answer_type.lower == 'audio' or question.answer_type.lower == 'image' or question.answer_type.lower == 'video' %}binary{% elif question.answer_type.lower == 'geopoint' %}geopoint{% else %}string{% endif %}" {% if question.answer_type.lower != 'geopoint' and question.group.name != 'NON_RESPONSE' %}required="true()"{% endif %} relevant="true() {{ relevance_context }}"/>
-                
-           {% if question.group.name == 'NON_RESPONSE' %}
-             <bind nodeset="/survey/b{{batch.pk}}/qnr{{question.pk}}" type="string" relevant="string-length(/survey/b{{batch.pk}}/q{{question.pk}})=0" />
-           {% endif %}
+		{% for question in batch.survey_questions %}
+		{% is_relevant_odk question interviewer registered_households as relevance_context %}
+			<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}"
+				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
+				required="true()"
+				relevant="{% if interviewer.ea in batch.non_response_eas %}selected(/survey/bnr{{batch.pk}}, '0'){% else %}true(){% endif %} {{ relevance_context }}"/>
+        	{% if interviewer.ea in batch.non_response_eas %}
+				<bind nodeset="/survey/bnr{{batch.pk}}" type="select1" />
+	    		<bind nodeset="/survey/qnr{{batch.pk}}" type="string" relevant="selected(/survey/bnr{{batch.pk}}, '1')" required="selected(/survey/bnr{{batch.pk}}, '1')" />
+			{% endif %}
 		{% endfor %}
-        
 	{% endfor %}
 
   </model>
@@ -99,9 +103,6 @@ xmlns:jr="http://openrosa.org/javarosa">
 <h:body>
     <group>
         <label>Household details</label>
-        {% if survey.has_sampling %}
-            <hint>Please complete this survey for {{ survey.sample_size }} random households only</hint>
-        {% endif %}
         {% if registered_households %}
 		    <select1 ref="/survey/chooseExistingHousehold">
 					<label>What do you want to do?</label>
@@ -135,10 +136,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 		        </select1>
 		   {% endfor %}
        {% endif %}
-       {% if selectable_households %}
+       {% if registered_households %}
           <select1 ref="/survey/household/houseNumber">    
               <label>Select household</label>
-              {% for h_number in selectable_households %}
+              {% for h_number in registered_households %}
                  <item>
 					<label>{{ h_number }}</label>
 					<value>{{ h_number }}</value>
@@ -206,8 +207,24 @@ xmlns:jr="http://openrosa.org/javarosa">
 		<group>
 			<label>{{ batch.name }}</label>
 			<hint>{{ batch.description }}</hint>
-			{% for question in batch.questions_and_subquestions %}
-				{% if question.answer_type.lower == 'multichoice' %}
+			{% if interviewer.ea in batch.non_response_eas %}
+                <select1  ref="/survey/bnr{{batch.pk}}">
+					<label>Member is available to respond</label>
+					<item>
+						<label>Yes</label>
+						<value>0</value>
+					</item>
+					<item>
+						<label>No</label>
+						<value>1</value>
+					</item>
+				</select1>
+				<input ref="/survey/qnr{{batch.pk}}">
+					<label>{{messages.NON_RESPONSE_MSG}}</label>
+				</input>
+			{% endif %}
+			{% for question in batch.survey_questions %}
+				{% if question.answer_type == answer_types.multichoiceanswer %}
 					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
 						<label>{{question.text}}</label>
 						{% for option in question.options.all %}
@@ -217,7 +234,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 						</item>
 						{% endfor %}
 					</select1>
-				{% elif question.answer_type.lower == 'multiselect' %}
+				{% elif question.answer_type == answer_types.multiselectanswer %}
 					<select ref="/survey/b{{batch.pk}}/q{{question.pk}}">
 						<label>{{question.text}}</label>
 						{% for option in question.options.all %}
@@ -227,19 +244,19 @@ xmlns:jr="http://openrosa.org/javarosa">
 						</item>
 						{% endfor %}
 					</select>
-				{% elif question.answer_type.lower == 'image' %}
+				{% elif question.answer_type == answer_types.imageanswer %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
 						<label>{{question.text}}</label>
 					</upload>
-				{% elif question.answer_type.lower == 'audio' %}
+				{% elif question.answer_type == answer_types.audioanswer %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   mediatype="audio/*">
 						<label>{{question.text}}</label>
 					</upload>
-				{% elif question.answer_type.lower == 'video' %}
+				{% elif question.answer_type == answer_types.videoanswer %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}" mediatype="video/*">
 						<label>{{question.text}}</label>
 					</upload>
-                {% elif question.answer_type.lower == 'date' %}
+                {% elif question.answer_type == answer_types.dateanswer %}
 				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}" appearance="no-calendar">
 					<label>{{question.text}}</label>
 				</input>
@@ -248,11 +265,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<label>{{question.text}}</label>
 				</input>
 				{% endif %}
-                {% if question.group.name == 'NON_RESPONSE' %}
-                <input ref="/survey/b{{batch.pk}}/qnr{{question.pk}}">
-					<label>Please enter reason for no response</label>
-				</input>
-                {% endif %}
+
 			{% endfor %}
 		</group>
 	{% endfor %}

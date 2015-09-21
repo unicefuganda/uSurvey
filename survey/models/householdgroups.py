@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.datastructures import SortedDict
 from survey.models.base import BaseModel
+import ast
 
 
 class HouseholdMemberGroup(BaseModel):
@@ -69,7 +70,7 @@ class GroupCondition(BaseModel):
     GROUP_TYPES = {
         'AGE': 'AGE',
         'GENDER': 'GENDER',
-        'GENERAL': 'GENERAL'
+        'GENERAL': 'ROLE'
     }
 
     value = models.CharField(max_length=50)
@@ -77,31 +78,46 @@ class GroupCondition(BaseModel):
     condition = models.CharField(max_length=20, default='EQUALS', choices=CONDITIONS.items())
     groups = models.ManyToManyField(HouseholdMemberGroup, related_name='conditions')
 
-    def confirm_male(self, value):
-        if str(value) == str(True) or str(value) == str(False):
-            return value
-        return str(value).lower() == "male" or (str(value).lower() == "head" and self.attribute == GroupCondition.GROUP_TYPES['GENERAL'])
+    def confirm_head(self, value):
+        return bool(ast.literal_eval(value))
+
+    def odk_confirm_head(self, value):
+        return 'true()' if bool(ast.literal_eval(value)) else 'false()'
 
     def matches(self, attributes):
         value = attributes.get(self.attribute.upper())
         return self.matches_condition(value)
+
+    def odk_matches(self, odk_attributes):
+        value_path = odk_attributes.get(self.attribute.upper())
+        method = getattr(self, 'odk_%s'%self.MATCHING_METHODS[self.condition])
+        return method(value_path)
 
     def matches_condition(self, value):
         method = getattr(self, self.MATCHING_METHODS[self.condition])
         return method(value)
 
     def is_equal(self, value):
-        return str(self.value) == str(value) or str(value) == str(self.confirm_male(self.value))
+        return str(self.value) == str(value) or value == self.confirm_head(self.value)
+
+    def odk_is_equal(self, value_path):
+        return "%s = '%s' or boolean(%s) = %s" % (value_path, self.value, value_path, self.odk_confirm_head(self.value))
 
     def is_greater_than(self, value):
         return int(value) >= int(self.value)
 
+    def odk_is_greater_than(self, value_path):
+        return "%s &gt; '%s'" % (value_path, self.value)
+
     def is_less_than(self, value):
         return int(value) <= int(self.value)
+
+    def odk_is_less_than(self, value_path):
+        return "%s &lt; '%s'" % (value_path, self.value)
 
     class Meta:
         app_label = 'survey'
         unique_together = ('value', 'attribute', 'condition')
 
     def __unicode__(self):
-        return "%s %s %s" % (self.attribute, self.condition, self.value)
+        return "%s %s %s" % (GroupCondition.GROUP_TYPES[self.attribute], self.condition, self.value)

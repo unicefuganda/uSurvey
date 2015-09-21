@@ -60,6 +60,7 @@ class Interview(BaseModel):
                             resulting_flow = flow
                     if resulting_flow:
                         next_question = resulting_flow.next_question
+
                  #confirm if next question is applicable
                 if next_question and (self.householdmember.belongs_to(next_question.group) and  \
                                     AnswerAccessDefinition.is_valid(channel, next_question.answer_type)) is False:

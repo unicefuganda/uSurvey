@@ -17,7 +17,8 @@ from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
 from survey.models import Survey, Interviewer, Interview, SurveyAllocation, ODKAccess, Household, HouseholdMember, HouseholdHead, \
             Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer, \
-            VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer, GeopointAnswer
+            VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer, GeopointAnswer, \
+            SurveyHouseholdListing, HouseholdListing
 from survey.models.surveys import SurveySampleSizeReached
 from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.odk.utils.log import logger
@@ -44,6 +45,7 @@ INSTANCE_ID_PATH = '//survey/meta/instanceID'
 FORM_ID_PATH = '//survey/@id'
 ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
 HOUSE_REG_FORM_ID_PREFIX = 'hreg'
+MANUAL_PHYSICAL_ADDR_PATH = '//survey/household/physicalAddress'
 MULTI_SELECT_XFORM_SEP = ' '
 GEOPOINT_XFORM_SEP = ' '
 # default content length for submission requests
@@ -67,6 +69,9 @@ def only_household_reg(survey_tree):
     flag_nodes = _get_nodes(ONLY_HOUSEHOLD_PATH, tree=survey_tree)
     return (flag_nodes and len(flag_nodes) > 0 and flag_nodes[0].text == '1')
 
+def batches_included(survey_tree):
+    return only_household_reg(survey_tree) is False
+
 def _get_household_members(survey_tree):
     member_nodes = _get_nodes(MANUAL_HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
     return HouseholdMember.objects.filter(pk__in=[member_node.text for member_node in member_nodes]).all()
@@ -77,6 +82,9 @@ def _get_member_attrs(survey_tree):
 
 def _get_household_house_number(survey_tree):
     return _get_nodes(MANUAL_HOUSEHOLD_SAMPLE_PATH, tree=survey_tree)[0].text
+
+def _get_household_physical_addr(survey_tree):
+    return _get_nodes(MANUAL_PHYSICAL_ADDR_PATH, tree=survey_tree)[0].text
 
 def _choosed_existing_household(survey_tree):
     return _get_nodes(NEW_OR_OLD_HOUSEHOLD_CHOICE_PATH, tree=survey_tree)[0].text == '1'
@@ -92,14 +100,21 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
     if _choosed_existing_household(survey_tree):
         return _get_selected_household_member(survey_tree)
     house_number = _get_household_house_number(survey_tree)
+    survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+    house_listing = survey_listing.listing
     try:
-        household = Household.objects.get(registrar=interviewer, survey=survey, ea=interviewer.ea, house_number=house_number)
+        household = Household.objects.get(listing=house_listing,
+                                          house_number=house_number)
     except Household.DoesNotExist:
-        household = Household.objects.create(registrar=interviewer,
-                                                           ea=interviewer.ea,
-                                                           registration_channel=ODKAccess.choice_name(),
-                                                           survey=survey,
-                                                           house_number=house_number)
+        physical_addr = ''
+        try:
+            physical_addr = _get_household_physical_addr(survey_tree)
+        except IndexError:
+            pass
+        household = Household.objects.create(last_registrar=interviewer,
+                                                listing=house_listing,
+                                                registration_channel=ODKAccess.choice_name(),
+                                                house_number=house_number, physical_address=physical_addr)
     #now time for member details
     MALE = '1'
     IS_HEAD = '1'
@@ -110,12 +125,18 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
     kwargs['gender'] = (mem_attrs['sex'] == MALE)
     kwargs['date_of_birth'] = datetime.strptime(mem_attrs['dateOfBirth'], '%Y-%m-%d')
     kwargs['household'] = household
+    kwargs['registrar'] = interviewer
+    kwargs['registration_channel'] = ODKAccess.choice_name()
+    kwargs['survey_listing'] = survey_listing
     if mem_attrs['isHead'] == IS_HEAD:
         kwargs['occupation'] = mem_attrs.get('occupation', '')
         kwargs['level_of_education'] = mem_attrs.get('levelOfEducation', '')
         resident_since = datetime.strptime(mem_attrs.get('residentSince', '1900-01-01'), '%Y-%m-%d')
         kwargs['resident_since']=resident_since
-        return HouseholdHead.objects.create(**kwargs)
+        head = HouseholdHead.objects.create(**kwargs)
+        if household.head_desc is not head.surname:
+            household.head_desc = head.surname
+            household.save()
     else:
         return HouseholdMember.objects.create(**kwargs)
 
@@ -174,15 +195,15 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     survey_tree = _get_tree(xml_file)
     form_id = _get_form_id(survey_tree)
     survey = _get_survey(survey_tree)
-    if (not only_household_reg(survey_tree)) and survey.has_sampling and \
-            Household.objects.filter(survey=survey, ea=interviewer.ea).count() >= survey.sample_size: #if its not only household registration, make sure sample size is not violated
-        #cannot continue if this survey has reached sample size for this ea
-        raise SurveySampleSizeReached()
+    # if (batches_included(survey_tree)) and survey.has_sampling and \
+    #         Household.objects.filter(survey=survey, ea=interviewer.ea).count() >= survey.sample_size: #if its not only household registration, make sure sample size is not violated
+    #     #cannot continue if this survey has reached sample size for this ea
+    #     raise SurveySampleSizeReached()
     member = _get_or_create_household_member(interviewer, survey, survey_tree)
     response_dict = _get_responses(interviewer, survey_tree, survey)
     treated_batches = {}
     interviews = {}
-    if response_dict and not only_household_reg(survey_tree):
+    if response_dict and batches_included(survey_tree):
         for (b_id, q_id), answer in response_dict.items():
             question = Question.objects.get(pk=q_id)
             batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
@@ -215,6 +236,9 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
 
 def get_survey(interviewer):
     return SurveyAllocation.get_allocation(interviewer)
+
+def get_survey_allocation(interviewer):
+    return SurveyAllocation.get_allocation_details(interviewer)
 
 class SubmissionReport:
     form_id = None

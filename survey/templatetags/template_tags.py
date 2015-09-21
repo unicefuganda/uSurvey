@@ -67,6 +67,10 @@ def get_value(dict, key):
     return dict.get(key, "")
 
 @register.filter
+def batches_enabled(survey, ea):
+    return 'Enabled' if survey.batches_enabled(ea) else 'Not Enabled'
+
+@register.filter
 def get_month(index):
     if not str(index).isdigit() and not index :
         return "N/A"
@@ -180,8 +184,11 @@ def total_household_members(interviewer):
     return sum([household.household_member.count() for household in households])
 
 @register.assignment_tag
-def  get_download_url(request, url_name, instance):
-    return request.build_absolute_uri(reverse(url_name, args=(instance.pk, )))
+def  get_download_url(request, url_name, instance=None):
+    if instance is None:
+        return request.build_absolute_uri(reverse(url_name))
+    else:
+        return request.build_absolute_uri(reverse(url_name, args=(instance.pk, )))
 
 @register.assignment_tag(takes_context=True)
 def is_relevant_odk(context, question, interviewer, registered_households):
@@ -213,6 +220,14 @@ def is_relevant_odk(context, question, interviewer, registered_households):
 def is_relevant_by_group(context, question, registered_households):
     question_group = question.group
     relevant_existing = []
+    relevant_new = []
+    attributes = {'AGE': '/survey/household/householdMember/age',
+                  'GENDER': '/survey/household/householdMember/sex',
+                  'GENERAL': '/survey/household/householdMember/isHead'
+                }
+    for condition in question_group.get_all_conditions():
+        relevant_new.append(condition.odk_matches(attributes))
+
     for household in registered_households:
         for member in household.members.all():
             if member.belongs_to(question_group):
@@ -226,11 +241,11 @@ def is_relevant_by_group(context, question, registered_households):
                     next_q_context.append("string-length(%s) &gt; 0" % node_path)
                     context[next_question.pk] = next_q_context
     relevance_builder = ['false()', ]
+    if relevant_new:
+       relevance_builder.append('(%s)' % ' and '.join(relevant_new))
     if relevant_existing:
         relevance_builder.append('(%s)' % ' or '.join(relevant_existing))
-    if relevance_builder:
-        return ' and (%s)' % ' or '.join(relevance_builder)
-    else: return ''
+    return ' and (%s)' % ' or '.join(relevance_builder)
 
     
 
