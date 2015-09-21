@@ -34,8 +34,10 @@ redips.init = function () {
 	};
 	// row row_dropped
 	rd.event.rowDropped = function () {
-		if(rd.obj.getAttribute("id") == 'lib_questions_table')
-			rd.objOld.style = "display:none;";
+		if(document.getElementById(rd.obj.id).rows.length > 3)
+		{
+			 document.getElementById(rd.obj.id).deleteRow(rd.objOld.rowIndex);
+		}
 		msg.innerHTML = 'Dropped';
 	};
 	// row was dropped to the source - event handler
