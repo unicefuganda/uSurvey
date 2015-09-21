@@ -4,7 +4,7 @@ fieldset .add-row {
       background:url(/static/img/add.png) no-repeat left center;
       width:16px;
       height:16px;
-      margin-left: 100px;
+      margin-right: 0px;
   }
 fieldset  .delete-row {
       display:block;
@@ -15,7 +15,7 @@ fieldset  .delete-row {
   }
 
 fieldset span.add-on {
-       margin-top: 5px;
+       margin-top: 3px;
   }
 
 fieldset td.horizontal-formset {

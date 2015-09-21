@@ -17,21 +17,19 @@ $(document).ready(function() {
 {% block pre_form_content %}
 	<div class="filter-form">
 		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
-        
     </div>
     <div class="search">
     	{% include "search_form.html" with id="library_search_form" %} 
     </div>
        <div id="redips-drag" class="clear redips-noautoscroll">
        	<br />
-  		<table id="lib_questions_table" class="left"  style="width: 45%;" >
-		<thead  class="redips-mark">
-			<th  class="redips-mark"  colspan="2">Identifier</th>
-			<th class="redips-mark">Text</th>
-			<th class="redips-mark">Answer Type</th>
-		</thead>
+		   <table width="45%"><tr><td class="redips-mark"  colspan="2">Identifier</td><td class="redips-mark">Text</td><td align="center" class="redips-mark">Answer Type</td></tr></table>
+  		<table id="lib_questions_table" class="left"  style="width: 45%;">
 		<tbody>
-			{% for question in library_questions %} 
+		<tr><td>
+		 <div class="scrollit">
+			 <table>
+			{% for question in library_questions %}
 				<tr class="rd ms-selectable" id="{{question.pk}}-selectable">
 					<td align="center" width="35px"><div class="redips-drag redips-row"><img src="{{ STATIC_URL }}img/drag.png" class="img-responsive" alt="" /></div>
 					<input type="hidden" name="identifier" value="{{question.identifier}}" />
@@ -45,6 +43,9 @@ $(document).ready(function() {
 					<td>{{question.answer_type}}</td>
 				</tr>
 			{% endfor %}
+				 </table>
+			 </div>
+		</td></tr>
 			<tr>
 				<td colspan="6" class="redips-mark"><span id="msg"></span></td>
 			</tr>
@@ -52,10 +53,8 @@ $(document).ready(function() {
 	</table>
 {% endblock %}
 {% block display_form_fields %}
-    			<table id="batch_questions" style="width: 50%; margin-left: 2%;" class="left">
-					<thead  class="redips-mark">
-						<th colspan="4"  class="redips-mark">Drop Questions Here</th>
-					</thead>
+		   <table align="center" style="width: 45%;"><tr><td class="redips-mark">Drop Questions Here</td></tr></table>
+    			<table id="batch_questions" align="center" style="width: 45%;">
 					<tbody>
 						<tr class="rd">
 							<td></td>
