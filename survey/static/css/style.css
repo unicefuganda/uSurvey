@@ -78,7 +78,7 @@ background-position:center:
 }
 .usocilbg
 {
-background-color:#1B1B1B;
+background-color:#FFFFFF;
 }
 .whitebg
 {
@@ -250,7 +250,7 @@ background-color:#33CCFF; opacity: 0.9; filter: alpha(opacity=90); top: 0;  widt
 .breadnavbar2 {
  width: auto;
  box-shadow: 1px 1px 1px #BEBEBE;
-padding-bottom: 2px;
+padding-bottom: 10px;
  padding-top: 2px;
 padding-left: 60px;
 height:60px;
@@ -556,11 +556,11 @@ text-decoration:none;
 }
 .footer
 {
-background-color:#CCCCCC; opacity: 0.6; filter: alpha(opacity=40); bottom: 0; position: fixed;  width: 100%; border-bottom:solid 1px #ffffff; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666;
+background-color:#CCCCCC; opacity: 0.6; filter: alpha(opacity=40); bottom: 0;  width: 100%; border-bottom:solid 1px #ffffff; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666;
 }
 .footer2
 {
-background-color:#CCCCCC; opacity: 0.6; filter: alpha(opacity=40); bottom: 0; position: fixed;  width: 100%; border-bottom:solid 1px #ffffff; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666; text-align:right; height: 30px;
+background-color:#CCCCCC; opacity: 0.6; filter: alpha(opacity=40); bottom: 0;  width: 100%; border-bottom:solid 1px #ffffff; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666; text-align:right; height: 30px;
 }
 	.sidelines
 	{

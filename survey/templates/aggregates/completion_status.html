@@ -5,8 +5,6 @@
 {% block content %}
    {% load pagination_tags %}
 
-    <h3>Survey Completion by Region/District</h3>
-
   <form id="aggregates-form" action="{% url action %}" method="post">
     {% csrf_token %}
     <div>
