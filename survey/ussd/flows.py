@@ -513,7 +513,7 @@ class EndRegistration(Task):
     
     @property
     def _intro_speech(self):
-        return MESSAGES['END_REGISTRATION']
+        return MESSAGES['END_REGISTRATION'] % self._household
     
     def _respond(self, message):
         message = message.strip()

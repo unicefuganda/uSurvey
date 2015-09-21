@@ -20,7 +20,7 @@ class SurveyForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SurveyForm, self).__init__(*args, **kwargs)
         if kwargs.get('instance', None) and kwargs['instance'].batches_enabled():
-            del self.fields['preferred_listing']
+            self.fields['preferred_listing'].widget.attrs['disabled'] = 'disabled'
         else:
             preferred_listings = [('', '------ None, Create new -------'), ]
             survey_listings = SurveyHouseholdListing.objects.all()
