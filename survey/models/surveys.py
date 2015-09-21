@@ -10,7 +10,8 @@ class Survey(BaseModel):
     sample_size = models.PositiveIntegerField(max_length=2, null=False, blank=False, default=10)
     has_sampling = models.BooleanField(default=True)
     preferred_listing = models.ForeignKey('Survey', related_name='householdlist_users',
-                                          help_text='Select which survey household listing to reuse. Leave empty for fresh listing', required=False)
+                                          help_text='Select which survey household listing to reuse. Leave empty for fresh listing',
+                                          null=True, blank=True)
 
     # min_percent_reg_houses = models.IntegerField(verbose_name='Min % Of Registered Households', default=80, validators=[MinValueValidator(0), MaxValueValidator(100)],
     #                                                     help_text='Enter minimum percentage of total household to be registered before survey can start on ODK channel')

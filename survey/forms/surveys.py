@@ -26,7 +26,6 @@ class SurveyForm(ModelForm):
             survey_listings = SurveyHouseholdListing.objects.all()
             preferred_listings.extend([(l.survey.pk, l.survey.name) for l in survey_listings])
             self.fields['preferred_listing'].choices = preferred_listings
-            self.fields['preferred_listing'].required = False
 
 
     def clean(self):
