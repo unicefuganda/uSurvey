@@ -9,10 +9,11 @@ class HouseholdForm(ModelForm):
 
     class Meta:
         model = Household
-        exclude = ['ea', 'survey', 'household_code']
+        exclude = [ 'listing', 'head_desc']
         widgets = {
             'ea': forms.HiddenInput(),
-            'registration_channel': forms.HiddenInput()
+            'registration_channel': forms.HiddenInput(),
+            'physical_address' : forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"}),
         }
 
     def __init__(self, is_edit=False, eas=[],  survey=None, *args, **kwargs):
@@ -20,7 +21,7 @@ class HouseholdForm(ModelForm):
         self.is_editing = is_edit
         self.fields['registration_channel'].initial = WebAccess.choice_name()
         if eas:
-            self.fields['registrar'].queryset = Interviewer.objects.filter(ea__pk__in=[ea.pk for ea in eas])
+            self.fields['last_registrar'].queryset = Interviewer.objects.filter(ea__pk__in=[ea.pk for ea in eas])
 
 #         if not self.is_editing:
 #             self.fields['uid'].initial = Household.next_uid(survey)
@@ -28,7 +29,7 @@ class HouseholdForm(ModelForm):
 #             self.fields['uid'].initial = self.instance.uid
 #             self.fields['uid'].widget.attrs['disabled'] = 'disabled'
     def clean_registrar(self):
-        if SurveyAllocation.get_allocation(self.cleaned_data['registrar']) is None:
+        if SurveyAllocation.get_allocation(self.cleaned_data['last_registrar']) is None:
             raise ValidationError("No open survey available for this Interviewer yet.")
         return self.cleaned_data['registrar']
 

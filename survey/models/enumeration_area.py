@@ -7,7 +7,7 @@ from survey.models.batch import Batch, BatchLocationStatus
 
 class EnumerationArea(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=True)
-    total_households = models.PositiveIntegerField(null=True, blank=True)
+    # total_households = models.PositiveIntegerField(null=True, blank=True)
     locations = models.ManyToManyField(Location, null=True, related_name="enumeration_areas")
 
     def __unicode__(self):

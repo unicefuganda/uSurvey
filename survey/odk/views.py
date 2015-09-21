@@ -16,11 +16,11 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.template import RequestContext, loader, Context
 from survey.odk.utils.log import audit_log, Actions, logger
-from survey.odk.utils.odk_helper import get_survey, process_submission, disposition_ext_and_date, get_zipped_dir, \
+from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, get_zipped_dir, \
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth
-from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch
+from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, HouseholdListing
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
@@ -30,28 +30,28 @@ from survey.interviewer_configs import MESSAGES
 
 
 def get_survey_xform(interviewer, batch):
+    registered_households = interviewer.generate_survey_households(batch.survey)
+    return render_to_string("odk/survey_form.xml", {
+        'interviewer': interviewer,
+        'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
+        'title' : '%s - %s' % (batch.survey, batch),
+        'survey' : batch.survey,
+        'survey_batches' : [batch, ],
+        'educational_levels' : LEVEL_OF_EDUCATION,
+        'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
+        })
+
+def get_household_list_xform(interviewer, survey, house_listing):
     selectable_households = None
-    household_size = interviewer.ea.total_households
-    if interviewer.may_commence(batch.survey):
-        registered_households = interviewer.generate_survey_households(batch.survey)
-        return render_to_string("odk/survey_form_without_house_reg.xml", {
-            'interviewer': interviewer,
-            'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
-            'title' : '%s - %s' % (batch.survey, batch),
-            'survey' : batch.survey,
-            'survey_batches' : [batch, ],
-            'educational_levels' : LEVEL_OF_EDUCATION,
-            'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
-            })
-    else:
-        selectable_households = range(1, household_size + 1)
-        return render_to_string("odk/household_registration.xml", {
-            'interviewer': interviewer,
-            'survey' : batch.survey,
-            'educational_levels' : LEVEL_OF_EDUCATION,
-            'selectable_households' : selectable_households,
-            'messages' : MESSAGES,
-            })
+    if house_listing.total_households:
+        selectable_households = [idx+1 for idx in range(house_listing.total_households)]
+    return render_to_string("odk/household_registration.xml", {
+        'interviewer': interviewer,
+        'survey' : survey,
+        'educational_levels' : LEVEL_OF_EDUCATION,
+        'messages' : MESSAGES,
+        'selectable_households' : selectable_households,
+        })
 
 @login_required
 @permission_required('auth.can_view_aggregates')
@@ -82,18 +82,18 @@ def form_list(request):
         This is where ODK Collect gets its download list.
     """
     interviewer = request.user
-    household_size = interviewer.ea.total_households
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
-    survey = get_survey(interviewer)
+    allocation = get_survey_allocation(interviewer)
+    survey = allocation.survey
     audit = {}
     audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
           _("Requested forms list. for %s" % interviewer.name), audit, request)
     content = render_to_string("odk/xformsList.xml", {
+    'allocation' : allocation,
     'batches': interviewer.ea.open_batches(survey),
     'interviewer' : interviewer,
     'request' : request,
-    'household_size' : household_size
     })
     response = BaseOpenRosaResponse(content)
     response.status_code = 200
@@ -103,18 +103,48 @@ def form_list(request):
 def download_xform(request, batch_id):
     interviewer = request.user
     batch = get_object_or_404(Batch, pk=batch_id)
-    survey_xform = get_survey_xform(interviewer, batch)
-    form_id = '%s'% batch_id
+    allocation = get_survey_allocation(interviewer)
+    if allocation.batches_enabled():
+        try:
+            allocation.survey.batches.get(id=batch_id)
+            # import pdb; pdb.set_trace()
+            survey_xform = get_survey_xform(interviewer, batch)
+            form_id = '%s'% batch_id
+
+            audit = {
+                "xform": form_id
+            }
+            audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
+                        _("Downloaded XML for form '%(id_string)s'.") % {
+                                                                "id_string": form_id
+                                                            }, audit, request)
+            response = response_with_mimetype_and_name('xml', 'survey-%s' %batch_id,
+                                                       show_date=False, full_mime='text/xml')
+            response.content = survey_xform
+            return response
+        except Batch.DoesNotExist:
+            pass
+    return OpenRosaResponseNotFound()
+
+
+@http_digest_interviewer_auth
+def download_houselist_xform(request):
+    interviewer = request.user
+    allocation = get_survey_allocation(interviewer)
+    survey = allocation.survey
+    survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+    householdlist_xform = get_household_list_xform(interviewer, survey, survey_listing.listing)
+    form_id = 'allocation-%s'% allocation.id
     audit = {
         "xform": form_id
     }
-    audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer, 
+    audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
                 _("Downloaded XML for form '%(id_string)s'.") % {
                                                         "id_string": form_id
                                                     }, audit, request)
-    response = response_with_mimetype_and_name('xml', 'survey-%s' %batch_id,
+    response = response_with_mimetype_and_name('xml', 'household_listing-%s' % survey.pk,
                                                show_date=False, full_mime='text/xml')
-    response.content = survey_xform
+    response.content = householdlist_xform
     return response
 
 @http_digest_interviewer_auth

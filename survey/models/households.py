@@ -16,19 +16,52 @@ from django.core.exceptions import ValidationError
 from django import template
 
 
+class HouseholdListing(BaseModel):
+    ea = models.ForeignKey("EnumerationArea", null=True, related_name="household_enumeration_area")
+    list_registrar = models.ForeignKey('Interviewer', related_name='listings', verbose_name='Interviewer')
+    initial_survey = models.ForeignKey('Survey', related_name='listings')
+    total_households = models.IntegerField(null=True, blank=True)
+
+    def __unicode__(self):
+        return '%s-%s' % (self.ea, self.initial_survey)
+
+    class Meta:
+        app_label = 'survey'
+        unique_together = [('initial_survey', 'ea'), ]
+
+class SurveyHouseholdListing(BaseModel):
+    listing = models.ForeignKey(HouseholdListing, related_name='survey_houselistings')
+    survey = models.ForeignKey('Survey', related_name='survey_house_listings')
+
+    class Meta:
+        app_label = 'survey'
+
+    @classmethod
+    def get_or_create_survey_listing(cls, interviewer, survey):
+        survey_listing = None
+        try:
+            return cls.objects.get(survey=survey, listing__ea=interviewer.ea)
+        except cls.DoesNotExist:
+            try:
+                listing = HouseholdListing.objects.get(ea=interviewer.ea, initial_survey=survey.preferred_listing)
+            except HouseholdListing.DoesNotExist:
+                listing = HouseholdListing.objects.create(ea=interviewer.ea, initial_survey=survey, list_registrar=interviewer)
+            survey_listing = cls.objects.create(survey=survey, listing=listing)
+        return survey_listing
+
+
 class Household(BaseModel):
     REGISTRATION_CHANNELS = [(name, name) for name in InterviewerAccess.access_channels()]
-    ea = models.ForeignKey("EnumerationArea", null=True, related_name="household_enumeration_area")
-#     uid = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Interviewer Unique Identification for the Household")
     house_number = models.PositiveIntegerField(verbose_name="Household Number")
-    household_code = models.CharField(max_length=100, null=True, verbose_name="Household Code")
-    registrar = models.ForeignKey('Interviewer', related_name='registered_households', verbose_name='Interviewer')
-    survey = models.ForeignKey('Survey', related_name='registered_households')
+    listing = models.ForeignKey(HouseholdListing, related_name='households')
+    physical_address = models.CharField(max_length=200, null=True, blank=True, verbose_name="Structure Address")
+    last_registrar = models.ForeignKey('Interviewer', related_name='registered_households', verbose_name='Interviewer')
     registration_channel = models.CharField(max_length=100, choices=REGISTRATION_CHANNELS)
+    head_desc = models.CharField(max_length=200)
     
     class Meta:
         app_label = 'survey'
-        unique_together = [('survey', 'house_number', 'ea'), ]
+        unique_together = [('house_number', 'listing'), ]
     
     def __unicode__(self):
         return 'HH-%s' % self.house_number
@@ -68,7 +101,7 @@ class Household(BaseModel):
     
     @classmethod
     def all_households_in(cls, location, survey, ea=None):
-        all_households = Household.objects.filter(survey=survey)
+        all_households = Household.objects.filter(household_members__survey=survey)
         if ea:
             return all_households.filter(ea=ea)
         return all_households.filter(ea__locations__in=location.get_descendants(include_self=True))
@@ -92,12 +125,13 @@ class HouseholdMember(BaseModel):
     MALE = 1
     FEMALE = 0
     surname = models.CharField(max_length=25, verbose_name="Family Name")
-    first_name = models.CharField(max_length=25, blank=True, null=True, verbose_name="Other Names")
+    first_name = models.CharField(max_length=25, blank=True, null=True, verbose_name="Name")
     gender = models.BooleanField(default=True, verbose_name="Sex", choices=[(MALE, 'M'), (FEMALE, 'F')])
     date_of_birth = models.DateField(auto_now=False)
     household = models.ForeignKey(Household, related_name='household_members')
-#     registrar = models.ForeignKey(Interviewer, related_name='registered_household_members')
-#     registration_channel = models.ForeignKey(InterviewerAccess, related_name='registered_household_members')
+    survey_listing = models.ForeignKey(SurveyHouseholdListing, related_name='house_members')
+    registrar = models.ForeignKey('Interviewer', related_name='registered_household_members')
+    registration_channel = models.CharField(max_length=100, choices=Household.REGISTRATION_CHANNELS)
 
     def is_head(self):
         return False
@@ -145,7 +179,7 @@ class HouseholdMember(BaseModel):
     def get_composed(self, raw_text):
         question_context = template.Context(dict([(field.verbose_name.upper().replace(' ', '_'),
                                                             getattr(self, field.name))
-                                                                    for field in self._meta.fields]))
+                                                                    for field in self._meta.fields if hasattr(self, field.name)]))
         return template.Template(raw_text).render(question_context)
 
     class Meta:
@@ -162,7 +196,7 @@ class HouseholdHead(HouseholdMember):
     resident_since = models.DateField(auto_now=False, verbose_name='Since when have you lived here') #typically only month and year would be filled
 
     def is_head(self):
-        return False
+        return True
 
     class Meta:
         app_label = 'survey'

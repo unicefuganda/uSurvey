@@ -1,17 +1,30 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-{% load template_tags %}
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
- {% for batch in batches %}
- {% get_download_url request 'download_odk_survey_form' batch as download_url %}
-  <xform>
-    <formID>{{ batch.pk }} </formID>
-    <name>{{ batch.name }}</name>
-    <majorMinorVersion/>
-    <version/>
-    <hash />
-    <descriptionText> {{ batch.description }}</descriptionText>
-    <downloadUrl>{{ download_url }}</downloadUrl>
-    <manifestUrl></manifestUrl>
-  </xform>
-{% endfor %}
+    {% load template_tags %}
+    <xform>
+        {% get_download_url request 'download_odk_householdlist_form'  as household_download_url %}
+        <formID>{{ allocation.pk }}</formID>
+        <name>Household List Form - {{ allocation.survey.name }}</name>
+        <majorMinorVersion/>
+        <version/>
+        <hash />
+        <descriptionText> {{ allocation.survey.description }}</descriptionText>
+        <downloadUrl> {{ household_download_url }} </downloadUrl>
+        <manifestUrl></manifestUrl>
+    </xform>
+ {% if allocation.batches_enabled %}
+     {% for batch in batches %}
+     {% get_download_url request 'download_odk_survey_form' batch as download_url %}
+      <xform>
+        <formID>{{ batch.pk }} </formID>
+        <name>{{ batch.name }}</name>
+        <majorMinorVersion/>
+        <version/>
+        <hash />
+        <descriptionText> {{ batch.description }}</descriptionText>
+        <downloadUrl>{{ download_url }}</downloadUrl>
+        <manifestUrl></manifestUrl>
+      </xform>
+    {% endfor %}
+ {% endif %}
 </xforms>

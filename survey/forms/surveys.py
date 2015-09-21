@@ -2,19 +2,25 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
 from survey.forms.widgets import InlineRadioSelect
-from survey.models.surveys import Survey
+from survey.models.surveys import Survey, BatchCommencement
 
 
 class SurveyForm(ModelForm):
+    # survey_listing = forms.CharField(choices=[(survey.pk, survey.name) for survey in Survey.objects.all()],
+    #                                  help_text='Select survey household listing to reuse. Leave empty for fresh listing',
+    #                                  required=False)
     class Meta:
         model = Survey
-        fields = ['name', 'description', 'has_sampling', 'sample_size', 'min_percent_reg_houses']
+        fields = ['name', 'description', 'has_sampling', 'sample_size', 'preferred_listing']
         widgets = {
             'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
             'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')), attrs={'class' : 'has_sampling'}),
         }
 
-#     has_sampling = forms.BooleanField(label="Enable Sampling", required=False, initial=True)
+    def __init__(self, *args, **kwargs):
+        super(SurveyForm, self).__init__(*args, **kwargs)
+        if kwargs.get('instance', None) and kwargs['instance'].batches_started():
+            self.fields['survey_listing'].widgets.attrs['class'] = 'hide'
 
 
     def clean(self):
@@ -38,3 +44,5 @@ class SurveyForm(ModelForm):
             raise ValidationError("Survey with name %s already exist." % name)
 
         return self.cleaned_data['name']
+
+

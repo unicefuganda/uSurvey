@@ -50,18 +50,18 @@
                         {% endwith %}
                     </td>                    
                     <td>
-                        {% if household.registrar %}
-                            <a href="{% url 'show_interviewer_page' household.registrar.pk %}">{{ household.registrar.name }}</a>
+                        {% if household.last_registrar %}
+                            <a href="{% url 'show_interviewer_page' household.last_registrar.pk %}">{{ household.last_registrar.name }}</a>
                         {% endif %}
                     </td>
                     <td>
                     	{{ household.registration_channel}}
                     </td>
                     <td>
-                    	{{ household.survey.name}}
+                    	{{ household.listing.initial_survey.name}}
                     </td>
                     <td>
-                    	{{ household.ea.name}}
+                    	{{ household.listing.ea.name}}
                     </td>
                 </tr>
             {% endfor %}

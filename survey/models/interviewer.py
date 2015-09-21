@@ -10,7 +10,7 @@ import random
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
-from survey.models.households import Household
+from survey.models.households import Household, SurveyHouseholdListing, HouseholdListing
 from rapidsms.router import send
 
 def validate_min_date_of_birth(value):
@@ -95,14 +95,11 @@ class Interviewer(BaseModel):
     
     def present_households(self, survey=None):
         if survey is None:
-            return Household.objects.filter(ea=self.ea)
+            return Household.objects.filter(listing__ea=self.ea)
         else:
-            return Household.objects.filter(ea=self.ea, survey=survey)
-
-    def may_commence(self, survey):
-        total_registered = self.present_households(survey).count()
-        registration_percent = total_registered * 100 / self.ea.total_households
-        return registration_percent >= survey.min_percent_reg_houses
+            # import pdb; pdb.set_trace()
+            # listings = HouseholdListing.objects.filter(survey_houselistings__survey=survey, ea=self.ea)
+            return Household.objects.filter(listing__ea=self.ea, listing__survey_houselistings__survey=survey)
     
     def generate_survey_households(self, survey):
         survey_households = list(self.present_households(survey))
@@ -131,7 +128,7 @@ class SurveyAllocation(BaseModel):
     survey = models.ForeignKey('Survey', related_name='work_allocation')
     allocation_ea = models.ForeignKey('EnumerationArea', related_name='survey_allocations')
     completed = models.BooleanField(default=False)
-    
+
     class Meta:
         app_label = 'survey'
 
@@ -141,6 +138,18 @@ class SurveyAllocation(BaseModel):
     @classmethod
     def get_allocation(cls, interviewer):
         try:
-            return cls.objects.get(interviewer=interviewer, allocation_ea=interviewer.ea, completed=False).survey
+            allocation = cls.get_allocation_details(interviewer)
+            if allocation:
+                return allocation.survey
         except cls.DoesNotExist:
             return None
+
+    @classmethod
+    def get_allocation_details(cls, interviewer):
+        try:
+            return cls.objects.get(interviewer=interviewer, allocation_ea=interviewer.ea, completed=False)
+        except cls.DoesNotExist:
+            return None
+
+    def batches_enabled(self):
+        return self.survey.batches_enabled(ea=self.allocation_ea)
