@@ -8,9 +8,8 @@ class EnumerationAreaForm(ModelForm):
     
     def __init__(self, locations=None, *args, **kwargs):
         super(EnumerationAreaForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder = ['name', 'total_households']
+        self.fields.keyOrder = ['name', ]
         locations = locations or LocationsFilterForm().get_locations()
-#         import pdb; pdb.set_trace()
         self.fields['locations'].queryset = locations
         self.fields.keyOrder.append('locations')
 
