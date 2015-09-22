@@ -12,7 +12,10 @@ from model_utils.managers import InheritanceManager
 class Question(BaseModel):
     ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
     identifier = models.CharField(max_length=100, blank=False, null=True, verbose_name='Variable Name')
-    text = models.CharField(max_length=150, blank=False, null=False)
+    text = models.CharField(max_length=150, blank=False, null=False, help_text='To automatically include attributes \
+                household members as placeholders in the text, put the attribute name capitalized \
+                (as seen on household member page) \
+                in curly brackets. eg {{ FAMILY_NAME }}. Only supported on for USSD channel')
     answer_type = models.CharField(max_length=100, blank=False, null=False, choices=ANSWER_TYPES)
     group = models.ForeignKey(HouseholdMemberGroup, related_name='questions')
     batch = models.ForeignKey('Batch', related_name='batch_questions')

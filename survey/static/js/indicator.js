@@ -26,5 +26,6 @@ jQuery(function($){
             });
         });
     }
+    $('#id_survey').trigger("change");
 
 });

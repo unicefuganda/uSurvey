@@ -1,10 +1,10 @@
 {% load template_tags %}
 <div class="btn-group">
   <a href="{% url 'edit_interviewer_page'  interviewer.id %}" class="btn btn-small" ><i class="icon-pencil"></i> Edit</a>
-  {% if interviewer.is_blocked %}
-    <a href="#unblock_interviewer_{{interviewer.id}}" class="btn btn-small" data-toggle="modal" id="unblock_interviewer"><i class="icon-lock"></i> Unblock</a>
-  {% else %}
+  {% if interviewer.has_access %}
     <a href="#block_interviewer_{{interviewer.id}}" class="btn btn-small" data-toggle="modal" id="block_interviewer"><i class="icon-lock"></i> Block</a>
+  {% else %}
+    <a href="#unblock_interviewer_{{interviewer.id}}" class="btn btn-small" data-toggle="modal" id="unblock_interviewer"><i class="icon-lock"></i> Unblock</a>
   {% endif %}
 </div>
 

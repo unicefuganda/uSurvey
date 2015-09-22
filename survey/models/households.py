@@ -125,7 +125,7 @@ class HouseholdMember(BaseModel):
     MALE = 1
     FEMALE = 0
     surname = models.CharField(max_length=25, verbose_name="Family Name")
-    first_name = models.CharField(max_length=25, blank=True, null=True, verbose_name="Name")
+    first_name = models.CharField(max_length=25, blank=True, null=True, verbose_name="First Name")
     gender = models.BooleanField(default=True, verbose_name="Sex", choices=[(MALE, 'M'), (FEMALE, 'F')])
     date_of_birth = models.DateField(auto_now=False)
     household = models.ForeignKey(Household, related_name='household_members')

@@ -4,7 +4,7 @@ from django.core.validators import MinLengthValidator, MaxLengthValidator, MinVa
 from django.db import models
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PHONE_CODE, INTERVIEWER_MIN_AGE, INTERVIEWER_MAX_AGE
 from survey.models.base import BaseModel
-from survey.models.access_channels import USSDAccess, ODKAccess
+from survey.models.access_channels import USSDAccess, ODKAccess, InterviewerAccess
 from survey.models.locations import Location
 import random
 from django.core.exceptions import ValidationError
@@ -112,6 +112,10 @@ class Interviewer(BaseModel):
 
     def has_survey(self):
         return self.assignments.filter(completed=False).count() > 0
+
+    @property
+    def has_access(self):
+        return self.intervieweraccess.filter(is_active=True).exists()
 
     @classmethod
     def sms_interviewers_in_locations(cls, locations, text):

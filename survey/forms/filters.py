@@ -104,6 +104,9 @@ class SurveyBatchFilterForm(forms.Form):
         super(SurveyBatchFilterForm, self).__init__(*args, **kwargs)
         self.constrain_batch_choices_to_survey()
 
+    def clean_batch(self):
+        batch_id = self.data.get('batch', None)
+
     def constrain_batch_choices_to_survey(self):
         survey_id = self.data.get('survey', None)
         batches = Batch.objects.filter(survey__pk=survey_id)

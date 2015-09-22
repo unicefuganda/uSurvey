@@ -1,4 +1,5 @@
-from survey.models import LocationTypeDetails, Location, Household, HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer
+from survey.models import LocationTypeDetails, Location, LocationType, Household, \
+            HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer
 from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -42,13 +43,13 @@ class ResultsDownloadService(object):
 
     def _set_survey_and_questions(self, survey):
         if self.batch:
-            return self.batch.survey, self.batch.batch_questions.all()
+            return self.batch.survey, self.batch.survey_questions
         survey_questions = []
-        map(lambda batch: survey_questions.extend(list(batch.batch_questions.all())), survey.batches.all())
+        map(lambda batch: survey_questions.extend(list(batch.survey_questions)), survey.batches.all())
         return survey, survey_questions
 
     def set_report_headers(self):
-        header = list(LocationTypeDetails.get_ordered_types().exclude(name__iexact="country").values_list('name', flat=True))
+        header = list(LocationType.objects.exclude(name__iexact="country").values_list('name', flat=True))
         other_headers = ['Household ID', 'Name', 'Age', 'Date of Birth', 'Gender']
         header.extend(other_headers)
         header.extend(self.question_headers())
