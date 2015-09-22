@@ -41,9 +41,7 @@ class USSDAccess(InterviewerAccess):
     
     class Meta:
         app_label = 'survey'
-        
 
-    
     
 class ODKAccess(InterviewerAccess):
     odk_token = models.CharField(max_length=10, default="12345")

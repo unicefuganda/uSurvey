@@ -26,5 +26,6 @@ jQuery(function($){
             });
         });
     }
+    updateBatchSelectField($("#id_filter_survey"));
 
 });
