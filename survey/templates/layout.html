@@ -5,27 +5,7 @@
         {{ PROJECT_TITLE }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
-	<link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" />
-    <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css" />
-
-    {% block extra_css %}{% endblock %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/background.cycle.js"></script>
-    <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
-    <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-<style type="text/css">
+    <!-- style type="text/css">
      #loader-wrapper {
     position: fixed;
     top: 0;
@@ -133,8 +113,8 @@
             -ms-transform: translateX(-100%);  /* IE 9 */
                 transform: translateX(-100%);  /* Firefox 16+, IE 10+, Opera */
 
-        -webkit-transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-                transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+        -webkit-transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+                transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
     }
 
     .loaded #loader-wrapper .loader-section.section-right {
@@ -142,8 +122,8 @@
             -ms-transform: translateX(100%);  /* IE 9 */
                 transform: translateX(100%);  /* Firefox 16+, IE 10+, Opera */
 
--webkit-transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-        transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+-webkit-transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+        transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
     }
 
     .loaded #loader {
@@ -172,7 +152,28 @@
     }
 
 
-    </style>
+    </style -->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
+          charset="utf-8">
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
+          charset="utf-8">
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
+          charset="utf-8">
+    <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
+	<link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" />
+    <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css" />
+
+    {% block extra_css %}{% endblock %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/background.cycle.js"></script>
+    <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
+    <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
+
 </head>
 <body>
 <div id="loader-wrapper">

@@ -86,6 +86,7 @@ def show_interviewer_completion_summary(request):
         interviewers = interviewers.intervieweraccess.filter(is_active=ast.literal_eval(params['status']))
     locations_filter = LocFilterForm(data=request.GET, include_ea=True)
     if locations_filter.is_valid():
+        print 'locations count: ', locations_filter.get_enumerations().count()
         interviewers = interviewers.filter(ea__in=locations_filter.get_enumerations()).order_by('name')
     # location_widget = LocationWidget(selected_location, ea=selected_ea)
     return render(request, 'aggregates/interviewers_summary.html',
