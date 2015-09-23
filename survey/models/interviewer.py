@@ -129,7 +129,7 @@ class Interviewer(BaseModel):
 
     @property
     def has_access(self):
-        return self.intervieweraccess.objects.filter(is_active=True).exists()
+        return self.intervieweraccess.filter(is_active=True).exists()
 
     @classmethod
     def sms_interviewers_in_locations(cls, locations, text):
