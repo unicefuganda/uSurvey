@@ -7,7 +7,7 @@ jQuery(function($){
 
     function updateBatchSelectField () {
        $batch.find('option').remove();
-        $batch.append($('<option />').val('All').text('All'));
+        $batch.append($('<option />').val('').text('Select Batch'));
         populate_choices.call(this);
     }
 
