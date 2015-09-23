@@ -45,7 +45,7 @@ class LocationsFilterForm(Form):
                 self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filter chzn-select'
                 # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
         if include_ea:
-            eas = self.get_enumerations()#EnumerationArea.objects.filter(locations__in=locations).order_by('name')
+            eas = EnumerationArea.objects.filter(locations__in=get_leaf_locs(loc=data.get(location_type.parent.name, None))).distinct()
             choices = [(ea.pk, ea.name) for ea in eas]
             choices.insert(0, ('', '--- Select EA ---'))
             self.fields['enumeration_area'] = forms.ModelChoiceField(queryset=eas)#ChoiceField(choices=choices)
@@ -71,13 +71,16 @@ class LocationsFilterForm(Form):
         return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct().order_by('name')
     
 def get_leaf_locs(loc=None, ea=None):
-    if loc is None:
+    if not loc:
         location = Location.objects.get(parent=None)
     else:
-        location = loc
+        if isinstance(loc, Location):
+            location = loc
+        else:
+            location = Location.objects.get(pk=loc)
     locations = location.get_leafnodes(True)
     if ea:
-        locations = locations.filter(enumeration_areas__pk__in=ea)
+        locations = locations.filter(enumeration_areas=ea)
     return locations.distinct()
 
 # 
