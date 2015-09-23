@@ -84,7 +84,7 @@ def show_interviewer_completion_summary(request):
         interviewers = get_filterset(interviewers, request.GET['q'], search_fields)
     if params.has_key('status'):
         interviewers = interviewers.intervieweraccess.filter(is_active=ast.literal_eval(params['status']))
-    locations_filter = LocFilterForm(request.GET, include_ea=True)
+    locations_filter = LocFilterForm(data=request.GET, include_ea=True)
     if locations_filter.is_valid():
         interviewers = interviewers.filter(ea__in=locations_filter.get_enumerations()).order_by('name')
     # location_widget = LocationWidget(selected_location, ea=selected_ea)

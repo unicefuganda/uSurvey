@@ -48,7 +48,7 @@ def get_interviewers(request):
 
 @permission_required('auth.can_view_households')
 def list_households(request):
-    locations_filter = LocationsFilterForm(request.GET, include_ea=True)
+    locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     enumeration_areas = locations_filter.get_enumerations()
     households = Household.objects.filter(listing__ea__in=enumeration_areas).order_by('house_number')
     search_fields = ['ea__name', 'registrar__name', 'survey__name', ]
