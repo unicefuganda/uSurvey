@@ -33,6 +33,14 @@ border: 1px solid #eee;
 
 }
 
+.scrollit{
+    overflow:scroll;
+    height:180px;
+    width:100%;
+    background-color: #F5F5F5;
+}
+
+
 /* set table row height */
 div#redips-drag table tr {
 	height: 32px;
@@ -67,6 +75,7 @@ div#redips-drag th {
 	/* round corners */
 	border-radius: 4px; /* Opera, Chrome */
 	-moz-border-radius: 4px; /* FF */
+
 }
 
 /* blue DIV elements */
