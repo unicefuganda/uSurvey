@@ -7,15 +7,17 @@
  {% if field.label_tag|is_mobile_number %}
    <div class="input-prepend">
        <span class="add-on">{{ country_phone_code }}</span>
+       </div>
   {% endif %}
-   <span class="horiselect">{{field}}</span> 
+   <span class="horiselect">{{field}}</span>
+       {% if field.errors %}
    <label class="error">
-        {% if field.errors %}
             {% for error in field.errors %}
                 {{ error}}
             {% endfor %}
-        {% endif %}
+        </label>
 </td>
+    {% endif %}
 {% endfor %}
 </tr>
 </table>

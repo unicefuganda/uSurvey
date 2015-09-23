@@ -93,7 +93,7 @@ def list_interviewers(request):
     else:
         interviewers = Interviewer.objects.all()
 #     import pdb; pdb.set_trace()
-    search_fields = ['name', 'mobile_number']
+    search_fields = ['name', 'intervieweraccess__user_identifier']
     if request.GET.has_key('q'):
         interviewers = get_filterset(interviewers, request.GET['q'], search_fields)
     if params.has_key('status'):

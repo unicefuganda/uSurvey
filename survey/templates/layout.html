@@ -52,6 +52,7 @@
                         <li>
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
                         </li>
+
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
                                    role="button" href="#">Survey Administration<b class="caret"></b></a>
@@ -162,7 +163,7 @@
 </header>
 <div class="breadnavbar">
     <div class="container">
-<a href="/home/">Home</a> &raquo;
+<a href="{% url 'main_page' %}" style="background: 000;">Home</a> &raquo;
 {% for breadcrumb in request.breadcrumbs %} 
 <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
 {% endfor %}

@@ -13,6 +13,8 @@ class IndicatorForm(ModelForm):
             self.fields['batch'].choices.queryset = survey.batches
         self.fields['module'].choices.queryset = QuestionModule.objects.all()
         self.fields['name'].label = 'Indicator'
+        self.fields['batch'].required = True
+        self.fields['batch'].empty_label = 'Select Batch'
 
     def clean(self):
         super(IndicatorForm, self).clean()
