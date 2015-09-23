@@ -10,7 +10,7 @@ import random
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
-from survey.models.households import Household, SurveyHouseholdListing, HouseholdListing
+from survey.models.households import Household, SurveyHouseholdListing, HouseholdListing, RandomSelection
 from rapidsms.router import send
 
 def validate_min_date_of_birth(value):
@@ -102,12 +102,26 @@ class Interviewer(BaseModel):
             return Household.objects.filter(listing__ea=self.ea, listing__survey_houselistings__survey=survey)
     
     def generate_survey_households(self, survey):
-        survey_households = list(self.present_households(survey))
+        survey_households = self.present_households(survey)
         if survey.has_sampling:
-            #random select households as per sample size
-            #first shuffle registered households and select up to sample number
-            random.shuffle(survey_households)
-            survey_households = survey_households[:survey.sample_size]
+            selections = RandomSelection.objects.filter(survey=survey, household__listing__ea=self.ea).distinct()
+            households = [s.household for s in selections]
+            if survey.sample_size > selections.count():
+                #random select households as per sample size
+                #first shuffle registered households and select up to sample number
+                sample_size = survey.sample_size - selections.count()
+                if households:
+                    survey_households = survey_households.exclude(pk__in=households)
+                ###to do bulk create
+                survey_households = list(survey_households)
+                random.shuffle(survey_households)
+                survey_households = survey_households[:sample_size]
+                random_selections = []
+                for household in survey_households:
+                    random_selections.append(RandomSelection(household=household, survey=survey))
+                RandomSelection.objects.bulk_create(random_selections)
+            else:
+                survey_households = households
         return sorted(survey_households, key=lambda household: household.house_number)
 
     def has_survey(self):
@@ -115,7 +129,7 @@ class Interviewer(BaseModel):
 
     @property
     def has_access(self):
-        return self.intervieweraccess.filter(is_active=True).exists()
+        return self.intervieweraccess.objects.filter(is_active=True).exists()
 
     @classmethod
     def sms_interviewers_in_locations(cls, locations, text):

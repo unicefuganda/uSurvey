@@ -1,5 +1,5 @@
-from survey.models import LocationTypeDetails, Location, LocationType, Household, \
-            HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer
+from survey.models import LocationTypeDetails, Location, LocationType, Household, HouseholdMember, \
+    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer
 from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -37,9 +37,14 @@ class ResultComposer:
 
 
 class ResultsDownloadService(object):
-    def __init__(self, survey=None, batch=None):
+    # MEMBER_ATTRS = {
+    #     'id' : 'Household ID',
+    #      'name' : 'Name', 'Age', 'Date of Birth', 'Gender'
+    # }
+    def __init__(self, survey=None, batch=None, restrict_to=None):
         self.batch = batch
         self.survey, self.questions = self._set_survey_and_questions(survey)
+        self.locations = restrict_to or Location.objects.all()
 
     def _set_survey_and_questions(self, survey):
         if self.batch:
@@ -50,7 +55,8 @@ class ResultsDownloadService(object):
 
     def set_report_headers(self):
         header = list(LocationType.objects.exclude(name__iexact="country").values_list('name', flat=True))
-        other_headers = ['Household ID', 'Name', 'Age', 'Date of Birth', 'Gender']
+
+        other_headers = ['Household Number', 'Name', 'Age', 'Date of Birth', 'Gender']
         header.extend(other_headers)
         header.extend(self.question_headers())
         return header
@@ -65,22 +71,22 @@ class ResultsDownloadService(object):
 
     def get_summarised_answers(self):
         data = []
-        # all_households = Household.objects.filter(survey=self.survey)
-        # locations = list(set(all_households.values_list('ea__locations', flat=True)))
-        # general_group = HouseholdMemberGroup.objects.get(name="GENERAL")
-        # for location_id in locations:
-        #     households_in_location = all_households.filter(ea__locations=location_id)
-        #     household_location = households_in_location[0].location
-        #     location_ancestors = self._get_ancestors_names(household_location, exclude_type='country')
-        #     for household in households_in_location:
-        #         for member in household.all_members():
-        #             member_gender = 'Male' if member.male else 'Female'
-        #             answers = location_ancestors
-        #             answers = answers + [household.household_code, member.surname, str(int(member.get_age())),
-        #                                  str(member.get_month_of_birth()), str(member.get_year_of_birth()),
-        #                                  member_gender]
-        #             answers = answers + member.answers_for(self.questions, general_group)
-        #             data.append(answers)
+        all_households = Household.objects.filter(listing__survey_houselistings__survey=self.survey)
+        locations = list(set(all_households.values_list('listing__ea__locations', flat=True)))
+        for location_id in locations:
+            households_in_location = all_households.filter(listing__ea__locations=location_id)
+            household_location = Location.objects.get(id=location_id)
+            location_ancestors = household_location.get_ancestors().values_list('name', flat=True)
+            for household in households_in_location:
+                for member in household.members.all():
+                    member_gender = 'Male' if member.gender == HouseholdMember.MALE else 'Female'
+                    answers = list(location_ancestors)
+                    answers.extend([household.house_number, '%s-%s' % (member.surname, member.first_name), str(member.age),
+                                         member.date_of_birth.strftime(settings.DATE_FORMAT),
+                                         member_gender])
+                    for question in self.questions:
+                        answers.append(member.reply(question))
+            data.append(answers)
         return data
 
     def generate_report(self):

@@ -28,8 +28,6 @@ class Command(BaseCommand):
             location_types.append(location_type)
         existing_locs = dict([((loc.name, loc.type.pk, loc.parent.pk), loc) for loc in Location.objects.all() if loc.parent])
         existing_eas = dict([(ea.name, ea) for ea in EnumerationArea.objects.all()])
-        print 'starting with ', len(existing_locs), ' existing locations'
-        print 'starting with ', len(existing_eas), ' existing eas'
         for items in csv_file:
             for index, item in enumerate(items):
                 if index == 0:
@@ -44,7 +42,6 @@ class Command(BaseCommand):
                     ea.locations.add(location)
                     ea.save()
                     print 'added ea ', item
-                    print len(existing_eas), ' eas now'
                     existing_eas[item.strip()] = ea
                     break
 

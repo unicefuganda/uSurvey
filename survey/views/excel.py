@@ -9,6 +9,7 @@ from survey.models import Batch, LocationType
 from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 from survey.utils.views_helper import contains_key
 from survey.tasks import email_task
+from survey.forms.enumeration_area import LocationsFilterForm
 
 
 def _process_export(survey_batch_filter_form):
@@ -26,8 +27,10 @@ def _process_export(survey_batch_filter_form):
 @permission_required('auth.can_view_aggregates')
 def download(request):
     survey_batch_filter_form = SurveyBatchFilterForm()
+    # locations_filter = LocationsFilterForm()
     if request.GET:
-        survey_batch_filter_form = SurveyBatchFilterForm(request.GET)
+        survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
+        # locations_filter = LocationsFilterForm(data=request.GET)
         if survey_batch_filter_form.is_valid():
             if request.GET.get('action') == 'Email Spreadsheet':
                 batch = survey_batch_filter_form.cleaned_data['batch']
@@ -37,7 +40,11 @@ def download(request):
                 messages.warning(request, "Email would be sent to you shortly. This could take a while.")
             else:
                 return _process_export(survey_batch_filter_form)
-    return render(request, 'aggregates/download_excel.html', {'survey_batch_filter_form': survey_batch_filter_form})
+    return render(request, 'aggregates/download_excel.html',
+                  {
+                      'survey_batch_filter_form': survey_batch_filter_form,
+                      # 'locations_filter' : locations_filter
+                  })
 
 @login_required
 @permission_required('auth.can_view_aggregates')

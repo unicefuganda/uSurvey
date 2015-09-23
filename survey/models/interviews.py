@@ -10,7 +10,8 @@ from rapidsms.contrib.locations.models import Point
 from django import template
 from survey.interviewer_configs import MESSAGES
 from survey.utils.decorators import static_var
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 def reply_test(cls, func):
     func.is_reply_test = True
@@ -33,6 +34,7 @@ class Interview(BaseModel):
     def respond(self, reply=None, channel=ODKAccess.choice_name()):
         if self.is_closed():
             return
+        # import pdb; pdb.set_trace()
         #get last question
         next_question = None
         try:
@@ -81,14 +83,18 @@ class Interview(BaseModel):
         # self.save()
         print 'nothing here mehn', next_question
 
+    @property
+    def has_pending_questions(self):
+        return self.last_question is not None and self.last_question.flows.filter(next_question__isnull=False).exists()
+
     @classmethod
     def pending_batches(cls, house_member, ea, survey):
-        available_batches = ea.open_batches(survey, house_member)
+        available_batches = ea.open_batches(survey)
         print 'available batches: ', available_batches
         completed_interviews = Interview.objects.filter(householdmember=house_member, batch__in=available_batches,
                                                         closure_date__isnull=False)
         completed_batches = [interview.batch for interview in completed_interviews]
-        return [batch for batch in available_batches if batch not in completed_batches]
+        return [batch for batch in available_batches if batch.start_question and batch not in completed_batches]
 
     @classmethod
     def interviews(cls, house_member, interviewer, survey):
@@ -98,6 +104,7 @@ class Interview(BaseModel):
         return (interviews.filter(closure_date__isnull=False), interviews.filter(closure_date__isnull=True))
 #         completed_batches = [interview.batch for interview in completed_interviews]
 #         return [batch for batch in available_batches if batch not in completed_batches]
+
 
     def members_with_open_batches(self):
         pass
@@ -134,6 +141,8 @@ class Answer(BaseModel):
                 return cl
         ValueError('unknown class')
 
+    def to_text(self):
+        return self.value
 
     @classmethod
     def choice_name(cls):
@@ -276,6 +285,9 @@ class MultiChoiceAnswer(Answer):
     def validators(cls):
         return [cls.equals, ]
 
+    def to_text(self):
+        return self.value.text
+
 
     @classmethod
     @static_var('label', 'Equals Option')
@@ -287,6 +299,8 @@ class MultiSelectAnswer(Answer):
 
     def __init__(self, question, answer, *args, **kwargs):
         super(MultiSelectAnswer, self).__init__()
+        if isinstance(answer, basestring):
+            answer = answer.split(' ')
         if isinstance(answer, list):
             selected = [a.lower() for a in answer]
             options = question.options.all()
@@ -296,6 +310,11 @@ class MultiSelectAnswer(Answer):
             self.selected = answer
         self.question = question
 
+    def to_text(self):
+        texts = []
+        map(lambda opt: texts.append(opt.text), self.value)
+        return ' and '.join(texts)
+
     @classmethod
     def validators(cls):
         return [cls.equals, cls.contains]
@@ -304,7 +323,12 @@ class MultiSelectAnswer(Answer):
     def equals(cls, answer, txt):
         return answer.text.lower() == txt.lower()
 
-
+@receiver(post_save, sender=MultiSelectAnswer)
+def add_multiselect_options(sender, **kwargs):
+    sender.value.all().delete()
+    opts = sender.selected.all()
+    for opt in opts:
+        sender.value.add(opt)
 
 class DateAnswer(Answer):
     value = models.DateField(null=True)
@@ -361,6 +385,9 @@ class GeopointAnswer(Answer):
 
     def __init__(self, question, answer, *args, **kwargs):
         super(GeopointAnswer, self).__init__()
+        if isinstance(answer, basestring):
+            answer = answer.split(' ')
+            answer = ODKGeoPoint(latitude=answer[0], longitude=answer[1], altitude=[2], precision=answer[3])
         self.value = answer
         self.question = question
 

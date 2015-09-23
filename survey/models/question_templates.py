@@ -12,13 +12,13 @@ from model_utils.managers import InheritanceManager
 class QuestionTemplate(BaseModel):
     ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
     identifier = models.CharField(max_length=100, blank=False, null=True, unique=True)
-    group = models.ForeignKey("HouseholdMemberGroup", null=True, related_name="question_templates")
+    group = models.ForeignKey("HouseholdMemberGroup", related_name="question_templates")
     text = models.CharField(max_length=150, blank=False, null=False, help_text='To automatically include attributes \
                 household members as placeholders in the text, put the attribute name capitalized \
                 (as seen on household member page) \
                 in curly brackets. eg {{ FAMILY_NAME }}. Only supported on for USSD channel')
     answer_type = models.CharField(max_length=100, blank=False, null=False, choices=ANSWER_TYPES)
-    module = models.ForeignKey("QuestionModule", null=True, related_name="question_templates")
+    module = models.ForeignKey("QuestionModule", related_name="question_templates")
 
     class Meta:
         app_label = 'survey'

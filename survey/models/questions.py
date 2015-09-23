@@ -19,7 +19,7 @@ class Question(BaseModel):
     answer_type = models.CharField(max_length=100, blank=False, null=False, choices=ANSWER_TYPES)
     group = models.ForeignKey(HouseholdMemberGroup, related_name='questions')
     batch = models.ForeignKey('Batch', related_name='batch_questions')
-    module = models.ForeignKey("QuestionModule", null=True, related_name="questions")
+    module = models.ForeignKey("QuestionModule", related_name="questions", default='')
 
     class Meta:
         app_label = 'survey'        
