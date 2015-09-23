@@ -573,6 +573,10 @@ class StartSurvey(SelectHousehold, Interviews):
             registered = dict([(int(h.house_number), unicode(h)) for h in survey_households if h.members.count()>0])
             self._set_param('house_register', registered)
         return registered
+
+    @house_roaster.setter
+    def house_roaster(self, house_roaster):
+        self._set_param('house_register', house_roaster)
     
     @property
     def houselist(self):
@@ -630,13 +634,15 @@ class SelectMember(Interviews):
 
     @property
     def _intro_speech(self):
-        lines = self._memberlist
-        lines.insert(0, MESSAGES['MEMBERS_LIST'])
-        if self.current_page != 0:
-            lines.append('%s:Previous' % settings.USSD_NEXT)
-        if self.current_page < len(lines)/settings.USSD_ITEMS_PER_PAGE:
-            lines.append('%s:Next' % settings.USSD_NEXT)
-        return '\n'.join(lines)
+        if len(self._house_members):
+            lines = self._memberlist
+            lines.insert(0, MESSAGES['MEMBERS_LIST'])
+            if self.current_page != 0:
+                lines.append('%s:Previous' % settings.USSD_NEXT)
+            if self.current_page < len(lines)/settings.USSD_ITEMS_PER_PAGE:
+                lines.append('%s:Next' % settings.USSD_NEXT)
+            return '\n'.join(lines)
+        return MESSAGES['MEMBERS_LIST_EMPTY']
     
     @property
     def _total_members(self):
@@ -718,7 +724,8 @@ class SelectMember(Interviews):
                 task._pending_batches = pending_batches[1:]
                 return task.intro()
             else:
-                return MESSAGES['NO_OPEN_BATCH'] 
+                HouseMemberSurveyCompletion.objects.get_or_create(householdmember=house_member, interviewer=self.interviewer, survey=self.ongoing_survey)
+                return MESSAGES['NO_OPEN_BATCH']
 
 class ConfirmContinue(Interviews):
     
@@ -772,8 +779,10 @@ class StartInterview(Interviews):
             ongoing_interview = self._ongoing_interview
             response = ongoing_interview.respond(message, channel=USSDAccess.choice_name())
             self._ongoing_interview = ongoing_interview #probably something may have happened to the interview instance in db
-            if response is None:
-                interview = self._ongoing_interview
+            interview = self._ongoing_interview
+            import pdb; pdb.set_trace()
+            if interview.has_pending_questions is False:
+                import pdb; pdb.set_trace()
                 interview.closure_date = datetime.now()
                 interview.save()
                 house_member = interview.householdmember

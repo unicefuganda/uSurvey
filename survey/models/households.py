@@ -136,6 +136,10 @@ class HouseholdMember(BaseModel):
     def is_head(self):
         return False
 
+    @property
+    def ea(self):
+        return self.household.listing.ea
+
     def __unicode__(self):
         return '%s, %s' % (self.surname, self.first_name)
 
@@ -182,6 +186,14 @@ class HouseholdMember(BaseModel):
                                                                     for field in self._meta.fields if hasattr(self, field.name)]))
         return template.Template(raw_text).render(question_context)
 
+    def reply(self, question):
+        if self.belongs_to(question.group):
+            answer_class = Answer.get_class(question.answer_type)
+            answers = answer_class.objects.filter(interview__householdmember=self, question=question)
+            if answers.exists():
+                return answers[0].to_text()
+        return ''
+
     class Meta:
         app_label = 'survey'
         get_latest_by = 'created'
@@ -198,5 +210,14 @@ class HouseholdHead(HouseholdMember):
     def is_head(self):
         return True
 
+    def save(self, *args, **kwargs):
+        # self.full_clean()
+        return super(HouseholdMember, self).save(*args, **kwargs)
+
     class Meta:
         app_label = 'survey'
+
+
+class RandomSelection(BaseModel):
+    survey = models.ForeignKey('Survey', related_name='random_selections')
+    household = models.OneToOneField(Household, related_name='random_selection')

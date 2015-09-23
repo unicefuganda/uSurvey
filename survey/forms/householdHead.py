@@ -5,6 +5,7 @@ from survey.models.households import HouseholdHead
 from survey.interviewer_configs import OCCUPATION, MONTHS
 from widgets import InlineRadioSelect
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 
 class HouseholdHeadForm(ModelForm):
@@ -29,4 +30,11 @@ class HouseholdHeadForm(ModelForm):
                                                                     'class': 'datepicker'},
                                                              format=settings.DATE_FORMAT),
                                      help_text='Date the person started living there')
+
+    def clean_resident_since(self):
+        resident_since = self.cleaned_data['resident_since']
+        date_of_birth = self.cleaned_data['date_of_birth']
+        if date_of_birth > resident_since:
+            raise ValidationError('Member cannot be resident before date of birth')
+        return self.cleaned_data['resident_since']
 

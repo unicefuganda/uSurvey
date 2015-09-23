@@ -61,6 +61,7 @@ class Location(MPTTModel, BaseModel):
 
     class Meta:
         app_label = 'survey'
+
         
 # 
 # class LocationCode(BaseModel):

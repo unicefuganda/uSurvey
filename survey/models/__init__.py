@@ -11,7 +11,8 @@ from survey.models.enumeration_area import EnumerationArea
 from survey.models.household_batch_completion import HouseholdMemberBatchCompletion, HouseholdMemberBatchCompletion, \
     HouseholdBatchCompletion, HouseMemberSurveyCompletion, HouseSurveyCompletion
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
-from survey.models.households import Household, HouseholdHead, HouseholdMember, HouseholdListing, SurveyHouseholdListing
+from survey.models.households import Household, HouseholdHead, HouseholdMember, HouseholdListing, SurveyHouseholdListing, \
+                RandomSelection
 from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess, WebAccess
 from survey.models.location_weight import LocationWeight
 # from survey.models.locations import LocationAutoComplete, LocationCode
@@ -61,6 +62,7 @@ __all__ = [
     'BatchChannel',
     'Formula',
     'HouseholdMemberGroup',
+    'RandomSelection',
     'Household',
     'HouseholdHead',
     'HouseholdMemberBatchCompletion',

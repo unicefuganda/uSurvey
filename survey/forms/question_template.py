@@ -22,7 +22,7 @@ class QuestionTemplateForm(ModelForm):
         
     def clean_identifier(self):
         answer_type = self.cleaned_data.get('identifier', None)
-        qts = QuestionTemplate.objects.filter(identifier=answer_type)
+        qts = QuestionTemplate.objects.filter(identifier__iexact=answer_type)
         if qts.exists():
             if not self.instance or not (self.instance.identifier == answer_type):
                 raise ValidationError('Identifier already in use the question library')

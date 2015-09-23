@@ -98,14 +98,12 @@ class LocationFilterForm(forms.Form):
 
 class SurveyBatchFilterForm(forms.Form):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all().order_by('name'), empty_label=None)
-    batch = forms.ModelChoiceField(queryset=None, empty_label="All", required=False)
+    batch = forms.ModelChoiceField(queryset=Batch.objects.all().order_by('name'), empty_label=None, required=False)
 
     def __init__(self, *args, **kwargs):
         super(SurveyBatchFilterForm, self).__init__(*args, **kwargs)
         self.constrain_batch_choices_to_survey()
 
-    def clean_batch(self):
-        batch_id = self.data.get('batch', None)
 
     def constrain_batch_choices_to_survey(self):
         survey_id = self.data.get('survey', None)
