@@ -24,15 +24,15 @@
         </tr>
         <tr id="error">
             {% for field in a_form.visible_fields %}
+               {% if field.errors %}
                 <td valign="top">
                    <label class="error">
-                        {% if field.errors %}
                             {% for error in field.errors %}
                                 {{ error}}
                             {% endfor %}
-                        {% endif %}
                    </label>
                 </td>
+               {% endif %}
             {% endfor %}
         </tr>
 
