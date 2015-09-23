@@ -31,7 +31,6 @@ class LocationsFilterForm(Form):
         include_ea = kwargs.pop('include_ea', False)
         super(LocationsFilterForm, self).__init__(*args, **kwargs)
         data = kwargs.get('data', {})
-        # import pdb; pdb.set_trace()
         for location_type in LocationType.objects.all():
             if location_type.parent is not None and location_type.is_leaf_node() == False:
                 kw = {'type':location_type}
@@ -39,9 +38,9 @@ class LocationsFilterForm(Form):
                 if parent_selection:
                     kw['parent__pk'] = parent_selection
                 locations = Location.objects.filter(**kw)
-                choices = [(loc.pk, loc.name) for loc in locations]
-                choices.insert(0, ('', '--- Select %s ---' % location_type.name))
-                self.fields[location_type.name] = forms.ChoiceField(choices=choices)
+                # choices = [(loc.pk, loc.name) for loc in locations]
+                # choices.insert(0, ('', '--- Select %s ---' % location_type.name))
+                self.fields[location_type.name] = forms.ModelChoiceField(queryset=locations) #forms.ChoiceField(choices=choices)
                 self.fields[location_type.name].required = False
                 self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filter chzn-select'
                 # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
@@ -71,11 +70,11 @@ class LocationsFilterForm(Form):
     def get_enumerations(self):
         return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct().order_by('name')
     
-def get_leaf_locs(loc_id=None, ea=None):
-    if loc_id is None:
+def get_leaf_locs(loc=None, ea=None):
+    if loc is None:
         location = Location.objects.get(parent=None)
     else:
-        location = Location.objects.get(pk=loc_id)
+        location = loc
     locations = location.get_leafnodes(True)
     if ea:
         locations = locations.filter(enumeration_areas__pk__in=ea)
