@@ -9,14 +9,9 @@
                  {% if field.label_tag|is_mobile_number %}
                    <div class="input-prepend">
                        <span class="add-on">{{ country_phone_code }}</span>
+                    </div>
                   {% endif %}
                    <span class="horiselect">{{field}}</span>
-                   <label class="error">
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                                {{ error}}
-                            {% endfor %}
-                        {% endif %}
                 </td>
             {% endfor %}
             {% if not no_button %}
@@ -26,6 +21,19 @@
                     </td>
                 {% endblock %}
             {% endif %}
+        </tr>
+        <tr id="error">
+            {% for field in a_form.visible_fields %}
+                <td valign="top">
+                   <label class="error">
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                {{ error}}
+                            {% endfor %}
+                        {% endif %}
+                   </label>
+                </td>
+            {% endfor %}
         </tr>
 
 </table>
