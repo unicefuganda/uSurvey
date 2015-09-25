@@ -18,7 +18,7 @@ $(document).ready(function() {
 		/*table {
 			max-height: 500px;
 			overflow: scroll;
-			text-align: left;
+			text-align: center;
 		}
 
 		tr {
@@ -48,8 +48,11 @@ $(document).ready(function() {
 		  background-color: white;
 
 		}*/
+table {
+		text-align: center;
+		}
 
-        table a:link {
+table a:link {
 	color: #666;
 	font-weight: bold;
 	text-decoration:none;
@@ -91,7 +94,6 @@ table th {
 	background: -moz-linear-gradient(top,  #ededed,  #ebebeb);
 }
 table th:first-child{
-	text-align: left;
 	padding-left:20px;
 }
 table tr:first-child th:first-child{
@@ -110,7 +112,7 @@ table tr{
 
 }
 table tr td:first-child{
-	text-align: left;
+	text-align: center;
 	padding-left:20px;
 	border-left: 0;
 }
@@ -155,6 +157,10 @@ table tr:hover td{
         background: #ffffff;
         }
 
+		#batch_questions {
+			margin-top: -17px;
+		}
+
 	</style>
 {% endblock %}
 {% block pre_form_content %}
@@ -162,7 +168,7 @@ table tr:hover td{
 		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
     </div>
     <div class="search">
-    	{% include "search_form.html" with id="library_search_form" %} 
+    	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
     </div>
        <div id="batch_assignment" class="clear">
        	<br />
