@@ -18,7 +18,7 @@ $(document).ready(function() {
 		/*table {
 			max-height: 500px;
 			overflow: scroll;
-			text-align: left;
+			text-align: center;
 		}
 
 		tr {
@@ -48,8 +48,11 @@ $(document).ready(function() {
 		  background-color: white;
 
 		}*/
+table {
+		text-align: center;
+		}
 
-        table a:link {
+table a:link {
 	color: #666;
 	font-weight: bold;
 	text-decoration:none;
@@ -64,7 +67,7 @@ table a:hover {
 	color: #bd5a35;
 	text-decoration:underline;
 }
-.tablem {
+.table {
 	font-family:Arial, Helvetica, sans-serif;
 	color:#666;
 	font-size:12px;
@@ -91,7 +94,6 @@ table th {
 	background: -moz-linear-gradient(top,  #ededed,  #ebebeb);
 }
 table th:first-child{
-	text-align: left;
 	padding-left:20px;
 }
 table tr:first-child th:first-child{
@@ -107,9 +109,10 @@ table tr:first-child th:last-child{
 table tr{
 	text-align: center;
 	padding-left:20px;
+
 }
 table tr td:first-child{
-	text-align: left;
+	text-align: center;
 	padding-left:20px;
 	border-left: 0;
 }
@@ -147,6 +150,16 @@ table tr:hover td{
 	background: -moz-linear-gradient(top,  #f2f2f2,  #f0f0f0);
 }
 
+        .theader
+        {
+        color:#0099FF;
+        padding-left: 80px;
+        background: #ffffff;
+        }
+
+		#batch_questions {
+			margin-top: -17px;
+		}
 
 	</style>
 {% endblock %}
@@ -155,14 +168,14 @@ table tr:hover td{
 		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
     </div>
     <div class="search">
-    	{% include "search_form.html" with id="library_search_form" %} 
+    	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
     </div>
        <div id="batch_assignment" class="clear">
        	<br />
 		 	 <table id="lib_questions_table" class="tablem" style="width: 48%; float: left;">
 				 <thead>
-				 <tr class="tabletrtd"><th colspan="4">Library Questions</th></tr>
-				 <tr class="tabletrtd"><th class="hide" /><th>Code</th><th>Text</th><th>Identifier</th></tr>
+				 <tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
+				 <tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Identifier</th></tr>
 				 </thead>
 				 <tbody>
 			{% for question in library_questions %}
@@ -184,14 +197,14 @@ table tr:hover td{
 {% endblock %}
 {% block display_form_fields %}
            <br>
-    			<table id="batch_questions" align="center" class="scrollit" style="width: 48%; float: right;">
+    			<table id="batch_questions" class="scrollit" style="width: 48%; float: right;">
 					<thead>
-						<tr class="title">
-							<th colspan="4">
+						<tr>
+							<th colspan="4" class="theader">
 								Batch Questions
 							</th>
 						</tr>
-						<tr><th class="hide" /><th>Code</th><th>Text</th><th>Identifier</th></tr>
+						<tr><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Identifier</th></tr>
 					</thead>
 					<tbody></tbody>
 				</table>
@@ -203,8 +216,8 @@ table tr:hover td{
 </div>
 {% endblock %}
 {% block javascripts %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
 {% comment %}
-		<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/redips-drag-min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/script.js"></script>
 {% endcomment %}

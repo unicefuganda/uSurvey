@@ -1,7 +1,7 @@
 fieldset .add-row {
       float:: right;
       display:block;
-      background:url(/static/img/add.png) no-repeat left bottom;
+      background:url(/static/img/add.png) no-repeat center bottom;
       width:16px;
       height:16px;
       margin-right: 0px;
@@ -15,8 +15,7 @@ fieldset .add-m-text {
 
 fieldset  .delete-row {
       display:block;
-      background:url(/static/img/delete.png) no-repeat left center;
-      margin-top: -30px;
+      background: url(/static/img/delete-icon.png) no-repeat center center;
       width:16px;
       height:16px;
   }
