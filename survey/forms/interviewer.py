@@ -60,6 +60,7 @@ class InterviewerForm(ModelForm):
         if commit:
             survey = self.cleaned_data['survey']
             ea = self.cleaned_data['ea']
+            interviewer.assignments.update(completed=False)
             SurveyAllocation.objects.get_or_create(survey=survey,
                                                    interviewer=interviewer,
                                                    allocation_ea=ea)
