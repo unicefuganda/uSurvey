@@ -79,7 +79,7 @@ def show_interviewer_completion_summary(request):
     selected_location = None
     selected_ea = None
     interviewers = Interviewer.objects.order_by('id')
-    search_fields = ['name', ]
+    search_fields = ['name', 'ea__name']
     if request.GET.has_key('q'):
         interviewers = get_filterset(interviewers, request.GET['q'], search_fields)
     if params.has_key('status'):

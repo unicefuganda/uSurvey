@@ -45,9 +45,11 @@
 						
 					</td>
                     <td>
+                        <a href="{% url 'view_household_page' household.id %}">
                         {% with household.get_head as head %}
                            {% if head.first_name %} {{ head.first_name|capfirst }} {% endif %} {{ head.surname|capfirst }}
                         {% endwith %}
+                         </a>
                     </td>                    
                     <td>
                         {% if household.last_registrar %}

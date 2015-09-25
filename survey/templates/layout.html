@@ -280,8 +280,9 @@
                                    href="#">Settings<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-settings-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'users_index' %}">Users</a></li>
-                                    <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations
-                                        CSV</a></li>
+                                {% comment "Left to set up script" %}
+                                    <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
+                                {% endcomment %}
                                 </ul>
                             </li>
                         {% endif %}

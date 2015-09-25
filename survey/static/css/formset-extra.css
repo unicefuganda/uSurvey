@@ -1,11 +1,18 @@
 fieldset .add-row {
       float:: right;
       display:block;
-      background:url(/static/img/add.png) no-repeat left center;
+      background:url(/static/img/add.png) no-repeat left bottom;
       width:16px;
       height:16px;
       margin-right: 0px;
   }
+
+fieldset .add-m-text {
+    display: block;
+    width: 500px;
+    margin-left: 18px;
+}
+
 fieldset  .delete-row {
       display:block;
       background:url(/static/img/delete.png) no-repeat left center;

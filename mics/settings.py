@@ -151,7 +151,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.media",
     "django.core.context_processors.static",
     "django.contrib.messages.context_processors.messages",
-    "survey.context_processor.project_title",
+    "survey.context_processor.context_extras",
     "django.core.context_processors.request"
 )
 

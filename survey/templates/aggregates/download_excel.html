@@ -4,10 +4,14 @@
 {% endblock %}
 {% block content %}
 {% load template_tags %}
+<style type="text/css">
+	.form {
+		margin-top: -1px;
+	  }
+</style>
   <h4>
     Choose which reports you would like to export to excel
   </h4>
   {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
-    <br class="clear"/>
   {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-csv-form" a_form=survey_batch_filter_form no_button=False no_auto_refresh=True %}
 {% endblock %}

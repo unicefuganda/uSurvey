@@ -5,9 +5,9 @@
 <td valign="top">
   <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label>
  {% if field.label_tag|is_mobile_number %}
-   <div class="input-prepend">
+   <div class="ccode">
        <span class="add-on">{{ country_phone_code }}</span>
-       </div>
+
   {% endif %}
    <span class="horiselect">{{field}}</span>
        {% if field.errors %}
@@ -16,6 +16,7 @@
                 {{ error}}
             {% endfor %}
         </label>
+       </div>
 </td>
     {% endif %}
 {% endfor %}
