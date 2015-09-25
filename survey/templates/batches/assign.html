@@ -1,18 +1,53 @@
-<script language="JavaScript" type="text/javascript">
+<!-- script language="JavaScript" type="text/javascript">
 $(document).ready(function() {
-    $('#example').DataTable( {
+    $('table.batch_assignments').DataTable( {
         "scrollY":        "200px",
         "scrollCollapse": true,
         "paging":         false
     } );
 } );
-</script>
+</script -->
 {% extends 'form.html' %}
 {% block title %}
     Select Questions for {{ batch.survey.name.capitalize }} - {{ batch.name.capitalize }}
 {% endblock %}
 {% block extra_css %}
-	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css">
+	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css" />
+	<style type="text/css">
+
+		table {
+			max-height: 500px;
+			overflow: scroll;
+			text-align: left;
+		}
+
+		tr {
+			max-height: 40px;
+			color: #09f;
+			text-align: left;
+		}
+
+		tr.title {
+			text-align: center;
+		}
+
+		tbody tr {
+			color: #005580;
+		}
+
+		<!--thead {-->
+			<!--height: 80px;-->
+		<!--}-->
+
+		tbody tr:nth-child(even) {
+		  background-color: #def;
+		}
+
+
+		tbody tr:nth-child(odd) {
+		  background-color: white;
+		}
+	</style>
 {% endblock %}
 {% block pre_form_content %}
 	<div class="filter-form">
@@ -21,17 +56,17 @@ $(document).ready(function() {
     <div class="search">
     	{% include "search_form.html" with id="library_search_form" %} 
     </div>
-       <div id="redips-drag" class="clear redips-noautoscroll">
+       <div id="batch_assignment" class="clear">
        	<br />
-		   <table width="45%"><tr><td class="redips-mark"  colspan="2">Identifier</td><td class="redips-mark">Text</td><td align="center" class="redips-mark">Answer Type</td></tr></table>
-  		<table id="lib_questions_table" class="left"  style="width: 45%;">
-		<tbody>
-		<tr><td>
-		 <div class="scrollit">
-			 <table>
+		 	 <table id="lib_questions_table" class="scrollit" style="width: 48%; float: left;">
+				 <thead>
+				 <tr class="title"><th colspan="4">Library Questions</th></tr>
+				 <tr><th class="hide" /><th>Code</th><th>Text</th><th>Identifier</th></tr>
+				 </thead>
+				 <tbody>
 			{% for question in library_questions %}
-				<tr class="rd ms-selectable" id="{{question.pk}}-selectable">
-					<td align="center" width="35px"><div class="redips-drag redips-row"><img src="{{ STATIC_URL }}img/drag.png" class="img-responsive" alt="" /></div>
+				<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
+					<td align="center" width="35px" class="hide">
 					<input type="hidden" name="identifier" value="{{question.identifier}}" />
 					<input type="hidden" name="text" value="{{question.text}}" />
 					<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
@@ -43,29 +78,20 @@ $(document).ready(function() {
 					<td>{{question.answer_type}}</td>
 				</tr>
 			{% endfor %}
+				 </tbody>
 				 </table>
-			 </div>
-		</td></tr>
-			<tr>
-				<td colspan="6" class="redips-mark"><span id="msg"></span></td>
-			</tr>
-		</tbody>
-	</table>
 {% endblock %}
 {% block display_form_fields %}
-		   <table align="center" style="width: 45%;"><tr><td class="redips-mark">Drop Questions Here</td></tr></table>
-    			<table id="batch_questions" align="center" style="width: 45%;">
-					<tbody>
-						<tr class="rd">
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
+    			<table id="batch_questions" align="center" class="scrollit" style="width: 48%; float: right;">
+					<thead>
+						<tr class="title">
+							<th colspan="4">
+								Batch Questions
+							</th>
 						</tr>
-						<tr>
-							<td colspan="4" class="redips-mark"></td>
-						</tr>
-					</tbody>
+						<tr><th class="hide" /><th>Code</th><th>Text</th><th>Identifier</th></tr>
+					</thead>
+					<tbody></tbody>
 				</table>
 				<input type="hidden" value="{{ batch.id }}" id="batch_id">
 		   	<br class="clear" />
@@ -75,8 +101,57 @@ $(document).ready(function() {
 </div>
 {% endblock %}
 {% block javascripts %}
+{% comment %}
 		<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/redips-drag-min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/script.js"></script>
+{% endcomment %}
 
+<script type="text/javascript">
+<!--$(document).ready( function () {-->
+	<!--libTable =  $('lib_questions_table').dataTable();-->
+	<!--batchTable =  $('batch_questions').dataTable();-->
+	<!--alert(libTable);-->
+	<!--});-->
+
+function Move(tr){
+ while (tr.parentNode&&tr.nodeName.toUpperCase()!='TR'){
+  tr=tr.parentNode
+ }
+ var table1=document.getElementById('lib_questions_table');
+ if (!this.rows){
+  var rows=table1.getElementsByTagName('TR');
+  this.rows=[];
+  for (var z0=0;z0<rows.length;z0++){
+   this.rows[z0]=rows[z0];
+   <!--alert(rows[z0].style.background);-->
+   <!--if(z0%2 == 1) {-->
+		<!--this.rows[z0].style.background = '#005580;';-->
+   <!--}-->
+   <!--else-->
+   <!--{-->
+		<!--this.rows[z0].style.background = 'white;';-->
+   <!--}-->
+  }
+ }
+ var table2=document.getElementById('batch_questions');
+ if (tr.parentNode!=table2){
+  table2.appendChild(tr);
+ }
+ else {
+  table1.appendChild(tr);
+  for (var z0=0;z0<this.rows.length;z0++){
+   if (this.rows[z0].parentNode==table1){
+	table1.appendChild(this.rows[z0]);
+   }
+  }
+ }
+
+ <!--&lt;!&ndash;$('lib_questions_table').dataTable();&ndash;&gt;-->
+ <!--libTable.fnDraw();-->
+ <!--&lt;!&ndash;$('batch_questions').dataTable();&ndash;&gt;-->
+ <!--batchTable.fnDraw();-->
+}
+
+</script>
 {% endblock %}

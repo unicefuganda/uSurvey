@@ -1,4 +1,5 @@
 from django.conf import settings
+from survey.interviewer_configs import COUNTRY_PHONE_CODE
 
-def project_title (request):
-    return { 'PROJECT_TITLE': settings.PROJECT_TITLE }
+def context_extras (request):
+    return { 'PROJECT_TITLE': settings.PROJECT_TITLE, 'country_phone_code' : COUNTRY_PHONE_CODE }
