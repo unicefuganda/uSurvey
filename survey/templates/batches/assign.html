@@ -64,7 +64,7 @@ table a:hover {
 	color: #bd5a35;
 	text-decoration:underline;
 }
-.tablem {
+.table {
 	font-family:Arial, Helvetica, sans-serif;
 	color:#666;
 	font-size:12px;
@@ -203,8 +203,8 @@ table tr:hover td{
 </div>
 {% endblock %}
 {% block javascripts %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
 {% comment %}
-		<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/redips-drag-min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/script.js"></script>
 {% endcomment %}
