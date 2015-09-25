@@ -1,6 +1,8 @@
-import sys
-
-
+import sys, os
+#from djanfo.conf import settings
+#settings.configure()
+#export DJANGO_SETTINGS_MODULE="settings"
+#os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 ## Broker settings.
 BROKER_URL = "amqp://guest:guest@localhost:5672//"
 
