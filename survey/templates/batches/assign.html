@@ -48,10 +48,16 @@ $(document).ready(function() {
 		  background-color: white;
 
 		}*/
+div.batch_assignment {
+		max-height: 50%;
+		overflow-y:  auto;
+		width: 48%;
+		margin-left: 1%;
+
+}
+
 table {
 		text-align: center;
-		max-height: 500px;
-		overflow: scroll;
 		}
 
 table a:link {
@@ -174,7 +180,8 @@ table tr:hover td{
     </div>
        <div id="batch_assignment" class="clear">
        	<br />
-		 	 <table id="lib_questions_table" class="tablem" style="width: 48%; float: left;">
+		   <div class="batch_assignment" style="float: left;">
+		 	 <table id="lib_questions_table" class="tablem" >
 				 <thead>
 				 <tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
 				 <tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Identifier</th></tr>
@@ -196,10 +203,12 @@ table tr:hover td{
 			{% endfor %}
 				 </tbody>
 				 </table>
+			   </div>
 {% endblock %}
 {% block display_form_fields %}
            <br>
-    			<table id="batch_questions" class="scrollit" style="width: 48%; float: right;">
+		   		<div class="batch_assignment" style="float: left;">
+    			<table id="batch_questions">
 					<thead>
 						<tr>
 							<th colspan="4" class="theader">
@@ -210,6 +219,7 @@ table tr:hover td{
 					</thead>
 					<tbody></tbody>
 				</table>
+				</div>
 				<input type="hidden" value="{{ batch.id }}" id="batch_id">
 		   	<br class="clear" />
 
