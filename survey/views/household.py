@@ -51,9 +51,9 @@ def list_households(request):
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     enumeration_areas = locations_filter.get_enumerations()
     households = Household.objects.filter(listing__ea__in=enumeration_areas).order_by('house_number')
-    search_fields = ['ea__name', 'registrar__name', 'survey__name', ]
+    search_fields = ['house_number', 'listing__ea__name', 'last_registrar__name', 'listing__initial_survey__name', ]
     if request.GET.has_key('q'):
-        all_households = get_filterset(households, request.GET['q'], search_fields)
+        households = get_filterset(households, request.GET['q'], search_fields)
     # households = _remove_duplicates(all_households)
     if not households:
         messages.error(request, "There are  no households currently registered for present location" )
@@ -69,7 +69,7 @@ def household_filter(request):
     locations_filter = LocationsFilterForm(request.GET, include_ea=True)
     enumeration_areas = locations_filter.get_enumerations()
     all_households = Household.objects.filter(ea__in=enumeration_areas).order_by('household_member__householdhead__surname')
-    search_fields = [ 'ea__name', 'registrar__name', 'survey__name', ]
+    search_fields = ['house_number', 'listing__ea__name', 'last_registrar__name', 'listing__initial_survey__name', ]
     if request.GET.has_key('q'):
         all_households = get_filterset(all_households, request.GET['q'], search_fields)
     all_households =  all_households.values('id', 'house_number', ).order_by('name')

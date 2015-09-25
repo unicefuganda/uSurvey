@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 
 
 class InterviewerForm(ModelForm):
-    survey = forms.ChoiceField()
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all())
     date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT,],
                                     widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                   'class': 'datepicker'}, format=settings.DATE_FORMAT))
@@ -15,15 +15,6 @@ class InterviewerForm(ModelForm):
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
         self.fields.keyOrder=['name', 'gender', 'date_of_birth', 'level_of_education', 'language',  'ea', 'survey']
-        survey_choices = [('', 'Select Survey')]
-        if data and data.get('ea'):
-            ea = EnumerationArea.objects.get(pk=data['ea'])
-            open_surveys = ea.open_surveys()
-            survey_choices.extend([(survey.pk, survey.name) for survey in open_surveys])
-        else:
-            extras = dict([(b.batch.survey.pk, b.batch.survey.name) for b in BatchLocationStatus.objects.all()]).items()
-            survey_choices.extend(extras)
-        self.fields['survey'].choices = survey_choices
         if self.instance:
             try:
                 self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance, completed=False)[0].survey.pk
@@ -45,8 +36,6 @@ class InterviewerForm(ModelForm):
         ea = self.cleaned_data.get('ea', '')
         survey_pk = self.cleaned_data['survey']
         if survey_pk.strip():
-            if str(survey_pk.strip()) not in [str(s.pk) for s in ea.open_surveys()]:
-                raise ValidationError('Survey does not belong to that Enumeration Area')
             survey = Survey.objects.get(pk=survey_pk)
             #check if this has already been allocated to someone else
             allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
