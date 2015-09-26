@@ -50,18 +50,7 @@ class Interview(BaseModel):
                     answer.interview = self
                     answer.save()
                     #after answering the question, lets see if it leads us anywhere
-                    flows = self.last_question.flows.all()
-                    resulting_flow = None
-                    for flow in flows:
-                        if flow.validation_test:
-                            test_values = [arg.param for arg in flow.text_arguments]
-                            if getattr(answer_class, flow.validation_test)(reply, *test_values) == True:
-                                resulting_flow = flow
-                                break
-                        else:
-                            resulting_flow = flow
-                    if resulting_flow:
-                        next_question = resulting_flow.next_question
+                    next_question = self.last_question.next_question(reply)
 
                  #confirm if next question is applicable
                 if next_question and (self.householdmember.belongs_to(next_question.group) and  \
@@ -277,7 +266,7 @@ class MultiChoiceAnswer(Answer):
     def __init__(self, question, answer, *args, **kwargs):
         super(MultiChoiceAnswer, self).__init__()
         if isinstance(answer, basestring):
-            self.value = question.options.get(text__iexact=answer)
+            self.value = question.options.get(order=answer)
         else: self.value = answer
         self.question = question
 

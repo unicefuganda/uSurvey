@@ -18,6 +18,7 @@ from django.core.exceptions import ValidationError
 #USSD_PREVIOUS, USSD_NEXT, USSD_ITEMS_PER_PAGE
 
 #from django.core.exceptions import ObjectDoesNotExist
+DEFAULT_LISTING_SIZE = 1000
 
 class InvalidSelection(ValidationError):
     pass
@@ -158,9 +159,13 @@ class ListHouseholds(Task):
     @property
     def _intro_speech(self):
         if self.house_listing.total_households is None:
-            return MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
-        else:
-            return RegisterHousehold(self.access).intro()
+            if self.ongoing_survey.has_sampling:
+                return MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
+            #just set total housholds to default listing size but dont save
+            house_listing = self.house_listing
+            house_listing.total_households = DEFAULT_LISTING_SIZE
+            self.house_listing = house_listing
+        return RegisterHousehold(self.access).intro()
 
     def _respond(self, message):
         if message.isdigit():
@@ -780,9 +785,7 @@ class StartInterview(Interviews):
             response = ongoing_interview.respond(message, channel=USSDAccess.choice_name())
             self._ongoing_interview = ongoing_interview #probably something may have happened to the interview instance in db
             interview = self._ongoing_interview
-            import pdb; pdb.set_trace()
             if interview.has_pending_questions is False:
-                import pdb; pdb.set_trace()
                 interview.closure_date = datetime.now()
                 interview.save()
                 house_member = interview.householdmember

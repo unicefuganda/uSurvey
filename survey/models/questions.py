@@ -30,11 +30,25 @@ class Question(BaseModel):
         if channel and channel== USSDAccess.choice_name() and self.answer_type == MultiChoiceAnswer.choice_name():
             extras = []
             #append question options
-            for option in self.options.all():
-                extras.append(option.text)
+            for option in self.options.all().order_by('order'):
+                extras.append(option.to_text)
             text = '%s\n%s' % (text, '\n'.join(extras))
         return text
 
+    def next_question(self, reply):
+        flows = self.flows.all()
+        answer_class = Answer.get_class(self.answer_type)
+        resulting_flow = None
+        for flow in flows:
+            if flow.validation_test:
+                test_values = [arg.param for arg in flow.text_arguments]
+                if getattr(answer_class, flow.validation_test)(reply, *test_values) == True:
+                    resulting_flow = flow
+                    break
+            else:
+                resulting_flow = flow
+        if resulting_flow:
+            return resulting_flow.next_question
 
     
     def conditional_flows(self):
@@ -131,7 +145,8 @@ class QuestionOption(BaseModel):
  
     class Meta:
         app_label = 'survey'
- 
+
+    @property
     def to_text(self):
         return "%d: %s" % (self.order, self.text)
 
