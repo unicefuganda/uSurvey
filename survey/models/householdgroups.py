@@ -80,11 +80,6 @@ class GroupCondition(BaseModel):
 
     def confirm_head(self, value):
         return bool(value)
-<<<<<<< HEAD
-        #if isinstance(value, basestring):
-        #return bool(ast.literal_eval(value))
-=======
->>>>>>> 6d948eba7c88a5d7ce30d1a073cc549fa6cd8f07
 
     def odk_confirm_head(self, value):
         return 'true()' if bool(value) else 'false()'
