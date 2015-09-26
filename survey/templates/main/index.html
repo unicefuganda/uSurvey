@@ -70,8 +70,8 @@ $(document).ready( function(){
     position: relative;
     left: 50%;
     top: 50%;
-    width: 150px;
-    height: 150px;
+    width: 50px;
+    height: 50px;
     margin: -75px 0 0 -75px;
     border-radius: 50%;
     border: 3px solid transparent;
@@ -164,8 +164,8 @@ $(document).ready( function(){
             -ms-transform: translateX(-100%);  /* IE 9 */
                 transform: translateX(-100%);  /* Firefox 16+, IE 10+, Opera */
 
-        -webkit-transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-                transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+        -webkit-transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+                transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
     }
 
     .loaded #loader-wrapper .loader-section.section-right {
@@ -173,8 +173,8 @@ $(document).ready( function(){
             -ms-transform: translateX(100%);  /* IE 9 */
                 transform: translateX(100%);  /* Firefox 16+, IE 10+, Opera */
 
--webkit-transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-        transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+-webkit-transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+        transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
     }
 
     .loaded #loader {
@@ -241,7 +241,7 @@ $(document).ready( function(){
                     <td width="83%" align="left" valign="top"><table width="100%" border="0" cellspacing="2" cellpadding="0">
                       <tr>
                         <td width="4%"><img src="{{ STATIC_URL }}img/home.png" width="19" height="18" /></td>
-                        <td width="96%" align="left" valign="top"> <span class="utopnav"><a href="{% url 'main_page' %}">HOME</a></span> <span class="utopnav">DISCOVER</span> <span class="utopnav"><a href="{% url 'about_page' %}">ABOUT</a></span> <span class="utopnav">CONTACT</span> </td>
+                        <td width="96%" align="left" valign="top"> <span class="utopnav"><a href="{% url 'main_page' %}">HOME</a></span> <span class="utopnav"><a href="#C4">DISCOVER</a></span> <span class="utopnav"><a href="{% url 'about_page' %}">ABOUT</a></span> <span class="utopnav">CONTACT</span> </td>
                       </tr>
                     </table></td>
 
@@ -275,32 +275,20 @@ $(document).ready( function(){
                     <li>
                         <img src="{{ STATIC_URL }}img/u1.jpg" class="img-responsive" alt="" />
 <div class="forleft">
-                            <h1>Welcome To Usurvey Uganda.</h1>
 
-                            <div class="clearfix"></div>
-                            <h4><p>uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups.</p></h4>
-                            <a href="#">Get Started</a>
                         </div>
                     </li>
                     <li>
                         <img src="{{ STATIC_URL }}img/u2.jpg" class="img-responsive" alt="" />
 <div class="forleft">
-                            <h1>Welcome To Usurvey Uganda.</h1>
 
-                            <div class="clearfix"></div>
-                            <h4><p>uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups.</p></h4>
-                            <a href="#">Get Started</a>
                         </div>
 
                     </li>
                     <li>
                         <img src="{{ STATIC_URL }}img/u3.jpg" class="img-responsive" alt="" />
 <div class="forleft">
-                            <h1>Welcome To Usurvey Uganda.</h1>
-
-                            <div class="clearfix"></div>
-                            <h4><p>uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups.</p></h4>
-                            <a href="#">Get Started</a>
+                           
                         </div>
 
                     </li>
@@ -325,7 +313,7 @@ $(document).ready( function(){
             <td align="left" valign="top">&nbsp;</td>
           </tr>
                     <tr>
-            <td align="center" valign="top" class="udiscover">Discover</td>
+            <td align="center" valign="top"  id="C4" class="udiscover">Discover</td>
           </tr>
           <tr>
             <td align="left" valign="top">&nbsp;</td>
@@ -353,18 +341,31 @@ $(document).ready( function(){
                     <td align="center" valign="middle" class="uhimgs">SAMPLE AND NON SAMPLE SURVEY</td>
                   </tr>
                   <tr>
-                    <td align="center" valign="middle" class="uhtxt">UNICEF Uganda has developed <br />
-                      a mobile-based tool to work <br />
-                      over the USSD technology to <br />
-                      collect household-level.</td>
-                    <td align="center" valign="middle" class="uhtxt">Real time reports are being<br />
-                      generated on the go keeping<br />
-                      previlaged users updated.</td>
-                    <td align="center" valign="middle" class="uhtxt">Data collected from conducted <br />
-                      surveys can be exported into <br />
-                      external systems (eg. Google <br />
-                      Maps, etc) for statistical <br />
-                      analysis.</td>
+                    <td align="center" valign="middle" class="uhtxt">uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via
+
+USSD and ODK channels. This secure and interactive connection enables communication through
+
+the relay of survey questions from the server to the hand-held mobile device and the instant
+
+transmission of each response from the mobile device to the server. The off-line ODK (Open Data
+
+Kit) based mobile application to optimize its utilization in locations with intermittent mobile
+
+connections.</td>
+                    <td align="center" valign="middle" class="uhtxt">uSurvey eliminates the use of paper questionnaires and associated delays in the release of survey
+
+results oftentimes due to the time required for data capture, editing and cleaning. The tool enables
+
+remote review and (if necessary) editing of captured data in real time, while the data collectors are
+
+still in the field.</td>
+                    <td align="center" valign="middle" class="uhtxt">uSurvey possesses in-built capabilities to randomly select a representative sample from a population
+
+of interest and generate a list of unique identification numbers for each sampling unit (e.g.
+
+households, institutions, etc.) to be included in the sample. Just like for traditional surveys techniques, uSurvey results can be used to make inferences about the population from which the
+
+sample was selected..</td>
                   </tr>
                   <tr>
                     <td align="center" valign="middle">&nbsp;</td>
@@ -372,9 +373,9 @@ $(document).ready( function(){
                     <td align="center" valign="middle">&nbsp;</td>
                   </tr>
                   <tr>
-                    <td align="center" valign="middle"><a href="#"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
-                    <td align="center" valign="middle"><a href="#"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
-                    <td align="center" valign="middle"><a href="#"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
+                    <td align="center" valign="middle"><a href="{% url 'about_page' %}"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
+                    <td align="center" valign="middle"><a href="{% url 'about_page' %}"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
+                    <td align="center" valign="middle"><a href="{% url 'about_page' %}"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
                   </tr>
                   
                 </table></td>
@@ -414,7 +415,17 @@ $(document).ready( function(){
               <tr>
                 <td align="center" valign="top"><table width="90%" border="0" cellspacing="0" cellpadding="0">
                   <tr>
-                    <td align="left" valign="top" class="uhtxt">The  uSurvey tools are developed by UNICEF after consultations with relevant experts from various UN organizations as well as with interagency monitoring groups. UNICEF works closely with other household survey programmes, in particular the Demographic and Health Surveys (DHS) programme, to harmonize survey questions and modules and to ensure a coordinated approach to survey implementation, with the objective to provide comparability across surveys and to avoid duplication of efforts. The survey questionnaires are modular tools that can be adapted to the needs of the country.</td>
+                    <td align="left" valign="top" class="uhtxt">uSurvey has been developed to collect information from a scientifically selected sample in standard
+
+surveys. To this end, it possesses in-built capabilities to randomly select a representative sample
+
+from a population of interest and generate a list of unique identification numbers for each sampling
+
+unit (e.g. households, institutions, etc.) to be included in the sample. Just like for traditional surveys
+
+techniques, uSurvey results can be used to make inferences about the population from which the
+
+sample was selected..</td>
                   </tr>
                 </table></td>
               </tr>
