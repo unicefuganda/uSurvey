@@ -60,14 +60,20 @@ div.batch_assignment {
 }
 
  #batch_assignment td {
-	width: 15%;
 	text-align: left;
 }
 
 th.theader {
-	width: 15%;
 	text-align: center;
 	padding:21px 25px 22px 25px;
+}
+
+th.question, td.question {
+	width: 35%;
+}
+
+th.code, td.code {
+	width: 10%;
 }
 
 table.question_headers {
@@ -203,7 +209,7 @@ table tr:hover td{
 	</style>
 {% endblock %}
 {% block pre_form_content %}
-	<div class="filter-form">
+	<div class="filter-form right">
 		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
     </div>
     <div class="search">
@@ -215,7 +221,7 @@ table tr:hover td{
 				<table class="question_headers">
 					<thead>
 						<tr class="tabletrtd"><th class="theader" colspan="3">Library Questions</th></tr>
-						<tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
+						<tr class="tabletrtd"><th class="hide" /><th class="theader code">Code</th><th class="theader  question">Text</th></tr>
 					</thead>
 				</table>
 				<div class="scrollit">
@@ -223,7 +229,7 @@ table tr:hover td{
 						 <tbody>
 						{% for question in library_questions %}
 							<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
-								<td class="tabletrtd">
+								<td class="tabletrtd code">
 									<div align="center" class="hide">
 										<input type="hidden" name="identifier" value="{{question.identifier}}" />
 										<input type="hidden" name="text" value="{{question.text}}" />
@@ -233,8 +239,7 @@ table tr:hover td{
 									</div>
 									{{question.identifier}}
 								</td>
-								<td class="tabletrtd">{{question.text}}</td>
-								<td class="tabletrtd">{{question.answer_type}}</td>
+								<td class="tabletrtd question">{{question.text}}</td>
 							</tr>
 						{% endfor %}
 						 </tbody>
@@ -251,7 +256,7 @@ table tr:hover td{
 									Batch Questions
 								</th>
 							</tr>
-							<tr><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
+							<tr><th class="theader code">Code</th><th class="theader question">Text</th></tr>
 						</thead>
 					</table>
 					<div class="scrollit">
