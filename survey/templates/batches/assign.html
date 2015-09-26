@@ -35,6 +35,8 @@ $(document).ready(function() {
 			color: #005580;
 		}
 
+		td.
+
 		<!--thead {-->
 			<!--height: 80px;-->
 		<!--}-->
@@ -57,8 +59,24 @@ div.batch_assignment {
 
 }
 
+td,tabletrtd {
+	width: 15%;
+	text-align: center;
+}
+
+th.theader {
+	width: 15%;
+	text-align: center;
+	padding:21px 25px 22px 25px;
+}
+
+table.question_headers {
+	margin-left: -5px;
+}
+
 table {
 		text-align: center;
+
 		}
 
 table a:link {
@@ -185,39 +203,39 @@ table tr:hover td{
     	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
     </div>
        <div id="batch_assignment" class="clear">
-       	<br />
+		   <br />
 		   <div class="batch_assignment" style="float: left;">
+				<table class="question_headers">
+					<thead>
+						<tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
+						<tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
+					</thead>
+				</table>
 				<div class="scrollit">
 					<table id="lib_questions_table" class="tablem" >
-						<thead>
-							<tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
-						 	<tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
-						</thead>
 						 <tbody>
-							{% for question in library_questions %}
-								<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
-									<td align="center" width="35px" class="hide">
-									<input type="hidden" name="identifier" value="{{question.identifier}}" />
-									<input type="hidden" name="text" value="{{question.text}}" />
-									<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
-									<input type="hidden" name="module" value="{{question.module}}" />
-									<input type="hidden" name="group" value="{{question.group}}" />
-									</td>
-									<td class="tabletrtd">{{question.identifier}}</td>
-									<td class="tabletrtd">{{question.text}}</td>
-									<td class="tabletrtd">{{question.answer_type}}</td>
-								</tr>
-							{% endfor %}
-
+						{% for question in library_questions %}
+							<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
+								<td align="center" width="35px" class="hide">
+								<input type="hidden" name="identifier" value="{{question.identifier}}" />
+								<input type="hidden" name="text" value="{{question.text}}" />
+								<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
+								<input type="hidden" name="module" value="{{question.module}}" />
+								<input type="hidden" name="group" value="{{question.group}}" />
+								</td>
+								<td class="tabletrtd">{{question.identifier}}</td>
+								<td class="tabletrtd">{{question.text}}</td>
+								<td class="tabletrtd">{{question.answer_type}}</td>
+							</tr>
+						{% endfor %}
 						 </tbody>
 					</table>
 				</div>
-		   </div>
+			</div>
 {% endblock %}
 {% block display_form_fields %}
-			<div class="batch_assignment" style="float: right;">
-				<div class="scrollit">
-					<table id="batch_questions">
+		   		<div class="batch_assignment" style="float: right;">
+					<table  class="question_headers">
 						<thead>
 							<tr>
 								<th colspan="4" class="theader">
@@ -226,15 +244,19 @@ table tr:hover td{
 							</tr>
 							<tr><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
 						</thead>
-						<tbody></tbody>
 					</table>
+					<div class="scrollit">
+						<table id="batch_questions">
+							<tbody></tbody>
+						</table>
+					</div>
 				</div>
-			</div>
-			<input type="hidden" value="{{ batch.id }}" id="batch_id">
+				<input type="hidden" value="{{ batch.id }}" id="batch_id">
 		   	<br class="clear" />
+
 {% endblock %}
 {% block non_form_content %}
-		</div>
+	</div>
 {% endblock %}
 {% block javascripts %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
