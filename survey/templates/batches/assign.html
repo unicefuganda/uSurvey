@@ -187,59 +187,54 @@ table tr:hover td{
        <div id="batch_assignment" class="clear">
        	<br />
 		   <div class="batch_assignment" style="float: left;">
-<table>
-	<thead>			 <tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
-				 <tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
-</thead>
-</table>
-		<div class="scrollit"> 	 <table id="lib_questions_table" class="tablem" >
+				<div class="scrollit">
+					<table id="lib_questions_table" class="tablem" >
+						<thead>
+							<tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
+						 	<tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
+						</thead>
+						 <tbody>
+							{% for question in library_questions %}
+								<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
+									<td align="center" width="35px" class="hide">
+									<input type="hidden" name="identifier" value="{{question.identifier}}" />
+									<input type="hidden" name="text" value="{{question.text}}" />
+									<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
+									<input type="hidden" name="module" value="{{question.module}}" />
+									<input type="hidden" name="group" value="{{question.group}}" />
+									</td>
+									<td class="tabletrtd">{{question.identifier}}</td>
+									<td class="tabletrtd">{{question.text}}</td>
+									<td class="tabletrtd">{{question.answer_type}}</td>
+								</tr>
+							{% endfor %}
 
-				 <tbody>
-
-			{% for question in library_questions %}
-				<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
-					<td align="center" width="35px" class="hide">
-					<input type="hidden" name="identifier" value="{{question.identifier}}" />
-					<input type="hidden" name="text" value="{{question.text}}" />
-					<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
-					<input type="hidden" name="module" value="{{question.module}}" />
-					<input type="hidden" name="group" value="{{question.group}}" />
-					</td>
-					<td class="tabletrtd">{{question.identifier}}</td>
-					<td class="tabletrtd">{{question.text}}</td>
-					<td class="tabletrtd">{{question.answer_type}}</td>
-				</tr>
-			{% endfor %}
-
-				 </tbody>
-				 </table></div>
-			   </div>
-			   </div>
+						 </tbody>
+					</table>
+				</div>
+		   </div>
 {% endblock %}
 {% block display_form_fields %}
-
-		   		<div class="batch_assignment" style="float: right;">
-					<table>
+			<div class="batch_assignment" style="float: right;">
+				<div class="scrollit">
+					<table id="batch_questions">
 						<thead>
-						<tr>
-							<th colspan="4" class="theader">
-								Batch Questions
-							</th>
-						</tr>
-						<tr><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
-					</thead></table>
-					<div class="scrollit">
-    			<table id="batch_questions">
-
-					<tbody></tbody>
-				</table></div>
+							<tr>
+								<th colspan="4" class="theader">
+									Batch Questions
+								</th>
+							</tr>
+							<tr><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
+						</thead>
+						<tbody></tbody>
+					</table>
 				</div>
-				<input type="hidden" value="{{ batch.id }}" id="batch_id">
+			</div>
+			<input type="hidden" value="{{ batch.id }}" id="batch_id">
 		   	<br class="clear" />
-
 {% endblock %}
 {% block non_form_content %}
-</div>
+		</div>
 {% endblock %}
 {% block javascripts %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
