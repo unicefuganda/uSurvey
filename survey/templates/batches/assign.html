@@ -187,12 +187,13 @@ table tr:hover td{
        <div id="batch_assignment" class="clear">
        	<br />
 		   <div class="batch_assignment" style="float: left;">
-
-		 	 <table id="lib_questions_table" class="tablem" >
-				 <thead>
-				 <tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
+<table>
+	<thead>			 <tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
 				 <tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
-				 </thead>
+</thead>
+</table>
+		<div class="scrollit"> 	 <table id="lib_questions_table" class="tablem" >
+
 				 <tbody>
 
 			{% for question in library_questions %}
@@ -211,24 +212,27 @@ table tr:hover td{
 			{% endfor %}
 
 				 </tbody>
-				 </table>
+				 </table></div>
 			   </div>
 			   </div>
 {% endblock %}
 {% block display_form_fields %}
 
-		   		<div class="batch_assignment" style="float: left;">
-    			<table id="batch_questions">
-					<thead>
+		   		<div class="batch_assignment" style="float: right;">
+					<table>
+						<thead>
 						<tr>
 							<th colspan="4" class="theader">
 								Batch Questions
 							</th>
 						</tr>
 						<tr><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
-					</thead>
+					</thead></table>
+					<div class="scrollit">
+    			<table id="batch_questions">
+
 					<tbody></tbody>
-				</table>
+				</table></div>
 				</div>
 				<input type="hidden" value="{{ batch.id }}" id="batch_id">
 		   	<br class="clear" />
