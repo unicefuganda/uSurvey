@@ -170,5 +170,18 @@ class SurveyAllocation(BaseModel):
         except cls.DoesNotExist:
             return None
 
+    def is_valid(self):
+        '''
+        It's up to users of this class to ensure that interviewer as not been assigned to new ea from allocated one
+        :return:
+        '''
+        return self.completed is False and self.interviewer.ea == self.allocation_ea
+
     def batches_enabled(self):
-        return self.survey.batches_enabled(ea=self.allocation_ea)
+        if self.is_valid():
+            if self.survey.has_sampling:
+                if self.interviewer.present_households(self.survey).count() < self.survey.sample_size:
+                    return False
+            return True
+        else:
+            raise ValidationError('Interviewer not assigned to EA: ' % self.allocation_ea)

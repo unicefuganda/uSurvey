@@ -130,7 +130,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 				    {% for member in r_household.all_members %}
 				    <item>
 		               <label>{{member.surname}}, {{member.first_name}} </label>
-		               <value>{{member.pk}}</value>
+		               <value>{{r_household.pk}}_{{member.pk}}</value>
 		            </item>
 				    {% endfor %}
 		        </select1>
