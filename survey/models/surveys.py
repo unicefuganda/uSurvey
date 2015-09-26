@@ -40,6 +40,9 @@ class Survey(BaseModel):
                 return True
         return False
 
+    def is_open(self):
+        return any([batch.is_open() for batch in self.batches.all()])
+
     def generate_completion_report(self, batch=None):
         data = []
         all_interviewers = Interviewer.objects.all()
@@ -51,10 +54,12 @@ class Survey(BaseModel):
                 data.append(row)
         return data
 
-    def batches_enabled(self, ea=None):
-        if ea:
-            return self.commencement_registry.filter(ea=ea).exists()
-        return self.commencement_registry.exists()
+    # def batches_enabled(self, interviewer):
+    #     if self.has_sampling:
+    #         if interviewer.present_households(self).count() < self.sample_size:
+    #             return False
+    #     return True
+
 
     def bulk_enable_batches(self, eas):
         register = []

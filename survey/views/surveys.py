@@ -28,44 +28,44 @@ def index(request):
                'survey_form': SurveyForm()}
     return render(request, 'surveys/index.html',
                   context)
-
-@permission_required('auth.can_view_batches')
-def manage(request, survey_id):
-    '''
-    Page to enable listing to
-    :param request:
-    :return:
-    '''
-    survey = get_object_or_404(Survey, id=survey_id)
-    if request.method == 'POST':
-        action = request.POST['action']
-        eas = EnumerationArea.objects.filter(id__in=request.POST.getlist('eas'))
-        if action.lower() == 'enable all':
-            survey.bulk_enable_batches(eas)
-        if action.lower() == 'disable all':
-            survey.bulk_disable_batches(eas)
-    locations_filter = LocationsFilterForm(data=request.GET)
-    enumeration_areas = locations_filter.get_enumerations()
-    search_fields = ['name', 'locations__name', ]
-    if request.GET.has_key('q'):
-        enumeration_areas = get_filterset(enumeration_areas, request.GET['q'], search_fields)
-    if request.GET.has_key('status'):
-        rs = list(survey.commencement_registry.all())
-        enabled_eas = [r.ea.id for r in rs]
-        if request.GET['status'] == 'enabled':
-            enumeration_areas = enumeration_areas.filter(id__in=enabled_eas)
-        else:
-            enumeration_areas = enumeration_areas.exclude(id__in=enabled_eas)
-    loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(parent__isnull=True)
-    context = {'enumeration_areas': enumeration_areas,
-               'locations_filter' : locations_filter,
-               'location_filter_types' : loc_types,
-               'survey' : survey,
-               'max_display_per_page': settings.MAX_DISPLAY_PER_PAGE}
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-    ])
-    return render(request, 'surveys/show.html', context)
+#
+# @permission_required('auth.can_view_batches')
+# def manage(request, survey_id):
+#     '''
+#     Page to enable listing to
+#     :param request:
+#     :return:
+#     '''
+#     survey = get_object_or_404(Survey, id=survey_id)
+#     if request.method == 'POST':
+#         action = request.POST['action']
+#         eas = EnumerationArea.objects.filter(id__in=request.POST.getlist('eas'))
+#         if action.lower() == 'enable all':
+#             survey.bulk_enable_batches(eas)
+#         if action.lower() == 'disable all':
+#             survey.bulk_disable_batches(eas)
+#     locations_filter = LocationsFilterForm(data=request.GET)
+#     enumeration_areas = locations_filter.get_enumerations()
+#     search_fields = ['name', 'locations__name', ]
+#     if request.GET.has_key('q'):
+#         enumeration_areas = get_filterset(enumeration_areas, request.GET['q'], search_fields)
+#     if request.GET.has_key('status'):
+#         rs = list(survey.commencement_registry.all())
+#         enabled_eas = [r.ea.id for r in rs]
+#         if request.GET['status'] == 'enabled':
+#             enumeration_areas = enumeration_areas.filter(id__in=enabled_eas)
+#         else:
+#             enumeration_areas = enumeration_areas.exclude(id__in=enabled_eas)
+#     loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(parent__isnull=True)
+#     context = {'enumeration_areas': enumeration_areas,
+#                'locations_filter' : locations_filter,
+#                'location_filter_types' : loc_types,
+#                'survey' : survey,
+#                'max_display_per_page': settings.MAX_DISPLAY_PER_PAGE}
+#     request.breadcrumbs([
+#         ('Surveys', reverse('survey_list_page')),
+#     ])
+#     return render(request, 'surveys/show.html', context)
 
 
 @permission_required('auth.can_view_batches')

@@ -29,14 +29,15 @@ from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_P
 from survey.interviewer_configs import MESSAGES
 
 
-def get_survey_xform(interviewer, batch):
-    registered_households = interviewer.generate_survey_households(batch.survey)
+def get_survey_xform(interviewer, survey):
+    registered_households = interviewer.generate_survey_households(survey)
+    batches = interviewer.ea.open_batches(survey)
     return render_to_string("odk/survey_form.xml", {
         'interviewer': interviewer,
         'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
-        'title' : '%s - %s' % (batch.survey, batch),
-        'survey' : batch.survey,
-        'survey_batches' : [batch, ],
+        'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
+        'survey' : survey,
+        'survey_batches' : batches,
         'educational_levels' : LEVEL_OF_EDUCATION,
         'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
         })
@@ -91,7 +92,7 @@ def form_list(request):
           _("Requested forms list. for %s" % interviewer.name), audit, request)
     content = render_to_string("odk/xformsList.xml", {
     'allocation' : allocation,
-    'batches': interviewer.ea.open_batches(survey),
+    'survey' : survey,
     'interviewer' : interviewer,
     'request' : request,
     })
@@ -100,16 +101,14 @@ def form_list(request):
     return response
 
 @http_digest_interviewer_auth
-def download_xform(request, batch_id):
+def download_xform(request, survey_id):
     interviewer = request.user
-    batch = get_object_or_404(Batch, pk=batch_id)
+    survey = get_object_or_404(Survey, pk=survey_id)
     allocation = get_survey_allocation(interviewer)
     if allocation.batches_enabled():
         try:
-            allocation.survey.batches.get(id=batch_id)
-            # import pdb; pdb.set_trace()
-            survey_xform = get_survey_xform(interviewer, batch)
-            form_id = '%s'% batch_id
+            survey_xform = get_survey_xform(interviewer, survey)
+            form_id = '%s'% survey_id
 
             audit = {
                 "xform": form_id
@@ -118,11 +117,13 @@ def download_xform(request, batch_id):
                         _("Downloaded XML for form '%(id_string)s'.") % {
                                                                 "id_string": form_id
                                                             }, audit, request)
-            response = response_with_mimetype_and_name('xml', 'survey-%s' %batch_id,
+            response = response_with_mimetype_and_name('xml', 'survey-%s' %survey_id,
                                                        show_date=False, full_mime='text/xml')
             response.content = survey_xform
             return response
-        except Batch.DoesNotExist:
+        except:
+            raise
+            print 'an error occurred'
             pass
     return OpenRosaResponseNotFound()
 

@@ -37,7 +37,9 @@
               <a class="btn btn-small" href="{% url 'batch_questions_page' batch.id %}"><i class="icon-pencil"></i>Add/Edit Questions</a>
               <a class="btn btn-small" href="{% url 'batch_edit_page' survey.id batch.pk %}"><i class="icon-pencil"></i> Edit</a>
               <a class="btn btn-small" data-toggle="modal" href="#delete_batch_{{batch.id}}"><i class="icon-trash"></i> Delete</a>
-              <a class="btn btn-small" href="{% url 'batch_show_page' survey.id batch.pk %}"><i class="icon-lock"></i> Open/Close</a>
+              {% if batch.survey_questions %}
+                <a class="btn btn-small" href="{% url 'batch_show_page' survey.id batch.pk %}"><i class="icon-lock"></i> Open/Close</a>
+              {% endif %}
             </div>
               {% include "base/delete_modal.html" with object_name=batch.name id=batch.id name="Batch" url=survey.id|add_string:batch.id|get_url_with_ids:"delete_batch" %}
           </td>

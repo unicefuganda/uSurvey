@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
     {% load template_tags %}
+    {% if survey.has_sampling %}
     <xform>
         {% get_download_url request 'download_odk_householdlist_form'  as household_download_url %}
         <formID>{{ allocation.pk }}</formID>
@@ -12,19 +13,18 @@
         <downloadUrl> {{ household_download_url }} </downloadUrl>
         <manifestUrl></manifestUrl>
     </xform>
+  {% endif %}
  {% if allocation.batches_enabled %}
-     {% for batch in batches %}
-     {% get_download_url request 'download_odk_survey_form' batch as download_url %}
+     {% get_download_url request 'download_odk_survey_form' survey as download_url %}
       <xform>
-        <formID>{{ batch.pk }} </formID>
-        <name>{{ batch.name }}</name>
+        <formID>{{ survey.pk }} </formID>
+        <name>{{ survey.name }}</name>
         <majorMinorVersion/>
         <version/>
         <hash />
-        <descriptionText> {{ batch.description }}</descriptionText>
+        <descriptionText> {{ survey.description }}</descriptionText>
         <downloadUrl>{{ download_url }}</downloadUrl>
         <manifestUrl></manifestUrl>
       </xform>
-    {% endfor %}
  {% endif %}
 </xforms>

@@ -231,7 +231,7 @@ def is_relevant_by_group(context, question, registered_households):
     for household in registered_households:
         for member in household.members.all():
             if member.belongs_to(question_group):
-                relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s_%s_%s' " % (member.pk, member.surname, member.first_name))
+                relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s_%s' " % (member.household.pk, member.pk))
             else:
             #get next inline question... This is another flow leading to the next inline question in case current is not applicable
                 next_question = question.batch.next_inline(question, groups=member.groups, channel=ODKAccess.choice_name())
