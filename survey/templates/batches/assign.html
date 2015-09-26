@@ -59,7 +59,7 @@ div.batch_assignment {
 
 }
 
-td,tabletrtd {
+ #batch_assignment td {
 	width: 15%;
 	text-align: center;
 }
@@ -77,6 +77,8 @@ table.question_headers {
 table {
 		text-align: center;
 		color: #005580;
+		margin: 0;
+		padding: 0;
 		}
 
 table tr {
@@ -211,7 +213,7 @@ table tr:hover td{
 		   <div class="batch_assignment" style="float: left;">
 				<table class="question_headers">
 					<thead>
-						<tr class="tabletrtd"><th class="theader" colspan="4">Library Questions</th></tr>
+						<tr class="tabletrtd"><th class="theader" colspan="3">Library Questions</th></tr>
 						<tr class="tabletrtd"><th class="hide" /><th class="theader">Code</th><th class="theader">Text</th><th class="theader">Answer Type</th></tr>
 					</thead>
 				</table>
@@ -220,14 +222,16 @@ table tr:hover td{
 						 <tbody>
 						{% for question in library_questions %}
 							<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
-								<td align="center" width="35px" class="hide">
-								<input type="hidden" name="identifier" value="{{question.identifier}}" />
-								<input type="hidden" name="text" value="{{question.text}}" />
-								<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
-								<input type="hidden" name="module" value="{{question.module}}" />
-								<input type="hidden" name="group" value="{{question.group}}" />
+								<td class="tabletrtd">
+									<div align="center" class="hide">
+										<input type="hidden" name="identifier" value="{{question.identifier}}" />
+										<input type="hidden" name="text" value="{{question.text}}" />
+										<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
+										<input type="hidden" name="module" value="{{question.module}}" />
+										<input type="hidden" name="group" value="{{question.group}}" />
+									</div>
+									{{question.identifier}}
 								</td>
-								<td class="tabletrtd">{{question.identifier}}</td>
 								<td class="tabletrtd">{{question.text}}</td>
 								<td class="tabletrtd">{{question.answer_type}}</td>
 							</tr>
@@ -242,7 +246,7 @@ table tr:hover td{
 					<table  class="question_headers">
 						<thead>
 							<tr>
-								<th colspan="4" class="theader">
+								<th colspan="3" class="theader">
 									Batch Questions
 								</th>
 							</tr>
