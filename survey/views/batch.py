@@ -190,7 +190,7 @@ def assign(request, batch_id):
         return HttpResponseRedirect(reverse("batch_questions_page",  args=(batch_id, )))
     all_modules = QuestionModule.objects.all()
     used_identifiers = [question.identifier for question in batch.batch_questions.all()]
-    library_questions = QuestionTemplate.objects.exclude(identifier__in=used_identifiers)
+    library_questions = QuestionTemplate.objects.exclude(identifier__in=used_identifiers).order_by('identifier')
     question_filter_form = QuestionFilterForm()
 #     library_questions =  question_filter_form.filter(library_questions)
     request.breadcrumbs([
