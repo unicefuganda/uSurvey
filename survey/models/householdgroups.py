@@ -79,10 +79,10 @@ class GroupCondition(BaseModel):
     groups = models.ManyToManyField(HouseholdMemberGroup, related_name='conditions')
 
     def confirm_head(self, value):
-        return bool(ast.literal_eval(value))
+        return bool(value)
 
     def odk_confirm_head(self, value):
-        return 'true()' if bool(ast.literal_eval(value)) else 'false()'
+        return 'true()' if bool(value) else 'false()'
 
     def matches(self, attributes):
         value = attributes.get(self.attribute.upper())
