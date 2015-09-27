@@ -15,7 +15,7 @@ jQuery(function($){
         if (survey_id == 'All'){
             return '/batches/'
         }
-        return '/surveys/'+ survey_id +'/batches/';
+        return '/surveys/'+ survey_id +'/survey_batches/';
     }
 
     function populate_choices() {
