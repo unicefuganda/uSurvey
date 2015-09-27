@@ -45,14 +45,16 @@ xmlns:jr="http://openrosa.org/javarosa">
         </householdMember>
     </household>
 	{% for batch in survey_batches %}
-		<b{{batch.pk}}>
-			{% for question in batch.questions_and_subquestions %}
+		{% if interviewer.ea in batch.non_response_eas %}
+	   		<bnr{{batch.pk}}>0</bnr{{batch.pk}}>
+	   		<qnr{{batch.pk}} />
+		{% endif %}
+	   <b{{batch.pk}}>
+			{% for question in batch.survey_questions %}
 				<q{{question.pk}} />
-                {% if question.group.name == 'NON_RESPONSE' %}
-                 <qnr{{question.pk}} />
-                {% endif %}
 			{% endfor %}
 		</b{{batch.pk}}>
+
 	{% endfor %}
    </survey>
   </instance>

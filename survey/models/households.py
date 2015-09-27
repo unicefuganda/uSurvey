@@ -106,19 +106,19 @@ class Household(BaseModel):
             return all_households.filter(ea=ea)
         return all_households.filter(ea__locations__in=location.get_descendants(include_self=True))
 
-    def has_completed(self):
-        completion_recs = HouseMemberSurveyCompletion.objects.filter(householdmember__household=self, survey=self.survey).distinct()
+    def has_completed(self, survey):
+        completion_recs = HouseMemberSurveyCompletion.objects.filter(householdmember__household=self, survey=survey).distinct()
         return completion_recs.count() == self.members.count()
 
     def has_completed_batch(self, batch):
         completion_recs = HouseholdMemberBatchCompletion.objects.filter(householdmember__household=self, batch=batch).distinct()
         return completion_recs.count() == self.members.count()
 
-    def survey_completed(self):
-        return HouseSurveyCompletion.objects.create(household=self, survey=self.survey, interviewer=self.registrar)
+    def survey_completed(self, survey, registrar):
+        return HouseSurveyCompletion.objects.create(household=self, survey=survey, interviewer=registrar)
 
-    def batch_completed(self, batch):
-        return HouseholdBatchCompletion.objects.create(household=self, batch=batch, interviewer=self.registrar)
+    def batch_completed(self, batch, registrar):
+        return HouseholdBatchCompletion.objects.create(household=self, batch=batch, interviewer=registrar)
 
 
 class HouseholdMember(BaseModel):
@@ -173,12 +173,12 @@ class HouseholdMember(BaseModel):
     def batch_completed(self, batch):
         return HouseholdMemberBatchCompletion.objects.create(householdmember=self,
                                                               batch=batch,
-                                                              interviewer=self.household.registrar)
+                                                              interviewer=self.registrar)
 
     def survey_completed(self):
         return HouseMemberSurveyCompletion.objects.create(householdmember=self,
-                                                           interviewer=self.household.registrar,
-                                                           survey=self.household.survey)
+                                                           interviewer=self.registrar,
+                                                           survey=self.survey_listing.survey)
 
     def get_composed(self, raw_text):
         question_context = template.Context(dict([(field.verbose_name.upper().replace(' ', '_'),

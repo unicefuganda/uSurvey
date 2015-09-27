@@ -15,6 +15,41 @@ $(document).ready(function() {
 	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css" />
 	<style type="text/css">
 
+		/*table {
+			max-height: 500px;
+			overflow: scroll;
+			text-align: center;
+		}
+
+		tr {
+			max-height: 40px;
+			color: #09f;
+			text-align: left;
+		}
+
+		tr.title {
+			text-align: center;
+		}
+
+		tbody tr {
+			color: #005580;
+		}
+
+		td.
+
+		<!--thead {-->
+			<!--height: 80px;-->
+		<!--}-->
+
+		tbody tr:nth-child(even) {
+		  background-color: #def;
+		}
+
+
+		tbody tr:nth-child(odd) {
+		  background-color: white;
+
+		}*/
 div.batch_assignment {
 		height: 10%;
 		max-height: 50%;
@@ -30,7 +65,12 @@ div.batch_assignment {
 
 th.theader {
 	text-align: center;
-	padding:21px 25px 22px 25px;
+	padding:11px 15px 12px 25px;
+}
+
+table.question_headers {
+	border: 1px solid #e0e0e0;
+	border-right: none;
 }
 
 th.question, td.question {
@@ -50,8 +90,6 @@ table {
 		color: #005580;
 		margin: 0;
 		padding: 0;
-
-
 		}
 
 table tr {
@@ -71,7 +109,7 @@ table a:visited {
 }
 table a:active,
 table a:hover {
-	color: #bd5a35;
+	color: #ffffff;
 	text-decoration:underline;
 }
 .table {
@@ -91,15 +129,8 @@ table a:hover {
 	-webkit-box-shadow: 0 1px 2px #d1d1d1;
 	box-shadow: 0 1px 2px #d1d1d1;
 }
-table th {
-	padding:21px 25px 22px 25px;
-	border-top:1px solid #fafafa;
-	border-bottom:1px solid #e0e0e0;
 
-	background: #ededed;
-	background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#ebebeb));
-	background: -moz-linear-gradient(top,  #ededed,  #ebebeb);
-}
+
 table th:first-child{
 	padding-left:20px;
 }
@@ -125,28 +156,11 @@ table tr td:first-child{
 }
 .tabletrtd {
 	padding:10px;
-	border-top: 1px solid #ffffff;
 	border-bottom:1px solid #e0e0e0;
 	border-left: 1px solid #e0e0e0;
-
 	background: #fafafa;
 	background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
 	background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
-}
-		.tabletrtd2 {
-	padding:10px;
-	color:#0099FF;
-	background: #fffffff;
-		text-align:center;
-
-}
-			.tabletrtd3 {
-	padding:10px;
-	color:#0099FF;
-	background: #fffffff;
-		text-align:center;
-		border:1px solid #e0e0e0;
-
 }
 table tr.even td{
 	background: #f6f6f6;
@@ -169,7 +183,7 @@ table tr:last-child td:last-child{
 table tr:hover td{
 	background: #ffffff;
 	background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#ffffff));
-	background: -moz-linear-gradient(top,  #f2f2f2,  #f0f0f0);
+	background: -moz-linear-gradient(top,  #ffffff,  #ffffff);
 }
 .4tbody{
   overflow-y: scroll;
@@ -180,37 +194,38 @@ table tr:hover td{
         .theader
         {
         color:#0099FF;
-        padding-left: 80px;
         background: #ffffff;
-		padding-top:10px;
-		padding-left:10px;
         }
 
 		#batch_questions {
 			margin-top: -17px;
 		}
 
-	</style>
+.forleft {
+    position: relative;
+    top: 20px;
+	left:35;
+}
+</style>
 {% endblock %}
 {% block pre_form_content %}
 	<div class="filter-form right">
 		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
     </div>
-    <div class="search">
+    <div class="forleft">
     	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
     </div>
        <div id="batch_assignment" class="clear">
 		   <br />
 		   <div class="batch_assignment" style="float: left;">
-				<table width="100%"  class="tabletrtd3">
-					<tr>
-						<td>Library Questions</td>
-					</tr>
-						<tr><td class="hide" /><td class="tabletrtd2">Code</td><td class="tabletrtd2">Text</td>
-					</tr>
+				<table class="question_headers">
+					<thead>
+						<tr class="tabletrtd"><th class="theader" colspan="3">Library Questions</th></tr>
+						<tr class="tabletrtd"><th class="theader code">Code</th><th class="theader  question">Text</th></tr>
+					</thead>
 				</table>
 				<div class="scrollit">
-					<table id="lib_questions_table" class="tablem" >
+					<table id="lib_questions_table" class="tablebody tablem" >
 						 <tbody>
 						{% for question in library_questions %}
 							<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
@@ -246,7 +261,7 @@ table tr:hover td{
 					</table>
 					<div class="scrollit">
 						<br>
-						<table id="batch_questions">
+						<table id="batch_questions" class="tablebody">
 							<tbody></tbody>
 						</table>
 					</div>
@@ -264,6 +279,18 @@ table tr:hover td{
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/redips-drag-min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/script.js"></script>
 {% endcomment %}
+<script type="text/javascript">
+	$(document).ready(function(){
+    var counter = 0;
+    $(".tablebody th").each(function(){
+    	alert('hey');
+        var width = $('.tablebody tr:last td:eq(' + counter + ')').width();
+        $(".question_headers tr").append(this);
+        this.width = width;
+        counter++;
+    });
+});
+</script>
 
 <script type="text/javascript">
 <!--$(document).ready( function () {-->

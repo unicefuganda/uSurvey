@@ -229,7 +229,7 @@ class NumericalAnswer(Answer):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(NumericalAnswer, self).__init__()
+        super(NumericalAnswer, self).__init__(*args, **kwargs)
         try:
             self.value = int(answer)
         except Exception: raise
@@ -246,7 +246,7 @@ class TextAnswer(Answer):
     value = models.CharField(max_length=100, blank=False, null=False)
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(TextAnswer, self).__init__()
+        super(TextAnswer, self).__init__(*args, **kwargs)
         self.value = answer
         self.question = question
 
@@ -287,7 +287,7 @@ class MultiSelectAnswer(Answer):
     value = models.ManyToManyField("QuestionOption", null=True)
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(MultiSelectAnswer, self).__init__()
+        super(MultiSelectAnswer, self).__init__(*args, **kwargs)
         if isinstance(answer, basestring):
             answer = answer.split(' ')
         if isinstance(answer, list):
@@ -314,16 +314,18 @@ class MultiSelectAnswer(Answer):
 
 @receiver(post_save, sender=MultiSelectAnswer)
 def add_multiselect_options(sender, **kwargs):
-    sender.value.all().delete()
-    opts = sender.selected.all()
-    for opt in opts:
-        sender.value.add(opt)
+    if kwargs.get('created', False) and kwargs.get('instance', False):
+        answer = kwargs['instance']
+        answer.value.clear()
+        opts = answer.selected.all()
+        for opt in opts:
+            answer.value.add(opt)
 
 class DateAnswer(Answer):
     value = models.DateField(null=True)
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(DateAnswer, self).__init__()
+        super(DateAnswer, self).__init__(*args, **kwargs)
         if isinstance(answer, basestring):
             answer = extract_date(answer, fuzzy=True)
         self.value = answer
@@ -337,7 +339,7 @@ class AudioAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(AudioAnswer, self).__init__()
+        super(AudioAnswer, self).__init__(*args, **kwargs)
         self.value = answer
         self.question = question
 
@@ -349,7 +351,7 @@ class VideoAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(VideoAnswer, self).__init__()
+        super(VideoAnswer, self).__init__(*args, **kwargs)
         self.value = answer
         self.question = question
 
@@ -361,7 +363,7 @@ class ImageAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(ImageAnswer, self).__init__()
+        super(ImageAnswer, self).__init__(*args, **kwargs)
         self.value = answer
         self.question = question
 
@@ -373,7 +375,7 @@ class GeopointAnswer(Answer):
     value = models.ForeignKey(ODKGeoPoint, null=True)
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(GeopointAnswer, self).__init__()
+        super(GeopointAnswer, self).__init__(*args, **kwargs)
         if isinstance(answer, basestring):
             answer = answer.split(' ')
             answer = ODKGeoPoint(latitude=answer[0], longitude=answer[1], altitude=[2], precision=answer[3])
@@ -389,7 +391,7 @@ class NonResponseAnswer(Answer):
     value = models.CharField(max_length=100, blank=False, null=False)
 
     def __init__(self, question, answer, *args, **kwargs):
-        super(NonResponseAnswer, self).__init__()
+        super(NonResponseAnswer, self).__init__(*args, **kwargs)
         self.value = answer
         self.question = question
 
