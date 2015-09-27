@@ -1,18 +1,24 @@
 {% extends "layout.html" %}
+{% block extra_css %}
+    <style type="text/css">
+
+        div.row-fluid {
+            display: none;
+        }
+    </style>
+{% endblock %}
 {% block title %}
-    Questions List
+    {{ batch.name.capitalize }} Questions
 {% endblock %}
 
 {% block content %}
     {% load pagination_tags %}
     {% autopaginate questions max_question_per_page %}
     {% load template_tags %}
-    <h3>
-        {{ batch.name.capitalize }} Questions
-    </h3>
+
     {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
 
-    <div class="search">
+    <div>
         <input type="hidden" value="{{ batch.id }}" id="batch_id">
         {% include "search_form.html" %}
         <div class="question-button pull-right">
