@@ -19,10 +19,10 @@ from survey.forms.filters import QuestionFilterForm
 def index(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
     batches = Batch.objects.filter(survey__id=survey_id)
-    if request.is_ajax():
-        batches = batches.values('id', 'name').order_by('name')
-        json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
-        return HttpResponse(json_dump, mimetype='application/json')
+    # if request.is_ajax():
+    #     batches = batches.values('id', 'name').order_by('name')
+    #     json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
+    #     return HttpResponse(json_dump, mimetype='application/json')
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
     ])
@@ -32,6 +32,15 @@ def index(request, survey_id):
     return render(request, 'batches/index.html',
                   context)
 
+@login_required
+@permission_required('auth.can_view_batches')
+def batches(request, survey_id):
+    survey = Survey.objects.get(id=survey_id)
+    batches = Batch.objects.filter(survey__id=survey_id)
+    if request.is_ajax():
+        batches = batches.values('id', 'name').order_by('name')
+        json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
+        return HttpResponse(json_dump, mimetype='application/json')
 
 @login_required
 @permission_required('auth.can_view_batches')

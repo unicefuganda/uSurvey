@@ -1,6 +1,6 @@
 ;
 function get_survey_batches(val) {
-    $.get('/surveys/' + val + '/batches/', function (data) {
+    $.get('/surveys/' + val + '/survey_batches/', function (data) {
         $('#batch-list-select').find('option')
             .remove()
             .end();
