@@ -15,41 +15,6 @@ $(document).ready(function() {
 	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css" />
 	<style type="text/css">
 
-		/*table {
-			max-height: 500px;
-			overflow: scroll;
-			text-align: center;
-		}
-
-		tr {
-			max-height: 40px;
-			color: #09f;
-			text-align: left;
-		}
-
-		tr.title {
-			text-align: center;
-		}
-
-		tbody tr {
-			color: #005580;
-		}
-
-		td.
-
-		<!--thead {-->
-			<!--height: 80px;-->
-		<!--}-->
-
-		tbody tr:nth-child(even) {
-		  background-color: #def;
-		}
-
-
-		tbody tr:nth-child(odd) {
-		  background-color: white;
-
-		}*/
 div.batch_assignment {
 		height: 10%;
 		max-height: 50%;
@@ -85,6 +50,8 @@ table {
 		color: #005580;
 		margin: 0;
 		padding: 0;
+
+
 		}
 
 table tr {
@@ -166,6 +133,21 @@ table tr td:first-child{
 	background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
 	background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
 }
+		.tabletrtd2 {
+	padding:10px;
+	color:#0099FF;
+	background: #fffffff;
+		text-align:center;
+
+}
+			.tabletrtd3 {
+	padding:10px;
+	color:#0099FF;
+	background: #fffffff;
+		text-align:center;
+		border:1px solid #e0e0e0;
+
+}
 table tr.even td{
 	background: #f6f6f6;
 	background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#f6f6f6));
@@ -200,6 +182,8 @@ table tr:hover td{
         color:#0099FF;
         padding-left: 80px;
         background: #ffffff;
+		padding-top:10px;
+		padding-left:10px;
         }
 
 		#batch_questions {
@@ -218,11 +202,12 @@ table tr:hover td{
        <div id="batch_assignment" class="clear">
 		   <br />
 		   <div class="batch_assignment" style="float: left;">
-				<table class="question_headers">
-					<thead>
-						<tr class="tabletrtd"><th class="theader" colspan="3">Library Questions</th></tr>
-						<tr class="tabletrtd"><th class="hide" /><th class="theader code">Code</th><th class="theader  question">Text</th></tr>
-					</thead>
+				<table width="100%"  class="tabletrtd3">
+					<tr>
+						<td>Library Questions</td>
+					</tr>
+						<tr><td class="hide" /><td class="tabletrtd2">Code</td><td class="tabletrtd2">Text</td>
+					</tr>
 				</table>
 				<div class="scrollit">
 					<table id="lib_questions_table" class="tablem" >
@@ -260,6 +245,7 @@ table tr:hover td{
 						</thead>
 					</table>
 					<div class="scrollit">
+						<br>
 						<table id="batch_questions">
 							<tbody></tbody>
 						</table>

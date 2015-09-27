@@ -44,8 +44,6 @@ def index(request, batch_id):
 
     question_form = QuestionForm(batch)
 
-    if batch.start_question is None:
-        messages.error(request, 'There are no questions associated with this batch yet.')
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
