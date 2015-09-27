@@ -793,8 +793,8 @@ class StartInterview(Interviews):
                 batches = self._pending_batches
                 present_batch = batches.pop(0)
                 self._pending_batches = batches
-                if house_member.household.has_completed_batch():
-                    house_member.household.batch_completed(ongoing_interview.batch)
+                if house_member.household.has_completed_batch(ongoing_interview.batch):
+                    house_member.household.batch_completed(ongoing_interview.batch, self.interviewer)
                 if self._pending_batches:
                     #start next batch and respond
                     interview, created = Interview.objects.get_or_create(interviewer=self.interviewer, 
@@ -808,9 +808,8 @@ class StartInterview(Interviews):
                         task._pending_batches = batches
                         return task.intro()
                 else:
-                    house_member.survey_completed()
-                    if house_member.household.has_completed():
-                        house_member.household.survey_completed()
+                    if house_member.household.has_completed(self.ongoing_survey):
+                        house_member.household.survey_completed(self.ongoing_survey, self.interviewer)
                     task = EndMemberSurvey(self.access)
                     task._household = house_member.household
                     task.intro()

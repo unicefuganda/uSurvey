@@ -67,7 +67,7 @@ def _get_nodes(search_path, tree=None, xml_string=None): #either tree or xml_str
 
 def only_household_reg(survey_tree):
     flag_nodes = _get_nodes(ONLY_HOUSEHOLD_PATH, tree=survey_tree)
-    return (flag_nodes and len(flag_nodes) > 0 and flag_nodes[0].text == '1')
+    return (flag_nodes is not None and len(flag_nodes) > 0 and flag_nodes[0].text == '1')
 
 def batches_included(survey_tree):
     return only_household_reg(survey_tree) is False
@@ -145,9 +145,19 @@ def record_interview_answer(interview, question, answer):
         if question.answer_type == MultiSelectAnswer.choice_name():
             answer = answer.split(MULTI_SELECT_XFORM_SEP)
         answer_class = Answer.get_class(question.answer_type)
+        print 'answer type ', answer_class.__name__
+        print 'question is ', question
+        print 'question pk is ', question.pk
+        print 'interview is ', interview
+        print 'answer text is ', answer
         answer = answer_class(question, answer)
+        print 'answer instance is ', answer
+        print 'presave answer pk is ', answer.pk
     answer.interview = interview
     answer.save()
+    print 'answer instance is ', answer.pk
+    print 'answer question is ', answer.question
+    print 'answer value is ', answer.value
     if question.answer_type == MultiSelectAnswer.choice_name():
         for an in answer.selected:
             answer.value.add(an)
@@ -223,9 +233,9 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                 treated_batches[b_id] = batch
         map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
         member.survey_completed()
-        if member.household.has_completed():
-            map(lambda batch: member.household.batch_completed(batch), treated_batches.values())
-            member.household.survey_completed()
+        if member.household.has_completed(survey):
+            map(lambda batch: member.household.batch_completed(batch, interviewer), treated_batches.values())
+            member.household.survey_completed(survey, interviewer)
     submission = ODKSubmission.objects.create(interviewer=interviewer, 
                 survey=survey, form_id= form_id,
                 instance_id=_get_instance_id(survey_tree), household_member=member, 
