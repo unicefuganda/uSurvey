@@ -1,0 +1,34 @@
+   <survey id="1" >
+     <meta>
+       <instanceID>657</instanceID>
+       <instanceName />
+     </meta>
+     <chooseExistingHousehold>0</chooseExistingHousehold>
+    <household>
+        <houseNumber>14</houseNumber>
+		<householdMember>
+            <surname>James12</surname>
+            <firstName>Joy3</firstName>
+            <sex>1</sex>
+            <dateOfBirth>1990-04-11</dateOfBirth>
+            <isHead>1</isHead>
+            <occupation>Farmer</occupation>
+            <levelOfEducation>Primary</levelOfEducation>
+            <residentSince>1993-04-11</residentSince>
+        </householdMember>
+    </household>
+	
+		
+			
+	   <b2>
+			
+				<q104>4</q104>
+			
+				<q112>1999-05-10</q112>
+			
+				<q113>18 17</q113>
+			
+		</b2>
+
+	
+   </survey>

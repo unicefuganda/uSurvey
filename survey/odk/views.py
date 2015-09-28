@@ -44,9 +44,9 @@ def get_survey_xform(interviewer, survey):
 
 def get_household_list_xform(interviewer, survey, house_listing):
     selectable_households = None
-    total_households = house_listing.households.count()
-    if total_households > 0:
-        selectable_households = [idx+1 for idx in range(total_households)]
+    # total_households = house_listing.households.count()
+    # if total_households > 0:
+    #     selectable_households = [idx+1 for idx in range(total_households)]
     return render_to_string("odk/household_registration.xml", {
         'interviewer': interviewer,
         'survey' : survey,
@@ -88,6 +88,7 @@ def form_list(request):
     #to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
     survey = allocation.survey
+    survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
     audit = {}
     audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
           _("Requested forms list. for %s" % interviewer.name), audit, request)
@@ -96,6 +97,7 @@ def form_list(request):
     'survey' : survey,
     'interviewer' : interviewer,
     'request' : request,
+     'survey_listing': survey_listing
     })
     response = BaseOpenRosaResponse(content)
     response.status_code = 200

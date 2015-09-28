@@ -46,9 +46,11 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/dateOfBirth" type="date" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" constraint=". &lt;= today()"/>
   <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
-  <bind nodeset="/survey/household/householdMember/occupation" type="string" relevant="selected(/survey/household/householdMember/isHead,'1')" />
-  <bind nodeset="/survey/household/householdMember/levelOfEducation" type="select1" relevant="selected(/survey/household/householdMember/isHead,'1')" />
-  <bind nodeset="/survey/household/householdMember/residentSince" type="date" relevant="selected(/survey/household/householdMember/isHead,'1')" constraint=". &gt;= /survey/household/householdMember/dateOfBirth" />
+  <bind nodeset="/survey/household/householdMember/occupation" type="string" required="true()" relevant="selected(/survey/household/householdMember/isHead,'1')" />
+  <bind nodeset="/survey/household/householdMember/levelOfEducation" type="select1" required="true()" relevant="selected(/survey/household/householdMember/isHead,'1')" />
+  <bind nodeset="/survey/household/householdMember/residentSince" type="date" required="true()" relevant="selected(/survey/household/householdMember/isHead,'1')"
+        constraint=". &lt;= today() and . &gt;= /survey/household/householdMember/dateOfBirth"
+        jr:constraintMsg="Residence date cannot be before date of birth and cannot be in the future"/>
 
   </model>
 </h:head>
