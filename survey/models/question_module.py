@@ -7,7 +7,7 @@ class QuestionModule(BaseModel):
     description = models.TextField(null=True, blank=True)
 
     def remove_related_questions(self):
-        self.question_templates.delete()
+        self.question_templates.all().delete()
 
     def __unicode__(self):
         return self.name
