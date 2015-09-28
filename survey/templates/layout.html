@@ -310,8 +310,10 @@
                                 <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle2" role="button"
                                    href="#">{{ user.get_full_name }} <b class="caret"></b></a>
                                 <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
+                                    {% if user.is_superuser == False %}
                                     <li role="presentation"><a href="{% url 'users_edit' user.id %}" id="edit_user"><i
                                             class="icon-pencil"></i> Edit Profile</a></li>
+                                    {% endif %}
                                     <li role="presentation"><a href="{% url 'password_change' %}"><i
                                             class="icon-pencil"></i> Change Password</a></li>
                                     <li role="presentation"><a href="{% url 'logout_page' %}"><i class="icon-off"></i>
