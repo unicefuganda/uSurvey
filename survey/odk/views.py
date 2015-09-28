@@ -84,7 +84,6 @@ def form_list(request):
         This is where ODK Collect gets its download list.
     """
     interviewer = request.user
-    content = ""
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
@@ -101,9 +100,11 @@ def form_list(request):
         'request' : request,
          'survey_listing': survey_listing
         })
-    response = BaseOpenRosaResponse(content)
-    response.status_code = 200
-    return response
+        response = BaseOpenRosaResponse(content)
+        response.status_code = 200
+        return response
+    else:
+        return OpenRosaResponseNotFound('No survey allocated presently')
 
 @http_digest_interviewer_auth
 def download_xform(request, survey_id):
