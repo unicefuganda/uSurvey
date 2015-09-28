@@ -137,6 +137,7 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
         if household.head_desc is not head.surname:
             household.head_desc = head.surname
             household.save()
+        return head
     else:
         return HouseholdMember.objects.create(**kwargs)
 

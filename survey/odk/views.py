@@ -44,8 +44,9 @@ def get_survey_xform(interviewer, survey):
 
 def get_household_list_xform(interviewer, survey, house_listing):
     selectable_households = None
-    if house_listing.total_households:
-        selectable_households = [idx+1 for idx in range(house_listing.total_households)]
+    total_households = house_listing.households.count()
+    if total_households > 0:
+        selectable_households = [idx+1 for idx in range(total_households)]
     return render_to_string("odk/household_registration.xml", {
         'interviewer': interviewer,
         'survey' : survey,
