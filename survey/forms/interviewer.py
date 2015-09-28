@@ -17,7 +17,7 @@ class InterviewerForm(ModelForm):
         self.fields.keyOrder=['name', 'gender', 'date_of_birth', 'level_of_education', 'language',  'ea', 'survey']
         if self.instance:
             try:
-                self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance, completed=False)[0].survey
+                self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance, completed=False)[0].survey.pk
             except IndexError:
                 pass
         if eas:
@@ -58,7 +58,7 @@ class InterviewerForm(ModelForm):
         if commit:
             survey = self.cleaned_data['survey']
             ea = self.cleaned_data['ea']
-            interviewer.assignments.update(completed=False)
+            interviewer.assignments.update(completed=True)
             SurveyAllocation.objects.get_or_create(survey=survey,
                                                    interviewer=interviewer,
                                                    allocation_ea=ea)
