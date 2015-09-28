@@ -56,7 +56,10 @@ th.question, td.question {
 
 th.code, td.code {
 	width: 10%;
+
 }
+
+
 
 table.question_headers {
 	margin-left: -5px;
@@ -172,6 +175,11 @@ table tr:hover td{
 		top:20px;
 		left:35;
 		}
+
+		th.code {
+			padding-left: 130px;
+			padding-right: 90px;
+		}
 	</style>
 {% endblock %}
 {% block pre_form_content %}
@@ -187,7 +195,7 @@ table tr:hover td{
 				<table width="100%">
 					<thead>
 						<tr><th  colspan="3">Library Questions</th></tr>
-						<tr><th class="hide" /><th width="29%">Code</th><th width="71%">Text</th></tr>
+						<tr><th width="29%" class="code">Code</th><th width="71%">Text</th></tr>
 					</thead>
 				</table>
 				<div class="scrollit">
@@ -218,7 +226,7 @@ table tr:hover td{
 					<table width="100%">
 					<thead>
 						<tr><th  colspan="3">Batch Questions</th></tr>
-						<tr><th class="hide" /><th width="29%">Code</th><th width="71%">Text</th></tr>
+						<tr><th width="29%" class="code">Code</th><th width="71%">Text</th></tr>
 					</thead>
 				</table>
 					<div class="scrollit">
