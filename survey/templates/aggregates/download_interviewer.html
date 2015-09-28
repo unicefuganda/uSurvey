@@ -7,8 +7,8 @@
     Choose survey to get investigators who completed the survey
   </h4>
   <form id="download-investigator-form" action="{% url 'download_interviewer_excel' %}" method="POST" accept-charset="utf-8">
-    <table width="58%">
-      <tr><td align="left" valign="middle">
+    <table>
+      <tr align="left"><td align="left" valign="middle">
         {% csrf_token %}
     <select name="survey" id="id_survey">
       {% for survey in surveys %}
