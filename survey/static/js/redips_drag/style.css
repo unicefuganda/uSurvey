@@ -35,7 +35,7 @@ border: 1px solid #eee;
 
 .scrollit{
     overflow-y:scroll;
-    height:180px;
+    height:350px;
     width:100%;
     background-color: #F5F5F5;
 }
