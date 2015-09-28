@@ -21,10 +21,12 @@
      var $div_to_toggle = $preferred_listing.closest('div').parent('div');
      if(show) {
          $div_to_toggle.show();
+         $preferred_listing.removeAttr('disabled');
      }
      else {
          $div_to_toggle.hide();
          $preferred_listing.val("");
+         $preferred_listing.attr('disabled', 'disabled');
      }
 
  }
