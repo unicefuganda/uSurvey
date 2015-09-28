@@ -84,21 +84,23 @@ def form_list(request):
         This is where ODK Collect gets its download list.
     """
     interviewer = request.user
+    content = ""
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
-    survey = allocation.survey
-    survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
-    audit = {}
-    audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
-          _("Requested forms list. for %s" % interviewer.name), audit, request)
-    content = render_to_string("odk/xformsList.xml", {
-    'allocation' : allocation,
-    'survey' : survey,
-    'interviewer' : interviewer,
-    'request' : request,
-     'survey_listing': survey_listing
-    })
+    if allocation:
+        survey = allocation.survey
+        survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+        audit = {}
+        audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
+              _("Requested forms list. for %s" % interviewer.name), audit, request)
+        content = render_to_string("odk/xformsList.xml", {
+        'allocation' : allocation,
+        'survey' : survey,
+        'interviewer' : interviewer,
+        'request' : request,
+         'survey_listing': survey_listing
+        })
     response = BaseOpenRosaResponse(content)
     response.status_code = 200
     return response
