@@ -17,7 +17,7 @@ class InterviewerForm(ModelForm):
         self.fields.keyOrder=['name', 'gender', 'date_of_birth', 'level_of_education', 'language',  'ea', 'survey']
         if self.instance:
             try:
-                self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance, completed=False)[0].survey.pk
+                self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance, completed=False)[0].survey
             except IndexError:
                 pass
         if eas:
@@ -34,18 +34,16 @@ class InterviewerForm(ModelForm):
 
     def clean_survey(self):
         ea = self.cleaned_data.get('ea', '')
-        survey_pk = self.cleaned_data['survey']
-        if survey_pk.strip():
-            survey = Survey.objects.get(pk=survey_pk)
-            #check if this has already been allocated to someone else
-            allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
-                                               interviewer__ea=ea,
-                                               allocation_ea=ea)
-            if self.instance:
-                allocs = allocs.exclude(interviewer=self.instance)
-            if allocs.exists():
-                raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
-            return survey
+        survey = self.cleaned_data['survey']
+        #check if this has already been allocated to someone else
+        allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
+                                           interviewer__ea=ea,
+                                           allocation_ea=ea)
+        if self.instance:
+            allocs = allocs.exclude(interviewer=self.instance)
+        if allocs.exists():
+            raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
+        return survey
 
 
     def clean(self):
