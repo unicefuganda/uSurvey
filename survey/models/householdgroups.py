@@ -107,13 +107,13 @@ class GroupCondition(BaseModel):
         return int(value) >= int(self.value)
 
     def odk_is_greater_than(self, value_path):
-        return "%s &gt; '%s'" % (value_path, self.value)
+        return "%s &gt; %s" % (value_path, self.value)
 
     def is_less_than(self, value):
         return int(value) <= int(self.value)
 
     def odk_is_less_than(self, value_path):
-        return "%s &lt; '%s'" % (value_path, self.value)
+        return "%s &lt; %s" % (value_path, self.value)
 
     class Meta:
         app_label = 'survey'

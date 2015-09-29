@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
     {% load template_tags %}
-    {% if survey.has_sampling and survey_listing.listing.initial_survey == survey and not allocation.batches_enabled%}
+    {% if survey.has_sampling and survey_listing.listing.initial_survey == survey and not allocation.batches_enabled %}
     <xform>
         {% get_download_url request 'download_odk_householdlist_form'  as household_download_url %}
         <formID>{{ allocation.pk }}</formID>

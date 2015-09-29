@@ -87,9 +87,12 @@ def form_list(request):
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
+    audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
+              _("survey allocation %s" % allocation.survey), {}, request)
     if allocation:
         survey = allocation.survey
         survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+
         audit = {}
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
               _("Requested forms list. for %s" % interviewer.name), audit, request)
