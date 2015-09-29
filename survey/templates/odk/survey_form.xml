@@ -77,7 +77,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/dateOfBirth" type="date" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" constraint=". &lt;= today()"/>
 	<bind nodeset="/survey/household/householdMember/age" type="int" readonly="true()"
-		  calculate="int((decimal-date-time(/survey/household/householdMember/dateOfBirth) - decimal-date-time(today())) div 365.4)"/>
+		  calculate="int((decimal-date-time(today()) - decimal-date-time(/survey/household/householdMember/dateOfBirth)) div 365.4)"/>
   <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/occupation" type="string" relevant="selected(/survey/household/householdMember/isHead,'1')" />
   <bind nodeset="/survey/household/householdMember/levelOfEducation" type="select1" relevant="selected(/survey/household/householdMember/isHead,'1')" />
