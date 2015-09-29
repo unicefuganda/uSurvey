@@ -224,7 +224,8 @@ def is_relevant_by_group(context, question, registered_households):
     question_group = question.group
     relevant_existing = []
     relevant_new = []
-    attributes = {'AGE': '/survey/household/householdMember/age',
+    attributes = {
+                  'AGE': '/survey/household/householdMember/age',
                   'GENDER': '/survey/household/householdMember/sex',
                   'GENERAL': '/survey/household/householdMember/isHead'
                 }
