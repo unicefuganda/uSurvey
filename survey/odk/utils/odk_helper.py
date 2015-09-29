@@ -143,26 +143,17 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
 
 def record_interview_answer(interview, question, answer):
     if not isinstance(answer, NonResponseAnswer):
-        if question.answer_type == MultiSelectAnswer.choice_name():
-            answer = answer.split(MULTI_SELECT_XFORM_SEP)
         answer_class = Answer.get_class(question.answer_type)
         print 'answer type ', answer_class.__name__
         print 'question is ', question
         print 'question pk is ', question.pk
         print 'interview is ', interview
         print 'answer text is ', answer
-        answer = answer_class(question, answer)
-        print 'answer instance is ', answer
-        print 'presave answer pk is ', answer.pk
-    answer.interview = interview
-    answer.save()
-    print 'answer instance is ', answer.pk
-    print 'answer question is ', answer.question
-    print 'answer value is ', answer.value
-    if question.answer_type == MultiSelectAnswer.choice_name():
-        for an in answer.selected:
-            answer.value.add(an)
+        return answer_class.create(interview, question, answer)
+    else:
+        answer.interview = interview
         answer.save()
+        return answer
 
 def _get_responses(interviewer, survey_tree, survey):
     response_dict = {}

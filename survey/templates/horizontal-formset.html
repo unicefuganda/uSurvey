@@ -25,19 +25,22 @@
 									   <span class="add-on">{{ country_phone_code }}</span>
 								  {% endif %}
 									{{field}}
-									{% if field.errors %}
-								   		<label class="error">
-
-										{% for error in field.errors %}
-											{{ error}}
-										{% endfor %}
-									 </label>
-									 {% endif %}
 								  {% if field.label_tag|is_mobile_number %}
 									</div>
 								  {% endif %}
 							</td>
 					{% endfor %}
+						</tr>
+						<tr class="error">
+							{% for field in form.visible_fields %}
+								{% if field.errors %}
+									<label class="error">
+										{% for error in field.errors %}
+												{{ error}}
+										{% endfor %}
+									</label>
+								{% endif %}
+							{% endfor %}
 						</tr>
 					<div class="hide">
                     {% for hidden in form.hidden_fields %}

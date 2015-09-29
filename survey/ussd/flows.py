@@ -347,6 +347,7 @@ class RegisterMember(Task):
                                     ])
         prompts = self._retrieve('_get_dob().prompts', ['year', 'month', 'day'])
         params = self._retrieve('_get_dob().params', {})
+        print 'present prompt', prompts[0]
         ongoing_prompt = _get_dob__PROMPTS[prompts[0]]
         if message and len(prompts) > 0:
             error_prompt = 'Invalid input\n%s'%ongoing_prompt
@@ -496,7 +497,7 @@ class RegisterMember(Task):
         household_member.survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(self.interviewer,
                                                                                               self.ongoing_survey)
         household_member.registration_channel = ODKAccess.choice_name()
-        household_member.last_registrar = self.interviewer
+        household_member.registrar = self.interviewer
         household_member.save()
         task = EndRegistration(self.access) 
         task._household = household_member.household
@@ -785,7 +786,8 @@ class StartInterview(Interviews):
             response = ongoing_interview.respond(message, channel=USSDAccess.choice_name())
             self._ongoing_interview = ongoing_interview #probably something may have happened to the interview instance in db
             interview = self._ongoing_interview
-            if interview.has_pending_questions is False:
+            # import pdb; pdb.set_trace()
+            if response is None:
                 interview.closure_date = datetime.now()
                 interview.save()
                 house_member = interview.householdmember
