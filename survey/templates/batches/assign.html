@@ -13,6 +13,25 @@ $(document).ready(function() {
 {% endblock %}
 {% block extra_css %}
 	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css" />
+<script type="text/javascript">
+
+	var $table = $('table.scroll'),
+    $bodyCells = $table.find('tbody tr:first').children(),
+    colWidth;
+
+// Adjust the width of thead cells when window resizes
+$(window).resize(function() {
+    // Get the tbody columns width array
+    colWidth = $bodyCells.map(function() {
+        return $(this).width();
+    }).get();
+
+    // Set the width of thead columns
+    $table.find('thead tr').children().each(function(i, v) {
+        $(v).width(colWidth[i]);
+    });
+}).resize(); // Trigger resize handler
+</script>
 	<style type="text/css">
 /*.table {
 	font-family:Arial, Helvetica, sans-serif;
@@ -51,23 +70,30 @@ th.theader {
 }
 
 th.question, td.question {
-	width: 35%;
+	width: 80%;
 }
 
 th.code, td.code {
-	width: 10%;
+	width: 20%;
 }
 
-table.question_headers {
-	margin-left: -5px;
-}
 
-table {
+table.scroll {
 		text-align: center;
 		color: #005580;
 		margin: 0;
 		padding: 0;
 		}
+
+table.scroll tbody,
+table.scroll thead { display: block; }
+
+		table.scroll tbody {
+    overflow-y:scroll;
+    height:300px;
+    width:100%;
+    background-color: #F5F5F5;
+}
 
 table tr {
 		padding:11px 15px 12px 15px;
@@ -86,21 +112,21 @@ table a:visited {
 }
 table a:active,
 table a:hover {
-	color: #bd5a35;
+	<!--color: #bd5a35;-->
 	text-decoration:underline;
 }
 
 table th {
-	padding:11px 15px 12px 15px;
+	padding:10px;
 	border-top:1px solid #fafafa;
+		border-right:1px solid  #e0e0e0;
 	border-bottom:1px solid #e0e0e0;
-
-	background: #ededed;
-	background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#ebebeb));
-	background: -moz-linear-gradient(top,  #ededed,  #ebebeb);
+    width : 100%;
+	color:#0099FF;
 }
+
 table th:first-child{
-	padding-left:20px;
+	padding-left:5px;
 }
 table tr:first-child th:first-child{
 	-moz-border-radius-topleft:3px;
@@ -111,6 +137,7 @@ table tr:first-child th:last-child{
 	-moz-border-radius-topright:3px;
 	-webkit-border-top-right-radius:3px;
 	border-top-right-radius:3px;
+
 }
 table tr{
 	text-align: center;
@@ -153,7 +180,7 @@ table tr:last-child td:last-child{
 table tr:hover td{
 	background: #ffffff;
 	background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#ffffff));
-	background: -moz-linear-gradient(top,  #f2f2f2,  #f0f0f0);
+	background: -moz-linear-gradient(top,  #ffffff,  #ffffff);
 }
 
         .theader
@@ -169,9 +196,10 @@ table tr:hover td{
 	.forleft
 		{
 		position: relative;
-		top:20px;
+		top:17px;
 		left:35;
 		}
+
 	</style>
 {% endblock %}
 {% block pre_form_content %}
@@ -184,19 +212,22 @@ table tr:hover td{
        <div id="batch_assignment" class="clear">
 		   <br />
 		   <div class="batch_assignment" style="float: left;">
-				<table width="100%">
-					<thead>
-						<tr><th  colspan="3">Library Questions</th></tr>
-						<tr><th class="hide" /><th width="29%">Code</th><th width="71%">Text</th></tr>
-					</thead>
-				</table>
-				<div class="scrollit">
-					<table id="lib_questions_table">
-						 <tbody>
+
+					<table id="lib_questions_table" class="scroll">
+						<thead id="lib_questions_table_head">
+        <tr  style="width: 100%;">
+
+			<th  colspan="2"  id="lib_title">Library Questions</th>
+		</tr>
+		<tr>
+            <th align="center">Code</th><th align="left"  style="padding-right: 350px;">Text</th>
+
+        </tr></thead>
+						 <tbody id="lib_questions_table_body">
 						{% for question in library_questions %}
-							<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
+							<tr width="100%"  id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
 								<td class="tabletrtd code">
-									<div align="center" class="hide">
+									<div align="center">
 										<input type="hidden" name="identifier" value="{{question.identifier}}" />
 										<input type="hidden" name="text" value="{{question.text}}" />
 										<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
@@ -210,24 +241,25 @@ table tr:hover td{
 						{% endfor %}
 						 </tbody>
 					</table>
-				</div>
+
 			</div>
 {% endblock %}
 {% block display_form_fields %}
 		   		<div class="batch_assignment" style="float: right;">
-					<table width="100%">
-					<thead>
-						<tr><th  colspan="3">Batch Questions</th></tr>
-						<tr><th class="hide" /><th width="29%">Code</th><th width="71%">Text</th></tr>
-					</thead>
-				</table>
-					<div class="scrollit">
-						<br>
-						<table id="batch_questions">
-							<tbody></tbody>
+						<table id="batch_questions" class="scroll" width="100%">
+							<br>
+							<thead id="batch_questions_head">
+        <tr>
+           <th  colspan="2">Batch Questions</th>
+		</tr>
+		<tr>
+            <th align="center">Code</th><th align="left"  style="padding-right: 350px;">Text</th>
+
+        </tr></thead>
+							<tbody id="batch_questions_body"></tbody>
 						</table>
 					</div>
-				</div>
+
 				<input type="hidden" value="{{ batch.id }}" id="batch_id">
 		   	<br class="clear" />
 
@@ -253,7 +285,7 @@ function Move(tr){
  while (tr.parentNode&&tr.nodeName.toUpperCase()!='TR'){
   tr=tr.parentNode
  }
- var table1=document.getElementById('lib_questions_table');
+ var table1=document.getElementById('lib_questions_table_body');
  if (!this.rows){
   var rows=table1.getElementsByTagName('TR');
   this.rows=[];
@@ -269,7 +301,7 @@ function Move(tr){
    <!--}-->
   }
  }
- var table2=document.getElementById('batch_questions');
+ var table2=document.getElementById('batch_questions_body');
  if (tr.parentNode!=table2){
   table2.appendChild(tr);
  }
