@@ -156,7 +156,9 @@ def validation_args(batch):
         args_map.update({validator.__name__.upper() : len(inspect.getargspec(validator).args) - 2 }) #validator is a class method, plus answer extra pram
     return mark_safe(json.dumps(args_map));
         
-        
+@register.filter
+def trim(value):
+    return value.strip()
     
 
 @register.filter
@@ -210,7 +212,8 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                 next_q_context = context.get(next_question.pk, ['false()', ])
                 if flow.validation_test:
                     text_params = [t.param for t in flow.text_arguments]
-                    next_q_context.append(Answer.print_odk_validation(node_path, flow.validation_test, *text_params))
+                    answer_class = Answer.get_class(question.answer_type)
+                    next_q_context.append(answer_class.print_odk_validation(node_path, flow.validation_test, *text_params))
                 else:
                     next_q_context.append("string-length(%s) &gt; 0" % node_path)
                 context[next_question.pk] = next_q_context
