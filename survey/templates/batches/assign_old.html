@@ -13,43 +13,7 @@ $(document).ready(function() {
 {% endblock %}
 {% block extra_css %}
 	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css" />
-<script type="text/javascript">
-
-	var $table = $('table.scroll'),
-    $bodyCells = $table.find('tbody tr:first').children(),
-    colWidth;
-
-// Adjust the width of thead cells when window resizes
-$(window).resize(function() {
-    // Get the tbody columns width array
-    colWidth = $bodyCells.map(function() {
-        return $(this).width();
-    }).get();
-
-    // Set the width of thead columns
-    $table.find('thead tr').children().each(function(i, v) {
-        $(v).width(colWidth[i]);
-    });
-}).resize(); // Trigger resize handler
-</script>
 	<style type="text/css">
-/*.table {
-	font-family:Arial, Helvetica, sans-serif;
-	color:#666;
-	font-size:12px;
-	text-shadow: 1px 1px 0px #fff;
-	background:#eaebec;
-	margin:20px;
-	border:#ccc 1px solid;
-
-	-moz-border-radius:3px;
-	-webkit-border-radius:3px;
-	border-radius:3px;
-
-	-moz-box-shadow: 0 1px 2px #d1d1d1;
-	-webkit-box-shadow: 0 1px 2px #d1d1d1;
-	box-shadow: 0 1px 2px #d1d1d1;
-}*/
 
 div.batch_assignment {
 		height: 10%;
@@ -66,46 +30,29 @@ div.batch_assignment {
 
 th.theader {
 	text-align: center;
-
+	padding:21px 25px 22px 25px;
 }
 
 th.question, td.question {
-	width: 80%;
+	width: 35%;
 }
 
 th.code, td.code {
-<<<<<<< HEAD
-	width: 20%;
-}
-
-=======
 	width: 10%;
-
 }
-
-
 
 table.question_headers {
 	margin-left: -5px;
 }
->>>>>>> f51f584797206b5597b3335884c25358e9324e6f
 
-table.scroll {
+table {
 		text-align: center;
 		color: #005580;
 		margin: 0;
 		padding: 0;
+
+
 		}
-
-table.scroll tbody,
-table.scroll thead { display: block; }
-
-		table.scroll tbody {
-    overflow-y:scroll;
-    height:300px;
-    width:100%;
-    background-color: #F5F5F5;
-}
 
 table tr {
 		padding:11px 15px 12px 15px;
@@ -124,21 +71,37 @@ table a:visited {
 }
 table a:active,
 table a:hover {
-	<!--color: #bd5a35;-->
+	color: #bd5a35;
 	text-decoration:underline;
 }
+.table {
+	font-family:Arial, Helvetica, sans-serif;
+	color:#666;
+	font-size:12px;
+	text-shadow: 1px 1px 0px #fff;
+	background:#eaebec;
+	margin:20px;
+	border:#ccc 1px solid;
 
-table th {
-	padding:10px;
-	border-top:1px solid #fafafa;
-		border-right:1px solid  #e0e0e0;
-	border-bottom:1px solid #e0e0e0;
-    width : 100%;
-	color:#0099FF;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+
+	-moz-box-shadow: 0 1px 2px #d1d1d1;
+	-webkit-box-shadow: 0 1px 2px #d1d1d1;
+	box-shadow: 0 1px 2px #d1d1d1;
 }
+table th {
+	padding:21px 25px 22px 25px;
+	border-top:1px solid #fafafa;
+	border-bottom:1px solid #e0e0e0;
 
+	background: #ededed;
+	background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#ebebeb));
+	background: -moz-linear-gradient(top,  #ededed,  #ebebeb);
+}
 table th:first-child{
-	padding-left:5px;
+	padding-left:20px;
 }
 table tr:first-child th:first-child{
 	-moz-border-radius-topleft:3px;
@@ -149,7 +112,6 @@ table tr:first-child th:last-child{
 	-moz-border-radius-topright:3px;
 	-webkit-border-top-right-radius:3px;
 	border-top-right-radius:3px;
-
 }
 table tr{
 	text-align: center;
@@ -170,6 +132,21 @@ table tr td:first-child{
 	background: #fafafa;
 	background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
 	background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
+}
+		.tabletrtd2 {
+	padding:10px;
+	color:#0099FF;
+	background: #fffffff;
+		text-align:center;
+
+}
+			.tabletrtd3 {
+	padding:10px;
+	color:#0099FF;
+	background: #fffffff;
+		text-align:center;
+		border:1px solid #e0e0e0;
+
 }
 table tr.even td{
 	background: #f6f6f6;
@@ -192,73 +169,53 @@ table tr:last-child td:last-child{
 table tr:hover td{
 	background: #ffffff;
 	background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#ffffff));
-	background: -moz-linear-gradient(top,  #ffffff,  #ffffff);
+	background: -moz-linear-gradient(top,  #f2f2f2,  #f0f0f0);
 }
+.4tbody{
+  overflow-y: scroll;
+  height: 50px;
 
+  position: absolute;
+}
         .theader
         {
         color:#0099FF;
         padding-left: 80px;
         background: #ffffff;
+		padding-top:10px;
+		padding-left:10px;
         }
 
 		#batch_questions {
 			margin-top: -17px;
 		}
-	.forleft
-		{
-		position: relative;
-		top:17px;
-		left:35;
-		}
 
-<<<<<<< HEAD
-=======
-		th.code {
-			padding-left: 130px;
-			padding-right: 90px;
-		}
->>>>>>> f51f584797206b5597b3335884c25358e9324e6f
 	</style>
 {% endblock %}
 {% block pre_form_content %}
 	<div class="filter-form right">
 		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
     </div>
-    <div class="forleft">
+    <div class="search">
     	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
     </div>
        <div id="batch_assignment" class="clear">
 		   <br />
 		   <div class="batch_assignment" style="float: left;">
-<<<<<<< HEAD
-
-					<table id="lib_questions_table" class="scroll">
-						<thead id="lib_questions_table_head">
-        <tr  style="width: 100%;">
-
-			<th  colspan="2"  id="lib_title">Library Questions</th>
-		</tr>
-		<tr>
-            <th align="center">Code</th><th align="left"  style="padding-right: 350px;">Text</th>
-
-        </tr></thead>
-						 <tbody id="lib_questions_table_body">
-=======
-				<table width="100%">
-					<thead>
-						<tr><th  colspan="3">Library Questions</th></tr>
-						<tr><th width="29%" class="code">Code</th><th width="71%">Text</th></tr>
-					</thead>
+				<table width="100%"  class="tabletrtd3">
+					<tr>
+						<td>Library Questions</td>
+					</tr>
+						<tr><td class="hide" /><td class="tabletrtd2">Code</td><td class="tabletrtd2">Text</td>
+					</tr>
 				</table>
 				<div class="scrollit">
-					<table id="lib_questions_table">
+					<table id="lib_questions_table" class="tablem" >
 						 <tbody>
->>>>>>> f51f584797206b5597b3335884c25358e9324e6f
 						{% for question in library_questions %}
-							<tr width="100%"  id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
+							<tr class="rd ms-selectable" id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
 								<td class="tabletrtd code">
-									<div align="center">
+									<div align="center" class="hide">
 										<input type="hidden" name="identifier" value="{{question.identifier}}" />
 										<input type="hidden" name="text" value="{{question.text}}" />
 										<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
@@ -272,38 +229,28 @@ table tr:hover td{
 						{% endfor %}
 						 </tbody>
 					</table>
-
+				</div>
 			</div>
 {% endblock %}
 {% block display_form_fields %}
 		   		<div class="batch_assignment" style="float: right;">
-<<<<<<< HEAD
-						<table id="batch_questions" class="scroll" width="100%">
-							<br>
-							<thead id="batch_questions_head">
-        <tr>
-           <th  colspan="2">Batch Questions</th>
-		</tr>
-		<tr>
-            <th align="center">Code</th><th align="left"  style="padding-right: 350px;">Text</th>
-
-        </tr></thead>
-							<tbody id="batch_questions_body"></tbody>
-=======
-					<table width="100%">
-					<thead>
-						<tr><th  colspan="3">Batch Questions</th></tr>
-						<tr><th width="29%" class="code">Code</th><th width="71%">Text</th></tr>
-					</thead>
-				</table>
+					<table  class="question_headers">
+						<thead>
+							<tr>
+								<th colspan="3" class="theader">
+									Batch Questions
+								</th>
+							</tr>
+							<tr><th class="theader code">Code</th><th class="theader question">Text</th></tr>
+						</thead>
+					</table>
 					<div class="scrollit">
 						<br>
 						<table id="batch_questions">
 							<tbody></tbody>
->>>>>>> f51f584797206b5597b3335884c25358e9324e6f
 						</table>
 					</div>
-
+				</div>
 				<input type="hidden" value="{{ batch.id }}" id="batch_id">
 		   	<br class="clear" />
 
@@ -329,7 +276,7 @@ function Move(tr){
  while (tr.parentNode&&tr.nodeName.toUpperCase()!='TR'){
   tr=tr.parentNode
  }
- var table1=document.getElementById('lib_questions_table_body');
+ var table1=document.getElementById('lib_questions_table');
  if (!this.rows){
   var rows=table1.getElementsByTagName('TR');
   this.rows=[];
@@ -345,7 +292,7 @@ function Move(tr){
    <!--}-->
   }
  }
- var table2=document.getElementById('batch_questions_body');
+ var table2=document.getElementById('batch_questions');
  if (tr.parentNode!=table2){
   table2.appendChild(tr);
  }
