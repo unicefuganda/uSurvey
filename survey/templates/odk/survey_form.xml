@@ -46,7 +46,7 @@ xmlns:jr="http://openrosa.org/javarosa">
     </household>
 	{% for batch in survey_batches %}
 		<b{{batch.pk}}>
-			{% for question in batch.questions_and_subquestions %}
+			{% for question in batch.survey_questions %}
 				<q{{question.pk}} />
                 {% if question.group.name == 'NON_RESPONSE' %}
                  <qnr{{question.pk}} />
