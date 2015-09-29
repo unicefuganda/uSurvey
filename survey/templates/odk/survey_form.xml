@@ -240,7 +240,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 						{% for option in question.options.all %}
 						<item>
 							<label>{{ option.text }}</label>
-							<value>{{ option.pk }}</value>
+							<value>{{ option.text|trim }}</value>
 						</item>
 						{% endfor %}
 					</select>
