@@ -1,3 +1,16 @@
+
+<style type="text/css">
+	.button {
+		margin-top: -15px;
+	height:10px;
+	  }
+.forright
+		{
+		position: relative;
+		margin-top: -51px;
+		left:478;
+		}
+</style>
 {% extends "layout.html" %}
 {% block title %}
     Completion Rates
@@ -13,7 +26,8 @@
      <div>
         {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
      </div>
-    <button class="btnforall">Refresh status</button>
+      <div class="forright"><button class="btnforall">Refresh status</button></div>
+
   </form>
   {% if completion_rates %}
     {% autopaginate completion_rates.attributes 50 %}

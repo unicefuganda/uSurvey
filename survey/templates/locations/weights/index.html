@@ -1,3 +1,15 @@
+<style type="text/css">
+	.button {
+		margin-top: -15px;
+	height:10px;
+	  }
+.forright
+		{
+		position: relative;
+		margin-top: -51px;
+		left:478;
+		}
+</style>
 {% extends 'layout.html' %}
 {% block title %}
     Location Weights
@@ -7,7 +19,6 @@
 {% load template_tags %}
 {% load pagination_tags %}
 {% autopaginate location_weights 50 %}
-<h3>Location Weights</h3>
    <form id="aggregates-form" action="{% url action %}" method="get">
     <div>
       {% load template_tags %}
@@ -21,7 +32,7 @@
      <div>
         {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
      </div>
-    <button class="btnforall" id="get_list">Get List</button>
+    <div class="forright"><button class="btnforall" id="get_list">Get List</button></div>
   </form>
 
     <div class="btn-group pull-right">

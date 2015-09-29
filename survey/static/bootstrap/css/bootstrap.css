@@ -70,7 +70,13 @@ color: #ffffff;
 .downbutton
 {
 padding-top:30px;
-padding-bottom:10px;
+padding-bottom:9px;
+}
+
+.downbutton2
+{
+padding-top:30px;
+padding-bottom:7px;
 }
 
 .clearfix:before,

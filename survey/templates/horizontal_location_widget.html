@@ -1,6 +1,7 @@
 {% load template_tags %}
 <div>
-<ul id="location-widget">
+    <table><tr align="left" valign="top">
+        <td><ul id="location-widget">
   {% for type, locations  in location_data.get_widget_data.items %}
     <li class="parent">
       <label> {{ type.capitalize }} </label>
@@ -12,8 +13,8 @@
       </select>
     </li>
   {% endfor %}
-</ul>
-<ul id="ea-widget">
+</ul></td>
+        <td><ul id="ea-widget">
     <li class="parent">
       <label for="widget_ea">Enumeration area</label>
       <select id="widget_ea"  class="chzn-select" name="ea">
@@ -24,5 +25,8 @@
       </select>
     </li>
 </ul>
+</td>
+    </tr></table>
+
 </div>
 <input type="hidden" name="location" value="{% if selected_location %}{{selected_location.id}}{% endif %}">
