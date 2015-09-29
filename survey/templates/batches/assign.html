@@ -13,25 +13,6 @@ $(document).ready(function() {
 {% endblock %}
 {% block extra_css %}
 	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css" />
-<script type="text/javascript">
-
-	var $table = $('table.scroll'),
-    $bodyCells = $table.find('tbody tr:first').children(),
-    colWidth;
-
-// Adjust the width of thead cells when window resizes
-$(window).resize(function() {
-    // Get the tbody columns width array
-    colWidth = $bodyCells.map(function() {
-        return $(this).width();
-    }).get();
-
-    // Set the width of thead columns
-    $table.find('thead tr').children().each(function(i, v) {
-        $(v).width(colWidth[i]);
-    });
-}).resize(); // Trigger resize handler
-</script>
 	<style type="text/css">
 /*.table {
 	font-family:Arial, Helvetica, sans-serif;
@@ -67,8 +48,9 @@ div.batch_assignment {
 
 }
 
- #batch_assignment td {
-	text-align: left;
+ div.batch_assignment {
+	height: 400px;
+	overflow-y: auto;
 }
 
 th.theader {
@@ -76,36 +58,29 @@ th.theader {
 
 }
 
+
+
 th.question, td.question {
-	width: 80%;
+	width: 85%;
+	text-align: left;
+	padding-left: 15px;
 }
 
 th.code, td.code {
-	width: 20%;
+	width: 15%;
+	text-align: left;
+	padding-left: 15px;
 }
 
-
-table.scroll {
-		text-align: center;
-		color: #005580;
-		margin: 0;
-		padding: 0;
-		}
-
-table.scroll tbody,
-table.scroll thead { display: block; }
-
-		table.scroll tbody {
-    <!--overflow-x:scroll;-->
-    height:300px;
-    width:100%;
-    background-color: #F5F5F5;
+thead {
+	<!--display: block;-->
 }
 
-table tr {
-		padding:11px 15px 12px 15px;
-
-		}
+#lib_questions_table_body, #batch_questions_body {
+	overflow-y: scroll;
+    max-height:100px;
+	<!--display: block;-->
+}
 
 table a:link {
 	color: #666;
@@ -128,13 +103,9 @@ table th {
 	border-top:1px solid #eee;
 		border-right:1px solid  #e0e0e0;
 	border-bottom:1px solid #e0e0e0;
-    width : 100%;
 	color:#0099FF;
 }
 
-table th:first-child{
-	padding-left:5px;
-}
 table tr:first-child th:first-child{
 	-moz-border-radius-topleft:3px;
 	-webkit-border-top-left-radius:3px;
@@ -146,14 +117,7 @@ table tr:first-child th:last-child{
 	border-top-right-radius:3px;
 
 }
-table tr{
-	text-align: center;
-	padding-left:20px;
-
-}
 table tr td:first-child{
-	text-align: center;
-	padding-left:20px;
 	border-left: 0;
 }
 .tabletrtd {
@@ -189,12 +153,7 @@ table tr:hover td{
 	background: -moz-linear-gradient(top,  #ffffff,  #ffffff);
 }
 
-        .theader
-        {
-        color:#0099FF;
-        padding-left: 80px;
-        background: #ffffff;
-        }
+
 
 		#batch_questions {
 			margin-top: -17px;
@@ -221,11 +180,11 @@ table tr:hover td{
 
 					<table id="lib_questions_table" >
 						<thead id="lib_questions_table_head">
-        <tr  style="width: 100%;">
+        <tr>
 
 			<th  colspan="2"  id="lib_title">LIBRARY QUESTIONS</th>
 		</tr>
-		<tr><th align="center">CODE</th><th align="left"  style="padding-right: 350px;">TEXT</th></tr></thead>
+		<tr><th align="center" class="code">CODE</th><th align="left" class="question">TEXT</th></tr></thead>
 						 <tbody id="lib_questions_table_body">
 						{% for question in library_questions %}
 							<tr id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
@@ -256,7 +215,7 @@ table tr:hover td{
            <th  colspan="2">BATCH QUESTIONS</th>
 		</tr>
 		<tr>
-            <th align="center">CODE</th><th align="left"  style="padding-right: 350px;">TEXT</th>
+            <th align="center" class="code">CODE</th><th align="left"  class="question">TEXT</th>
 
         </tr></thead>
 							<tbody id="batch_questions_body"></tbody>
@@ -323,5 +282,24 @@ function Move(tr){
  <!--batchTable.fnDraw();-->
 }
 
+</script>
+<script type="text/javascript">
+
+	var $table = $('table.scroll'),
+    $bodyCells = $table.find('tbody tr:first').children(),
+    colWidth;
+
+// Adjust the width of thead cells when window resizes
+$(window).resize(function() {
+    // Get the tbody columns width array
+    colWidth = $bodyCells.map(function() {
+        return $(this).width();
+    }).get();
+
+    // Set the width of thead columns
+    $table.find('thead tr').children().each(function(i, v) {
+        $(v).width(colWidth[i]);
+    });
+}).resize(); // Trigger resize handler
 </script>
 {% endblock %}
