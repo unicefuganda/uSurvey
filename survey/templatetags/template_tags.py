@@ -204,19 +204,27 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                                 is_relevant_by_group(context, question, registered_households)
                                 )
     flows = question.flows.all()
+    node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
+    flow_conditions = []
     if flows:
         for flow in flows:
             if flow.next_question:
-                node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
                 next_question = flow.next_question
                 next_q_context = context.get(next_question.pk, ['false()', ])
                 if flow.validation_test:
                     text_params = [t.param for t in flow.text_arguments]
                     answer_class = Answer.get_class(question.answer_type)
-                    next_q_context.append(answer_class.print_odk_validation(node_path, flow.validation_test, *text_params))
-                else:
-                    next_q_context.append("string-length(%s) &gt; 0" % node_path)
-                context[next_question.pk] = next_q_context
+                    flow_condition = answer_class.print_odk_validation(node_path, flow.validation_test, *text_params)
+                    flow_conditions.append(flow_condition)
+                    next_q_context.append(flow_condition)
+        null_flows = flows.filter(validation_test__isnull=True, next_question__isnull=False)
+        if null_flows:
+            excludes = ''
+            null_condition = "string-length(%s) &gt; 0" % node_path
+            if len(flow_conditions) > 0:
+                excludes = 'not (%s)' % ' or '.join(flow_conditions)
+            next_q_context.append('(%s)' % ' and '.join([null_condition, excludes]))
+            context[next_question.pk] = next_q_context
     return mark_safe(relevance_context)
 
 

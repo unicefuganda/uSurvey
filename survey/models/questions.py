@@ -88,6 +88,16 @@ class QuestionFlow(BaseModel):
     def test_params(self):
         return [t.param for t in self.text_arguments]
 
+    def params_display(self):
+        params = []
+        for arg in self.text_arguments:
+            if self.question.answer_type == MultiChoiceAnswer.choice_name():
+                params.append(self.question.options.get(order=arg.param))
+            else:
+                params.append(arg.param)
+
+        return params
+
     @property
     def text_arguments(self):
         return TextArgument.objects.filter(flow=self).order_by('position')
