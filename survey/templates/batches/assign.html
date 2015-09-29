@@ -74,21 +74,9 @@ th.question, td.question {
 }
 
 th.code, td.code {
-<<<<<<< HEAD
 	width: 20%;
 }
 
-=======
-	width: 10%;
-
-}
-
-
-
-table.question_headers {
-	margin-left: -5px;
-}
->>>>>>> f51f584797206b5597b3335884c25358e9324e6f
 
 table.scroll {
 		text-align: center;
@@ -166,7 +154,6 @@ table tr td:first-child{
 	border-top: 1px solid #ffffff;
 	border-bottom:1px solid #e0e0e0;
 	border-left: 1px solid #e0e0e0;
-
 	background: #fafafa;
 	background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
 	background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
@@ -212,13 +199,6 @@ table tr:hover td{
 		left:35;
 		}
 
-<<<<<<< HEAD
-=======
-		th.code {
-			padding-left: 130px;
-			padding-right: 90px;
-		}
->>>>>>> f51f584797206b5597b3335884c25358e9324e6f
 	</style>
 {% endblock %}
 {% block pre_form_content %}
@@ -230,41 +210,26 @@ table tr:hover td{
     </div>
        <div id="batch_assignment" class="clear">
 		   <br />
-		   <div class="batch_assignment" style="float: left;">
-<<<<<<< HEAD
+<div class="batch_assignment" style="float: left;">
 
-					<table id="lib_questions_table" class="scroll">
+					<table id="lib_questions_table" >
 						<thead id="lib_questions_table_head">
         <tr  style="width: 100%;">
 
-			<th  colspan="2"  id="lib_title">Library Questions</th>
+			<th  colspan="2"  id="lib_title">LIBRARY QUESTIONS</th>
 		</tr>
-		<tr>
-            <th align="center">Code</th><th align="left"  style="padding-right: 350px;">Text</th>
-
-        </tr></thead>
+		<tr><th align="center">CODE</th><th align="left"  style="padding-right: 350px;">TEXT</th></tr></thead>
 						 <tbody id="lib_questions_table_body">
-=======
-				<table width="100%">
-					<thead>
-						<tr><th  colspan="3">Library Questions</th></tr>
-						<tr><th width="29%" class="code">Code</th><th width="71%">Text</th></tr>
-					</thead>
-				</table>
-				<div class="scrollit">
-					<table id="lib_questions_table">
-						 <tbody>
->>>>>>> f51f584797206b5597b3335884c25358e9324e6f
 						{% for question in library_questions %}
-							<tr width="100%"  id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
+							<tr id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move">
 								<td class="tabletrtd code">
-									<div align="center">
+
 										<input type="hidden" name="identifier" value="{{question.identifier}}" />
 										<input type="hidden" name="text" value="{{question.text}}" />
 										<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
 										<input type="hidden" name="module" value="{{question.module}}" />
 										<input type="hidden" name="group" value="{{question.group}}" />
-									</div>
+
 									{{question.identifier}}
 								</td>
 								<td class="tabletrtd question">{{question.text}}</td>
@@ -272,35 +237,22 @@ table tr:hover td{
 						{% endfor %}
 						 </tbody>
 					</table>
+</div>
 
-			</div>
 {% endblock %}
 {% block display_form_fields %}
 		   		<div class="batch_assignment" style="float: right;">
-<<<<<<< HEAD
-						<table id="batch_questions" class="scroll" width="100%">
+						<table id="batch_questions"  width="100%">
 							<br>
 							<thead id="batch_questions_head">
         <tr>
-           <th  colspan="2">Batch Questions</th>
+           <th  colspan="2">BATCH QUESTIONS</th>
 		</tr>
 		<tr>
-            <th align="center">Code</th><th align="left"  style="padding-right: 350px;">Text</th>
+            <th align="center">CODE</th><th align="left"  style="padding-right: 350px;">TEXT</th>
 
         </tr></thead>
 							<tbody id="batch_questions_body"></tbody>
-=======
-					<table width="100%">
-					<thead>
-						<tr><th  colspan="3">Batch Questions</th></tr>
-						<tr><th width="29%" class="code">Code</th><th width="71%">Text</th></tr>
-					</thead>
-				</table>
-					<div class="scrollit">
-						<br>
-						<table id="batch_questions">
-							<tbody></tbody>
->>>>>>> f51f584797206b5597b3335884c25358e9324e6f
 						</table>
 					</div>
 
