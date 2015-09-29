@@ -61,7 +61,7 @@ class InterviewerForm(ModelForm):
             if survey:
                 ea = self.cleaned_data['ea']
                 interviewer.assignments.update(completed=True)
-                SurveyAllocation.objects.get_or_create(survey=survey,
+                SurveyAllocation.objects.create(survey=survey,
                                                    interviewer=interviewer,
                                                    allocation_ea=ea)
         return interviewer
