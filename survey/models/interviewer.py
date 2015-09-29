@@ -103,7 +103,7 @@ class Interviewer(BaseModel):
             return Household.objects.filter(listing__ea=self.ea, listing__survey_houselistings__survey=survey)
     
     def generate_survey_households(self, survey):
-        survey_households = self.present_households(survey)
+        survey_households = [h for h in self.present_households(survey) if h.members.count() > 0]
         if survey.has_sampling:
             selections = RandomSelection.objects.filter(survey=survey, household__listing__ea=self.ea).distinct()
             households = [s.household for s in selections]

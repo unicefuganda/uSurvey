@@ -34,18 +34,16 @@ class InterviewerForm(ModelForm):
 
     def clean_survey(self):
         ea = self.cleaned_data.get('ea', '')
-        survey_pk = self.cleaned_data['survey']
-        if survey_pk.strip():
-            survey = Survey.objects.get(pk=survey_pk)
-            #check if this has already been allocated to someone else
-            allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
-                                               interviewer__ea=ea,
-                                               allocation_ea=ea)
-            if self.instance:
-                allocs = allocs.exclude(interviewer=self.instance)
-            if allocs.exists():
-                raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
-            return survey
+        survey = self.cleaned_data['survey']
+        #check if this has already been allocated to someone else
+        allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
+                                           interviewer__ea=ea,
+                                           allocation_ea=ea)
+        if self.instance:
+            allocs = allocs.exclude(interviewer=self.instance)
+        if allocs.exists():
+            raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
+        return survey
 
 
     def clean(self):
@@ -60,7 +58,7 @@ class InterviewerForm(ModelForm):
         if commit:
             survey = self.cleaned_data['survey']
             ea = self.cleaned_data['ea']
-            interviewer.assignments.update(completed=False)
+            interviewer.assignments.update(completed=True)
             SurveyAllocation.objects.get_or_create(survey=survey,
                                                    interviewer=interviewer,
                                                    allocation_ea=ea)
