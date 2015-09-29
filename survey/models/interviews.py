@@ -46,9 +46,7 @@ class Interview(BaseModel):
                 else:
                     print 'last question is ', self.last_question
                     answer_class = Answer.get_class(self.last_question.answer_type)
-                    answer = answer_class(self.last_question, reply)
-                    answer.interview = self
-                    answer.save()
+                    answer_class.create(self, self.last_question, reply)
                     #after answering the question, lets see if it leads us anywhere
                     next_question = self.last_question.next_question(reply)
 
@@ -72,9 +70,9 @@ class Interview(BaseModel):
         # self.save()
         print 'nothing here mehn', next_question
 
-    @property
-    def has_pending_questions(self):
-        return self.last_question is not None and self.last_question.flows.filter(next_question__isnull=False).exists()
+    # @property
+    # def has_pending_questions(self):
+    #     return self.last_question is not None and self.last_question.flows.filter(next_question__isnull=False).exists()
 
     @classmethod
     def pending_batches(cls, house_member, ea, survey):
@@ -113,6 +111,10 @@ class Answer(BaseModel):
 #     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
 #                                                             #value shall hold the exact worth of the response
     question = models.ForeignKey("Question", null=True, related_name="%(class)s", on_delete=models.PROTECT)
+
+    @classmethod
+    def create(cls, interview, question, answer):
+        return cls.objects.create(question=question, value=answer, interview=interview)
 
     @classmethod
     def supported_answers(cls):
@@ -228,12 +230,48 @@ class NumericalAnswer(Answer):
     def validators(cls):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(NumericalAnswer, self).__init__(*args, **kwargs)
+    @classmethod
+    def create(cls, interview, question, answer):
         try:
-            self.value = int(answer)
+            value = int(answer)
         except Exception: raise
-        self.question = question
+        return cls.objects.create(question=question, value=answer, interview=interview)
+
+    @classmethod
+    def greater_than(cls, answer, value):
+        answer = int(answer)
+        value = int(value)
+        return answer > value
+
+    @classmethod
+    def odk_greater_than(cls, node_path, value):
+        return "%s &gt; %s" % (node_path, value)
+
+    @classmethod
+    def less_than(cls, answer, value):
+        answer = int(answer)
+        value = int(value)
+        return answer < value
+
+    @classmethod
+    def odk_less_than(cls, node_path, value):
+        return "%s &lt; %s" % (node_path, value)
+
+    @classmethod
+    def between(cls, answer, lowerlmt, upperlmt):
+        answer = int(answer)
+        upperlmt = int(upperlmt)
+        lowerlmt = int(lowerlmt)
+        return upperlmt > answer >= lowerlmt
+
+    @classmethod
+    def odk_between(cls, node_path, lowerlmt, upperlmt):
+        return "(%s &gt; %s) and (%s &lt; %s)" % (node_path, lowerlmt, node_path, upperlmt)
+
+
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
 class ODKGeoPoint(Point):
     altitude = models.DecimalField(decimal_places=3, max_digits=10)
@@ -241,14 +279,14 @@ class ODKGeoPoint(Point):
 
     class Meta:
         app_label = 'survey'
+        abstract = False
 
 class TextAnswer(Answer):
     value = models.CharField(max_length=100, blank=False, null=False)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(TextAnswer, self).__init__(*args, **kwargs)
-        self.value = answer
-        self.question = question
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def validators(cls):
@@ -263,12 +301,18 @@ class TextAnswer(Answer):
 class MultiChoiceAnswer(Answer):
     value = models.ForeignKey("QuestionOption", null=True)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(MultiChoiceAnswer, self).__init__()
-        if isinstance(answer, basestring):
-            self.value = question.options.get(order=answer)
-        else: self.value = answer
-        self.question = question
+    @classmethod
+    def create(cls, interview, question, answer):
+        try:
+            answer = int(answer)
+            answer = question.options.get(order=answer)
+        except:
+            pass
+        return cls.objects.create(question=question, value=answer, interview=interview)
+
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def validators(cls):
@@ -286,18 +330,38 @@ class MultiChoiceAnswer(Answer):
 class MultiSelectAnswer(Answer):
     value = models.ManyToManyField("QuestionOption", null=True)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(MultiSelectAnswer, self).__init__(*args, **kwargs)
+    @classmethod
+    def create(cls, interview, question, answer):
         if isinstance(answer, basestring):
             answer = answer.split(' ')
         if isinstance(answer, list):
             selected = [a.lower() for a in answer]
             options = question.options.all()
             chosen = [op.pk for op in options if op.text.lower() in selected]
-            self.selected = question.options.filter(pk__in=chosen)
+            selected = question.options.filter(pk__in=chosen)
         else:
-            self.selected = answer
-        self.question = question
+            selected = answer
+        ans = cls.objects.create(question=question, interview=interview)
+        for opt in selected:
+            ans.value.add(opt)
+        return ans
+
+    # def __init__(self, question, answer, *args, **kwargs):
+    #     super(MultiSelectAnswer, self).__init__(*args, **kwargs)
+    #     if isinstance(answer, basestring):
+    #         answer = answer.split(' ')
+    #     if isinstance(answer, list):
+    #         selected = [a.lower() for a in answer]
+    #         options = question.options.all()
+    #         chosen = [op.pk for op in options if op.text.lower() in selected]
+    #         self.selected = question.options.filter(pk__in=chosen)
+    #     else:
+    #         self.selected = answer
+    #     self.question = question
+
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     def to_text(self):
         texts = []
@@ -312,24 +376,19 @@ class MultiSelectAnswer(Answer):
     def equals(cls, answer, txt):
         return answer.text.lower() == txt.lower()
 
-@receiver(post_save, sender=MultiSelectAnswer)
-def add_multiselect_options(sender, **kwargs):
-    if kwargs.get('created', False) and kwargs.get('instance', False):
-        answer = kwargs['instance']
-        answer.value.clear()
-        opts = answer.selected.all()
-        for opt in opts:
-            answer.value.add(opt)
-
 class DateAnswer(Answer):
     value = models.DateField(null=True)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(DateAnswer, self).__init__(*args, **kwargs)
+    @classmethod
+    def create(cls, interview, question, answer):
         if isinstance(answer, basestring):
             answer = extract_date(answer, fuzzy=True)
-        self.value = answer
-        self.question = question
+        question = question
+        return cls.objects.create(question=question, value=answer, interview=interview)
+
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def validators(cls):
@@ -338,10 +397,9 @@ class DateAnswer(Answer):
 class AudioAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(AudioAnswer, self).__init__(*args, **kwargs)
-        self.value = answer
-        self.question = question
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def validators(cls):
@@ -350,10 +408,9 @@ class AudioAnswer(Answer):
 class VideoAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(VideoAnswer, self).__init__(*args, **kwargs)
-        self.value = answer
-        self.question = question
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def validators(cls):
@@ -362,10 +419,9 @@ class VideoAnswer(Answer):
 class ImageAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(ImageAnswer, self).__init__(*args, **kwargs)
-        self.value = answer
-        self.question = question
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def validators(cls):
@@ -374,13 +430,16 @@ class ImageAnswer(Answer):
 class GeopointAnswer(Answer):
     value = models.ForeignKey(ODKGeoPoint, null=True)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(GeopointAnswer, self).__init__(*args, **kwargs)
+    @classmethod
+    def create(cls, interview, question, answer):
         if isinstance(answer, basestring):
             answer = answer.split(' ')
             answer = ODKGeoPoint(latitude=answer[0], longitude=answer[1], altitude=[2], precision=answer[3])
-        self.value = answer
-        self.question = question
+        return cls.objects.create(question=question, value=answer, interview=interview)
+
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def validators(cls):
@@ -390,10 +449,9 @@ class GeopointAnswer(Answer):
 class NonResponseAnswer(Answer):
     value = models.CharField(max_length=100, blank=False, null=False)
 
-    def __init__(self, question, answer, *args, **kwargs):
-        super(NonResponseAnswer, self).__init__(*args, **kwargs)
-        self.value = answer
-        self.question = question
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
     @classmethod
     def validators(cls):

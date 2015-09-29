@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 
 
 class InterviewerForm(ModelForm):
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all())
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), required=False)
     date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT,],
                                     widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                   'class': 'datepicker'}, format=settings.DATE_FORMAT))
@@ -35,14 +35,15 @@ class InterviewerForm(ModelForm):
     def clean_survey(self):
         ea = self.cleaned_data.get('ea', '')
         survey = self.cleaned_data['survey']
-        #check if this has already been allocated to someone else
-        allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
-                                           interviewer__ea=ea,
-                                           allocation_ea=ea)
-        if self.instance:
-            allocs = allocs.exclude(interviewer=self.instance)
-        if allocs.exists():
-            raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
+        if survey:
+            #check if this has already been allocated to someone else
+            allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
+                                               interviewer__ea=ea,
+                                               allocation_ea=ea)
+            if self.instance:
+                allocs = allocs.exclude(interviewer=self.instance)
+            if allocs.exists():
+                raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
         return survey
 
 
@@ -57,9 +58,10 @@ class InterviewerForm(ModelForm):
         interviewer = super(InterviewerForm, self).save(commit=commit, **kwargs)
         if commit:
             survey = self.cleaned_data['survey']
-            ea = self.cleaned_data['ea']
-            interviewer.assignments.update(completed=True)
-            SurveyAllocation.objects.get_or_create(survey=survey,
+            if survey:
+                ea = self.cleaned_data['ea']
+                interviewer.assignments.update(completed=True)
+                SurveyAllocation.objects.get_or_create(survey=survey,
                                                    interviewer=interviewer,
                                                    allocation_ea=ea)
         return interviewer

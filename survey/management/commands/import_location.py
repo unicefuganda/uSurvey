@@ -37,8 +37,7 @@ class Command(BaseCommand):
                     print 'loading EA ', item.strip()
                     # ea = existing_eas.get(item.strip(), None)
                     # if ea is None: #not already created
-                    ea, _ = EnumerationArea.objects.get_or_create(name=item.strip(),
-                                                total_households=self.DEFAULT_TOTAL_HOUSEHOLDS)
+                    ea, _ = EnumerationArea.objects.get_or_create(name=item.strip())
                     ea.locations.add(location)
                     ea.save()
                     print 'added ea ', item
