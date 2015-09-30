@@ -115,6 +115,16 @@ class GroupCondition(BaseModel):
     def odk_is_less_than(self, value_path):
         return "%s &lt; %s" % (value_path, self.value)
 
+    @property
+    def display_value(self):
+        if self.attribute == GroupCondition.GROUP_TYPES['GENDER']:
+            return 'Male' if self.value == '1' else 'Female'
+        return self.value
+
+    @property
+    def display_attribute(self):
+        return GroupCondition.GROUP_TYPES[self.attribute]
+
     class Meta:
         app_label = 'survey'
         unique_together = ('value', 'attribute', 'condition')
