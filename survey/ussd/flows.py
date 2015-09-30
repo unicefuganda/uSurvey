@@ -786,7 +786,6 @@ class StartInterview(Interviews):
             response = ongoing_interview.respond(message, channel=USSDAccess.choice_name())
             self._ongoing_interview = ongoing_interview #probably something may have happened to the interview instance in db
             interview = self._ongoing_interview
-            # import pdb; pdb.set_trace()
             if response is None:
                 interview.closure_date = datetime.now()
                 interview.save()
