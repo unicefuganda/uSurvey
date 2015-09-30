@@ -151,7 +151,7 @@ def next_inline_question(question, flows, groups=None, answer_types=[]):
 
 def last_inline(question, flows):
     try:
-        qflow = flows.get(question=question, validation_test__isnull=True)
+        qflow = flows.get(question=question, validation_test__isnull=True, next_question__isnull=False)
         return last_inline(qflow.next_question, flows)
     except QuestionFlow.DoesNotExist:
         return question
