@@ -34,14 +34,17 @@ class EnumerationArea(BaseModel):
         location_registry = self.get_survey_openings()
         return list(Survey.objects.filter(pk__in=[reg.batch.survey.pk for reg in location_registry]))
     
-    def open_batches(self, survey, house_member=None):
+    def open_batches(self, survey, house_member=None, access_channel=None):
         location_registry = self.get_survey_openings(survey)
         batches = list([reg.batch for reg in location_registry])
         if house_member is not None:
             applicable = []
             for batch in batches:
                 if batch.is_applicable(house_member):
-                   applicable.append(batch)
+                    # if access_channel and not batch.access_channels.filter(channel=access_channel):
+                    #     pass
+                    # else:
+                    applicable.append(batch)
             batches = applicable
         return sorted(batches, key=lambda batch: batch.order)
 
