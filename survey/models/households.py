@@ -156,8 +156,8 @@ class HouseholdMember(BaseModel):
     
     def belongs_to(self, member_group):
         attributes = {'AGE': self.age,
-                      'GENDER': self.gender,
-                      'GENERAL': self.is_head()
+                      'GENDER': str(int(self.gender)),
+                      'GENERAL': str(int(self.is_head()))
                       }
         for condition in member_group.get_all_conditions():
             if not condition.matches(attributes):
