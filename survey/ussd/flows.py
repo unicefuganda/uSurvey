@@ -790,13 +790,14 @@ class StartInterview(Interviews):
                 interview.closure_date = datetime.now()
                 interview.save()
                 house_member = interview.householdmember
+                # import pdb; pdb.set_trace()
                 house_member.batch_completed(ongoing_interview.batch)
-                batches = self._pending_batches
-                present_batch = batches.pop(0)
-                self._pending_batches = batches
                 if house_member.household.has_completed_batch(ongoing_interview.batch):
                     house_member.household.batch_completed(ongoing_interview.batch, self.interviewer)
                 if self._pending_batches:
+                    batches = self._pending_batches
+                    present_batch = batches.pop(0)
+                    self._pending_batches = batches
                     #start next batch and respond
                     interview, created = Interview.objects.get_or_create(interviewer=self.interviewer, 
                                                     householdmember=house_member,
@@ -813,7 +814,7 @@ class StartInterview(Interviews):
                         house_member.household.survey_completed(self.ongoing_survey, self.interviewer)
                     task = EndMemberSurvey(self.access)
                     task._household = house_member.household
-                    task.intro()
+                    return task.intro()
             else:
                 return response
         return self.intro()    

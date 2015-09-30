@@ -75,6 +75,7 @@
                                             <h5 class="muted validation"><span>{{ flow.validation_test }}</span>&nbsp;&nbsp;{{ flow.params_display | display_list }}</h5>
                                             <span class="muted flow_desc">{{ flow.desc }}</span>
                                             <span class="next_quest">{{ flow.next_question.text }} </span>&nbsp;&nbsp;
+                                            {% if  batch and not batch.is_open %}
                                             <a href="#delete_subquestion_{{ flow.next_question.id }}" data-toggle="modal"
                                                id="delete_subquestion">Delete</a>
                                             &nbsp;&nbsp;
@@ -83,6 +84,8 @@
                                             <!-- disabled this for now -->
                                             <!-- a href="{% url 'add_question_logic_page' batch.pk  flow.next_question.pk %}" class="add-logic">Add Logic</a -->
                                             {% include "base/delete_modal.html" with object_name=flow.next_question.text id=flow.next_question.id name='Subquestion' url=flow.next_question.id|get_url_with_ids:"delete_question_page" %}
+                                            {% endif %}
+
                                         </li>
 
                                     {% endif %}
