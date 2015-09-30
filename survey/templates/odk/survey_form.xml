@@ -139,10 +139,10 @@ xmlns:jr="http://openrosa.org/javarosa">
        {% if registered_households %}
           <select1 ref="/survey/household/houseNumber">    
               <label>Select household</label>
-              {% for h_number in registered_households %}
+              {% for household in registered_households %}
                  <item>
-					<label>{{ h_number }}</label>
-					<value>{{ h_number }}</value>
+					<label>{{ household.house_number }}</label>
+					<value>{{ household.house_number }}</value>
 				</item>  
               {% endfor %}
           </select1>
