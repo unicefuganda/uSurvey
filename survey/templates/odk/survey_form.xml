@@ -136,22 +136,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 		        </select1>
 		   {% endfor %}
        {% endif %}
-		
-       {% if registered_households %}
-          <select1 ref="/survey/household/houseNumber">
-              <label>Select household</label>
-              {% for household in registered_households %}
-                 <item>
-					<label>{{ household.house_number }}</label>
-					<value>{{ household.house_number }}</value>
-				</item>
-              {% endfor %}
-          </select1>
-       {% else %}
-		<input ref="/survey/household/houseNumber">
+
+       <input ref="/survey/household/houseNumber">
 			<label>Enter household number</label>
 		</input>
-       {% endif %}
     <group>
         <label>Household Member Details</label>
 
