@@ -27,7 +27,7 @@ class GroupConditionForm(ModelForm):
             value = self.cleaned_data['value']
             attribute = self.cleaned_data['attribute']
 
-            if attribute == GroupCondition.GROUP_TYPES['GENDER'] and value not in ['Male', 'Female']:
+            if attribute == GroupCondition.GROUP_TYPES['GENDER'] and str(value) not in ['1', '0']:
                 message = "%s can only have male or female values." % GroupCondition.GROUP_TYPES['GENDER']
                 self._errors['value'] = self.error_class([message])
                 del self.cleaned_data['value']
