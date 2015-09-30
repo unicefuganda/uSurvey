@@ -161,7 +161,7 @@ def edit(request, question_id):
     questions = Question.objects.filter(id=question_id)
     if not questions:
         messages.error(request, "Question does not exist.")
-        return HttpResponseRedirect(reverse('batch_questions_page', args=(questions[0].batch.pk, )))
+        return HttpResponseRedirect(reverse('batch_questions_page', args=(batch.pk, )))
     question = questions[0]
     response, context = _render_question_view(request, question.batch, question)
     return response or render(request, 'questions/new.html', context)
@@ -230,42 +230,40 @@ def _remove(request, batch_id, question_id):
     batch.zombie_questions().delete()
     redirect_url = '/batches/%s/questions/' % batch_id if batch_id else reverse('batch_questions_page', args=(batch.pk, ))
     if question:
-        next_question = batch.next_inline(question)
-        previous_flows = question.connecting_flows.all()
-        previous_inline = previous_flows.filter(validation_test__isnull=True)
-        flows = question.flows.all()
-        if previous_flows and previous_inline: #just to make both evaluate
-            QuestionFlow.objects.create(question=previous_inline[0].question, next_question=next_question)
-        elif next_question:
-            batch.start_question = next_question
-            batch.save()
-        flows.delete()
-        previous_flows.delete()
-        question.delete()
         success_message = "Question successfully deleted."
         messages.success(request, success_message) #% ("Sub question" if question.subquestion else "Question"))
     else:
         messages.error(request, "Question / Subquestion does not exist.")
-
+    next_question = batch.next_inline(question)
+    previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
+    if previous_inline.exists() and next_question:
+        QuestionFlow.objects.create(question=previous_inline[0].question, next_question=next_question)
+    elif next_question:
+        #need to delete the previous flow for the next question
+        batch.start_question = next_question
+        batch.save()
+    question.connecting_flows.all().delete()
+    question.flows.all().delete()
+    question.delete()
     return HttpResponseRedirect(redirect_url)
 
-# @permission_required('auth.can_view_batches')
-# def _index(request, batch_id):
-#     batch = get_object_or_404(Batch, pk=batch_id)
-#     data = dict(request.GET)
-#     question_filter_form = QuestionFilterForm(data=data, batch=batch)
-#     question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
-#     question_form = QuestionForm(batch)
-#     question_flow_form = QuestionFlowForm()
-#     question_tree = None
-#     if batch.start_question:
-#         question_tree = batch.batch_questions.all()
-# #     import pdb; pdb.set_trace()
-#     context = {'batch': batch, 'batch_question_tree' : question_tree, 'question_form' : question_form, 'button_label' : 'Add',
-#                'id' : 'question_form', 'action': '#',
-#                'question_library' : question_library, 'question_filter_form' : question_filter_form,
-#                'question_flow_form' : question_flow_form}
-#     return render(request, 'questions/batch_question.html', context)
+@permission_required('auth.can_view_batches')
+def _index(request, batch_id):
+    batch = get_object_or_404(Batch, pk=batch_id)
+    data = dict(request.GET)
+    question_filter_form = QuestionFilterForm(data=data, batch=batch)
+    question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
+    question_form = QuestionForm(batch)
+    question_flow_form = QuestionFlowForm()
+    question_tree = None
+    if batch.start_question:
+        question_tree = batch.batch_questions.all()
+#     import pdb; pdb.set_trace()
+    context = {'batch': batch, 'batch_question_tree' : question_tree, 'question_form' : question_form, 'button_label' : 'Add',
+               'id' : 'question_form', 'action': '#',
+               'question_library' : question_library, 'question_filter_form' : question_filter_form,
+               'question_flow_form' : question_flow_form}
+    return render(request, 'questions/batch_question.html', context)
 
 def submit(request, batch_id):
     if request.method == 'POST':
