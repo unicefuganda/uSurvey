@@ -1,14 +1,15 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
-from survey.models import Batch, BatchChannel, QuestionTemplate
+from survey.models import Batch, BatchChannel, QuestionTemplate, WebAccess
 from django.utils.safestring import mark_safe
 from survey.models.formula import *
 
 
 class BatchForm(ModelForm):
     access_channels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
-                                         choices=BatchChannel.ACCESS_CHANNELS)
+                                         choices=[opt for opt in BatchChannel.ACCESS_CHANNELS
+                                                  if not opt[0] == WebAccess.choice_name()])
     
     def __init__(self, *args, **kwargs):
         if kwargs.get('instance'):
