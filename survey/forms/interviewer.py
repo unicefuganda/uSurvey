@@ -40,7 +40,7 @@ class InterviewerForm(ModelForm):
             allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
                                                interviewer__ea=ea,
                                                allocation_ea=ea)
-            if self.instance:
+            if self.instance and self.instance.pk:
                 allocs = allocs.exclude(interviewer=self.instance)
             if allocs.exists():
                 raise ValidationError('Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
@@ -95,7 +95,7 @@ class USSDAccessForm(ModelForm):
             except Interviewer.DoesNotExist:
                 pass
         if accesses.exists():
-            raise ValidationError('This id mobile number is already in use by %s' % accesses[0].interviewer.name)
+            raise ValidationError('This mobile number is already in use by %s' % accesses[0].interviewer.name)
         return self.cleaned_data['user_identifier']
         
 
