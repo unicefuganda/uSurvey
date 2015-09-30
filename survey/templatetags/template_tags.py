@@ -219,11 +219,10 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                     next_q_context.append(flow_condition)
         null_flows = flows.filter(validation_test__isnull=True, next_question__isnull=False)
         if null_flows:
-            excludes = ''
-            null_condition = "string-length(%s) &gt; 0" % node_path
+            null_condition = ["string-length(%s) &gt; 0" % node_path, ]
             if len(flow_conditions) > 0:
-                excludes = 'not (%s)' % ' or '.join(flow_conditions)
-            next_q_context.append('(%s)' % ' and '.join([null_condition, excludes]))
+                null_condition.append('not (%s)' % ' or '.join(flow_conditions))
+            next_q_context.append('(%s)' % ' and '.join(null_condition))
             context[next_question.pk] = next_q_context
     return mark_safe(relevance_context)
 
