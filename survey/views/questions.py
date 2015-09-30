@@ -236,7 +236,7 @@ def _remove(request, batch_id, question_id):
         flows = question.flows.all()
         if previous_flows and previous_inline: #just to make both evaluate
             QuestionFlow.objects.create(question=previous_inline[0].question, next_question=next_question)
-        elif next_question:
+        elif next_question and not previous_inline:
             batch.start_question = next_question
             batch.save()
         flows.delete()
