@@ -790,7 +790,6 @@ class StartInterview(Interviews):
                 interview.closure_date = datetime.now()
                 interview.save()
                 house_member = interview.householdmember
-                # import pdb; pdb.set_trace()
                 house_member.batch_completed(ongoing_interview.batch)
                 if house_member.household.has_completed_batch(ongoing_interview.batch):
                     house_member.household.batch_completed(ongoing_interview.batch, self.interviewer)

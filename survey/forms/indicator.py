@@ -9,12 +9,16 @@ class IndicatorForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
         if kwargs.get('instance'):
-            survey = kwargs['instance'].survey
-            self.fields['batch'].choices.queryset = survey.batches
-        self.fields['module'].choices.queryset = QuestionModule.objects.all()
+            batch = kwargs['instance'].batch
+            survey = batch.survey
+            self.fields['survey'].initial = survey
+            self.fields['batch'].queryset = survey.batches
+            self.fields['batch'].initial = batch
+        self.fields['module'].queryset = QuestionModule.objects.all()
         self.fields['name'].label = 'Indicator'
         self.fields['batch'].empty_label = 'Select Batch'
         self.fields['batch'].required = True
+
 
 
     def clean(self):

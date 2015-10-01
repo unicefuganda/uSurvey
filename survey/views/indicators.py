@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
 from survey.forms.indicator import IndicatorForm
 from survey.forms.filters import IndicatorFilterForm
 from survey.models import Indicator, Survey, Formula
@@ -17,9 +18,12 @@ def new(request):
             messages.success(request, "Indicator successfully created.")
             return HttpResponseRedirect("/indicators/")
         messages.error(request, "Indicator was not created.")
+    request.breadcrumbs([
+        ('Indicators', reverse('list_indicator_page')),
+    ])
     return render(request, 'indicator/new.html',
                   {'indicator_form': indicator_form, 'title': 'Add Indicator', 'button_label': 'Create',
-                   'cancel_url':'/indicators/', 'action': '/indicators/new/'})
+                   'cancel_url': reverse('list_indicator_page'), 'action': '/indicators/new/'})
 
 
 def _process_form(indicator_filter_form, indicators):
@@ -68,6 +72,9 @@ def edit(request, indicator_id):
             messages.success(request, "Indicator successfully edited.")
             return HttpResponseRedirect("/indicators/")
         messages.error(request, "Indicator was not successfully edited.")
-    context = {'indicator_form': indicator_form, 'title': 'Edit Indicator', 'button_label': 'Save'}
+    request.breadcrumbs([
+        ('Indicators', reverse('list_indicator_page')),
+    ])
+    context = {'indicator_form': indicator_form, 'title': 'Edit Indicator', 'button_label': 'Save', 'cancel_url': reverse('list_indicator_page')}
     return render(request, 'indicator/new.html', context)
 
