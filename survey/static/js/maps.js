@@ -20,7 +20,7 @@ function getCompletionFor(survey_id){
         $.getJSON("/static/map_resources/uganda_districts_2011_005.json", function (data) {
           $.each(data, function(element){
              data.features.map(function(feature){
-              feature.properties.rate = 90; //rate_data[feature.properties['DNAME_2010']]
+              feature.properties.rate = rate_data[feature.properties['DNAME_2010']]
             })
           });
        geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
