@@ -365,8 +365,7 @@ class MultiSelectAnswer(Answer):
 
     def to_text(self):
         texts = []
-        if self.value:
-            map(lambda opt: texts.append(opt.text), self.value)
+        map(lambda opt: texts.append(opt.text), self.value.all())
         return ' and '.join(texts)
 
     @classmethod
@@ -406,6 +405,10 @@ class AudioAnswer(Answer):
     def validators(cls):
         return []
 
+    def to_text(self):
+        return ''
+
+
 class VideoAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
@@ -417,6 +420,9 @@ class VideoAnswer(Answer):
     def validators(cls):
         return []
 
+    def to_text(self):
+        return ''
+
 class ImageAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
@@ -427,6 +433,9 @@ class ImageAnswer(Answer):
     @classmethod
     def validators(cls):
         return []
+
+    def to_text(self):
+        return ''
 
 class GeopointAnswer(Answer):
     value = models.ForeignKey(ODKGeoPoint, null=True)
@@ -446,6 +455,8 @@ class GeopointAnswer(Answer):
     def validators(cls):
         return [cls.equals]
 
+    def to_text(self):
+        return ''
 
 class NonResponseAnswer(Answer):
     value = models.CharField(max_length=100, blank=False, null=False)
