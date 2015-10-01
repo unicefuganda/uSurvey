@@ -365,7 +365,8 @@ class MultiSelectAnswer(Answer):
 
     def to_text(self):
         texts = []
-        map(lambda opt: texts.append(opt.text), self.value)
+        if self.value:
+            map(lambda opt: texts.append(opt.text), self.value)
         return ' and '.join(texts)
 
     @classmethod
