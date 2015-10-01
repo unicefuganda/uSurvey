@@ -3,6 +3,7 @@ from survey.models.base import BaseModel
 from django.core.validators import MinValueValidator, MaxValueValidator
 from survey.models.locations import Location, LocationType
 from survey.models.interviewer import Interviewer
+from survey.models.households import Household
 
 class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=True, unique=True)
@@ -54,6 +55,9 @@ class Survey(BaseModel):
                 data.append(row)
         return data
 
+    @property
+    def registered_households(self):
+        return Household.objects.filter(listing__survey_houselistings__survey=self).distinct()
     # def batches_enabled(self, interviewer):
     #     if self.has_sampling:
     #         if interviewer.present_households(self).count() < self.sample_size:
