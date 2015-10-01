@@ -48,6 +48,13 @@ class EnumerationArea(BaseModel):
             batches = applicable
         return sorted(batches, key=lambda batch: batch.order)
 
+    def get_siblings(self):
+        return self.under_(self.parent_location())
+
+    @classmethod
+    def under_(cls, selected_location):
+        import pdb; pdb.set_trace()
+        return cls.objects.filter(locations__in=selected_location.get_leafnodes()).distinct('name', 'survey')
         
 #     def validate_unique(self, *args, **kwargs):
 #         super(EnumerationArea, self).validate_unique(*args, **kwargs)

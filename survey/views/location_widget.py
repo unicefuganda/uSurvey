@@ -21,14 +21,15 @@ class LocationWidget(object):
     def sorted_by_hierarchy(self, old_data):
         data = SortedDict()
         location_types_excluding_country_and_village = self.get_all_location_types()
-        for slug in location_types_excluding_country_and_village:
-            data[slug] = old_data[slug] if old_data.has_key(slug) else []
+        for ltype in location_types_excluding_country_and_village:
+            data[ltype.slug] = old_data[ltype.slug] if old_data.has_key(ltype.slug) else []
+        #import pdb; pdb.set_trace()
         return data
 
     def get_all_location_types(self):
-        types = LocationType.objects.exclude(parent__isnull=True)
+        types = LocationType.objects.exclude(name__iexact='country').exclude(pk=LocationType.smallest_unit().pk)
         if not self.level:
-            return list(types.exclude(pk=LocationType.smallest_unit().pk))
+            return list(types)
         return types.filter(level__lte=self.level)[1:]
 
     def has_location_selected(self, location):
@@ -59,9 +60,9 @@ class LocationWidget(object):
             self.get_siblings_data(data, location[0])
 
     def get_parent(self):
-        the_country = LocationTypeDetails.the_country
-        locations = Location.objects.filter(parent=the_country).order_by('name')
-        return self.sorted_by_hierarchy({locations[0].type.slug: locations }) if locations else {}
+        largest_loc_type = LocationType.largest_unit()
+        locations = Location.objects.filter(type=largest_loc_type).order_by('name')
+        return {largest_loc_type.slug: locations } #self.sorted_by_hierarchy({largest_loc_type.slug: locations }) if locations else {}
 
     def next_type_in_hierarchy(self):
         children = self.selected_location.get_children()
@@ -77,4 +78,5 @@ class LocationWidget(object):
             return self.selected_ea.get_siblings()
 
     def selected_type_is_second_lowest(self):
-        return self.selected_location.type == LocationTypeDetails.get_second_lowest_level_type()
+        return self.selected_location.type == LocationType.smallest_unit().parent.type
+               #LocationTypeDetails.get_second_lowest_level_type()

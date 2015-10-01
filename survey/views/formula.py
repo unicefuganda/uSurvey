@@ -89,6 +89,9 @@ def simple_indicator(request, indicator_id):
     if contains_key(params, 'location'):
         first_level_location_analyzed = Location.objects.get(id=params['location'])
         selected_location = first_level_location_analyzed
+    selected_ea = None
+    if contains_key(params, 'ea'):
+        selected_ea = params['ea']
     formula = formula[0]
     indicator_service = SimpleIndicatorService(formula, first_level_location_analyzed)
     data_series, locations = indicator_service.get_location_names_and_data_series()
@@ -97,5 +100,5 @@ def simple_indicator(request, indicator_id):
                'tabulated_data': indicator_service.tabulated_data_series(),
                'location_names': locations,
                'indicator': indicator,
-               'locations': LocationWidget(selected_location, level=hierarchy_limit)}
+               'locations': LocationWidget(selected_location, level=hierarchy_limit, ea=selected_ea)}
     return render(request, 'formula/simple_indicator.html', context)
