@@ -30,10 +30,9 @@ def _create_or_edit(request, action_text, interviewer=None):
     ])
     title = 'New Interviewer'
     odk_instance = None
-    data = request.GET or request.POST
-    ea_id = data.get('ea')
-    if ea_id:
-        ea = get_object_or_404(EnumerationArea, pk=ea_id)
+    data = request.GET
+    if request.POST and request.POST.get('ea'):
+        ea = get_object_or_404(EnumerationArea, pk=request.POST['ea'])
         data = dict([(loc.type.name, loc.pk) for loc in ea.parent_locations()])
     if interviewer:
         extra = 0

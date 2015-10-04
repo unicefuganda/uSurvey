@@ -33,6 +33,8 @@ class InterviewerForm(ModelForm):
 
     def clean_survey(self):
         ea = self.data.get('ea', '')
+        if not ea:
+            raise ValidationError('No Enumeration Area selected')
         survey = self.cleaned_data['survey']
         if survey:
             #check if this has already been allocated to someone else
@@ -46,12 +48,12 @@ class InterviewerForm(ModelForm):
         return survey
 
 
-    def clean(self):
-        ea_id = self.data.get('ea')
-        #check if interviewer is already active with survey in current EA
-        if self.instance and self.instance.pk and ea_id != self.instance.ea.pk and self.instance.has_survey():
-            raise ValidationError('Interviewer is having an active survey')
-        return self.cleaned_data
+    # def clean(self):
+    #     ea_id = self.data.get('ea')
+    #     #check if interviewer is already active with survey in current EA
+    #     if self.instance and self.instance.pk and ea_id != self.instance.ea.pk and self.instance.has_survey():
+    #         raise ValidationError('Interviewer is having an active survey')
+    #     return self.cleaned_data
 
     def save(self, commit=True, **kwargs):
         interviewer = super(InterviewerForm, self).save(commit=commit, **kwargs)
