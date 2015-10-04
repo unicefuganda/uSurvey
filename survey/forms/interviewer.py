@@ -32,7 +32,7 @@ class InterviewerForm(ModelForm):
         }
 
     def clean_survey(self):
-        ea = self.cleaned_data.get('ea', '')
+        ea = self.data.get('ea', '')
         survey = self.cleaned_data['survey']
         if survey:
             #check if this has already been allocated to someone else
@@ -47,9 +47,9 @@ class InterviewerForm(ModelForm):
 
 
     def clean(self):
-        ea = self.cleaned_data.get('ea')
+        ea_id = self.data.get('ea')
         #check if interviewer is already active with survey in current EA
-        if self.instance and self.instance.pk and ea.pk != self.instance.ea.pk and self.instance.has_survey():
+        if self.instance and self.instance.pk and ea_id != self.instance.ea.pk and self.instance.has_survey():
             raise ValidationError('Interviewer is having an active survey')
         return self.cleaned_data
 

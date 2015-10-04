@@ -30,7 +30,8 @@ def _create_or_edit(request, action_text, interviewer=None):
     ])
     title = 'New Interviewer'
     odk_instance = None
-    data = request.GET
+    data = request.GET or request.POST
+    initial = {}
     if interviewer:
         extra = 0
         title = 'Edit Interviewer'
