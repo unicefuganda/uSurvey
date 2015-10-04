@@ -19,7 +19,6 @@ function getCompletionFor(survey_id){
     $.getJSON("/survey/"+ survey_id +"/completion/json/", function (rate_data) {
         $.getJSON("/static/map_resources/uganda_districts_2011_005.json", function (data) {
           $.each(data, function(element){
-             alert(JSON.stringify(data));
              data.features.map(function(feature){
               feature.properties.rate = rate_data[feature.properties['DNAME_2010']]
             })
