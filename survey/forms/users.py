@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.forms import ModelForm
 
 from django.contrib.auth.forms import UserCreationForm
@@ -19,6 +19,7 @@ class UserForm(UserCreationForm):
         self.fields['password2'].label = 'Confirm Password'
         self.fields.keyOrder= ['username', 'password1', 'password2', 'first_name', 'last_name',
                                 'mobile_number', 'email', 'groups']
+        self.fields['groups'].queryset = Group.objects.all().order_by('name')
 
 
     def _clean_attribute(self, Klass, **kwargs):

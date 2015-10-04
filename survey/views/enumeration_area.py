@@ -76,7 +76,7 @@ def enumeration_area_filter(request):
 
 @permission_required('auth.can_view_batches')
 def location_sub_types(request):
-    kwargs = {'type__parent__pk' : request.GET['type']}
+    kwargs = {'type__parent__pk' : request.GET.get('type')}
     if request.GET.get('parent_loc', None):
         kwargs['parent__pk'] =  request.GET['parent_loc']
     child_locations = Location.objects.filter(**kwargs)
