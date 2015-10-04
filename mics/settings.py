@@ -274,6 +274,14 @@ ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerFiles')
 TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
 ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Processed"
 INTERVIEWER_EXPORT_HEADERS =  ['name', 'age', 'level_of_education', 'language', 'ea', 'mobile_numbers', 'odk_id']
+HOUSEHOLD_EXPORT_HEADERS =  {
+                            'HOUSE NUMBER' : 'house_number',
+                             # 'Head' : 'head_name',
+                             'REGISTRAR' : 'last_registrar__name',
+                             'REGISTRATION CHANNEL' : 'registration_channel',
+                             'SURVEY LISTING': 'listing__initial_survey__name',
+                             'ENUMERATION AREA': 'listing__ea__name',
+                             }
 AGGREGATORS = [('testAggregator', 'testAggregator'), ]
 DEFAULT_AGGREGATOR = 'testAggregator'
 TWITTER_URL = 'https://twitter.com/unicefuganda'

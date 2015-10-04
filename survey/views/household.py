@@ -3,6 +3,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib import messages
+from django.conf import settings
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required, permission_required
@@ -17,6 +18,7 @@ from survey.utils.views_helper import contains_key
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
+
 
 CREATE_HOUSEHOLD_DEFAULT_SELECT = ''
 
@@ -136,3 +138,18 @@ def save(request, instance=None):
         ('Households', reverse('list_household_page')),
     ])
     return render(request, 'households/new.html', context)
+
+@permission_required('auth.can_view_households')
+def download_households(request):
+    filename = 'all_interviewers'
+    header_keyval = settings.HOUSEHOLD_EXPORT_HEADERS
+    household_details = Household.objects.all().values(*header_keyval.values())
+    headers= header_keyval.keys()
+    hd_response = [','.join(headers), ]
+    for detail in household_details:
+        vals = ','.join([str(detail[header_keyval[header]]) for header in headers])
+        hd_response.append(vals)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
+    response.write("\r\n".join(hd_response))
+    return response

@@ -76,7 +76,13 @@ class Household(BaseModel):
             return HouseholdHead.objects.get(household=self)
         except HouseholdHead.DoesNotExist:
             return None
-    
+
+    @property
+    def head_name(self):
+        head = self.get_head()
+        if head:
+            return '%s %s' % (head.first_name or '', head.surname or '')
+
     @property
     def members(self):
         return HouseholdMember.objects.filter(household=self)
