@@ -41,7 +41,11 @@ def _create_or_edit(request, action_text, interviewer=None):
     else:
         extra = 1
     locations_filter = LocationsFilterForm(data=data)
-    interviewer_form = InterviewerForm(locations_filter.get_enumerations(), instance=interviewer)
+    if data:
+        eas = locations_filter.get_enumerations()
+    else:
+        eas = EnumerationArea.objects.none()
+    interviewer_form = InterviewerForm(eas, instance=interviewer)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
     ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)
     response = None
