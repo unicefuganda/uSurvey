@@ -24,6 +24,9 @@
         <th>
           Sample Size
         </th>
+        <th>
+            Household Listings
+        </th>
         <th  style="background-image: None;">
           Actions
         </th>
@@ -43,6 +46,9 @@
           </td>
           <td>
               {{ survey.sample_size }}
+          </td>
+          <td>
+              {{ survey.survey_house_listings.count}}
           </td>
           <td>
             <div class="btn-group">
