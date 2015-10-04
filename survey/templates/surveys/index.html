@@ -47,7 +47,7 @@
           <td>
             <div class="btn-group">
                 <a class="btn btn-small" href='{% url "edit_survey_page" survey.id %}'><i class="icon-pencil"></i> Edit</a>
-      {% comment %}          {% if not survey.is_open %}<a class="btn btn-small " data-toggle="modal" href="#delete_survey_{{survey.id}}"><i class="icon-trash"></i> Delete</a> {% endif %}  {% endcomment %}
+      {% if not survey.survey_house_listings.exists %}<a class="btn btn-small " data-toggle="modal" href="#delete_survey_{{survey.id}}"><i class="icon-trash"></i> Delete</a> {% endif %}
                 <a class="add_batch btn btn-small" href='{% url 'batch_index_page' survey.pk %}'>View Batches</a>
                {% comment %}  <a class="add_batch btn btn-small" href='{% url 'manage_survey_page' survey.pk %}'>Manage Survey</a> {% endcomment %}
             </div>

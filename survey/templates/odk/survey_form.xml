@@ -6,10 +6,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 {% load template_tags %}
 <h:head>
 <h:title> 
-  {{survey.name}} 
-  {% if survey.has_sampling %} for
-  {{ survey.sample_size }} random households only
-  {% endif %} 
+  {{survey.name}}
 </h:title>
   <model>
   <instance>

@@ -9,7 +9,7 @@ from survey.models.surveys import Survey, Location, LocationType
 from survey.forms.surveys import SurveyForm
 from survey.views.custom_decorators import handle_object_does_not_exist
 from survey.utils.query_helper import get_filterset
-from survey.models import EnumerationArea, LocationType, Location, BatchCommencement
+from survey.models import EnumerationArea, LocationType, Location, BatchCommencement, SurveyHouseholdListing
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 from django.conf import settings
 
@@ -120,5 +120,8 @@ def edit(request, survey_id):
 @permission_required('auth.can_view_batches')
 def delete(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
-    messages.error(request, "Survey cannot be deleted.")
+    if SurveyHouseholdListing.objects.filter(survey=survey).exists():
+        messages.error(request, "Survey cannot be deleted.")
+    else:
+        survey.delete()
     return HttpResponseRedirect('/surveys/')
