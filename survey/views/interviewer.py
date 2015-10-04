@@ -31,7 +31,10 @@ def _create_or_edit(request, action_text, interviewer=None):
     title = 'New Interviewer'
     odk_instance = None
     data = request.GET or request.POST
-    initial = {}
+    ea_id = data.get('ea')
+    if ea_id:
+        ea = get_object_or_404(EnumerationArea, pk=ea_id)
+        data = dict([(loc.type.name, loc.pk) for loc in ea.parent_locations()])
     if interviewer:
         extra = 0
         title = 'Edit Interviewer'
@@ -46,14 +49,13 @@ def _create_or_edit(request, action_text, interviewer=None):
         eas = locations_filter.get_enumerations()
     else:
         eas = EnumerationArea.objects.none()
-    interviewer_form = InterviewerForm(eas, instance=interviewer)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
     ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)
     response = None
     redirect_url = reverse('interviewers_page')
     odk_access_form = ODKAccessForm(instance=odk_instance)
     if request.method == 'POST':
-        interviewer_form = InterviewerForm(locations_filter.get_enumerations(), data=request.POST, instance=interviewer)
+        interviewer_form = InterviewerForm(eas, data=request.POST, instance=interviewer)
         ussd_access_form = USSDAccessFormSet(request.POST, prefix='ussd_access', instance=interviewer)
 #         odk_access_form = ODKAccessFormSet(request.POST, prefix='odk_access', instance=interviewer)
         odk_access_form = ODKAccessForm(request.POST, instance=odk_instance)
@@ -66,6 +68,8 @@ def _create_or_edit(request, action_text, interviewer=None):
             odk_access.save()
             messages.success(request, "Interviewer successfully %sed." % action_text )
             return HttpResponseRedirect(redirect_url)
+    else:
+        interviewer_form = InterviewerForm(eas, instance=interviewer)
     loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(name__iexact='country')
     return response or render(request, 'interviewers/interviewer_form.html', {'country_phone_code': COUNTRY_PHONE_CODE,
                                                                   'form': interviewer_form,
@@ -99,7 +103,6 @@ def list_interviewers(request):
         interviewers = Interviewer.objects.filter(ea__in=locations_filter.get_enumerations()).order_by('name')
     else:
         interviewers = Interviewer.objects.all()
-#     import pdb; pdb.set_trace()
     search_fields = ['name', 'intervieweraccess__user_identifier']
     if request.GET.has_key('q'):
         interviewers = get_filterset(interviewers, request.GET['q'], search_fields)
