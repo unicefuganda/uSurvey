@@ -74,7 +74,7 @@ def index(request):
         userlist = get_filterset(userlist, request.GET['q'], search_fields)
         
     if request.GET.has_key('status'):
-        userlist = userlist.filter(is_active=(True if request.GET['status'].lower() == 'active' else False))
+        userlist = userlist.filter(is_active=(True if request.GET['status'].lower() == 'active' else False)).order_by('first_name')
     
     return render(request, 'users/index.html', { 'users' : userlist,
                                                  'request': request})
