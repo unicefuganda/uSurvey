@@ -68,13 +68,13 @@ def index(request):
                                     username=request.GET['username'])
     if request.GET.has_key('email'):
         return check_user_attribute(email=request.GET['email'])
-    userlist = User.objects.exclude(is_superuser=True)
+    userlist = User.objects.exclude(is_superuser=True).order_by('first_name')
     search_fields = ['first_name', 'last_name', 'groups__name']
     if request.GET.has_key('q'):
         userlist = get_filterset(userlist, request.GET['q'], search_fields)
         
     if request.GET.has_key('status'):
-        userlist = userlist.filter(is_active=(True if request.GET['status'].lower() == 'active' else False)).order_by('first_name')
+        userlist = userlist.filter(is_active=(True if request.GET['status'].lower() == 'active' else False))
     
     return render(request, 'users/index.html', { 'users' : userlist,
                                                  'request': request})
