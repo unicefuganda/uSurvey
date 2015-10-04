@@ -20,8 +20,7 @@ class InterviewerForm(ModelForm):
                 self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance, completed=False)[0].survey.pk
             except IndexError:
                 pass
-        if eas:
-            self.fields['ea'].queryset = eas
+        self.fields['ea'].queryset = eas
 
     class Meta:
         model = Interviewer
