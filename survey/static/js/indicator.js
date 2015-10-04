@@ -26,7 +26,7 @@ jQuery(function($){
             });
         });
     }
-    if(batch.val().length == 0)
+    if(batch && batch.val().length == 0)
         $('#id_survey').trigger("change");
 
 });

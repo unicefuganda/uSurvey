@@ -30,15 +30,17 @@ def _create_or_edit(request, action_text, interviewer=None):
     ])
     title = 'New Interviewer'
     odk_instance = None
+    data = request.GET
     if interviewer:
         extra = 0
         title = 'Edit Interviewer'
         odk_accesses = interviewer.odk_access
         if odk_accesses.exists():
             odk_instance = odk_accesses[0]
+        data = data or dict([(loc.type.name, loc.pk) for loc in interviewer.ea.parent_locations()])
     else:
         extra = 1
-    locations_filter = LocationsFilterForm(data=request.GET)
+    locations_filter = LocationsFilterForm(data=data)
     interviewer_form = InterviewerForm(locations_filter.get_enumerations(), instance=interviewer)
     USSDAccessFormSet = inlineformset_factory(Interviewer, USSDAccess, form=USSDAccessForm, extra=extra)
     ussd_access_form = USSDAccessFormSet(prefix='ussd_access', instance=interviewer)

@@ -31,21 +31,28 @@ class LocationsFilterForm(Form):
         include_ea = kwargs.pop('include_ea', False)
         super(LocationsFilterForm, self).__init__(*args, **kwargs)
         data = kwargs.get('data', {})
+        largest_unit = LocationType.largest_unit()
         for location_type in LocationType.objects.all():
             if location_type.parent is not None and location_type.is_leaf_node() == False:
                 kw = {'type':location_type}
                 parent_selection = data.get(location_type.parent.name, None)
-                if parent_selection:
-                    kw['parent__pk'] = parent_selection
-                locations = Location.objects.filter(**kw)
+                if parent_selection or location_type == largest_unit:
+                    kw['parent__pk'] = parent_selection or largest_unit.parent.pk
+                    locations = Location.objects.filter(**kw)
+                else:
+                    locations = Location.objects.none()
                 # choices = [(loc.pk, loc.name) for loc in locations]
                 # choices.insert(0, ('', '--- Select %s ---' % location_type.name))
                 self.fields[location_type.name] = forms.ModelChoiceField(queryset=locations) #forms.ChoiceField(choices=choices)
                 self.fields[location_type.name].required = False
-                self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filter chzn-select'
+                self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filters chzn-select'
                 # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
         if include_ea:
-            eas = EnumerationArea.objects.filter(locations__in=get_leaf_locs(loc=data.get(location_type.parent.name, None))).distinct()
+            ea_location = data.get(location_type.parent.name, None)
+            if ea_location:
+                eas = EnumerationArea.objects.filter(locations__in=get_leaf_locs(loc=ea_location)).distinct()
+            else:
+                eas = EnumerationArea.objects.none()
             choices = [(ea.pk, ea.name) for ea in eas]
             choices.insert(0, ('', '--- Select EA ---'))
             self.fields['enumeration_area'] = forms.ModelChoiceField(queryset=eas)#ChoiceField(choices=choices)

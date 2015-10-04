@@ -7,10 +7,10 @@ var map = L.map('completion_map').setView([1.34,32.683525], 7, {zoomControl: tru
   layer = new L.TileLayer(osmUrl, {minZoom: 6, maxZoom: 12, attribution: osmAttrib});
 
 map.addLayer(layer);
-   
+
 $(function(){
     $("#surveys").on('change', function(){
-        getCompletionFor($(this).val());
+        getCompletionFor($(this).val())
 
     })
 });
@@ -19,8 +19,9 @@ function getCompletionFor(survey_id){
     $.getJSON("/survey/"+ survey_id +"/completion/json/", function (rate_data) {
         $.getJSON("/static/map_resources/uganda_districts_2011_005.json", function (data) {
           $.each(data, function(element){
+             alert(JSON.stringify(data));
              data.features.map(function(feature){
-              feature.properties.rate = 90; //rate_data[feature.properties['DNAME_2010']]
+              feature.properties.rate = rate_data[feature.properties['DNAME_2010']]
             })
           });
        geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
@@ -58,7 +59,7 @@ function onEachFeature(feature, layer) {
 }
 
 info.onAdd = function (map) {
-  this._div = L.DomUtil.create('div', 'info'); 
+  this._div = L.DomUtil.create('div', 'info');
   this.update();
   return this._div;
 };

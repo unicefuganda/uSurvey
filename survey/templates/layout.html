@@ -394,7 +394,6 @@ document.write(" "+ now.getFullYear());
 <script src="{{ STATIC_URL }}js/simple_indicator_bar_chart.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
 {% block javascripts %}
 {% endblock %}
@@ -402,7 +401,8 @@ document.write(" "+ now.getFullYear());
      $('.datepicker').datepicker({
      changeMonth: true,
      changeYear: true,
-     dateFormat: 'dd-mm-yy'
+     dateFormat: 'dd-mm-yy',
+     yearRange: "-120:+nn"
      });
 </script>
 

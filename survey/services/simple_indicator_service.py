@@ -3,7 +3,6 @@ from django.utils.datastructures import SortedDict
 
 class SimpleIndicatorService(object):
     def __init__(self, formula, location_parent):
-        # import pdb; pdb.set_trace()
         self.count = formula.get_count_type()
         self.survey = formula.indicator.batch.survey
         self.location_parent = location_parent
