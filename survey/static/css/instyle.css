@@ -735,3 +735,8 @@ dd, dt, dl {
 dl, dt {
   color: #005580
 }
+
+ul
+{
+list-style-type: none;
+}
