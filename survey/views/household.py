@@ -54,8 +54,6 @@ def list_households(request):
     search_fields = ['house_number', 'listing__ea__name', 'last_registrar__name', 'listing__initial_survey__name', ]
     if request.GET.has_key('q'):
         households = get_filterset(households, request.GET['q'], search_fields)
-    if not households:
-        messages.error(request, "There are  no households currently registered for present location" )
     return render(request, 'households/index.html',
                   {'households': households, 
                    'locations_filter' : locations_filter, 
