@@ -45,7 +45,7 @@ class LocationsFilterForm(Form):
                 # choices.insert(0, ('', '--- Select %s ---' % location_type.name))
                 self.fields[location_type.name] = forms.ModelChoiceField(queryset=locations) #forms.ChoiceField(choices=choices)
                 self.fields[location_type.name].required = False
-                self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filter chzn-select'
+                self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filters chzn-select'
                 # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
         if include_ea:
             ea_location = data.get(location_type.parent.name, None)
