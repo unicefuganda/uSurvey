@@ -7,7 +7,7 @@ from survey.models.formula import *
 
 
 class BatchForm(ModelForm):
-    access_channels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
+    access_channels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'access_channels'}),
                                          choices=[opt for opt in BatchChannel.ACCESS_CHANNELS
                                                   if not opt[0] == WebAccess.choice_name()])
     

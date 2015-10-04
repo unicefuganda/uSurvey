@@ -9,7 +9,7 @@
     {% if cancel_url %}
         <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button">Cancel</a>
     {% else %}
-        <button class="btn btn-primary" data-dismiss="modal">Cancel</button>
+        <a href="{% url 'batch_index_page' survey.pk %}" class="btn btn-primary" name="cancel_button">Cancel</a>
     {% endif %}
   </div>
 </form>

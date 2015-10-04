@@ -26,9 +26,10 @@ def index(request, survey_id):
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
     ])
+    can_delete = survey.survey_house_listings.exists() is False #if there has been no household listing yet
     context = {'batches': batches, 'survey': survey,
                'request': request, 'batchform': BatchForm(instance=Batch(survey=survey)),
-               'action': '/surveys/%s/batches/new/' % survey_id, }
+               'action': '/surveys/%s/batches/new/' % survey_id, 'can_delete' : can_delete}
     return render(request, 'batches/index.html',
                   context)
 
@@ -108,7 +109,7 @@ def new(request, survey_id):
 #         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
     ])
     context = {'batchform': batchform, 'button_label': "Create", 'id': 'add-batch-form', 'title': 'New Batch',
-               'action': '/surveys/%s/batches/new/' % survey_id, 'cancel_url': '/surveys/'}
+               'action': '/surveys/%s/batches/new/' % survey_id, 'cancel_url': '/surveys/', 'survey': survey}
     return response or render(request, 'batches/new.html', context)
 
 
@@ -137,7 +138,7 @@ def edit(request, survey_id, batch_id):
 #         (_('%s %s') % (action.title(),model.title()),'/crud/%s/%s' % (model,action)),
     ])
     context = {'batchform': batchform, 'button_label': "Save", 'id': 'edit-batch-form', 'title': 'Edit Batch',
-               'action': '/surveys/%s/batches/%s/edit/' % (survey_id, batch.id)}
+               'action': '/surveys/%s/batches/%s/edit/' % (survey_id, batch.id), 'survey': batch.survey}
     return response or render(request, 'batches/new.html', context)
 
 
