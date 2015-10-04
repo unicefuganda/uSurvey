@@ -10,12 +10,11 @@ RapidSMS==0.14.0
 django-mptt==0.5.5
 Werkzeug==0.8.3
 django-autocomplete-light==1.2.0
-#git+git://github.com/tgdn/django-bootstrap-pagination.git
+git+git://github.com/tgdn/django-bootstrap-pagination.git
 uWSGI==1.9.12
 gunicorn==0.17.4
 Fabric==1.6.1
 mock
-django-pylibmc==0.5.0
 newrelic==1.13.1.31
 dateutils
 xlwt

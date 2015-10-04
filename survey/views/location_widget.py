@@ -23,7 +23,6 @@ class LocationWidget(object):
         location_types_excluding_country_and_village = self.get_all_location_types()
         for ltype in location_types_excluding_country_and_village:
             data[ltype.slug] = old_data[ltype.slug] if old_data.has_key(ltype.slug) else []
-        #import pdb; pdb.set_trace()
         return data
 
     def get_all_location_types(self):
