@@ -32,12 +32,14 @@ class LocationsFilterForm(Form):
         super(LocationsFilterForm, self).__init__(*args, **kwargs)
         data = kwargs.get('data', {})
         largest_unit = LocationType.largest_unit()
+        # import pdb; pdb.set_trace()
         for location_type in LocationType.objects.all():
             if location_type.parent is not None and location_type.is_leaf_node() == False:
                 kw = {'type':location_type}
                 parent_selection = data.get(location_type.parent.name, None)
                 if parent_selection or location_type == largest_unit:
-                    kw['parent__pk'] = parent_selection or largest_unit.parent.pk
+                    if parent_selection:
+                        kw['parent__pk'] = parent_selection
                     locations = Location.objects.filter(**kw)
                 else:
                     locations = Location.objects.none()

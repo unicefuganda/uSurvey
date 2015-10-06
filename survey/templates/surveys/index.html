@@ -25,7 +25,7 @@
           Sample Size
         </th>
         <th>
-            Enumeration Areas Covered
+            No. of selected EAs
         </th>
         <th  style="background-image: None;">
           Actions
@@ -45,7 +45,7 @@
               {% if survey.has_sampling %}Sampled{% else %}Census{% endif %}
           </td>
           <td>
-              {{ survey.sample_size }}
+              {% if survey.has_sampling %}{{ survey.sample_size }}{% else %}N/A{% endif %}
           </td>
           <td>
               {{ survey.survey_house_listings.count}}
