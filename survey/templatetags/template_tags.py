@@ -22,6 +22,11 @@ def next(value, arg):
         return None
 
 @register.filter
+def space_replace(value, search_string):
+    return value.replace(search_string, ' ')
+
+
+@register.filter
 def is_location_selected(locations_data, location):
     if locations_data.has_location_selected(location):
         return "selected='selected'"
