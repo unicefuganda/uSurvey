@@ -7,7 +7,7 @@ from django.shortcuts import render
 from survey.models import Location, LocationType
 from survey.forms.enumeration_area import LocationsFilterForm as LocFilterForm
 from survey.forms.filters import LocationFilterForm
-from survey.models import Survey, Interviewer
+from survey.models import Survey, Interviewer, SurveyAllocation
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates, \
     BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.views.location_widget import LocationWidget
@@ -27,13 +27,13 @@ def is_valid(params):
 
 def render_household_details(request, ea, batch):
     context = {'selected_ea': ea}
-    interviewer = Interviewer.objects.filter(ea=ea)
-    if not interviewer.exists():
-        messages.error(request, 'Interviewer not registered for this ea.')
+    allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
+    if not allocations.exists():
+        messages.error(request, 'No interviewer registered for this ea.')
         return render(request, 'aggregates/household_completion_status.html', context)
     completion_rates = BatchLocationCompletionRates(batch, location=None, ea=ea)
     context.update({'completion_rates': completion_rates,
-                    'interviewer': interviewer[0]})
+                    'interviewer': allocations[0].interviewer})
     return render(request, 'aggregates/household_completion_status.html', context)
 
 
