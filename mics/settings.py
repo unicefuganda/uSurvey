@@ -309,6 +309,7 @@ DEFAULT_TOTAL_HOUSEHOLDS_IN_EA = 1000
 DATE_FORMAT = "%d-%m-%Y"
 MOBILE_NUM_MIN_LENGTH = 9
 MOBILE_NUM_MAX_LENGTH = 9
+SHAPE_FILE_URI = '/static/map_resources/uganda_districts_2011_005.json'
 
 ##end USSD config ##
 # Importing server specific settings
