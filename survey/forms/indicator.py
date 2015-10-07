@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 class IndicatorForm(ModelForm):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)
+    batch = forms.ModelChoiceField(queryset=Batch.objects.none(), empty_label='Select Batch', required=False)
 
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
@@ -14,10 +15,10 @@ class IndicatorForm(ModelForm):
             self.fields['survey'].initial = survey
             self.fields['batch'].queryset = survey.batches
             self.fields['batch'].initial = batch
+        if self.data.get('survey'):
+            self.fields['batch'].queryset = Batch.objects.filter(survey=self.data['survey'])
         self.fields['module'].queryset = QuestionModule.objects.all()
         self.fields['name'].label = 'Indicator'
-        self.fields['batch'].empty_label = 'Select Batch'
-        self.fields['batch'].required = True
 
 
 

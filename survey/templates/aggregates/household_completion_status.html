@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
+{% load template_tags %}
 {% block title %}
   Completion Rates
 {% endblock %}
 {% block content %}
     <h3>Survey Completion by household in EA {{ selected_ea.name }}</h3>
     {% if interviewer %}
-    <p>Interviewer: {{ interviewer.name }}({{ interviewer.mobile_number }})</p>
+    <p>Interviewer: {{ interviewer.name }} (Mobile Numbers: {{ interviewer.ussd_access | display_list}} )</p>
     {% endif %}
     {% if completion_rates %}
         <p>Percent Completion: {{ completion_rates.percent_completed_households }}</p>
@@ -24,9 +25,9 @@
         <tbody>
         {% for interviewed in completion_rates.interviewed_households %}
             <tr>
-                <td>{{ interviewed.household.uid }}</td>
+                <td>{{ interviewed.household.house_number }}</td>
                 <td>{{ interviewed.household.get_head.surname.capitalize }}</td>
-                <td>{{ interviewed.household.household_member.all.count }}</td>
+                <td>{{ interviewed.household.members.all.count }}</td>
                 <td>{{ interviewed.number_of_member_interviewed }}</td>
                 <td>{{ interviewed.date_interviewed|default_if_none:'--' }}</td>
             </tr>

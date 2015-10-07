@@ -19,21 +19,7 @@
 {% load template_tags %}
 {% load pagination_tags %}
 {% autopaginate location_weights 50 %}
-   <form id="aggregates-form" action="{% url action %}" method="get">
-    <div>
-      {% load template_tags %}
-      <label>Survey</label>
-      <select name="survey" id="survey-list-select" name="survey">
-        {% for survey in surveys %}
-          <option value="{{ survey.id }}" {{ survey|is_selected:selected_survey }} >{{ survey.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-     <div>
-        {% include "horizontal_location_widget.html" with location_data=location_data default_text="All" %}
-     </div>
-    <div class="forright"><button class="btnforall" id="get_list">Get List</button></div>
-  </form>
+    {% include "locations/weights/weights_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' survey=survey id="aggregates-form" method='post'%}
 
     <div class="btn-group pull-right">
         <a class="btn" href="{% url 'upload_weights' %}" id="upload_weights"><i class="icon icon-upload"></i> Upload weights</a>

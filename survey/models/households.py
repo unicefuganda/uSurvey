@@ -127,6 +127,16 @@ class Household(BaseModel):
     def batch_completed(self, batch, registrar):
         return HouseholdBatchCompletion.objects.create(household=self, batch=batch, interviewer=registrar)
 
+    def date_interviewed_for(self, batch):
+        hmcs = HouseholdMemberBatchCompletion.objects.filter(householdmember__household=self, batch=batch)
+        if hmcs.exists():
+            return hmcs[0].created
+
+    def total_members_interviewed(self, batch):
+        return HouseholdMemberBatchCompletion.objects.\
+            filter(householdmember__household=self, batch=batch).distinct().count()
+
+
 
 class HouseholdMember(BaseModel):
     MALE = 1

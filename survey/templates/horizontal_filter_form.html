@@ -1,6 +1,8 @@
 {% load template_tags %}
 <form id="{{ filter_id }}" action="{{ action }}" method="{% if method %}{{method}}{% else %}get{% endif %}" class="pull-left padded-bottom" accept-charset="utf-8">
-{% csrf_token %}
+    {% if method and not method.lower == 'get' %}
+        {% csrf_token %}
+    {% endif %}
     {% block prefilter %}
 
     {% endblock %}
