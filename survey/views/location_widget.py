@@ -77,5 +77,4 @@ class LocationWidget(object):
             return self.selected_ea.get_siblings()
 
     def selected_type_is_second_lowest(self):
-        return self.selected_location.type == LocationType.smallest_unit().parent.type
-               #LocationTypeDetails.get_second_lowest_level_type()
+        return self.selected_location.type == LocationType.smallest_unit().parent
