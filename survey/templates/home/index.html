@@ -44,7 +44,10 @@ function getCompletionFor(survey_id){
         $.getJSON("{{shape_file_uri}}", function (data) {
           $.each(data, function(element){
              data.features.map(function(feature){
-              feature.properties.rate = rate_data[feature.properties['DNAME_2010']]
+              var property = feature.properties['DNAME_2010'];
+              if(property === undefined)
+                property = feature.properties['DNAME_2006'];
+              feature.properties.rate = rate_data[property]
             })
           });
        geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
@@ -89,8 +92,11 @@ info.onAdd = function (map) {
 info.update = function (props) {
   this._div.innerHTML = '<h1>Completion rates:</h1>';
   if(typeof props != 'undefined'){
+    var property = props['DNAME_2010'];
+    if(property === undefined)
+        property = props['DNAME_2006'];
     rate = props.rate >-1 ? props.rate + '%' : 'Survey not opened.';
-    this._div.innerHTML += props['DNAME_2010'] +': '+ rate;
+    this._div.innerHTML += property +': '+ rate;
   }
 };
 
