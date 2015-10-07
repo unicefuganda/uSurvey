@@ -4,9 +4,12 @@
 {% endblock %}
 {% block content %}
     <h3>Survey Completion by household in EA {{ selected_ea.name }}</h3>
+    {% if interviewer %}
+    <p>Interviewer: {{ interviewer.name }}({{ interviewer.mobile_number }})</p>
+    {% endif %}
     {% if completion_rates %}
-    <p>Investigator: {{ investigator.name }}({{ investigator.mobile_number }})</p>
-    <p>Percent Completion: {{ completion_rates.percent_completed_households }}</p>
+        <p>Percent Completion: {{ completion_rates.percent_completed_households }}</p>
+    {% endif %}
 
     <table class="table table-striped table-bordered table-sort">
       <thead>
@@ -30,5 +33,4 @@
         {% endfor %}
       </tbody>
     </table>
-    {% endif %}
 {% endblock %}
