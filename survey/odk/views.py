@@ -87,9 +87,9 @@ def form_list(request):
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
-    audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
-              _("survey allocation %s" % allocation.survey), {}, request)
     if allocation:
+        audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
+              _("survey allocation %s" % allocation.survey), {}, request)
         survey = allocation.survey
         survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
 
@@ -114,7 +114,7 @@ def download_xform(request, survey_id):
     interviewer = request.user
     survey = get_object_or_404(Survey, pk=survey_id)
     allocation = get_survey_allocation(interviewer)
-    if allocation.batches_enabled():
+    if allocation and allocation.batches_enabled():
         try:
             survey_xform = get_survey_xform(interviewer, survey)
             form_id = '%s'% survey_id
@@ -141,20 +141,22 @@ def download_xform(request, survey_id):
 def download_houselist_xform(request):
     interviewer = request.user
     allocation = get_survey_allocation(interviewer)
-    survey = allocation.survey
-    survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
-    householdlist_xform = get_household_list_xform(interviewer, survey, survey_listing.listing)
-    form_id = 'allocation-%s'% allocation.id
-    audit = {
-        "xform": form_id
-    }
-    audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                _("Downloaded XML for form '%(id_string)s'.") % {
-                                                        "id_string": form_id
-                                                    }, audit, request)
-    response = response_with_mimetype_and_name('xml', 'household_listing-%s' % survey.pk,
-                                               show_date=False, full_mime='text/xml')
-    response.content = householdlist_xform
+    response = OpenRosaResponseNotFound()
+    if allocation:
+        survey = allocation.survey
+        survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+        householdlist_xform = get_household_list_xform(interviewer, survey, survey_listing.listing)
+        form_id = 'allocation-%s'% allocation.id
+        audit = {
+            "xform": form_id
+        }
+        audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
+                    _("Downloaded XML for form '%(id_string)s'.") % {
+                                                            "id_string": form_id
+                                                        }, audit, request)
+        response = response_with_mimetype_and_name('xml', 'household_listing-%s' % survey.pk,
+                                                   show_date=False, full_mime='text/xml')
+        response.content = householdlist_xform
     return response
 
 @http_digest_interviewer_auth
