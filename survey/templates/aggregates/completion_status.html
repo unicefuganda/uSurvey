@@ -17,7 +17,10 @@
 {% endblock %}
 {% block content %}
    {% load pagination_tags %}
-{% include "aggregates/completion_status_form.html" with a_form=locations_filter filter_button_name='Refresh Status' survey_form=filter filter_id='aggregates-form' method='post' %}
+  <h4>
+    Select Batch and Location to view report
+  </h4>
+{% include "aggregates/completion_status_form.html" with a_form=locations_filter filter_button_name='Refresh Status' survey_form=filter filter_id='aggregates-form' method='post' no_button=True %}
 
   {% if completion_rates %}
     {% autopaginate completion_rates.attributes 50 %}
