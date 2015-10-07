@@ -1,0 +1,13 @@
+{% extends "horizontal_filter_form.html" %}
+{% load template_tags %}
+{% block prefilter %}
+<div>
+      {% load template_tags %}
+      <label>Survey</label>
+      <select name="survey" id="survey-list-select" name="survey">
+        {% for survey in surveys %}
+          <option value="{{ survey.id }}" {{ survey|is_selected:selected_survey }} >{{ survey.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+{% endblock %}

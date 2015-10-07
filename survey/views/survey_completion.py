@@ -25,13 +25,13 @@ def is_valid(params):
     return True
 
 
-def render_household_details(request, ea, batch):
+def render_household_details(request, location, ea, batch):
     context = {'selected_ea': ea}
     allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
     if not allocations.exists():
         messages.error(request, 'No interviewer registered for this ea.')
         return render(request, 'aggregates/household_completion_status.html', context)
-    completion_rates = BatchLocationCompletionRates(batch, location=None, ea=ea)
+    completion_rates = BatchLocationCompletionRates(batch, location=location, ea=ea)
     context.update({'completion_rates': completion_rates,
                     'interviewer': allocations[0].interviewer})
     return render(request, 'aggregates/household_completion_status.html', context)
@@ -55,7 +55,7 @@ def show(request):
             selected_location = locations_filter.last_location_selected
             selected_ea = request.POST.get('enumeration_area', None)
             if selected_ea:
-                return render_household_details(request, selected_ea, batch)
+                return render_household_details(request, selected_location, selected_ea, batch)
             if selected_location:
                 high_level_locations = selected_location.get_children().order_by('name')
             else:

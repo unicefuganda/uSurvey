@@ -6,12 +6,13 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from survey.models import LocationType, Location
-
 from survey.forms.upload_csv_file import UploadWeightsForm
 from survey.models import LocationWeight, LocationTypeDetails, UploadErrorLog, Survey
+from survey.forms.enumeration_area import LocationsFilterForm
 from survey.tasks import upload_task
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
+from django.core.urlresolvers import reverse
 
 
 @permission_required('auth.can_view_batches')
@@ -36,21 +37,21 @@ def list_weights(request):
     surveys = Survey.objects.all()
     survey = None
     selected_location = None
-    params = request.GET
+    params = request.GET or request.POST
+    location_filter_form = LocationsFilterForm(data=params)
     if contains_key(params, 'survey'):
         survey = Survey.objects.get(id=params['survey'])
         location_weights = location_weights.filter(survey=survey)
-    if contains_key(params, 'location'):
-        selected_location = Location.objects.get(id=params['location'])
-        location_weights = location_weights.filter(location=selected_location)
+    if location_filter_form.last_location_selected:
+        location_weights = location_weights.filter(location=location_filter_form.last_location_selected)
 
-    location_types = LocationTypeDetails.get_ordered_types().exclude(name__iexact="country")
+    location_types = LocationType.objects.exclude(name__iexact="country")
     context = {'location_weights': location_weights,
                'location_types': location_types,
-               'location_data': LocationWidget(selected_location),
+               'locations_filter': location_filter_form,
                'surveys': surveys,
                'selected_survey': survey,
-               'action': 'list_weights_page',
+               'action': reverse('list_weights_page'),
                'request': request}
     return render(request, 'locations/weights/index.html', context)
 
