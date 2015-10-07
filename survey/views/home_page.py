@@ -11,7 +11,8 @@ def home(request):
     return render(request, 'home/index.html', {'surveys': Survey.objects.all(), 
                                                'title': settings.PROJECT_TITLE, 
                                                'twitter_token' : settings.TWITTER_TOKEN,
-                                               'twitter_url': settings.TWITTER_URL})
+                                               'twitter_url': settings.TWITTER_URL,
+                                               'shape_file_uri': settings.SHAPE_FILE_URI})
 
 def index(request):
     return render(request, 'main/index.html', {'title': settings.PROJECT_TITLE})
