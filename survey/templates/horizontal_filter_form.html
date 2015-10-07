@@ -1,6 +1,9 @@
 {% load template_tags %}
-<form id="{{ filter_id }}" action="{{ action }}" method="get" class="pull-left padded-bottom" accept-charset="utf-8">
+<form id="{{ filter_id }}" action="{{ action }}" method="{% if method %}{{method}}{% else %}get{% endif %}" class="pull-left padded-bottom" accept-charset="utf-8">
+{% csrf_token %}
+    {% block prefilter %}
 
+    {% endblock %}
     <table class="{{ class }} horizontal-filter">
         <tr id="control-group">
             {% for field in a_form.visible_fields %}
@@ -39,6 +42,10 @@
         {% endif %}
 
 </table>
+{% block postfilter %}
+
+{% endblock %}
+
 </form>
 {% if not no_auto_refresh %}
     {% block auto_refresh %}

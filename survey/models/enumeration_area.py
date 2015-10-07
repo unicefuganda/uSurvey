@@ -53,8 +53,7 @@ class EnumerationArea(BaseModel):
 
     @classmethod
     def under_(cls, selected_location):
-        import pdb; pdb.set_trace()
-        return cls.objects.filter(locations__in=selected_location.get_leafnodes()).distinct('name', 'survey')
+        return cls.objects.filter(locations__in=selected_location.get_leafnodes()).distinct('name')
         
 #     def validate_unique(self, *args, **kwargs):
 #         super(EnumerationArea, self).validate_unique(*args, **kwargs)

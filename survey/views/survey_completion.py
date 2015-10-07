@@ -47,12 +47,13 @@ def show(request):
     location_filter_form = LocationFilterForm()
     content = {'action': 'survey_completion_rates',
                'request': request}
+    locations_filter = LocFilterForm(data=request.POST, include_ea=True)
     if request.method == 'POST':
         location_filter_form = LocationFilterForm(request.POST)
         if location_filter_form.is_valid():
             batch = location_filter_form.cleaned_data.get('batch', None)
-            selected_location = location_filter_form.cleaned_data.get('location', None)
-            selected_ea = location_filter_form.cleaned_data.get('ea', None)
+            selected_location = locations_filter.last_location_selected
+            selected_ea = request.POST.get('enumeration_area', None)
             if selected_ea:
                 return render_household_details(request, selected_ea, batch)
             if selected_location:
@@ -60,7 +61,7 @@ def show(request):
             else:
                 high_level_locations = __get_parent_level_locations()
             content['completion_rates'] = BatchHighLevelLocationsCompletionRates(batch, high_level_locations)
-    content['locations'] = LocationWidget(selected_location)
+    content['locations_filter'] = locations_filter
     content['filter'] = location_filter_form
     return render(request, 'aggregates/completion_status.html', content)
 

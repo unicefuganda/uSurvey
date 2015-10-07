@@ -8,7 +8,7 @@ from survey.forms.formula import FormulaForm
 from survey.models import Indicator
 from survey.models.formula import Formula
 from survey.services.simple_indicator_service import SimpleIndicatorService
-from survey.views.location_widget import LocationWidget
+from survey.forms.enumeration_area import LocationsFilterForm
 from survey.utils.views_helper import contains_key
 
 
@@ -78,6 +78,8 @@ def delete(request, indicator_id, formula_id):
 def simple_indicator(request, indicator_id):
     hierarchy_limit = 2
     selected_location = None
+    params = request.GET or request.POST
+    locations_filter = LocationsFilterForm(data=params)
     first_level_location_analyzed = Location.objects.filter(type__name__iexact="country")[0]
     indicator = Indicator.objects.get(id=indicator_id)
     formula = indicator.formula.all()
@@ -85,13 +87,9 @@ def simple_indicator(request, indicator_id):
         messages.error(request, "No formula was found in this indicator")
         return HttpResponseRedirect(reverse("list_indicator_page"))
 
-    params = request.GET
-    if contains_key(params, 'location'):
-        first_level_location_analyzed = Location.objects.get(id=params['location'])
+    if locations_filter.last_location_selected:
+        first_level_location_analyzed = locations_filter.last_location_selected
         selected_location = first_level_location_analyzed
-    selected_ea = None
-    if contains_key(params, 'ea'):
-        selected_ea = params['ea']
     formula = formula[0]
     indicator_service = SimpleIndicatorService(formula, first_level_location_analyzed)
     data_series, locations = indicator_service.get_location_names_and_data_series()
@@ -100,5 +98,5 @@ def simple_indicator(request, indicator_id):
                'tabulated_data': indicator_service.tabulated_data_series(),
                'location_names': locations,
                'indicator': indicator,
-               'locations': LocationWidget(selected_location, level=hierarchy_limit, ea=selected_ea)}
+               'locations_filter': locations_filter}
     return render(request, 'formula/simple_indicator.html', context)
