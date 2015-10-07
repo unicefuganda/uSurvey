@@ -4,26 +4,7 @@
 {% endblock %}
 {% block content %}
   <h4>
-    Choose survey to get investigators who completed the survey
+    Choose survey to get interviewers who completed a survey
   </h4>
-  <form id="download-investigator-form" action="{% url 'download_interviewer_excel' %}" method="POST" accept-charset="utf-8">
-    <table>
-      <tr align="left"><td align="left" valign="middle">
-        {% csrf_token %}
-    <select name="survey" id="id_survey">
-      {% for survey in surveys %}
-        <option value="{{ survey.id }}">{{ survey.name }}</option>
-      {% endfor %}
-    </select>
-
-      {% if batches %}
-      <select name="batch" id="id_batch">
-          {% for batch in batches %}
-            <option value="{{ batch.id }}">{{ batch.name }}</option>
-          {% endfor %}
-        </select>
-  {% endif %}
-      </td><td align="left" valign="top"><button class="btnforall" id="generate_report">Generate Report</button></td></tr>
-      </table>
-  </form>
+{% include "horizontal_filter_form.html" with a_form=report_form no_button=False filter_id='report_form' filter_button_name='download' %}
 {% endblock %}

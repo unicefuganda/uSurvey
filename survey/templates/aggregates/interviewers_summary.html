@@ -20,9 +20,6 @@
             Name
           </th>
           <th>
-            Interview IDs
-          </th>
-          <th>
             Enumeration Area
           </th>
           <!-- th>
@@ -39,9 +36,6 @@
           <tr>
             <td>
               <a href="{% url 'interviewer_completion_summary' interviewer.pk %}">{{ interviewer.name }}</a>
-            </td>
-            <td>
-              {{ interviewer.access_ids | display_list }}
             </td>
             <td>
               {{ interviewer.ea.name }}

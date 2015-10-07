@@ -16,10 +16,9 @@
 }
 </style>
   <h4>
-    Choose which reports you would like to export to excel
+    Choose survey to export data
   </h4>
 <div class="forleft">
-  {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
-  {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-csv-form" a_form=survey_batch_filter_form no_button=False no_auto_refresh=True %}
+  {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-csv-form" a_form=survey_batch_filter_form  %}
 </div>
   {% endblock %}
