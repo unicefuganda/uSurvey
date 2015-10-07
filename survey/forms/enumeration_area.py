@@ -26,19 +26,22 @@ class LocationsFilterForm(Form):
         1. Used to filter out locations under a given main location (eg states under a country)
         2. Also to filter out locations under given ea if defined
     '''
-    
+
+    last_location_selected = None
+
     def __init__(self, *args, **kwargs):
         include_ea = kwargs.pop('include_ea', False)
         super(LocationsFilterForm, self).__init__(*args, **kwargs)
         data = kwargs.get('data', {})
+        last_selected_pk = None
         largest_unit = LocationType.largest_unit()
-        # import pdb; pdb.set_trace()
         for location_type in LocationType.objects.all():
             if location_type.parent is not None and location_type.is_leaf_node() == False:
                 kw = {'type':location_type}
                 parent_selection = data.get(location_type.parent.name, None)
                 if parent_selection or location_type == largest_unit:
                     if parent_selection:
+                        last_selected_pk = parent_selection
                         kw['parent__pk'] = parent_selection
                     locations = Location.objects.filter(**kw)
                 else:
@@ -61,6 +64,8 @@ class LocationsFilterForm(Form):
             self.fields['enumeration_area'].widget.attrs['class'] = 'location_filter chzn-select'
             # self.fields['enumeration_area'].widget.attrs['style'] = 'width: 100px;'
             self.fields['enumeration_area'].required = False
+        if last_selected_pk:
+            self.last_location_selected = Location.objects.get(pk=last_selected_pk)
 
     
     def get_locations(self):

@@ -1,10 +1,8 @@
 {% extends 'layout.html' %}
 {% block title %} Simple Indicator {% endblock %}
 {% block content %}
-<form id="results-location-widget" method="get" accept-charset="utf-8">
-    {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
-    <button class="btn btn-primary"> Show results</button>
-</form>
+{% include "horizontal_filter_form.html" with a_form=locations_filter filter_button_name='Show results' filter_id='location_filter' method='post' %}
+
 <br>
 
   <div id="simple_indicator_bar_chart" class="chart"></div>

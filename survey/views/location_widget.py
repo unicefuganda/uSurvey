@@ -69,7 +69,7 @@ class LocationWidget(object):
             return children[0].type
 
     def get_ea_data(self):
-        if self.level or not self.selected_location:
+        if not self.level or not self.selected_location:
             return
         if self.selected_type_is_second_lowest():
             return EnumerationArea.under_(self.selected_location)

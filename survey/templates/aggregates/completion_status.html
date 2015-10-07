@@ -17,18 +17,8 @@
 {% endblock %}
 {% block content %}
    {% load pagination_tags %}
+{% include "aggregates/completion_status_form.html" with a_form=locations_filter filter_button_name='Refresh Status' survey_form=filter filter_id='aggregates-form' method='post' %}
 
-  <form id="aggregates-form" action="{% url action %}" method="post">
-    {% csrf_token %}
-    <div>
-        {% include "horizontal_naked_form.html" with a_form=filter %}
-    </div>
-     <div>
-        {% include "horizontal_location_widget.html" with location_data=locations default_text="All" %}
-     </div>
-      <div class="forright"><button class="btnforall">Refresh status</button></div>
-
-  </form>
   {% if completion_rates %}
     {% autopaginate completion_rates.attributes 50 %}
 
