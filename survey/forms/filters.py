@@ -1,6 +1,5 @@
 from django import forms
-from rapidsms.contrib.locations.models import Location
-from survey.models import HouseholdMemberGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, SurveyAllocation
+from survey.models import HouseholdMemberGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, SurveyAllocation, Location
 from django.contrib.auth.handlers.modwsgi import groups_for_user
 MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
 DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE =20
