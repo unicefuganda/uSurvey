@@ -1,18 +1,19 @@
 ;
 function get_survey_batches(val) {
     $.get('/surveys/' + val + '/survey_batches/', function (data) {
-        $('#batch-list-select').find('option')
+        $('#id_batch').find('option')
             .remove()
             .end();
         counter = 0;
+        $('#id_batch').append('<option value="">----</option>');
         $.each(data, function () {
-            $('#batch-list-select').append("<option value=" + data[counter]['id'] + ">" + data[counter]['name'] + "</option>");
+            $('#id_batch').append("<option value=" + data[counter]['id'] + ">" + data[counter]['name'] + "</option>");
             counter++;
         });
     });
 }
 jQuery(function($){
-  $("#survey-list-select").on('change',function(){
-      get_survey_batches($(this).val());
+  $("#id_survey").on('change',function(){
+        get_survey_batches($(this).val());
   });
 });

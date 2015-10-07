@@ -73,41 +73,26 @@ class IndicatorFilterForm(forms.Form):
 
 
 class LocationFilterForm(forms.Form):
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)
-    batch = forms.ModelChoiceField(queryset=None, empty_label=None)
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label='----')
+    batch = forms.ModelChoiceField(queryset=Batch.objects.none(), empty_label='----')
     location = forms.ModelChoiceField(queryset=Location.objects.all(), widget=forms.HiddenInput(), required=False)
     ea = forms.ModelChoiceField(queryset=None, widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(LocationFilterForm, self).__init__(*args, **kwargs)
-        self.constrain_batch_and_ea_choices_to_survey()
-
-    def constrain_batch_and_ea_choices_to_survey(self):
-        survey_id = self.data.get('survey', None)
-        self.fields['batch'].queryset = Batch.objects.none()
-        self.fields['ea'].queryset = EnumerationArea.objects.none()
-        try:
-            survey_id = survey_id if str(survey_id).isdigit() else self.fields['survey'].queryset[0].id
-            ea = SurveyAllocation.objects.get(survey=survey_id).interviewer.ea
-            self.fields['batch'].queryset = Batch.objects.filter(survey=survey_id)
-            self.fields['ea'].queryset = EnumerationArea.objects.filter(pk=ea.pk)
-        except:
-            pass
+        if self.data.get('survey'):
+            survey = Survey.objects.get(id=self.data['survey'])
+            self.fields['batch'].queryset = survey.batches.all()
+            self.fields['ea'].queryset = EnumerationArea.objects.filter(survey_allocations__survey=survey)
 
 
 
 class SurveyBatchFilterForm(forms.Form):
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all().order_by('name'), empty_label=None)
-    batch = forms.ModelChoiceField(queryset=Batch.objects.all().order_by('name'), empty_label=None, required=False)
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all().order_by('name'), empty_label='----')
+    batch = forms.ModelChoiceField(queryset=Batch.objects.all().order_by('name'), empty_label='----', required=False)
 
     def __init__(self, *args, **kwargs):
         super(SurveyBatchFilterForm, self).__init__(*args, **kwargs)
-        self.constrain_batch_choices_to_survey()
-
-
-    def constrain_batch_choices_to_survey(self):
-        survey_id = self.data.get('survey', None)
-        batches = Batch.objects.filter(survey__pk=survey_id)
-        if batches:
-            batches = batches.order_by('name')
-        self.fields['batch'].queryset = batches
+        if self.data.get('survey'):
+            survey = Survey.objects.get(id=self.data['survey'])
+            self.fields['batch'].queryset = survey.batches.all()

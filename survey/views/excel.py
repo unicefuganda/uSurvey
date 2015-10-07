@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from survey.forms.filters import SurveyBatchFilterForm
+from survey.forms.aggregates import InterviewerReportForm
 from survey.models import Survey, Interviewer
 from survey.models import Batch, LocationType
 from survey.services.results_download_service import ResultsDownloadService, ResultComposer
@@ -26,11 +27,9 @@ def _process_export(survey_batch_filter_form):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def download(request):
-    survey_batch_filter_form = SurveyBatchFilterForm()
-    # locations_filter = LocationsFilterForm()
-    if request.GET:
+    survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
+    if request.GET and request.GET.get('action'):
         survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
-        # locations_filter = LocationsFilterForm(data=request.GET)
         if survey_batch_filter_form.is_valid():
             if request.GET.get('action') == 'Email Spreadsheet':
                 batch = survey_batch_filter_form.cleaned_data['batch']
@@ -58,7 +57,7 @@ def _list(request):
 def completed_interviewer(request):
     batch = None
     survey = None
-    params = request.POST
+    params = request.POST or request.GET
     if contains_key(params, 'survey'):
         survey = Survey.objects.get(id=params['survey'])
     if contains_key(params, 'batch'):
@@ -76,6 +75,7 @@ def completed_interviewer(request):
 
 @permission_required('auth.can_view_aggregates')
 def interviewer_report(request):
-    surveys = Survey.objects.all()
-    batches = Batch.objects.all()
-    return render(request, 'aggregates/download_interviewer.html', {'surveys':surveys, 'batches': batches})
+    if request.GET and request.GET.get('action'):
+        return completed_interviewer(request)
+    report_form = InterviewerReportForm(request.GET)
+    return render(request, 'aggregates/download_interviewer.html', {'report_form': report_form, })
