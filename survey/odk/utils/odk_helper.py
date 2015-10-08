@@ -128,7 +128,7 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
     kwargs['registrar'] = interviewer
     kwargs['registration_channel'] = ODKAccess.choice_name()
     kwargs['survey_listing'] = survey_listing
-    if mem_attrs['isHead'] == IS_HEAD:
+    if not household.get_head()  and mem_attrs['isHead'] == IS_HEAD:
         kwargs['occupation'] = mem_attrs.get('occupation', '')
         kwargs['level_of_education'] = mem_attrs.get('levelOfEducation', '')
         resident_since = datetime.strptime(mem_attrs.get('residentSince', '1900-01-01'), '%Y-%m-%d')
