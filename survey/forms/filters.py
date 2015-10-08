@@ -72,7 +72,7 @@ class IndicatorFilterForm(forms.Form):
 
 
 class LocationFilterForm(forms.Form):
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label='----')
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all().order_by('name'), empty_label='----')
     batch = forms.ModelChoiceField(queryset=Batch.objects.none(), empty_label='----')
     location = forms.ModelChoiceField(queryset=Location.objects.all(), widget=forms.HiddenInput(), required=False)
     ea = forms.ModelChoiceField(queryset=None, widget=forms.HiddenInput(), required=False)
@@ -81,7 +81,7 @@ class LocationFilterForm(forms.Form):
         super(LocationFilterForm, self).__init__(*args, **kwargs)
         if self.data.get('survey'):
             survey = Survey.objects.get(id=self.data['survey'])
-            self.fields['batch'].queryset = survey.batches.all()
+            self.fields['batch'].queryset = survey.batches.all().order_by('name')
             self.fields['ea'].queryset = EnumerationArea.objects.filter(survey_allocations__survey=survey)
 
 
