@@ -93,7 +93,7 @@ def _get_selected_household_member(survey_tree):
     household_id = _get_nodes(HOUSEHOLD_SELECT_PATH, tree=survey_tree)[0].text
     context = template.Context({'household_id': household_id})
     hm_path = template.Template(HOUSEHOLD_MEMBER_SELECT_PATH).render(context)    
-    member_id = (_get_nodes(hm_path, tree=survey_tree)[0].text).split(HOUSEHOLD_MEMBER_ID_DELIMITER)[0]
+    member_id = (_get_nodes(hm_path, tree=survey_tree)[0].text).split(HOUSEHOLD_MEMBER_ID_DELIMITER)[1]
     return HouseholdMember.objects.get(pk=member_id)
 
 def _get_or_create_household_member(interviewer, survey, survey_tree):
