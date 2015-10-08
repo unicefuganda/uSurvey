@@ -119,6 +119,8 @@ class GroupCondition(BaseModel):
     def display_value(self):
         if self.attribute == GroupCondition.GROUP_TYPES['GENDER']:
             return 'Male' if self.value == '1' else 'Female'
+        if self.attribute == 'GENERAL':
+            return 'HEAD' if self.value == '1' else 'NOT HEAD'
         return self.value
 
     @property
@@ -130,4 +132,4 @@ class GroupCondition(BaseModel):
         unique_together = ('value', 'attribute', 'condition')
 
     def __unicode__(self):
-        return "%s %s %s" % (GroupCondition.GROUP_TYPES[self.attribute], self.condition, self.value)
+        return "%s %s %s" % (GroupCondition.GROUP_TYPES[self.attribute], self.condition, self.display_value)

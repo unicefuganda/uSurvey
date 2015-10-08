@@ -73,8 +73,8 @@ class Household(BaseModel):
     
     def get_head(self):
         try:
-            return HouseholdHead.objects.get(household=self)
-        except HouseholdHead.DoesNotExist:
+            return HouseholdHead.objects.filter(household=self)[0]
+        except IndexError:
             return None
 
     @property
@@ -108,7 +108,7 @@ class Household(BaseModel):
     @classmethod
     def all_households_in(cls, location, survey, ea=None):
         all_households = Household.objects.filter(listing__survey_houselistings__survey=survey,
-                                                  listing__ea__locations__in=location.get_descendants(include_self=True)).distinct()
+                                                  listing__ea__locations__in=location.get_leafnodes(include_self=True)).distinct()
         if ea:
             return all_households.filter(listing__ea=ea)
         return all_households
@@ -151,7 +151,11 @@ class HouseholdMember(BaseModel):
     registration_channel = models.CharField(max_length=100, choices=Household.REGISTRATION_CHANNELS)
 
     def is_head(self):
-        return False
+        try:
+            HouseholdHead.objects.get(pk=self)
+            return True
+        except HouseholdHead.DoesNotExist:
+            return False
 
     @property
     def ea(self):
@@ -228,8 +232,10 @@ class HouseholdHead(HouseholdMember):
         return True
 
     def save(self, *args, **kwargs):
-        # self.full_clean()
-        return super(HouseholdMember, self).save(*args, **kwargs)
+        if HouseholdHead.objects.filter(household=self.household).exists():
+            raise ValidationError('Head already exists')
+        else:
+            return super( HouseholdHead, self).save(*args, **kwargs)
 
     class Meta:
         app_label = 'survey'

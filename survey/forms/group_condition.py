@@ -57,9 +57,8 @@ class GroupConditionForm(ModelForm):
         if self.cleaned_data.get('condition', None) and self.cleaned_data.get('value', None):
             value = self.cleaned_data['value']
             attribute = self.cleaned_data['attribute']
-
-            if attribute == GroupCondition.GROUP_TYPES['GENERAL'] and value != 'HEAD':
-                message = "%s can only have the value: HEAD." % GroupCondition.GROUP_TYPES['GENERAL']
+            if attribute == 'GENERAL' and str(value) not in ['1', '0']:
+                message = "%s can only have the value: HEAD. or Not HEAD" % GroupCondition.GROUP_TYPES['GENERAL']
                 self._errors['value'] = self.error_class([message])
                 del self.cleaned_data['value']
             return self.cleaned_data
