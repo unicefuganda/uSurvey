@@ -8,7 +8,7 @@ from django.conf import settings
 
 
 def home(request):
-    return render(request, 'home/index.html', {'surveys': Survey.objects.all(), 
+    return render(request, 'home/index.html', {'surveys': Survey.objects.all().order_by('name'),
                                                'title': settings.PROJECT_TITLE, 
                                                'twitter_token' : settings.TWITTER_TOKEN,
                                                'twitter_url': settings.TWITTER_URL,
