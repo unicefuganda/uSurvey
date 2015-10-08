@@ -15,7 +15,11 @@ xmlns:jr="http://openrosa.org/javarosa">
        <instanceID />
        <instanceName />
      </meta>
-    <chooseExistingHousehold>0</chooseExistingHousehold>
+	{% if registered_households  %}
+    <chooseExistingHousehold>1</chooseExistingHousehold>
+	{% else %}
+	   <chooseExistingHousehold>1</chooseExistingHousehold>
+	{% endif %}
     {% if registered_households  %}
     <registeredHousehold>
         <household />
