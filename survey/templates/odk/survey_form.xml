@@ -18,7 +18,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% if registered_households  %}
     <chooseExistingHousehold>1</chooseExistingHousehold>
 	{% else %}
-	   <chooseExistingHousehold>1</chooseExistingHousehold>
+	   <chooseExistingHousehold>0</chooseExistingHousehold>
 	{% endif %}
     {% if registered_households  %}
     <registeredHousehold>
