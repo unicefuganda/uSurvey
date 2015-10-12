@@ -6,8 +6,11 @@ from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswe
 from survey.models.householdgroups import HouseholdMemberGroup
 from survey.models.access_channels import USSDAccess
 from survey.models.base import BaseModel
+from survey.models.households import Household
 from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
+from collections import OrderedDict
+
 
 class Question(BaseModel):
     ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
@@ -70,6 +73,20 @@ class Question(BaseModel):
         #these are the batch questions that do not belong to any flow in any way
         survey_questions = batch.survey_questions
         return batch.batch_questions.exclude(pk__in=[q.pk for q in survey_questions])
+
+    def hierarchical_result_for(self, location_parent, survey):
+        locations = location_parent.get_children().order_by('name')[:10]
+        answers = self.multichoiceanswer.all()
+        return self._format_answer(locations, answers, survey)
+
+    def _format_answer(self, locations, answers, survey):
+        question_options = self.options.all()
+        data = OrderedDict()
+        for location in locations:
+            households = Household.all_households_in(location, survey)
+            data[location] = {option.text: answers.filter(answer=option, household__in=households).count() for option in
+                              question_options}
+        return data
         
     
 class QuestionFlow(BaseModel):
@@ -112,7 +129,8 @@ class QuestionFlow(BaseModel):
         #         identifier = self.next_question.identifier
         #     else: identifier = ''
         #     self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", identifier)
-        return super(QuestionFlow, self).save(*args, **kwargs) 
+        return super(QuestionFlow, self).save(*args, **kwargs)
+
 
 class TestArgument(models.Model):
     objects = InheritanceManager()
