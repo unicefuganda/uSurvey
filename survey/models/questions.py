@@ -84,7 +84,7 @@ class Question(BaseModel):
         data = OrderedDict()
         for location in locations:
             households = Household.all_households_in(location, survey)
-            data[location] = {option.text: answers.filter(answer=option, household__in=households).count() for option in
+            data[location] = {option.text: answers.filter(value=option, household__in=households).count() for option in
                               question_options}
         return data
         
