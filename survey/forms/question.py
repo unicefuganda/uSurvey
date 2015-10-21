@@ -108,7 +108,7 @@ class QuestionForm(ModelForm):
                         flow, _ = QuestionFlow.objects.get_or_create(question=last_question) #incase, inline flow with no next quest already exists
                         flow.next_question=question
                         flow.save()
-                else:
+                elif batch.start_question is None:
                     batch.start_question = question
                     batch.save()
             else:
