@@ -105,10 +105,10 @@ class QuestionForm(ModelForm):
                 last_question = batch.last_question_inline()
                 if last_question:
                     if zombie is False:
-                        flow, _ = QuestionFlow.objects.get_or_create(question=last_question) #incase, inline flow with no next quest already exists
+                        flow, _ = QuestionFlow.objects.get_or_create(question=last_question, validation_test__isnull=True) #incase, inline flow with no next quest already exists
                         flow.next_question=question
                         flow.save()
-                else:
+                elif batch.start_question is None:
                     batch.start_question = question
                     batch.save()
             else:

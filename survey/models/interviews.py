@@ -168,7 +168,7 @@ class Answer(BaseModel):
 
     @classmethod
     def odk_starts_with(cls, node_path, value):
-        return "regex(%s, '^(%s).*'" % (node_path, value)
+        return "regex(%s, '^(%s).*')" % (node_path, value)
 
     @classmethod
     def ends_with(cls, answer, txt):
@@ -178,7 +178,7 @@ class Answer(BaseModel):
 
     @classmethod
     def odk_ends_with(cls, node_path, value):
-        return "regex(%s, '.*(%s)$'" % (node_path, value)
+        return "regex(%s, '.*(%s)$')" % (node_path, value)
 
     @classmethod
     def greater_than(cls, answer, value):
