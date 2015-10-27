@@ -72,14 +72,14 @@ xmlns:jr="http://openrosa.org/javarosa">
       <bind nodeset="/survey/registeredHousehold/selectedMember" type="string" 
            readonly="true()" calculate="if(selected(/survey/chooseExistingHousehold,'1'), concat({% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}''), '')" />
   {% endif %}
-  <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}int{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}string{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/dateOfBirth" type="date" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" constraint=". &lt;= today()"/>
 	<bind nodeset="/survey/household/householdMember/age" type="int" readonly="true()"
 		  calculate="int((decimal-date-time(today()) - decimal-date-time(/survey/household/householdMember/dateOfBirth)) div 365.4)"/>
-  <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0') and not(false() {% for r_household in registered_households %}{% if r_household.get_head %} or /survey/household/houseNumber = '{{r_household.house_number}}' {% endif %}{% endfor %})" />
   <bind nodeset="/survey/household/householdMember/occupation" type="string" relevant="selected(/survey/household/householdMember/isHead,'1')" />
   <bind nodeset="/survey/household/householdMember/levelOfEducation" type="select1" relevant="selected(/survey/household/householdMember/isHead,'1')" />
   <bind nodeset="/survey/household/householdMember/residentSince" type="date" relevant="selected(/survey/household/householdMember/isHead,'1')" constraint=". &gt;= /survey/household/householdMember/dateOfBirth" />
@@ -108,7 +108,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		    <select1 ref="/survey/chooseExistingHousehold">
 					<label>What do you want to do?</label>
 					<item>
-						<label>Select existing member</label>
+						<label>Select registered member</label>
 						<value>1</value>
 					</item>
 					<item>
@@ -154,8 +154,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% endif %}
     <group>
         <label>Household Member Details</label>
-			{% if not r_household.get_head %}
-        	<select1 ref="/survey/household/householdMember/isHead">
+			<select1 ref="/survey/household/householdMember/isHead">
 				<label>Is this the main respondent of this household?</label>
                 <hint>Skip if already assigned for this household</hint>
 				<item>
@@ -167,7 +166,6 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<value>0</value>
 				</item>
 			</select1>
-			{% endif %}
 		<input ref="/survey/household/householdMember/surname">
 						<label>Enter Surname</label>
 					</input>
