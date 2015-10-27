@@ -154,7 +154,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% endif %}
     <group>
         <label>Household Member Details</label>
-
+			{% if not r_household.get_head %}
         	<select1 ref="/survey/household/householdMember/isHead">
 				<label>Is this the main respondent of this household?</label>
                 <hint>Skip if already assigned for this household</hint>
@@ -167,6 +167,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<value>0</value>
 				</item>
 			</select1>
+			{% endif %}
 		<input ref="/survey/household/householdMember/surname">
 						<label>Enter Surname</label>
 					</input>
