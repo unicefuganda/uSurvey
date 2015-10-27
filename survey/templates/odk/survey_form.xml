@@ -15,12 +15,12 @@ xmlns:jr="http://openrosa.org/javarosa">
        <instanceID />
        <instanceName />
      </meta>
-	{% if registered_households  %}
+	{% if survey.has_sampling  %}
     <chooseExistingHousehold>1</chooseExistingHousehold>
 	{% else %}
 	   <chooseExistingHousehold>0</chooseExistingHousehold>
 	{% endif %}
-    {% if registered_households  %}
+    {% if survey.has_sampling  %}
     <registeredHousehold>
         <household />
         <selectedMember />
@@ -63,7 +63,7 @@ xmlns:jr="http://openrosa.org/javarosa">
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/meta/instanceName" type="string" 
            readonly="true()" calculate="concat(/survey/household/houseNumber, {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}'', ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
-   {% if registered_households %}
+   {% if survey.has_sampling %}
 	<bind nodeset="/survey/chooseExistingHousehold" type="select1"  required="true()" />
 	   <bind nodeset="/survey/registeredHousehold/household" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'1')" />
 	   {% for r_household in registered_households %}
@@ -72,7 +72,7 @@ xmlns:jr="http://openrosa.org/javarosa">
       <bind nodeset="/survey/registeredHousehold/selectedMember" type="string" 
            readonly="true()" calculate="if(selected(/survey/chooseExistingHousehold,'1'), concat({% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}''), '')" />
   {% endif %}
-  <bind nodeset="/survey/household/houseNumber" type="{%if registered_households %}select1{% else %}int{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}int{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
@@ -104,11 +104,11 @@ xmlns:jr="http://openrosa.org/javarosa">
 <h:body>
     <group>
         <label>Household details</label>
-        {% if registered_households %}
+        {% if survey.has_sampling %}
 		    <select1 ref="/survey/chooseExistingHousehold">
 					<label>What do you want to do?</label>
 					<item>
-						<label>Select member from existing household</label>
+						<label>Select existing member</label>
 						<value>1</value>
 					</item>
 					<item>
@@ -137,10 +137,21 @@ xmlns:jr="http://openrosa.org/javarosa">
 		        </select1>
 		   {% endfor %}
        {% endif %}
-
+		{% if survey.has_sampling and registered_households %}
+			<select1 ref="/survey/household/houseNumber">
+		         <label>Select Household</label>
+		         {% for r_household in registered_households %}
+				    <item>
+						<label>HH-{{r_household.house_number}}{% if r_household.get_head %}, {{r_household.get_head.surname}}{% endif %}</label>
+	               		<value>{{r_household.pk}}</value>
+		            </item>
+		         {% endfor %}
+		    </select1>
+		{% else %}
        <input ref="/survey/household/houseNumber">
 			<label>Enter household number</label>
 		</input>
+		{% endif %}
     <group>
         <label>Household Member Details</label>
 
