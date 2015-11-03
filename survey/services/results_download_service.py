@@ -65,8 +65,8 @@ class ResultsDownloadService(object):
         header = []
         for question in self.questions:
             header.append(question.identifier)
-            if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
-                header.append('')
+            # if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
+            #     header.append('')
         return header
 
     def get_summarised_answers(self):
