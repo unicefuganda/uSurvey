@@ -77,6 +77,7 @@ class ResultsDownloadService(object):
             households_in_location = all_households.filter(listing__ea__locations=location_id)
             household_location = Location.objects.get(id=location_id)
             location_ancestors = household_location.get_ancestors().values_list('name', flat=True)
+            answers = []
             for household in households_in_location:
                 for member in household.members.all():
                     member_gender = 'Male' if member.gender == HouseholdMember.MALE else 'Female'
