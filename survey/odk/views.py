@@ -71,11 +71,14 @@ def download_submission_attachment(request, submission_id):
 @permission_required('auth.can_view_aggregates')
 def submission_list(request):
     odk_submissions = ODKSubmission.objects.all()
-    search_fields = ['interviewer__name', 'interviewer__ea__name', 'survey__name', 'household_member__household__uid', 'form_id', 'instance_id']
+    search_fields = ['interviewer__name', 'interviewer__ea__name', 'survey__name',
+                     'household_member__household__house_number', 'household_member__surname',
+                     'household_member__first_name', 'form_id', 'instance_id']
     if request.GET.has_key('q'):
         odk_submissions = get_filterset(odk_submissions, request.GET['q'], search_fields)
     return render(request, 'odk/submission_list.html', { 'submissions' : odk_submissions,
-                                                 'request': request})
+                                                         'placeholder': 'interviewer, house, member, survey',
+                                                        'request': request})
 
 @http_digest_interviewer_auth
 @require_GET
