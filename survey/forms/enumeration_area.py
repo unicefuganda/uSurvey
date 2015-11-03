@@ -35,11 +35,13 @@ class LocationsFilterForm(Form):
         data = kwargs.get('data', {})
         last_selected_pk = None
         largest_unit = LocationType.largest_unit()
+        locations = Location.objects.none()
         for location_type in LocationType.objects.all():
             if location_type.parent is not None and location_type.is_leaf_node() == False:
                 kw = {'type':location_type}
                 parent_selection = data.get(location_type.parent.name, None)
-                if parent_selection or location_type == largest_unit:
+                
+                if (locations and parent_selection) or location_type == largest_unit:
                     if parent_selection:
                         last_selected_pk = parent_selection
                         kw['parent__pk'] = parent_selection
