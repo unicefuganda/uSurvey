@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm, Form
 from django.conf import settings
 from survey.models import EnumerationArea, Location, LocationType
+from django.http import QueryDict
 
 class EnumerationAreaForm(ModelForm):
     
@@ -32,6 +33,7 @@ class LocationsFilterForm(Form):
     def __init__(self, *args, **kwargs):
         include_ea = kwargs.pop('include_ea', False)
         super(LocationsFilterForm, self).__init__(*args, **kwargs)
+        self.data = self.data or QueryDict('')
         self.data._mutable = True
         data = self.data
         last_selected_pk = None
