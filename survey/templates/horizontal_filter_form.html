@@ -49,18 +49,33 @@
 {% endblock %}
 
 </form>
+    <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
 {% if not no_auto_refresh %}
     {% block auto_refresh %}
-    <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
     $(function(){
         {% for field in a_form.visible_fields %}
             $('#{{ field.auto_id }}').on('change', function () {
+                {% with a_form.visible_fields|next:forloop.counter0 as next %}
+                    $('#{{ next.auto_id }}').val('');
+                {% endwith %}
                 $('#{{ filter_id }}').submit();
             });
         {% endfor %}
         });
     </script>
     {% endblock %}
+{% else %}
+    <script type="text/javascript">
+    $(function(){
+        {% for field in a_form.visible_fields %}
+            $('#{{ field.auto_id }}').on('change', function () {
+                {% with a_form.visible_fields|next:forloop.counter0 as next %}
+                    $('#{{ next.auto_id }}').val('');
+                {% endwith %}
+            });
+        {% endfor %}
+        });
+    </script>
 {% endif %}
 <br class="clear" />

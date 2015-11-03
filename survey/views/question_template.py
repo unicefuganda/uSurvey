@@ -24,7 +24,9 @@ def index(request):
     search_fields = ['identifier', 'group__name', 'text', ]
     if request.GET.has_key('q'):
         questions = get_filterset(questions, request.GET['q'], search_fields)
-    context = {'questions': questions, 'request': request, 'question_filter_form' : question_filter_form}
+    context = {'questions': questions, 'request': request,
+               'placeholder': 'identifier, group name, text',
+               'question_filter_form' : question_filter_form}
     return render(request, 'question_templates/index.html', context)
 
 @permission_required('auth.can_view_batches')

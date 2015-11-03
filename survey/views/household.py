@@ -61,6 +61,7 @@ def list_households(request):
                    'locations_filter' : locations_filter, 
                    'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk),
                    'Largest Unit' : LocationType.largest_unit(),
+                   'placeholder': 'house no, ea, survey, interviewer',
                    'request': request})
 
 @permission_required('auth.can_view_batches')

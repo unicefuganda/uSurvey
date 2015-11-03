@@ -48,6 +48,7 @@ def index(request):
     context = {'enumeration_areas': enumeration_areas,
                'locations_filter' : locations_filter,
                'location_filter_types' : loc_types,
+               'placeholder': 'name, location name',
                'max_display_per_page': settings.MAX_DISPLAY_PER_PAGE}
     return render(request, "enumeration_area/index.html", context)
 

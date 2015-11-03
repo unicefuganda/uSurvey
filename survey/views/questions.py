@@ -34,7 +34,11 @@ def index(request, batch_id):
     max_per_page = None
     if request.method == 'GET':
         question_filter_form = QuestionFilterForm(data=request.GET, batch=batch)
-        relevant_questions = question_filter_form.filter(batch.batch_questions.all())
+        batch_questions = batch.batch_questions.all()
+        search_fields = ['identifier', 'group__name', 'text', ]
+        if request.GET.has_key('q'):
+            questions = get_filterset(batch_questions, request.GET['q'], search_fields)
+        relevant_questions = question_filter_form.filter(batch_questions)
         questions = [q for q in questions if q in relevant_questions]
         #now maintain same inline other exclusing questions in
         max_per_page = _max_number_of_question_per_page(request.GET.get('number_of_questions_per_page', 0))
@@ -49,7 +53,9 @@ def index(request, batch_id):
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
     ])
     context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page':max_per_page,
-               'question_filter_form': question_filter_form, }
+               'question_filter_form': question_filter_form,
+               'placeholder': 'identifier, group name, text',
+               }
     return render(request, 'questions/index.html', context)
 
 @permission_required('auth.can_view_batches')

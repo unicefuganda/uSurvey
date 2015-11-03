@@ -112,6 +112,7 @@ def list_interviewers(request):
                   {'interviewers': interviewers,
                    'locations_filter' : locations_filter,
                    'location_filter_types' : loc_types,
+                   'placeholder': 'name, ussd id, odk id',
                    'request': request})
 
 

@@ -25,6 +25,7 @@ def index(request):
     if request.GET.has_key('isopen'):
         surveys = surveys.filter(type=ast.literal_eval(request.GET['isopen']))
     context = {'surveys': surveys, 'request': request,
+               'placeholder': 'name, description',
                'survey_form': SurveyForm()}
     return render(request, 'surveys/index.html',
                   context)
