@@ -40,13 +40,14 @@ class LocationsFilterForm(Form):
             if location_type.parent is not None and location_type.is_leaf_node() == False:
                 kw = {'type':location_type}
                 parent_selection = data.get(location_type.parent.name, None)
-                
+
                 if (locations and parent_selection) or location_type == largest_unit:
                     if parent_selection:
                         last_selected_pk = parent_selection
                         kw['parent__pk'] = parent_selection
                     locations = Location.objects.filter(**kw)
                 else:
+                    self.data[location_type.name] = None
                     locations = Location.objects.none()
                 # choices = [(loc.pk, loc.name) for loc in locations]
                 # choices.insert(0, ('', '--- Select %s ---' % location_type.name))
