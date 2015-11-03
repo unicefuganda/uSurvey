@@ -32,7 +32,8 @@ class LocationsFilterForm(Form):
     def __init__(self, *args, **kwargs):
         include_ea = kwargs.pop('include_ea', False)
         super(LocationsFilterForm, self).__init__(*args, **kwargs)
-        data = kwargs.get('data', {})
+        self.data._mutable = True
+        data = self.data
         last_selected_pk = None
         largest_unit = LocationType.largest_unit()
         locations = Location.objects.none()
@@ -47,7 +48,7 @@ class LocationsFilterForm(Form):
                         kw['parent__pk'] = parent_selection
                     locations = Location.objects.filter(**kw)
                 else:
-                    #self.data[location_type.name] = None
+                    self.data[location_type.name] = ''
                     locations = Location.objects.none()
                 # choices = [(loc.pk, loc.name) for loc in locations]
                 # choices.insert(0, ('', '--- Select %s ---' % location_type.name))
@@ -55,10 +56,11 @@ class LocationsFilterForm(Form):
                 self.fields[location_type.name].required = False
                 self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filters chzn-select'
                 # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
+        if last_selected_pk:
+            self.last_location_selected = Location.objects.get(pk=last_selected_pk)
         if include_ea:
-            ea_location = data.get(location_type.parent.name, None)
-            if ea_location:
-                eas = EnumerationArea.objects.filter(locations__in=get_leaf_locs(loc=ea_location)).distinct()
+            if self.last_location_selected:
+                eas = EnumerationArea.objects.filter(locations__in=get_leaf_locs(loc=self.last_location_selected)).distinct()
             else:
                 eas = EnumerationArea.objects.none()
             choices = [(ea.pk, ea.name) for ea in eas]
@@ -67,8 +69,7 @@ class LocationsFilterForm(Form):
             self.fields['enumeration_area'].widget.attrs['class'] = 'location_filter chzn-select'
             # self.fields['enumeration_area'].widget.attrs['style'] = 'width: 100px;'
             self.fields['enumeration_area'].required = False
-        if last_selected_pk:
-            self.last_location_selected = Location.objects.get(pk=last_selected_pk)
+        self.data._mutable = False
 
     
     def get_locations(self):
