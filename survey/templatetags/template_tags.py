@@ -14,7 +14,7 @@ import json, inspect
 
 register = template.Library()
 
-@register.assignment_tag
+@register.filter
 def next(value, arg):
     try:
         return value[int(arg)+1]
