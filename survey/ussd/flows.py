@@ -159,12 +159,13 @@ class ListHouseholds(Task):
     @property
     def _intro_speech(self):
         if self.house_listing.total_households is None:
-            if self.ongoing_survey.has_sampling:
-                return MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
-            #just set total housholds to default listing size but dont save
-            house_listing = self.house_listing
-            house_listing.total_households = DEFAULT_LISTING_SIZE
-            self.house_listing = house_listing
+            return MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
+            # if self.ongoing_survey.has_sampling:
+            #     return MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
+            # #just set total housholds to default listing size but dont save
+            # house_listing = self.house_listing
+            # house_listing.total_households = DEFAULT_LISTING_SIZE
+            # self.house_listing = house_listing
         return RegisterHousehold(self.access).intro()
 
     def _respond(self, message):
