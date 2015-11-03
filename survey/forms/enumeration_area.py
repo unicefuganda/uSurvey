@@ -47,7 +47,7 @@ class LocationsFilterForm(Form):
                         kw['parent__pk'] = parent_selection
                     locations = Location.objects.filter(**kw)
                 else:
-                    self.data[location_type.name] = None
+                    #self.data[location_type.name] = None
                     locations = Location.objects.none()
                 # choices = [(loc.pk, loc.name) for loc in locations]
                 # choices.insert(0, ('', '--- Select %s ---' % location_type.name))
