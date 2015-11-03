@@ -41,7 +41,6 @@ class LocationsFilterForm(Form):
             if location_type.parent is not None and location_type.is_leaf_node() == False:
                 kw = {'type':location_type}
                 parent_selection = data.get(location_type.parent.name, None)
-
                 if (locations and parent_selection) or location_type == largest_unit:
                     if parent_selection:
                         last_selected_pk = parent_selection
