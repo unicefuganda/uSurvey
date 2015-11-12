@@ -33,9 +33,11 @@ class LocationsFilterForm(Form):
     def __init__(self, *args, **kwargs):
         include_ea = kwargs.pop('include_ea', False)
         super(LocationsFilterForm, self).__init__(*args, **kwargs)
-        self.data = self.data or QueryDict('')
-        self.data._mutable = True
         data = self.data
+        if not isinstance(self.data, QueryDict):
+            self.data = QueryDict('', mutable=True)
+            self.data.update(data)
+        self.data._mutable = True
         last_selected_pk = None
         largest_unit = LocationType.largest_unit()
         locations = Location.objects.none()
