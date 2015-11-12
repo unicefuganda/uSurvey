@@ -5,6 +5,175 @@
         {{ PROJECT_TITLE }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- style type="text/css">
+     #loader-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100000;
+}
+#loader {
+    display: block;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: #3498db;
+
+    -webkit-animation: spin 2s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+    animation: spin 2s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+
+    z-index: 1001;
+}
+
+    #loader:before {
+        content: "";
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        border-top-color: #e74c3c;
+
+        -webkit-animation: spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+        animation: spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+    }
+
+    #loader:after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        border-top-color: #f9c922;
+
+        -webkit-animation: spin 1.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+          animation: spin 1.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+    }
+
+    @-webkit-keyframes spin {
+        0%   {
+            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+            -ms-transform: rotate(0deg);  /* IE 9 */
+            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+        }
+        100% {
+            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+            -ms-transform: rotate(360deg);  /* IE 9 */
+            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+        }
+    }
+    @keyframes spin {
+        0%   {
+            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+            -ms-transform: rotate(0deg);  /* IE 9 */
+            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+        }
+        100% {
+            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+            -ms-transform: rotate(360deg);  /* IE 9 */
+            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+        }
+    }
+
+    #loader-wrapper .loader-section {
+        position: fixed;
+        top: 0;
+        width: 51%;
+        height: 100%;
+        background: #FFFFFF;
+        z-index: 1000;
+        -webkit-transform: translateX(0);  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: translateX(0);  /* IE 9 */
+        transform: translateX(0);  /* Firefox 16+, IE 10+, Opera */
+    }
+
+    #loader-wrapper .loader-section.section-left {
+        left: 0;
+    }
+
+    #loader-wrapper .loader-section.section-right {
+        right: 0;
+    }
+
+    /* Loaded */
+    .loaded #loader-wrapper .loader-section.section-left {
+        -webkit-transform: translateX(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
+            -ms-transform: translateX(-100%);  /* IE 9 */
+                transform: translateX(-100%);  /* Firefox 16+, IE 10+, Opera */
+
+        -webkit-transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+                transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+    }
+
+    .loaded #loader-wrapper .loader-section.section-right {
+        -webkit-transform: translateX(100%);  /* Chrome, Opera 15+, Safari 3.1+ */
+            -ms-transform: translateX(100%);  /* IE 9 */
+                transform: translateX(100%);  /* Firefox 16+, IE 10+, Opera */
+
+-webkit-transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+        transition: all 0.4s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+    }
+
+    .loaded #loader {
+        opacity: 0;
+        -webkit-transition: all 0.3s ease-out;
+                transition: all 0.3s ease-out;
+    }
+    .loaded #loader-wrapper {
+        visibility: hidden;
+
+        -webkit-transform: translateY(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
+            -ms-transform: translateY(-100%);  /* IE 9 */
+                transform: translateY(-100%);  /* Firefox 16+, IE 10+, Opera */
+
+        -webkit-transition: all 0.3s 1s ease-out;
+                transition: all 0.3s 1s ease-out;
+    }
+
+    /* JavaScript Turned Off */
+    .no-js #loader-wrapper {
+        display: none;
+    }
+
+    #contentx {
+        margin: 0 auto;
+    }
+
+
+    </style -->
+    <style type="text/css">
+
+        body {
+    background-image: url("{{ STATIC_URL }}img/uniceflogo.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+        .alert {
+            padding: 0;
+        }
+
+        .alert ul {
+            height: 10px;
+            size: 8px;
+            padding: 4px;
+        }
+        .row-fluid {
+            display: none;
+        }
+    </style>
 <link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
           charset="utf-8">
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
@@ -16,23 +185,27 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
 	<link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />  
+    <!-- link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" / -->
+	<link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />
+    <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css" />
 
     {% block extra_css %}{% endblock %}
-
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/background.cycle.js"></script>
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/smoothness/jquery-ui.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript">
-$(function(){
 
-  $('.chzn-select').chosen();
-$('.chosen-drop').css({minWidth: '100%', width: 'auto'});
-
-});
-</script>
 </head>
 <body>
+<div id="loader-wrapper">
+			<div id="loader"></div>
+
+			<div class="loader-section section-left"></div>
+            <div class="loader-section section-right"></div>
+
+		</div>
+		<div id="contentx">
 <header class="tbanner">
     <div class="navbar navbar-fixed-top">
         <div>
@@ -47,25 +220,27 @@ $('.chosen-drop').css({minWidth: '100%', width: 'auto'});
 <a class="logopad" href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}img/uSurvey.png" /></a>
 {% endif%} 
 
-                        {% if perms.auth.can_view_interviewers %}
+
 <div class="nav-collapse collapse">
                     <ul class="nav">
+                        {% if perms.auth.can_view_interviewers %}
                         <li>
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'main_page' %}">Home</a>
                         </li>
                         <li>
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
                         </li>
+
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
                                    role="button" href="#">Survey Administration<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'interviewers_page' %}">Interviewers</a>
                                     </li>
-                                    {%if perms.auth.can_view_interviewers %}
+                                    {% if perms.auth.can_enter_data %}
                                     <li role="presentation"><a href="{% url 'list_household_page' %}">Households</a>
                                     </li>
-				    {% endif %}
+                                    {% endif %}
 
                                     {% if perms.auth.can_view_batches %}
                                         <li role="presentation"><a href="{% url 'show_question_library' %}">Question
@@ -76,10 +251,14 @@ $('.chosen-drop').css({minWidth: '100%', width: 'auto'});
                                         <li role="presentation"><a href="{% url 'household_member_groups_page' %}">Groups</a>
                                         </li>
                                         <li role="presentation"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
+
                                         <!--  li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li -->
                                         <li role="presentation"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
                                     {% endif %}
+
+                                    {% if perms.auth.can_enter_data %}
                                     <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
+                                    {% endif %}
                                 </ul>
                             </li>
                         {% endif %}
@@ -90,14 +269,14 @@ $('.chosen-drop').css({minWidth: '100%', width: 'auto'});
                                    href="#">Downloads<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-downloads-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'download_excel' %}">Download
-                                        Spreadsheets</a></li>
+                                        Data Sheet</a></li>
                                     <li role="presentation"><a href="{% url 'interviewer_report_page' %}">Mobile Money
                                         Sheet</a></li>
                                 </ul>
                             </li>
                         {% endif %}
 
-                        {% if perms.auth.can_view_batches or perms.survey.view_completed_survey %}
+                        {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
                             <li class="dropdown">
                                 <a data-toggle="dropdown" id="drop-analysis-tab" class="dropdown-toggle" role="button"
                                    href="#">Analysis<b class="caret"></b></a>
@@ -107,7 +286,7 @@ $('.chosen-drop').css({minWidth: '100%', width: 'auto'});
                                     </li>
                                     <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion
                                         Rates</a></li>
- {% if perms.survey.view_completed_survey %}
+ {% if perms.auth.view_completed_survey %}
                                     <li role="presentation"><a href="{% url 'show_interviewer_completion_summary' %}">Interviewer Completion
                                         Summary</a></li>
  {% endif %}
@@ -123,8 +302,9 @@ $('.chosen-drop').css({minWidth: '100%', width: 'auto'});
                                    href="#">Settings<b class="caret"></b></a>
                                 <ul aria-labelledby="drop-settings-tab" role="menu" class="dropdown-menu">
                                     <li role="presentation"><a href="{% url 'users_index' %}">Users</a></li>
-                                    <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations
-                                        CSV</a></li>
+                                {% comment "Left to set up script" %}
+                                    <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
+                                {% endcomment %}
                                 </ul>
                             </li>
                         {% endif %}
@@ -138,8 +318,10 @@ $('.chosen-drop').css({minWidth: '100%', width: 'auto'});
                                 <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle2" role="button"
                                    href="#">{{ user.get_full_name }} <b class="caret"></b></a>
                                 <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
+                                    {% if user.is_superuser == False %}
                                     <li role="presentation"><a href="{% url 'users_edit' user.id %}" id="edit_user"><i
                                             class="icon-pencil"></i> Edit Profile</a></li>
+                                    {% endif %}
                                     <li role="presentation"><a href="{% url 'password_change' %}"><i
                                             class="icon-pencil"></i> Change Password</a></li>
                                     <li role="presentation"><a href="{% url 'logout_page' %}"><i class="icon-off"></i>
@@ -161,11 +343,10 @@ $('.chosen-drop').css({minWidth: '100%', width: 'auto'});
     </div>
 </header>
 <div class="breadnavbar">
-
-<div class="container"> 
-<a href="/home/">Home</a> &raquo;
+    <div class="container">
+<a href="{% url 'main_page' %}" style="background: 000;">Home</a> &raquo;
 {% for breadcrumb in request.breadcrumbs %} 
-<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>&raquo;
+<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
 {% endfor %}
 <span class="breadnavbarblue">{% block title %}{% endblock %}</span></div></div>
 <br />
@@ -186,7 +367,9 @@ $('.chosen-drop').css({minWidth: '100%', width: 'auto'});
     </div>
 <div id="push"></div>
 </div>
-<div class="footer">&copy; Unicef <script language="JavaScript" type="text/javascript"> 
+<br class="clear" />
+<br class="clear" />
+<div class="footer">&copy; UNICEF &amp; UBOS 2013 - <script language="JavaScript" type="text/javascript">
 
 var now = new Date();
 
@@ -202,10 +385,9 @@ document.write(" "+ now.getFullYear());
 <script src="{{ STATIC_URL }}/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/highcharts.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/exporting.js" type="text/javascript" charset="utf-8"></script>
-
 <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
-<script src="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/underscore.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/question_options.js" type="text/javascript" charset="utf-8"></script>
@@ -220,11 +402,21 @@ document.write(" "+ now.getFullYear());
 <script src="{{ STATIC_URL }}js/simple_indicator_bar_chart.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}/js/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
-
-
 {% block javascripts %}
 {% endblock %}
+<script type="text/javascript">
+     $('.datepicker').datepicker({
+     changeMonth: true,
+     changeYear: true,
+     dateFormat: 'dd-mm-yy',
+     yearRange: "-120:+nn"
+     });
+</script>
+
+            </div>
+
+	<script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+	<script src="{{ STATIC_URL }}js/main.js"></script>
 </body>
 </html>
