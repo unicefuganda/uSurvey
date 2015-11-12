@@ -1,0 +1,35 @@
+<survey id="1">
+     <meta>
+       <instanceID>657</instanceID>
+       <instanceName />
+     </meta>
+<chooseExistingHousehold>0</chooseExistingHousehold>
+ <household>
+        <houseNumber>1</houseNumber>
+		<householdMember>
+            <surname>Pet</surname>
+            <firstName>Jerry</firstName>
+            <sex>1</sex>
+            <dateOfBirth>1990-04-11</dateOfBirth>
+			<age>25</age>
+            <isHead>0</isHead>
+            <occupation />
+            <levelOfEducation />
+            <residentSince />
+        </householdMember>
+    </household>
+	
+		<b1>
+			
+				<q3>3000</q3>
+                
+			
+				<q2 />
+                
+			
+				<q1>Lawyer</q1>
+                
+			
+		</b1>
+	
+   </survey>

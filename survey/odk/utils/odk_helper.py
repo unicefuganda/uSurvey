@@ -319,6 +319,7 @@ class OpenRosaResponse(BaseOpenRosaResponse):
 <OpenRosaResponse xmlns="http://openrosa.org/http/response">
         <message nature="">%s</message>
 </OpenRosaResponse>''' % self.content
+        self['X-OpenRosa-Accept-Content-Length'] = len(self.content)
 
 
 class OpenRosaResponseNotFound(OpenRosaResponse):
