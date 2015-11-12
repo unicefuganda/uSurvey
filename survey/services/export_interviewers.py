@@ -10,10 +10,9 @@ class ExportInterviewersService:
 
     def formatted_responses(self):
         _formatted_responses = []
-        loc_types = [loc_type.name.upper() for loc_type in
+        headers = [loc_type.name.upper() for loc_type in
                                 LocationType.objects.exclude(name__iexact='country')
                                 if loc_type != LocationType.smallest_unit()]
-        headers = loc_types
         headers.extend([entry.upper() for entry in self.HEADERS])
         _formatted_responses.append(','.join(headers))
         interviewer_records = []

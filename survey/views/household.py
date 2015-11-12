@@ -142,7 +142,7 @@ def save(request, instance=None):
 
 @permission_required('auth.can_view_households')
 def download_households(request):
-    filename = 'all_interviewers'
+    filename = 'all_households'
     header_keyval = settings.HOUSEHOLD_EXPORT_HEADERS
     household_details = Household.objects.all().values(*header_keyval.values())
     headers= header_keyval.keys()
