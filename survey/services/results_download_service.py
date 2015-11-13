@@ -54,7 +54,8 @@ class ResultsDownloadService(object):
         return survey, survey_questions
 
     def set_report_headers(self):
-        header = list(LocationType.objects.exclude(name__iexact="country").values_list('name', flat=True))
+        header = [loc.name for loc in LocationType.objects.exclude(name__iexact="country")
+                  if loc is not LocationType.smallest_unit()] 
 
         other_headers = ['EA', 'Household Number', 'Name', 'Age', 'Date of Birth', 'Gender']
         header.extend(other_headers)
