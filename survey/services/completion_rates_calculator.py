@@ -72,5 +72,5 @@ class BatchSurveyCompletionRates:
             percent_completed = 0.0
             percent_completed = reduce(lambda percent_completed, rate: percent_completed + rate,
                                        map(lambda batch: BatchLocationCompletionRates(batch, location).percent_completed_households(), all_batches))
-            completion_rates_dict[location.name] = percent_completed/number_of_batches if survey.is_open_for(location) else -1
+            completion_rates_dict[location.name] = percent_completed/number_of_batches #if survey.is_open_for(location) else -1
         return completion_rates_dict
