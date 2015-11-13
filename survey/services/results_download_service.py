@@ -76,7 +76,7 @@ class ResultsDownloadService(object):
         for location_id in locations:
             households_in_location = all_households.filter(listing__ea__locations=location_id)
             household_location = Location.objects.get(id=location_id)
-            location_ancestors = household_location.get_ancestors().exclude(name__iexact='country').values_list('name', flat=True)
+            location_ancestors = household_location.get_ancestors().exclude(parent__isnull='country').values_list('name', flat=True)
             answers = []
             for household in households_in_location:
                 for member in household.members.all():
