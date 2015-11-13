@@ -55,7 +55,7 @@ class ResultsDownloadService(object):
 
     def set_report_headers(self):
         header = [loc.name for loc in LocationType.objects.exclude(name__iexact="country")
-                  if loc is not LocationType.smallest_unit()] 
+                  if not loc == LocationType.smallest_unit()]
 
         other_headers = ['EA', 'Household Number', 'Name', 'Age', 'Date of Birth', 'Gender']
         header.extend(other_headers)
