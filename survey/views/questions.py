@@ -167,7 +167,7 @@ def edit(request, question_id):
     questions = Question.objects.filter(id=question_id)
     if not questions:
         messages.error(request, "Question does not exist.")
-        return HttpResponseRedirect(reverse('batch_questions_page', args=(batch.pk, )))
+        return HttpResponseRedirect(reverse('survey_list_page'))
     question = questions[0]
     response, context = _render_question_view(request, question.batch, question)
     return response or render(request, 'questions/new.html', context)
@@ -176,18 +176,23 @@ def edit(request, question_id):
 def new(request, batch_id):
     batch = get_object_or_404(Batch, pk=batch_id)
     response, context = _render_question_view(request, batch)
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
-        (batch.name, reverse('batch_questions_page', args=(batch.pk, ))),
-    ])
     return response or render(request, 'questions/new.html', context)
 
 def _process_question_form(request, batch, response, instance=None):
     question_form = QuestionForm(batch, data=request.POST, instance=instance)
+
+    if request.POST.get('add_to_lib_button'):
+        import pdb;pdb.set_trace()
     action_str = 'edit' if instance else 'add'
     if question_form.is_valid():
-        question_form.save(**request.POST)
+        question = question_form.save(**request.POST)
+        if request.POST.has_key('add_to_lib_button'):
+            QuestionTemplate.objects.create(identifier=question.identifier,
+                                            group=question.group,
+                                            text=question.text,
+                                            answer_type=question.answer_type,
+                                            module=question.module)
+            messages.success(request, 'Question successfully %sed. to library' % action_str)
         messages.success(request, 'Question successfully %sed.' % action_str)
         response = HttpResponseRedirect(reverse('batch_questions_page', args=(batch.pk, )))
     else:
@@ -208,7 +213,6 @@ def _render_question_view(request, batch, instance=None):
 
     if request.method == 'POST':
         response, question_form = _process_question_form(request, batch, response, instance)
-
     context = {'button_label': button_label,
                'id': 'add-question-form',
                'request': request,
@@ -220,7 +224,11 @@ def _render_question_view(request, batch, instance=None):
         options = filter(lambda text: text.strip(), list(OrderedDict.fromkeys(options)))
         options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
         context['options'] = map(lambda option: re.sub("  ", ' ', option), options)
-
+    request.breadcrumbs([
+        ('Surveys', reverse('survey_list_page')),
+        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
+        (batch.name, reverse('batch_questions_page', args=(batch.pk, ))),
+    ])
     return response, context
 
 

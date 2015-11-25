@@ -46,6 +46,7 @@ class LogicForm(forms.Form):
                           and q.pk not in existing_nexts]
         next_q_choices.extend([(q.pk, q.text) for q in batch.zombie_questions()])
         self.fields['next_question'] = forms.ChoiceField(label='', choices=next_q_choices, widget=forms.Select, required=False)
+        # self.fields['next_question'].widget.attrs['class'] = 'chzn-select'
         self.fields['action'].choices = self.ACTIONS.items()
 
         action_sent = data.get('action', None) if data else None

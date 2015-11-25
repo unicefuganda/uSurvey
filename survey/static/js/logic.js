@@ -59,6 +59,7 @@ function show_or_hide_next_question(action_value) {
     show_next_question = ['SKIP_TO', 'ASK_SUBQUESTION'];
 
     var next_question_field = $('#id_next_question');
+    next_question_field.addClass('chzn-select');
 
     if (show_next_question.indexOf(action_value) != -1) {
         next_question_field.show();
@@ -77,6 +78,7 @@ function append_to_next_question_dropdown(data) {
         $('#id_next_question').append("<option value=" + data[counter]['id'] + ">(" + data[counter]['identifier'] + "!) "+ data[counter]['text'] + "</option>");
         counter++;
     });
+    $(' .chzn-select').trigger("liszt:updated");
 }
 
 function append_to_drop_down_options(url)
@@ -91,6 +93,7 @@ function replace_next_question_with_right_data(questions_url) {
     $('#id_next_question').find('option')
         .remove()
         .end()
+     $(' .chzn-select').trigger("liszt:updated");
     }
     append_to_drop_down_options(questions_url)
 }
