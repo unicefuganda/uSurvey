@@ -90,12 +90,14 @@ def show(request):
         location_filter_form = LocationFilterForm(request.POST)
         if location_filter_form.is_valid():
             batch = location_filter_form.cleaned_data.get('batch', None)
+            content['selected_batch'] = batch
             selected_location = locations_filter.last_location_selected
             selected_ea = request.POST.get('enumeration_area', None)
             if selected_ea:
                 return render_household_details(request, selected_location, selected_ea, batch)
             if selected_location:
                 high_level_locations = selected_location.get_children().order_by('name')
+                # import pdb; pdb.set_trace()
                 content['selection_location_type'] = LocationType.objects.get(parent=selected_location.type)
             else:
                 high_level_locations = __get_parent_level_locations()
