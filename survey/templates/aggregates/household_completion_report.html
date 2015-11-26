@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% load template_tags %}
+{% block title %}
+  Completion Rates
+{% endblock %}
+{% block content %}
+    <h3>Survey Completion by household {{ household.house_number }} - {{ household.get_head }}</h3>
+    {% if interviewer %}
+    <p>Interviewer: {{ interviewer.name }} (Mobile Numbers: {{ interviewer.ussd_access | display_list}} )</p>
+    {% endif %}
+    {% if completion_rates %}
+        <p>Percent Completion: {{ completion_rates.percent_completed_households }}%</p>
+    {% endif %}
+    <div id="reports-card">
+        <table class="table table-striped table-bordered table-sort">
+          <thead>
+            <tr>
+              {% for header in reports_headers %}
+                <th>{{ header }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for report in reports %}
+                <tr>
+                    {% for data in report %}
+                        <td>{{data}}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+{% endblock %}

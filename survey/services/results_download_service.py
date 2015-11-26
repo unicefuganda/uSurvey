@@ -41,10 +41,11 @@ class ResultsDownloadService(object):
     #     'id' : 'Household ID',
     #      'name' : 'Name', 'Age', 'Date of Birth', 'Gender'
     # }
-    def __init__(self, survey=None, batch=None, restrict_to=None):
+    def __init__(self, survey=None, batch=None, restrict_to=None, specific_households=None):
         self.batch = batch
         self.survey, self.questions = self._set_survey_and_questions(survey)
         self.locations = restrict_to or Location.objects.all()
+        self.specific_households = specific_households
 
     def _set_survey_and_questions(self, survey):
         if self.batch:
@@ -70,7 +71,11 @@ class ResultsDownloadService(object):
 
     def get_summarised_answers(self):
         data = []
-        all_households = Household.objects.filter(listing__survey_houselistings__survey=self.survey)
+        if self.specific_households is None:
+            all_households = Household.objects.filter(listing__survey_houselistings__survey=self.survey)
+        else:
+            all_households = Household.objects.filter(pk__in=self.specific_households,
+                                                      listing__survey_houselistings__survey=self.survey)
         locations = list(set(all_households.values_list('listing__ea__locations', flat=True)))
         for location_id in locations:
             households_in_location = all_households.filter(listing__ea__locations=location_id)

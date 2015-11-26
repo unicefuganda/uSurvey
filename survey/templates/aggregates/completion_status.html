@@ -1,3 +1,5 @@
+{% extends "layout.html" %}
+{% block extra_css %}
 
 <style type="text/css">
 	.button {
@@ -11,7 +13,7 @@
 		left:478;
 		}
 </style>
-{% extends "layout.html" %}
+{% endblock %}
 {% block title %}
     Completion Rates
 {% endblock %}
@@ -28,7 +30,7 @@
     <table class="table table-striped table-bordered table-sort">
       <thead>
         <tr>
-          <th>Location</th>
+          <th>{% if selection_location_type %}{{selection_location_type}}{% else %}Location{% endif %}</th>
           <th>Total Household</th>
           <th>% Completed</th>
         </tr>

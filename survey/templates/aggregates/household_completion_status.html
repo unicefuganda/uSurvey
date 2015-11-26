@@ -1,4 +1,11 @@
 {% extends "layout.html" %}
+{% block extra_css %}
+<style  type="text/css">
+    #reports-card {
+        overflow-x: auto;
+    }
+</style>
+{% endblock %}
 {% load template_tags %}
 {% block title %}
   Completion Rates
@@ -9,7 +16,7 @@
     <p>Interviewer: {{ interviewer.name }} (Mobile Numbers: {{ interviewer.ussd_access | display_list}} )</p>
     {% endif %}
     {% if completion_rates %}
-        <p>Percent Completion: {{ completion_rates.percent_completed_households }}</p>
+        <p>Percent Completion: {{ completion_rates.percent_completed_households }}%</p>
     {% endif %}
 
     <table class="table table-striped table-bordered table-sort">
@@ -20,6 +27,7 @@
           <th>Total number of members in Household</th>
           <th>Total Interviewed</th>
           <th>Date Completed</th>
+          <th>Actions</th>
         </tr>
       </thead>
         <tbody>
@@ -30,6 +38,7 @@
                 <td>{{ interviewed.household.members.all.count }}</td>
                 <td>{{ interviewed.number_of_member_interviewed }}</td>
                 <td>{{ interviewed.date_interviewed|default_if_none:'--' }}</td>
+                <td><a href="{% url 'house_completion_summary' interviewed.household.pk batch.pk %}">view</a></td>
             </tr>
         {% endfor %}
       </tbody>
