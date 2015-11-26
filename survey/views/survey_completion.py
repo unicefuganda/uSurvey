@@ -27,20 +27,6 @@ def is_valid(params):
     return True
 
 
-def render_household_details(request, location, ea, batch):
-    context = {'selected_ea': ea, 'batch': batch}
-    interviewer = None
-    allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
-    request.breadcrumbs([
-        ('Completion Rates', reverse('survey_completion_rates', )),
-    ])
-    if allocations.exists():
-        completion_rates = BatchLocationCompletionRates(batch, location=location, ea=ea)
-        context.update({'completion_rates': completion_rates,
-                        'interviewer' : allocations[0].interviewer})
-    return render(request, 'aggregates/household_completion_status.html', context)
-
-
 @login_required
 @permission_required('auth.can_view_aggregates')
 def survey_completion_summary(request, household_id, batch_id):
@@ -69,7 +55,6 @@ def survey_completion_summary(request, household_id, batch_id):
     ])
     return render(request, 'aggregates/household_completion_report.html', context)
 
-
 @login_required
 @permission_required('auth.can_view_aggregates')
 def ea_completion_summary(request, ea_id, batch_id):
@@ -77,6 +62,18 @@ def ea_completion_summary(request, ea_id, batch_id):
     batch = get_object_or_404(Batch, pk=batch_id)
     return render_household_details(request, ea.locations.all()[0], ea, batch)
 
+def render_household_details(request, location, ea, batch):
+    context = {'selected_ea': ea, 'batch': batch}
+    interviewer = None
+    allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
+    request.breadcrumbs([
+        ('Completion Rates', reverse('survey_completion_rates', )),
+    ])
+    if allocations.exists():
+        completion_rates = BatchLocationCompletionRates(batch, location=location, ea=ea)
+        context.update({'completion_rates': completion_rates,
+                        'interviewer' : allocations[0].interviewer})
+    return render(request, 'aggregates/household_completion_status.html', context)
 
 def __get_parent_level_locations():
     return Location.objects.filter(type=LocationType.largest_unit())

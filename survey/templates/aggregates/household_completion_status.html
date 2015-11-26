@@ -28,7 +28,7 @@
             <tr>
                 <td>{{ interviewed.household.house_number }}</td>
                 <td>{{ interviewed.household.get_head.surname.capitalize }}</td>
-                <td>{{ interviewed.household.members.all.count }}</td>
+                <td>{{ interviewed.household.members.count }}</td>
                 <td>{{ interviewed.number_of_member_interviewed }}</td>
                 <td>{{ interviewed.date_interviewed|default_if_none:'--' }}</td>
                 <td><a href="{% url 'house_completion_summary' interviewed.household.pk batch.pk %}">view</a></td>

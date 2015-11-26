@@ -134,7 +134,7 @@ class Household(BaseModel):
 
     def total_members_interviewed(self, batch):
         return HouseholdMemberBatchCompletion.objects.\
-            filter(householdmember__household=self, batch=batch).distinct().count()
+            filter(householdmember__household=self, batch=batch).values('householdmember').distinct().count()
 
 
 
