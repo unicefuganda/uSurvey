@@ -38,7 +38,7 @@
       <tbody>
       {% for completion_attributes in completion_rates.attributes %}
           <tr>
-            <td><a href="{% url 'survey_completion_rates' %}?location={{ completion_attributes.location.id }}&batch={{ selected_batch.id }}">{{ completion_attributes.location.name }}</a></td>
+            <td><a href="{% url 'location_completion_summary'  completion_attributes.location.id  selected_batch.id %}">{{ completion_attributes.location.name }}</a></td>
             <td>{{ completion_attributes.total_households }}</td>
             <td>{% if completion_attributes.total_households %}
                     {{ completion_attributes.completed_households_percent}}
