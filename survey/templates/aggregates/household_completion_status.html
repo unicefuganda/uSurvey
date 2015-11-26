@@ -4,7 +4,7 @@
   EA Summary
 {% endblock %}
 {% block content %}
-    <h3>Survey Completion by household in {{ location.name }}</h3>
+    <h3>Survey Completion by household in {{location.type.name}} {{ location.name }}</h3>
     {% if selected_ea %}
         <p><strong>Enumeration Area:</strong> {{ selected_ea.name }}</p>
     {% endif %}
