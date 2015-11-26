@@ -60,19 +60,28 @@ def survey_completion_summary(request, household_id, batch_id):
 def ea_completion_summary(request, ea_id, batch_id):
     ea = get_object_or_404(EnumerationArea, pk=ea_id)
     batch = get_object_or_404(Batch, pk=batch_id)
-    return render_household_details(request, ea.locations.all()[0], ea, batch)
+    return render_household_details(request, ea.locations.all()[0], batch, ea)
 
-def render_household_details(request, location, ea, batch):
+@login_required
+@permission_required('auth.can_view_aggregates')
+def location_completion_summary(request, location_id, batch_id):
+    location = get_object_or_404(Location, pk=location_id)
+    batch = get_object_or_404(Batch, pk=batch_id)
+    return render_household_details(request, location, batch)
+
+
+def render_household_details(request, location, batch, ea=None):
     context = {'selected_ea': ea, 'batch': batch}
-    interviewer = None
-    allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
     request.breadcrumbs([
         ('Completion Rates', reverse('survey_completion_rates', )),
     ])
-    if allocations.exists():
-        completion_rates = BatchLocationCompletionRates(batch, location=location, ea=ea)
-        context.update({'completion_rates': completion_rates,
-                        'interviewer' : allocations[0].interviewer})
+    if ea:
+        allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
+        if allocations.exists():
+            context['interviewer'] = allocations[0].interviewer
+        location = ea.locations.all()[0]
+    completion_rates = BatchLocationCompletionRates(batch, location=location, ea=ea)
+    context.update({'completion_rates' : completion_rates, 'location' : location });
     return render(request, 'aggregates/household_completion_status.html', context)
 
 def __get_parent_level_locations():
@@ -94,10 +103,9 @@ def show(request):
             selected_location = locations_filter.last_location_selected
             selected_ea = request.POST.get('enumeration_area', None)
             if selected_ea:
-                return render_household_details(request, selected_location, selected_ea, batch)
+                return render_household_details(request, selected_location, batch, selected_ea)
             if selected_location:
                 high_level_locations = selected_location.get_children().order_by('name')
-                # import pdb; pdb.set_trace()
                 content['selection_location_type'] = LocationType.objects.get(parent=selected_location.type)
             else:
                 high_level_locations = __get_parent_level_locations()

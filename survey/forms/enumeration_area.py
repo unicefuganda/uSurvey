@@ -47,7 +47,7 @@ class LocationsFilterForm(Form):
                 parent_selection = data.get(location_type.parent.name, None)
                 if (locations and parent_selection) or location_type == largest_unit:
                     if parent_selection:
-                        last_selected_pk = data.get(location_type.name, parent_selection)
+                        last_selected_pk = data.get(location_type.name, '').strip() or parent_selection
                         kw['parent__pk'] = parent_selection
                     locations = Location.objects.filter(**kw)
                 else:
