@@ -22,11 +22,14 @@ class BatchCompletionRates:
 
 
 class BatchLocationCompletionRates(BatchCompletionRates):
-    def __init__(self, batch, location=None, ea=None):
+    def __init__(self, batch, location=None, ea=None, specific_households=None):
         self.batch = batch
         self.ea = ea
         self.location = location
-        self.all_households = Household.all_households_in(self.location, batch.survey, ea)
+        if specific_households:
+            self.all_households = Household.objects.filter(pk__in=specific_households)
+        else:
+            self.all_households = Household.all_households_in(self.location, batch.survey, ea)
 
     def percent_completed_households(self):
         all_households = self.all_households

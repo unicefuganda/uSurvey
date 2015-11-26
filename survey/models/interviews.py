@@ -488,5 +488,9 @@ class AnswerAccessDefinition(BaseModel):
             return False
 
     @classmethod
+    def access_channels(cls, answer_type):
+        return set(AnswerAccessDefinition.objects.filter(answer_type=answer_type).values_list('channel', flat=True))
+
+    @classmethod
     def answer_types(cls, channel):
         return set(AnswerAccessDefinition.objects.filter(channel=channel).values_list('answer_type', flat=True))

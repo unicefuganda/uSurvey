@@ -740,3 +740,8 @@ ul
 {
 list-style-type: none;
 }
+
+.tip, .help {
+  color: #09F;
+  font-size: 10px;
+}

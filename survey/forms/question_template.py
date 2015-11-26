@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError
 import re
 from django.conf import settings
 from survey.models import QuestionTemplate, TemplateOption, Answer, QuestionModule, \
-            HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow
+            HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
 
 
 class QuestionTemplateForm(ModelForm):
@@ -13,6 +13,15 @@ class QuestionTemplateForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(QuestionTemplateForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder = ['module', 'text', 'identifier', 'group', 'answer_type']
+        instance = kwargs.get('instance', None)
+        if instance:
+            self.help_text = ' and '.join(AnswerAccessDefinition.access_channels(instance.answer_type))
+            self.fields['answer_type'].help_text = self.help_text
+        self.answer_map = {}
+        definitions = AnswerAccessDefinition.objects.all()
+        for defi in definitions:
+            self.answer_map[defi.answer_type] = self.answer_map.get(defi.answer_type, [])
+            self.answer_map[defi.answer_type].append(defi.channel)
     
     class Meta:
         model = QuestionTemplate

@@ -34,4 +34,16 @@
 
 {% block javascripts %}
     <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+    channel_map = {
+        {% for answer_type, channels in questionform.answer_map.items %}
+            '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
+        {% endfor %}
+    };
+    $('#id_answer_type').change(function(){
+        help_text = channel_map[$('#id_answer_type').val()].join(' and ');
+       // alert($('#id_answer_type_tip').val());
+       $('#id_answer_type_tip').text(help_text);
+    });
+</script>
 {% endblock %}

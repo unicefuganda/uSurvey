@@ -3,7 +3,7 @@ from django.forms import ModelForm
 import re
 from django.core.exceptions import ValidationError
 from survey.models import Question, QuestionOption, Batch, Answer, QuestionModule, \
-            HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow
+            HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
 from django.conf import settings
 
 
@@ -20,6 +20,16 @@ class QuestionForm(ModelForm):
         #depending on type of ussd/odk access of batch restrict the answer type
         self.fields['answer_type'].choices = [choice for choice in self.fields['answer_type'].choices \
                                                     if choice[0] in batch.answer_types or choice[0] == '' ]
+        if instance:
+            self.help_text = ' and '.join(AnswerAccessDefinition.access_channels(instance.answer_type))
+            self.fields['answer_type'].help_text = self.help_text
+        self.answer_map = {}
+        definitions = AnswerAccessDefinition.objects.all()
+        for defi in definitions:
+            self.answer_map[defi.answer_type] = self.answer_map.get(defi.answer_type, [])
+            self.answer_map[defi.answer_type].append(defi.channel)
+
+
         self.parent_question = parent_question
         
     class Meta:
