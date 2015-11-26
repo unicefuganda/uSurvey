@@ -1,4 +1,12 @@
 {% extends "layout.html" %}
+{% block extra_css %}
+<style  type="text/css">
+    #reports-card {
+        overflow-x: auto;
+        width: 80%;
+    }
+</style>
+{% endblock %}
 {% load template_tags %}
 {% block title %}
   Completion Rates
@@ -6,7 +14,9 @@
 {% block content %}
     <h3>Survey Completion by household {{ household.house_number }} - {{ household.get_head }}</h3>
     {% if interviewer %}
-    <p>Interviewer: {{ interviewer.name }} (Mobile Numbers: {{ interviewer.ussd_access | display_list}} )</p>
+    <p><strong>Interviewer:</strong> {{ interviewer.name }} (Mobile Numbers: {{ interviewer.ussd_access | display_list}} )</p>
+    <p><strong>Survey:</strong> {{ batch.survey.name }}</p>
+    <p><strong>Batch:</strong> {{ batch.name }}</p>
     {% endif %}
     {% if completion_rates %}
         <p>Percent Completion: {{ completion_rates.percent_completed_households }}%</p>

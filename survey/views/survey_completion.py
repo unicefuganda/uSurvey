@@ -57,7 +57,7 @@ def survey_completion_summary(request, household_id, batch_id):
         reports_headers = reports.pop(0)
         context.update({
         'household' : household,
-        'survey': survey,
+        'batch': batch,
         'reports_headers': reports_headers,
         'reports': reports,
         'completion_rates': completion_rates,
