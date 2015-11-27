@@ -83,20 +83,9 @@ thead {
 	<!--display: block;-->
 }
 
-table a:link {
-	color: #666;
-	font-weight: bold;
+table a:active, a:link, a:visited, table a:hover
+ {
 	text-decoration:none;
-}
-table a:visited {
-	color: #999999;
-	font-weight:bold;
-	text-decoration:none;
-}
-table a:active,
-table a:hover {
-	<!--color: #bd5a35;-->
-	text-decoration:underline;
 }
 
 table th {
@@ -169,6 +158,16 @@ table tr:hover td{
 		top:17px;
 		left:35;
 		}
+	.tip {
+		padding: 0;
+		text-align: center;
+		font-size: 11px;
+	}
+	table tr td a {
+		display:block;
+		height:100%;
+		width:100%;
+		}
 
 	</style>
 {% endblock %}
@@ -180,30 +179,31 @@ table tr:hover td{
     	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
     </div>
        <div id="batch_assignment" class="clear">
-		   <br />
+		<ul>
+			<li class="help tip">
+				Click on question or text to move between tables
+			</li>
+		</ul>
 <div class="batch_assignment" style="float: left;">
 
 					<table id="lib_questions_table" >
 						<thead id="lib_questions_table_head">
         <tr>
-
 			<th  colspan="2"  id="lib_title">LIBRARY QUESTIONS</th>
 		</tr>
 		<tr><th align="center" class="code">CODE</th><th align="left" class="question">TEXT</th></tr></thead>
 						 <tbody id="lib_questions_table_body">
 						{% for question in library_questions %}
 							<tr id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move" class="ms-selectable">
-								<td class="tabletrtd code">
-
-										<input type="hidden" name="identifier" value="{{question.identifier}}" />
-										<input type="hidden" name="text" value="{{question.text}}" />
-										<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
-										<input type="hidden" name="module" value="{{question.module}}" />
-										<input type="hidden" name="group" value="{{question.group}}" />
-
-									{{question.identifier}}
+								<td class="tabletrtd code"><a href="#">
+											<input type="hidden" name="identifier" value="{{question.identifier}}" />
+											<input type="hidden" name="text" value="{{question.text}}" />
+											<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
+											<input type="hidden" name="module" value="{{question.module}}" />
+											<input type="hidden" name="group" value="{{question.group}}" />
+										{{question.identifier}}</a>
 								</td>
-								<td class="tabletrtd question">{{question.text}}</td>
+								<td class="tabletrtd question"><a href="#">{{question.text}}</a></td>
 							</tr>
 						{% endfor %}
 						 </tbody>
