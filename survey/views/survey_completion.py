@@ -76,6 +76,7 @@ def render_household_details(request, location, batch, ea=None):
         ('Completion Rates', reverse('survey_completion_rates', )),
     ])
     if ea:
+        ea = get_object_or_404(EnumerationArea, pk=ea)
         allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
         if allocations.exists():
             context['interviewer'] = allocations[0].interviewer

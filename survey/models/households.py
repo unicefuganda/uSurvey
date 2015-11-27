@@ -137,7 +137,6 @@ class Household(BaseModel):
             filter(householdmember__household=self, batch=batch).values('householdmember').distinct().count()
 
 
-
 class HouseholdMember(BaseModel):
     MALE = 1
     FEMALE = 0
