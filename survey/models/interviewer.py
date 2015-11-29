@@ -67,7 +67,7 @@ class Interviewer(BaseModel):
     def locations_in_hierarchy(self):
         locs = self.ea.locations.all() #this should evaluate to country
         if locs:
-            return locs[0].get_ancestors(include_self=True).exlude(parent__isnull=True)
+            return locs[0].get_ancestors(include_self=True).exclude(parent__isnull=True)
         else:
             Location.objects.none()
 
