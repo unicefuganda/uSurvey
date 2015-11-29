@@ -23,7 +23,7 @@ class FormulaForm(ModelForm):
                 if question.module == indicator.module:
                     question_choices.append((question.id, question.text))
 
-            groups = HouseholdMemberGroup.objects.all().exclude(name='REGISTRATION GROUP')
+            groups = HouseholdMemberGroup.objects.all()
             self.fields['numerator'].choices = question_choices
             self.fields['denominator'].choices = question_choices
             self.fields['count'].choices = question_choices

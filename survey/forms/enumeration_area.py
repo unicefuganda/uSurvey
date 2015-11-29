@@ -92,17 +92,20 @@ class LocationsFilterForm(Form):
         return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct().order_by('name')
     
 def get_leaf_locs(loc=None, ea=None):
-    if not loc:
-        location = Location.objects.get(parent=None)
-    else:
-        if isinstance(loc, Location):
-            location = loc
+    if Location.objects.exists():
+        if not loc:
+            location = Location.objects.get(parent=None)
         else:
-            location = Location.objects.get(pk=loc)
-    locations = location.get_leafnodes(True)
-    if ea:
-        locations = locations.filter(enumeration_areas=ea)
-    return locations.distinct()
+            if isinstance(loc, Location):
+                location = loc
+            else:
+                location = Location.objects.get(pk=loc)
+        locations = location.get_leafnodes(True)
+        if ea:
+            locations = locations.filter(enumeration_areas=ea)
+        return locations.distinct()
+    else:
+        return Location.objects.none()
 
 # 
 #     def save(self, commit=True, **kwargs):

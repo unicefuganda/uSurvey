@@ -34,7 +34,7 @@ def new(request):
     return render(request, 'enumeration_area/new.html',
                   {'enumeration_area_form': enumeration_area_form, 'locations_filter' : locations_filter, 'title': 'New Enumeration Area', 'button_label': 'Create',
                    'action': reverse('new_enumeration_area_page', args=()), 
-                   'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk)})
+                   'location_filter_types' : LocationType.in_between()})
 
 
 @permission_required('auth.can_view_batches')
@@ -44,7 +44,7 @@ def index(request):
     search_fields = ['name', 'locations__name', ]
     if request.GET.has_key('q'):
         enumeration_areas = get_filterset(enumeration_areas, request.GET['q'], search_fields)
-    loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk,).exclude(parent__isnull=True)
+    loc_types = LocationType.in_between()
     context = {'enumeration_areas': enumeration_areas,
                'locations_filter' : locations_filter,
                'location_filter_types' : loc_types,
@@ -112,7 +112,7 @@ def edit(request, ea_id):
     return render(request, 'enumeration_area/new.html',
                   {'enumeration_area_form': enumeration_area_form, 'locations_filter' : locations_filter, 'title': 'New Enumeration Area', 'button_label': 'Create',
                    'action': reverse('edit_enumeration_area_page', args=(ea_id, )), 
-                   'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk),
+                   'location_filter_types' : LocationType.in_between(),
                    })
 
 

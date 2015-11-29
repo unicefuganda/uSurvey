@@ -148,8 +148,7 @@ urlpatterns = patterns('',
 	url(r'^odk/collect/forms/submission$', 'survey.odk.views.submission', name='odk_submit_forms'),
 	url(r'^odk/aggregate/submission_list/$', 'survey.odk.views.submission_list', name='odk_submission_list'),
 	url(r'^odk/aggregate/download_attachment/(?P<submission_id>\d+)$', 'survey.odk.views.download_submission_attachment', name='download_submission_attachment'),
-    url(r'^object_does_not_exist/$', login_required(TemplateView.as_view(template_name="empty.html")), name='empty_page'),
-    url(r'^test/', include('survey.test.urls')),
+    url(r'^object_does_not_exist/$', login_required(TemplateView.as_view(template_name="empty.html")), name='empty_page')
 )
 
 if not settings.PRODUCTION:
