@@ -38,7 +38,14 @@ class LocationType(MPTTModel, BaseModel):
             return root_node.get_children()[0]
         except cls.DoesNotExist, IndexError:
             return None
-    
+
+    @classmethod
+    def in_between(cls):
+        if cls.objects.exists():
+            return cls.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(parent__isnull=True)
+        else:
+            return cls.objects.none()
+
     
 class Location(MPTTModel, BaseModel):
     name = models.CharField(max_length=50)

@@ -17,7 +17,7 @@ class IndicatorForm(ModelForm):
             self.fields['batch'].initial = batch
         if self.data.get('survey'):
             self.fields['batch'].queryset = Batch.objects.filter(survey=self.data['survey'])
-        self.fields['module'].queryset = QuestionModule.objects.all()
+        self.fields['module'].queryset = QuestionModule.objects.order_by('name')
         self.fields['name'].label = 'Indicator'
 
 

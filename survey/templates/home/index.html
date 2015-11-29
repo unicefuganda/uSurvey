@@ -20,7 +20,6 @@
 
 {% block javascripts %}
     <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-    <!-- script src="{{ STATIC_URL }}js/maps.js" charset="utf-8"></script -->
     <script type="text/javascript">
         var map = L.map('completion_map').setView([1.34,32.683525], 7, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
     osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -44,9 +43,9 @@ function getCompletionFor(survey_id){
         $.getJSON("{{shape_file_uri}}", function (data) {
           $.each(data, function(element){
              data.features.map(function(feature){
-              var property = feature.properties['DNAME_2010'];
+              var property = feature.properties['{{loc_field}}'];
               if(property === undefined)
-                property = feature.properties['DNAME_2006'];
+                property = feature.properties['{{alt_loc_field}}'];
               feature.properties.rate = rate_data[property]
             })
           });

@@ -10,7 +10,7 @@ ADMINS = (
 )
 
 PROJECT_TITLE = 'uSurvey'
-COUNTRY = 'NIGERIA'
+COUNTRY = 'UGANDA'
 
 MANAGERS = ADMINS
 
@@ -27,21 +27,6 @@ DATABASES = {
 }
 
 '''
-CACHES = {
-    'default': {
-        'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
-        'LOCATION': 'memcached:11211',
-        'TIMEOUT': 500,
-        'BINARY': False,
-        'OPTIONS': {  # Maps to pylibmc "behaviors"
-            'tcp_nodelay': True,
-            'ketama': True
-        }
-    }
-}
-
-
-
 CACHES = {
     'default': {
     'BACKEND': 'redis_cache.RedisCache',
@@ -91,7 +76,7 @@ ALLOWED_HOSTS = []
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'Africa/Nairobi'
+TIME_ZONE = 'Africa/Kampala'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -255,9 +240,9 @@ USSD_PAGINATION = {
 }
 
 INSTALLED_BACKENDS = {
-    "HTTP": {
-        "ENGINE": "rapidsms.backends.database.DatabaseBackend",
-    },
+    # "HTTP": {
+    #     "ENGINE": "rapidsms.backends.database.DatabaseBackend",
+    # },
 }
 
 PRODUCTION = False
@@ -274,7 +259,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'usurvey.global.unicef'
 EMAIL_HOST_PASSWORD = 'usurvey.global.unicef321'
 DEFAULT_EMAIL_SENDER = 'usurvey.global.unicef@gmail.com'
-
 
 #odk settings
 TOKEN_DEFAULT_SIZE=5
@@ -310,6 +294,8 @@ DATE_FORMAT = "%d-%m-%Y"
 MOBILE_NUM_MIN_LENGTH = 9
 MOBILE_NUM_MAX_LENGTH = 9
 SHAPE_FILE_URI = '/static/map_resources/uganda_districts_2011_005.json'
+SHAPE_FILE_LOC_FIELD ='DNAME_2010'
+SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
 
 ##end USSD config ##
 # Importing server specific settings

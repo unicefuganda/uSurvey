@@ -86,7 +86,9 @@ def simple_indicator(request, indicator_id):
     if not formula:
         messages.error(request, "No formula was found in this indicator")
         return HttpResponseRedirect(reverse("list_indicator_page"))
-
+    request.breadcrumbs([
+        ('Indicator List', reverse('list_indicator_page')),
+        ])
     if locations_filter.last_location_selected:
         first_level_location_analyzed = locations_filter.last_location_selected
         selected_location = first_level_location_analyzed

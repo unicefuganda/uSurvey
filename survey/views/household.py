@@ -59,7 +59,7 @@ def list_households(request):
     return render(request, 'households/index.html',
                   {'households': households, 
                    'locations_filter' : locations_filter, 
-                   'location_filter_types' : LocationType.objects.exclude(pk=LocationType.smallest_unit().pk),
+                   'location_filter_types' : LocationType.in_between(),
                    'Largest Unit' : LocationType.largest_unit(),
                    'placeholder': 'house no, ea, survey, interviewer',
                    'request': request})

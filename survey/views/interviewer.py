@@ -69,7 +69,7 @@ def _create_or_edit(request, action_text, interviewer=None):
             return HttpResponseRedirect(redirect_url)
     else:
         interviewer_form = InterviewerForm(eas, instance=interviewer)
-    loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(name__iexact='country')
+    loc_types = LocationType.in_between()
     return response or render(request, 'interviewers/interviewer_form.html', {'country_phone_code': COUNTRY_PHONE_CODE,
                                                                   'form': interviewer_form,
                                                                   'ussd_access_form' : ussd_access_form,
@@ -107,7 +107,7 @@ def list_interviewers(request):
         interviewers = get_filterset(interviewers, request.GET['q'], search_fields)
     if params.has_key('status'):
         interviewers = interviewers.filter(is_blocked=ast.literal_eval(params['status']))
-    loc_types = LocationType.objects.exclude(pk=LocationType.smallest_unit().pk).exclude(name__iexact='country')
+    loc_types = LocationType.in_between()
     return render(request, 'interviewers/index.html',
                   {'interviewers': interviewers,
                    'locations_filter' : locations_filter,
