@@ -77,6 +77,7 @@ def render_household_details(request, location, batch, ea=None):
     ])
     if ea:
         ea = get_object_or_404(EnumerationArea, pk=ea)
+        context['selected_ea'] = ea
         allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
         if allocations.exists():
             context['interviewer'] = allocations[0].interviewer

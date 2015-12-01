@@ -184,7 +184,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 				</item>
 			</select1>
         <input ref="/survey/household/householdMember/dateOfBirth" appearance="no-calendar">
-						<label>Choose Date of Birth</label>
+					<label>, Choose Date of Birth</label>
 					</input>
         <input ref="/survey/household/householdMember/occupation">
 						<label>Enter Occupation</label>
