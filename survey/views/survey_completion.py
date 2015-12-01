@@ -71,12 +71,13 @@ def location_completion_summary(request, location_id, batch_id):
 
 
 def render_household_details(request, location, batch, ea=None):
-    context = {'selected_ea': ea, 'batch': batch}
+    context = { 'batch': batch}
     request.breadcrumbs([
         ('Completion Rates', reverse('survey_completion_rates', )),
     ])
     if ea:
         ea = get_object_or_404(EnumerationArea, pk=ea)
+        context['selected_ea'] =  ea
         allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
         if allocations.exists():
             context['interviewer'] = allocations[0].interviewer
