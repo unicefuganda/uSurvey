@@ -60,7 +60,7 @@ def survey_completion_summary(request, household_id, batch_id):
 def ea_completion_summary(request, ea_id, batch_id):
     ea = get_object_or_404(EnumerationArea, pk=ea_id)
     batch = get_object_or_404(Batch, pk=batch_id)
-    return render_household_details(request, ea.locations.all()[0], batch, ea)
+    return render_household_details(request, ea.locations.all()[0], batch, ea.pk)
 
 @login_required
 @permission_required('auth.can_view_aggregates')
@@ -71,13 +71,13 @@ def location_completion_summary(request, location_id, batch_id):
 
 
 def render_household_details(request, location, batch, ea=None):
-    context = {'selected_ea': ea, 'batch': batch}
+    context = { 'batch': batch}
     request.breadcrumbs([
         ('Completion Rates', reverse('survey_completion_rates', )),
     ])
     if ea:
         ea = get_object_or_404(EnumerationArea, pk=ea)
-        context['selected_ea'] = ea
+        context['selected_ea'] =  ea
         allocations = SurveyAllocation.objects.filter(allocation_ea=ea, survey=batch.survey)
         if allocations.exists():
             context['interviewer'] = allocations[0].interviewer
@@ -144,4 +144,5 @@ def show_interviewer_completion_summary(request):
                   {'interviewers': interviewers,
                     'locations_filter' : locations_filter,
                    'request': request})
+
 

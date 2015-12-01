@@ -12,9 +12,9 @@ One is for initial location data, the other is for the custom permissions and ot
     
     > python manage.py import_location [LOCATION_FILE_CSV]
     
-    The first line to the location csv file shall be taken as file header. 
+    The first line of the csv file shall be taken as file header. 
     
-    The file header is expected to contain names as per the Administrative structure of the current country in a comma separated format. The last entry of the header can contain EAName  
+    The file header is expected to contain names as per the Administrative division of the current country in a comma separated format. The last entry of the header can contain EAName  
     Eg. For Uganda, example headers can be **Country,DistrictName,CountyName,SubCountyName,ParishName,VillageName,EAName** 
     
     Eg. For Nigeria, example headers can be **Country,State,Local Government Area,EAName** 
@@ -35,7 +35,7 @@ One is for initial location data, the other is for the custom permissions and ot
 
 To enable uSurvey capture survey data in country map, A few settings needs to be made on the ``mics/settings.py`` file.
 
-uSurvey must be made aware of the a shape file to use. The shape file is expected to contain json data. 
+uSurvey must be made aware of the shape file to use. The shape file is expected to contain json data. 
 
 Sample data is given below:  
 ``` 
@@ -61,16 +61,11 @@ Required settings are given below:
 - SHAPE_FILE_LOC_ALT_FIELD: This is the secondary field used to indicate the corresponding Administrative area whose shape file is presented in shape file list item. This entry shall be used if **SHAPE_FILE_LOC_FIELD** is missing in any shape data list item
        
 ####Note: 
-uSurvey expects shape file for highest Administrative Area. 
-Eg. If for Nigeria, system configuration for Administrative structure is  **Country,State,Local Government Area,EAName**  
-Shape file should capture shapes for State only. Since uSurvey captures map reports based on the Highest Admin area of the country.
+uSurvey expects shape file for the primary Administrative divisions of a country. 
+Eg. If for Nigeria, system configuration for Administrative structure is  **Country,State,Local Government Area,EAName**,  Shape file should capture shapes for State only. Since uSurvey captures map reports based on the Primary Administrative division of the country.
 For Uganda, shape file would be based on Districts likewise. 
     
     
-###User Access
 
-uSurvey supports the creating of different user roles
-
-At setup, specific user roles can be created by super user on ``http://applicationbase/admin/ path``
 
 
