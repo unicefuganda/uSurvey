@@ -60,7 +60,7 @@ def survey_completion_summary(request, household_id, batch_id):
 def ea_completion_summary(request, ea_id, batch_id):
     ea = get_object_or_404(EnumerationArea, pk=ea_id)
     batch = get_object_or_404(Batch, pk=batch_id)
-    return render_household_details(request, ea.locations.all()[0], batch, ea)
+    return render_household_details(request, ea.locations.all()[0], batch, ea.pk)
 
 @login_required
 @permission_required('auth.can_view_aggregates')
