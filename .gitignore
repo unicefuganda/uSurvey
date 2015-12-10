@@ -47,5 +47,5 @@ tags
 */**/.DS_STORE
 
 #odk media submissions
-submissions
-answerFiles
+submissions/*
+answerFiles/*

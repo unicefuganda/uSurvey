@@ -40,6 +40,6 @@ def get_filterset(objectset, query_string, search_fields):
     '''
     if query_string:
         query = _get_query(query_string, search_fields)
-        return objectset.filter(query)    
+        return objectset.filter(query).distinct()
     return objectset.distinct()
 
