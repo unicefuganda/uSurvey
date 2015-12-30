@@ -239,10 +239,6 @@ LOGGING = {
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-USSD_PAGINATION = {
-    'PREVIOUS': "*",
-    'NEXT': "#"
-}
 
 INSTALLED_BACKENDS = {
     # "HTTP": {
@@ -261,9 +257,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'usurvey.global.unicef'
-EMAIL_HOST_PASSWORD = 'usurvey.global.unicef321'
-DEFAULT_EMAIL_SENDER = 'usurvey.global.unicef@gmail.com'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+DEFAULT_EMAIL_SENDER = ''
 
 #odk settings
 TOKEN_DEFAULT_SIZE=5
@@ -308,8 +304,3 @@ try:
     from localsettings import *
 except ImportError:
     pass
-# import sys
-# if not (('syncdb' in sys.argv) or ('migrate' in sys.argv) or ('harvest' in sys.argv)):
-#     from survey.models import Backend
-#     for backend in INSTALLED_BACKENDS.keys():
-#         Backend.objects.get_or_create(name=backend)

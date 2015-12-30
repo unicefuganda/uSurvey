@@ -113,9 +113,13 @@ def save(request, instance=None):
                 household.listing = survey_listing.listing
                 household.save()
                 householdform = HouseholdForm()
+                # import pdb; pdb.set_trace()
                 if headform.is_valid():
                     head = headform.save(commit=False)
                     head.household = household
+                    head.registrar = interviewer
+                    head.survey_listing = survey_listing
+                    head.registration_channel = WebAccess.choice_name()
                     head.save()
                     if household.head_desc is not head.surname:
                         household.head_desc = head.surname
