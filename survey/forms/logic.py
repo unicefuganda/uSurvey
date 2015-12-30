@@ -42,8 +42,8 @@ class LogicForm(forms.Form):
         self.fields['action'] = forms.ChoiceField(label='Then', choices=[], widget=forms.Select, required=True)
         flows = self.question.flows.all()
         existing_nexts = [f.next_question.pk for f in flows if f.next_question]
-        next_q_choices = [(q.pk, q.text) for q in batch.questions_inline() if q.pk is not self.question.pk
-                          and q.pk not in existing_nexts]
+        next_q_choices = [(q.pk, q.text) for q in batch.questions_inline() if q.pk is not self.question.pk]
+                          # and q.pk not in existing_nexts]
         next_q_choices.extend([(q.pk, q.text) for q in batch.zombie_questions()])
         self.fields['next_question'] = forms.ChoiceField(label='', choices=next_q_choices, widget=forms.Select, required=False)
         self.fields['next_question'].widget.attrs['class'] = 'chzn-select'
@@ -87,11 +87,14 @@ class LogicForm(forms.Form):
                 raise ValidationError("Invalid value.")
         return self.cleaned_data.get('max_value', '')
 
+    def _make_desc(self):
+        return '%s-%s' % (self.cleaned_data['condition'], self.ACTIONS[self.cleaned_data['action']])
+
     def clean(self):
         field_name = ""
         rule = []
-        flows = QuestionFlow.objects.filter(question=self.question)
-        # import pdb; pdb.set_trace()
+        desc = self._make_desc()
+        flows = QuestionFlow.objects.filter(question=self.question, desc=desc)
         if len(flows) > 0:
             for flow in flows:
                 if self.cleaned_data['condition'] == 'between':
@@ -110,6 +113,7 @@ class LogicForm(forms.Form):
 
     def save(self, *args, **kwargs):
         next_question = None
+        desc = self._make_desc()
         if self.cleaned_data['action'] in [self.ASK_SUBQUESTION, self.SKIP_TO]:
             next_question = Question.objects.get(pk=self.cleaned_data['next_question'])
         if self.cleaned_data['action'] == self.REANSWER:
@@ -117,10 +121,11 @@ class LogicForm(forms.Form):
         flow = QuestionFlow.objects.create(question=self.question,
                                                validation_test=self.cleaned_data['condition'],
                                                next_question=next_question,
-                                                desc=self.ACTIONS[self.cleaned_data['action']])
+                                                desc=desc)
         if self.cleaned_data['action'] == self.ASK_SUBQUESTION:
             #connect back to next inline question of the main
             QuestionFlow.objects.create(question=next_question,
+                                              desc=desc,
                                                next_question=self.batch.next_inline(self.question))
         if self.cleaned_data['condition'] == 'between':
             TextArgument.objects.create(flow=flow, position=0, param=self.cleaned_data['min_value'])

@@ -99,7 +99,7 @@ class QuestionFlow(BaseModel):
     
     class Meta:
         app_label = 'survey'        
-        unique_together = [('question', 'next_question', 'desc'),]
+        unique_together = [('question', 'next_question', 'desc', ),]
 
     @property
     def test_params(self):
