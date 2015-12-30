@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
 from survey.forms.householdMember import HouseholdMemberForm
 from survey.models.households import HouseholdMember, Household
+from survey.models import WebAccess, SurveyAllocation, SurveyHouseholdListing
 
 
 @permission_required('auth.can_view_households')
@@ -16,10 +17,15 @@ def new(request, household_id):
         breadcrumbs.append(('Household', reverse('view_household_page', args=(household_id, ))),)
         if request.method == 'POST':
             member_form = HouseholdMemberForm(data=request.POST)
-
+            interviewer = household.last_registrar
+            survey = SurveyAllocation.get_allocation(interviewer)
             if member_form.is_valid():
                 household_member = member_form.save(commit=False)
                 household_member.household = household
+                household_member.registrar = household.last_registrar
+                household_member.survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer,
+                                                                                                      survey)
+                household_member.registration_channel = WebAccess.choice_name()
                 household_member.save()
                 messages.success(request, 'Household member successfully created.')
                 return HttpResponseRedirect('/households/%s/'%(str(household_id)))
