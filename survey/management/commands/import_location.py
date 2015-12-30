@@ -45,7 +45,8 @@ class Command(BaseCommand):
                 parent, created = Location.objects.get_or_create(name=item.strip(), type=loc_type, parent=parent)
             if has_ea:
                 if parent and unicode(parent.pk) not in existing_eas:
-                    ea, created = EnumerationArea.objects.get_or_create(name=ea_name, code=parent.pk)
+                    ea, created = EnumerationArea.objects.get_or_create(name=ea_name, code='%s-%s'%(parent.pk,
+                                                                                                    ea_name))
                     ea.locations.add(parent)
         #clean up... delete locations and types having no name
         LocationType.objects.filter(name='').delete()
