@@ -13,7 +13,7 @@
 
 {% block content %}
     {% load pagination_tags %}
-    {% autopaginate questions max_question_per_page %}
+    {% autopaginate questions 200 %}
     {% load template_tags %}
 
     {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
