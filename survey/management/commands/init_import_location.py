@@ -46,18 +46,19 @@ class Command(BaseCommand):
             # self.stdout.write('loading entry... %s' % items)
             if has_ea:
                 ea_name = items.pop(-1)
+            p_key = parent.pk if parent else None
             for index, item in enumerate(items):
                 item = string.capwords(item.strip())
                 loc_type = location_types[index]
-                if (item.strip(), loc_type.name, parent) not in treated.keys():
+                if (item.strip(), loc_type.parent, p_key) in treated.keys():
+                    parent = treated[(item.strip(), loc_type.parent, p_key)]
+                else:
                     loc_parent = parent
                     parent = Location.objects.create(name=item.strip(), type=loc_type, parent=parent)
-                    treated[(item.strip(), loc_type.name, loc_parent)] = parent
-                else:
-                    parent = treated[(item.strip(), loc_type.name, parent)]
+                    treated[(item.strip(), loc_type.parent, p_key)] = parent
             if has_ea:
-                if not (parent.pk, ea_name) in treated_eas.keys():
-                    ea = EnumerationArea.objects.create(name=ea_name, code='%s-%s'%(parent.pk, ea_name))
+                if (parent.pk, ea_name) not in treated_eas.keys():
+                    ea, created = EnumerationArea.objects.get_or_create(name=ea_name, code='%s-%s'%(parent.pk, ea_name))
                     ea.locations.add(parent)
                     treated_eas[(parent.pk, ea_name)] = ea
             count = count + 1
