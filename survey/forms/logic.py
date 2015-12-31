@@ -95,7 +95,7 @@ class LogicForm(forms.Form):
         rule = []
         desc = self._make_desc()
         flows = QuestionFlow.objects.filter(question=self.question)
-        
+
         if len(flows) > 0:
             for flow in flows:
                 if self.cleaned_data['condition'] == 'between':
