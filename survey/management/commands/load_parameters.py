@@ -20,6 +20,8 @@ class Command(BaseCommand):
         Permission.objects.get_or_create(codename='can_view_households', name='Can view Households', content_type=content_type)
         Permission.objects.get_or_create(codename='can_view_locations', name='Can view Locations', content_type=content_type)
         Permission.objects.get_or_create(codename='can_view_users', name='Can view Users', content_type=content_type)
+        Permission.objects.get_or_create(codename='can_view_household_groups', name='Can view Household Groups', content_type=content_type)
+
         self.stdout.write('Permissions.')
         self.stdout.write('Creating answer definition... ')
         #ussd definition
