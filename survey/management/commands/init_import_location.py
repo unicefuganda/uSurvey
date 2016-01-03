@@ -32,8 +32,10 @@ class Command(BaseCommand):
         existing_eas = EnumerationArea.objects.all()
         existing_eas = [ea.code for ea in existing_eas]
         treated_locs = {}
+        treated_eas = {}
         total_divisions = len(location_types)
         count = 0
+        treated = {}
         for items in csv_file:
             parent = None
             if len(items) <= total_divisions:
@@ -44,14 +46,21 @@ class Command(BaseCommand):
             # self.stdout.write('loading entry... %s' % items)
             if has_ea:
                 ea_name = items.pop(-1)
+            p_key = parent.pk if parent else None
             for index, item in enumerate(items):
                 item = string.capwords(item.strip())
                 loc_type = location_types[index]
-                parent, created = Location.objects.get_or_create(name=item.strip(), type=loc_type, parent=parent)
+                if (item.strip(), loc_type.parent, p_key) in treated.keys():
+                    parent = treated[(item.strip(), loc_type.parent, p_key)]
+                else:
+                    loc_parent = parent
+                    parent = Location.objects.create(name=item.strip(), type=loc_type, parent=parent)
+                    treated[(item.strip(), loc_type.parent, p_key)] = parent
             if has_ea:
-                if parent and unicode(parent.pk) not in existing_eas:
+                if (parent.pk, ea_name) not in treated_eas.keys():
                     ea, created = EnumerationArea.objects.get_or_create(name=ea_name, code='%s-%s'%(parent.pk, ea_name))
                     ea.locations.add(parent)
+                    treated_eas[(parent.pk, ea_name)] = ea
             count = count + 1
             if not count%1000:
                 self.stdout.write('>>treating entry %s - %s' % (count, items))

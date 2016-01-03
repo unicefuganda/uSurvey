@@ -12,8 +12,6 @@
 {% endblock %}
 
 {% block content %}
-    {% load pagination_tags %}
-    {% autopaginate questions max_question_per_page %}
     {% load template_tags %}
 
     {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
@@ -177,7 +175,7 @@
     <button type="submit" class="btn btn-primary pull-right" name="save_button">Update Question Order</button>
     </form>
 {% endif %}
-    {% paginate %}
+
 {% endblock %}
 
 {% block javascripts %}
