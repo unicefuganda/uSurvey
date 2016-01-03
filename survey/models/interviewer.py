@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
 from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
 from survey.models.households import Household, SurveyHouseholdListing, HouseholdListing, RandomSelection
+from survey.utils.sms import send_sms
 from rapidsms.router import send
 
 def validate_min_date_of_birth(value):
@@ -50,7 +51,7 @@ class Interviewer(BaseModel):
     def total_households_completed(self, survey=None):
         try:
             if survey is None:
-                survey = self.assignments.get(completed=False).survey
+                survey = self.assignments.get(status=SurveyAllocation.PENDING).survey
             return HouseSurveyCompletion.objects.filter(survey=survey, interviewer=self).distinct().count()
         except:
             return 0
@@ -97,12 +98,11 @@ class Interviewer(BaseModel):
         if survey is None:
             return Household.objects.filter(listing__ea=self.ea)
         else:
-            # import pdb; pdb.set_trace()
-            # listings = HouseholdListing.objects.filter(survey_houselistings__survey=survey, ea=self.ea)
             return Household.objects.filter(listing__ea=self.ea, listing__survey_houselistings__survey=survey)
-    
+
+
     def generate_survey_households(self, survey):
-        survey_households = [h for h in self.present_households(survey) if h.members.count() > 0]
+        survey_households = list(self.present_households(survey))
         if survey.has_sampling:
             selections = RandomSelection.objects.filter(survey=survey, household__listing__ea=self.ea).distinct()
             households = [s.household for s in selections]
@@ -120,12 +120,25 @@ class Interviewer(BaseModel):
                 for household in survey_households:
                     random_selections.append(RandomSelection(household=household, survey=survey))
                 RandomSelection.objects.bulk_create(random_selections)
+                survey_households.extend(households)
             else:
                 survey_households = households
+            msg = '\n'.join(['Survey: %s'%survey, 'Households: %s'%','.join([ str(h) for h in survey_households])])
+            for access in self.ussd_access:
+                send_sms(access.user_identifier, msg)
         return sorted(survey_households, key=lambda household: household.house_number)
 
+    def survey_households(self, survey):
+        if survey.has_sampling:
+            selections = RandomSelection.objects.filter(survey=survey, household__listing__ea=self.ea).distinct()
+            households = [s.household for s in selections]
+        else:
+            households = self.present_households(survey)
+        return sorted(households, key=lambda household: household.house_number)
+
+
     def has_survey(self):
-        return self.assignments.filter(completed=False).count() > 0
+        return self.assignments.filter(status=SurveyAllocation.PENDING).count() > 0
 
     @property
     def has_access(self):
@@ -139,13 +152,22 @@ class Interviewer(BaseModel):
         # send(text, interviewers)
 
     def allocated_surveys(self):
-        return self.assignments.filter(completed=False, allocation_ea=self.ea)
+        return self.assignments.filter(status=SurveyAllocation.PENDING, allocation_ea=self.ea)
 
 class SurveyAllocation(BaseModel):
+    LISTING = 1
+    SURVEY = 2
+    PENDING = 0
+    COMPLETED = 1
+    DEALLOCATED = 2
     interviewer = models.ForeignKey(Interviewer, related_name='assignments')
     survey = models.ForeignKey('Survey', related_name='work_allocation')
     allocation_ea = models.ForeignKey('EnumerationArea', related_name='survey_allocations')
-    completed = models.BooleanField(default=False)
+    stage = models.CharField(max_length=20, choices=[(LISTING, 'LISTING'),
+                                                     (SURVEY, 'SURVEY'),],
+                             null=True, blank=True)
+    status = models.IntegerField(default=PENDING, choices=[(PENDING, 'PENDING'), (DEALLOCATED, 'DEALLOCATED'),
+                                                           (COMPLETED, 'COMPLETED')])
 
     class Meta:
         app_label = 'survey'
@@ -165,7 +187,7 @@ class SurveyAllocation(BaseModel):
     @classmethod
     def get_allocation_details(cls, interviewer):
         try:
-            return cls.objects.get(interviewer=interviewer, allocation_ea=interviewer.ea, completed=False)
+            return cls.objects.get(interviewer=interviewer, allocation_ea=interviewer.ea, status=cls.PENDING)
         except cls.DoesNotExist:
             return None
 
@@ -174,7 +196,7 @@ class SurveyAllocation(BaseModel):
         It's up to users of this class to ensure that interviewer as not been assigned to new ea from allocated one
         :return:
         '''
-        return self.completed is False and self.interviewer.ea == self.allocation_ea
+        return self.status == self.PENDING and self.interviewer.ea == self.allocation_ea
 
     def batches_enabled(self):
         if self.is_valid():

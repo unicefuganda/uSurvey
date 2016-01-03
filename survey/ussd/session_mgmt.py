@@ -10,6 +10,7 @@ from survey.models import USSDAccess
 from django.core import serializers
 from django.core.cache import cache
 from functools import wraps
+from utils import reads_from_cache, refreshes_cache, saves_to_cache, ONGOING_COMMAND_NP
 import flows
 
 def ussd_login_required(func):
@@ -22,17 +23,27 @@ def ussd_login_required(func):
 #             request_string = request.get('ussdRequestString')
             access = USSDAccess.objects.get(user_identifier=msisdn, is_active=True)
             kwargs['access'] = access
-            cache.set('/interviewer/%s/access' % access.interviewer.pk, access)
+#            cache.set('/interviewer/%s/access' % access.interviewer.pk, access)
             return func(msisdn, *args, **kwargs)
         except USSDAccess.DoesNotExist:
             return flows.MESSAGES['USER_NOT_REGISTERED']
     return _decorator
 
+class Mock(object):
+
+    def __init__(self, access):
+        self.access = access
+
+    @property
+    @reads_from_cache(store=ONGOING_COMMAND_NP)
+    def ongoing_command(self):
+        pass
+
+
 @ussd_login_required
 def manage(msisdn, trnx_id, request_string, access=None):
-    ongoing_command_name = cache.get('/interviewer/%s/ongoing' % access.interviewer.pk, None)
+    ongoing_command_name = Mock(access).ongoing_command
     if ongoing_command_name is None:
-        cache.set('/interviewer/%s/ongoing' % access.interviewer.pk, 'Start')
         return flows.Start(access).intro()
     else:
         print ongoing_command_name

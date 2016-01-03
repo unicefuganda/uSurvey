@@ -2,11 +2,11 @@ import datetime
 from django.conf import settings
 from django.db import models
 from survey.models.base import BaseModel
-# from survey.models.interviewer import Interviewer
 from model_utils.managers import InheritanceManager
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 
+DEFAULT_TOKEN = getattr(settings, 'DEFAULT_TOKEN', "12345")
 
 class InterviewerAccess(BaseModel):
     DAYS = 'D'
@@ -18,8 +18,11 @@ class InterviewerAccess(BaseModel):
     interviewer = models.ForeignKey('Interviewer', related_name='%(class)s')
     user_identifier = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True, verbose_name='Activated')
-    reponse_timeout = models.PositiveIntegerField(default=1000, help_text='Max time to wait for response before ending interview', null=True, blank=True)
-    duration = models.CharField(default=HOURS, choices=REPONSE_TIMEOUT_DURATIONS, max_length=100, null=True, blank=True)
+    reponse_timeout = models.PositiveIntegerField(default=1000,
+                                                  help_text='Max time to wait for response before ending interview',
+                                                  null=True, blank=True)
+    duration = models.CharField(default=HOURS, choices=REPONSE_TIMEOUT_DURATIONS, max_length=100,
+                                null=True, blank=True)
     
     class Meta:
         app_label = 'survey'
@@ -37,14 +40,15 @@ class InterviewerAccess(BaseModel):
         return mark_safe(name)
 
 class USSDAccess(InterviewerAccess):
-    aggregator = models.CharField(choices=settings.AGGREGATORS, max_length=100, null=True, blank=True, default=settings.DEFAULT_AGGREGATOR)
+    aggregator = models.CharField(choices=settings.AGGREGATORS, max_length=100, null=True, blank=True,
+                                  default=settings.DEFAULT_AGGREGATOR)
     
     class Meta:
         app_label = 'survey'
 
     
 class ODKAccess(InterviewerAccess):
-    odk_token = models.CharField(max_length=10, default="12345")
+    odk_token = models.CharField(max_length=10, default=DEFAULT_TOKEN)
     
     class Meta:
         app_label = 'survey'

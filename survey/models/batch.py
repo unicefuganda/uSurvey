@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Max
+from survey.models.householdgroups import HouseholdMemberGroup
 from survey.models.locations import Location
 from survey.models.surveys import Survey
 from survey.models.base import BaseModel
@@ -7,7 +8,7 @@ from survey.utils.views_helper import get_descendants
 from survey.models.questions import Question, QuestionFlow
 from survey.models.access_channels import InterviewerAccess
 # from survey.models.enumeration_area import EnumerationArea
-from survey.models.interviews import AnswerAccessDefinition
+from survey.models.interviews import AnswerAccessDefinition, Answer
 from survey.models.access_channels import ODKAccess
 from ordered_set import OrderedSet
 
@@ -136,12 +137,14 @@ def sub_questions(question, flows):
         return OrderedSet()
     return questions
 
-
-def next_inline_question(question, flows, groups=None, answer_types=[]):
+ALL_GROUPS = HouseholdMemberGroup.objects.all()
+ALL_ANSWERS = Answer.answer_types()
+def next_inline_question(question, flows, groups=ALL_GROUPS, answer_types=ALL_ANSWERS):
     try:
         qflow = flows.get(question=question, validation_test__isnull=True)
         next_question = qflow.next_question
-        if groups is None or (next_question and next_question.group in groups and next_question.answer_type in answer_types):
+        if next_question and next_question.group in groups and \
+                                      next_question.answer_type in answer_types:
             return next_question
         else:
             return next_inline_question(next_question, flows, groups=groups, answer_types=answer_types)

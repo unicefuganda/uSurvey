@@ -14,13 +14,14 @@ from survey.models.household_batch_completion import HouseSurveyCompletion, Hous
             HouseholdMemberBatchCompletion, HouseMemberSurveyCompletion
 from django.core.exceptions import ValidationError
 from django import template
+from django.db.models import Max
 
 
 class HouseholdListing(BaseModel):
     ea = models.ForeignKey("EnumerationArea", null=True, related_name="household_enumeration_area")
     list_registrar = models.ForeignKey('Interviewer', related_name='listings', verbose_name='Interviewer')
     initial_survey = models.ForeignKey('Survey', related_name='listings')
-    total_households = models.IntegerField(null=True, blank=True)
+    # total_households = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return '%s-%s' % (self.ea, self.initial_survey)
@@ -51,6 +52,8 @@ class SurveyHouseholdListing(BaseModel):
 
 
 class Household(BaseModel):
+    MALE = True
+    FEMALE = False
     REGISTRATION_CHANNELS = [(name, name) for name in InterviewerAccess.access_channels()]
     house_number = models.PositiveIntegerField(verbose_name="Household Number")
     listing = models.ForeignKey(HouseholdListing, related_name='households')
@@ -58,6 +61,7 @@ class Household(BaseModel):
     last_registrar = models.ForeignKey('Interviewer', related_name='registered_households', verbose_name='Interviewer')
     registration_channel = models.CharField(max_length=100, choices=REGISTRATION_CHANNELS)
     head_desc = models.CharField(max_length=200)
+    head_sex = models.BooleanField(default=FEMALE)
     
     class Meta:
         app_label = 'survey'
@@ -65,6 +69,12 @@ class Household(BaseModel):
     
     def __unicode__(self):
         return 'HH-%s' % self.house_number
+
+    @classmethod
+    def next_new_house(cls, listing):
+        max = cls.objects.filter(listing=listing).aggregate(Max('house_number'))
+        if not max: max = {'house_number' : 0 }
+        return max['house_number'] + 1
     
     # def clean(self):
     #     super(Household, self).clean()
@@ -225,7 +235,8 @@ class HouseholdHead(HouseholdMember):
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary',
                                           verbose_name="Highest level of education completed")
-    resident_since = models.DateField(auto_now=False, verbose_name='Since when have you lived here') #typically only month and year would be filled
+    resident_since = models.DateField(auto_now=False, verbose_name='Since when have you lived here', null=True,
+                                      blank=True) #typically only month and year would be filled
 
     def is_head(self):
         return True
@@ -238,7 +249,7 @@ class HouseholdHead(HouseholdMember):
 
     class Meta:
         app_label = 'survey'
-
+        verbose_name = 'Main Respondent'
 
 class RandomSelection(BaseModel):
     survey = models.ForeignKey('Survey', related_name='random_selections')

@@ -25,58 +25,65 @@ class Interview(BaseModel):
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
     last_question = models.ForeignKey("Question", related_name='ongoing', null=True, blank=True)
 
-    def start(self):
-        return self.batch.start_question
+    # def start(self):
+    #     return self.batch.start_question
 
     def is_closed(self):
         return self.closure_date is not None
 
+    @property
+    def has_started(self):
+        return self.last_question is not None
+
     def respond(self, reply=None, channel=ODKAccess.choice_name()):
+        '''
+            Respond to given reply for specified channel.
+            This method is volatile.Raises exception if some error happens in the process
+        :param reply:
+        :param channel:
+        :return: Returns next question if any
+        '''
         if self.is_closed():
             return
-        # import pdb; pdb.set_trace()
-        #get last question
+        if self.last_question and reply is None:
+            return self.householdmember.get_composed(self.last_question.display_text(USSDAccess.choice_name()))
         next_question = None
-        try:
-            if self.last_question is None:
-                next_question = self.batch.start_question
-            else:
-                if reply is None: #if we are not replying, simply return last question or first question
-                    next_question = self.last_question
-                else:
-                    print 'last question is ', self.last_question
-                    answer_class = Answer.get_class(self.last_question.answer_type)
-                    answer_class.create(self, self.last_question, reply)
-                    #after answering the question, lets see if it leads us anywhere
-                    next_question = self.last_question.next_question(reply)
-
-                 #confirm if next question is applicable
-                if next_question and (self.householdmember.belongs_to(next_question.group) and  \
-                                    AnswerAccessDefinition.is_valid(channel, next_question.answer_type)) is False:
-                    next_question = self.batch.next_inline(self.last_question, groups=self.householdmember.groups, channel=channel) #if not get next line question
-        except Exception, ex:
-            print 'error %s occurred', str(ex)
-            next_question = self.last_question
-            print 'but first last quest', self.last_question, ' next one: ', next_question
+        if self.has_started:
+            #save reply
+            answer_class = Answer.get_class(self.last_question.answer_type)
+            answer_class.create(self, self.last_question, reply)
+            #compute nnext
+            next_question = self.last_question.next_question(reply)
+        else:
+            next_question = self.batch.start_question
+        #now confirm the question is applicable
+        if next_question and (self.householdmember.belongs_to(next_question.group) \
+                and AnswerAccessDefinition.is_valid(channel, next_question.answer_type)) is False:
+                next_question = self.batch.next_inline(self.last_question, groups=self.householdmember.groups,
+                                                       channel=channel) #if not get next line question
+        response_text = None
         if next_question:
             self.last_question = next_question
-            print 'last question now is ', next_question
-            self.save()
             response_text = self.householdmember.get_composed(next_question.display_text(USSDAccess.choice_name()))
-            print 'response text is: ', response_text
-            return response_text
-        # #if there is nothing left to ask, just close this survey
-        # self.closure_date = datetime.now()
-        # self.save()
-        print 'nothing here mehn', next_question
+        else:
+            print 'interview batch ', self.batch.name
+            # if self.batch.name == 'Test5':
+            #     import pdb; pdb.set_trace()
+            #no more questions to ask. capture this time as closure
+            self.closure_date = datetime.now()
+        self.save()
+        return response_text
+
+
 
     # @property
     # def has_pending_questions(self):
     #     return self.last_question is not None and self.last_question.flows.filter(next_question__isnull=False).exists()
 
     @classmethod
-    def pending_batches(cls, house_member, ea, survey):
-        available_batches = ea.open_batches(survey)
+    def pending_batches(cls, house_member, ea, survey, available_batches):
+        if available_batches is None:
+            available_batches = ea.open_batches(survey)
         print 'available batches: ', available_batches
         completed_interviews = Interview.objects.filter(householdmember=house_member, batch__in=available_batches,
                                                         closure_date__isnull=False)

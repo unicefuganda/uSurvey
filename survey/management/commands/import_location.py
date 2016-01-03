@@ -32,11 +32,16 @@ class Command(BaseCommand):
         existing_eas = EnumerationArea.objects.all()
         existing_eas = [ea.code for ea in existing_eas]
         treated_locs = {}
+        total_divisions = len(location_types)
+        count = 0
         for items in csv_file:
             parent = None
-            if last_entry_empty:
-                items.pop(-1)
-            self.stdout.write('loading entry... %s' % items)
+            if len(items) <= total_divisions:
+                self.stdout.write('skiping entry... %s' % items)
+                continue
+            else:
+                items = items[:total_divisions+1]
+            # self.stdout.write('loading entry... %s' % items)
             if has_ea:
                 ea_name = items.pop(-1)
             for index, item in enumerate(items):
@@ -47,6 +52,9 @@ class Command(BaseCommand):
                 if parent and unicode(parent.pk) not in existing_eas:
                     ea, created = EnumerationArea.objects.get_or_create(name=ea_name, code=parent.pk)
                     ea.locations.add(parent)
+            count = count + 1
+            if not count%1000:
+                self.stdout.write('>>treating entry %s - %s' % (count, items))
         #clean up... delete locations and types having no name
         LocationType.objects.filter(name='').delete()
         Location.objects.filter(name='').delete()
