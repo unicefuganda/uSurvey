@@ -269,7 +269,7 @@ def is_relevant_by_group(context, question, registered_households):
        relevance_builder.append('(%s)' % ' and '.join(relevant_new))
     if relevant_existing:
         relevance_builder.append('(%s)' % ' or '.join(relevant_existing))
-    return ' or '.join(relevance_builder)
+    return '(%s)' % ' or '.join(relevance_builder)
 
     
 
