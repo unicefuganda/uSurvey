@@ -21,8 +21,9 @@ xmlns:jr="http://openrosa.org/javarosa">
         <physicalAddress />
         <headDesc />
         <headSex />
+        <listingCompleted>0</listingCompleted>
     </household>
-    <listingCompleted>0</listingCompleted>
+
    </survey>
   </instance>
 
@@ -36,7 +37,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/household/headDesc" type="string"  required="true()" />
   <bind nodeset="/survey/household/headSex" type="select1"  required="true()"  />
   <bind nodeset="/survey/household"   />
-  <bind nodeset="/survey/listingCompleted" type="select1"  required="true()"  relevant="/survey/household/houseNumber &gt;= {{survey.sample_size}}" />
+  <bind nodeset="/survey/household/listingCompleted" type="select1"  required="true()"  relevant="/survey/household/houseNumber &gt;= {{survey.sample_size}}" />
 
   </model>
 </h:head>
