@@ -67,7 +67,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 			<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}"
 				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
 				required="true()"
-				relevant="{% if interviewer.ea in batch.non_response_eas %}selected(/survey/bnr{{batch.pk}}, '0'){% else %}true(){% endif %} {{ relevance_context }}"/>
+				relevant="{% if interviewer.ea in batch.non_response_eas %}selected(/survey/bnr{{batch.pk}}, '0'){% endif %} {{ relevance_context }}"/>
         	{% if interviewer.ea in batch.non_response_eas %}
 				<bind nodeset="/survey/bnr{{batch.pk}}" type="select1" />
 	    		<bind nodeset="/survey/qnr{{batch.pk}}" type="string" relevant="selected(/survey/bnr{{batch.pk}}, '1')" required="selected(/survey/bnr{{batch.pk}}, '1')" />

@@ -204,7 +204,7 @@ def is_relevant_odk(context, question, interviewer, registered_households):
         default_relevance = 'true()'
     else:
         default_relevance = 'false()'
-    relevance_context = ' and (%s) %s' % (
+    relevance_context = ' (%s) %s' % (
                                 ' or '.join(context.get(question.pk, [default_relevance, ])),
                                 is_relevant_by_group(context, question, registered_households)
                                 )
