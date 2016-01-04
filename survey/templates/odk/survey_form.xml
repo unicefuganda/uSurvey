@@ -102,7 +102,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		</input>
 		{% endif %}
 	</group>
-	<repeat nodeset="/survey/household/householdMember" appearance="field-list">
+	<repeat nodeset="/survey/household/householdMember">
 		<label>Household Member Data</label>
 		<group>
 				<label>Household Member Details</label>
