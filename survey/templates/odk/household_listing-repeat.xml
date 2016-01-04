@@ -5,7 +5,7 @@ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 xmlns:jr="http://openrosa.org/javarosa">
 {% load template_tags %}
 <h:head>
-<h:title> 
+<h:title>
   Household Listing form
 </h:title>
   <model>
@@ -32,48 +32,51 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/meta/instanceName" type="string" 
            readonly="true()" calculate="concat('House-', /survey/household/houseNumber, ' ', /survey/household/headSex, '_', /survey/household/headDesc)" />
   <bind nodeset="/survey/household/physicalAddress" type="string"  required="true()" />
-  <bind nodeset="/survey/household/houseNumber" type="int"  readonly="true()" required="true()" calculate="count(/survey/household)"/>
+  <bind nodeset="/survey/household/houseNumber" type="int"  readonly="true()" calculate="count(/survey/household)"/>
   <bind nodeset="/survey/household/headDesc" type="string"  required="true()" />
   <bind nodeset="/survey/household/headSex" type="select1"  required="true()"  />
-  <bind nodeset="/survey/listingCompleted" type="select1"  required="true()"  />
-  <bind nodeset="/survey/household"  required="true()" relevant="selected(/survey/listingCompleted, '1')" />
+  <bind nodeset="/survey/household"   />
+  <bind nodeset="/survey/listingCompleted" type="select1"  required="true()"  relevant="/survey/household/houseNumber &gt;= {{survey.sample_size}}" />
+
   </model>
 </h:head>
-<repeat nodeset="/survey/household" appearance="field-list">
+<h:body>
     <group>
         <label>Household Details</label>
-		<input ref="/survey/household/houseNumber">
-			<label>Enter household number</label>
-		</input>
-        <input ref="/survey/household/physicalAddress">
-			<label>Enter Physical Address</label>
-		</input>
-        <input ref="/survey/household/headDesc">
-			<label>Enter name of head</label>
-		</input>
-        <select1 ref="/survey/household/headSex">
-			<label>Enter sex of head</label>
-            <item>
-                <label>Male</label>
-                <value>M</value>
-            </item>
-            <item>
-                <label>Female</label>
-                <value>F</value>
-            </item>
-		</select1>
-        <select1 ref="/survey/listingCompleted">
-			<label>Have you completed listing for {{interviewer.ea}}</label>
-            <item>
-                <label>Yes</label>
-                <value>1</value>
-            </item>
-            <item>
-                <label>No</label>
-                <value>0</value>
-            </item>
-		</select1>
+        <repeat nodeset="/survey/household" appearance="field-list">
+            <!--<input ref="/survey/household/houseNumber">-->
+                <!--<label>Enter household number</label>-->
+            <!--</input>-->
+
+            <input ref="/survey/household/physicalAddress">
+                <label>HH-<output value="/survey/household/houseNumber" />. Enter Physical Address</label>
+            </input>
+            <input ref="/survey/household/headDesc">
+                <label>HH-<output value="/survey/household/houseNumber" />.Enter name of head</label>
+            </input>
+            <select1 ref="/survey/household/headSex">
+                <label>HH-<output value="/survey/household/houseNumber" />.Enter sex of head</label>
+                <item>
+                    <label>Male</label>
+                    <value>M</value>
+                </item>
+                <item>
+                    <label>Female</label>
+                    <value>F</value>
+                </item>
+            </select1>
+            <select1 ref="/survey/listingCompleted">
+                <label>Have you completed listing for {{interviewer.ea}}</label>
+                <item>
+                    <label>Yes</label>
+                    <value>1</value>
+                </item>
+                <item>
+                    <label>No</label>
+                    <value>0</value>
+                </item>
+            </select1>
+        </repeat>
     </group>
-</repeat>
 </h:body>
 </h:html>
