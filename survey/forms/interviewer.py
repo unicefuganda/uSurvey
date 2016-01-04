@@ -112,6 +112,18 @@ class ODKAccessForm(ModelForm):
         self.fields.keyOrder=['is_active', 'user_identifier', 'odk_token', ]
 
 
+    def clean_user_identifier(self):
+        identifier = self.cleaned_data.get('user_identifier', '')
+        accesses = ODKAccess.objects.filter(user_identifier=identifier)
+        if self.instance:
+            try:
+                accesses = accesses.exclude(interviewer=self.instance.interviewer)
+            except Interviewer.DoesNotExist:
+                pass
+        if accesses.exists():
+            raise ValidationError('This ODK ID is already in use by %s' % accesses[0].interviewer.name)
+        return self.cleaned_data['user_identifier']
+
     class Meta:
         model = ODKAccess
         exclude = ['reponse_timeout', 'duration', 'interviewer']
