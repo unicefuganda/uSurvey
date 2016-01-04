@@ -33,7 +33,7 @@ from survey.interviewer_configs import MESSAGES
 def get_survey_xform(interviewer, survey):
     registered_households = interviewer.generate_survey_households(survey)
     batches = interviewer.ea.open_batches(survey)
-    return render_to_string("odk/survey_form-no-repeat.xml", {
+    return render_to_string("odk/survey_form.xml", {
         'interviewer': interviewer,
         'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
         'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
@@ -47,7 +47,7 @@ def get_household_list_xform(interviewer, survey, house_listing):
     # total_households = house_listing.households.count()
     # if total_households > 0:
     #     selectable_households = [idx+1 for idx in range(total_households)]
-    return render_to_string("odk/household_listing.xml", {
+    return render_to_string("odk/household_listing-repeat.xml", {
         'interviewer': interviewer,
         'survey' : survey,
         'educational_levels' : LEVEL_OF_EDUCATION,
@@ -90,13 +90,13 @@ def form_list(request):
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
-    # import pdb; pdb.set_trace()
     if allocation:
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
               _("survey allocation %s" % allocation.survey), {}, request)
         survey = allocation.survey
         survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
         audit = {}
+
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
               _("Requested forms list. for %s" % interviewer.name), audit, request)
         content = render_to_string("odk/xformsList.xml", {
