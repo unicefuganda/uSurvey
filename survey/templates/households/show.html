@@ -6,16 +6,16 @@
 {% load template_tags %}
     {% with household.get_head as head %}
         <h3 class="offset3">
-            {{ household.get_head.surname|capfirst }} Household Details (House {{household.house_number}})
+            {{ head.surname|capfirst }} Household Details (House {{household.house_number}})
         </h3>
         <div class="details offset1">
-            {% if household.get_head %}
+            {% if head %}
             <dl class="details offset1">
                 <dt>
                     Family Name
                 </dt>
                 <dd>
-                    {{ household.get_head.surname }}
+                    {{ head.surname }}
                 </dd>
                 <dt>
                     Other Names
@@ -59,9 +59,30 @@
                 </dd>
             </dl>
             {% else %}
-                <div class="alert alert-error" style="clear:both;">
-                <p> There is no head member registered for this household.</p>
-                </div>
+                {% if household.head_desc %}
+                    <dl class="details">
+                        <dt>
+                            Household Head
+                        </dt>
+                        <dd>
+                            {{ household.head_desc }}
+                        </dd>
+                        <dt>
+                            Sex
+                        </dt>
+                        <dd>
+                            {% if household.head_sex %}
+                                Male
+                            {% else %}
+                                Female
+                            {% endif %}
+                        </dd>
+                    </dl>
+                {% else %}
+                    <div class="alert alert-error" style="clear:both;">
+                    <p> There is no head member registered for this household.</p>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     {% endwith %}

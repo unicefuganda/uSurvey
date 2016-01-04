@@ -156,9 +156,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 				</input>
 			{% endif %}
 			{% for question in batch.survey_questions %}
+				{% get_odk_mem_question question as member_question %}
 				{% if question.answer_type == answer_types.multichoiceanswer %}
 					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
-						<label>{{question.text}}</label>
+						<label>{{member_question}}</label>
 						{% for option in question.options.all %}
 						<item>
 							<label>{{ option.text }}</label>
@@ -168,7 +169,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					</select1>
 				{% elif question.answer_type == answer_types.multiselectanswer %}
 					<select ref="/survey/b{{batch.pk}}/q{{question.pk}}">
-						<label>{{question.text}}</label>
+						<label>{{member_question}}</label>
 						{% for option in question.options.all %}
 						<item>
 							<label>{{ option.text }}</label>
@@ -178,23 +179,23 @@ xmlns:jr="http://openrosa.org/javarosa">
 					</select>
 				{% elif question.answer_type == answer_types.imageanswer %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
-						<label>{{question.text}}</label>
+						<label>{{member_question}}</label>
 					</upload>
 				{% elif question.answer_type == answer_types.audioanswer %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   mediatype="audio/*">
-						<label>{{question.text}}</label>
+						<label>{{member_question}}</label>
 					</upload>
 				{% elif question.answer_type == answer_types.videoanswer %}
 					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}" mediatype="video/*">
-						<label>{{question.text}}</label>
+						<label>{{member_question}}</label>
 					</upload>
                 {% elif question.answer_type == answer_types.dateanswer %}
 				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}" appearance="no-calendar">
-					<label>{{question.text}}</label>
+					<label>{{member_question}}</label>
 				</input>
 				{% else %}
 				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}">
-					<label>{{question.text}}</label>
+					<label>{{member_question}}</label>
 				</input>
 				{% endif %}
 

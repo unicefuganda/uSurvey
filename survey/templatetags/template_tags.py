@@ -4,7 +4,7 @@ from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
 from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
-    GroupCondition, Answer, AnswerAccessDefinition, ODKAccess
+    GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
@@ -196,6 +196,23 @@ def  get_download_url(request, url_name, instance=None):
         return request.build_absolute_uri(reverse(url_name))
     else:
         return request.build_absolute_uri(reverse(url_name, args=(instance.pk, )))
+
+@register.assignment_tag
+def  get_odk_mem_question(question):
+    surname = HouseholdMember._meta.get_field('surname')
+    first_name = HouseholdMember._meta.get_field('first_name')
+    gender = HouseholdMember._meta.get_field('gender')
+    context = {
+        surname.verbose_name.upper().replace(' ', '_') :
+                mark_safe('<output value="/survey/household/householdMember/surname"/>'),
+        first_name.verbose_name.upper().replace(' ', '_') :
+                mark_safe('<output value="/survey/household/householdMember/firstName"/>'),
+        gender.verbose_name.upper().replace(' ', '_') :
+            mark_safe('<output value="/survey/household/householdMember/sex"/>'),
+    }
+    question_context = template.Context(context)
+    return template.Template(question.text).render(question_context)
+
 
 @register.assignment_tag(takes_context=True)
 def is_relevant_odk(context, question, interviewer, registered_households):
