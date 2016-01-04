@@ -118,6 +118,7 @@ class Task(object):
         return intro_speech
 
     def respond(self, message):
+
         restart_prompt = '%s:Restart'%settings.USSD_RESTART
         response = ''
         if self.ongoing_survey:
@@ -169,8 +170,8 @@ class Start(Task):
 class ListHouseholds(Task):
     MALE = 1
     FEMALE = 2
-    REGISTER_ANOTHER = 1
-    DONT_REGISTER_ANOTHER = 2
+    DONT_REGISTER_ANOTHER = 1
+    REGISTER_ANOTHER = 2
 
     @property
     @reads_from_cache(store=LOCALS_NP)
@@ -697,6 +698,8 @@ class EndMemberSurvey(Task):
             return task.intro()
         else:
             self._household.survey_completed(self.ongoing_survey, self.interviewer)
+            for batch in self.open_batches:
+                self._household.batch_completed(batch, self.interviewer)
             task = Start(self.access)
             return task.intro()
 
