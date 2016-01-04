@@ -248,22 +248,22 @@ def is_relevant_by_group(context, question, registered_households):
     for condition in question_group.get_all_conditions():
         relevant_new.append(condition.odk_matches(attributes))
 
-    for household in registered_households:
-        for member in household.members.all():
-            if member.belongs_to(question_group):
-                relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s_%s' " % (member.household.pk, member.pk))
-            else:
-            #get next inline question... This is another flow leading to the next inline question in case current is not applicable
-                connecting_flows = question.connecting_flows.filter(validation_test__isnull=True)
-                if connecting_flows:
-                    f_question = connecting_flows[0].question
-                    next_question = f_question.batch.next_inline(f_question, groups=member.groups,
-                                                                            channel=ODKAccess.choice_name())
-                    if next_question:
-                        node_path = '/survey/b%s/q%s' % (f_question.batch.pk, f_question.pk)
-                        next_q_context = context.get(next_question.pk, ['false()', ])
-                        next_q_context.append("string-length(%s) &gt; 0" % node_path)
-                        context[next_question.pk] = next_q_context
+    # for household in registered_households:
+    #     for member in household.members.all():
+    #         if member.belongs_to(question_group):
+    #             relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s_%s' " % (member.household.pk, member.pk))
+    #         else:
+    #         #get next inline question... This is another flow leading to the next inline question in case current is not applicable
+    #             connecting_flows = question.connecting_flows.filter(validation_test__isnull=True)
+    #             if connecting_flows:
+    #                 f_question = connecting_flows[0].question
+    #                 next_question = f_question.batch.next_inline(f_question, groups=member.groups,
+    #                                                                         channel=ODKAccess.choice_name())
+    #                 if next_question:
+    #                     node_path = '/survey/b%s/q%s' % (f_question.batch.pk, f_question.pk)
+    #                     next_q_context = context.get(next_question.pk, ['false()', ])
+    #                     next_q_context.append("string-length(%s) &gt; 0" % node_path)
+    #                     context[next_question.pk] = next_q_context
     relevance_builder = ['false()', ]
     if relevant_new:
        relevance_builder.append('(%s)' % ' and '.join(relevant_new))
