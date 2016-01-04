@@ -34,7 +34,6 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/household/physicalAddress" type="string"  required="true()" />
-  <bind nodeset="/survey/" type="int"  readonly="true()" calculate="count(/survey/household)"/>
   <bind nodeset="/survey/household/headDesc" type="string"  required="true()" />
   <bind nodeset="/survey/household/headSex" type="select1"  required="true()"  />
   <bind nodeset="/survey/household"   />

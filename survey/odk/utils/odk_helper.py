@@ -219,8 +219,8 @@ def _get_form_type(survey_tree):
 
 def save_household_list(interviewer, survey, survey_tree, survey_listing):
     house_nodes = _get_nodes(HOUSEHOLD_PATH, tree=survey_tree)
-    # if len(house_nodes) < survey.sample_size:
-    #     raise ValueError('Not enough households')
+    if len(house_nodes) < survey.sample_size:
+        raise ValueError('Not enough households')
     house_number = 1
     households = []
     for node in house_nodes:
