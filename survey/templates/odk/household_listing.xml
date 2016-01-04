@@ -50,7 +50,7 @@ xmlns:jr="http://openrosa.org/javarosa">
         <input ref="/survey/household/headDesc">
 			<label>Enter name of head</label>
 		</input>
-        <input ref="/survey/household/headSex">
+        <select1 ref="/survey/household/headSex">
 			<label>Enter sex of head</label>
             <item>
                 <label>Male</label>
@@ -60,8 +60,8 @@ xmlns:jr="http://openrosa.org/javarosa">
                 <label>Female</label>
                 <value>F</value>
             </item>
-		</input>
-        <input ref="/survey/listingCompleted">
+		</select1>
+        <select1 ref="/survey/listingCompleted">
 			<label>Have you completed listing for {{interviewer.ea}}</label>
             <item>
                 <label>Yes</label>
@@ -71,7 +71,7 @@ xmlns:jr="http://openrosa.org/javarosa">
                 <label>No</label>
                 <value>0</value>
             </item>
-		</input>
+		</select1>
     </group>
 </h:body>
 </h:html>
