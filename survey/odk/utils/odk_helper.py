@@ -243,7 +243,6 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
     if _get_form_type(survey_tree) == LISTING:
         household = save_household_list(interviewer, survey_tree, survey_listing)
-        import pdb; pdb.set_trace()
         if _get_listing_completed(survey_tree):
             survey_allocation.stage = SurveyAllocation.SURVEY
             survey_allocation.save()
