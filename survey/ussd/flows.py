@@ -61,7 +61,7 @@ class Task(object):
         pass
 
     @property
-    #@reads_from_cache(store=GLOBALS_NP)
+    @reads_from_cache(store=GLOBALS_NP)
     def ongoing_survey(self):
         return self.survey_allocation.survey
 
