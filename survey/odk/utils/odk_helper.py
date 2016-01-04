@@ -48,6 +48,7 @@ ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
 HOUSE_LISTING_FORM_ID_PREFIX = 'hreg_'
 FORM_TYPE_PATH = '//survey/type'
 HOUSE_NUMBER_PATH = '//survey/household/houseNumber'
+HOUSEHOLD_PATH = '//survey/household'
 PHYSICAL_ADDR_PATH = '//survey/household/physicalAddress'
 HEAD_DESC_PATH = '//survey/household/headDesc'
 HEAD_SEX_PATH = '//survey/household/headSex'
@@ -216,17 +217,25 @@ def _get_survey(survey_tree):
 def _get_form_type(survey_tree):
     return _get_nodes(FORM_TYPE_PATH, tree=survey_tree)[0].text
 
-def save_household_list(interviewer, survey_tree, survey_listing):
-    household, _ = Household.objects.get_or_create(
-                            house_number=_get_household_house_number(survey_tree),
-                             listing=survey_listing.listing,
-                             last_registrar=interviewer,
-                             registration_channel=ODKAccess.choice_name(),
-                             physical_address=_get_household_physical_addr(survey_tree),
-                             head_desc=_get_household_head_desc(survey_tree),
-                             head_sex=_get_household_head_sex(survey_tree)
-                )
-    return household
+def save_household_list(interviewer, survey, survey_tree, survey_listing):
+    house_nodes = _get_nodes(HOUSEHOLD_PATH, tree=survey_tree)
+    # if len(house_nodes) < survey.sample_size:
+    #     raise ValueError('Not enough households')
+    house_number = 1
+    households = []
+    for node in house_nodes:
+        household, _ = Household.objects.get_or_create(
+                                house_number=house_number,
+                                 listing=survey_listing.listing,
+                                 last_registrar=interviewer,
+                                 registration_channel=ODKAccess.choice_name(),
+                                 physical_address=_get_nodes('./physicalAddress', tree=node)[0].text,
+                                 head_desc=_get_nodes('./headDesc', tree=node)[0].text,
+                                 head_sex=_get_nodes('./headSex', tree=node)[0].text,
+                    )
+        house_number = house_number + 1
+        households.append(household)
+    return households
 
 @transaction.autocommit
 def process_submission(interviewer, xml_file, media_files=[], request=None):
@@ -243,10 +252,14 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     member = None
     survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
     if _get_form_type(survey_tree) == LISTING:
-        household = save_household_list(interviewer, survey_tree, survey_listing)
-        if _get_listing_completed(survey_tree):
-            survey_allocation.stage = SurveyAllocation.SURVEY
-            survey_allocation.save()
+        households = save_household_list(interviewer, survey, survey_tree, survey_listing)
+        survey_allocation.stage = SurveyAllocation.SURVEY
+        survey_allocation.save()
+        for household in households:
+            submission = ODKSubmission.objects.create(interviewer=interviewer,
+                    survey=survey, form_id= form_id,
+                    instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
+                    xml=etree.tostring(survey_tree, pretty_print=True))
     else:
         member = _get_or_create_household_member(interviewer, survey, survey_tree)
         response_dict = _get_responses(interviewer, survey_tree, survey)
@@ -276,12 +289,12 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                 map(lambda batch: member.household.batch_completed(batch, interviewer), treated_batches.values())
                 member.household.survey_completed(survey, interviewer)
             household = member.household
-    submission = ODKSubmission.objects.create(interviewer=interviewer, 
-                survey=survey, form_id= form_id,
-                instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
-                xml=etree.tostring(survey_tree, pretty_print=True))
-    #    execute.delay(submission.save_attachments, media_files)
-    submission.save_attachments(media_files.values())
+        submission = ODKSubmission.objects.create(interviewer=interviewer,
+                    survey=survey, form_id= form_id,
+                    instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
+                    xml=etree.tostring(survey_tree, pretty_print=True))
+        #    execute.delay(submission.save_attachments, media_files)
+        submission.save_attachments(media_files.values())
     return submission
 
 def get_survey(interviewer):
