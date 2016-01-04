@@ -54,13 +54,13 @@ xmlns:jr="http://openrosa.org/javarosa">
             <!--</input>-->
             {% endcomment %}
             <input ref="/survey/household/physicalAddress">
-                <label>HH-<output value="/survey/houseCount" />. Enter Physical Address</label>
+                <label>Enter Physical Address</label>
             </input>
             <input ref="/survey/household/headDesc">
-                <label>HH-<output value="/survey/houseCount" />.Enter name of head</label>
+                <label>Enter name of head</label>
             </input>
             <select1 ref="/survey/household/headSex">
-                <label>HH-<output value="/survey/houseCount" />.Enter sex of head</label>
+                <label>Enter sex of head</label>
                 <item>
                     <label>Male</label>
                     <value>M</value>
