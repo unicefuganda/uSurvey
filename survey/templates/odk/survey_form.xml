@@ -57,9 +57,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 {% endif %}
   <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" />
   <bind nodeset="/survey/household/householdMember/age" type="int" required="true()" constraint=". &gt;= 0"/>
-  <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="string-length(/survey/household/householdMember/isHead) = 0"/>
-  <bind nodeset="/survey/household/householdMember/headMember" type="select1" required="true()"
-		  calculate="if(selected(/survey/household/householdMember/isHead,'1'), concat(/survey/household/householdMember/surname, /survey/household/householdMember/firstName), '')"/>
+  <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="false()" />
+  <!--<bind nodeset="/survey/household/householdMember/headMember" type="select1" required="true()"-->
+		  <!--calculate="if(selected(/survey/household/householdMember/isHead,'1'), concat(/survey/household/householdMember/surname, /survey/household/householdMember/firstName), '')"/>-->
 
 
 	{% for batch in survey_batches  %}
