@@ -66,7 +66,7 @@ xmlns:jr="http://openrosa.org/javarosa">
                     <value>F</value>
                 </item>
             </select1>
-            <select1 ref="/survey/listingCompleted">
+            <select1 ref="/survey/household/listingCompleted">
                 <label>Have you completed listing for {{interviewer.ea}}</label>
                 <item>
                     <label>Yes</label>
