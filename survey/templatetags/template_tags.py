@@ -209,7 +209,7 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                                 is_relevant_by_group(context, question, registered_households)
                                 )
     flows = question.flows.all()
-    node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
+    node_path = '/survey/household/b%s/q%s' % (batch.pk, question.pk)
     flow_conditions = []
     if flows:
         for flow in flows:
@@ -260,7 +260,7 @@ def is_relevant_by_group(context, question, registered_households):
                     next_question = f_question.batch.next_inline(f_question, groups=member.groups,
                                                                             channel=ODKAccess.choice_name())
                     if next_question:
-                        node_path = '/survey/b%s/q%s' % (f_question.batch.pk, f_question.pk)
+                        node_path = '/survey/household/b%s/q%s' % (f_question.batch.pk, f_question.pk)
                         next_q_context = context.get(next_question.pk, ['false()', ])
                         next_q_context.append("string-length(%s) &gt; 0" % node_path)
                         context[next_question.pk] = next_q_context
