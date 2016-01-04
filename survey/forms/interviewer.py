@@ -17,7 +17,9 @@ class InterviewerForm(ModelForm):
         self.fields.keyOrder=['name', 'gender', 'date_of_birth', 'level_of_education', 'language',  'ea', 'survey']
         if self.instance:
             try:
-                self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance, completed=False)[0].survey.pk
+                self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance,
+                                                                    status__in=[SurveyAllocation.PENDING,
+                                                                            SurveyAllocation.COMPLETED])[0].survey.pk
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas
@@ -38,7 +40,8 @@ class InterviewerForm(ModelForm):
         survey = self.cleaned_data['survey']
         if survey:
             #check if this has already been allocated to someone else
-            allocs = SurveyAllocation.objects.filter(survey=survey, completed=False,
+            allocs = SurveyAllocation.objects.filter(survey=survey, status__in=[SurveyAllocation.PENDING,
+                                                                                SurveyAllocation.COMPLETED],
                                                interviewer__ea=ea,
                                                allocation_ea=ea)
             if self.instance and self.instance.pk:
@@ -61,7 +64,7 @@ class InterviewerForm(ModelForm):
             survey = self.cleaned_data['survey']
             if survey:
                 ea = self.cleaned_data['ea']
-                interviewer.assignments.update(completed=True)
+                interviewer.assignments.update(status=SurveyAllocation.DEALLOCATED)
                 SurveyAllocation.objects.create(survey=survey,
                                                    interviewer=interviewer,
                                                    allocation_ea=ea)

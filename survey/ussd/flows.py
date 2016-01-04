@@ -15,6 +15,10 @@ from collections import OrderedDict
 import calendar
 from datetime import time, date, datetime
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
+from dateutil.relativedelta import relativedelta
+from utils import *
+from django.db.models import Max
 #USSD_PREVIOUS, USSD_NEXT, USSD_ITEMS_PER_PAGE
 
 #from django.core.exceptions import ObjectDoesNotExist
@@ -23,77 +27,85 @@ DEFAULT_LISTING_SIZE = 1000
 class InvalidSelection(ValidationError):
     pass
 
+# def refresh_cache(cls, sender, instance, created, **kwargs):
+#     #refresh cache every time some database update happens
+#     pass
+#
+# post_save.connect(refresh_cache, sender=Household)
+
+INVALID_INPUT = 'Invalid Input'
+ERROR = 'Error'
+
 
 class Task(object):
     context = template.Context()
-    
-    def _set_global(self, name, val):
-        return cache.set('%s/%s' % (self.GLOBALS_SPACE, name), val)
-    
-    def _retrieve_global(self, name, fallback=None):
-        return cache.get('%s/%s' % (self.GLOBALS_SPACE, name), fallback)
 
     @property
+    @reads_from_cache(store=GLOBALS_NP)
+    def survey_listing(self):
+        return SurveyHouseholdListing.get_or_create_survey_listing(self.interviewer, self.ongoing_survey)
+
+    @property
+    @reads_from_cache(store=GLOBALS_NP)
     def house_listing(self):
-        house_listing = self._retrieve_global('house_listing', None)
-        if house_listing is None:
-            survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(self.interviewer, self.ongoing_survey)
-            if survey_listing:
-                house_listing = survey_listing.listing
-                self._set_global('house_listing', house_listing)
-        return house_listing
-
-    @house_listing.setter
-    def house_listing(self, listing):
-        self._set_global('house_listing', listing)
+        return self.survey_listing.listing
 
     @property
+    @reads_from_cache(store=GLOBALS_NP)
     def survey_allocation(self):
-        allocation = self._retrieve_global('survey_allocation', None)
-        if allocation is None:
-            try:
-                allocation = SurveyAllocation.get_allocation_details(self.interviewer)
-                self._set_global('survey_allocation', allocation)
-            except SurveyAllocation.DoesNotExist:
-                pass
-        return allocation
-    
+        return SurveyAllocation.get_allocation_details(self.interviewer)
+
+    @survey_allocation.setter
+    @saves_to_cache(store=GLOBALS_NP)
+    def survey_allocation(self, survey_allocation):
+        pass
+
     @property
+    #@reads_from_cache(store=GLOBALS_NP)
     def ongoing_survey(self):
-        allocation = self.survey_allocation
-        if allocation:
-            return allocation.survey
-    
+        return self.survey_allocation.survey
+
     @property
+    @reads_from_cache(store=GLOBALS_NP)
     def enumeration_area(self):
-        ea = self._retrieve_global('enumeration_area', None)
-        if ea is None:
-            ea = self.interviewer.ea
-            self._set_global('enumeration_area', ea)
-        return ea
+        return self.survey_allocation.allocation_ea
+
+    @property
+    @reads_from_cache(store=GLOBALS_NP)
+    def open_batches(self):
+        return self.enumeration_area.open_batches(self.ongoing_survey)
         
     @property
     def registered_households(self):
         return self.interviewer.present_households(survey=self.ongoing_survey)
+
+    @property
+    @reads_from_cache(store=ONGOING_COMMAND_NP)
+    def ongoing_command(self):
+        pass
+
+    @ongoing_command.setter
+    @refreshes_cache(store=LOCALS_NP)
+    @saves_to_cache(store=ONGOING_COMMAND_NP)
+    def ongoing_command(self, command):
+        pass
     
     @property
+    @reads_from_cache(store=GLOBALS_NP)
     def survey_households(self):
-        return self.interviewer.generate_survey_households(self.ongoing_survey)
+        if self.survey_allocation.stage == SurveyAllocation.SURVEY:
+            return self.interviewer.survey_households(self.ongoing_survey)
         
     def __init__(self, ussd_access):
         self.access = ussd_access
         interviewer = ussd_access.interviewer
-        self.VARIABLE_SPACE = '/interviewer/%s/locals'%interviewer.pk
-        self.GLOBALS_SPACE = '/interviewer/%s/globals'%interviewer.pk
-        self.EXEC_SPACE = '/interviewer/%s/ongoing'%interviewer.pk
-        if not cache.get(self.EXEC_SPACE) == type(self).__name__:
-            print cache.get(self.EXEC_SPACE), ' is now cleaning up variable space', type(self).__name__
-            cache.delete_pattern('%s*'%self.VARIABLE_SPACE) #refresh local variables space
-            cache.set(self.EXEC_SPACE, type(self).__name__) #claim execution space
         self.interviewer = interviewer
-    
+        if not self.ongoing_command == type(self).__name__:
+            print ' is now cleaning up variable space', type(self).__name__
+            self.ongoing_command = type(self).__name__
+
     def intro(self):
-        if self.ongoing_survey:
+        if self.ongoing_survey and self.open_batches:
             return self._intro()
         else:
             return MESSAGES['NO_OPEN_BATCH']
@@ -105,12 +117,6 @@ class Task(object):
             intro_speech = '\n'.join([intro_speech, restart_prompt])
         return intro_speech
 
-    def _set(self, name, val):
-        return cache.set('%s/%s' % (self.VARIABLE_SPACE, name), val)
-    
-    def _retrieve(self, name, fallback=None):
-        return cache.get('%s/%s' % (self.VARIABLE_SPACE, name), fallback)
-    
     def respond(self, message):
         restart_prompt = '%s:Restart'%settings.USSD_RESTART
         response = ''
@@ -118,66 +124,177 @@ class Task(object):
             message = message.strip()
             if message == settings.USSD_RESTART:
                 access = self.access
-                cache.delete_pattern('%s*'%self.VARIABLE_SPACE)
-                cache.delete_pattern('%s*'%self.GLOBALS_SPACE)
-                if getattr(self, 'INVERVIEW_SPACE', None):
-                    cache.delete_pattern('%s*'%self.INVERVIEW_SPACE)
                 response = Start(access).intro()
             else:
                 response = self._respond(message)
         else:
             response = MESSAGES['NO_OPEN_BATCH']
-        response = response.strip(restart_prompt)
-        return '\n'.join([response, restart_prompt])     
+        if not response.endswith(restart_prompt):
+            response = '\n'.join([response, restart_prompt])
+        return response
     
 class Start(Task):
-    RESGISTER_HOUSEHOLDS = 1
-    TAKE_SURVEY = 2
+    START_LISTING = 1
+    SELECT_HOUSEHOLD = 1
+    NEW_HOUSEHOLD = 2
     
     def __init__(self, ussd_access):
         super(Start, self).__init__(ussd_access)
         context = template.Context({'interviewer': self.interviewer.name, 'survey':  self.ongoing_survey})
         self._intro_speech = template.Template(MESSAGES['START']).render(context)
-        if self.survey_allocation.batches_enabled():
-            self._intro_speech = '%s\n%s' % (self._intro_speech, MESSAGES['START_SURVEY'])
+        if self.ongoing_survey.has_sampling and self.survey_allocation.stage in [None, SurveyAllocation.LISTING]:
+            self._intro_speech = '\n'.join([self._intro_speech,
+                                            '%s: %s'% (self.START_LISTING, MESSAGES['START_LISTING'])])
+        else:
+            self._intro_speech = '\n'.join([self._intro_speech,
+                                            '%s: %s'%(self.SELECT_HOUSEHOLD, MESSAGES['SELECT_HOUSEHOLD'])])
+        if self.ongoing_survey.has_sampling is False:
+            self._intro_speech = '\n'.join([self._intro_speech,
+                                            '%s: %s'%(self.NEW_HOUSEHOLD, MESSAGES['NEW_HOUSEHOLD'])])
             
     def _intro(self):
         return self._intro_speech
         
     def _respond(self, message):
         if message.isdigit():
-            if int(message) == self.RESGISTER_HOUSEHOLDS:
-                return ListHouseholds(self.access).intro()
-            elif self.survey_allocation.batches_enabled() and int(message.strip()) == self.TAKE_SURVEY:
-                return StartSurvey(self.access).intro()
+            if self.ongoing_survey.has_sampling and self.survey_allocation.stage in [None, SurveyAllocation.LISTING]:
+                if int(message) == self.START_LISTING:
+                    return ListHouseholds(self.access).intro()
+            elif int(message) == self.SELECT_HOUSEHOLD:
+                return SelectHousehold(self.access).intro()
+            elif self.ongoing_survey.has_sampling is False and int(message) == self.NEW_HOUSEHOLD:
+                return RegisterHousehold(self.access).intro()
         return self.intro()
 
-
-
 class ListHouseholds(Task):
+    MALE = 1
+    FEMALE = 2
+    REGISTER_ANOTHER = 1
+    DONT_REGISTER_ANOTHER = 2
+
+    @property
+    @reads_from_cache(store=LOCALS_NP)
+    def hl_prompts(self):
+        return OrderedDict([
+            ('physical_address' , 'Enter the physical address'),
+            ('head_desc', 'Enter name of head'),
+            ('head_sex', '\n'.join(['Enter sex:', '%s. Male'%ListHouseholds.MALE,
+                                   '%s. Female'%ListHouseholds.FEMALE])),
+            ('register_another', '\n'.join(['Thank you for completing listing for this household. '
+                                           'Have you completed listing for %s:' % self.interviewer.ea,
+                                           '%s. Yes'%ListHouseholds.REGISTER_ANOTHER,
+                                           '%s. No'%ListHouseholds.DONT_REGISTER_ANOTHER]))
+        ])
+
+    @refreshes_cache(store=LOCALS_NP)
+    def restart_listing(self):
+        return self.intro()
+
+    @hl_prompts.setter
+    @saves_to_cache(store=LOCALS_NP)
+    def hl_prompts(self, prompts):
+        pass
+
+    @property
+    @reads_from_cache(store=LOCALS_NP)
+    def hl_results(self):
+        return {}
+
+    @hl_results.setter
+    @saves_to_cache(store=LOCALS_NP)
+    def hl_results(self, results):
+        pass
+
+    @property
+    @reads_from_cache(store=GLOBALS_NP)
+    def next_house(self):
+        return Household.objects.filter(listing=self.house_listing)\
+                    .aggregate(Max('house_number')).get('house_number', 0) + 1
+
+    @next_house.setter
+    @saves_to_cache(store=GLOBALS_NP)
+    def next_house(self, house_number):
+        pass
+
+    def _intro(self):
+        return '\n'.join([MESSAGES['HOUSEHOLD_LIST'], 'HH-%s'%self.next_house, self._intro_speech])
 
     @property
     def _intro_speech(self):
-        if self.house_listing.total_households is None:
-            return MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
-            # if self.ongoing_survey.has_sampling:
-            #     return MESSAGES['HOUSEHOLDS_COUNT_QUESTION']
-            # #just set total housholds to default listing size but dont save
-            # house_listing = self.house_listing
-            # house_listing.total_households = DEFAULT_LISTING_SIZE
-            # self.house_listing = house_listing
-        return RegisterHousehold(self.access).intro()
+        if len(self.hl_prompts) > 0:
+            return self.hl_prompts.values()[0]
+        else:
+            return Start(self.access).intro()
 
     def _respond(self, message):
-        if message.isdigit():
-            house_listing = self.house_listing
-            house_listing.total_households = int(message)
-            house_listing.save()
-            self.house_listing = house_listing
-            return RegisterHousehold(self.access).intro()
-        else:
+        if self.hl_prompts.keys()[0] in ['head_sex', 'register_another'] and message not in ['1', '2']:
             return self.intro()
+        if len(self.hl_prompts) > 0:
+            hl_prompts = self.hl_prompts
+            prompt = hl_prompts.popitem(0)
+            self.hl_prompts = hl_prompts
+            results = self.hl_results
+            results[prompt[0]] = message
+            self.hl_results = results
+            if prompt[0] == 'head_sex': #save on last house attribute
+                next_house = self.next_house
+                Household.objects.create(
+                            house_number=next_house,
+                             listing=self.house_listing,
+                             last_registrar=self.interviewer,
+                             registration_channel=USSDAccess.choice_name(),
+                             physical_address=self.hl_results['physical_address'],
+                             head_desc=self.hl_results['head_desc'],
+                             head_sex=self.hl_results['head_sex']
+                )
+                self.next_house = next_house + 1
+            if prompt[0] == 'register_another':
+                if message == str(ListHouseholds.REGISTER_ANOTHER):
+                    return self.restart_listing()
+                else:
+                    survey_allocation = self.survey_allocation
+                    survey_allocation.stage = SurveyAllocation.SURVEY
+                    survey_allocation.save()
+                    self.survey_allocation = survey_allocation
+                    self.interviewer.generate_survey_households(self.ongoing_survey)
+                    return Start(self.access).intro() #back to main menu
+            return self.hl_prompts.values()[0]
+        else:
+            return Start(self.access).intro()
 
+class RegisterHousehold(Task):
+
+    @property
+    @reads_from_cache(store=GLOBALS_NP)
+    def next_house(self):
+        return Household.objects.filter(listing=self.house_listing)\
+                    .aggregate(Max('house_number')).get('house_number__max', 0) + 1
+
+    @next_house.setter
+    @saves_to_cache(store=GLOBALS_NP)
+    def next_house(self, house_number):
+        pass
+
+    def _intro(self):
+        return '\n'.join([MESSAGES['HOUSE_REGISTRATION'], 'HH-%s'%self.next_house, self._intro_speech])
+
+    @property
+    def _intro_speech(self):
+        return 'Enter the physical address'
+
+    def _respond(self, message):
+        next_house = self.next_house
+        household = Household.objects.create(
+                            house_number=next_house,
+                             listing=self.house_listing,
+                             last_registrar=self.interviewer,
+                             registration_channel=USSDAccess.choice_name(),
+                             physical_address=message
+                )
+        self.next_house = next_house + 1
+        task = RegisterMember(self.access)
+        task._household = household
+        return task.intro()
 
 class SelectHousehold(Task):
 
@@ -190,22 +307,40 @@ class SelectHousehold(Task):
         if self.current_page < len(lines)/settings.USSD_ITEMS_PER_PAGE:
             lines.append('%s:Next' % settings.USSD_NEXT)
         return '\n'.join(lines)
-    
+
+    @property
+    @reads_from_cache(store=GLOBALS_NP)
+    def survey_households(self):
+        return self.interviewer.survey_households(self.ongoing_survey)
+
+    @property
+    @reads_from_cache(store=GLOBALS_NP)
+    def completed_households(self):
+        return HouseholdBatchCompletion.objects.filter(batch__in=self.open_batches, interviewer=self.interviewer).\
+                                values_list('household', flat=True)
+
+    @completed_households.setter
+    @saves_to_cache(store=GLOBALS_NP)
+    def completed_households(self, households):
+        pass
+
     @property
     def total_households(self):
-        return self.house_listing.total_households
+        return len(self.survey_households)
     
     @property
+    @reads_from_cache(store=LOCALS_NP)
     def current_page(self):
-        return self._retrieve('current_page') or 0
+        return 0
     
     @current_page.setter
+    @reads_from_cache(store=LOCALS_NP)
     def current_page(self, val):
         if val < 0:
             val = 0
         if val > (self.total_households/settings.USSD_ITEMS_PER_PAGE):
             val = self.total_households/settings.USSD_ITEMS_PER_PAGE + 1
-        self._set('current_page', int(val))
+        return val
 
     @property
     def houselist(self):
@@ -216,9 +351,13 @@ class SelectHousehold(Task):
         if start_to > total_households:
             start_to = total_households+1
         lines = []
-        registered = dict([(h.house_number, unicode(h)) for h in self.registered_households])
-        for idx in range(start_from, start_to):
-            lines.append(registered.get(idx, 'HH-%s' % idx))
+        households = self.survey_households[start_from-1:start_to]
+        completed_households = self.completed_households
+        for h in households:
+            if h in completed_households:
+                lines.append('%s*'%str(h))
+            else:
+                lines.append(str(h))
         return lines
         
     def _select(self, message):
@@ -234,9 +373,6 @@ class SelectHousehold(Task):
             return selection
         return None
 
-            
-class RegisterHousehold(SelectHousehold): 
-            
     def _respond(self, message):
         selection = self._select(message)
         if selection is not None:
@@ -247,579 +383,289 @@ class RegisterHousehold(SelectHousehold):
                                                            house_number=selection
                                                            )
             except Household.DoesNotExist:
-                household = Household.objects.create(
-                                       last_registrar = self.interviewer,
-                                       registration_channel = USSDAccess.choice_name(),
-                                       listing=self.house_listing,
-                                       house_number=selection
-                                       )
-            task = MemberOrHead(self.access)
-            task._household =  household
+                self._intro_speech = '\n'.join([INVALID_INPUT, self._intro_speech])
+                return self.intro()
+            ##check if there is an uncompleted interview with this household
+            interviews = Interview.objects.filter(interviewer=self.interviewer,
+                                                               householdmember__household=household,
+                                                               batch__in=self.open_batches,
+                                                               closure_date__isnull=True
+                                                               )
+            if interviews.exists():
+                interview = interviews[0]
+                task = ConfirmContinue(self.access)
+                task._house_member = interview.householdmember
+                task._ongoing_interview = interview
+            else:
+                task = RegisterMember(self.access)
+                task._household = household
             return task.intro()
         return self.intro()
 
-class MemberOrHead(Task):
-    SELECT_RESPONDENT = 1
-    SELECT_MEMBER = 2
-     
-    def __init__(self, ussd_access):
-        super(MemberOrHead, self).__init__(ussd_access)
-        
-    @property
-    def _household(self):
-        return self._retrieve('household')
-        
-    @_household.setter
-    def _household(self, hs):
-        self._set('household', hs)
- 
-    @property
-    def _intro_speech(self):
-        if self._household.get_head() is None:
-            context = template.Context({'household': self._household})
-            return template.Template(MESSAGES['SELECT_HEAD_OR_MEMBER']).render(context)
-        else:
-            household = self._household
-            task = RegisterMember(self.access)
-            task._household_member = HouseholdMember(household=household)
-            return '\n'.join([MESSAGES['HEAD_REGISTERED'], 
-                                             #this step automatically transfers execution to register member 
-                                             #next on session managemt. Next request from interviewer ends up calling
-                                             #RegisterMember.respond
-                                             task.intro()
-                                            ])
-          
-    def _respond(self, message):
-        message = message.strip()
-        if message.isdigit() and int(message) == self.SELECT_RESPONDENT:
-            household = self._household
-            task = RegisterMember(self.access)
-            task._household_member = HouseholdHead(household=household)
-            return task.intro()
-        if message.isdigit() and int(message) == self.SELECT_MEMBER:
-            household = self._household
-            task = RegisterMember(self.access)
-            task._household_member = HouseholdMember(household=household)
-            return task.intro()
-        return self.intro()
-                
-education_level_prompt = ['Please Choose Level of education', ] 
-for idx, e_level in enumerate(LEVEL_OF_EDUCATION):
-    education_level_prompt.append('%s. %s' % (idx+1, e_level[0]))
-month_prompt = ['Please enter month:\n']
-month_prompt.extend(['. '.join((str(mo[0]), str(mo[1]))) for mo in MONTHS])
 class RegisterMember(Task):
+    IS_HEAD = 'is_head'
     SURNAME = 'surname'
     FIRSTNAME = 'first_name'
     GENDER = 'gender'
     DOB = 'date_of_birth'
-    OCCUPATION = 'occupation'
-    LOE = 'level_of_education'
-    RESIDENCEDATE = 'resident_since'
-    
+    MALE = 1
+    FEMALE = 2
+
+    PROMPTS = OrderedDict([
+                    (IS_HEAD, 'Is this the main respondent\n1.Yes\n2.No'),
+                   (SURNAME, 'Please enter your surname:\n'),
+                   (FIRSTNAME, 'Please enter your first name:\n'),
+                   (GENDER, 'Please enter the gender:\n1.Male\n2.Female.' ), #these functions should return intro speech by default
+                   (DOB,  'Please Enter Age:')
+                   ])
+
     @property
+    @reads_from_cache(store=LOCALS_NP)
+    def _household(self):
+        pass
+
+    @_household.setter
+    @saves_to_cache(store=LOCALS_NP)
+    def _household(self, household):
+        pass
+
+    @property
+    @reads_from_cache(store=LOCALS_NP)
+    def house_head(self):
+        return self._household.get_head()
+
+    def extractor(self):
+        return {
+            self.DOB: self._get_dob,
+            self.IS_HEAD: self._get_one_or_two,
+            self.GENDER: self._get_one_or_two
+        }
+
+    @property
+    @reads_from_cache(store=LOCALS_NP)
     def pending_prompts(self):
-        return self._retrieve('pending_prompts', fallback=[]) 
-        
+        if self.house_head and self.PROMPTS.has_key(self.IS_HEAD):
+            del(self.PROMPTS[self.IS_HEAD])
+        prompts = self.PROMPTS.items()
+        return OrderedDict(prompts)
+
+    def reset(self):
+        self.pending_prompts = None
+        return self.pending_prompts
+
     @pending_prompts.setter
+    @saves_to_cache(store=LOCALS_NP)
     def pending_prompts(self, prompts):
-        self._set('pending_prompts', prompts)
-    
-    def __init__(self, ussd_access):
-        super(RegisterMember, self).__init__(ussd_access)
-        self.PROMPTS = OrderedDict([
-               (self.SURNAME, 'Please enter your surname:\n'),
-               (self.FIRSTNAME, 'Please enter your first name:\n'),
-               (self.GENDER, self._get_gender ), #these functions should return intro speech by default
-               (self.DOB,  self._get_dob),
-               (self.OCCUPATION, 'Please enter Occupation:\n',),
-               (self.LOE, self._get_loe),
-               (self.RESIDENCEDATE, self._get_residency_date),              
-               ])
-        if len(self.pending_prompts) == 0: #if prompts has finished restart
-            self.pending_prompts = self.PROMPTS.keys()
-    
-    def _get_dob(self, message=None):
-        error_prompt = None
-        current_val = None
-        _get_dob__PROMPTS = OrderedDict([ ('year', 'Please enter year of birth YYYY\n'),
-                                    ('month', '\n'.join(month_prompt)),
-                                    ('day', 'Please enter day of birth:\n'),
-                                    ])
-        prompts = self._retrieve('_get_dob().prompts', ['year', 'month', 'day'])
-        params = self._retrieve('_get_dob().params', {})
-        print 'present prompt', prompts[0]
-        ongoing_prompt = _get_dob__PROMPTS[prompts[0]]
-        if message and len(prompts) > 0:
-            error_prompt = 'Invalid input\n%s'%ongoing_prompt
-            if prompts[0] == 'year':
-                if message.isdigit() and (int(message)>=1900 and int(message)<=date.today().year):
-                    params['year'] = int(message)
-                    error_prompt = None
-                    prompts.pop(0)
-            elif prompts[0] == 'month':
-                if message.isdigit() and (int(message)>=1 and int(message)<=12):
-                    params['month'] = int(message) 
-                    error_prompt = None
-                    prompts.pop(0)       
-            elif prompts[0] == 'day':
-                _, max_days = calendar.monthrange(params['year'], params['month'])
-                if message.isdigit() and int(message)>=1 and int(message) <= max_days:
-                    params['day'] = int(message)
-                    error_prompt = None    
-                    prompts.pop(0)
-                else:
-                    error_prompt = 'Invalid input. %s has %s days in %s\n%s'% (
-                                                                             dict(MONTHS)[params['month']], 
-                                                                             max_days, 
-                                                                             params['year'], 
-                                                                             ongoing_prompt[0])
-           
-        self._set('_get_dob().params', params)
-        self._set('_get_dob().prompts', prompts)
-        if len(prompts) == 0:
-            current_val = date(day=params['day'], month=params['month'], year=params['year']) 
-        prompt = error_prompt 
-        if prompt is None and len(prompts) > 0:
-            prompt = _get_dob__PROMPTS[prompts[0]] #return the first prompt 
-        return (prompt, current_val)
-    
-    
-    def _get_gender(self, message=None):
-        current_val = None
-        prompt = 'Please enter the gender:\n1.Male\n2.Female'
-        if message: 
-            if message.isdigit() and int(message) in [1, 2]:
-                prompt, current_val = None, int(message)
-            else:
-                prompt = 'Invalid input\n%s'%prompt
-        return (prompt, current_val)
-    
-    def _get_loe(self, message=None):
-        current_val = None
-        prompt = '\n'.join(education_level_prompt)
-        if message:
-            if message.isdigit() and int(message) in range(1, len(LEVEL_OF_EDUCATION) + 1):
-                prompt, current_val = None, LEVEL_OF_EDUCATION[int(message) - 1][0]
-            else:
-                prompt = 'Invalid input\n%s'%prompt
-        return (prompt, current_val)       
+        pass
 
-    def _get_residency_date(self, message=None):
-        error_prompt = None
-        current_val = None
-        _get_residency_date__PROMPTS = OrderedDict([ ('year', 'Please enter year you started living here (YYYY)\n'),
-                                    ('month', '\n'.join(month_prompt)),
-                                    ('day', 'Please enter the day:\n'),
-                                    ])
-        prompts = self._retrieve('_get_residency_date().prompts', ['year', 'month', 'day'])
-        params = self._retrieve('_get_residency_date().params', {})
-        ongoing_prompt = _get_residency_date__PROMPTS[prompts[0]]
-        if message and len(prompts) > 0:
-            error_prompt = 'Invalid input\n%s'%ongoing_prompt
-            if prompts[0] == 'year':
-                if message.isdigit() and (int(message)>=1900 and int(message)<=date.today().year):
-                    params['year'] = int(message)
-                    error_prompt = None
-                    prompts.pop(0)
-            elif prompts[0] == 'month':
-                if message.isdigit() and (int(message)>=1 and int(message)<=12):
-                    params['month'] = int(message) 
-                    error_prompt = None
-                    prompts.pop(0)       
-            elif prompts[0] == 'day':
-                _, max_days = calendar.monthrange(params['year'], params['month'])
-                if message.isdigit() and int(message)>=1 and int(message) <= max_days:
-                    params['day'] = int(message)
-                    error_prompt = None    
-                    prompts.pop(0)
-                else:
-                    error_prompt = 'Invalid input. %s has %s days in %s\n%s'% (
-                                                                             dict(MONTHS)[params['month']], 
-                                                                             max_days, 
-                                                                             params['year'], 
-                                                                             ongoing_prompt[0])
-            
-            self._set('_get_residency_date().params', params)
-            self._set('_get_residency_date().prompts', prompts)
-            if len(prompts) == 0:
-                current_val = date(day=params['day'], month=params['month'], year=params['year']) 
-        prompt = error_prompt 
-        if prompt is None and len(prompts) > 0:
-            prompt = _get_residency_date__PROMPTS[prompts[0]] #return the first prompt 
-        return (prompt, current_val)
-
-    
     @property
-    def _household_member(self):
-        return self._retrieve('household_member')
-        
-    @_household_member.setter
-    def _household_member(self, member):
-        self._set('household_member', member)        
+    @reads_from_cache(store=LOCALS_NP)
+    def hm_details(self):
+        return {}
+
+    @hm_details.setter
+    @saves_to_cache(store=LOCALS_NP)
+    def hm_details(self, prompts):
+        pass
+
+    def _get_dob(self, message):
+        current_val = None
+        try:
+            current_val = datetime.now() - relativedelta(years=int(message))
+        except:
+            pass
+        return current_val
+
+    def _get_one_or_two(self, message):
+        current_val = None
+        if message.isdigit() and int(message) in [1, 2]:
+            if int(message) == self.MALE:
+                current_val = True
+            else:
+                current_val = False
+        return current_val
             
     @property
     def _intro_speech(self):
         pending_prompts = self.pending_prompts
         if len(pending_prompts) > 0:
-            prompt_desc = self.PROMPTS[pending_prompts[0]]
-            if hasattr(self._household_member, pending_prompts[0]): #if prompt is applicable
-                if hasattr(prompt_desc, '__call__'):
-                    return prompt_desc()[0] #callable prompt handlers return tuple (prompt text, current value)
-                else:
-                    return prompt_desc
-            else:
-                pending_prompts.pop(0) #remove irrelevant
-                self.pending_prompts = pending_prompts #becaus the pending prompts are cached
-                return self._intro_speech
-        else:
-            return self.end_registration()
-    
+            return self.pending_prompts.values()[0]
+
+    def _intro(self):
+        return '\n'.join([MESSAGES['REGISTER_MEMBER'], self._intro_speech])
+
     def _respond(self, message):
         pending_prompts = self.pending_prompts
         if pending_prompts:
-            household_member = self._household_member
-            prompt_desc = self.PROMPTS[pending_prompts[0]]
-            if hasattr(household_member, pending_prompts[0]):
-                if hasattr(prompt_desc, '__call__'):
-                    next_prompt, attr_val =  prompt_desc(message)
-                    if next_prompt:
-                        return next_prompt
-                else:
-                    attr_val = message
-                setattr(household_member, pending_prompts[0], attr_val)
-            pending_prompts.pop(0) #whatever the case, we've treated this one. Hence pop it
-            self.pending_prompts = pending_prompts
-            self._household_member = household_member
+            attrs = pending_prompts.keys()
+            extractor = self.extractor().get(attrs[0], None)
+            if extractor and hasattr(extractor, '__call__'):
+                attr_val =  extractor(message)
+            else:
+                attr_val = message
+            if attr_val is None:
+                return '\n'.join([INVALID_INPUT, self.intro()])
+            else:
+                hm_details = self.hm_details
+                hm_details[attrs[0]] = attr_val
+                self.hm_details = hm_details
+                pending_prompts.popitem(0) #whatever the case, we've treated this one. Hence pop it
+                self.pending_prompts = pending_prompts
+                if not pending_prompts: #no more prompts
+                    if hm_details.get(self.IS_HEAD):
+                        hm = HouseholdHead.objects.create(household=self._household,
+                                           surname=hm_details.get(self.SURNAME),
+                                           first_name=hm_details.get(self.FIRSTNAME),
+                                           date_of_birth=hm_details.get(self.DOB),
+                                           gender=hm_details.get(self.GENDER),
+                                           survey_listing=self.survey_listing,
+                                           registrar=self.interviewer,
+                                           registration_channel=USSDAccess.choice_name()
+                                           )
+                    else:
+                        hm = HouseholdMember.objects.create(household=self._household,
+                                           surname=hm_details.get(self.SURNAME),
+                                           first_name=hm_details.get(self.FIRSTNAME),
+                                           date_of_birth=hm_details.get(self.DOB),
+                                           gender=hm_details.get(self.GENDER),
+                                           survey_listing=self.survey_listing,
+                                           registrar=self.interviewer,
+                                           registration_channel=USSDAccess.choice_name()
+                                           )
+                    task = StartInterview(self.access)
+                    task._house_member = hm
+                    return task.intro()
+        else:
+            self.reset()
         return self.intro()
-    
-    def end_registration(self):
-        household_member = self._household_member
-        household_member.survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(self.interviewer,
-                                                                                              self.ongoing_survey)
-        household_member.registration_channel = ODKAccess.choice_name()
-        household_member.registrar = self.interviewer
-        household_member.save()
-        task = EndRegistration(self.access) 
-        task._household = household_member.household
-        return task.intro()
-        
-class EndRegistration(Task):
-    REGISTER_NEW = 1
-    DONT_REGISTER_NEW = 2
-    def __init__(self, ussd_access):
-        super(EndRegistration, self).__init__(ussd_access)
-    
-    @property
-    def _household(self):
-        return self._retrieve('household')
-        
-    @_household.setter
-    def _household(self, hs):
-        self._set('household', hs)      
-    
-    @property
-    def _intro_speech(self):
-        return MESSAGES['END_REGISTRATION'] % self._household
-    
-    def _respond(self, message):
-        message = message.strip()
-        if message.isdigit():
-            if int(message) == self.REGISTER_NEW: 
-                household = self._household
-                task = MemberOrHead(self.access)
-                task._household =  household
-                return task.intro()
-            if int(message) == self.DONT_REGISTER_NEW: 
-                return Start(self.access).intro()
-        return self.intro()        
-
 
 class Interviews(Task):
     
-    def __init__(self, ussd_access):
-        super(Interviews, self).__init__(ussd_access)
-        self.INVERVIEW_SPACE = '/interviewer/%s/interviews'%self.interviewer.pk
-        
-    def _set_param(self, name, val):
-        cache.set('%s/%s' % (self.INVERVIEW_SPACE, name), val)
-    
-    def _get_param(self, name, fallback=None):
-        return cache.get('%s/%s' % (self.INVERVIEW_SPACE, name), fallback)
-    
     @property
+    @reads_from_cache(store=LOCALS_NP)
     def _ongoing_interview(self):
-        return self._get_param('ongoing_interview')
+        print 'pending batches is ', self._pending_batches
+        if self._pending_batches:
+            interview,_ = Interview.objects.get_or_create(interviewer=self.interviewer,
+                                                               householdmember=self._house_member,
+                                                               batch=self._pending_batches[0],
+                                                               interview_channel=self.access,
+                                                               closure_date__isnull=True
+                                                               )
+            return interview
     
     @_ongoing_interview.setter
+    @saves_to_cache(store=LOCALS_NP)
     def _ongoing_interview(self, interview):
-        self._set_param('ongoing_interview', interview)
-    
-    @property    
+        pass
+
+    @property
+    @reads_from_cache(store=LOCALS_NP)
+    def _house_member(self):
+        pass
+
+    @_house_member.setter
+    @saves_to_cache(store=LOCALS_NP)
+    def _house_member(self, hm):
+        pass
+
+    @property
+    @reads_from_cache(store=LOCALS_NP)
     def _pending_batches(self):
-        return self._get_param('pending_batches')
-    
+        return Interview.pending_batches(self._house_member, self.enumeration_area,
+                                         self.ongoing_survey, self.open_batches)
+
     @_pending_batches.setter
+    @saves_to_cache(store=LOCALS_NP)
     def _pending_batches(self, batches):
-        return self._set_param('pending_batches', batches)       
+        pass
     
     def respond(self, message):
         try:
             return super(Interviews, self).respond(message)
         except:
-            return StartSurvey(self.access).respond(message)
-    
-    
-class StartSurvey(SelectHousehold, Interviews):
-    
-    @property
-    def house_roaster(self):
-        registered = self._get_param('house_register', None)
-        if registered is None:
-            survey_households = self.interviewer.generate_survey_households(self.ongoing_survey)
-            registered = dict([(int(h.house_number), unicode(h)) for h in survey_households if h.members.count()>0])
-            self._set_param('house_register', registered)
-        return registered
-
-    @house_roaster.setter
-    def house_roaster(self, house_roaster):
-        self._set_param('house_register', house_roaster)
-    
-    @property
-    def houselist(self):
-        #if list exists in cache fetch, else get from db and put in cache
-        total_households = len(self.house_roaster.keys())
-        start_from = self.current_page * settings.USSD_ITEMS_PER_PAGE+1
-        start_to = start_from+settings.USSD_ITEMS_PER_PAGE
-        if start_to > total_households:
-            start_to = total_households+1
-        lines = []
-        registered = self.house_roaster
-        for idx in registered.keys():
-            lines.append(registered.get(idx))
-        return lines
-    
-    def _select(self, message):
-        selection = None
-        message = message.strip()
-        if message == settings.USSD_NEXT:
-            self.current_page = self.current_page + 1 
-        if message == settings.USSD_PREVIOUS:
-            self.current_page -= 1
-        if message.isdigit():
-            selection = int(message)
-        registered = self.house_roaster
-        if selection in registered.keys():
-            return selection
-        return None
-            
-    def _respond(self, message):
-        selection = self._select(message)
-        if selection is None:
             return self.intro()
-        else:
-            household = Household.objects.get(#might have been registered by some other interviewer
-                                                           listing=self.house_listing,
-                                                           house_number=selection
-                                                           )
-            task = SelectMember(self.access)
-            task._household =  household
-            return task.intro()
-        
-class SelectMember(Interviews):
-
-    def __init__(self, ussd_access):
-        super(SelectMember, self).__init__(ussd_access)
-    
-    @property
-    def _household(self):
-        return self._retrieve('household')
-        
-    @_household.setter
-    def _household(self, hs):
-        self._set('household', hs)
-
-    @property
-    def _intro_speech(self):
-        if len(self._house_members):
-            lines = self._memberlist
-            lines.insert(0, MESSAGES['MEMBERS_LIST'])
-            if self.current_page != 0:
-                lines.append('%s:Previous' % settings.USSD_NEXT)
-            if self.current_page < len(lines)/settings.USSD_ITEMS_PER_PAGE:
-                lines.append('%s:Next' % settings.USSD_NEXT)
-            return '\n'.join(lines)
-        return MESSAGES['MEMBERS_LIST_EMPTY']
-    
-    @property
-    def _total_members(self):
-        return self._house_members.count()
-    
-    @property
-    def registered_households(self):
-        return self.interviewer.present_households()
-    
-    @property
-    def current_page(self):
-        return self._retrieve('current_page') or 0
-    
-    @current_page.setter
-    def current_page(self, val):
-        if val < 0:
-            val = 0
-        if val > (self._total_members/settings.USSD_ITEMS_PER_PAGE):
-            val = self._total_members/settings.USSD_ITEMS_PER_PAGE + 1
-        self._set('current_page', int(val))
-        
-    @property
-    def _house_members(self):
-        members = self._retrieve("house_members", None)
-        if members is None:
-            completion_records = HouseMemberSurveyCompletion.objects.filter(householdmember__household=self._household, 
-                                                       interviewer=self.interviewer,
-                                                       survey=self.ongoing_survey)
-            members = self._household.members.exclude(pk__in=[c_r.householdmember.pk 
-                                                              for c_r in completion_records]).order_by('first_name')
-            self._set('house_members', members) #better to cache this list to prevent changes before response from affecting
-        return members
-        
-    @property
-    def _memberlist(self):
-        memberlist = self._house_members
-        total_members = self._total_members
-        start_from = self.current_page * settings.USSD_ITEMS_PER_PAGE+1
-        start_to = start_from+settings.USSD_ITEMS_PER_PAGE
-        if start_to > total_members:
-            start_to = total_members+1
-        lines = []
-        for idx in range(start_from, start_to):
-            lines.append( '%s. %s\n'% (idx, memberlist[idx-1]))
-        return lines
-        
-    def _select(self, message):
-        selection = None
-        message = message.strip()
-        if message == settings.USSD_NEXT:
-            self.current_page = self.current_page + 1 
-        if message == settings.USSD_PREVIOUS:
-            self.current_page -= 1
-        if message.isdigit():
-            selection = int(message)
-        if selection is not None and selection <= len(self._memberlist) and selection > 0:
-            return selection
-        return None
-
-    def _respond(self, message):
-        selection = self._select(message)
-        if selection is None:
-            return self.intro()
-        else:
-            selection = int(selection)
-            house_member = self._house_members[selection-1]
-#             task._house_member = self._memberlist[selection]
-            pending_batches = Interview.pending_batches(house_member, self.enumeration_area, self.ongoing_survey)
-            if len(pending_batches):
-                interview, created = Interview.objects.get_or_create(interviewer=self.interviewer, 
-                                                householdmember=house_member,
-                                                batch=pending_batches[0],
-                                                interview_channel=self.access)
-                if created:
-                    task = StartInterview(self.access)
-                else:
-                    task = ConfirmContinue(self.access)
-                task._ongoing_interview = interview
-                task._pending_batches = pending_batches[1:]
-                return task.intro()
-            else:
-                HouseMemberSurveyCompletion.objects.get_or_create(householdmember=house_member, interviewer=self.interviewer, survey=self.ongoing_survey)
-                return MESSAGES['NO_OPEN_BATCH']
 
 class ConfirmContinue(Interviews):
-    
+
     RESUME_INTERVIEW = 1
     RESTART_INTERVIEW = 2
-    
+
     @property
     def _intro_speech(self):
-        return MESSAGES['RESUME_MESSAGE']
-        
-    
+        context = template.Context({'batch': self._ongoing_interview.batch.name,
+                                    'house_member':  self._house_member})
+        return template.Template(MESSAGES['RESUME_MESSAGE']).render(context)
+
+
     def _respond(self, message):
         if message.isdigit():
             selection = int(message)
             if selection in (self.RESTART_INTERVIEW, self.RESUME_INTERVIEW):
-                open_batches = self._pending_batches
                 interview = self._ongoing_interview
                 house_member = self._ongoing_interview.householdmember
                 if selection == self.RESTART_INTERVIEW:
                     self._ongoing_interview.delete()
-                    interview = Interview.objects.create(interviewer=self.interviewer, 
+                    interview = Interview.objects.create(interviewer=self.interviewer,
                                                     householdmember=house_member,
                                                     batch=self._ongoing_interview.batch,
                                                     interview_channel=self.access)
                     self._ongoing_interview = interview
                 task = StartInterview(self.access)
-                # task._ongoing_interview = interview
-#                 task._pending_batches = open_batches
+                task._house_member = house_member
+                task._ongoing_interview = interview
                 return task.intro()
+            else:
+                self._intro_speech = '\n'.join([INVALID_INPUT, self._intro_speech])
         else:
             return self.intro()
-                
+
 class StartInterview(Interviews):
-    
-    def __init__(self, ussd_access):
-        super(StartInterview, self).__init__(ussd_access)
-        
+
     @property
     def _intro_speech(self):
-        ongoing_interview = self._ongoing_interview
-        speech = ongoing_interview.respond(channel=USSDAccess.choice_name())
-        self._ongoing_interview = ongoing_interview
-        return speech
+        if self._has_next:
+            return self._respond(None)
+        else:
+            return EndMemberSurvey.get_new(self._house_member, self.access)
     
     @property
     def _has_next(self):
         return len(self._pending_batches) > 0
     
     def _respond(self, message):
-        if message:
-            ongoing_interview = self._ongoing_interview
-            response = ongoing_interview.respond(message, channel=USSDAccess.choice_name())
-            self._ongoing_interview = ongoing_interview #probably something may have happened to the interview instance in db
-            interview = self._ongoing_interview
-            if response is None:
-                interview.closure_date = datetime.now()
-                interview.save()
-                house_member = interview.householdmember
-                house_member.batch_completed(ongoing_interview.batch)
-                if house_member.household.has_completed_batch(ongoing_interview.batch):
-                    house_member.household.batch_completed(ongoing_interview.batch, self.interviewer)
-                if self._pending_batches:
-                    batches = self._pending_batches
-                    present_batch = batches.pop(0)
-                    self._pending_batches = batches
-                    #start next batch and respond
-                    interview, created = Interview.objects.get_or_create(interviewer=self.interviewer, 
-                                                    householdmember=house_member,
-                                                    batch=present_batch)
-                    if created:
-                        self._ongoing_interview = interview
-                    else:
-                        task = ConfirmContinue(self.access)
-                        task._ongoing_interview = interview
-                        task._pending_batches = batches
-                        return task.intro()
+        ongoing_interview = self._ongoing_interview
+        try:
+            response = ongoing_interview.respond(reply=message, channel=USSDAccess.choice_name())
+        except:
+            response = '\n'.join([ERROR, self.intro()])
+        self._ongoing_interview = ongoing_interview #probably something may have happened to the interview instance in db
+        if ongoing_interview.is_closed():
+            house_member = ongoing_interview.householdmember
+            house_member.batch_completed(ongoing_interview.batch)
+            batches = self._pending_batches
+            batches.pop(0) #pop off the present batch
+            self._pending_batches = batches
+            if self._pending_batches:
+                #start next batch and respond
+                interview, created = Interview.objects.get_or_create(interviewer=self.interviewer,
+                                                householdmember=house_member,
+                                                batch=self._pending_batches[0],
+                                                interview_channel=self.access)
+                if created:
+                    self._ongoing_interview = interview
+                    return self.intro()
                 else:
-                    if house_member.household.has_completed(self.ongoing_survey):
-                        house_member.household.survey_completed(self.ongoing_survey, self.interviewer)
-                    task = EndMemberSurvey(self.access)
-                    task._household = house_member.household
+                    task = ConfirmContinue(self.access)
+                    task._ongoing_interview = interview
+                    task._pending_batches = batches
                     return task.intro()
             else:
-                return response
-        return self.intro()    
+                return EndMemberSurvey.get_new(house_member, self.access)
+        else:
+            return response
     
-class EndMemberSurvey(Interviews):
+class EndMemberSurvey(Task):
     
     NEXT_MEMBER = 1
     NEW_HOUSE = 2 
@@ -827,16 +673,17 @@ class EndMemberSurvey(Interviews):
     def __init__(self, ussd_access):
         super(EndMemberSurvey, self).__init__(ussd_access)
         self._ongoing_interview = None
-        
-        
+
     @property
+    @reads_from_cache(store=LOCALS_NP)
     def _household(self):
-        self._retrieve("household")
-        
+        pass
+
     @_household.setter
-    def _household(self, hs):
-        self._set("_household", hs)
-        
+    @saves_to_cache(store=LOCALS_NP)
+    def _household(self, household):
+        pass
+
     @property
     def _intro_speech(self):
         return MESSAGES['MEMBER_SUCCESS_MESSAGE']
@@ -845,10 +692,18 @@ class EndMemberSurvey(Interviews):
         selection = int(message)
         if selection == self.NEXT_MEMBER:
             present_household = self._household
-            task = SelectMember(self.access)
+            task = RegisterMember(self.access)
             task._household = present_household
             return task.intro()
         else:
-            task = StartSurvey(self.access)
-            return task.intro() 
-            
+            self._household.survey_completed(self.ongoing_survey, self.interviewer)
+            task = Start(self.access)
+            return task.intro()
+
+    @classmethod
+    def get_new(cls, house_member, access):
+        house_member.survey_completed()
+        task = EndMemberSurvey(access)
+        task._household = house_member.household
+        return task.intro()
+

@@ -4,7 +4,7 @@ import os
 import zipfile
 import pytz
 from lxml import etree
-from django.http import HttpResponse, StreamingHttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.storage import get_storage_class
 from django.conf import settings
@@ -44,14 +44,24 @@ NON_RESP_ANSWER_PATH = '//survey/qnr{{question_id}}'
 INSTANCE_ID_PATH = '//survey/meta/instanceID'
 FORM_ID_PATH = '//survey/@id'
 ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
-HOUSE_REG_FORM_ID_PREFIX = 'hreg'
-MANUAL_PHYSICAL_ADDR_PATH = '//survey/household/physicalAddress'
+HOUSE_LISTING_FORM_ID_PREFIX = 'hreg_'
+FORM_TYPE_PATH = '//survey/type'
+HOUSE_NUMBER_PATH = '//survey/household/houseNumber'
+PHYSICAL_ADDR_PATH = '//survey/household/physicalAddress'
+HEAD_DESC_PATH = '//survey/household/headDesc'
+HEAD_SEX_PATH = '//survey/household/headSex'
+LISTING_COMPLETED = '//survey/listingCompleted'
 MULTI_SELECT_XFORM_SEP = ' '
 GEOPOINT_XFORM_SEP = ' '
 # default content length for submission requests
 DEFAULT_CONTENT_LENGTH = 10000000
 MAX_DISPLAY_PER_COLLECTOR = 1000
 NON_RESPONSE = '1'
+LISTING = 'L'
+SURVEY = 'S'
+MALE = 'M'
+FEMALE = 'F'
+
 
 
 def _get_tree(xml_file):
@@ -84,7 +94,22 @@ def _get_household_house_number(survey_tree):
     return _get_nodes(MANUAL_HOUSEHOLD_SAMPLE_PATH, tree=survey_tree)[0].text
 
 def _get_household_physical_addr(survey_tree):
-    return _get_nodes(MANUAL_PHYSICAL_ADDR_PATH, tree=survey_tree)[0].text
+    return _get_nodes(PHYSICAL_ADDR_PATH, tree=survey_tree)[0].text
+
+def _get_household_head_desc(survey_tree):
+    return _get_nodes(HEAD_DESC_PATH, tree=survey_tree)[0].text
+
+def _get_listing_completed(survey_tree):
+    status = _get_nodes(LISTING_COMPLETED, tree=survey_tree)[0].text
+    if status == '1': return True
+    else: return False
+
+def _get_household_head_sex(survey_tree):
+    sex = _get_nodes(HEAD_SEX_PATH, tree=survey_tree)[0].text
+    if sex == MALE:
+        return True
+    else:
+        return False
 
 def _choosed_existing_household(survey_tree):
     return _get_nodes(NEW_OR_OLD_HOUSEHOLD_CHOICE_PATH, tree=survey_tree)[0].text == '1'
@@ -184,8 +209,23 @@ def _get_form_id(survey_tree):
     return _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
 
 def _get_survey(survey_tree):
-    pk = _get_nodes(FORM_ID_PATH, tree=survey_tree)[0].strip(HOUSE_REG_FORM_ID_PREFIX)
+    pk = _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
     return Survey.objects.get(pk=pk)
+
+def _get_form_type(survey_tree):
+    return _get_nodes(FORM_TYPE_PATH, tree=survey_tree)[0].text
+
+def save_household_list(interviewer, survey_tree, survey_listing):
+    household, _ = Household.objects.get_or_create(
+                            house_number=_get_household_house_number(survey_tree),
+                             listing=survey_listing.listing,
+                             last_registrar=interviewer,
+                             registration_channel=ODKAccess.choice_name(),
+                             physical_address=_get_household_physical_addr(survey_tree),
+                             head_desc=_get_household_head_desc(survey_tree),
+                             head_sex=_get_household_head_sex(survey_tree)
+                )
+    return household
 
 @transaction.autocommit
 def process_submission(interviewer, xml_file, media_files=[], request=None):
@@ -197,40 +237,48 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     survey_tree = _get_tree(xml_file)
     form_id = _get_form_id(survey_tree)
     survey = _get_survey(survey_tree)
-    # if (batches_included(survey_tree)) and survey.has_sampling and \
-    #         Household.objects.filter(survey=survey, ea=interviewer.ea).count() >= survey.sample_size: #if its not only household registration, make sure sample size is not violated
-    #     #cannot continue if this survey has reached sample size for this ea
-    #     raise SurveySampleSizeReached()
-    member = _get_or_create_household_member(interviewer, survey, survey_tree)
-    response_dict = _get_responses(interviewer, survey_tree, survey)
-    treated_batches = {}
-    interviews = {}
-    if response_dict and batches_included(survey_tree):
-        for (b_id, q_id), answer in response_dict.items():
-            question = Question.objects.get(pk=q_id)
-            batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-            if answer is not None:
-                if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(), VideoAnswer.choice_name()]:
-                    answer = media_files.get(answer, None)
-                interview = interviews.get(b_id,
-                                           Interview.objects.get_or_create(
-                                               interviewer=interviewer,
-                                               householdmember=member,
-                                               batch=batch,
-                                               interview_channel=interviewer.odk_access[0]
-                                           )[0])
-                interviews[b_id] = interview
-                created = record_interview_answer(interview, question, answer)
-            if b_id not in treated_batches.keys():
-                treated_batches[b_id] = batch
-        map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
-        member.survey_completed()
-        if member.household.has_completed(survey):
-            map(lambda batch: member.household.batch_completed(batch, interviewer), treated_batches.values())
-            member.household.survey_completed(survey, interviewer)
+    survey_allocation = get_survey_allocation(interviewer)
+    household = None
+    member = None
+    survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+    if _get_form_type(survey_tree) == LISTING:
+        household = save_household_list(interviewer, survey_tree, survey_listing)
+        import pdb; pdb.set_trace()
+        if _get_listing_completed(survey_tree):
+            survey_allocation.stage = SurveyAllocation.SURVEY
+            survey_allocation.save()
+    else:
+        member = _get_or_create_household_member(interviewer, survey, survey_tree)
+        response_dict = _get_responses(interviewer, survey_tree, survey)
+        treated_batches = {}
+        interviews = {}
+        if response_dict and batches_included(survey_tree):
+            for (b_id, q_id), answer in response_dict.items():
+                question = Question.objects.get(pk=q_id)
+                batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
+                if answer is not None:
+                    if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(), VideoAnswer.choice_name()]:
+                        answer = media_files.get(answer, None)
+                    interview = interviews.get(b_id,
+                                               Interview.objects.get_or_create(
+                                                   interviewer=interviewer,
+                                                   householdmember=member,
+                                                   batch=batch,
+                                                   interview_channel=interviewer.odk_access[0]
+                                               )[0])
+                    interviews[b_id] = interview
+                    created = record_interview_answer(interview, question, answer)
+                if b_id not in treated_batches.keys():
+                    treated_batches[b_id] = batch
+            map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
+            member.survey_completed()
+            if member.household.has_completed(survey):
+                map(lambda batch: member.household.batch_completed(batch, interviewer), treated_batches.values())
+                member.household.survey_completed(survey, interviewer)
+            household = member.household
     submission = ODKSubmission.objects.create(interviewer=interviewer, 
                 survey=survey, form_id= form_id,
-                instance_id=_get_instance_id(survey_tree), household_member=member, 
+                instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
                 xml=etree.tostring(survey_tree, pretty_print=True))
     #    execute.delay(submission.save_attachments, media_files)
     submission.save_attachments(media_files.values())

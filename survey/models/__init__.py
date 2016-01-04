@@ -25,7 +25,7 @@ from survey.models.location_type_details import LocationTypeDetails
 from survey.models.indicators import Indicator
 from survey.models.about_us_content import AboutUs
 from survey.models.odk_submission import ODKSubmission, Attachment
-from survey.models.formula import Formula 
+from survey.models.formula import Formula
 from survey.models.interviews import AnswerAccessDefinition
 from survey.models.locations import Location, LocationType
 

@@ -8,13 +8,14 @@ from django.db import models
 from survey.models.base import BaseModel
 from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
-from survey.models.households import HouseholdMember
+from survey.models.households import HouseholdMember, Household
 
 
 class ODKSubmission(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name="odk_submissions")
     survey = models.ForeignKey(Survey, related_name="odk_submissions")
-    household_member = models.ForeignKey(HouseholdMember, related_name="odk_submissions")
+    household_member = models.ForeignKey(HouseholdMember, related_name="odk_submissions", null=True, blank=True)
+    household = models.ForeignKey(Household, related_name="odk_submissions", null=True, blank=True)
     form_id = models.CharField(max_length=256)
     instance_id = models.CharField(max_length=256)
     xml = models.TextField()

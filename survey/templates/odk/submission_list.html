@@ -27,10 +27,10 @@
             {% for submission in submissions %}
                 <tr>
                     <td>
-                        {{ submission.household_member.ea }}
+                        {{ submission.household.listing.ea }}
                     </td>
                     <td>
-                        {{ submission.household_member.household.house_number }}
+                        {{ submission.household.house_number }}
                     </td>
 					<td>
                         {{ submission.household_member.first_name}}, {{submission.household_member.surname }}
