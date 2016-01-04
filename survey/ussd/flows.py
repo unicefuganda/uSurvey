@@ -209,11 +209,14 @@ class ListHouseholds(Task):
     @property
     @reads_from_cache(store=LOCALS_NP)
     def next_house(self):
-        return Household.objects.filter(listing=self.house_listing)\
-                    .aggregate(Max('house_number')).get('house_number__max', 0) + 1
+        present = Household.objects.filter(listing=self.house_listing)\
+                    .aggregate(Max('house_number')).get('house_number__max', 0)
+        if present is None:
+            present = 0
+        return present + 1
 
     @next_house.setter
-    # @saves_to_cache(store=LOCALS_NP)
+    @saves_to_cache(store=LOCALS_NP)
     def next_house(self, house_number):
         pass
 
