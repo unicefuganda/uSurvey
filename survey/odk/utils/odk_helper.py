@@ -26,6 +26,7 @@ from survey.tasks import execute
 from functools import wraps
 from survey.utils.zip import InMemoryZip
 from django.contrib.sites.models import Site
+from dateutils import relativedelta
 
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
@@ -122,8 +123,6 @@ def _get_selected_household_member(survey_tree):
     return HouseholdMember.objects.get(pk=member_id)
 
 def _get_or_create_household_member(interviewer, survey, survey_tree):
-    if _choosed_existing_household(survey_tree):
-        return _get_selected_household_member(survey_tree)
     house_number = _get_household_house_number(survey_tree)
     survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
     house_listing = survey_listing.listing
@@ -148,16 +147,18 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
     kwargs['surname'] = mem_attrs.get('surname')
     kwargs['first_name'] = mem_attrs['firstName']
     kwargs['gender'] = (mem_attrs['sex'] == MALE)
-    kwargs['date_of_birth'] = datetime.strptime(mem_attrs['dateOfBirth'], '%Y-%m-%d')
+    date_of_birth = current_val = datetime.now() - relativedelta(years=int(mem_attrs['age']))
+    kwargs['date_of_birth'] = date_of_birth
+    #datetime.strptime(mem_attrs['dateOfBirth'], '%Y-%m-%d')
     kwargs['household'] = household
     kwargs['registrar'] = interviewer
     kwargs['registration_channel'] = ODKAccess.choice_name()
     kwargs['survey_listing'] = survey_listing
     if not household.get_head() and mem_attrs['isHead'] == IS_HEAD:
-        kwargs['occupation'] = mem_attrs.get('occupation', '')
-        kwargs['level_of_education'] = mem_attrs.get('levelOfEducation', '')
-        resident_since = datetime.strptime(mem_attrs.get('residentSince', '1900-01-01'), '%Y-%m-%d')
-        kwargs['resident_since']=resident_since
+        # kwargs['occupation'] = mem_attrs.get('occupation', '')
+        # kwargs['level_of_education'] = mem_attrs.get('levelOfEducation', '')
+        # resident_since = datetime.strptime(mem_attrs.get('residentSince', '1900-01-01'), '%Y-%m-%d')
+        # kwargs['resident_since']=resident_since
         head = HouseholdHead.objects.create(**kwargs)
         if household.head_desc is not head.surname:
             household.head_desc = head.surname
