@@ -355,8 +355,8 @@ class SelectHousehold(Task):
         households = self.survey_households[start_from-1:start_to]
         completed_households = self.completed_households
         for h in households:
-            if h in completed_households:
-                lines.append('%s*'%str(h))
+            if h.pk in completed_households:
+                lines.append('%s**'%str(h))
             else:
                 lines.append(str(h))
         return lines
