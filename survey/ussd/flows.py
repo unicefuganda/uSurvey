@@ -417,8 +417,8 @@ class RegisterMember(Task):
 
     PROMPTS = OrderedDict([
                     (IS_HEAD, 'Is this the main respondent\n1.Yes\n2.No'),
-                   (SURNAME, 'Please enter your surname:\n'),
-                   (FIRSTNAME, 'Please enter your first name:\n'),
+                   (SURNAME, 'Please enter surname:\n'),
+                   (FIRSTNAME, 'Please enter first name:\n'),
                    (GENDER, 'Please enter the gender:\n1.Male\n2.Female.' ), #these functions should return intro speech by default
                    (DOB,  'Please Enter Age:')
                    ])
@@ -434,7 +434,7 @@ class RegisterMember(Task):
         pass
 
     @property
-    @reads_from_cache(store=LOCALS_NP)
+    # @reads_from_cache(store=LOCALS_NP)
     def house_head(self):
         return self._household.get_head()
 
@@ -510,6 +510,7 @@ class RegisterMember(Task):
             if attr_val is None:
                 return '\n'.join([INVALID_INPUT, self.intro()])
             else:
+
                 hm_details = self.hm_details
                 hm_details[attrs[0]] = attr_val
                 self.hm_details = hm_details

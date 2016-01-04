@@ -243,7 +243,8 @@ class HouseholdHead(HouseholdMember):
         return True
 
     def save(self, *args, **kwargs):
-        if HouseholdHead.objects.exclude(household=self.household, pk=self.pk).exists():
+        if HouseholdHead.objects.filter(household=self.household,
+                                         survey_listing=self.survey_listing).exclude(pk=self.pk).exists():
             raise ValidationError('Head already exists')
         else:
             return super( HouseholdHead, self).save(*args, **kwargs)

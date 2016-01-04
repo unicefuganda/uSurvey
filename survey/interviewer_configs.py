@@ -61,7 +61,7 @@ MESSAGES = {
     'REGISTER_MEMBER' : 'Member Registration',
     'START_LISTING': 'Start Listing',
     'START_SURVEY': 'Start Survey',
-    'SELECT_HOUSEHOLD' : 'Select Household',
+    'SELECT_HOUSEHOLD' : 'To Select Household',
     'NEW_HOUSEHOLD' : 'New Household',
     'HOUSEHOLD_LIST': "Household Listing.",
     'HOUSEHOLD_LIST_PRE': 'Please enter details for this household',
