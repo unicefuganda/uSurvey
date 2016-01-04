@@ -17,11 +17,14 @@ xmlns:jr="http://openrosa.org/javarosa">
      </meta>
     <type>L</type>
     <household>
-        <houseNumber />
+        {% comment %}
+            <houseNumber />
+            <listingCompleted>0</listingCompleted>
+        {% endcomment %}
         <physicalAddress />
         <headDesc />
         <headSex />
-        <listingCompleted>0</listingCompleted>
+
     </household>
 
    </survey>
@@ -31,11 +34,13 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/household/physicalAddress" type="string"  required="true()" />
-  <bind nodeset="/survey/household/houseNumber" type="int"  readonly="true()" calculate="count(/survey/household)"/>
+  <bind nodeset="/survey/" type="int"  readonly="true()" calculate="count(/survey/household)"/>
   <bind nodeset="/survey/household/headDesc" type="string"  required="true()" />
   <bind nodeset="/survey/household/headSex" type="select1"  required="true()"  />
   <bind nodeset="/survey/household"   />
-  <bind nodeset="/survey/household/listingCompleted" type="select1"  required="true()"  relevant="/survey/household/houseNumber &gt;= {{survey.sample_size}}" />
+  {% comment %}
+  <!--<bind nodeset="/survey/household/listingCompleted" type="select1"  required="true()"  relevant="/survey/houseCount &gt;= {{survey.sample_size}}" />-->
+  {% endcomment %}
 
   </model>
 </h:head>
@@ -43,18 +48,19 @@ xmlns:jr="http://openrosa.org/javarosa">
     <group>
         <label>Household Details</label>
         <repeat nodeset="/survey/household" appearance="field-list">
+            {% comment %}
             <!--<input ref="/survey/household/houseNumber">-->
                 <!--<label>Enter household number</label>-->
             <!--</input>-->
-
+            {% endcomment %}
             <input ref="/survey/household/physicalAddress">
-                <label>HH-<output value="/survey/household/houseNumber" />. Enter Physical Address</label>
+                <label>HH-<output value="/survey/houseCount" />. Enter Physical Address</label>
             </input>
             <input ref="/survey/household/headDesc">
-                <label>HH-<output value="/survey/household/houseNumber" />.Enter name of head</label>
+                <label>HH-<output value="/survey/houseCount" />.Enter name of head</label>
             </input>
             <select1 ref="/survey/household/headSex">
-                <label>HH-<output value="/survey/household/houseNumber" />.Enter sex of head</label>
+                <label>HH-<output value="/survey/houseCount" />.Enter sex of head</label>
                 <item>
                     <label>Male</label>
                     <value>M</value>
@@ -64,6 +70,7 @@ xmlns:jr="http://openrosa.org/javarosa">
                     <value>F</value>
                 </item>
             </select1>
+            {% comment %}
             <select1 ref="/survey/household/listingCompleted">
                 <label>Have you completed listing for {{interviewer.ea}}</label>
                 <item>
@@ -75,6 +82,7 @@ xmlns:jr="http://openrosa.org/javarosa">
                     <value>0</value>
                 </item>
             </select1>
+            {% endcomment %}
         </repeat>
     </group>
 </h:body>
