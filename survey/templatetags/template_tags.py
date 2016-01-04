@@ -204,10 +204,10 @@ def is_relevant_odk(context, question, interviewer, registered_households):
         default_relevance = 'true()'
     else:
         default_relevance = 'false()'
-    relevance_context = ' and '.join([
-                                '(%s)' % ' or '.join(context.get(question.pk, [default_relevance, ])),
+    relevance_context = ' (%s) %s' % (
+                                ' or '.join(context.get(question.pk, [default_relevance, ])),
                                 is_relevant_by_group(context, question, registered_households)
-                                ])
+                                )
     flows = question.flows.all()
     node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
     flow_conditions = []
@@ -269,7 +269,7 @@ def is_relevant_by_group(context, question, registered_households):
        relevance_builder.append('(%s)' % ' and '.join(relevant_new))
     if relevant_existing:
         relevance_builder.append('(%s)' % ' or '.join(relevant_existing))
-    return '(%s)' % ' or '.join(relevance_builder)
+    return ' and (%s)' % ' or '.join(relevance_builder)
 
     
 
