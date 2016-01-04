@@ -102,9 +102,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 		</input>
 		{% endif %}
 	</group>
-	<repeat nodeset="/survey/household/householdMember">
+	<repeat nodeset="/survey/household/householdMember" appearance="field-list">
 		<label>Household Member Data</label>
-		<group>
+
 				<label>Household Member Details</label>
 					<select1 ref="/survey/household/householdMember/isHead">
 						<label>Is this the main respondent of this household?</label>
@@ -138,7 +138,6 @@ xmlns:jr="http://openrosa.org/javarosa">
 				<input ref="/survey/household/householdMember/age" >
 								<label>Enter the Age</label>
 							</input>
-			</group>
 		{% for batch in survey_batches %}
 			<group>
 				<label>{{ batch.name }}</label>
