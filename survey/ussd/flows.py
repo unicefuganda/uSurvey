@@ -181,9 +181,9 @@ class ListHouseholds(Task):
             ('head_sex', '\n'.join(['Enter sex:', '%s. Male'%ListHouseholds.MALE,
                                    '%s. Female'%ListHouseholds.FEMALE])),
             ('register_another', '\n'.join(['Thank you for completing listing for this household. '
-                                           'Have you completed listing for %s:' % self.interviewer.ea,
-                                           '%s. Yes'%ListHouseholds.REGISTER_ANOTHER,
-                                           '%s. No'%ListHouseholds.DONT_REGISTER_ANOTHER]))
+                                           'Have you completed listing for %s?' % self.interviewer.ea,
+                                           '%s. Yes'%ListHouseholds.DONT_REGISTER_ANOTHER,
+                                           '%s. No'%ListHouseholds.REGISTER_ANOTHER]))
         ])
 
     @refreshes_cache(store=LOCALS_NP)
@@ -206,13 +206,13 @@ class ListHouseholds(Task):
         pass
 
     @property
-    @reads_from_cache(store=GLOBALS_NP)
+    @reads_from_cache(store=LOCALS_NP)
     def next_house(self):
         return Household.objects.filter(listing=self.house_listing)\
                     .aggregate(Max('house_number')).get('house_number', 0) + 1
 
     @next_house.setter
-    @saves_to_cache(store=GLOBALS_NP)
+    @saves_to_cache(store=LOCALS_NP)
     def next_house(self, house_number):
         pass
 
@@ -301,7 +301,7 @@ class SelectHousehold(Task):
     @property
     def _intro_speech(self):
         lines = self.houselist
-        lines.insert(0, MESSAGES['HOUSEHOLD_LIST'])
+        lines.insert(0, MESSAGES['SELECT_HOUSEHOLD'])
         if self.current_page != 0:
             lines.append('%s:Previous' % settings.USSD_NEXT)
         if self.current_page < len(lines)/settings.USSD_ITEMS_PER_PAGE:
