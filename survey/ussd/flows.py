@@ -315,15 +315,15 @@ class SelectHousehold(Task):
         return self.interviewer.survey_households(self.ongoing_survey)
 
     @property
-    @reads_from_cache(store=GLOBALS_NP)
+    @reads_from_cache(store=LOCALS_NP)
     def completed_households(self):
         return HouseholdBatchCompletion.objects.filter(batch__in=self.open_batches, interviewer=self.interviewer).\
                                 values_list('household', flat=True)
-
-    @completed_households.setter
-    @saves_to_cache(store=GLOBALS_NP)
-    def completed_households(self, households):
-        pass
+    #
+    # @completed_households.setter
+    # @saves_to_cache(store=GLOBALS_NP)
+    # def completed_households(self, households):
+    #     pass
 
     @property
     def total_households(self):
@@ -355,8 +355,8 @@ class SelectHousehold(Task):
         households = self.survey_households[start_from-1:start_to]
         completed_households = self.completed_households
         for h in households:
-            if h in completed_households:
-                lines.append('%s*'%str(h))
+            if h.pk in completed_households:
+                lines.append('%s**'%str(h))
             else:
                 lines.append(str(h))
         return lines
