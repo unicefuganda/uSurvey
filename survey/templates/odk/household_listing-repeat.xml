@@ -13,7 +13,7 @@ xmlns:jr="http://openrosa.org/javarosa">
    <survey id="{{ survey.pk }}" >
      <meta>
        <instanceID />
-       <instanceName />
+       <instanceName>Households-{{interviewer.ea.name}}</instanceName>
      </meta>
     <type>L</type>
     <household>
@@ -30,8 +30,6 @@ xmlns:jr="http://openrosa.org/javarosa">
   <!-- bindings -->
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
-  <bind nodeset="/survey/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat('House-', /survey/household/houseNumber, ' ', /survey/household/headSex, '_', /survey/household/headDesc)" />
   <bind nodeset="/survey/household/physicalAddress" type="string"  required="true()" />
   <bind nodeset="/survey/household/houseNumber" type="int"  readonly="true()" calculate="count(/survey/household)"/>
   <bind nodeset="/survey/household/headDesc" type="string"  required="true()" />
