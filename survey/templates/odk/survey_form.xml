@@ -15,6 +15,7 @@ xmlns:jr="http://openrosa.org/javarosa">
        <instanceID />
        <instanceName />
      </meta>
+	 <type>S</type>
     <household>
         <houseNumber />
 		<headMember />

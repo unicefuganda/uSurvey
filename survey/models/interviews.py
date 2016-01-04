@@ -25,8 +25,8 @@ class Interview(BaseModel):
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
     last_question = models.ForeignKey("Question", related_name='ongoing', null=True, blank=True)
 
-    # def start(self):
-    #     return self.batch.start_question
+    def __unicode__(self):
+        return '%s-%s: %s' % (self.interviewer.name, self.householdmember.first_name, self.batch.name)
 
     def is_closed(self):
         return self.closure_date is not None
