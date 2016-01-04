@@ -181,7 +181,7 @@ class ListHouseholds(Task):
             ('head_sex', '\n'.join(['Enter sex:', '%s. Male'%ListHouseholds.MALE,
                                    '%s. Female'%ListHouseholds.FEMALE])),
             ('register_another', '\n'.join(['Thank you for completing listing for this household. '
-                                           'Would you like to list another?:',
+                                           'Have you completed listing for %s:' % self.interviewer.ea,
                                            '%s. Yes'%ListHouseholds.REGISTER_ANOTHER,
                                            '%s. No'%ListHouseholds.DONT_REGISTER_ANOTHER]))
         ])

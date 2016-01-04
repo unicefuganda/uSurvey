@@ -102,7 +102,7 @@ class Interviewer(BaseModel):
 
 
     def generate_survey_households(self, survey):
-        survey_households = list(self.present_households(survey))
+        survey_households = self.present_households(survey)
         if survey.has_sampling:
             selections = RandomSelection.objects.filter(survey=survey, household__listing__ea=self.ea).distinct()
             households = [s.household for s in selections]
@@ -111,7 +111,7 @@ class Interviewer(BaseModel):
                 #first shuffle registered households and select up to sample number
                 sample_size = survey.sample_size - selections.count()
                 if households:
-                    survey_households = survey_households.exclude(pk__in=households)
+                    survey_households = survey_households.exclude(pk__in=[h.pk for h in households])
                 ###to do bulk create
                 survey_households = list(survey_households)
                 random.shuffle(survey_households)
@@ -122,10 +122,13 @@ class Interviewer(BaseModel):
                 RandomSelection.objects.bulk_create(random_selections)
                 survey_households.extend(households)
             else:
+                # import pdb; pdb.set_trace()
                 survey_households = households
             msg = '\n'.join(['Survey: %s'%survey, 'Households: %s'%','.join([ str(h) for h in survey_households])])
             for access in self.ussd_access:
                 send_sms(access.user_identifier, msg)
+        else:
+            survey_households = list(survey_households)
         return sorted(survey_households, key=lambda household: household.house_number)
 
     def survey_households(self, survey):

@@ -62,6 +62,7 @@ class Household(BaseModel):
     registration_channel = models.CharField(max_length=100, choices=REGISTRATION_CHANNELS)
     head_desc = models.CharField(max_length=200)
     head_sex = models.BooleanField(default=FEMALE)
+
     
     class Meta:
         app_label = 'survey'

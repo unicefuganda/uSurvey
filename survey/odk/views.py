@@ -20,7 +20,8 @@ from survey.odk.utils.odk_helper import get_survey_allocation, process_submissio
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth
-from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, HouseholdListing
+from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, \
+    HouseholdListing, SurveyAllocation
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
@@ -38,7 +39,6 @@ def get_survey_xform(interviewer, survey):
         'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
         'survey' : survey,
         'survey_batches' : batches,
-        'educational_levels' : LEVEL_OF_EDUCATION,
         'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
         })
 
@@ -90,12 +90,12 @@ def form_list(request):
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
+    # import pdb; pdb.set_trace()
     if allocation:
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
               _("survey allocation %s" % allocation.survey), {}, request)
         survey = allocation.survey
         survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
-
         audit = {}
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
               _("Requested forms list. for %s" % interviewer.name), audit, request)
@@ -104,7 +104,8 @@ def form_list(request):
         'survey' : survey,
         'interviewer' : interviewer,
         'request' : request,
-         'survey_listing': survey_listing
+         'survey_listing': survey_listing,
+          'Const': SurveyAllocation
         })
         response = BaseOpenRosaResponse(content)
         response.status_code = 200
@@ -117,9 +118,16 @@ def download_xform(request, survey_id):
     interviewer = request.user
     survey = get_object_or_404(Survey, pk=survey_id)
     allocation = get_survey_allocation(interviewer)
-    if allocation and allocation.batches_enabled():
+    if allocation:
         try:
-            survey_xform = get_survey_xform(interviewer, survey)
+            if survey.has_sampling and allocation.stage in [None, SurveyAllocation.LISTING]:
+                if allocation.stage is None:
+                    allocation.stage = SurveyAllocation.LISTING
+                    allocation.save()
+                survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+                survey_xform = get_household_list_xform(interviewer, survey, survey_listing.listing)
+            else:
+                survey_xform = get_survey_xform(interviewer, survey)
             form_id = '%s'% survey_id
 
             audit = {
