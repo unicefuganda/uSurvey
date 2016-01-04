@@ -25,7 +25,6 @@ xmlns:jr="http://openrosa.org/javarosa">
             <firstName />
             <sex />
             <age />
-			<age />
             <isHead>0</isHead>
         </householdMember>
     </household>
