@@ -1,0 +1,208 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+xmlns:h="http://www.w3.org/1999/xhtml"
+xmlns:ev="http://www.w3.org/2001/xml-events"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:jr="http://openrosa.org/javarosa">
+{% load template_tags %}
+<h:head>
+<h:title> 
+  {{survey.name}}
+</h:title>
+  <model>
+  <instance>
+   <survey id="{{ survey.pk }}" >
+     <meta>
+       <instanceID />
+       <instanceName />
+     </meta>
+    <household>
+        <houseNumber />
+		<headMember />
+		{% if not survey.has_sampling %}
+			<physicalAddress />
+		{% endif %}
+		<householdMember>
+            <surname />
+            <firstName />
+            <sex />
+            <age />
+			<age />
+            <isHead>0</isHead>
+        </householdMember>
+    </household>
+	{% for batch in survey_batches %}
+	   {% if interviewer.ea in batch.non_response_eas %}
+	   		<bnr{{batch.pk}} />
+	   		<qnr{{batch.pk}} />
+	   {% endif %}
+		<b{{batch.pk}}>
+	   		{% for question in batch.survey_questions %}
+				<q{{question.pk}} />
+			{% endfor %}
+		</b{{batch.pk}}>
+	{% endfor %}
+   </survey>
+  </instance>
+
+  <!-- bindings -->
+  <bind nodeset="/survey/meta/instanceID" type="string" 
+           readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/survey/meta/instanceName" type="string" 
+           readonly="true()" calculate="concat(/survey/household/houseNumber, {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}'', ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
+  <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}string{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" />
+  <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()"  />
+{% if not survey.has_sampling %}
+  <bind nodeset="/survey/household/householdMember/physicalAddress" type="string"  required="true()"  />
+{% endif %}
+  <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" />
+  <bind nodeset="/survey/household/householdMember/age" type="int" required="true()" constraint=". &gt;= 0"/>
+  <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="string-length(/survey/household/householdMember/isHead) &gt; 0"/>
+  <bind nodeset="/survey/household/householdMember/headMember" type="select1" required="true()"
+		  calculate="if(selected(/survey/household/householdMember/isHead,'1'), concat(/survey/household/householdMember/surname, /survey/household/householdMember/firstName), '')"/>
+
+
+	{% for batch in survey_batches  %}
+		{% for question in batch.survey_questions %}
+		{% is_relevant_odk question interviewer registered_households as relevance_context %}
+			<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}"
+				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
+				required="true()"
+				relevant="{% if interviewer.ea in batch.non_response_eas %}selected(/survey/bnr{{batch.pk}}, '0'){% else %}true(){% endif %} {{ relevance_context }}"/>
+        	{% if interviewer.ea in batch.non_response_eas %}
+				<bind nodeset="/survey/bnr{{batch.pk}}" type="select1" />
+	    		<bind nodeset="/survey/qnr{{batch.pk}}" type="string" relevant="selected(/survey/bnr{{batch.pk}}, '1')" required="selected(/survey/bnr{{batch.pk}}, '1')" />
+			{% endif %}
+		{% endfor %}
+	{% endfor %}
+
+  </model>
+</h:head>
+<h:body>
+    <group>
+        <label>Household details</label>
+
+		{% if survey.has_sampling %}
+			<select1 ref="/survey/household/houseNumber">
+		         <label>Select Household</label>
+		         {% for r_household in registered_households %}
+				    <item>
+						<label>HH-{{r_household.house_number}}{% if r_household.head_desc %} - {{r_household.head_sex}}{% endif %}</label>
+	               		<value>{{r_household.pk}}</value>
+		            </item>
+		         {% endfor %}
+		    </select1>
+		{% else %}
+       <input ref="/survey/household/houseNumber">
+			<label>Enter household number</label>
+		</input>
+		<input ref="/survey/household/physicalAddress">
+			<label>Enter the Physical Address</label>
+			<hint>Skip if already assigned for this household</hint>
+		</input>
+		{% endif %}
+    <group>
+        <label>Household Member Details</label>
+			<select1 ref="/survey/household/householdMember/isHead">
+				<label>Is this the main respondent of this household?</label>
+                <hint>Skip if already assigned for this household</hint>
+				<item>
+					<label> Yes </label>
+					<value>1</value>
+				</item>
+				<item>
+					<label> No </label>
+					<value>0</value>
+				</item>
+			</select1>
+		<input ref="/survey/household/householdMember/surname">
+						<label>Enter Surname</label>
+					</input>
+		<input ref="/survey/household/householdMember/firstName">
+						<label>Enter Firstname</label>
+					</input>
+        	<select1 ref="/survey/household/householdMember/sex">
+				<label>Enter sex</label>
+				<item>
+					<label> Male </label>
+					<value>1</value>
+				</item>
+				<item>
+					<label> Female </label>
+					<value>0</value>
+				</item>
+			</select1>
+        <input ref="/survey/household/householdMember/age" >
+						<label>Enter the Age</label>
+					</input>
+		</group>            
+    </group>
+	{% for batch in survey_batches %}
+		<group>
+			<label>{{ batch.name }}</label>
+			<hint>{{ batch.description }}</hint>
+			{% if interviewer.ea in batch.non_response_eas %}
+                <select1  ref="/survey/bnr{{batch.pk}}">
+					<label>Member is available to respond</label>
+					<item>
+						<label>Yes</label>
+						<value>0</value>
+					</item>
+					<item>
+						<label>No</label>
+						<value>1</value>
+					</item>
+				</select1>
+				<input ref="/survey/qnr{{batch.pk}}">
+					<label>{{messages.NON_RESPONSE_MSG}}</label>
+				</input>
+			{% endif %}
+			{% for question in batch.survey_questions %}
+				{% if question.answer_type == answer_types.multichoiceanswer %}
+					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+						<label>{{question.text}}</label>
+						{% for option in question.options.all %}
+						<item>
+							<label>{{ option.text }}</label>
+							<value>{{ option.order }}</value>
+						</item>
+						{% endfor %}
+					</select1>
+				{% elif question.answer_type == answer_types.multiselectanswer %}
+					<select ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+						<label>{{question.text}}</label>
+						{% for option in question.options.all %}
+						<item>
+							<label>{{ option.text }}</label>
+							<value>{{ option.text|trim }}</value>
+						</item>
+						{% endfor %}
+					</select>
+				{% elif question.answer_type == answer_types.imageanswer %}
+					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
+						<label>{{question.text}}</label>
+					</upload>
+				{% elif question.answer_type == answer_types.audioanswer %}
+					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   mediatype="audio/*">
+						<label>{{question.text}}</label>
+					</upload>
+				{% elif question.answer_type == answer_types.videoanswer %}
+					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}" mediatype="video/*">
+						<label>{{question.text}}</label>
+					</upload>
+                {% elif question.answer_type == answer_types.dateanswer %}
+				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}" appearance="no-calendar">
+					<label>{{question.text}}</label>
+				</input>
+				{% else %}
+				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+					<label>{{question.text}}</label>
+				</input>
+				{% endif %}
+
+			{% endfor %}
+		</group>
+	{% endfor %}
+
+</h:body>
+</h:html>
