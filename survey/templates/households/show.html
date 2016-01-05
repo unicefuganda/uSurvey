@@ -27,7 +27,7 @@
                     Age
                 </dt>
                 <dd>
-                    {{ head.date_of_birth|format_date }}
+                    {{ head.date_of_birth|get_age }}
                 </dd>
                 <dt>
                     Gender
@@ -39,6 +39,7 @@
                         Female
                     {% endif %}
                 </dd>
+                {% comment %}
                 <dt>
                     Highest level of education completed
                 </dt>
@@ -57,6 +58,7 @@
                 <dd>
                     {{ head.resident_since.month }} {{ head.resident_since.year }}
                 </dd>
+                {% endcomment %}
             </dl>
             {% else %}
                 {% if household.head_desc %}
@@ -101,7 +103,7 @@
                       Name
                   </th>
                   <th>
-                      Date of birth
+                      Age
                   </th>
                   <th>
                       Sex
@@ -115,10 +117,10 @@
               {% for household_member in household.members.all %}
                   <tr>
                       <td>
-                         {{ household_member.surname }}
+                         {{ household_member.surname }} {% if household_member.first_name  %}, household_member.first_name  {% endif %}
                       </td>
                       <td>
-                          {{ household_member.date_of_birth|format_date }}
+                          {{ household_member.date_of_birth|get_age }}
                       </td>
                       <td>
                          {% if household_member.gender == 1 %}Male{% else %}Female{% endif %}

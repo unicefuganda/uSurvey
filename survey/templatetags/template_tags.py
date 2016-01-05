@@ -88,6 +88,11 @@ def format_date(date):
         return date.strftime("%b %d, %Y")
 
 @register.filter
+def get_age(date):
+    return relativedelta(date.today() - date).years
+
+
+@register.filter
 def get_url_with_ids(args, url_name):
     if not str(args).isdigit():
       arg_list = [int(arg) for arg in args.split(',')]
