@@ -33,7 +33,7 @@ from survey.interviewer_configs import MESSAGES
 def get_survey_xform(interviewer, survey):
     registered_households = interviewer.generate_survey_households(survey)
     batches = interviewer.ea.open_batches(survey)
-    return render_to_string("odk/survey_form.xml", {
+    return render_to_string("odk/survey_form-no-repeat.xml", {
         'interviewer': interviewer,
         'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
         'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
