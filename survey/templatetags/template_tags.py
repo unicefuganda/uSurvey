@@ -8,7 +8,7 @@ from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswe
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
-from dateutils import relativedelta
+from dateutil import relativedelta
 from datetime import date
 import json, inspect
 from django.utils import html
@@ -89,7 +89,7 @@ def format_date(date):
 
 @register.filter
 def get_age(d):
-    return relativedelta(date.today() - d).years
+    return relativedelta.relativedelta(date.today(), d).years
 
 
 @register.filter
