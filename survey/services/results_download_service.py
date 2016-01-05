@@ -91,7 +91,7 @@ class ResultsDownloadService(object):
                                          member_gender])
                     for question in self.questions:
                         answers.append(member.reply(question))
-            data.append(answers)
+                data.append(answers)
         return data
 
     def generate_report(self):
