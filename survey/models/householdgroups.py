@@ -101,7 +101,7 @@ class GroupCondition(BaseModel):
         return str(self.value) == str(value) or value == self.confirm_head(self.value)
 
     def odk_is_equal(self, value_path):
-        return "%s = '%s' or boolean(%s) = %s" % (value_path, self.value, value_path, self.odk_confirm_head(self.value))
+        return "(%s = '%s' or boolean(%s) = %s)" % (value_path, self.value, value_path, self.odk_confirm_head(self.value))
 
     def is_greater_than(self, value):
         return int(value) >= int(self.value)
