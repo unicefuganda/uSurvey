@@ -88,8 +88,8 @@ def format_date(date):
         return date.strftime("%b %d, %Y")
 
 @register.filter
-def get_age(date):
-    return relativedelta(date.today() - date).years
+def get_age(d):
+    return relativedelta(date.today() - d).years
 
 
 @register.filter
