@@ -117,7 +117,7 @@
               {% for household_member in household.members.all %}
                   <tr>
                       <td>
-                         {{ household_member.surname }} {% if household_member.first_name  %}, household_member.first_name  {% endif %}
+                         {{ household_member.surname }} {% if household_member.first_name  %}, {{ household_member.first_name }} {% endif %}
                       </td>
                       <td>
                           {{ household_member.date_of_birth|get_age }}
