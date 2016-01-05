@@ -48,7 +48,7 @@ xmlns:jr="http://openrosa.org/javarosa">
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/meta/instanceName" type="string" 
            readonly="true()" calculate="concat(/survey/household/houseNumber, {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}'', ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
-  <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}string{% endif %}"  required="true()" />
+  <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}int{% endif %}"  required="true()" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" />
   <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()"  />
 {% if not survey.has_sampling %}
@@ -86,8 +86,8 @@ xmlns:jr="http://openrosa.org/javarosa">
 		         <label>Select Household</label>
 		         {% for r_household in registered_households %}
 				    <item>
-						<label>HH-{{r_household.house_number}}{% if r_household.head_desc %}{{r_household.head_desc}} - {% if r_household.head_sex %}Male{% else %}Female{% endif %}{% endif %}</label>
-	               		<value>{{r_household.pk}}</value>
+						<label>HH-{{r_household.house_number}}{% if r_household.head_desc %}-{{r_household.head_desc}}{% endif %}</label>
+	               		<value>{{r_household.house_number}}</value>
 		            </item>
 		         {% endfor %}
 		    </select1>
