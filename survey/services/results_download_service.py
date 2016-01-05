@@ -83,15 +83,15 @@ class ResultsDownloadService(object):
             location_ancestors = household_location.get_ancestors().exclude(parent__isnull='country').values_list('name', flat=True)
             answers = []
             for household in households_in_location:
-                answers = list(location_ancestors)
                 for member in household.members.all():
+                    answers = list(location_ancestors)
                     member_gender = 'Male' if member.gender == HouseholdMember.MALE else 'Female'
                     answers.extend([household.listing.ea.name, household.house_number, '%s-%s' % (member.surname, member.first_name), str(member.age),
                                          member.date_of_birth.strftime(settings.DATE_FORMAT),
                                          member_gender])
                     for question in self.questions:
                         answers.append(member.reply(question))
-            data.append(answers)
+                    data.append(answers)
         return data
 
     def generate_report(self):
