@@ -11,6 +11,7 @@ from django.utils.safestring import mark_safe
 from dateutils import relativedelta
 from datetime import date
 import json, inspect
+from django.utils import html
 
 register = template.Library()
 
@@ -211,7 +212,7 @@ def  get_odk_mem_question(question):
             mark_safe('<output value="/survey/household/householdMember/sex"/>'),
     }
     question_context = template.Context(context)
-    return template.Template(question.text).render(question_context)
+    return template.Template(html.escape(question.text)).render(question_context)
 
 
 @register.assignment_tag(takes_context=True)
