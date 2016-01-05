@@ -249,7 +249,8 @@ def is_relevant_odk(context, question, interviewer, registered_households):
         null_flows = flows.filter(validation_test__isnull=True, next_question__isnull=False)
         if null_flows:
             null_flow = null_flows[0]
-            null_condition = ["string-length(%s) &gt; 0" % node_path, ]
+            # null_condition = ["string-length(%s) &gt; 0" % node_path, ]
+            null_condition = ['true()', ]
             if len(flow_conditions) > 0:
                 null_condition.append('not (%s)' % ' or '.join(flow_conditions))
             next_question = null_flow.next_question
