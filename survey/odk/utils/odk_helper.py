@@ -420,7 +420,10 @@ def http_basic_interviewer_auth(func):
 def http_digest_interviewer_auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
-        realm = Site.objects.get_current().name
+        if request.META.has_key('HTTP_HOST'):
+            realm = request.META['HTTP_HOST']
+        else:
+            realm = Site.objects.get_current().name
         digestor = Digestor(method=request.method, path=request.get_full_path(), realm=realm)
         if request.META.has_key('HTTP_AUTHORIZATION'):
             logger.debug('request meta: %s' % request.META['HTTP_AUTHORIZATION'])
