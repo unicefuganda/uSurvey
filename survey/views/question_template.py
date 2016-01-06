@@ -58,8 +58,8 @@ def _render_question_view(request, instance=None):
     response = None
     if instance:
         button_label = 'Save'
-        options = instance.options.all()
-        options = [option.text for option in options] if options else None
+        options = instance.options.all().order_by('order')
+        # options = [option.text for option in options] if options else None
     if request.method == 'POST':
         response, question_form = _process_question_form(request, response, instance)
     request.breadcrumbs([
@@ -73,8 +73,8 @@ def _render_question_view(request, instance=None):
                'questionform': question_form}
 
     if options:
-        options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
-        context['options'] = map(lambda option: re.sub("  ", ' ', option), options)
+        #options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
+        context['options'] = options #map(lambda option: re.sub("  ", ' ', option), options)
     return response, context
 
 @permission_required('auth.can_view_batches')
