@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from survey.forms.filters import QuestionFilterForm,  MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
-from survey.models import Question, Batch, QuestionTemplate, QuestionFlow, TextArgument
+from survey.models import Question, Batch, QuestionTemplate, QuestionFlow, TextArgument, TemplateOption
 from survey.forms.question import QuestionForm #, QuestionFlowForm
 from survey.services.export_questions import get_question_template_as_dump
 from survey.utils.query_helper import get_filterset
@@ -181,17 +181,21 @@ def new(request, batch_id):
 def _process_question_form(request, batch, response, instance=None):
     question_form = QuestionForm(batch, data=request.POST, instance=instance)
 
-    if request.POST.get('add_to_lib_button'):
-        import pdb;pdb.set_trace()
     action_str = 'edit' if instance else 'add'
     if question_form.is_valid():
         question = question_form.save(**request.POST)
         if request.POST.has_key('add_to_lib_button'):
-            QuestionTemplate.objects.create(identifier=question.identifier,
+            qt = QuestionTemplate.objects.create(identifier=question.identifier,
                                             group=question.group,
                                             text=question.text,
                                             answer_type=question.answer_type,
                                             module=question.module)
+            options = question.options.all()
+            if options:
+                topts = []
+                for option in options:
+                    topts.append(TemplateOption(question=qt, text=option.text, order=option.order))
+                TemplateOption.objects.bulk_create(topts)
             messages.success(request, 'Question successfully %sed. to library' % action_str)
         messages.success(request, 'Question successfully %sed.' % action_str)
         response = HttpResponseRedirect(reverse('batch_questions_page', args=(batch.pk, )))
@@ -208,8 +212,8 @@ def _render_question_view(request, batch, instance=None):
     response = None
     if instance:
         button_label = 'Save'
-        options = instance.options.all()
-        options = [option.text for option in options] if options else None
+        options = instance.options.all().order_by('order')
+        # options = [option.text.strip() for option in options] if options else None
 
     if request.method == 'POST':
         response, question_form = _process_question_form(request, batch, response, instance)
@@ -221,9 +225,9 @@ def _render_question_view(request, batch, instance=None):
                'questionform': question_form}
 
     if options:
-        options = filter(lambda text: text.strip(), list(OrderedDict.fromkeys(options)))
-        options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
-        context['options'] = map(lambda option: re.sub("  ", ' ', option), options)
+        #options = filter(lambda text: text.strip(), list(OrderedDict.fromkeys(options)))
+        # options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
+        context['options'] = options #map(lambda option: re.sub("  ", ' ', option), options)
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
@@ -272,7 +276,6 @@ def _index(request, batch_id):
     question_tree = None
     if batch.start_question:
         question_tree = batch.batch_questions.all()
-#     import pdb; pdb.set_trace()
     context = {'batch': batch, 'batch_question_tree' : question_tree, 'question_form' : question_form, 'button_label' : 'Add',
                'id' : 'question_form', 'action': '#',
                'question_library' : question_library, 'question_filter_form' : question_filter_form,
@@ -306,7 +309,6 @@ def submit(request, batch_id):
                 connections[source_identifier] = flows
         for source_identifier, flows in connections.items():
             for flow in flows:
-                #import pdb; pdb.set_trace()
                 f, _ = QuestionFlow.objects.get_or_create(question=nodes[source_identifier], 
                                                    next_question=nodes[flow['target']],
                                                    validation_test=flow['validation_test']

@@ -77,7 +77,7 @@ class QuestionTemplateForm(ModelForm):
         order = 0
         options = self.cleaned_data['options']
         question.options.all().delete()
-        options.sort()
+        # options.sort()
         for text in options:
             order += 1
             TemplateOption.objects.create(question=question, text=text, order=order)
