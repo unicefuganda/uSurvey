@@ -50,8 +50,9 @@ class LocationType(MPTTModel, BaseModel):
 class Location(MPTTModel, BaseModel):
     name = models.CharField(max_length=50)
     type = models.ForeignKey(LocationType, related_name='locations')
+    code = models.CharField(max_length=100, null=True, blank=True)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='sub_locations', db_index=True)
-    coordinates = models.ManyToManyField(Point, related_name='admin_struct_locations') #would use this in the future. But ignore for now
+    coordinates = models.ManyToManyField(Point, related_name='admin_div_locations') #would use this in the future. But ignore for now
     
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -68,6 +69,7 @@ class Location(MPTTModel, BaseModel):
 
     class Meta:
         app_label = 'survey'
+        unique_together = [('code', 'type'), ]
 
         
 # 
