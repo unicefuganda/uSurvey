@@ -12,7 +12,8 @@ from survey.models.interviews import AnswerAccessDefinition, Answer
 from survey.models.access_channels import ODKAccess
 from ordered_set import OrderedSet
 
-
+ALL_GROUPS = HouseholdMemberGroup.objects.all()
+ALL_ANSWERS = Answer.answer_types()
 class Batch(BaseModel):
     order = models.PositiveIntegerField(max_length=2, null=True)
     name = models.CharField(max_length=100, blank=False, null=True)
@@ -86,7 +87,7 @@ class Batch(BaseModel):
     def is_applicable(self, house_member):
         return True #probably might be used later
 
-    def next_inline(self, question, groups=None, channel=ODKAccess.choice_name()):
+    def next_inline(self, question, groups=ALL_GROUPS, channel=ODKAccess.choice_name()):
         qflows = QuestionFlow.objects.filter(question__batch=self, validation_test__isnull=True)
         if qflows.exists():
             return next_inline_question(question, qflows, groups, AnswerAccessDefinition.answer_types(channel))
@@ -137,9 +138,12 @@ def sub_questions(question, flows):
         return OrderedSet()
     return questions
 
-ALL_GROUPS = HouseholdMemberGroup.objects.all()
-ALL_ANSWERS = Answer.answer_types()
+
 def next_inline_question(question, flows, groups=ALL_GROUPS, answer_types=ALL_ANSWERS):
+    if groups is None:
+        groups = ALL_GROUPS
+    if answer_types is None:
+        answer_types = ALL_ANSWERS
     try:
         qflow = flows.get(question=question, validation_test__isnull=True)
         next_question = qflow.next_question
