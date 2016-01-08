@@ -260,7 +260,7 @@ def is_relevant_odk(context, question, interviewer, registered_households):
             next_q_context.append('(%s)' % ' and '.join(null_condition))
             context[next_question.pk] = next_q_context
             if null_flow.next_question and question.group != null_flow.next_question.group:
-                prob_next = batch.next_inline(null_flow.next_question,
+                prob_next = batch.next_inline(question,
                                               exclude_groups=[null_flow.next_question.group, ])
                 if prob_next:
                     prob_next_context = context.get(prob_next.pk, ['false()', ])
