@@ -1,5 +1,5 @@
 from survey.models import LocationTypeDetails, Location, LocationType, Household, HouseholdMember, \
-    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer
+    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer
 from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -90,7 +90,10 @@ class ResultsDownloadService(object):
                                          member.date_of_birth.strftime(settings.DATE_FORMAT),
                                          member_gender])
                     for question in self.questions:
-                        answers.append(str(member.reply(question)).encode('utf8'))
+                        reply = member.reply(question)
+                        if question.answer_type == NumericalAnswer.choice_name():
+                            reply = unicode(reply)
+                        answers.append(reply.encode('utf8'))
                     data.append(answers)
         return data
 
