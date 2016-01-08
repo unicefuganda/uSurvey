@@ -90,7 +90,7 @@ class ResultsDownloadService(object):
                                          member.date_of_birth.strftime(settings.DATE_FORMAT),
                                          member_gender])
                     for question in self.questions:
-                        answers.append(member.reply(question).encode('utf8'))
+                        answers.append(str(member.reply(question)).encode('utf8'))
                     data.append(answers)
         return data
 
