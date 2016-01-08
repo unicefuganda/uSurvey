@@ -242,10 +242,10 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                 flow_condition = answer_class.print_odk_validation(node_path, flow.validation_test, *text_params)
                 flow_conditions.append(flow_condition)
                 if flow.next_question:
-                    next_q_context.append(flow_condition)
-                    context[next_question.pk] = next_q_context
                     next_question = flow.next_question
                     next_q_context = context.get(next_question.pk, ['false()', ])
+                    next_q_context.append(flow_condition)
+                    context[next_question.pk] = next_q_context
 
         null_flows = flows.filter(validation_test__isnull=True, next_question__isnull=False)
         if null_flows:
