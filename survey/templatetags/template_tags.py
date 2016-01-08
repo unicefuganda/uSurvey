@@ -258,18 +258,19 @@ def is_relevant_odk(context, question, interviewer, registered_households):
             next_question = null_flow.next_question
             next_q_context = context.get(next_question.pk, ['false()', ])
             next_q_context.append('(%s)' % ' and '.join(null_condition))
+            if question.group != next_question.group:
+                next_q_context.append('true()')
             context[next_question.pk] = next_q_context
-            if connecting_flows.count() == 0 or (next_question and
-                                                         question.group != next_question.group):
-                prob_next = batch.next_inline(next_question,
-                                              exclude_groups=[next_question.group, ])
-                if prob_next:
-                    prob_next_context = context.get(prob_next.pk, [])
-                    if connecting_flows.count() == 0:
-                        prob_next_context.append('true()')
-                    else:
-                        prob_next_context.append("string-length(%s) &gt; 0" % node_path)
-                    context[prob_next.pk] = prob_next_context
+            # if connecting_flows.count() == 0 or (next_question and
+            #                                              question.group != next_question.group):
+            #     prob_next = batch.next_inline(next_question,
+            #                                   exclude_groups=[next_question.group, ])
+            #     if prob_next:
+            #         prob_next_context = context.get(prob_next.pk, [])
+            #         prob_next_context.append('true()')
+            #         else:
+            #             prob_next_context.append("string-length(%s) &gt; 0" % node_path)
+            #         context[prob_next.pk] = prob_next_context
     return mark_safe(relevance_context)
 
 
