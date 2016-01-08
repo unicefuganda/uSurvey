@@ -236,27 +236,33 @@ def is_relevant_odk(context, question, interviewer, registered_households):
     flow_conditions = []
     if flows:
         for flow in flows:
-            if flow.next_question:
-                next_question = flow.next_question
-                next_q_context = context.get(next_question.pk, ['false()', ])
-                if flow.validation_test:
-                    text_params = [t.param for t in flow.text_arguments]
-                    answer_class = Answer.get_class(question.answer_type)
-                    flow_condition = answer_class.print_odk_validation(node_path, flow.validation_test, *text_params)
-                    flow_conditions.append(flow_condition)
+            if flow.validation_test:
+                text_params = [t.param for t in flow.text_arguments]
+                answer_class = Answer.get_class(question.answer_type)
+                flow_condition = answer_class.print_odk_validation(node_path, flow.validation_test, *text_params)
+                flow_conditions.append(flow_condition)
+                if flow.next_question:
+                    next_question = flow.next_question
+                    next_q_context = context.get(next_question.pk, ['false()', ])
                     next_q_context.append(flow_condition)
                     context[next_question.pk] = next_q_context
         null_flows = flows.filter(validation_test__isnull=True, next_question__isnull=False)
         if null_flows:
             null_flow = null_flows[0]
-            # null_condition = ["string-length(%s) &gt; 0" % node_path, ]
-            null_condition = ['true()', ]
+            null_condition = ["string-length(%s) &gt; 0" % node_path, ]
+            # null_condition = ['true()', ]
             if len(flow_conditions) > 0:
                 null_condition.append('not (%s)' % ' or '.join(flow_conditions))
             next_question = null_flow.next_question
             next_q_context = context.get(next_question.pk, ['false()', ])
             next_q_context.append('(%s)' % ' and '.join(null_condition))
             context[next_question.pk] = next_q_context
+            if null_flow.next_question and question.group != null_flow.next_question.group:
+                prob_next = batch.next_inline(question, exclude_groups=[null_flow.next_question.group, ])
+                if prob_next:
+                    prob_next_context = context.get(prob_next.pk, ['false()', ])
+                    prob_next_context.append("string-length(%s) &gt; 0" % node_path)
+                    context[prob_next.pk] = prob_next_context
     return mark_safe(relevance_context)
 
 

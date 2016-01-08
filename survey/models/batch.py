@@ -87,10 +87,11 @@ class Batch(BaseModel):
     def is_applicable(self, house_member):
         return True #probably might be used later
 
-    def next_inline(self, question, groups=ALL_GROUPS, channel=ODKAccess.choice_name()):
+    def next_inline(self, question, groups=ALL_GROUPS, channel=ODKAccess.choice_name(), exclude_groups=[]):
         qflows = QuestionFlow.objects.filter(question__batch=self, validation_test__isnull=True)
         if qflows.exists():
-            return next_inline_question(question, qflows, groups, AnswerAccessDefinition.answer_types(channel))
+            return next_inline_question(question, qflows, groups,
+                                        AnswerAccessDefinition.answer_types(channel), exclude_groups)
 
     def is_open(self):
         return self.open_locations.all().exists()
@@ -139,7 +140,7 @@ def sub_questions(question, flows):
     return questions
 
 
-def next_inline_question(question, flows, groups=ALL_GROUPS, answer_types=ALL_ANSWERS):
+def next_inline_question(question, flows, groups=ALL_GROUPS, answer_types=ALL_ANSWERS, exclude_groups=[]):
     if groups is None:
         groups = ALL_GROUPS
     if answer_types is None:
@@ -147,7 +148,7 @@ def next_inline_question(question, flows, groups=ALL_GROUPS, answer_types=ALL_AN
     try:
         qflow = flows.get(question=question, validation_test__isnull=True)
         next_question = qflow.next_question
-        if next_question and next_question.group in groups and \
+        if next_question and next_question.group in groups and next_question.group not in exclude_groups and \
                                       next_question.answer_type in answer_types:
             return next_question
         else:
