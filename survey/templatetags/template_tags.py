@@ -246,6 +246,8 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                     flow_conditions.append(flow_condition)
                     next_q_context.append(flow_condition)
                     context[next_question.pk] = next_q_context
+            # else:
+
         null_flows = flows.filter(validation_test__isnull=True, next_question__isnull=False)
         if null_flows:
             null_flow = null_flows[0]
@@ -258,7 +260,8 @@ def is_relevant_odk(context, question, interviewer, registered_households):
             next_q_context.append('(%s)' % ' and '.join(null_condition))
             context[next_question.pk] = next_q_context
             if null_flow.next_question and question.group != null_flow.next_question.group:
-                prob_next = batch.next_inline(question, exclude_groups=[null_flow.next_question.group, ])
+                prob_next = batch.next_inline(null_flow.next_question,
+                                              exclude_groups=[null_flow.next_question.group, ])
                 if prob_next:
                     prob_next_context = context.get(prob_next.pk, ['false()', ])
                     prob_next_context.append("string-length(%s) &gt; 0" % node_path)
