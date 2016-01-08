@@ -152,7 +152,8 @@ def next_inline_question(question, flows, groups=ALL_GROUPS, answer_types=ALL_AN
                                       next_question.answer_type in answer_types:
             return next_question
         else:
-            return next_inline_question(next_question, flows, groups=groups, answer_types=answer_types)
+            return next_inline_question(next_question, flows, groups=groups, answer_types=answer_types,
+                                        exclude_groups=exclude_groups)
     except QuestionFlow.DoesNotExist:
         return None
 
