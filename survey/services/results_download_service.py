@@ -86,11 +86,12 @@ class ResultsDownloadService(object):
                 for member in household.members.all():
                     answers = list(location_ancestors)
                     member_gender = 'Male' if member.gender == HouseholdMember.MALE else 'Female'
-                    answers.extend([household.listing.ea.name, household.house_number, '%s-%s' % (member.surname, member.first_name), str(member.age),
+                    answers.extend([unicode(household.listing.ea.name), unicode(household.house_number),
+                                    unicode('%s-%s' % (member.surname, member.first_name), str(member.age)),
                                          member.date_of_birth.strftime(settings.DATE_FORMAT),
                                          member_gender])
                     for question in self.questions:
-                        answers.append(member.reply(question))
+                        answers.append(unicode(member.reply(question)))
                     data.append(answers)
         return data
 
