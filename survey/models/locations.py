@@ -69,7 +69,7 @@ class Location(MPTTModel, BaseModel):
 
     class Meta:
         app_label = 'survey'
-        unique_together = [('code', 'type'), ]
+        # unique_together = [('code', 'type'), ]
 
         
 # 
