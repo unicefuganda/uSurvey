@@ -39,6 +39,7 @@ def get_survey_xform(interviewer, survey):
         'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
         'survey' : survey,
         'survey_batches' : batches,
+        'messages' : MESSAGES,
         'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
         })
 

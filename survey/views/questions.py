@@ -158,7 +158,7 @@ def delete_logic(request, batch_id, flow_id):
     batch = get_object_or_404(Batch, pk=batch_id)
     flow = QuestionFlow.objects.get(id=flow_id)
     flow.delete()
-    batch.zombie_questions().delete()
+    _kill_zombies(batch.zombie_questions())
     messages.success(request, "Logic successfully deleted.")
     return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
 
@@ -243,10 +243,14 @@ def _render_question_view(request, batch, instance=None):
 def remove(request, batch_id, question_id):
     return _remove(request, batch_id, question_id)
 
+def _kill_zombies(zombies):
+    for z in zombies:
+        z.delete()
+
 def _remove(request, batch_id, question_id):
     question = get_object_or_404(Question, pk=question_id)
     batch = question.batch
-    batch.zombie_questions().delete()
+    _kill_zombies(batch.zombie_questions())
     redirect_url = '/batches/%s/questions/' % batch_id if batch_id else reverse('batch_questions_page', args=(batch.pk, ))
     if question:
         success_message = "Question successfully deleted."
