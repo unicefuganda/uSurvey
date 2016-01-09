@@ -28,6 +28,16 @@ class Question(BaseModel):
         app_label = 'survey'        
         unique_together = [('identifier', 'batch'), ]
 
+    def delete(self, using=None):
+        '''
+        Delete related answers before deleting this object
+        :param using:
+        :return:
+        '''
+        answer_class = Answer.get_class(self.answer_type)
+        answer_class.objects.filter(question=self).delete()
+        return super(Question, self).delete(using=using)
+
     def display_text(self, channel=None):
         text = self.text
         if channel and channel== USSDAccess.choice_name() and self.answer_type == MultiChoiceAnswer.choice_name():
