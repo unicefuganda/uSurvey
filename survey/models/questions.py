@@ -183,6 +183,7 @@ class QuestionOption(BaseModel):
  
     class Meta:
         app_label = 'survey'
+        ordering = ['order', ]
 
     @property
     def to_text(self):
