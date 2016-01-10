@@ -120,10 +120,15 @@ class Batch(BaseModel):
     def survey_questions(self):
         inline_ques = self.questions_inline()
         questions = OrderedSet(inline_ques)
-        other_flows = QuestionFlow.objects.exclude(validation_test__isnull=True, question__pk__in=[q.pk for q in inline_ques])
+        survey_questions = OrderedSet()
+        other_flows = QuestionFlow.objects.exclude(validation_test__isnull=True,
+                                                   question__pk__in=[q.pk for q in inline_ques]).exclude(
+                                                    next_question__pk__in=[q.pk for q in inline_ques] #skip questions
+                                                    )
         for ques in inline_ques:
-            map(lambda q: questions.add(q), sub_questions(ques, other_flows))
-        return questions
+            survey_questions.append(ques)
+            map(lambda q: survey_questions.add(q), sub_questions(ques, other_flows))
+        return survey_questions
 
     def activate_non_response_for(self, location):
         self.open_locations.filter(location=location).update(non_response=True)
