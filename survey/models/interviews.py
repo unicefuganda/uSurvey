@@ -465,8 +465,11 @@ class GeopointAnswer(Answer):
     def to_text(self):
         return ''
 
-class NonResponseAnswer(Answer):
+class NonResponseAnswer(BaseModel):
+    household = models.ForeignKey('Household', related_name='non_response_answers')
+    survey_listing = models.ForeignKey('SurveyHouseholdListing', related_name='non_response_answers')
     value = models.CharField(max_length=100, blank=False, null=False)
+    interviewer = models.ForeignKey("Interviewer", null=True, related_name='non_response_answers')
 
     class Meta:
         app_label = 'survey'
