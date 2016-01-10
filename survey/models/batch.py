@@ -125,6 +125,12 @@ class Batch(BaseModel):
             map(lambda q: questions.add(q), sub_questions(ques, other_flows))
         return questions
 
+    def activate_non_response_for(self, location):
+        self.open_locations.filter(location=location).update(non_response=True)
+
+    def deactivate_non_response_for(self, location):
+        self.open_locations.filter(location=location).update(non_response=False)
+
 def sub_questions(question, flows):
     questions = OrderedSet()
     try:

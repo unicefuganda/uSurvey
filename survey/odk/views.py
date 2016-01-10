@@ -26,14 +26,18 @@ from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
 from survey.models.surveys import SurveySampleSizeReached
+from survey.models import BatchLocationStatus
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.interviewer_configs import MESSAGES
 
 
 def get_survey_xform(interviewer, survey):
+    template_file = "odk/survey_form-no-repeat.xml"
+    if BatchLocationStatus.objects.filter(batch__survey=survey, non_response=True).exists():
+        template_file = 'odk/non-response.xml'
     registered_households = interviewer.generate_survey_households(survey)
     batches = interviewer.ea.open_batches(survey)
-    return render_to_string("odk/survey_form-no-repeat.xml", {
+    return render_to_string(template_file, {
         'interviewer': interviewer,
         'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
         'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
@@ -54,6 +58,19 @@ def get_household_list_xform(interviewer, survey, house_listing):
         'educational_levels' : LEVEL_OF_EDUCATION,
         'messages' : MESSAGES,
         'selectable_households' : selectable_households,
+        })
+
+def get_on_response_xform(interviewer, survey):
+    registered_households = interviewer.generate_survey_households(survey)
+    batches = interviewer.ea.open_batches(survey)
+    return render_to_string("odk/survey_form-no-repeat.xml", {
+        'interviewer': interviewer,
+        'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
+        'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
+        'survey' : survey,
+        'survey_batches' : batches,
+        'messages' : MESSAGES,
+        'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
         })
 
 @login_required

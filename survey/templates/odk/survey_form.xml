@@ -49,7 +49,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat(/survey/household/houseNumber, {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}'', ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
+           readonly="true()" calculate="concat(/survey/household/houseNumber, ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
   <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}string{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" />
   <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()"  />

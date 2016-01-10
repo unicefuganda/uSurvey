@@ -40,8 +40,6 @@ HOUSEHOLD_MEMBER_ID_DELIMITER = '_'
 MANUAL_HOUSEHOLD_SAMPLE_PATH = '//survey/household/houseNumber'
 MANUAL_HOUSEHOLD_MEMBER_PATH = '//survey/household/householdMember'
 ANSWER_PATH = '//survey/b{{batch_id}}/q{{question_id}}'
-IS_NON_RESPONSE_PATH ='//survey/bnr{{batch.pk}}'
-NON_RESP_ANSWER_PATH = '//survey/qnr{{question_id}}'
 INSTANCE_ID_PATH = '//survey/meta/instanceID'
 FORM_ID_PATH = '//survey/@id'
 ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
@@ -58,11 +56,12 @@ GEOPOINT_XFORM_SEP = ' '
 # default content length for submission requests
 DEFAULT_CONTENT_LENGTH = 10000000
 MAX_DISPLAY_PER_COLLECTOR = 1000
-NON_RESPONSE = '1'
 LISTING = 'L'
 SURVEY = 'S'
+NON_RESPONSE = 'NR'
 MALE = 'M'
 FEMALE = 'F'
+COULD_NOT_COMPLETE_SURVEY = '0'
 
 
 
@@ -187,21 +186,21 @@ def _get_responses(interviewer, survey_tree, survey):
     batches = interviewer.ea.open_batches(survey)
     for batch in batches:
         context = template.Context({'batch_id': batch.pk, })
-        non_response_path = template.Template(IS_NON_RESPONSE_PATH).render(context)
-        non_response_node = _get_nodes(non_response_path, tree=survey_tree)
-        if non_response_node and non_response_node[0].text.strip() == NON_RESPONSE:
-            nrsp_answer_path = template.Template(NON_RESP_ANSWER_PATH).render(context)
-            resp = NonResponseAnswer(batch.start_question, _get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
-            response_dict[(batch.pk, batch.start_question.pk)] = resp
-        else:
-            for question in batch.survey_questions:
-                context['question_id'] = question.pk
-                # context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
-                answer_path = template.Template(ANSWER_PATH).render(context)
-                resp_text, resp_node = None, _get_nodes(answer_path, tree=survey_tree)
-                if resp_node: #if question is relevant but
-                    resp_text = resp_node[0].text
-                response_dict[(batch.pk, question.pk)] = resp_text
+        # non_response_path = template.Template(IS_NON_RESPONSE_PATH).render(context)
+        # non_response_node = _get_nodes(non_response_path, tree=survey_tree)
+        # if non_response_node and non_response_node[0].text.strip() == NON_RESPONSE:
+        #     nrsp_answer_path = template.Template(NON_RESP_ANSWER_PATH).render(context)
+        #     resp = NonResponseAnswer(batch.start_question, _get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
+        #     response_dict[(batch.pk, batch.start_question.pk)] = resp
+        # else:
+        for question in batch.survey_questions:
+            context['question_id'] = question.pk
+            # context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
+            answer_path = template.Template(ANSWER_PATH).render(context)
+            resp_text, resp_node = None, _get_nodes(answer_path, tree=survey_tree)
+            if resp_node: #if question is relevant but
+                resp_text = resp_node[0].text
+            response_dict[(batch.pk, question.pk)] = resp_text
     return response_dict
                 
 def _get_instance_id(survey_tree):
@@ -237,6 +236,25 @@ def save_household_list(interviewer, survey, survey_tree, survey_listing):
         households.append(household)
     return households
 
+def save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing):
+    house_nodes = _get_nodes(HOUSEHOLD_PATH, tree=survey_tree)
+    house_number = 1
+    non_responses = []
+    for node in house_nodes:
+        if _get_nodes('./nr', tree=node)[0].text == COULD_NOT_COMPLETE_SURVEY:
+            nr_msg = _get_nodes('./qnsr', tree=node)[0].text if len(_get_nodes('./qnsr', tree=node)) \
+                                                                else _get_nodes('./qnr', tree=node)[0].text
+            non_responses.append(
+                NonResponseAnswer.objects.create(
+                    household=Household.objects.get(listing=survey_listing.listing,
+                                                    house_number=_get_nodes('./houseNumber', tree=node)[0].text),
+                    survey_listing=survey_listing,
+                    interviewer=interviewer,
+                    value=nr_msg
+                )
+            )
+    return non_responses
+
 @transaction.autocommit
 def process_submission(interviewer, xml_file, media_files=[], request=None):
     """
@@ -259,6 +277,14 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
             submission = ODKSubmission.objects.create(interviewer=interviewer,
                     survey=survey, form_id= form_id,
                     instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
+                    xml=etree.tostring(survey_tree, pretty_print=True))
+    elif _get_form_type(survey_tree) == NON_RESPONSE:
+        non_responses = save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing)
+        for non_response in non_responses:
+            submission = ODKSubmission.objects.create(interviewer=interviewer,
+                    survey=survey, form_id= form_id,
+                    instance_id=_get_instance_id(survey_tree),
+                    household_member=member, household=non_response.household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
     else:
         member = _get_or_create_household_member(interviewer, survey, survey_tree)
