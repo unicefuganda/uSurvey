@@ -1,5 +1,5 @@
 from survey.models import LocationTypeDetails, Location, LocationType, Household, HouseholdMember, \
-    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer
+    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, QuestionOption
 from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -99,7 +99,10 @@ class ResultsDownloadService(object):
                                 and self.multi_display == self.AS_LABEL:
                             label = q_opts.get((question.pk, reply), None)
                             if label is None:
-                                label = question.options.get(text__iexact=reply).order
+                                try:
+                                    label = question.options.get(text__iexact=reply).order
+                                except QuestionOption.DoesNotExist:
+                                    label = reply
                                 q_opts[(question.pk, reply)] = label
                             reply = str(label)
                         answers.append(reply.encode('utf8'))

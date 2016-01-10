@@ -43,8 +43,9 @@ class QuestionForm(ModelForm):
         options = dict(self.data).get('options')
         if options:
             options = filter(lambda text: text.strip(), options)
-            options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
+            # options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
             options = map(lambda option: re.sub("  ", ' ', option), options)
+            options = map(lambda option: option.strip(), options)
             self.cleaned_data['options'] = options
         return options
 
