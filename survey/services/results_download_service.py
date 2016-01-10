@@ -48,7 +48,7 @@ class ResultsDownloadService(object):
         self.survey, self.questions = self._set_survey_and_questions(survey)
         self.locations = restrict_to or Location.objects.all()
         self.specific_households = specific_households
-        self.multi_display = multi_display
+        self.multi_display = int(multi_display)
 
     def _set_survey_and_questions(self, survey):
         if self.batch:
@@ -97,7 +97,7 @@ class ResultsDownloadService(object):
                         reply = member.reply(question)
                         if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
                                 and self.multi_display == self.AS_LABEL:
-                            label = q_opts.get((question.pk, reply))
+                            label = q_opts.get((question.pk, reply), None)
                             if label is None:
                                 label = question.options.get(text__iexact=reply).order
                                 q_opts[(question.pk, reply)] = label
