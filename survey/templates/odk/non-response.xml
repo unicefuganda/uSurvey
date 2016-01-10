@@ -13,7 +13,7 @@ xmlns:jr="http://openrosa.org/javarosa">
    <survey id="{{ survey.pk }}" >
      <meta>
        <instanceID />
-       <instanceName>Non Response {% for batch in batches %},{{batch.name}} {% endfor %}
+       <instanceName>Non Response {% for batch in batches %},{{batch.name}} {% endfor %}</instanceName>
      </meta>
 	 <type>NR</type>
     <household>
