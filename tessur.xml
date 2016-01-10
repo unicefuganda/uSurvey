@@ -1,0 +1,47 @@
+   <survey id="1" >
+     <meta>
+       <instanceID>34</instanceID>
+       <instanceName />
+     </meta>
+	 <type>S</type>
+    <household>
+        <houseNumber>3</houseNumber>
+		
+		<householdMember>
+            <surname>Peter</surname>
+            <firstName>Ola</firstName>
+            <sex>1</sex>
+            <age>10</age>
+            <isHead>0</isHead>
+        </householdMember>
+    </household>
+	
+	   
+		<b3>
+	   		
+				<q52>2</q52>
+			
+				<q55>3</q55>
+			
+				<q57>76</q57>
+			
+				<q58>92</q58>
+			
+				<q59>76</q59>
+			
+				<q60>82</q60>
+			
+		</b3>
+	
+	   
+		<b2>
+	   		
+				<q61>829</q61>
+			
+				<q62>92</q62>
+			
+				<q63>922</q63>
+			
+		</b2>
+	
+   </survey>

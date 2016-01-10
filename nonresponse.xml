@@ -1,0 +1,13 @@
+<survey id="1" >
+     <meta>
+       <instanceID>23</instanceID>
+       <instanceName>Hellos man</instanceName>
+     </meta>
+	 <type>NR</type>
+    <household>
+        <houseNumber>2</houseNumber>
+		<nr>0</nr>
+		<qnr>96</qnr>
+		<qnsr>I dont know</qnsr>
+    </household>
+ </survey>
