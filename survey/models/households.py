@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from django.utils.datastructures import SortedDict
-import dateutils
+import dateutils, string
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -222,7 +222,7 @@ class HouseholdMember(BaseModel):
             answer_class = Answer.get_class(question.answer_type)
             answers = answer_class.objects.filter(interview__householdmember=self, question=question)
             if answers.exists():
-                return answers[0].to_text()
+                return string.capwords(answers[0].to_text())
         return ''
 
     class Meta:

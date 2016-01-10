@@ -4,7 +4,7 @@ from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from datetime import datetime
-import csv, StringIO
+import csv, StringIO, string
 
 
 class ResultComposer:
@@ -37,15 +37,18 @@ class ResultComposer:
 
 
 class ResultsDownloadService(object):
+    AS_TEXT = 1
+    AS_LABEL = 0
     # MEMBER_ATTRS = {
     #     'id' : 'Household ID',
     #      'name' : 'Name', 'Age', 'Date of Birth', 'Gender'
     # }
-    def __init__(self, survey=None, batch=None, restrict_to=None, specific_households=None):
+    def __init__(self, survey=None, batch=None, restrict_to=None, specific_households=None, multi_display=AS_TEXT):
         self.batch = batch
         self.survey, self.questions = self._set_survey_and_questions(survey)
         self.locations = restrict_to or Location.objects.all()
         self.specific_households = specific_households
+        self.multi_display = multi_display
 
     def _set_survey_and_questions(self, survey):
         if self.batch:
@@ -71,6 +74,7 @@ class ResultsDownloadService(object):
 
     def get_summarised_answers(self):
         data = []
+        q_opts = {}
         if self.specific_households is None:
             all_households = Household.objects.filter(listing__survey_houselistings__survey=self.survey)
         else:
@@ -91,6 +95,12 @@ class ResultsDownloadService(object):
                                          member_gender])
                     for question in self.questions:
                         reply = member.reply(question)
+                        if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
+                                and self.multi_display == self.AS_LABEL:
+                            label = q_opts.get((question.pk, reply))
+                            if label is None:
+                                label = question.options.get(text__iexact=reply).order
+                                q_opts[(question.pk, reply)] = label
                         if question.answer_type == NumericalAnswer.choice_name():
                             reply = unicode(reply)
                         answers.append(reply.encode('utf8'))
