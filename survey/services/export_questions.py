@@ -58,6 +58,9 @@ def get_logic_print(question):
         # desc = flow.desc
         # if desc.startswith(flow.validation_test):
         #     desc = desc[len(flow.validation_test)+1:]
+        identifier = None
+        if flow.next_question:
+            identifier = flow.next_question.identifier
         content.append(' '.join([flow.validation_test, ' and '.join(flow.params_display()), #this a gamble for between ques
-                               flow.desc, flow.next_question.identifier]))
+                               flow.desc, identifier]))
     return ' | '.join(content)
