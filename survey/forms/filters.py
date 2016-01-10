@@ -91,7 +91,7 @@ class SurveyBatchFilterForm(forms.Form):
     AS_LABEL = 0
     survey = forms.ModelChoiceField(queryset=Survey.objects.all().order_by('name'), empty_label='----')
     batch = forms.ModelChoiceField(queryset=Batch.objects.all().order_by('name'), empty_label='----', required=False)
-    multi_option = forms.ChoiceField(choices=[(AS_TEXT, 'As Text'), (AS_LABEL, 'As Label')])
+    multi_option = forms.ChoiceField(choices=[(AS_TEXT, 'As Text'), (AS_LABEL, 'As Value')])
 
     def __init__(self, *args, **kwargs):
         super(SurveyBatchFilterForm, self).__init__(*args, **kwargs)
