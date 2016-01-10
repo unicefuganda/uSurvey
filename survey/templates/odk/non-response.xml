@@ -13,7 +13,7 @@ xmlns:jr="http://openrosa.org/javarosa">
    <survey id="{{ survey.pk }}" >
      <meta>
        <instanceID />
-       <instanceName />
+       <instanceName>Non Response {% for batch in batches %},{{batch.name}} {% endfor %}
      </meta>
 	 <type>NR</type>
     <household>
@@ -28,8 +28,6 @@ xmlns:jr="http://openrosa.org/javarosa">
   <!-- bindings -->
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
-  <bind nodeset="/survey/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat('Non-Response-',{% for r_household in registered_households %}'HH-{{r_household.house_number}}',{% endfor %}'')" />
   <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}int{% endif %}"  required="true()" />
   <bind nodeset="/survey/household/nr" type="select1" required="true()" />
 	<bind nodeset="/survey/household/qnr" type="select1"  relevant="selected(/survey/household/nr, '0')"/>
@@ -40,7 +38,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 </h:head>
 <h:body>
         <label>Household details</label>
-		<repeat nodeset="/survey/household">
+		<repeat nodeset="/survey/household"  appearance="field-list">
 		{% if survey.has_sampling %}
 			<select1 ref="/survey/household/houseNumber">
 		         <label>Select Household</label>
