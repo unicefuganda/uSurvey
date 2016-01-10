@@ -40,7 +40,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 </h:head>
 <h:body>
         <label>Household details</label>
-		<repeat nodeset="/survey/household"  appearance="field-list">
+		<repeat nodeset="/survey/household">
 		{% if survey.has_sampling %}
 			<select1 ref="/survey/household/houseNumber">
 		         <label>Select Household</label>
