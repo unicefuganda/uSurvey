@@ -32,15 +32,15 @@ xmlns:jr="http://openrosa.org/javarosa">
            readonly="true()" calculate="concat('Non-Response-',{% for r_household in registered_households %}'HH-{{r_household.house_number}}',{% endfor %}'')" />
   <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}int{% endif %}"  required="true()" />
   <bind nodeset="/survey/household/nr" type="select1" required="true()" />
-	<bind nodeset="/survey/household/qnr" type="select1"  relevant="selected(/survey/nr, '0')"/>
-	<bind nodeset="/survey/household/qnsr" type="select1"  relevant="selected(/survey/qnr, '96')"/>
+	<bind nodeset="/survey/household/qnr" type="select1"  relevant="selected(/survey/household/nr, '0')"/>
+	<bind nodeset="/survey/household/qnsr" type="select1"  relevant="selected(/survey/household/qnr, '96')"/>
 	 <bind nodeset="/survey/household"   />
 
   </model>
 </h:head>
 <h:body>
         <label>Household details</label>
-		<repeat nodeset="/survey/household">
+		<repeat nodeset="/survey/household"  appearance="field-list">
 		{% if survey.has_sampling %}
 			<select1 ref="/survey/household/houseNumber">
 		         <label>Select Household</label>
