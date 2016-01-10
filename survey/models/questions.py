@@ -119,7 +119,7 @@ class QuestionFlow(BaseModel):
         params = []
         for arg in self.text_arguments:
             if self.question.answer_type == MultiChoiceAnswer.choice_name():
-                params.append(self.question.options.get(order=arg.param))
+                params.append(self.question.options.get(order=arg.param).text)
             else:
                 params.append(arg.param)
 
