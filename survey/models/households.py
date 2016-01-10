@@ -222,7 +222,8 @@ class HouseholdMember(BaseModel):
             answer_class = Answer.get_class(question.answer_type)
             answers = answer_class.objects.filter(interview__householdmember=self, question=question)
             if answers.exists():
-                return string.capwords(answers[0].to_text())
+                reply = unicode(answers[0].to_text())
+                return string.capwords(reply)
         return ''
 
     class Meta:
