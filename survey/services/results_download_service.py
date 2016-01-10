@@ -101,7 +101,7 @@ class ResultsDownloadService(object):
                             if label is None:
                                 label = question.options.get(text__iexact=reply).order
                                 q_opts[(question.pk, reply)] = label
-                            reply = label
+                            reply = str(label)
                         answers.append(reply.encode('utf8'))
                     data.append(answers)
         return data
