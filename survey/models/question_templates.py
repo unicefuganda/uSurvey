@@ -34,7 +34,11 @@ class QuestionTemplate(BaseModel):
 class TemplateOption(BaseModel):
     question = models.ForeignKey(QuestionTemplate, null=True, related_name="options")
     text = models.CharField(max_length=150, blank=False, null=False)
-    order = models.PositiveIntegerField()    
+    order = models.PositiveIntegerField()
+
+    @property
+    def to_text(self):
+        return "%d: %s" % (self.order, self.text)
     
 # class QuestionTemplateChannel(BaseModel):
 #     ACCESS_CHANNELS = [(name, name) for name in InterviewerAccess.access_channels()]

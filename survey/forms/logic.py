@@ -88,7 +88,8 @@ class LogicForm(forms.Form):
         return self.cleaned_data.get('max_value', '')
 
     def _make_desc(self):
-        return '%s-%s' % (self.cleaned_data['condition'], self.ACTIONS[self.cleaned_data['action']])
+        # return '%s-%s' % (self.cleaned_data['condition'], self.ACTIONS[self.cleaned_data['action']])
+        return self.ACTIONS[self.cleaned_data['action']]
 
     def clean(self):
         field_name = ""

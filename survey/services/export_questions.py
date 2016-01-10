@@ -31,10 +31,33 @@ class ExportQuestionsService:
                 
 
 def get_question_template_as_dump(questions):
-    HEADERS = "Question Code,Question Text,Group,Module,Answer Type"
+    HEADERS = "Question Code,Question Text,Options,Group,Module,Answer Type"
     _formatted_responses = [HEADERS, ]
     map(lambda question:
-         _formatted_responses.append('%s,%s,%s,%s,%s' %
-        (question.identifier, question.text.replace('\r\n', ' '), question.group.name, question.module.name, question.answer_type.upper())
+         _formatted_responses.append('%s,%s,%s,%s,%s,%s' %
+        (question.identifier, question.text.replace('\r\n', ' '), '|'.join([opt.to_text for opt in
+                                                                            question.options.all()]),
+         question.group.name, question.module.name, question.answer_type.upper())
         ),questions)
     return _formatted_responses
+
+def get_batch_question_as_dump(questions):
+    HEADERS = "Question Code,Question Text,Options,Logic,Group,Module,Answer Type"
+    _formatted_responses = [HEADERS, ]
+    map(lambda question:
+         _formatted_responses.append('%s,%s,%s,%s,%s,%s,%s' %
+        (question.identifier, question.text.replace('\r\n', ' '), '|'.join([opt.to_text for opt in
+                                                                            question.options.all()]),
+         get_logic_print(question), question.group.name, question.module.name, question.answer_type.upper())
+        ),questions)
+    return _formatted_responses
+
+def get_logic_print(question):
+    content = []
+    for flow in question.flows.exclude(validation_test__isnull=True):
+        # desc = flow.desc
+        # if desc.startswith(flow.validation_test):
+        #     desc = desc[len(flow.validation_test)+1:]
+        content.append(' '.join([flow.validation_test, ' and '.join(flow.params_display()), #this a gamble for between ques
+                               flow.desc, flow.next_question.identifier]))
+    return ' | '.join(content)
