@@ -101,8 +101,6 @@ class ResultsDownloadService(object):
                             if label is None:
                                 label = question.options.get(text__iexact=reply).order
                                 q_opts[(question.pk, reply)] = label
-                        if question.answer_type == NumericalAnswer.choice_name():
-                            reply = unicode(reply)
                         answers.append(reply.encode('utf8'))
                     data.append(answers)
         return data
