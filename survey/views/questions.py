@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import permission_required
 from survey.forms.filters import QuestionFilterForm,  MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models import Question, Batch, QuestionTemplate, QuestionFlow, TextArgument, TemplateOption
 from survey.forms.question import QuestionForm #, QuestionFlowForm
-from survey.services.export_questions import get_question_template_as_dump
+from survey.services.export_questions import get_batch_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
 from survey.forms.logic import LogicForm
@@ -277,7 +277,7 @@ def _index(request, batch_id):
     question_filter_form = QuestionFilterForm(data=data, batch=batch)
     question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
     question_form = QuestionForm(batch)
-    question_flow_form = QuestionFlowForm()
+    question_flow_form = None#QuestionFlowForm()
     question_tree = None
     if batch.start_question:
         question_tree = batch.batch_questions.all()
@@ -332,7 +332,7 @@ def export_all_questions(request):
 def export_batch_questions(request, batch_id):
     batch = Batch.objects.get(pk=batch_id)
     filename =  '%s_questions' % batch.name
-    formatted_responses = get_question_template_as_dump(batch.survey_questions)
+    formatted_responses = get_batch_question_as_dump(batch.survey_questions)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))

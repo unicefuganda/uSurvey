@@ -34,7 +34,7 @@ from survey.interviewer_configs import MESSAGES
 def get_survey_xform(interviewer, survey):
     template_file = "odk/survey_form-no-repeat.xml"
     if BatchLocationStatus.objects.filter(batch__survey=survey, non_response=True).exists():
-        template_file = 'odk/non-response.xml'
+        template_file = 'odk/non-response-no-repeat.xml'
     registered_households = interviewer.generate_survey_households(survey)
     batches = interviewer.ea.open_batches(survey)
     return render_to_string(template_file, {
