@@ -45,7 +45,7 @@ class Command(BaseCommand):
                 if len(row) > total_divisions:
                     ea_name = row.pop(-1)
                 row = row[:total_divisions]
-            self.stdout.write('loading entry... %s' % row)
+            print 'loading entry... ', row
             with transaction.atomic():
                 with Location.tree.disable_mptt_updates():
                     for index, col in enumerate(row):

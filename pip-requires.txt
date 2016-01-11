@@ -22,7 +22,7 @@ django-celery
 selenium==2.35.0
 django-model-utils==2.2
 djangohttpdigest==0.2.3
-lxml==3.4.4
+lxml
 Hiredis==0.2.0
 django-redis-cache==1.6.4
 django-breadcrumbs==1.1.3
