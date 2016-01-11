@@ -150,9 +150,13 @@ def download_households(request):
     header_keyval = settings.HOUSEHOLD_EXPORT_HEADERS
     household_details = Household.objects.all().values(*header_keyval.values())
     headers= header_keyval.keys()
+    def pretty_print(header, entry):
+        if header == 'head_sex':
+            return 'M' if int(entry[header]) == 1 else 'F'
+        return str(entry[header])
     hd_response = [','.join(headers), ]
     for detail in household_details:
-        vals = ','.join([str(detail[header_keyval[header]]) for header in headers])
+        vals = ','.join([pretty_print(header_keyval[header], detail) for header in headers])
         hd_response.append(vals)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
