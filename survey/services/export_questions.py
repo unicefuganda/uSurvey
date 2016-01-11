@@ -31,24 +31,24 @@ class ExportQuestionsService:
                 
 
 def get_question_template_as_dump(questions):
-    HEADERS = "Question Code,Question Text,Options,Group,Module,Answer Type"
+    HEADERS = "Question Code,Question Text,Answer Type,Options,Group,Module"
     _formatted_responses = [HEADERS, ]
     map(lambda question:
          _formatted_responses.append('%s,%s,%s,%s,%s,%s' %
-        (question.identifier, question.text.replace('\r\n', ' '), '|'.join([opt.to_text for opt in
-                                                                            question.options.all()]),
-         question.group.name, question.module.name, question.answer_type.upper())
+        (question.identifier, question.text.replace('\r\n', ' '), question.answer_type.upper(),
+         '|'.join([opt.to_text for opt in question.options.all()]),
+         question.group.name, question.module.name)
         ),questions)
     return _formatted_responses
 
 def get_batch_question_as_dump(questions):
-    HEADERS = "Question Code,Question Text,Options,Logic,Group,Module,Answer Type"
+    HEADERS = "Question Code,Question Text,Answer Type,Options,Logic,Group,Module"
     _formatted_responses = [HEADERS, ]
     map(lambda question:
          _formatted_responses.append('%s,%s,%s,%s,%s,%s,%s' %
-        (question.identifier, question.text.replace('\r\n', ' '), '|'.join([opt.to_text for opt in
-                                                                            question.options.all()]),
-         get_logic_print(question), question.group.name, question.module.name, question.answer_type.upper())
+        (question.identifier, question.text.replace('\r\n', ' '), question.answer_type.upper(),
+         '|'.join([opt.to_text for opt in question.options.all()]),
+         get_logic_print(question), question.group.name, question.module.name)
         ),questions)
     return _formatted_responses
 
@@ -58,6 +58,10 @@ def get_logic_print(question):
         # desc = flow.desc
         # if desc.startswith(flow.validation_test):
         #     desc = desc[len(flow.validation_test)+1:]
+        next_question = flow.next_question
+        identifier = ''
+        if next_question:
+            next_question = next_question.identifier
         content.append(' '.join([flow.validation_test, ' and '.join(flow.params_display()), #this a gamble for between ques
-                               flow.desc, flow.next_question.identifier]))
+                               flow.desc or '', identifier]))
     return ' | '.join(content)

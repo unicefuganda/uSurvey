@@ -63,7 +63,8 @@ MALE = 'M'
 FEMALE = 'F'
 COULD_NOT_COMPLETE_SURVEY = '0'
 
-
+class NotEnoughHouseholds(ValueError):
+    pass
 
 def _get_tree(xml_file):
     return etree.fromstring(xml_file.read())
@@ -219,12 +220,12 @@ def _get_form_type(survey_tree):
 def save_household_list(interviewer, survey, survey_tree, survey_listing):
     house_nodes = _get_nodes(HOUSEHOLD_PATH, tree=survey_tree)
     if len(house_nodes) < survey.sample_size:
-        raise ValueError('Not enough households')
-    house_number = 1
+        raise NotEnoughHouseholds('Not enough households')
+    # house_number = 1
     households = []
     for node in house_nodes:
         household, _ = Household.objects.get_or_create(
-                                house_number=house_number,
+                                house_number=_get_nodes('./houseNumber', tree=node)[0].text,
                                  listing=survey_listing.listing,
                                  last_registrar=interviewer,
                                  registration_channel=ODKAccess.choice_name(),
@@ -232,7 +233,7 @@ def save_household_list(interviewer, survey, survey_tree, survey_listing):
                                  head_desc=_get_nodes('./headDesc', tree=node)[0].text,
                                  head_sex=_get_nodes('./headSex', tree=node)[0].text,
                     )
-        house_number = house_number + 1
+        # house_number = house_number + 1
         households.append(household)
     return households
 
