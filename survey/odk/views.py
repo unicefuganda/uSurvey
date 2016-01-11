@@ -19,7 +19,7 @@ from survey.odk.utils.log import audit_log, Actions, logger
 from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, get_zipped_dir, \
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
-    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth
+    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughHouseholds
 from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, \
     HouseholdListing, SurveyAllocation
 from django.utils.translation import ugettext as _
@@ -225,6 +225,8 @@ def submission(request):
         return response
     except SurveySampleSizeReached:
         return OpenRosaRequestForbidden(u"Max sample size reached for this survey")
+    except NotEnoughHouseholds:
+        OpenRosaRequestForbidden(u"Not Enough Households")
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer, 
             _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
