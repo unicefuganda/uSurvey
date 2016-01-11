@@ -153,7 +153,7 @@ def download_households(request):
     def pretty_print(header, entry):
         if header == 'head_sex':
             return 'M' if int(entry[header]) == 1 else 'F'
-        return str(entry[header])
+        return str(entry[header]).replace(',', '-')
     hd_response = [','.join(headers), ]
     for detail in household_details:
         vals = ','.join([pretty_print(header_keyval[header], detail) for header in headers])
