@@ -148,7 +148,7 @@ def save(request, instance=None):
 def download_households(request):
     filename = 'all_households'
     header_keyval = settings.HOUSEHOLD_EXPORT_HEADERS
-    household_details = Household.objects.all().values(*header_keyval.values())
+    household_details = Household.objects.all().order_by('listing__ea', 'house_number').values(*header_keyval.values())
     headers= header_keyval.keys()
     def pretty_print(header, entry):
         if header == 'head_sex':
