@@ -39,13 +39,13 @@ class Command(BaseCommand):
         for row in csv_file:
             parent = None
             if len(row) < total_divisions:
-                self.stdout.write('skiping entry... %s' % row)
+                print 'skiping entry... ', row
                 continue
             else:
                 if len(row) > total_divisions:
                     ea_name = row.pop(-1)
                 row = row[:total_divisions]
-            self.stdout.write('loading entry... %s' % row)
+
             with transaction.atomic():
                 with Location.tree.disable_mptt_updates():
                     for index, col in enumerate(row):
@@ -57,6 +57,9 @@ class Command(BaseCommand):
                             ea, created = EnumerationArea.objects.get_or_create(name=ea_name, code='%s-%s'%(parent.pk, ea_name))
                             if created:
                                 ea.locations.add(parent)
+            count = count + 1
+            if count % 1000 == 0:
+                print 'loaded up to entry...' , row
         #clean up... delete locations and types having no name
         Location.tree.rebuild()
         LocationType.objects.filter(name='').delete()
