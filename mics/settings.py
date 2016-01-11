@@ -271,10 +271,9 @@ ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Proce
 INTERVIEWER_EXPORT_HEADERS =  ['ea', 'name', 'age', 'level_of_education', 'language', 'mobile_numbers', 'odk_id']
 HOUSEHOLD_EXPORT_HEADERS =  {
                             'HOUSE NUMBER' : 'house_number',
-                             # 'Head' : 'head_name',
-                             'REGISTRAR' : 'last_registrar__name',
-                             'REGISTRATION CHANNEL' : 'registration_channel',
-                             'SURVEY LISTING': 'listing__initial_survey__name',
+                            'PHYSICAL ADDRESS' : 'physical_address',
+                            'HEAD MEMBER' : 'head_desc',
+                            'SEX' : 'head_sex',
                              'ENUMERATION AREA': 'listing__ea__name',
                              }
 AGGREGATORS = [('testAggregator', 'testAggregator'), ]

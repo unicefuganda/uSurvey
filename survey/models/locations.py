@@ -59,6 +59,7 @@ class Location(MPTTModel, BaseModel):
 
     class MPTTMeta:
         order_insertion_by = ['name']
+        ordering = ['name', ]
 
     def __unicode__(self):
         return self.name
