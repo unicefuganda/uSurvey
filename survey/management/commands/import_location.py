@@ -4,7 +4,6 @@ from django.template.defaultfilters import slugify
 import csv, string
 from django.db import transaction
 from mptt.models import MPTTModel, TreeForeignKey
-
 import datetime
 
 

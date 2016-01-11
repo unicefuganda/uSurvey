@@ -20,6 +20,7 @@ class Survey(BaseModel):
 
     class Meta:
         app_label = 'survey'
+        ordering = ['name', ]
         permissions = (
             ("view_completed_survey", "Can view Completed interviewers"),
         )
