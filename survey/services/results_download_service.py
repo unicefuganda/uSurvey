@@ -108,8 +108,8 @@ class ResultsDownloadService(object):
                                 reply = str(label)
                             answers.append(reply.encode('utf8'))
                         data.append(answers)
-                    except:
-                        pass
+                    except Exception, ex:
+                        print 'Error ', str(ex)
         return data
 
     def generate_report(self):
