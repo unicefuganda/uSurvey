@@ -1,13 +1,13 @@
-Django==1.5.1
+Django==1.6.1
 psycopg2==2.5
 South==0.7.6
 django-nose==1.1
 sure==1.2.3
-lettuce==0.2.19
+lettuce-0.2.21
 splinter==0.5.2
 django-extensions==1.1.1
 RapidSMS==0.14.0
-django-mptt==0.5.5
+django-mptt==0.6.0
 Werkzeug==0.8.3
 django-autocomplete-light==1.2.0
 git+git://github.com/tgdn/django-bootstrap-pagination.git

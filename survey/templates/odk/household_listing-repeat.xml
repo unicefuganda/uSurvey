@@ -17,8 +17,8 @@ xmlns:jr="http://openrosa.org/javarosa">
      </meta>
     <type>L</type>
     <household>
-        <houseNumber />
         {% comment %}
+            <houseNumber />
             <listingCompleted>0</listingCompleted>
         {% endcomment %}
         <physicalAddress />
@@ -33,7 +33,6 @@ xmlns:jr="http://openrosa.org/javarosa">
   <!-- bindings -->
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
-  <bind nodeset="/survey/household/houseNumber" type="string"  required="true()" />
   <bind nodeset="/survey/household/physicalAddress" type="string"  required="true()" />
   <bind nodeset="/survey/household/headDesc" type="string"  required="true()" />
   <bind nodeset="/survey/household/headSex" type="select1"  required="true()"  />
@@ -48,9 +47,11 @@ xmlns:jr="http://openrosa.org/javarosa">
     <group>
         <label>Household Details</label>
         <repeat nodeset="/survey/household" appearance="field-list">
-            <input ref="/survey/household/houseNumber">
-                <label>Enter household number</label>
-            </input>
+            {% comment %}
+            <!--<input ref="/survey/household/houseNumber">-->
+                <!--<label>Enter household number</label>-->
+            <!--</input>-->
+            {% endcomment %}
             <input ref="/survey/household/physicalAddress">
                 <label>Enter Physical Address</label>
             </input>
