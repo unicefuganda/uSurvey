@@ -35,7 +35,7 @@ def get_question_template_as_dump(questions):
     _formatted_responses = [HEADERS, ]
     map(lambda question:
          _formatted_responses.append('%s,%s,%s,%s,%s,%s' %
-        (question.identifier, question.text.replace('\r\n', ' '), '|'.join([opt.to_text for opt in
+        (question.identifier, question.text.replace('\r\n', ' '), ' | '.join([opt.to_text for opt in
                                                                             question.options.all()]),
          question.group.name, question.module.name, question.answer_type.upper())
         ),questions)
@@ -46,7 +46,7 @@ def get_batch_question_as_dump(questions):
     _formatted_responses = [HEADERS, ]
     map(lambda question:
          _formatted_responses.append('%s,%s,%s,%s,%s,%s,%s' %
-        (question.identifier, question.text.replace('\r\n', ' '), '|'.join([opt.to_text for opt in
+        (question.identifier, question.text.replace('\r\n', ' '), ' | '.join([opt.to_text for opt in
                                                                             question.options.all()]),
          get_logic_print(question), question.group.name, question.module.name, question.answer_type.upper())
         ),questions)
