@@ -316,7 +316,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
             if member.household.has_completed(survey):
                 map(lambda batch: member.household.batch_completed(batch, interviewer), treated_batches.values())
                 member.household.survey_completed(survey, interviewer)
-            household = member.household
+        household = member.household
         submission = ODKSubmission.objects.create(interviewer=interviewer,
                     survey=survey, form_id= form_id,
                     instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
