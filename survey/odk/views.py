@@ -108,7 +108,7 @@ def form_list(request):
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     #to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
-    if allocation:
+    if allocation and interviewer.ea.open_batches:
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
               _("survey allocation %s" % allocation.survey), {}, request)
         survey = allocation.survey
