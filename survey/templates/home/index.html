@@ -46,6 +46,8 @@ function getCompletionFor(survey_id){
               var property = feature.properties['{{loc_field}}'];
               if(property === undefined)
                 property = feature.properties['{{alt_loc_field}}'];
+              if(property)
+                property = property.toUpperCase();
               feature.properties.rate = rate_data[property]
             })
           });
@@ -91,9 +93,11 @@ info.onAdd = function (map) {
 info.update = function (props) {
   this._div.innerHTML = '<h1>Completion rates:</h1>';
   if(typeof props != 'undefined'){
-    var property = props['DNAME_2010'];
+    var property = props['{{loc_field}}'];
     if(property === undefined)
-        property = props['DNAME_2006'];
+        property = props['{{alt_loc_field}}'];
+    if(property)
+       property = property.toUpperCase();
     rate = props.rate >-1 ? props.rate + '%' : 'Survey not opened.';
     this._div.innerHTML += property +': '+ rate;
   }
