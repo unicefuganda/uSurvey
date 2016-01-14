@@ -37,7 +37,7 @@ class Interview(BaseModel):
         return self.last_question is not None
 
     def get_anwser(self, question, capwords=True):
-        if self.belongs_to(question.group):
+        if self.householdmember.belongs_to(question.group):
             answer_class = Answer.get_class(question.answer_type)
             answers = answer_class.objects.filter(interview=self, question=question)
             if answers.exists():
