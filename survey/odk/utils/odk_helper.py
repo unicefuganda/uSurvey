@@ -300,14 +300,17 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                 if answer is not None:
                     if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(), VideoAnswer.choice_name()]:
                         answer = media_files.get(answer, None)
-                    interview = interviews.get(b_id,
-                                               Interview.objects.get_or_create(
+                    interview = interviews.get(b_id, None)
+                    if interview is None:
+                        interview, _ = Interview.objects.get_or_create(
                                                    interviewer=interviewer,
                                                    householdmember=member,
                                                    batch=batch,
-                                                   interview_channel=interviewer.odk_access[0]
-                                               )[0])
-                    interviews[b_id] = interview
+                                                   interview_channel=interviewer.odk_access[0],
+                                                   ea=interviewer.ea
+                                               )
+
+                        interviews[b_id] = interview
                     created = record_interview_answer(interview, question, answer)
                 if b_id not in treated_batches.keys():
                     treated_batches[b_id] = batch

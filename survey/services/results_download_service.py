@@ -1,5 +1,5 @@
 from survey.models import LocationTypeDetails, Location, LocationType, Household, HouseholdMember, \
-    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, QuestionOption
+    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, QuestionOption, Interview
 from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -110,6 +110,39 @@ class ResultsDownloadService(object):
                         data.append(answers)
                     except Exception, ex:
                         print 'Error ', str(ex)
+        return data
+
+    def get_interview_answers(self):
+        data = []
+        q_opts = {}
+        interviews = Interview.objects.filter(batch=self.batch).order_by('householdmember__survey_listing',
+                                                                         'householdmember__household')
+        for interview in interviews:
+            location_ancestors = interview.ea.parent_locations()
+            try:
+                member = interview.householdmember
+                household = member.household
+                answers = list(location_ancestors)
+                member_gender = 'Male' if member.gender == HouseholdMember.MALE else 'Female'
+                answers.extend([interview.ea.name, household.house_number, '%s-%s' % (member.surname, member.first_name), str(member.age),
+                                     member.date_of_birth.strftime(settings.DATE_FORMAT),
+                                     member_gender])
+                for question in self.questions:
+                    reply = interview.get_anwser(question)
+                    if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
+                            and self.multi_display == self.AS_LABEL:
+                        label = q_opts.get((question.pk, reply), None)
+                        if label is None:
+                            try:
+                                label = question.options.get(text__iexact=reply).order
+                            except QuestionOption.DoesNotExist:
+                                label = reply
+                            q_opts[(question.pk, reply)] = label
+                        reply = str(label)
+                    answers.append(reply.encode('utf8'))
+                data.append(answers)
+            except Exception, ex:
+                print 'Error ', str(ex)
         return data
 
     def generate_report(self):

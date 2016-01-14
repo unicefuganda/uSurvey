@@ -276,7 +276,7 @@ HOUSEHOLD_EXPORT_HEADERS =  OrderedDict([
                                     ('HEAD MEMBER',  'head_desc'),
                                     ('SEX' , 'head_sex'),
                                     ('ENUMERATION AREA', 'listing__ea__name'),
-                                    ('REGISTRAR', 'last_registrar'),
+                                    ('REGISTRAR', 'last_registrar__name'),
                                     ('REGISTRATION_CHANNEL', 'registration_channel'),
                                     ('SURVEY_LISTING', 'listing__initial_survey__name')
                                     ])

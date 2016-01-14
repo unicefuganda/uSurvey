@@ -148,15 +148,16 @@ def save(request, instance=None):
 def download_households(request):
     filename = 'all_households'
     header_keyval = settings.HOUSEHOLD_EXPORT_HEADERS
-    locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
-    household_details = Household.objects.filter(
-        listing__ea=locations_filter.get_enumerations()
-    ).order_by('listing__ea', 'house_number').values(*header_keyval.values())
+    # locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
+    # household_details = Household.objects.filter(
+    #     listing__ea=locations_filter.get_enumerations()
+    # ).order_by('listing__ea', 'house_number').values(*header_keyval.values())
+    household_details = Household.objects.all().order_by('listing__ea', 'house_number').values(*header_keyval.values())
     headers= header_keyval.keys()
     def pretty_print(header, entry):
         if header == 'head_sex':
             return 'M' if int(entry[header]) == 1 else 'F'
-        return str(entry[header]).replace(',', '-')
+        return unicode(entry[header]).encode('utf8').replace(',', '-')
     hd_response = [','.join(headers), ]
     for detail in household_details:
         vals = ','.join([pretty_print(header_keyval[header], detail) for header in headers])

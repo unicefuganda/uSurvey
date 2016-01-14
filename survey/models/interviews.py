@@ -1,4 +1,4 @@
-import os
+import os, string
 from datetime import datetime
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -23,6 +23,7 @@ class Interview(BaseModel):
     batch = models.ForeignKey("Batch", related_name='interviews')
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
+    ea = models.ForeignKey('EnumerationArea', related_name='interviews')
     last_question = models.ForeignKey("Question", related_name='ongoing', null=True, blank=True)
 
     def __unicode__(self):
@@ -34,6 +35,17 @@ class Interview(BaseModel):
     @property
     def has_started(self):
         return self.last_question is not None
+
+    def get_anwser(self, question, capwords=True):
+        if self.belongs_to(question.group):
+            answer_class = Answer.get_class(question.answer_type)
+            answers = answer_class.objects.filter(interview=self, question=question)
+            if answers.exists():
+                reply = unicode(answers[0].to_text())
+                if capwords:
+                    reply = string.capwords(reply)
+                return reply
+        return ''
 
     def respond(self, reply=None, channel=ODKAccess.choice_name()):
         '''
