@@ -10,7 +10,7 @@
 <br />
 <div>
     <a href="{% url 'new_household_page' %}" class="btn btn_primary pull-right" id="add-household"><i class="icon-plus"></i> Add Household</a>
-    <a href="{% url 'download_household' %}" class="btn btn_primary pull-right" id="download-household"><i class="icon"></i> Download Households</a>
+    <a href="{% url 'download_household' %}?{{ request.META.QUERY_STRING}}" class="btn btn_primary pull-right" id="download-household"><i class="icon"></i> Download Households</a>
      {% include "search_form.html" %}
 </div>
     <br/>

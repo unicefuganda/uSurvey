@@ -17,6 +17,8 @@ from django.core.urlresolvers import reverse
 from survey.services.results_download_service import ResultsDownloadService
 
 
+
+
 def is_valid(params):
     if not contains_key(params, 'batch'):
         return False

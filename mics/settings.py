@@ -254,7 +254,10 @@ HOUSEHOLD_EXPORT_HEADERS =  OrderedDict([
                                     ('PHYSICAL ADDRESS', 'physical_address'),
                                     ('HEAD MEMBER',  'head_desc'),
                                     ('SEX' , 'head_sex'),
-                                    ('ENUMERATION AREA', 'listing__ea__name')
+                                    ('ENUMERATION AREA', 'listing__ea__name'),
+                                    ('REGISTRAR', 'last_registrar'),
+                                    ('REGISTRATION_CHANNEL', 'registration_channel'),
+                                    ('SURVEY_LISTING', 'listing__initial_survey__name')
                                     ])
 AGGREGATORS = [('testAggregator', 'testAggregator'), ]
 DEFAULT_AGGREGATOR = 'testAggregator'
