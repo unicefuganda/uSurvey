@@ -61,7 +61,7 @@ def get_logic_print(question):
         next_question = flow.next_question
         identifier = ''
         if next_question:
-            next_question = next_question.identifier
+            identifier = next_question.identifier
         content.append(' '.join([flow.validation_test, ' and '.join(flow.params_display()), #this a gamble for between ques
                                flow.desc or '', identifier]))
     return ' | '.join(content)
