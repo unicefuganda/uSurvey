@@ -555,7 +555,8 @@ class Interviews(Task):
                                                                householdmember=self._house_member,
                                                                batch=self._pending_batches[0],
                                                                interview_channel=self.access,
-                                                               closure_date__isnull=True
+                                                               closure_date__isnull=True,
+                                                                ea=self.enumeration_area
                                                                )
             return interview
     
@@ -614,7 +615,8 @@ class ConfirmContinue(Interviews):
                     interview = Interview.objects.create(interviewer=self.interviewer,
                                                     householdmember=house_member,
                                                     batch=self._ongoing_interview.batch,
-                                                    interview_channel=self.access)
+                                                    interview_channel=self.access,
+                                                         ea=self.enumeration_area)
                     self._ongoing_interview = interview
                 task = StartInterview(self.access)
                 task._house_member = house_member
@@ -656,7 +658,7 @@ class StartInterview(Interviews):
                 interview, created = Interview.objects.get_or_create(interviewer=self.interviewer,
                                                 householdmember=house_member,
                                                 batch=self._pending_batches[0],
-                                                interview_channel=self.access)
+                                                interview_channel=self.access, ea=self.enumeration_area)
                 if created:
                     self._ongoing_interview = interview
                     return self.intro()
