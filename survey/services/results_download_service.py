@@ -115,8 +115,8 @@ class ResultsDownloadService(object):
     def get_interview_answers(self):
         data = []
         q_opts = {}
-        interviews = Interview.objects.filter(batch=self.batch).order_by('householdmember__survey_listing',
-                                                                         'householdmember__household')
+        interviews = Interview.objects.filter(batch=self.batch)#.order_by('householdmember__survey_listing',
+                                                                #         'householdmember__household')
         for interview in interviews:
             location_ancestors = interview.ea.parent_locations().values_list('name', flat=True)
             try:
