@@ -20,7 +20,7 @@ class ResultComposer:
         print 'commencing...'
         try:
             mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [self.user.email, ])
-            data = self.results_download_service.generate_report()
+            data = self.results_download_service.generate_interview_reports()
             #data = [[unicode('"%s"' % entry) for entry in entries] for entries in data]
             f = StringIO.StringIO()
             writer = csv.writer(f)
@@ -148,6 +148,11 @@ class ResultsDownloadService(object):
     def generate_report(self):
         data = [self.set_report_headers(), ]
         data.extend(self.get_summarised_answers())
+        return data
+
+    def generate_interview_reports(self):
+        data = [self.set_report_headers(), ]
+        data.extend(self.get_interview_answers())
         return data
 
     def _get_ancestors_names(self, household_location, exclude_type='country'):
