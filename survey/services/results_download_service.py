@@ -121,7 +121,8 @@ class ResultsDownloadService(object):
         answer_objs = {}
         for answer_type in Answer.answer_types():
             answer_class = Answer.get_class(answer_type)
-            answer_objs[answer_type] = answer_class.objects.filter(interview__batch=self.batch)
+            answer_objs[answer_type] = dict([((a.interview.pk, a.question.pk), a.to_text())
+                                        for a in answer_class.objects.filter(interview__batch=self.batch)])
         locations_map = {}
         for interview in interviews:
             ea = interview.ea
@@ -138,11 +139,7 @@ class ResultsDownloadService(object):
                                      member.date_of_birth.strftime(settings.DATE_FORMAT),
                                      member_gender])
                 for question in self.questions:
-                    try:
-                        reply = answer_objs[question.answer_type].filter(interview=interview,#interview.get_anwser(question)
-                                                                 question=question)[0].to_text()
-                    except IndexError:
-                        reply = ''
+                    reply = answer_objs[question.answer_type].get((interview.pk, question.pk), '')
                     reply = unicode(reply)
                     if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
                             and self.multi_display == self.AS_LABEL:
