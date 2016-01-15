@@ -20,7 +20,7 @@ class ResultComposer:
         print 'commencing...'
         try:
             mail = EmailMessage(subject, text, settings.DEFAULT_EMAIL_SENDER, [self.user.email, ])
-            data = self.results_download_service.generate_interview_reports()
+            data = self.results_download_service.generate_report()
             #data = [[unicode('"%s"' % entry) for entry in entries] for entries in data]
             f = StringIO.StringIO()
             writer = csv.writer(f)
@@ -121,15 +121,8 @@ class ResultsDownloadService(object):
         answer_objs = {}
         for answer_type in Answer.answer_types():
             answer_class = Answer.get_class(answer_type)
-            relevant_answers = answer_class.objects.filter(interview__batch=self.batch)
-            for a in relevant_answers:
-                type_answer = []
-                if answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
-                            and self.multi_display == self.AS_LABEL:
-                    type_answer.append(((a.interview.pk, a.question.pk), a.to_label()))
-                else:
-                    type_answer.append(((a.interview.pk, a.question.pk), a.to_text()))
-                answer_objs[answer_type] = dict(type_answer)
+            answer_objs[answer_type] = dict([((a.interview.pk, a.question.pk), a.to_text())
+                                        for a in answer_class.objects.filter(interview__batch=self.batch)])
         locations_map = {}
         for interview in interviews:
             ea = interview.ea
@@ -146,8 +139,21 @@ class ResultsDownloadService(object):
                                      member.date_of_birth.strftime(settings.DATE_FORMAT),
                                      member_gender])
                 for question in self.questions:
-                    reply = answer_objs[question.answer_type].get((interview.pk, question.pk), '')
+                    try:
+                        reply = answer_objs[question.answer_type].get((interview.pk, question.pk), '')
+                    except IndexError:
+                        reply = ''
                     reply = unicode(reply)
+                    if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
+                            and self.multi_display == self.AS_LABEL:
+                        label = q_opts.get((question.pk, reply), None)
+                        if label is None:
+                            try:
+                                label = question.options.get(text__iexact=reply).order
+                            except QuestionOption.DoesNotExist:
+                                label = reply
+                            q_opts[(question.pk, reply)] = label
+                        reply = str(label)
                     answers.append(reply.encode('utf8'))
                 data.append(answers)
             except Exception, ex:

@@ -11,6 +11,7 @@ from survey.services.results_download_service import ResultsDownloadService, Res
 from survey.utils.views_helper import contains_key
 from survey.tasks import email_task
 from survey.forms.enumeration_area import LocationsFilterForm
+from django.core.urlresolvers import reverse
 
 
 def _process_export(survey_batch_filter_form):
@@ -19,7 +20,7 @@ def _process_export(survey_batch_filter_form):
     multi_option = survey_batch_filter_form.cleaned_data['multi_option']
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % (batch.name if batch else survey.name)
-    data = ResultsDownloadService(batch=batch, survey=survey, multi_display=multi_option).generate_interview_reports()
+    data = ResultsDownloadService(batch=batch, survey=survey, multi_display=multi_option).generate_report()
     writer = csv.writer(response)
     for row in data:
         writer.writerow(row)
@@ -29,6 +30,8 @@ def _process_export(survey_batch_filter_form):
 @permission_required('auth.can_view_aggregates')
 def download(request):
     survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
+    locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
+    last_selected_loc = locations_filter.last_location_selected
     if request.GET and request.GET.get('action'):
         survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
         if survey_batch_filter_form.is_valid():
@@ -39,15 +42,19 @@ def download(request):
                 composer = ResultComposer(request.user,
                                           ResultsDownloadService(batch=batch,
                                                                  survey=survey,
+                                                                 restrict_to=last_selected_loc,
                                                                 multi_display=multi_option))
                 email_task.delay(composer)
                 messages.warning(request, "Email would be sent to you shortly. This could take a while.")
             else:
                 return _process_export(survey_batch_filter_form)
+    loc_types = LocationType.in_between()
     return render(request, 'aggregates/download_excel.html',
                   {
                       'survey_batch_filter_form': survey_batch_filter_form,
-                      # 'locations_filter' : locations_filter
+                      'locations_filter' : locations_filter,
+                      'export_url' : '%s?%s' % (reverse('excel_report'), request.META['QUERY_STRING']),
+                      'location_filter_types' : loc_types
                   })
 
 @login_required
