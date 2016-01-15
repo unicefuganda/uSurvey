@@ -1,5 +1,5 @@
 from survey.models import LocationTypeDetails, Location, LocationType, Household, HouseholdMember, \
-    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, QuestionOption, Interview
+    HouseholdMemberGroup, Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, QuestionOption, Interview
 from survey.utils.views_helper import get_ancestors
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -39,6 +39,7 @@ class ResultComposer:
 class ResultsDownloadService(object):
     AS_TEXT = 1
     AS_LABEL = 0
+    answers = None
     # MEMBER_ATTRS = {
     #     'id' : 'Household ID',
     #      'name' : 'Name', 'Age', 'Date of Birth', 'Gender'
@@ -115,8 +116,12 @@ class ResultsDownloadService(object):
     def get_interview_answers(self):
         data = []
         q_opts = {}
-        interviews = Interview.objects.filter(batch=self.batch)#.order_by('householdmember__survey_listing',
-                                                                #         'householdmember__household')
+        interviews = Interview.objects.filter(batch=self.batch).order_by('householdmember__survey_listing',
+                                                                         'householdmember__household')
+        answers = {}
+        for answer_type in Answer.answer_types():
+            answer_class = Answer.get_class(answer_type)
+            answers[answer_type] = answer_class.objects.filter(interview__batch=self.batch)
         locations_map = {}
         for interview in interviews:
             ea = interview.ea
@@ -133,7 +138,12 @@ class ResultsDownloadService(object):
                                      member.date_of_birth.strftime(settings.DATE_FORMAT),
                                      member_gender])
                 for question in self.questions:
-                    reply = interview.get_anwser(question)
+                    try:
+                        reply = answers[question.answer_type].filter(interview=interview,#interview.get_anwser(question)
+                                                                 question=question)[0].to_text()
+                    except IndexError:
+                        reply = ''
+                    reply = unicode(reply)
                     if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
                             and self.multi_display == self.AS_LABEL:
                         label = q_opts.get((question.pk, reply), None)
@@ -169,4 +179,3 @@ class ResultsDownloadService(object):
         result= [ancestor.name for ancestor in location_ancestors]
         result.reverse()
         return result
-
