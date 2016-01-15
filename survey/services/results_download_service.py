@@ -129,12 +129,12 @@ class ResultsDownloadService(object):
         for answer_type in Answer.answer_types():
             query_args = list(val_list_args)
             value = 'value'
-            # if answer_type in [MultiChoiceAnswer.choice_name(), ]:
-            #     value = 'value__order'
-                # if  self.multi_display == self.AS_LABEL:
-                #     value = 'value__order'
-                # else:
-                #     value = 'value__text'
+            if answer_type in [MultiChoiceAnswer.choice_name(), ]:
+                value = 'value__order'
+                if  self.multi_display == self.AS_LABEL:
+                    value = 'value__order'
+                else:
+                    value = 'value__text'
             query_args.append(value)
             answer_class = Answer.get_class(answer_type)
             # print 'using query_args ', query_args
