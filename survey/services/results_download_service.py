@@ -123,13 +123,13 @@ class ResultsDownloadService(object):
             answer_class = Answer.get_class(answer_type)
             relevant_answers = answer_class.objects.filter(interview__batch=self.batch)
             for a in relevant_answers:
+                type_answer = []
                 if answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
                             and self.multi_display == self.AS_LABEL:
-                    answer_objs[answer_type] = dict([((a.interview.pk, a.question.pk), a.to_label())
-                                        ])
+                    type_answer.append(((a.interview.pk, a.question.pk), a.to_label()))
                 else:
-                    answer_objs[answer_type] = dict([((a.interview.pk, a.question.pk), a.to_text())
-                                        ])
+                    type_answer.append(((a.interview.pk, a.question.pk), a.to_text()))
+                answer_objs[answer_type] = dict(type_answer)
         locations_map = {}
         for interview in interviews:
             ea = interview.ea

@@ -390,6 +390,11 @@ class MultiSelectAnswer(Answer):
         map(lambda opt: texts.append(opt.text), self.value.all())
         return ' and '.join(texts)
 
+    def to_label(self):
+        texts = []
+        map(lambda opt: texts.append(str(opt.order)), self.value.all())
+        return ' and '.join(texts)
+
     @classmethod
     def validators(cls):
         return [cls.equals, cls.contains]
