@@ -118,10 +118,10 @@ class ResultsDownloadService(object):
         q_opts = {}
         interviews = Interview.objects.filter(batch=self.batch).order_by('householdmember__survey_listing',
                                                                          'householdmember__household')
-        answers = {}
+        answer_objs = {}
         for answer_type in Answer.answer_types():
             answer_class = Answer.get_class(answer_type)
-            answers[answer_type] = answer_class.objects.filter(interview__batch=self.batch)
+            answer_objs[answer_type] = answer_class.objects.filter(interview__batch=self.batch)
         locations_map = {}
         for interview in interviews:
             ea = interview.ea
@@ -139,7 +139,7 @@ class ResultsDownloadService(object):
                                      member_gender])
                 for question in self.questions:
                     try:
-                        reply = answers[question.answer_type].filter(interview=interview,#interview.get_anwser(question)
+                        reply = answer_objs[question.answer_type].filter(interview=interview,#interview.get_anwser(question)
                                                                  question=question)[0].to_text()
                     except IndexError:
                         reply = ''
