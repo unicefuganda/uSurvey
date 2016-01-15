@@ -137,12 +137,12 @@ class ResultsDownloadService(object):
                 #     value = 'value__text'
             query_args.append(value)
             answer_class = Answer.get_class(answer_type)
-            print 'using query_args ', query_args
+            # print 'using query_args ', query_args
             answer_data = answer_class.objects.filter(interview__batch=self.batch).\
                 values_list('interview__householdmember__pk', 'question__pk', *query_args).\
                         order_by('interview__ea__locations', 'interview__householdmember__household')
             answer_data = list(answer_data)
-            print 'answer data ', len(answer_data)
+            # print 'answer data ', len(answer_data)
             #now grab member reports
             for data in answer_data:
                 hm_pk, question_pk = data[:2]
@@ -160,7 +160,7 @@ class ResultsDownloadService(object):
         for hm in member_reports.values():
             answers = hm['mem_details']
             for question in self.questions:
-                answers.append(hm[question.pk])
+                answers.append(hm.get(question.pk, ''))
             data.append(answers)
         return data
 
