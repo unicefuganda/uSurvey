@@ -117,14 +117,19 @@ class ResultsDownloadService(object):
         q_opts = {}
         interviews = Interview.objects.filter(batch=self.batch)#.order_by('householdmember__survey_listing',
                                                                 #         'householdmember__household')
+        locations_map = {}
         for interview in interviews:
-            location_ancestors = interview.ea.parent_locations().values_list('name', flat=True)
+            ea = interview.ea
+            location_ancestors = locations_map.get(ea.pk, None)
+            if location_ancestors is None:
+                location_ancestors = ea.parent_locations().values_list('name', flat=True)
+                locations_map[ea.pk] = location_ancestors
             try:
                 member = interview.householdmember
                 household = member.household
                 answers = list(location_ancestors)
                 member_gender = 'Male' if member.gender == HouseholdMember.MALE else 'Female'
-                answers.extend([interview.ea.name, household.house_number, '%s-%s' % (member.surname, member.first_name), str(member.age),
+                answers.extend([ea.name, household.house_number, '%s-%s' % (member.surname, member.first_name), str(member.age),
                                      member.date_of_birth.strftime(settings.DATE_FORMAT),
                                      member_gender])
                 for question in self.questions:
