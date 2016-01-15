@@ -153,7 +153,7 @@ class ResultsDownloadService(object):
                                                                        report_data[-3]).years))
                     report_data[-3] = report_data[-3].strftime(settings.DATE_FORMAT)
                     report_data[-2] = 'M' if report_data[-2] else 'F'
-                    member_details = [unicode(md) for md in report_data[:-1]]
+                    member_details = [unicode(md).encode('utf8') for md in report_data[:-1]]
                     hm_data = OrderedDict([('mem_details' , member_details), ])
                 hm_data[question_pk] = unicode(report_data[-1])
                 member_reports[hm_pk] = hm_data
