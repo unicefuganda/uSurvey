@@ -127,7 +127,7 @@ class ResultsDownloadService(object):
             parent_loc = '%s__parent' % parent_loc
             val_list_args.insert(0, '%s__name'%parent_loc)
         for answer_type in Answer.answer_types():
-            query_args = val_list_args
+            query_args = list(val_list_args)
             value = 'value'
             # if answer_type in [MultiChoiceAnswer.choice_name(), ]:
             #     value = 'value__order'
