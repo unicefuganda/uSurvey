@@ -42,7 +42,7 @@ def download(request):
                 composer = ResultComposer(request.user,
                                           ResultsDownloadService(batch=batch,
                                                                  survey=survey,
-                                                                 restrict_to=last_selected_loc,
+                                                                 restrict_to=[last_selected_loc, ],
                                                                 multi_display=multi_option))
                 email_task.delay(composer)
                 messages.warning(request, "Email would be sent to you shortly. This could take a while.")
