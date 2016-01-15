@@ -116,7 +116,7 @@ class ResultsDownloadService(object):
         return data
 
     def get_interview_answers(self):
-        data = []
+        report = []
         member_reports = OrderedDict()
         val_list_args = [  'interview__ea__locations__name',
                          'interview__ea__name', 'interview__householdmember__household__house_number',
@@ -161,8 +161,8 @@ class ResultsDownloadService(object):
             answers = hm['mem_details']
             for question in self.questions:
                 answers.append(hm.get(question.pk, ''))
-            data.append(answers)
-        return data
+            report.append(answers)
+        return report
 
     def generate_report(self):
         data = [self.set_report_headers(), ]
