@@ -5,6 +5,8 @@ from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from datetime import datetime
 import csv, StringIO, string
+from collections import OrderedDict
+import dateutils
 
 
 class ResultComposer:
@@ -115,54 +117,54 @@ class ResultsDownloadService(object):
 
     def get_interview_answers(self):
         data = []
-        q_opts = {}
-        interviews = Interview.objects.filter(batch=self.batch).order_by('householdmember__survey_listing',
-                                                                         'householdmember__household')
-        answer_objs = {}
+        member_reports = OrderedDict()
+        val_list_args = [  'interview__ea__locations__name',
+                         'interview__ea__name', 'interview__householdmember__household__house_number',
+                         'interview__householdmember__surname', 'interview__householdmember__first_name',
+                         'interview__householdmember__date_of_birth', 'interview__householdmember__gender', ]
+        parent_loc = 'interview__ea__locations'
+        for i in range(LocationType.objects.count() - 1):
+            parent_loc = '%s__parent' % parent_loc
+            val_list_args.insert(0, '%s__name'%parent_loc)
         for answer_type in Answer.answer_types():
+            query_args = val_list_args
+            value = 'value'
+            # if answer_type in [MultiChoiceAnswer.choice_name(), ]:
+            #     value = 'value__order'
+                # if  self.multi_display == self.AS_LABEL:
+                #     value = 'value__order'
+                # else:
+                #     value = 'value__text'
+            query_args.append(value)
             answer_class = Answer.get_class(answer_type)
-            answer_objs[answer_type] = dict([((a.interview.pk, a.question.pk), a.to_text())
-                                        for a in answer_class.objects.filter(interview__batch=self.batch)])
-        locations_map = {}
-        for interview in interviews:
-            ea = interview.ea
-            location_ancestors = locations_map.get(ea.pk, None)
-            if location_ancestors is None:
-                location_ancestors = ea.parent_locations().values_list('name', flat=True)
-                locations_map[ea.pk] = location_ancestors
-            try:
-                member = interview.householdmember
-                household = member.household
-                answers = list(location_ancestors)
-                member_gender = 'Male' if member.gender == HouseholdMember.MALE else 'Female'
-                answers.extend([ea.name, household.house_number, '%s-%s' % (member.surname, member.first_name), str(member.age),
-                                     member.date_of_birth.strftime(settings.DATE_FORMAT),
-                                     member_gender])
-                for question in self.questions:
-                    try:
-                        reply = answer_objs[question.answer_type].get((interview.pk, question.pk), '')
-                    except IndexError:
-                        reply = ''
-                    reply = unicode(reply)
-                    if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
-                            and self.multi_display == self.AS_LABEL:
-                        label = q_opts.get((question.pk, reply), None)
-                        if label is None:
-                            try:
-                                label = question.options.get(text__iexact=reply).order
-                            except QuestionOption.DoesNotExist:
-                                label = reply
-                            q_opts[(question.pk, reply)] = label
-                        reply = str(label)
-                    answers.append(reply.encode('utf8'))
-                data.append(answers)
-            except Exception, ex:
-                print 'Error ', str(ex)
+            answer_data = answer_class.objects.filter(interview__batch=self.batch).\
+                values_list('interview__householdmember__pk', 'question__pk', *query_args).\
+                        order_by('interview__ea__locations', 'interview__householdmember__household')
+            answer_data = list(answer_data)
+            #now grab member reports
+            for data in answer_data:
+                hm_pk, question_pk = data[:2]
+                report_data = data[2:]
+                hm_data = member_reports.get(hm_pk, None)
+                if hm_data is None:
+                    report_data.insert(-3, str(dateutils.relativedelta(datetime.utcnow().date(),
+                                                                       report_data[-3]).years))
+                    report_data[-3] = report_data[-3].strftime(settings.DATE_FORMAT)
+                    report_data[-2] = 'M' if report_data[-2] else 'F'
+                    hm_data = OrderedDict([('mem_details' , report_data[:-1]), ])
+                hm_data[question_pk] = unicode(report_data[-1])
+                member_reports[hm_pk] = hm_data
+
+        for hm in member_reports.values():
+            answers = hm['mem_details']
+            for question in self.questions:
+                answers.append(hm[question.pk])
+            data.append(answers)
         return data
 
     def generate_report(self):
         data = [self.set_report_headers(), ]
-        data.extend(self.get_summarised_answers())
+        data.extend(self.get_interview_answers()) #data.extend(self.get_summarised_answers())
         return data
 
     def generate_interview_reports(self):

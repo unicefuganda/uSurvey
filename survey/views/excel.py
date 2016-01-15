@@ -49,7 +49,6 @@ def download(request):
                 composer = ResultComposer(request.user,
                                           ResultsDownloadService(batch=batch,
                                                                  survey=survey,
-                                                                 restrict_to=[last_selected_loc, ],
                                                                  specific_households=specific_households,
                                                                 multi_display=multi_option))
                 email_task.delay(composer)
