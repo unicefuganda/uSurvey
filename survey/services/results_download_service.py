@@ -144,7 +144,7 @@ class ResultsDownloadService(object):
             #now grab member reports
             for data in answer_data:
                 hm_pk, question_pk = data[:2]
-                report_data = data[2:]
+                report_data = list(data[2:])
                 hm_data = member_reports.get(hm_pk, None)
                 if hm_data is None:
                     report_data.insert(-3, str(dateutils.relativedelta(datetime.utcnow().date(),
