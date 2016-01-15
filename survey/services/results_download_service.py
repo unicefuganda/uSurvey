@@ -121,8 +121,15 @@ class ResultsDownloadService(object):
         answer_objs = {}
         for answer_type in Answer.answer_types():
             answer_class = Answer.get_class(answer_type)
-            answer_objs[answer_type] = dict([((a.interview.pk, a.question.pk), a.to_text())
-                                        for a in answer_class.objects.filter(interview__batch=self.batch)])
+            relevant_answers = answer_class.objects.filter(interview__batch=self.batch)
+            for a in relevant_answers:
+                if answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
+                            and self.multi_display == self.AS_LABEL:
+                    answer_objs[answer_type] = dict([((a.interview.pk, a.question.pk), a.to_label())
+                                        ])
+                else:
+                    answer_objs[answer_type] = dict([((a.interview.pk, a.question.pk), a.to_text())
+                                        ])
         locations_map = {}
         for interview in interviews:
             ea = interview.ea
@@ -141,16 +148,6 @@ class ResultsDownloadService(object):
                 for question in self.questions:
                     reply = answer_objs[question.answer_type].get((interview.pk, question.pk), '')
                     reply = unicode(reply)
-                    if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
-                            and self.multi_display == self.AS_LABEL:
-                        label = q_opts.get((question.pk, reply), None)
-                        if label is None:
-                            try:
-                                label = question.options.get(text__iexact=reply).order
-                            except QuestionOption.DoesNotExist:
-                                label = reply
-                            q_opts[(question.pk, reply)] = label
-                        reply = str(label)
                     answers.append(reply.encode('utf8'))
                 data.append(answers)
             except Exception, ex:

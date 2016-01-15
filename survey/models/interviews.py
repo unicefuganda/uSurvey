@@ -340,6 +340,9 @@ class MultiChoiceAnswer(Answer):
     def to_text(self):
         return self.value.text
 
+    def to_label(self):
+        return self.value.order
+
 
     @classmethod
     @static_var('label', 'Equals Option')
