@@ -14,13 +14,14 @@ from survey.forms.enumeration_area import LocationsFilterForm
 from django.core.urlresolvers import reverse
 
 
-def _process_export(survey_batch_filter_form):
+def _process_export(survey_batch_filter_form, last_selected_loc):
     batch = survey_batch_filter_form.cleaned_data['batch']
     survey = survey_batch_filter_form.cleaned_data['survey']
     multi_option = survey_batch_filter_form.cleaned_data['multi_option']
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % (batch.name if batch else survey.name)
-    data = ResultsDownloadService(batch=batch, survey=survey, multi_display=multi_option).generate_interview_reports()
+    data = ResultsDownloadService(batch=batch, survey=survey, restrict_to=last_selected_loc, 
+                                  multi_display=multi_option).generate_interview_reports()
     writer = csv.writer(response)
     for row in data:
         writer.writerow(row)
@@ -42,12 +43,12 @@ def download(request):
                 composer = ResultComposer(request.user,
                                           ResultsDownloadService(batch=batch,
                                                                  survey=survey,
-                                                                 restrict_to=last_selected_loc,
+                                                                 restrict_to=[last_selected_loc, ],
                                                                 multi_display=multi_option))
                 email_task.delay(composer)
                 messages.warning(request, "Email would be sent to you shortly. This could take a while.")
             else:
-                return _process_export(survey_batch_filter_form)
+                return _process_export(survey_batch_filter_form, last_selected_loc)
     loc_types = LocationType.in_between()
     return render(request, 'aggregates/download_excel.html',
                   {
