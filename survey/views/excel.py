@@ -20,7 +20,7 @@ def _process_export(survey_batch_filter_form, last_selected_loc):
     restrict_to = None
     multi_option = survey_batch_filter_form.cleaned_data['multi_option']
     response = HttpResponse(content_type='text/csv')
-    file_name = '%s%s' % ('%s-'%last_selected_loc.name if last_selected_loc else '',
+    file_name = '%s%s' % ('%s-%s-'% (last_selected_loc.type.name, last_selected_loc.name) if last_selected_loc else '',
                           batch.name if batch else survey.name)
     if last_selected_loc:
         restrict_to = [last_selected_loc, ]
