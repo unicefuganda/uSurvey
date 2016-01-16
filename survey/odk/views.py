@@ -26,7 +26,6 @@ from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer,
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
-from survey.models.surveys import SurveySampleSizeReached
 from survey.models import BatchLocationStatus
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.interviewer_configs import MESSAGES
