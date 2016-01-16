@@ -39,17 +39,10 @@ def download(request):
                 batch = survey_batch_filter_form.cleaned_data['batch']
                 survey = survey_batch_filter_form.cleaned_data['survey']
                 multi_option = survey_batch_filter_form.cleaned_data['multi_option']
-                if last_selected_loc is None:
-                    specific_households = Household.objects.filter(listing__survey_houselistings__survey=survey)
-                else:
-                    leaf_locs = last_selected_loc.get_leafnodes(include_self=True)
-                    specific_households = Household.objects.filter(listing__survey_houselistings__survey=survey,
-                                                                   listing__ea__locations__in=leaf_locs)
-
                 composer = ResultComposer(request.user,
                                           ResultsDownloadService(batch=batch,
                                                                  survey=survey,
-                                                                 specific_households=specific_households,
+                                                                 restrict_to=last_selected_loc,
                                                                 multi_display=multi_option))
                 email_task.delay(composer)
                 messages.warning(request, "Email would be sent to you shortly. This could take a while.")

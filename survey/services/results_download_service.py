@@ -49,7 +49,9 @@ class ResultsDownloadService(object):
     def __init__(self, survey=None, batch=None, restrict_to=None, specific_households=None, multi_display=AS_TEXT):
         self.batch = batch
         self.survey, self.questions = self._set_survey_and_questions(survey)
-        self.locations = restrict_to or Location.objects.all()
+        self.locations = []
+        if restrict_to:
+            map(lambda loc: self.locations.extend(loc.get_leafnodes(include_self=True)), restrict_to)
         self.specific_households = specific_households
         self.multi_display = int(multi_display)
 
@@ -126,6 +128,11 @@ class ResultsDownloadService(object):
         for i in range(LocationType.objects.count() - 2):
             parent_loc = '%s__parent' % parent_loc
             val_list_args.insert(0, '%s__name'%parent_loc)
+        filter_args = {}
+        if self.locations:
+            filter_args['interview__ea__locations__in'] = self.locations
+        if self.specific_households:
+            filter_args['interview__householdmember__household__in'] = self.specific_households
         for answer_type in Answer.answer_types():
             query_args = list(val_list_args)
             value = 'value'
@@ -138,9 +145,9 @@ class ResultsDownloadService(object):
             query_args.append(value)
             answer_class = Answer.get_class(answer_type)
             # print 'using query_args ', query_args
-            answer_data = answer_class.objects.filter(interview__batch=self.batch).\
+            answer_data = answer_class.objects.filter(interview__batch=self.batch, **filter_args).\
                 values_list('interview__householdmember__pk', 'question__pk', *query_args).\
-                        order_by('interview__ea', 'interview__ea__locations', 'interview__householdmember__household')
+                        order_by('interview__ea__locations', 'interview__ea', 'interview__householdmember__household')
             answer_data = list(answer_data)
             # print 'answer data ', len(answer_data)
             #now grab member reports
