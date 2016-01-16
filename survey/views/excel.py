@@ -17,12 +17,15 @@ from django.core.urlresolvers import reverse
 def _process_export(survey_batch_filter_form, last_selected_loc):
     batch = survey_batch_filter_form.cleaned_data['batch']
     survey = survey_batch_filter_form.cleaned_data['survey']
+    restrict_to = None
     multi_option = survey_batch_filter_form.cleaned_data['multi_option']
     response = HttpResponse(content_type='text/csv')
     file_name = '%s%s' % ('%s-'%last_selected_loc.name if last_selected_loc else '',
                           batch.name if batch else survey.name)
+    if last_selected_loc:
+        restrict_to = [last_selected_loc, ]
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
-    data = ResultsDownloadService(batch=batch, survey=survey, restrict_to=[last_selected_loc, ],
+    data = ResultsDownloadService(batch=batch, survey=survey, restrict_to=restrict_to,
                                   multi_display=multi_option).generate_interview_reports()
     writer = csv.writer(response)
     for row in data:
