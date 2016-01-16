@@ -63,7 +63,7 @@ class ResultsDownloadService(object):
     def set_report_headers(self):
         header = [loc.name for loc in LocationType.objects.exclude(name__iexact="country")]
 
-        other_headers = ['EA', 'Household Number', 'Name', 'Age', 'Date of Birth', 'Gender']
+        other_headers = ['EA', 'Household Number', 'Family Name', 'First Name',  'Age', 'Date of Birth', 'Gender']
         header.extend(other_headers)
         header.extend(self.question_headers())
         return header
@@ -153,9 +153,9 @@ class ResultsDownloadService(object):
                                                                        report_data[-3]).years))
                     report_data[-3] = report_data[-3].strftime(settings.DATE_FORMAT)
                     report_data[-2] = 'M' if report_data[-2] else 'F'
-                    member_details = ['"%s"' % unicode(md).encode('utf8') for md in report_data[:-1]]
+                    member_details = [ unicode(md).encode('utf8') for md in report_data[:-1]]
                     hm_data = OrderedDict([('mem_details' , member_details), ])
-                hm_data[question_pk] = '"%s"' % unicode(report_data[-1]).encode('utf8')
+                hm_data[question_pk] =  unicode(report_data[-1]).encode('utf8')
                 member_reports[hm_pk] = hm_data
 
         for hm in member_reports.values():
