@@ -61,8 +61,7 @@ class ResultsDownloadService(object):
         return survey, survey_questions
 
     def set_report_headers(self):
-        header = [loc.name for loc in LocationType.objects.exclude(name__iexact="country")
-                  if not loc == LocationType.smallest_unit()]
+        header = [loc.name for loc in LocationType.objects.exclude(name__iexact="country")]
 
         other_headers = ['EA', 'Household Number', 'Name', 'Age', 'Date of Birth', 'Gender']
         header.extend(other_headers)
@@ -87,7 +86,8 @@ class ResultsDownloadService(object):
         for location_id in locations:
             households_in_location = all_households.filter(listing__ea__locations=location_id)
             household_location = Location.objects.get(id=location_id)
-            location_ancestors = household_location.get_ancestors().exclude(parent__isnull='country').values_list('name', flat=True)
+            location_ancestors = household_location.get_ancestors(include_self=True).\
+                exclude(parent__isnull='country').values_list('name', flat=True)
             answers = []
             for household in households_in_location:
                 for member in household.members.all():
@@ -123,7 +123,7 @@ class ResultsDownloadService(object):
                          'interview__householdmember__surname', 'interview__householdmember__first_name',
                          'interview__householdmember__date_of_birth', 'interview__householdmember__gender', ]
         parent_loc = 'interview__ea__locations'
-        for i in range(LocationType.objects.count() - 1):
+        for i in range(LocationType.objects.count() - 2):
             parent_loc = '%s__parent' % parent_loc
             val_list_args.insert(0, '%s__name'%parent_loc)
         for answer_type in Answer.answer_types():
@@ -153,9 +153,9 @@ class ResultsDownloadService(object):
                                                                        report_data[-3]).years))
                     report_data[-3] = report_data[-3].strftime(settings.DATE_FORMAT)
                     report_data[-2] = 'M' if report_data[-2] else 'F'
-                    member_details = [unicode(md).encode('utf8') for md in report_data[:-1]]
+                    member_details = ['"%s"' % unicode(md).encode('utf8') for md in report_data[:-1]]
                     hm_data = OrderedDict([('mem_details' , member_details), ])
-                hm_data[question_pk] = unicode(report_data[-1]).encode('utf8')
+                hm_data[question_pk] = '"%s"' % unicode(report_data[-1]).encode('utf8')
                 member_reports[hm_pk] = hm_data
 
         for hm in member_reports.values():
