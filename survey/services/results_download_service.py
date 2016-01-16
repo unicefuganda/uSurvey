@@ -154,7 +154,7 @@ class ResultsDownloadService(object):
                                                                             'interview__householdmember__household',
                                                                             'interview__householdmember__pk',
                                                                             'question__pk'
-                                                                                   )
+                                                                            )
             answer_data = list(answer_data)
             # print 'answer data ', len(answer_data)
             #now grab member reports
