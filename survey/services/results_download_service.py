@@ -140,7 +140,7 @@ class ResultsDownloadService(object):
             # print 'using query_args ', query_args
             answer_data = answer_class.objects.filter(interview__batch=self.batch).\
                 values_list('interview__householdmember__pk', 'question__pk', *query_args).\
-                        order_by(parent_loc, 'interview__householdmember__household')
+                        order_by('interview__ea__locations', 'interview__householdmember__household')
             answer_data = list(answer_data)
             # print 'answer data ', len(answer_data)
             #now grab member reports
