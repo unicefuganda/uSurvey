@@ -20,7 +20,7 @@ def _process_export(survey_batch_filter_form, last_selected_loc):
     multi_option = survey_batch_filter_form.cleaned_data['multi_option']
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % (batch.name if batch else survey.name)
-    data = ResultsDownloadService(batch=batch, survey=survey, restrict_to=last_selected_loc, 
+    data = ResultsDownloadService(batch=batch, survey=survey, restrict_to=[last_selected_loc, ],
                                   multi_display=multi_option).generate_interview_reports()
     writer = csv.writer(response)
     for row in data:
