@@ -16,7 +16,8 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.template import RequestContext, loader, Context
 from survey.odk.utils.log import audit_log, Actions, logger
-from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, get_zipped_dir, \
+from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, \
+    get_zipped_dir, HouseholdNumberAlreadyExists, \
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughHouseholds
@@ -25,7 +26,6 @@ from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer,
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
-from survey.models.surveys import SurveySampleSizeReached
 from survey.models import BatchLocationStatus
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.interviewer_configs import MESSAGES
@@ -223,10 +223,10 @@ def submission(request):
         response.status_code = 201
         response['Location'] = request.build_absolute_uri(request.path)
         return response
-    except SurveySampleSizeReached:
-        return OpenRosaRequestForbidden(u"Max sample size reached for this survey")
     except NotEnoughHouseholds:
         OpenRosaRequestForbidden(u"Not Enough Households")
+    except HouseholdNumberAlreadyExists:
+        OpenRosaResponseNotAllowed(u'Household Number Already exists')
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer, 
             _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {

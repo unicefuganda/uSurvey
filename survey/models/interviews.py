@@ -154,6 +154,9 @@ class Answer(BaseModel):
     def to_text(self):
         return self.value
 
+    def pretty_print(self, as_label=False):
+        return self.to_text()
+
     @classmethod
     def choice_name(cls):
         return cls._meta.verbose_name.title()
@@ -340,6 +343,12 @@ class MultiChoiceAnswer(Answer):
     def to_text(self):
         return self.value.text
 
+    def pretty_print(self, as_label=False):
+        if as_label:
+            return self.value.order
+        else:
+            return self.value.text
+
 
     @classmethod
     @static_var('label', 'Equals Option')
@@ -386,6 +395,17 @@ class MultiSelectAnswer(Answer):
         texts = []
         map(lambda opt: texts.append(opt.text), self.value.all())
         return ' and '.join(texts)
+
+    def to_label(self):
+        texts = []
+        map(lambda opt: texts.append(str(opt.order)), self.value.all())
+        return ' and '.join(texts)
+
+    def pretty_print(self, as_label=False):
+        if as_label:
+            return self.to_label()
+        else:
+            return self.to_text()
 
     @classmethod
     def validators(cls):

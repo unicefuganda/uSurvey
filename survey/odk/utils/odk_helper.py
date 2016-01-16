@@ -19,7 +19,6 @@ from survey.models import Survey, Interviewer, Interview, SurveyAllocation, ODKA
             Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer, \
             VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer, GeopointAnswer, \
             SurveyHouseholdListing, HouseholdListing
-from survey.models.surveys import SurveySampleSizeReached
 from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.odk.utils.log import logger
 from survey.tasks import execute
@@ -27,6 +26,7 @@ from functools import wraps
 from survey.utils.zip import InMemoryZip
 from django.contrib.sites.models import Site
 from dateutils import relativedelta
+from django.db.utils import IntegrityError
 
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
@@ -65,6 +65,9 @@ COULD_NOT_COMPLETE_SURVEY = '0'
 
 
 class NotEnoughHouseholds(ValueError):
+    pass
+
+class HouseholdNumberAlreadyExists(IntegrityError):
     pass
 
 def _get_tree(xml_file):
@@ -224,18 +227,21 @@ def save_household_list(interviewer, survey, survey_tree, survey_listing):
         raise NotEnoughHouseholds('Not enough households')
     house_number = 1
     households = []
-    for node in house_nodes:
-        household, _ = Household.objects.get_or_create(
-                                house_number=house_number,
-                                 listing=survey_listing.listing,
-                                 last_registrar=interviewer,
-                                 registration_channel=ODKAccess.choice_name(),
-                                 physical_address=_get_nodes('./physicalAddress', tree=node)[0].text,
-                                 head_desc=_get_nodes('./headDesc', tree=node)[0].text,
-                                 head_sex=_get_nodes('./headSex', tree=node)[0].text,
-                    )
-        house_number = house_number + 1
-        households.append(household)
+    try:
+        for node in house_nodes:
+            household, _ = Household.objects.get_or_create(
+                                    house_number=house_number,
+                                     listing=survey_listing.listing,
+                                     last_registrar=interviewer,
+                                     registration_channel=ODKAccess.choice_name(),
+                                     physical_address=_get_nodes('./physicalAddress', tree=node)[0].text,
+                                     head_desc=_get_nodes('./headDesc', tree=node)[0].text,
+                                     head_sex=_get_nodes('./headSex', tree=node)[0].text,
+                        )
+            house_number = house_number + 1
+            households.append(household)
+    except IntegrityError:
+        raise HouseholdNumberAlreadyExists('Household number already exists')
     return households
 
 def save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing):
