@@ -152,8 +152,8 @@ class ResultsDownloadService(object):
                                                                             'interview__ea__locations',
                                                                             'interview__ea',
                                                                             'interview__householdmember__household',
-                                                                            'interview__householdmember',
-                                                                            'question'
+                                                                            'interview__householdmember__pk',
+                                                                            'question__pk'
                                                                                    )
             answer_data = list(answer_data)
             # print 'answer data ', len(answer_data)
