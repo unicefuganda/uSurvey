@@ -36,7 +36,7 @@ def _process_export(survey_batch_filter_form, last_selected_loc):
 @permission_required('auth.can_view_aggregates')
 def download(request):
     survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
-    locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
+    locations_filter = LocationsFilterForm(data=request.GET)
     last_selected_loc = locations_filter.last_location_selected
     if request.GET and request.GET.get('action'):
         survey_batch_filter_form = SurveyBatchFilterForm(data=request.GET)
