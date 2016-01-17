@@ -204,7 +204,7 @@ def submission(request):
         if len(xml_file_list) != 1:
             return OpenRosaResponseBadRequest(u"There should be a single XML submission file.")
         media_files = request.FILES.values()
-        submission_report = process_submission(interviewer, xml_file_list[0],             media_files=media_files)
+        submission_report = process_submission(interviewer, xml_file_list[0], media_files=media_files)
         logger.info(submission_report)
         context = Context({
         'message' : settings.ODK_SUBMISSION_SUCCESS_MSG,
@@ -224,9 +224,21 @@ def submission(request):
         response['Location'] = request.build_absolute_uri(request.path)
         return response
     except NotEnoughHouseholds:
-        OpenRosaRequestForbidden(u"Not Enough Households")
+        desc = 'Not enough households'
+        audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer,
+            _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                                                        "interviewer": interviewer.name,
+                                                        "desc" : desc
+                                                    }, {'desc' : desc}, request, logging.WARNING)
+        return OpenRosaRequestForbidden(u"Not Enough Households")
     except HouseholdNumberAlreadyExists:
-        OpenRosaResponseNotAllowed(u'Household Number Already exists')
+        desc = 'House number already exists'
+        audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer,
+            _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                                                        "interviewer": interviewer.name,
+                                                        "desc" : desc
+                                                    }, {'desc' : desc}, request, logging.WARNING)
+        return OpenRosaResponseNotAllowed(u'Household Number Already exists')
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer, 
             _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
