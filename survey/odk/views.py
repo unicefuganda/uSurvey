@@ -88,7 +88,7 @@ def download_submission_attachment(request, submission_id):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def submission_list(request):
-    odk_submissions = ODKSubmission.objects.all()
+    odk_submissions = ODKSubmission.objects.all().order_by('-created')
     search_fields = ['interviewer__name', 'interviewer__ea__name', 'survey__name',
                      'household_member__household__house_number', 'household_member__surname',
                      'household_member__first_name', 'form_id', 'instance_id']
