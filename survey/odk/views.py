@@ -18,7 +18,7 @@ from django.template import RequestContext, loader, Context
 from survey.odk.utils.log import audit_log, Actions, logger
 from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, \
     get_zipped_dir, HouseholdNumberAlreadyExists, \
-    response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, \
+    response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, OpenRosaRequestConflict, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughHouseholds
 from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, \
@@ -88,7 +88,7 @@ def download_submission_attachment(request, submission_id):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def submission_list(request):
-    odk_submissions = ODKSubmission.objects.all()
+    odk_submissions = ODKSubmission.objects.all().order_by('-created')
     search_fields = ['interviewer__name', 'interviewer__ea__name', 'survey__name',
                      'household_member__household__house_number', 'household_member__surname',
                      'household_member__first_name', 'form_id', 'instance_id']
@@ -152,7 +152,8 @@ def download_xform(request, survey_id):
                 "xform": form_id
             }
             audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                        _("Downloaded XML for form '%(id_string)s'.") % {
+                        _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
+                                                                 "interviewer": interviewer.name,
                                                                 "id_string": form_id
                                                             }, audit, request)
             response = response_with_mimetype_and_name('xml', 'survey-%s' %survey_id,
@@ -180,7 +181,8 @@ def download_houselist_xform(request):
             "xform": form_id
         }
         audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                    _("Downloaded XML for form '%(id_string)s'.") % {
+                    _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
+                                                            "interviewer": interviewer.name,
                                                             "id_string": form_id
                                                         }, audit, request)
         response = response_with_mimetype_and_name('xml', 'household_listing-%s' % survey.pk,
@@ -204,7 +206,7 @@ def submission(request):
         if len(xml_file_list) != 1:
             return OpenRosaResponseBadRequest(u"There should be a single XML submission file.")
         media_files = request.FILES.values()
-        submission_report = process_submission(interviewer, xml_file_list[0],             media_files=media_files)
+        submission_report = process_submission(interviewer, xml_file_list[0], media_files=media_files)
         logger.info(submission_report)
         context = Context({
         'message' : settings.ODK_SUBMISSION_SUCCESS_MSG,
@@ -216,7 +218,8 @@ def submission(request):
         t = loader.get_template('odk/submission.xml')
         audit = {}
         audit_log( Actions.SUBMISSION_CREATED, request.user, interviewer, 
-            _("Submitted XML for form '%(id_string)s'.") % {
+            _("'%(interviewer)s' Submitted XML for form '%(id_string)s'.") % {
+                                                        "interviewer": interviewer.name,
                                                         "id_string": submission_report.form_id
                                                     }, audit, request)
         response = BaseOpenRosaResponse(t.render(context))
@@ -224,9 +227,22 @@ def submission(request):
         response['Location'] = request.build_absolute_uri(request.path)
         return response
     except NotEnoughHouseholds:
-        OpenRosaRequestForbidden(u"Not Enough Households")
+        desc = 'Not enough households'
+        audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer,
+            _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                                                        "interviewer": interviewer.name,
+                                                        "desc" : desc
+                                                    }, {'desc' : desc}, request, logging.WARNING)
+        return OpenRosaRequestForbidden(u"Not Enough Households")
     except HouseholdNumberAlreadyExists:
-        OpenRosaResponseNotAllowed(u'Household Number Already exists')
+        desc = 'House number already exists'
+        audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer,
+            _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                                                        "interviewer": interviewer.name,
+                                                        "desc" : desc
+                                                    }, {'desc' : desc}, request, logging.WARNING)
+        # return OpenRosaRequestConflict(u'Household Number Already exists')
+        return OpenRosaResponseNotAllowed(u'Household Number Already exists')
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer, 
             _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
