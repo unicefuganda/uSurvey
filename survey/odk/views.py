@@ -220,7 +220,7 @@ def submission(request):
         audit_log( Actions.SUBMISSION_CREATED, request.user, interviewer, 
             _("'%(interviewer)s' Submitted XML for form '%(id_string)s'. Desc: '%(desc)s'") % {
                                                         "interviewer": interviewer.name,
-                                                        "desc" : submission_report.desc,
+                                                        "desc" : submission_report.description,
                                                         "id_string": submission_report.form_id
                                                     }, audit, request)
         response = BaseOpenRosaResponse(t.render(context))
