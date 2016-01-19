@@ -17,6 +17,7 @@ class ODKSubmission(BaseModel):
     household_member = models.ForeignKey(HouseholdMember, related_name="odk_submissions", null=True, blank=True)
     household = models.ForeignKey(Household, related_name="odk_submissions", null=True, blank=True)
     form_id = models.CharField(max_length=256)
+    desc = models.CharField(max_length=256, null=True, blank=True)
     instance_id = models.CharField(max_length=256)
     xml = models.TextField()
 

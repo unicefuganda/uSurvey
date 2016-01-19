@@ -218,8 +218,9 @@ def submission(request):
         t = loader.get_template('odk/submission.xml')
         audit = {}
         audit_log( Actions.SUBMISSION_CREATED, request.user, interviewer, 
-            _("'%(interviewer)s' Submitted XML for form '%(id_string)s'.") % {
+            _("'%(interviewer)s' Submitted XML for form '%(id_string)s'. Desc: '%(desc)s'") % {
                                                         "interviewer": interviewer.name,
+                                                        "desc" : submission_report.desc,
                                                         "id_string": submission_report.form_id
                                                     }, audit, request)
         response = BaseOpenRosaResponse(t.render(context))
