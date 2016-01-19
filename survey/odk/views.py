@@ -18,7 +18,7 @@ from django.template import RequestContext, loader, Context
 from survey.odk.utils.log import audit_log, Actions, logger
 from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, \
     get_zipped_dir, HouseholdNumberAlreadyExists, \
-    response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, \
+    response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, OpenRosaRequestConflict, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughHouseholds
 from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, \
@@ -152,7 +152,8 @@ def download_xform(request, survey_id):
                 "xform": form_id
             }
             audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                        _("Downloaded XML for form '%(id_string)s'.") % {
+                        _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
+                                                                 "interviewer": interviewer.name,
                                                                 "id_string": form_id
                                                             }, audit, request)
             response = response_with_mimetype_and_name('xml', 'survey-%s' %survey_id,
@@ -180,7 +181,8 @@ def download_houselist_xform(request):
             "xform": form_id
         }
         audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                    _("Downloaded XML for form '%(id_string)s'.") % {
+                    _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
+                                                            "interviewer": interviewer.name,
                                                             "id_string": form_id
                                                         }, audit, request)
         response = response_with_mimetype_and_name('xml', 'household_listing-%s' % survey.pk,
@@ -216,7 +218,8 @@ def submission(request):
         t = loader.get_template('odk/submission.xml')
         audit = {}
         audit_log( Actions.SUBMISSION_CREATED, request.user, interviewer, 
-            _("Submitted XML for form '%(id_string)s'.") % {
+            _("'%(interviewer)s' Submitted XML for form '%(id_string)s'.") % {
+                                                        "interviewer": interviewer.name,
                                                         "id_string": submission_report.form_id
                                                     }, audit, request)
         response = BaseOpenRosaResponse(t.render(context))
@@ -238,6 +241,7 @@ def submission(request):
                                                         "interviewer": interviewer.name,
                                                         "desc" : desc
                                                     }, {'desc' : desc}, request, logging.WARNING)
+        # return OpenRosaRequestConflict(u'Household Number Already exists')
         return OpenRosaResponseNotAllowed(u'Household Number Already exists')
     except Exception, ex:
         audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer, 
