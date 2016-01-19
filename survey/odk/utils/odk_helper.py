@@ -434,7 +434,7 @@ class OpenRosaRequestForbidden(OpenRosaResponse):
     status_code = 403
 
 class OpenRosaRequestConflict(OpenRosaResponse):
-    status_code = 40
+    status_code = 409
 
 class OpenRosaServerError(OpenRosaResponse):
     status_code = 500
