@@ -42,7 +42,7 @@ MANUAL_HOUSEHOLD_MEMBER_PATH = '//survey/household/householdMember'
 ANSWER_PATH = '//survey/b{{batch_id}}/q{{question_id}}'
 INSTANCE_ID_PATH = '//survey/meta/instanceID'
 FORM_ID_PATH = '//survey/@id'
-ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
+# ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
 HOUSE_LISTING_FORM_ID_PREFIX = 'hreg_'
 FORM_TYPE_PATH = '//survey/type'
 HOUSE_NUMBER_PATH = '//survey/household/houseNumber'
@@ -63,6 +63,9 @@ MALE = 'M'
 FEMALE = 'F'
 COULD_NOT_COMPLETE_SURVEY = '0'
 
+LISTING_DESC = 'LISTING'
+SURVEY_DESC = 'HOUSE MEMBER SURVEY'
+NON_RESPONSE_DESC = 'NONE RESPONSE'
 
 class NotEnoughHouseholds(ValueError):
     pass
@@ -81,12 +84,12 @@ def _get_nodes(search_path, tree=None, xml_string=None): #either tree or xml_str
     except Exception, ex:
         logger.error('Error retrieving path: %s, Desc: %s' % (search_path, str(ex)))
 
-def only_household_reg(survey_tree):
-    flag_nodes = _get_nodes(ONLY_HOUSEHOLD_PATH, tree=survey_tree)
-    return (flag_nodes is not None and len(flag_nodes) > 0 and flag_nodes[0].text == '1')
-
-def batches_included(survey_tree):
-    return only_household_reg(survey_tree) is False
+# def only_household_reg(survey_tree):
+#     flag_nodes = _get_nodes(ONLY_HOUSEHOLD_PATH, tree=survey_tree)
+#     return (flag_nodes is not None and len(flag_nodes) > 0 and flag_nodes[0].text == '1')
+#
+# def batches_included(survey_tree):
+#     return only_household_reg(survey_tree) is False
 
 def _get_household_members(survey_tree):
     member_nodes = _get_nodes(MANUAL_HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
@@ -283,14 +286,14 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
         survey_allocation.save()
         for household in households:
             submission = ODKSubmission.objects.create(interviewer=interviewer,
-                    survey=survey, form_id= form_id,
+                    survey=survey, form_id= form_id, desc=LISTING_DESC,
                     instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
     elif _get_form_type(survey_tree) == NON_RESPONSE:
         non_responses = save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing)
         for non_response in non_responses:
             submission = ODKSubmission.objects.create(interviewer=interviewer,
-                    survey=survey, form_id= form_id,
+                    survey=survey, form_id= form_id, desc=NON_RESPONSE_DESC,
                     instance_id=_get_instance_id(survey_tree),
                     household_member=member, household=non_response.household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
@@ -299,7 +302,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
         response_dict = _get_responses(interviewer, survey_tree, survey)
         treated_batches = {}
         interviews = {}
-        if response_dict and batches_included(survey_tree):
+        if response_dict:
             for (b_id, q_id), answer in response_dict.items():
                 question = Question.objects.get(pk=q_id)
                 batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
@@ -327,7 +330,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                 member.household.survey_completed(survey, interviewer)
         household = member.household
         submission = ODKSubmission.objects.create(interviewer=interviewer,
-                    survey=survey, form_id= form_id,
+                    survey=survey, form_id= form_id, desc=SURVEY_DESC,
                     instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
         #    execute.delay(submission.save_attachments, media_files)
