@@ -286,14 +286,14 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
         survey_allocation.save()
         for household in households:
             submission = ODKSubmission.objects.create(interviewer=interviewer,
-                    survey=survey, form_id= form_id, desc=LISTING_DESC,
+                    survey=survey, form_id= form_id, description=LISTING_DESC,
                     instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
     elif _get_form_type(survey_tree) == NON_RESPONSE:
         non_responses = save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing)
         for non_response in non_responses:
             submission = ODKSubmission.objects.create(interviewer=interviewer,
-                    survey=survey, form_id= form_id, desc=NON_RESPONSE_DESC,
+                    survey=survey, form_id= form_id, description=NON_RESPONSE_DESC,
                     instance_id=_get_instance_id(survey_tree),
                     household_member=member, household=non_response.household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
@@ -330,7 +330,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                 member.household.survey_completed(survey, interviewer)
         household = member.household
         submission = ODKSubmission.objects.create(interviewer=interviewer,
-                    survey=survey, form_id= form_id, desc=SURVEY_DESC,
+                    survey=survey, form_id= form_id, description=SURVEY_DESC,
                     instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
         #    execute.delay(submission.save_attachments, media_files)
