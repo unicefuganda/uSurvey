@@ -4,8 +4,12 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic import TemplateView
 from django.conf import settings
+import os
+from django.views.static import serve as staticserve
 
 urlpatterns = patterns('',
+    (r'^static/(?P<path>.*)$', staticserve,
+            {'document_root': os.path.join(os.path.dirname(__file__), 'static')} ),
     url(r'^$', 'survey.views.home_page.index', name='main_page'),
     url(r'^home/$', 'survey.views.home_page.home', name='home_page'),
     url(r'^about/$', 'survey.views.home_page.about', name='about_page'),
