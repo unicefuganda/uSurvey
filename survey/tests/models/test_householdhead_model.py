@@ -2,48 +2,79 @@ from datetime import date
 from django.test import TestCase
 from django.template.defaultfilters import slugify
 from rapidsms.contrib.locations.models import LocationType, Location
-from survey.models import Investigator, Backend
-from survey.models.households import HouseholdHead, Household, HouseholdMember
-
+from survey.models.locations import LocationType, Location
+from survey.models import Interviewer, Backend, EnumerationArea
+from survey.models.households import HouseholdHead, Household, HouseholdMember, HouseholdListing, SurveyHouseholdListing
+from survey.models.surveys import Survey
 
 class HouseholdHeadTest(TestCase):
+
 
     def test_fields(self):
         hHead = HouseholdHead()
         fields = [str(item.attname) for item in hHead._meta.fields]
-        self.assertEqual(len(fields), 13)
-        for field in ['id', 'surname', 'first_name', 'created', 'modified', 'male', 'occupation', 'date_of_birth',
-                        'level_of_education', 'resident_since_year', 'resident_since_month', 'household_id']:
+        print fields,"++++++++++++++++++"
+        self.assertEqual(len(fields), 15)
+        for field in ['id', 'created', 'modified', 'surname', 'first_name', 'gender', 'date_of_birth', 'household_id', 'survey_listing_id',
+                      'registrar_id', 'registration_channel', 'householdmember_ptr_id', 'occupation', 'level_of_education', 'resident_since']:
             self.assertIn(field, fields)
 
     def test_store(self):
-        village = LocationType.objects.create(name="Village", slug=slugify("village"))
-        some_village = Location.objects.create(name="Some village", type=village)
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
-        household = Household.objects.create(investigator=investigator, uid=0)
+        self.location_type_country = LocationType.objects.create(name="Country", slug='country')
+        self.location_type_district = LocationType.objects.create(name="District", parent=self.location_type_country,slug='district')
+        self.location_type_county = LocationType.objects.create(name="County", parent=self.location_type_district,slug='county')
+        self.location_type_subcounty = LocationType.objects.create(name="SubCounty", parent=self.location_type_county,slug='subcounty')
+        self.location_type_parish = LocationType.objects.create(name="Parish", parent=self.location_type_subcounty,slug='parish')
+        self.location_type_village = LocationType.objects.create(name="Village", parent=self.location_type_parish,slug='village')
 
-        hHead = HouseholdHead.objects.create(surname="Daddy", date_of_birth=date(1980, 05, 01), household=household)
+        self.country = Location.objects.create(name="Country", type=self.location_type_country, code=256
+                                                )
+        self.district = Location.objects.create(name="District", type=self.location_type_country, parent=self.country,code=256
+                                                )
+        self.county = Location.objects.create(name="County", type=self.location_type_county, parent=self.district,code=256
+                                                 )
+        # self.subcounty= Location.objects.create(name="Subcounty", type=self.location_type_subcountry, parent=self.country,code=256
+        #                                         )
+        # self.parish= Location.objects.create(name="Parish", type=self.location_type_parish, parent=self.subcountry,code=256
+        #                                         )
+        # self.village= Location.objects.create(name="Village", type=self.location_type_village, parent=self.parish,code=256
+        #                                         )
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        # some_village = Location.objects.create(name="Some village", type=village)
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                   ea=ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
+        survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
+        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
+        household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+
+        survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
+        hHead = HouseholdHead.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
+                                                          household=household,survey_listing=survey_householdlisting,
+                                                          registrar=investigator,registration_channel="ODK Access",occupation="Agricultural labor",level_of_education="Primary",
+                                                      resident_since='1989-02-02')
         self.failUnless(hHead.id)
         self.failUnless(hHead.created)
         self.failUnless(hHead.modified)
-        self.assertEquals(1984, hHead.resident_since_year)
-        self.assertEquals(5, hHead.resident_since_month)
 
     def test_knows_household_member_from_head(self):
-        village = LocationType.objects.create(name="Village", slug=slugify("village"))
-        some_village = Location.objects.create(name="Some village", type=village)
-        investigator = Investigator.objects.create(name="Investigator", mobile_number="987654321", location=some_village, backend=Backend.objects.create(name='something1'))
-        household = Household.objects.create(investigator=investigator, uid=0)
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        # some_village = Location.objects.create(name="Some village", type=village)
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                   ea=ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
+        survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
+        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
+        household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
 
-        surname = "Daddy"
-        date_of_birth = date(1980, 05, 01)
+        survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
+        hHead = HouseholdHead.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
+                                                          household=household,survey_listing=survey_householdlisting,
+                                                          registrar=investigator,registration_channel="ODK Access",occupation="Agricultural labor",level_of_education="Primary",
+                                                      resident_since='1989-02-02')
 
-        hHead = HouseholdHead.objects.create(surname=surname, date_of_birth=date_of_birth, household=household)
-
-        head_member = hHead.get_member()
-
-        self.assertEqual(surname, head_member.surname)
-        self.assertEqual(date_of_birth, head_member.date_of_birth)
-        self.assertEqual(hHead.id, head_member.id)
-        self.assertEqual(hHead.household, head_member.household)
-        self.assertIsInstance(head_member, HouseholdMember)
+        self.assertIs(hHead.is_head(),True)
