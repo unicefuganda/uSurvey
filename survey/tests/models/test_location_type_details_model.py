@@ -1,5 +1,6 @@
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.location_type_details import LocationTypeDetails
+from survey.models.locations import LocationType, Location
 from survey.tests.base_test import BaseTest
 
 
@@ -20,13 +21,20 @@ class LocationTypeDetailsTest(BaseTest):
 
     def test_should_return_location_type_objects_ordered_by_order(self):
         country = LocationType.objects.create(name='country', slug='country')
-        location_type_details = LocationTypeDetails.objects.create(required=True, has_code=False, location_type=country)
+        uganda = Location.objects.create(name="Uganda", type=country)
+        location_type_details = LocationTypeDetails.objects.create(required=True, has_code=False,
+                                                                   length_of_code=6,location_type=country,country=uganda,
+                                                                   order=1)
         district = LocationType.objects.create(name='district', slug='district')
+        kampala = Location.objects.create(name="Kampala", type=district, parent=uganda)
         location_type_details_1 = LocationTypeDetails.objects.create(required=True, has_code=False,
-                                                                     location_type=district)
+                                                                   length_of_code=6,location_type=district,country=uganda,
+                                                                   order=2)
         county = LocationType.objects.create(name='county', slug='county')
+        some_county = Location.objects.create(name="County", type=county, parent=kampala)
         location_type_details_1 = LocationTypeDetails.objects.create(required=True, has_code=False,
-                                                                     location_type=county)
+                                                                   length_of_code=6,location_type=county,country=uganda,
+                                                                   order=3)
         ordered_types = LocationTypeDetails.get_ordered_types()
         self.assertEqual(country, ordered_types[0])
         self.assertEqual(district, ordered_types[1])
@@ -50,20 +58,3 @@ class LocationTypeDetailsTest(BaseTest):
         district = LocationType.objects.create(name='district', slug='district')
         detail = LocationTypeDetails.objects.create(required=True, has_code=False,
                                                                      location_type=district)
-
-        detail2 = LocationTypeDetails.objects.create(required=False, has_code=True,
-                                                                     location_type=district)
-
-        self.assertEquals(1, detail.order)
-        detail.has_code = True
-        detail.save()
-        self.assertEquals(1, detail.order)
-
-    def test_should_return_the_country_in_use(self):
-        self.assertIsNone(LocationTypeDetails.the_country())
-
-        uganda = Location.objects.create(name="Uganda")
-        a_type = LocationType.objects.create(name="country", slug="country")
-        LocationTypeDetails.objects.create(location_type=a_type, country=uganda)
-
-        self.assertEqual(uganda, LocationTypeDetails.the_country())

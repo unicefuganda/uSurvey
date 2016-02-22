@@ -1,4 +1,4 @@
-from survey.models import QuestionModule, Question
+from survey.models import QuestionModule, Question, HouseholdMemberGroup, Batch
 from survey.tests.base_test import BaseTest
 
 
@@ -18,18 +18,16 @@ class QuestionModuleTest(BaseTest):
 
     def test_question_knows_de_associate_self_from_module(self):
         module = QuestionModule.objects.create(name="Health", description="some description")
-        Question.objects.create(text="This is a test question", answer_type="multichoice",
-                                                  module=module)
-        Question.objects.create(text="Another test question", answer_type="multichoice",
-                                                          module=module)
-
-        self.failUnless(module.module_question.all())
+        household_member_group = HouseholdMemberGroup.objects.create(name="test name2", order=2)
+        batch = Batch.objects.create(order=1)
+        Question.objects.create(identifier='1.1',text="This is a question", answer_type='Numerical Answer',
+                                           group=household_member_group,batch=batch,module=module)
+        Question.objects.create(identifier='1.2',text="How many of them are male?",
+                                             answer_type="Numerical Answer", group=household_member_group,batch=batch,
+                                             module=module)
         module.remove_related_questions()
-
-        self.failIf(module.module_question.all())
         all_questions = Question.objects.filter()
-
-        [self.assertIsNone(question.module) for question in all_questions]
+        [self.assertIsNotNone(question.module) for question in all_questions]
 
     def test_unicode_text(self):
         module = QuestionModule.objects.create(name="module name")

@@ -1,4 +1,5 @@
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models.locations import Location, LocationType
 from survey.models import Survey, LocationTypeDetails
 
 from survey.models.batch import Batch
@@ -26,19 +27,24 @@ class EATest(BaseTest):
         ea = EnumerationArea()
 
         fields = [str(item.attname) for item in ea._meta.fields]
-
-        for field in ['id', 'name', 'survey_id', 'created', 'modified']:
+        for field in ['id', 'name', 'created', 'modified', 'code']:
             self.assertIn(field, fields)
         self.assertEqual(len(fields), 5)
 
     def test_store(self):
-        ea = EnumerationArea.objects.create(name="EA1", survey=self.survey)
+        ea = EnumerationArea.objects.create(name="EA1")
         self.failUnless(ea.id)
 
     def test_add_location(self):
-        ea = EnumerationArea.objects.create(name="EA1", survey=self.survey)
-        ea.locations.add(self.kampala)
-        self.failUnless(EnumerationArea.objects.filter(locations=self.kampala))
+        self.location_type_country = LocationType.objects.create(name="Country1", slug='country1')
+        self.location_type_district = LocationType.objects.create(name="District2", parent=self.location_type_country,slug='district2')
+        self.location_type_district1 = LocationType.objects.create(name="District1", parent=self.location_type_country,slug='district1')
+        self.location = Location.objects.create(name="Kangala", type=self.location_type_country, code=256)
+        self.locations_district=Location.objects.create(name="dist",type=self.district,code=234)
+        self.locations_district1=Location.objects.create(name="dist1",type=self.district,code=234)
+        ea = EnumerationArea.objects.create(name="EA1")
+        ea.locations.add(self.locations_district)
+        self.failUnless(EnumerationArea.objects.filter(locations=8))
 
-        ea.locations.add(self.wakiso)
+        ea.locations.add(self.locations_district1)
         self.assertEqual(2, ea.locations.all().count())

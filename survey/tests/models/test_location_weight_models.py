@@ -1,6 +1,7 @@
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import Survey
 from survey.models.location_weight import LocationWeight
+from survey.models.locations import LocationType, Location
 from survey.tests.base_test import BaseTest
 
 
@@ -13,7 +14,15 @@ class LocationTypeDetailsTest(BaseTest):
             self.assertIn(field, fields)
 
     def test_store(self):
-        location = Location.objects.create(name="Kampala")
+
+        country = LocationType.objects.create(name='country', slug='country')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        # location_type_details = LocationTypeDetails.objects.create(required=True, has_code=False,
+        #                                                            length_of_code=6,location_type=country,country=uganda,
+        #                                                            order=1)
+        district = LocationType.objects.create(name='district', slug='district')
+        location = Location.objects.create(name="Kampala", type=district, parent=uganda)
+
         survey = Survey.objects.create(name="Kampala Survey")
         location_weight = LocationWeight.objects.create(location=location, survey=survey, selection_probability=0.2)
         self.failUnless(location_weight.id)
