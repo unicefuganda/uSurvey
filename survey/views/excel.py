@@ -55,10 +55,13 @@ def download(request):
                 batch = survey_batch_filter_form.cleaned_data['batch']
                 survey = survey_batch_filter_form.cleaned_data['survey']
                 multi_option = survey_batch_filter_form.cleaned_data['multi_option']
+                restricted_to = None
+                if last_selected_loc:
+                    restricted_to = [last_selected_loc, ]
                 composer = ResultComposer(request.user,
                                           ResultsDownloadService(batch=batch,
                                                                  survey=survey,
-                                                                 restrict_to=[last_selected_loc, ],
+                                                                 restrict_to=restricted_to,
                                                                 multi_display=multi_option))
                 send_mail.delay(composer)
                 messages.warning(request, "Email would be sent to you shortly. This could take a while.")
