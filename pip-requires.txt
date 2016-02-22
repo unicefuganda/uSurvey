@@ -18,7 +18,6 @@ mock
 newrelic==1.13.1.31
 dateutils
 xlwt
-django-celery
 selenium==2.35.0
 django-model-utils==2.2
 djangohttpdigest==0.2.3
@@ -27,3 +26,4 @@ Hiredis==0.2.0
 django-redis-cache==1.6.4
 django-breadcrumbs==1.1.3
 ordered-set
+django_rq

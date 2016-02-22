@@ -18,8 +18,12 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
 ) + survey_urls
 
+<<<<<<< HEAD
 #Static content serving for development
 #if settings.DEBUG:
+=======
+#Static content serving if not handled by web server
+>>>>>>> 7ba7df3ff1842f27b7bcfe05f1bd0ca0cc68c48a
 urlpatterns += patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT, 'show_indexes': False}),
         (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': False}),

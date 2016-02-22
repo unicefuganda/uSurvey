@@ -79,20 +79,19 @@ class GroupConditionTest(TestCase):
         self.assertFalse(gender_condition.matches_condition(not gender_value))
 
     def test_knows_to_match_equal_to_condition_for_gender_if_condition_value_is_female(self):
-        gender_value = "Female"
-        attribute_type = "gender"
-        is_male = True
-        is_female = False
+        gender_value = "FEMALE"
+        attribute_type = "GENDER"
+        is_male = "MALE"
+        is_female = "FEMALE"
         gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
-
         self.assertTrue(gender_condition.matches_condition(is_female))
         self.assertFalse(gender_condition.matches_condition(is_male))
 
     def test_knows_to_match_equal_to_condition_for_gender_if_condition_value_is_male(self):
-        gender_value = "Male"
-        attribute_type = "gender"
-        is_male = True
-        is_female = False
+        gender_value = "MALE"
+        attribute_type = "GENDER"
+        is_male = "MALE"
+        is_female = "FEMALE"
         gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
 
         self.assertTrue(gender_condition.matches_condition(is_male))
@@ -101,14 +100,14 @@ class GroupConditionTest(TestCase):
     def test_knows_to_match_equal_to_condition_for_general_if_condition_value_is_head(self):
         value = "HEAD"
         attribute_type = "GENERAL"
-        is_head = True
+        is_head = "HEAD"
         general_condition = GroupCondition.objects.create(attribute=attribute_type, value=value, condition='EQUALS')
 
         self.assertTrue(general_condition.matches_condition(is_head))
 
         value = "HEAD"
         attribute_type = "gender"
-        is_head = True
+        is_head = False
         general_condition = GroupCondition.objects.create(attribute=attribute_type, value=value, condition='EQUALS')
 
         self.assertFalse(general_condition.matches_condition(is_head))
