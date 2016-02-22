@@ -1,0 +1,274 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+xmlns:h="http://www.w3.org/1999/xhtml"
+xmlns:ev="http://www.w3.org/2001/xml-events"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:jr="http://openrosa.org/javarosa">
+{% load template_tags %}
+<h:head>
+<h:title> 
+  {{survey.name}}
+</h:title>
+  <model>
+  <instance>
+   <survey id="{{ survey.pk }}" >
+     <meta>
+       <instanceID />
+       <instanceName />
+     </meta>
+	{% if survey.has_sampling  %}
+    <chooseExistingHousehold>1</chooseExistingHousehold>
+	{% else %}
+	   <chooseExistingHousehold>0</chooseExistingHousehold>
+	{% endif %}
+    {% if survey.has_sampling  %}
+    <registeredHousehold>
+        <household />
+        <selectedMember />
+        <householdMember>
+        {% for r_household in registered_households %}
+            <h{{r_household.pk}} />
+        {% endfor %}
+        </householdMember>
+    </registeredHousehold>
+    {% endif %}
+    <household>
+        <houseNumber />
+		<householdMember>
+            <surname />
+            <firstName />
+            <sex />
+            <dateOfBirth />
+			<age />
+            <isHead>0</isHead>
+            <occupation />
+            <levelOfEducation />
+            <residentSince />
+        </householdMember>
+    </household>
+	{% for batch in survey_batches %}
+		<b{{batch.pk}}>
+			{% for question in batch.survey_questions %}
+				<q{{question.pk}} />
+                {% if question.group.name == 'NON_RESPONSE' %}
+                 <qnr{{question.pk}} />
+                {% endif %}
+			{% endfor %}
+		</b{{batch.pk}}>
+	{% endfor %}
+   </survey>
+  </instance>
+
+  <!-- bindings -->
+  <bind nodeset="/survey/meta/instanceID" type="string" 
+           readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/survey/meta/instanceName" type="string" 
+           readonly="true()" calculate="concat(/survey/household/houseNumber, {% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}'', ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
+   {% if survey.has_sampling %}
+	<bind nodeset="/survey/chooseExistingHousehold" type="select1"  required="true()" />
+	   <bind nodeset="/survey/registeredHousehold/household" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'1')" />
+	   {% for r_household in registered_households %}
+	   <bind nodeset="/survey/registeredHousehold/householdMember/h{{r_household.pk}}" type="select1"  required="true()" relevant="selected(/survey/registeredHousehold/household,'{{r_household.pk}}')" />
+	   {% endfor %}
+      <bind nodeset="/survey/registeredHousehold/selectedMember" type="string" 
+           readonly="true()" calculate="if(selected(/survey/chooseExistingHousehold,'1'), concat({% for r_household in registered_households %}/survey/registeredHousehold/householdMember/h{{r_household.pk}}, {% endfor %}''), '')" />
+  {% endif %}
+  <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}string{% endif %}"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/sex" type="select1"  required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" />
+  <bind nodeset="/survey/household/householdMember/dateOfBirth" type="date" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0')" constraint=". &lt;= today()"/>
+	<bind nodeset="/survey/household/householdMember/age" type="int" readonly="true()"
+		  calculate="int((decimal-date-time(today()) - decimal-date-time(/survey/household/householdMember/dateOfBirth)) div 365.4)"/>
+  <bind nodeset="/survey/household/householdMember/isHead" type="select1" required="true()" relevant="selected(/survey/chooseExistingHousehold,'0') and not(false() {% for r_household in registered_households %}{% if r_household.get_head %} or /survey/household/houseNumber = '{{r_household.pk}}' {% endif %}{% endfor %})" />
+  <bind nodeset="/survey/household/householdMember/occupation" type="string" relevant="selected(/survey/household/householdMember/isHead,'1')" />
+  <bind nodeset="/survey/household/householdMember/levelOfEducation" type="select1" relevant="selected(/survey/household/householdMember/isHead,'1')" />
+  <bind nodeset="/survey/household/householdMember/residentSince" type="date" relevant="selected(/survey/household/householdMember/isHead,'1')" constraint=". &gt;= /survey/household/householdMember/dateOfBirth" />
+
+
+	{% for batch in survey_batches  %}
+		{% for question in batch.survey_questions %}
+		{% is_relevant_odk question interviewer registered_households as relevance_context %}
+			<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}"
+				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
+				required="true()"
+				relevant="{% if interviewer.ea in batch.non_response_eas %}selected(/survey/bnr{{batch.pk}}, '0'){% else %}true(){% endif %} {{ relevance_context }}"/>
+        	{% if interviewer.ea in batch.non_response_eas %}
+				<bind nodeset="/survey/bnr{{batch.pk}}" type="select1" />
+	    		<bind nodeset="/survey/qnr{{batch.pk}}" type="string" relevant="selected(/survey/bnr{{batch.pk}}, '1')" required="selected(/survey/bnr{{batch.pk}}, '1')" />
+			{% endif %}
+		{% endfor %}
+	{% endfor %}
+
+  </model>
+</h:head>
+<h:body>
+    <group>
+        <label>Household details</label>
+        {% if survey.has_sampling %}
+		    <select1 ref="/survey/chooseExistingHousehold">
+					<label>What do you want to do?</label>
+					<item>
+						<label>Select registered member</label>
+						<value>1</value>
+					</item>
+					<item>
+						<label>Register new household member</label>
+						<value>0</value>
+					</item>
+				</select1>
+		    <select1 ref="/survey/registeredHousehold/household">
+		         <label>Select Household</label>
+		         {% for r_household in registered_households %}
+				    <item>
+						<label>HH-{{r_household.house_number}}{% if r_household.get_head %}, {{r_household.get_head.surname}}{% endif %}</label>
+	               		<value>{{r_household.pk}}</value>
+		            </item>                 
+		         {% endfor %}
+		    </select1>
+		    {% for r_household in registered_households %}
+		        <select1 ref="/survey/registeredHousehold/householdMember/h{{r_household.pk}}">
+		            <label>Select Household Member</label>
+				    {% for member in r_household.members.all %}
+				    <item>
+		               <label>{{member.surname}}, {{member.first_name}} </label>
+		               <value>{{r_household.pk}}_{{member.pk}}</value>
+		            </item>
+				    {% endfor %}
+		        </select1>
+		   {% endfor %}
+       {% endif %}
+		{% if survey.has_sampling and registered_households %}
+			<select1 ref="/survey/household/houseNumber">
+		         <label>Select Household</label>
+		         {% for r_household in registered_households %}
+				    <item>
+						<label>HH-{{r_household.house_number}}{% if r_household.get_head %}, {{r_household.get_head.surname}}{% endif %}</label>
+	               		<value>{{r_household.pk}}</value>
+		            </item>
+		         {% endfor %}
+		    </select1>
+		{% else %}
+       <input ref="/survey/household/houseNumber">
+			<label>Enter household number</label>
+		</input>
+		{% endif %}
+    <group>
+        <label>Household Member Details</label>
+			<select1 ref="/survey/household/householdMember/isHead">
+				<label>Is this the main respondent of this household?</label>
+                <hint>Skip if already assigned for this household</hint>
+				<item>
+					<label> Yes </label>
+					<value>1</value>
+				</item>
+				<item>
+					<label> No </label>
+					<value>0</value>
+				</item>
+			</select1>
+		<input ref="/survey/household/householdMember/surname">
+						<label>Enter Surname</label>
+					</input>
+		<input ref="/survey/household/householdMember/firstName">
+						<label>Enter Firstname</label>
+					</input>
+        	<select1 ref="/survey/household/householdMember/sex">
+				<label>Enter sex</label>
+				<item>
+					<label> Male </label>
+					<value>1</value>
+				</item>
+				<item>
+					<label> Female </label>
+					<value>0</value>
+				</item>
+			</select1>
+        <input ref="/survey/household/householdMember/dateOfBirth" appearance="no-calendar">
+						<label>Choose Date of Birth</label>
+					</input>
+        <input ref="/survey/household/householdMember/occupation">
+						<label>Enter Occupation</label>
+					</input>
+        <input ref="/survey/household/householdMember/residentSince" appearance="no-calendar">
+						<label>Choose date of residency</label>
+					</input>
+		<select1 ref="/survey/household/householdMember/levelOfEducation">
+			<label>Level Of Education</label>
+			{% for e_level in educational_levels %}
+			<item>
+				<label>{{ e_level.1 }}</label>
+				<value>{{ e_level.0 }}</value>
+			</item>
+			{% endfor %}
+		</select1>
+		</group>            
+    </group>
+	{% for batch in survey_batches %}
+		<group>
+			<label>{{ batch.name }}</label>
+			<hint>{{ batch.description }}</hint>
+			{% if interviewer.ea in batch.non_response_eas %}
+                <select1  ref="/survey/bnr{{batch.pk}}">
+					<label>Member is available to respond</label>
+					<item>
+						<label>Yes</label>
+						<value>0</value>
+					</item>
+					<item>
+						<label>No</label>
+						<value>1</value>
+					</item>
+				</select1>
+				<input ref="/survey/qnr{{batch.pk}}">
+					<label>{{messages.NON_RESPONSE_MSG}}</label>
+				</input>
+			{% endif %}
+			{% for question in batch.survey_questions %}
+				{% if question.answer_type == answer_types.multichoiceanswer %}
+					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+						<label>{{question.text}}</label>
+						{% for option in question.options.all %}
+						<item>
+							<label>{{ option.text }}</label>
+							<value>{{ option.order }}</value>
+						</item>
+						{% endfor %}
+					</select1>
+				{% elif question.answer_type == answer_types.multiselectanswer %}
+					<select ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+						<label>{{question.text}}</label>
+						{% for option in question.options.all %}
+						<item>
+							<label>{{ option.text }}</label>
+							<value>{{ option.text|trim }}</value>
+						</item>
+						{% endfor %}
+					</select>
+				{% elif question.answer_type == answer_types.imageanswer %}
+					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
+						<label>{{question.text}}</label>
+					</upload>
+				{% elif question.answer_type == answer_types.audioanswer %}
+					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   mediatype="audio/*">
+						<label>{{question.text}}</label>
+					</upload>
+				{% elif question.answer_type == answer_types.videoanswer %}
+					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}" mediatype="video/*">
+						<label>{{question.text}}</label>
+					</upload>
+                {% elif question.answer_type == answer_types.dateanswer %}
+				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}" appearance="no-calendar">
+					<label>{{question.text}}</label>
+				</input>
+				{% else %}
+				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+					<label>{{question.text}}</label>
+				</input>
+				{% endif %}
+
+			{% endfor %}
+		</group>
+	{% endfor %}
+
+</h:body>
+</h:html>
