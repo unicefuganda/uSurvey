@@ -172,7 +172,7 @@ INSTALLED_APPS = (
     'mptt',
     'rapidsms.backends.database',
     'rapidsms.contrib.httptester',
-    'djcelery',
+    'django_rq',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -279,6 +279,26 @@ MOBILE_NUM_MAX_LENGTH = 9
 SHAPE_FILE_URI = '/static/map_resources/uganda_districts_2011_005.json'
 SHAPE_FILE_LOC_FIELD ='DNAME_2010'
 SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
+
+RQ_QUEUES = {
+    'default': {
+    'HOST': 'localhost',
+    'PORT': 6379,
+    'DB': 0,
+    'DEFAULT_TIMEOUT': 360,
+    },
+    'results-queue': {
+    'HOST': 'localhost',
+    'PORT': 6379,
+    'DB': 0,
+    'DEFAULT_TIMEOUT': 360,
+    },
+    'email': {
+    'HOST': 'localhost',
+    'PORT': 6379,
+    'DB': 0,
+    }
+}
 
 ##end USSD config ##
 # Importing server specific settings

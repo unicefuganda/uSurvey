@@ -12,6 +12,8 @@ from survey.utils.views_helper import contains_key
 from survey.tasks import email_task
 from survey.forms.enumeration_area import LocationsFilterForm
 from django.core.urlresolvers import reverse
+from survey.utils.zip import InMemoryZip
+from django_rq import job
 
 
 def _process_export(survey_batch_filter_form, last_selected_loc):
@@ -27,10 +29,18 @@ def _process_export(survey_batch_filter_form, last_selected_loc):
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
     data = ResultsDownloadService(batch=batch, survey=survey, restrict_to=restrict_to,
                                   multi_display=multi_option).generate_interview_reports()
-    writer = csv.writer(response)
-    for row in data:
-        writer.writerow(row)
+    # writer = csv.writer(response)
+    zipf = InMemoryZip()
+    contents = data[0]
+    for row in data[1:]:
+        contents = '%s\n%s' % (contents, row)
+        #writer.writerow(row)
+
     return response
+
+@job('email')
+def send_mail(composer):
+    composer.send_mail()
 
 @login_required
 @permission_required('auth.can_view_aggregates')
@@ -50,7 +60,7 @@ def download(request):
                                                                  survey=survey,
                                                                  restrict_to=[last_selected_loc, ],
                                                                 multi_display=multi_option))
-                email_task.delay(composer)
+                send_mail.delay(composer)
                 messages.warning(request, "Email would be sent to you shortly. This could take a while.")
             else:
                 return _process_export(survey_batch_filter_form, last_selected_loc)

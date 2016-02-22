@@ -5,6 +5,7 @@
 *.*~
 # C extensions
 *.so
+*.~*
 
 # Packages
 *.egg
@@ -40,7 +41,7 @@ nosetests.xml
 
 localsettings.py
 *.log
-investigator_configs.py
+interviewer_configs.py
 *.csv
 .DS_STORE
 tags
