@@ -18,7 +18,6 @@ mock
 newrelic==1.13.1.31
 dateutils
 xlwt
-django-celery
 selenium==2.35.0
 django-model-utils==2.2
 djangohttpdigest==0.2.3

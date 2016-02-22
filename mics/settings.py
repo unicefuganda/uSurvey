@@ -180,7 +180,7 @@ INSTALLED_APPS = (
 )
 
 SOUTH_MIGRATION_MODULES = {
-        'djcelery': 'djcelery.south_migrations',
+
     }
 
 
