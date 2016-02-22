@@ -3,8 +3,7 @@ mics
 
 Installation
 ------------
-* Postgres, rabbitmq and memcached should be running
-(on OSX  install memcached and libmemcached from brew)
+* Postgres, redis-server should be running
 
 ##Git
 
@@ -17,7 +16,7 @@ Installation
 
         cd ../survey
 
-        cp investigator_configs.py.example investigator_configs.py
+        cp interviewer_configs.py.example interviewer_configs.py
 
         cd ..
 
