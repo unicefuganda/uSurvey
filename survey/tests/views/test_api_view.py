@@ -29,7 +29,6 @@ class TestApi(TestCase):
     def test_delete_investigator(self):
         self.ea = EnumerationArea.objects.create(name="EA2")
         self.ea.locations.add(self.location)
-
         investigator = Interviewer.objects.create(name="investigator name", mobile_number="123456789", ea=self.ea)
         self.assertEquals(Interviewer.objects.count(), 1)
         response = self.client.get("/api/delete_investigator", data={'mobile_number': investigator.mobile_number})

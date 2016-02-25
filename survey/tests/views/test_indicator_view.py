@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import Client
 from survey.forms.indicator import IndicatorForm
 from survey.forms.filters import IndicatorFilterForm
-from survey.models import QuestionModule, Batch, Indicator, Survey, Formula, Question
+from survey.models import QuestionModule, Batch, Indicator, Survey, Formula, Question, HouseholdMemberGroup
 from survey.tests.base_test import BaseTest
 
 
@@ -12,7 +12,14 @@ class IndicatorViewTest(BaseTest):
         self.module = QuestionModule.objects.create(name="Health")
         self.survey = Survey.objects.create(name="Health survey")
         self.batch = Batch.objects.create(name="Health", survey=self.survey)
-
+        household_member_group = HouseholdMemberGroup.objects.create(name="test name2", order=2)
+        question_mod = QuestionModule.objects.create(name="Test question name",description="test desc")
+        batch = Batch.objects.create(order=1)
+        self.question_1 = Question.objects.create(identifier='1.1',text="This is a question", answer_type='Numerical Answer',
+                                           group=household_member_group,batch=batch,module=question_mod)
+        self.question_2 = Question.objects.create(identifier='1.2',text="How many of them are male?",
+                                             answer_type="Numerical Answer", group=household_member_group,batch=batch,
+                                             module=question_mod)
         self.form_data = {'module': self.module.id,
                           'name': 'Health',
                           'description': 'some description',
@@ -250,7 +257,9 @@ class IndicatorViewTest(BaseTest):
                                                measure='Percentage',
                                                module=module, batch=batch_s)
 
-        indicators_formula = Formula.objects.create(indicator=indicator_1, count=Question.objects.create(text="Question", answer_type=Question.MULTICHOICE))
+        household_member_group = HouseholdMemberGroup.objects.create(name="test name123", order=11)
+        indicators_formula = Formula.objects.create(numerator=self.question_1, groups=household_member_group,denominator=self.question_2,
+                                         count=self.question_1, indicator=indicator_1)
         response = self.client.get('/indicators/%s/delete/' % indicator_1.id)
         self.failIf(Indicator.objects.filter(id=indicator_1.id))
         self.failIf(Formula.objects.filter(id=indicators_formula.id))
