@@ -1,7 +1,0 @@
-<table width="75%" height="20px" border="0" cellspacing="0" cellpadding="0">
-            <tr>
-              <td align="right" valign="bottom">{% extends "horizontal_filter_form.html" %}</td>
-<td align="left" valign="bottom">{% block submit_button %}
-    <button class="accesbutton2" id="export_excel">Email Spreadsheet</button>
-{% endblock %}</td>
-</tr></table>
