@@ -116,10 +116,8 @@ class TestSurveyCompletion(BaseTest):
         LocationType.objects.filter(name__iexact='country').delete()
         location_with_no_parent = Location.objects.create(name='Abim', parent=self.uganda, type=self.city)
         another_location_with_no_parent = Location.objects.create(name='Kampala', parent=self.uganda, type=self.city)
-        form_data = {'survey': self.batch.survey.id, 'location': '', 'batch': str(self.batch.pk), 'ea': ''}
+        form_data = {'survey': self.batch.survey.id, 'location': location_with_no_parent.id, 'batch': str(self.batch.pk), 'ea': self.kampala_ea.id}
         response = self.client.post('/surveys/completion/', data=form_data)
-        print dir(response.context['completion_rates']),"++++++++++++="
-        print response.context['completion_rates'].ea
         self.assertIn(location_with_no_parent, response.context['completion_rates'].locations)
         self.assertIn(another_location_with_no_parent, response.context['completion_rates'].locations)
         self.assertIsNotNone(response.context['request'])

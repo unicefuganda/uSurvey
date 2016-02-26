@@ -30,23 +30,23 @@ class HouseholdMemberViewsTest(BaseTest):
         uganda = Location.objects.create(name="Uganda", type=country)
         ea = EnumerationArea.objects.create(name="EA2")
         ea.locations.add(uganda)
-        investigator = Interviewer.objects.create(name="Investigator",
+        self.investigator = Interviewer.objects.create(name="Investigator",
                                                    ea=ea,
                                                    gender='1',level_of_education='Primary',
                                                    language='Eglish',weights=0)
         survey = Survey.objects.create(name="Survey A", description="open survey", has_sampling=True)
-        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
-        self.household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
-                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",
+        self.household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
+        self.household = Household.objects.create(house_number=123456,listing=self.household_listing,physical_address='Test address',
+                                             last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",
                                              head_sex='MALE')
-        survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
+        survey_householdlisting = SurveyHouseholdListing.objects.create(listing=self.household_listing,survey=survey)
         HouseholdHead.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth=date(1988,01,01) ,
                                                           household=self.household,survey_listing=survey_householdlisting,
-                                                          registrar=investigator,registration_channel="ODK Access",occupation="Agricultural labor",level_of_education="Primary",
+                                                          registrar=self.investigator,registration_channel="ODK Access",occupation="Agricultural labor",level_of_education="Primary",
                                                       resident_since=date(1989,02,02))
         self.household_member = HouseholdMember.objects.create(surname="sur123", first_name='fir123', gender='MALE', date_of_birth=date(1988,01,01),
                                                           household=self.household,survey_listing=survey_householdlisting,
-                                                          registrar=investigator,registration_channel="ODK Access")
+                                                          registrar=self.investigator,registration_channel="ODK Access")
 
     def test_new_should_have_household_member_form_in_response_context_for_get(self):
         response = self.client.get('/households/%d/member/new/' % int(self.household.id))
@@ -57,12 +57,21 @@ class HouseholdMemberViewsTest(BaseTest):
 
         self.assertIsInstance(response.context['member_form'], HouseholdMemberForm)
         self.assertEqual(response.context['button_label'], 'Create')
-    #
+
     # def test_new_should_redirect_on_post(self):
-    #     form_data = {'surname': 'xyz',
-    #                  'date_of_birth': date(1980, 05, 01),
-    #                  'male': True
-    #     }
+    #     # form_data = {'surname': 'xyz',
+    #     #              'date_of_birth': date(1980, 05, 01),
+    #     #              'male': True
+    #     # }
+    #     print self.household_listing.id
+    #     print self.investigator.id
+    #     form_data = {"house_number":123456,
+    #                  "listing":self.household_listing.id,
+    #                  "physical_address":'Test address',
+    #                  "last_registrar":self.investigator.id,
+    #                  "registration_channel":"ODK Access",
+    #                  "head_desc":"Head",
+    #                  "head_sex":'MALE'}
     #
     #     response = self.client.post('/households/%d/member/new/' % int(self.household.id), data=form_data)
     #

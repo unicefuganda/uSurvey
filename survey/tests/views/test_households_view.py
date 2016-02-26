@@ -1,5 +1,4 @@
 import json
-
 from django.template.defaultfilters import slugify
 from datetime import date
 from django.test.client import Client
@@ -9,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
-from survey.models import LocationTypeDetails, EnumerationArea
+from survey.models import LocationTypeDetails, EnumerationArea, HouseholdListing
 from survey.models.households import HouseholdMember, HouseholdHead, Household
 from survey.models.backend import Backend
 from survey.models.interviewer import Interviewer
@@ -215,60 +214,65 @@ class HouseholdViewTest(BaseTest):
 #         assert mock_error_class.called_once_with([message])
 
 #   Eswar ned to check after reaching office
-    # def test_create_households(self):
-    #     country = LocationType.objects.create(name='country', slug='country')
-    #     uganda = Location.objects.create(name="Uganda", type=country)
-    #     burundi = Location.objects.create(name="Burundi", type=country)
-    #     ea = EnumerationArea.objects.create(name="EA2")
-    #     ea.locations.add(uganda)
-    #     survey = Survey.objects.create(name="Survey A", description="open survey", has_sampling=True)
-    #     investigator = Interviewer.objects.create(name="Investigator",
-    #                                                ea=ea,
-    #                                                gender='1',level_of_education='Primary',
-    #                                                language='Eglish',weights=0)
-    #     form_data = {
-    #         'ea': investigator.ea.id,
-    #         'interviewer': investigator.id,
-    #         'surname': 'Rajini',
-    #         'first_name': 'Kant',
-    #         'male': 'False',
-    #         'date_of_birth': date(1980, 9, 01),
-    #         'occupation': 'Student',
-    #         'level_of_education': 'Nursery',
-    #         'resident_since_year': '2013',
-    #         'resident_since_month': '5',
-    #         'time_measure': 'Years',
-    #         'house_number': '2',
-    #         'survey':survey.id
-    #     }
-    #
-    #     # household_code = LocationCode.get_household_code(investigator) + str(Household.next_uid())
-    #
-    #     hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
-    #     household = Household.objects.filter(house_number=form_data['house_number'])
-    #     self.failIf(hHead)
-    #     self.failIf(household)
-    #     response = self.client.get('/households/new/', data=form_data)
-    #     self.failUnlessEqual(response.status_code, 302) # ensure redirection to list investigator page
-    #
-    #     hHead = HouseholdHead.objects.get(surname=form_data['surname'])
-    #     household = Household.objects.get(uid=form_data['uid'])
-    #     self.failUnless(hHead.id)
-    #     self.failUnless(household.id)
-    #     for key in ['surname', 'first_name', 'date_of_birth', 'occupation',
-    #                 'level_of_education', 'resident_since_year', 'resident_since_month']:
-    #         value = getattr(hHead, key)
-    #         self.assertEqual(str(form_data[key]), str(value))
-    #
-    #     self.assertEqual(hHead.male, False)
-    #     self.assertEqual(household.investigator, investigator)
-    #     self.assertEqual(household.location, investigator.location)
-    #     self.assertEqual(household.household_code, household_code)
-    #     self.assertEqual(hHead.household, household)
-    #
-    #     investigator.ea = ea
-    #     investigator.save()
-    #     self.assertEqual(household.location, uganda)
+#     def test_create_households(self):
+#         country = LocationType.objects.create(name='country', slug='country')
+#         district = LocationType.objects.create(name='district', slug='district', parent=country)
+#         uganda = Location.objects.create(name="Uganda", type=country)
+#         # burundi = Location.objects.create(name="Burundi", type=country)
+#         dist = Location.objects.create(name="dist", type=district, parent=uganda)
+#         ea = EnumerationArea.objects.create(name="EA2")
+#         ea.locations.add(uganda)
+#         survey = Survey.objects.create(name="Survey A", description="open survey", has_sampling=True)
+#         investigator = Interviewer.objects.create(name="Investigator",
+#                                                    ea=ea,
+#                                                    gender='1',level_of_education='Primary',
+#                                                    language='Eglish',weights=0)
+#         household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
+#         household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+#                                              last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",
+#                                              head_sex='MALE')
+#         survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
+#         SurveyAllocation.objects.create(interviewer=investigator,survey=survey,allocation_ea=ea,stage=1,status=0)
+#         form_data = {
+#             'surname': 'Rajini',
+#             'first_name': 'Kant',
+#             'gender': 1,
+#             'date_of_birth': '19-10-1980',
+#             'household':household.id,
+#             'survey_listing':survey_householdlisting.id,
+#             'registrar': investigator.id,
+#             'registration_channel':'ODK Access',
+#             'occupation': 'Student',
+#             'level_of_education': 'Nursery',
+#             'resident_since': '19-10-2001',
+#         }
+#
+#         hHead = HouseholdHead.objects.filter(surname=form_data['surname'])
+#         household = Household.objects.filter(house_number=123456)
+#         self.failIf(hHead)
+#         # self.trueIf(household)
+#         response = self.client.post('/households/new/', data=form_data)
+#         self.failUnlessEqual(response.status_code, 200) # ensure redirection to list investigator page
+#         print HouseholdHead.objects.all()
+#         hHead = HouseholdHead.objects.get(surname=form_data['surname'])
+#         # household = Household.objects.get(uid=form_data['house_number'])
+#         print household
+#         self.failUnless(hHead.id)
+#         self.failUnless(household.id)
+#         for key in ['surname', 'first_name', 'date_of_birth', 'occupation',
+#                     'level_of_education', 'resident_since_year', 'resident_since_month']:
+#             value = getattr(hHead, key)
+#             self.assertEqual(str(form_data[key]), str(value))
+#
+#         self.assertEqual(hHead.male, False)
+#         # self.assertEqual(household.investigator, investigator)
+#         # self.assertEqual(household.location, investigator.location)
+#         # self.assertEqual(household.household_code, household_code)
+#         self.assertEqual(hHead.household, household)
+#
+#         investigator.ea = ea
+#         investigator.save()
+#         self.assertEqual(household.location, uganda)
 
 #     def test_create_households_unsuccessful(self):
 #         country = LocationType.objects.create(name='country', slug='country')
@@ -644,96 +648,106 @@ class HouseholdViewTest(BaseTest):
 #         self.assertEqual(household_c, response.context['households'][2])
 #
 #
-# class ViewHouseholdDetailsTest(BaseTest):
-#     def test_view_household_details(self):
-#         client = Client()
+class ViewHouseholdDetailsTest(BaseTest):
+    def test_view_household_details(self):
+        client = Client()
+
+        country = LocationType.objects.create(name="Country", slug=slugify("country"))
+        city = LocationType.objects.create(name="City", slug=slugify("city"))
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+        survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                   ea=ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
+        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
+        household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",
+                                             head_sex='MALE')
+        survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
+        HouseholdHead.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
+                                        household=household,survey_listing=survey_householdlisting,
+                                        registrar=investigator,registration_channel="ODK Access",
+                                        occupation="Agricultural labor",level_of_education="Primary",
+                                        resident_since='1989-02-02')
+
+        HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
+                                                          household=household,survey_listing=survey_householdlisting,
+                                                          registrar=investigator,registration_channel="ODK Access")
+        response = client.get('/households/%d/' % int(household.id))
+
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('households/show.html', templates)
+        self.assertEquals(response.context['household'], household)
+
+class EditHouseholdDetailsTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_households')
+        self.client.login(username='Rajni', password='I_Rock')
+        self.survey = Survey.objects.create(name="Survey A")
+        self.country = LocationType.objects.create(name="Country", slug="country")
+        self.city = LocationType.objects.create(name="City", parent=self.country, slug="city")
+        self.village = LocationType.objects.create(name="Village", parent=self.city, slug="village")
+        self.uganda = Location.objects.create(name="Uganda", type=self.country)
+        self.kampala = Location.objects.create(name="Kampala", type=self.city, parent=self.uganda)
+        self.backend = Backend.objects.create(name='something')
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.country)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.city)
+        LocationTypeDetails.objects.create(country=self.uganda, location_type=self.village)
+        self.ea = EnumerationArea.objects.create(name="EA2")
+        self.ea.locations.add(self.kampala)
+        self.investigator = Interviewer.objects.create(name="Investigator",
+                                                   ea=self.ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
+        self.household_listing = HouseholdListing.objects.create(ea=self.ea,list_registrar=self.investigator,initial_survey=self.survey)
+        self.household = Household.objects.create(house_number=123456,listing=self.household_listing,physical_address='Test address',
+                                             last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",
+                                             head_sex='MALE')
+        self.survey_householdlisting = SurveyHouseholdListing.objects.create(listing=self.household_listing,survey=self.survey)
+        HouseholdHead.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
+                                        household=self.household,survey_listing=self.survey_householdlisting,
+                                        registrar=self.investigator,registration_channel="ODK Access",
+                                        occupation="Agricultural labor",level_of_education="Primary",
+                                        resident_since='1989-02-02')
 #
-#         country = LocationType.objects.create(name="Country", slug=slugify("country"))
-#         city = LocationType.objects.create(name="City", slug=slugify("city"))
-#         uganda = Location.objects.create(name="Uganda", type=country)
-#         kampala = Location.objects.create(name="Kampala", type=city, tree_parent=uganda)
-#         ea = EnumerationArea.objects.create(name="EA2")
-#         ea.locations.add(kampala)
-#
-#         investigator = Investigator.objects.create(name="investigator", mobile_number="123456789",
-#                                                    backend=Backend.objects.create(name='something'), ea=ea)
-#
-#         household = Household.objects.create(investigator=investigator, location=investigator.location, uid=0)
-#         HouseholdHead.objects.create(surname='Bravo', household=household, first_name='Test',
-#                                      date_of_birth='1980-09-01', male=True, occupation='Agricultural labor',
-#                                      level_of_education='Primary', resident_since_year=2000, resident_since_month=7)
-#
-#         HouseholdMember.objects.create(household=household, surname='Test Member', male=True,
-#                                        date_of_birth=date(2000, 8, 20))
-#         response = client.get('/households/%d/' % int(household.id))
-#
-#         self.failUnlessEqual(response.status_code, 200)
-#         templates = [template.name for template in response.templates]
-#         self.assertIn('households/show.html', templates)
-#         self.assertEquals(response.context['household'], household)
-#
-#
-# class EditHouseholdDetailsTest(BaseTest):
-#
-#     def setUp(self):
-#         self.client = Client()
-#         User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
-#         self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_households')
-#         self.client.login(username='Rajni', password='I_Rock')
-#         self.survey = Survey.objects.create(name="Survey A")
-#         self.country = LocationType.objects.create(name="Country", slug=slugify("country"))
-#         self.city = LocationType.objects.create(name="City", slug=slugify("city"))
-#         self.village = LocationType.objects.create(name="Village", slug=slugify("village"))
-#         self.uganda = Location.objects.create(name="Uganda", type=self.country)
-#         self.kampala = Location.objects.create(name="Kampala", type=self.city, tree_parent=self.uganda)
-#         self.backend = Backend.objects.create(name='something')
-#         LocationTypeDetails.objects.create(country=self.uganda, location_type=self.country)
-#         LocationTypeDetails.objects.create(country=self.uganda, location_type=self.city)
-#         LocationTypeDetails.objects.create(country=self.uganda, location_type=self.village)
-#         self.ea = EnumerationArea.objects.create(name="EA2", survey=self.survey)
-#         self.ea.locations.add(self.kampala)
-#         self.investigator = Investigator.objects.create(name="investigator", mobile_number="123456789",
-#                                                         backend=self.backend,
-#                                                         ea=self.ea)
-#
-#         self.household = Household.objects.create(investigator=self.investigator, ea=self.investigator.ea,
-#                                                   uid=0)
-#         HouseholdHead.objects.create(surname='Bravo', household=self.household, first_name='Test',
-#                                      date_of_birth='1980-09-01', male=True, occupation='Agricultural labor',
-#                                      level_of_education='Primary', resident_since_year=2000, resident_since_month=7)
-#
-#     def test_get_edit__household_details(self):
-#         response = self.client.get('/households/%s/edit/' % self.household.id)
-#         self.failUnlessEqual(response.status_code, 200)
-#         templates = [template.name for template in response.templates]
-#         self.assertIn('households/new.html', templates)
-#         self.assertEquals(response.context['action'], '/households/%s/edit/' % self.household.id)
-#         self.assertEquals(response.context['id'], 'add-household-form')
-#         self.assertEquals(response.context['button_label'], 'Save')
-#         self.assertEquals(response.context['heading'], 'Edit Household')
-#         self.assertEquals(response.context['loading_text'], 'Updating...')
-#         investigator_form = {'value': '', 'text': '', 'options': Investigator.objects.all(), 'error': ''}
-#         self.assert_dictionary_equal(response.context['investigator_form'], investigator_form)
-#         self.assertIsNotNone(response.context['householdform'])
-#         self.assertIsNotNone(response.context['locations'])
-#         self.assertIsNotNone(response.context['selected_location'])
-#         self.assertEqual(self.household.location, response.context['selected_location'])
-#
-#     def test_post_edit__household_details(self):
-#         new_investigator = Investigator.objects.create(name="new Investigator", mobile_number="123553539",
-#                                                        backend=self.backend, ea=self.ea)
-#
-#         form_values = {'investigator': new_investigator.id,
-#                        'location': self.household.location.id,
-#                        'uid': self.household.uid, 'ea': new_investigator.ea.id}
-#         response = self.client.post('/households/%s/edit/' % self.household.id, data=form_values)
-#
-#         self.assertRedirects(response, '/households/', 302, 200)
-#         updated_household = Household.objects.get(id=self.household.id)
-#         self.assertNotEqual(updated_household.investigator, self.investigator)
-#         self.assertEqual(updated_household.investigator, new_investigator)
-#         updated_investigator = Investigator.objects.get(id=self.investigator.id)
-#         self.assertEqual(0, len(updated_investigator.households.all()))
-#         self.assertEqual(1, len(new_investigator.households.all()))
-#         success_message = "Household successfully edited."
-#         self.assertIn(success_message, response.cookies['messages'].value)
+    def test_get_edit__household_details(self):
+        response = self.client.get('/households/%s/edit/' % self.household.id)
+        self.failUnlessEqual(response.status_code, 200)
+        templates = [template.name for template in response.templates]
+        self.assertIn('households/new.html', templates)
+        self.assertEquals(response.context['action'], '/households/%s/edit/' % self.household.id)
+        self.assertEquals(response.context['id'], 'create-household-form')
+        self.assertEquals(response.context['button_label'], 'Save')
+        self.assertEquals(response.context['heading'], 'Edit Household')
+        self.assertEquals(response.context['loading_text'], 'Creating...')
+        investigator_form = {'value': '', 'text': '', 'options': Interviewer.objects.all(), 'error': ''}
+        self.assertIsNotNone(response.context['householdform'])
+        self.assertIsNotNone(response.context['locations_filter'])
+
+    # def test_post_edit__household_details(self):
+    #     new_investigator = Interviewer.objects.create(name="Investigator",
+    #                                                ea=self.ea,
+    #                                                gender='1',level_of_education='Primary',
+    #                                                language='Eglish',weights=0)
+    #
+    #     form_values = {'investigator': new_investigator.id,
+    #                    'location': self.household.location.id,
+    #                    'uid': self.household.uid, 'ea': new_investigator.ea.id}
+    #     response = self.client.post('/households/%s/edit/' % self.household.id, data=form_values)
+    #
+    #     self.assertRedirects(response, '/households/', 302, 200)
+    #     updated_household = Household.objects.get(id=self.household.id)
+    #     self.assertNotEqual(updated_household.investigator, self.investigator)
+    #     self.assertEqual(updated_household.investigator, new_investigator)
+    #     updated_investigator = Interviewer.objects.get(id=self.investigator.id)
+    #     self.assertEqual(0, len(updated_investigator.households.all()))
+    #     self.assertEqual(1, len(new_investigator.households.all()))
+    #     success_message = "Household successfully edited."
+    #     self.assertIn(success_message, response.cookies['messages'].value)

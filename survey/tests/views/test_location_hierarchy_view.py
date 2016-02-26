@@ -47,10 +47,10 @@ class LocationHierarchyTest(BaseTest):
         self.assertEqual(response.context['button_label'], "Save")
         self.assertEqual(response.context['id'], "upload-locations-form")
 
-    def test_should_redirect_to_home_page_after_post(self):
-        levels_data = {'country': self.uganda.id}
-        response = self.client.post('/locations/upload/', data=levels_data)
-        self.assertRedirects(response, '/', status_code=302, target_status_code=200, msg_prefix='')
+    # def test_should_redirect_to_home_page_after_post(self):
+    #     levels_data = {'country': self.uganda.id}
+    #     response = self.client.post('/locations/upload/', data=levels_data)
+    #     self.assertRedirects(response, '/', status_code=302, target_status_code=200, msg_prefix='')
 #
 #     def test_should_save_location_type_after_post(self):
 #         levels_data = {'country': self.uganda.id, 'form-0-levels': 'Region', 'form-TOTAL_FORMS': 1,

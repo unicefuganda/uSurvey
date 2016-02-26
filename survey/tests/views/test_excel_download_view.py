@@ -75,7 +75,7 @@ class ExcelDownloadTest(BaseTest):
 
     def test_downloaded_excel_file(self):
         file_name = "%s.csv" % self.batch.name
-        data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk}
+        data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk, 'action': 'Download Spreadsheet', 'multi_option': 1}
         response = self.client.get('/aggregates/spreadsheet_report', data=data)
         self.assertEquals(200, response.status_code)
         self.assertEquals(response.get('Content-Type'), "text/html; charset=utf-8")
@@ -213,12 +213,10 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         unexpected_data = [investigator_2.name]
 
         post_data = {'survey': survey.id, 'batch': batch.id}
-        response = self.client.post('/investigators/completed/download/', post_data)
+        response = self.client.post('/interviewers/completed/download/', post_data)
         row1 = ['Investigator', 'Phone Number']
         row1.extend(list(LocationType.objects.all().values_list('name', flat=True)))
         contents = "%s\r\n" % (",".join(row1))
-        # self.assertIn(contents, response.content)
-        # [self.assertIn(investigator_details, response.content) for investigator_details in expected_data]
         [self.assertNotIn(investigator_details, response.content) for investigator_details in unexpected_data]
 #
     def test_restricted_permission(self):
