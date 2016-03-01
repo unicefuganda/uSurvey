@@ -6,7 +6,7 @@ from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import LocationType, Location
 from survey.models import GroupCondition, HouseholdHead, QuestionModule, Indicator, Formula, Survey, EnumerationArea
-from survey.models.batch_question_order import BatchQuestionOrder
+# from survey.models.batch_question_order import BatchQuestionOrder
 from django.db import IntegrityError
 from survey.models.batch import Batch
 from survey.models.backend import Backend

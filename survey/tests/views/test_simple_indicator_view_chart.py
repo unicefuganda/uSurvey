@@ -10,6 +10,7 @@ from survey.models.interviewer import Interviewer
 from survey.models.formula import *
 from survey.models.questions import Question, QuestionOption
 from survey.tests.base_test import BaseTest
+from survey.features.simple_indicator_chart_step import create_household_head
 
 
 class SimpleIndicatorChartViewTest(BaseTest):
@@ -76,16 +77,16 @@ class SimpleIndicatorChartViewTest(BaseTest):
     def test_get_data_for_simple_indicator_chart(self):
         household_listing = HouseholdListing.objects.create(ea=self.ea,list_registrar=self.investigator,initial_survey=self.survey)
         survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=self.survey)
-        household_head_1 = self.create_household_head(0, self.investigator,household_listing,survey_householdlisting)
-        household_head_2 = self.create_household_head(1, self.investigator,household_listing,survey_householdlisting)
-        household_head_3 = self.create_household_head(2, self.investigator,household_listing,survey_householdlisting)
-        household_head_4 = self.create_household_head(3, self.investigator,household_listing,survey_householdlisting)
-        household_head_5 = self.create_household_head(4, self.investigator,household_listing,survey_householdlisting)
+        household_head_1 = create_household_head(0, self.investigator,household_listing,survey_householdlisting)
+        household_head_2 = create_household_head(1, self.investigator,household_listing,survey_householdlisting)
+        household_head_3 = create_household_head(2, self.investigator,household_listing,survey_householdlisting)
+        household_head_4 = create_household_head(3, self.investigator,household_listing,survey_householdlisting)
+        household_head_5 = create_household_head(4, self.investigator,household_listing,survey_householdlisting)
 
-        household_head_6 = self.create_household_head(5, self.investigator_2,household_listing,survey_householdlisting)
-        household_head_7 = self.create_household_head(6, self.investigator_2,household_listing,survey_householdlisting)
-        household_head_8 = self.create_household_head(7, self.investigator_2,household_listing,survey_householdlisting)
-        household_head_9 = self.create_household_head(8, self.investigator_2,household_listing,survey_householdlisting)
+        household_head_6 = create_household_head(5, self.investigator_2,household_listing,survey_householdlisting)
+        household_head_7 = create_household_head(6, self.investigator_2,household_listing,survey_householdlisting)
+        household_head_8 = create_household_head(7, self.investigator_2,household_listing,survey_householdlisting)
+        household_head_9 = create_household_head(8, self.investigator_2,household_listing,survey_householdlisting)
         url = "/indicators/%s/simple/" % self.indicator.id
         response = self.client.get(url)
         self.failUnlessEqual(response.status_code, 200)
@@ -103,16 +104,16 @@ class SimpleIndicatorChartViewTest(BaseTest):
         mpigi = Location.objects.create(name="Mpigi", type=self.district, tree_parent=self.central)
         household_listing = HouseholdListing.objects.create(ea=self.ea,list_registrar=self.investigator,initial_survey=self.survey)
         survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=self.survey)
-        household_head_1 = self.create_household_head(0, self.investigator,household_listing,survey_householdlisting)
-        household_head_2 = self.create_household_head(1, self.investigator,household_listing,survey_householdlisting)
-        household_head_3 = self.create_household_head(2, self.investigator,household_listing,survey_householdlisting)
-        household_head_4 = self.create_household_head(3, self.investigator,household_listing,survey_householdlisting)
-        household_head_5 = self.create_household_head(4, self.investigator,household_listing,survey_householdlisting)
+        household_head_1 = create_household_head(0, self.investigator,household_listing,survey_householdlisting)
+        household_head_2 = create_household_head(1, self.investigator,household_listing,survey_householdlisting)
+        household_head_3 = create_household_head(2, self.investigator,household_listing,survey_householdlisting)
+        household_head_4 = create_household_head(3, self.investigator,household_listing,survey_householdlisting)
+        household_head_5 = create_household_head(4, self.investigator,household_listing,survey_householdlisting)
 
-        household_head_6 = self.create_household_head(5, self.investigator_2,household_listing,survey_householdlisting)
-        household_head_7 = self.create_household_head(6, self.investigator_2,household_listing,survey_householdlisting)
-        household_head_8 = self.create_household_head(7, self.investigator_2,household_listing,survey_householdlisting)
-        household_head_9 = self.create_household_head(8, self.investigator_2,household_listing,survey_householdlisting)
+        household_head_6 = create_household_head(5, self.investigator_2,household_listing,survey_householdlisting)
+        household_head_7 = create_household_head(6, self.investigator_2,household_listing,survey_householdlisting)
+        household_head_8 = create_household_head(7, self.investigator_2,household_listing,survey_householdlisting)
+        household_head_9 = create_household_head(8, self.investigator_2,household_listing,survey_householdlisting)
 
         url = "/indicators/%s/simple/?location=%s" % (self.indicator.id, self.west.id)
         response = self.client.get(url)

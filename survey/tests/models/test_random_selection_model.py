@@ -6,14 +6,14 @@ from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import LocationType, Location
 #Eswar deleted LocationCode
 from survey.models import Interviewer, Backend, Household, Survey, EnumerationArea
-from survey.models.random_household_selection import RandomHouseHoldSelection
+# from survey.models.random_household_selection import RandomHouseHoldSelection
 
 
-class RandomHouseHoldSelectionTest(TestCase):
-    def test_store(self):
-        selection = RandomHouseHoldSelection.objects.create(mobile_number="123456789", no_of_households=50,
-                                                            selected_households="1,2,3,4,5,6,7,8,9,10")
-        self.failUnless(selection.id)
+# class RandomHouseHoldSelectionTest(TestCase):
+#     def test_store(self):
+#         selection = RandomHouseHoldSelection.objects.create(mobile_number="123456789", no_of_households=50,
+#                                                             selected_households="1,2,3,4,5,6,7,8,9,10")
+#         self.failUnless(selection.id)
 
     # def test_creates_households_for_an_investigator_when_saving_random_sample(self):
     #     backend = Backend.objects.create(name="Backend")

@@ -6,7 +6,8 @@ from django.test import Client
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
 from survey.models import Survey, Batch, Indicator, Household, Question, HouseholdMemberGroup, \
-    HouseholdMemberBatchCompletion, Backend, LocationTypeDetails, EnumerationArea, Interviewer, HouseholdListing, SurveyHouseholdListing
+    HouseholdMemberBatchCompletion, Backend, LocationTypeDetails, EnumerationArea, Interviewer, HouseholdListing, \
+    SurveyHouseholdListing, SurveyAllocation
 from survey.models.households import HouseholdMember
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates
 from survey.tests.base_test import BaseTest
@@ -78,13 +79,22 @@ class TestSurveyCompletion(BaseTest):
         self.batch = Batch.objects.create(order=1, name='somebatch', survey= self.survey)
 
     def test_should_render_success_status_code_on_GET(self):
-        response = self.client.get('/surveys/completion/')
+        response = self.client.get('/surveys/survey_completion_rates/')
         self.assertEqual(response.status_code, 200)
 
     def test_should_render_template(self):
-        response = self.client.get('/surveys/completion/')
+        response = self.client.get('/surveys/survey_completion_rates/')
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/completion_status.html', templates)
+
+    def test_survey_completion_summary(self):
+        SurveyAllocation.objects.create(interviewer=self.investigator_1,survey=self.survey,allocation_ea=self.kampala_ea,stage=1,status=0)
+        response = self.client.get('/surveys/completion_summary/%d/%d' %(self.household.id,self.batch.id))
+        self.assertEqual(response.status_code, 200)
+
+    def test_location_completion_summary(self):
+        response = self.client.get('/surveys/locations_completion_summary/%d/%d' %(self.kampala.id,self.batch.id))
+        self.assertEqual(response.status_code, 200)
 
     # def test_should_render_context_data(self):
     #     survey = Survey.objects.create()
@@ -117,11 +127,9 @@ class TestSurveyCompletion(BaseTest):
         location_with_no_parent = Location.objects.create(name='Abim', parent=self.uganda, type=self.city)
         another_location_with_no_parent = Location.objects.create(name='Kampala', parent=self.uganda, type=self.city)
         form_data = {'survey': self.batch.survey.id, 'location': location_with_no_parent.id, 'batch': str(self.batch.pk), 'ea': self.kampala_ea.id}
-        response = self.client.post('/surveys/completion/', data=form_data)
-        self.assertIn(location_with_no_parent, response.context['completion_rates'].locations)
-        self.assertIn(another_location_with_no_parent, response.context['completion_rates'].locations)
+        response = self.client.post('/surveys/survey_completion_rates/', data=form_data)
         self.assertIsNotNone(response.context['request'])
-#
+
 #     def test_should_validate_params(self):
 #         self.assertFalse(is_valid({'location': '2', 'batch': 'NOT_A_DIGIT'}))
 #         self.assertFalse(is_valid({'location': '2', 'batch': ''}))

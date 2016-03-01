@@ -1,21 +1,24 @@
 from random import randint
 from lettuce import *
 from rapidsms.contrib.locations.models import *
-
+from survey.models.locations import *
 from survey.features.page_objects.indicators import ListIndicatorPage, SimpleIndicatorGraphPage
-from survey.models import HouseholdMemberGroup, Indicator, LocationTypeDetails, BatchQuestionOrder, EnumerationArea
+from survey.models import HouseholdMemberGroup, Indicator, LocationTypeDetails, EnumerationArea
 from survey.models.households import HouseholdHead, Household
 from survey.models.backend import Backend
-from survey.models.investigator import Investigator
+from survey.models.interviewer import Interviewer
 from survey.models.formula import *
-from survey.models.question import Question, QuestionOption
+from survey.models.questions import Question, QuestionOption
 
 
-def create_household_head(uid, investigator):
-    household = Household.objects.create(investigator=investigator, ea=investigator.ea,
-                                         uid=uid, survey=world.survey)
-    return HouseholdHead.objects.create(household=household, surname="Name " + str(randint(1, 9999)),
-                                        date_of_birth="1990-02-09")
+def create_household_head(uid, investigator, household_listing, survey_householdlisting):
+    household = Household.objects.create(house_number=uid,listing=household_listing,physical_address='Test address' + str(randint(1, 9999)),
+                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    return HouseholdHead.objects.create(surname="sur"+ str(randint(1, 9999)), first_name='fir'+ str(randint(1, 9999)), gender='MALE', date_of_birth="1988-01-01",
+                                                          household=household,survey_listing=survey_householdlisting,
+                                                          registrar=investigator,registration_channel="ODK Access",
+                                                      occupation="Agricultural labor",level_of_education="Primary",
+                                                      resident_since='1989-02-02')
 
 
 @step(u'And I have regions and districts')

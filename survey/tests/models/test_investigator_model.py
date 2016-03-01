@@ -7,7 +7,7 @@ from rapidsms.contrib.locations.models import Location, LocationType
 from django.template.defaultfilters import slugify
 #Eswar deleted LocationCode
 from survey.models import HouseholdHead, EnumerationArea, LocationTypeDetails
-from survey.models.batch_question_order import BatchQuestionOrder
+# from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.locations import *
 from survey.models.batch import Batch
 from survey.interviewer_configs import COUNTRY_PHONE_CODE

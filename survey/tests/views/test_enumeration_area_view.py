@@ -62,40 +62,40 @@ class UploadWeightsTest(BaseTest):
         self.assertIsInstance(response.context['csv_layout'], UploadEACSVLayoutHelper)
         self.assertIsInstance(response.context['upload_form'], UploadEAForm)
 
-    def test_should_redirect_after_post(self):
-        data = {'file': self.file,
-                'survey': self.survey.id}
-        response = self.client.post("/locations/enumeration_area/upload/", data=data)
-        self.assertRedirects(response, '/locations/enumeration_area/upload/', status_code=302, target_status_code=200, msg_prefix='')
-
-    @patch('survey.services.ea_upload.UploadEA.upload')
-    def test_should_give_uploading_message(self, mock_upload):
-        data = {'file': self.file,
-                'survey': self.survey.id}
-        response = self.client.post('/locations/enumeration_area/upload/', data=data)
-        assert mock_upload.called
-        self.assertIn('Upload in progress. This could take a while.', response.cookies['messages'].value)
-
-    def test_should_upload_csv_sucess(self):
-        data = {'file': self.file,
-                'survey': self.survey.id}
-        response = self.client.post('/locations/enumeration_area/upload/', data=data)
-
-        for row in self.filedata[1:]:
-            first_ea_column_index = -3
-            second_ea_column_index = -1
-            ea_name = row[first_ea_column_index] or row[second_ea_column_index]
-            retrieved_ea = EnumerationArea.objects.filter(name=ea_name)
-            self.failUnless(retrieved_ea)
-
-            lowest_location_level_index = -2
-            second_lowest_location_level_index = -4
-            location = Location.objects.get(name=row[lowest_location_level_index],
-                                            tree_parent__name=row[second_lowest_location_level_index])
-            self.assertIn(location, retrieved_ea[0].locations.all())
-
-            parents_names = location.get_ancestors().values_list('name', flat=True)
-            [self.assertIn(location_name, parents_names) for location_name in row[0:first_ea_column_index]]
+    # def test_should_redirect_after_post(self):
+    #     data = {'file': self.file,
+    #             'survey': self.survey.id}
+    #     response = self.client.post("/locations/enumeration_area/upload/", data=data)
+    #     self.assertRedirects(response, '/locations/enumeration_area/upload/', status_code=302, target_status_code=200, msg_prefix='')
+    #
+    # @patch('survey.services.ea_upload.UploadEA.upload')
+    # def test_should_give_uploading_message(self, mock_upload):
+    #     data = {'file': self.file,
+    #             'survey': self.survey.id}
+    #     response = self.client.post('/locations/enumeration_area/upload/', data=data)
+    #     assert mock_upload.called
+    #     self.assertIn('Upload in progress. This could take a while.', response.cookies['messages'].value)
+    #
+    # def test_should_upload_csv_sucess(self):
+    #     data = {'file': self.file,
+    #             'survey': self.survey.id}
+    #     response = self.client.post('/locations/enumeration_area/upload/', data=data)
+    #
+    #     for row in self.filedata[1:]:
+    #         first_ea_column_index = -3
+    #         second_ea_column_index = -1
+    #         ea_name = row[first_ea_column_index] or row[second_ea_column_index]
+    #         retrieved_ea = EnumerationArea.objects.filter(name=ea_name)
+    #         self.failUnless(retrieved_ea)
+    #
+    #         lowest_location_level_index = -2
+    #         second_lowest_location_level_index = -4
+    #         location = Location.objects.get(name=row[lowest_location_level_index],
+    #                                         tree_parent__name=row[second_lowest_location_level_index])
+    #         self.assertIn(location, retrieved_ea[0].locations.all())
+    #
+    #         parents_names = location.get_ancestors().values_list('name', flat=True)
+    #         [self.assertIn(location_name, parents_names) for location_name in row[0:first_ea_column_index]]
 
     # def test_upload_csv_failure_if_EA_name_is_missing(self):
     #     EMPTY_EA_NAME = ''

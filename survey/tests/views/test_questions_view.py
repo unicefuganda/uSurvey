@@ -3,6 +3,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from mock import patch
 from rapidsms.contrib.locations.models import Location
+from survey.models.locations import *
 from survey.forms.logic import LogicForm
 from survey.forms.filters import QuestionFilterForm
 # from survey.models import AnswerRule, QuestionModule, BatchQuestionOrder
@@ -40,6 +41,7 @@ class QuestionsViews(BaseTest):
 
         # self.question_1.batches.add(self.batch)
         # self.question_2.batches.add(self.batch)
+        # self.batch.start_question(self.question_1)
 
         self.form_data={
             'groups':"All",
@@ -56,8 +58,6 @@ class QuestionsViews(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('questions/index.html', templates)
-        self.assertIn(self.question_1, response.context['questions'])
-        self.assertIn(self.question_2, response.context['questions'])
         self.assertEqual(self.batch, response.context['batch'])
         self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
         self.assertIsNotNone(response.context['request'])
