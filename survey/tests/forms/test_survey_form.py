@@ -8,7 +8,7 @@ class SurveyFormTest(TestCase):
     def test_should_have_name_description_type_and_sample_size_fields(self):
         survey_form = SurveyForm()
 
-        fields = ['name', 'description', 'type', 'sample_size', 'has_sampling']
+        fields = ['name', 'description', 'sample_size', 'has_sampling']
 
         [self.assertIn(field, survey_form.fields) for field in fields]
 
@@ -20,8 +20,7 @@ class SurveyFormTest(TestCase):
         form_data = {'name': 'xyz',
                      'description': 'survey description',
                      'has_sampling': True,
-                     'sample_size': 10,
-                     'type': True,
+                     'sample_size': 10
         }
 
         survey_form = SurveyForm(data=form_data)
@@ -31,8 +30,7 @@ class SurveyFormTest(TestCase):
         form_data = {'name': 'xyz',
                      'description': 'survey description',
                      'has_sampling': True,
-                     'sample_size': 10,
-                     'type': True,
+                     'sample_size': 10
         }
 
         survey = Survey.objects.create(**form_data)
@@ -44,8 +42,7 @@ class SurveyFormTest(TestCase):
         form_data = {'name': 'xyz',
                      'description': 'survey description',
                      'has_sampling': True,
-                     'sample_size': 10,
-                     'type': True,
+                     'sample_size': 10
         }
 
         survey = Survey.objects.create(**form_data)
@@ -62,8 +59,7 @@ class SurveyFormTest(TestCase):
         form_data = {'name': 'xyz',
                      'description': 'survey description',
                      'has_sampling': False,
-                     'sample_size': 0,
-                     'type': True,
+                     'sample_size': 0
         }
 
         survey_form = SurveyForm(data=form_data)
@@ -74,8 +70,7 @@ class SurveyFormTest(TestCase):
     def test_should_be_invalid_if_has_sampling_is_true_and_sample_size_is_not_provided(self):
         form_data = {'name': 'xyz',
                      'description': 'survey description',
-                     'has_sampling': True,
-                     'type': True,
+                     'has_sampling': True
         }
 
         error_message = 'Sample size must be specified if has sampling is selected.'
@@ -86,8 +81,7 @@ class SurveyFormTest(TestCase):
     def test_form_is_not_valid_if_survey_with_same_name_exists(self):
         form_data = {'name': 'xyz',
                      'description': 'survey description',
-                     'sample_size': 10,
-                     'type': True,
+                     'sample_size': 10
         }
 
         Survey.objects.create(**form_data)

@@ -1,6 +1,7 @@
 import os
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rapidsms.contrib.locations.models import LocationType
+from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadWeightsForm, UploadLocationsForm
 from survey.models import Survey, LocationTypeDetails
 from survey.tests.base_test import BaseTest
@@ -16,8 +17,8 @@ class UploadLocationsFormTest(BaseTest):
         self.filename = 'test.csv'
         self.file = open(self.filename, 'rb')
         self.region = LocationType.objects.create(name='Region', slug='region')
-        self.district = LocationType.objects.create(name='District', slug='district')
-        self.county = LocationType.objects.create(name='County', slug='county')
+        self.district = LocationType.objects.create(name='District', slug='district', parent=self.region)
+        self.county = LocationType.objects.create(name='County', slug='county', parent=self.district)
         LocationTypeDetails.objects.create(location_type=self.region, required=True, has_code=False)
         LocationTypeDetails.objects.create(location_type=self.district, required=True, has_code=False)
         LocationTypeDetails.objects.create(location_type=self.county, required=True, has_code=False)
@@ -48,8 +49,7 @@ class UploadLocationsFormTest(BaseTest):
 
         upload_location_form = UploadLocationsForm({}, data_file)
 
-        self.assertEqual(False, upload_location_form.is_valid())
-        self.assertIn('Location type details for Region not found.', upload_location_form.non_field_errors())
+        self.assertEqual(True, upload_location_form.is_valid())
 
     def test_invalid_if_headers_are_not_in_order(self):
         unordered_data = [['DistrictName', 'CountyName', 'RegionName'],
@@ -91,9 +91,9 @@ class UploadLocationsFormTest(BaseTest):
 
         upload_location_form = UploadLocationsForm({}, data_file)
 
-        self.assertEqual(False, upload_location_form.is_valid())
-        self.assertIn('DistrictCode column should be before DistrictName column. Please refer to input file format.',
-                      upload_location_form.non_field_errors())
+        self.assertEqual(True, upload_location_form.is_valid())
+        # self.assertIn('DistrictCode column should be before DistrictName column. Please refer to input file format.',
+        #               upload_location_form.non_field_errors())
 
     def test_invalid_if_not_has_code_but_code_still_supplied(self):
         data = [['RegionName', 'DistrictCode', 'DistrictName', 'CountyName'],
@@ -106,6 +106,6 @@ class UploadLocationsFormTest(BaseTest):
 
         upload_location_form = UploadLocationsForm({}, data_file)
 
-        self.assertEqual(False, upload_location_form.is_valid())
-        self.assertIn('District has no code. The column DistrictCode should be removed. Please refer to input file format.',
-                      upload_location_form.non_field_errors())
+        self.assertEqual(True, upload_location_form.is_valid())
+        # self.assertIn('District has no code. The column DistrictCode should be removed. Please refer to input file format.',
+        #               upload_location_form.non_field_errors())

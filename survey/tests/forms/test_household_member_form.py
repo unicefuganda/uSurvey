@@ -7,7 +7,7 @@ class HouseholdMemberFormTest(TestCase):
     def test_should_have_name_month_year_and_gender_fields(self):
         member_form = HouseholdMemberForm()
 
-        fields = ['surname', 'first_name', 'date_of_birth', 'male']
+        fields = ['surname', 'first_name', 'date_of_birth', 'gender']
 
         [self.assertIn(field, member_form.fields) for field in fields]
 

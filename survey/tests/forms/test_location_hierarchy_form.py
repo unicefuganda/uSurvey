@@ -2,6 +2,7 @@ from django.forms.formsets import formset_factory
 from django.template.defaultfilters import slugify
 from django.test.testcases import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models.locations import *
 from survey.forms.location_details import LocationDetailsForm
 from survey.forms.location_hierarchy import LocationHierarchyForm, BaseArticleFormSet
 from survey.models import LocationTypeDetails
