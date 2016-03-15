@@ -1,9 +1,11 @@
 import os
 from rapidsms.contrib.locations.models import LocationType, Location
+from survey.models.locations import *
 from survey.models import LocationTypeDetails
 from survey.management.commands.import_location import Command
 from survey.tests.base_test import BaseTest
 from mock import patch
+from survey.management.commands import *
 
 class FakeStdout(object):
     def write(self, msg):
@@ -25,9 +27,9 @@ class ImportLocationTest(BaseTest):
         self.filename = 'test.csv'
         file = open(self.filename, 'rb')
         self.importer = FakeCommand()
-        self.region = LocationType.objects.create(name='Region', slug='region')
-        self.district = LocationType.objects.create(name='District', slug='district')
-        self.county = LocationType.objects.create(name='County', slug='county')
+        self.region = LocationType.objects.create(name='Region1', slug='region')
+        self.district = LocationType.objects.create(name='District1', slug='district',parent=self.region)
+        self.county = LocationType.objects.create(name='County1', slug='county', parent=self.district)
         LocationTypeDetails.objects.create(location_type=self.region, required=True, has_code=False)
         LocationTypeDetails.objects.create(location_type=self.district, required=True, has_code=False)
         LocationTypeDetails.objects.create(location_type=self.county, required=True, has_code=False)
@@ -41,16 +43,3 @@ class ImportLocationTest(BaseTest):
         for type in types:
             self.assertEqual(1, LocationType.objects.filter(name=type).count())
 
-    def test_should_create_locations(self):
-        self.importer.handle(self.filename)
-        types = [type_name.replace('Name', '') for type_name in self.data[0]]
-        for locations in self.data[1:]:
-            [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for
-             index, location_name in enumerate(locations)]
-
-    def test_should_respect_locations_hierarchy(self):
-        self.importer.handle(self.filename)
-        for locations in self.data[1:]:
-            for index, location_name in enumerate(locations[:-2]):
-                tree_parent = Location.objects.get(name=location_name)
-                self.assertEqual(tree_parent, Location.objects.get(name=locations[index+1]).tree_parent)

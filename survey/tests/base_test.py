@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 import xlwt
 from survey.models import LocationTypeDetails, Question
-from survey.models import Household
+from survey.models import Household, Batch, QuestionModule, HouseholdMemberGroup
 from survey.models import HouseholdHead
 from mock import patch
 import datetime
@@ -42,9 +42,14 @@ class BaseTest(Base):
         some_group.user_set.add(user)
         return user
 
-    def create_questions_not_in_batch(sel1f):
-        Question.objects.create(text="Question 11?", answer_type=Question.NUMBER, order=11, identifier='Q11')
-        Question.objects.create(text="Question 12?", answer_type=Question.NUMBER, order=12, identifier='Q12')
+    def create_questions_not_in_batch(self):
+        question_mod = QuestionModule.objects.create(name="Test question name123",description="test desc")
+        batch = Batch.objects.create(order=11)
+        member_group = HouseholdMemberGroup.objects.create(name="old people123", order=1)
+        Question.objects.create(identifier='1.1',text="This is a question1", answer_type='Numerical Answer',
+                                           group=member_group,batch=batch,module=question_mod)
+        Question.objects.create(identifier='1.2',text="This is a question2", answer_type='Text Answer',
+                                           group=member_group,batch=batch,module=question_mod)
 
     def assert_not_allowed_when_batch_is_open(self, url, expected_redirect_url, expected_message):
         response = self.client.get(url)

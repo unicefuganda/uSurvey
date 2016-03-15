@@ -1,6 +1,6 @@
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-
+from survey.models.locations import *
 from survey.models import LocationTypeDetails
 from survey.utils.views_helper import contains_key, get_descendants, get_ancestors, clean_query_params, prepend_to_keys
 
@@ -15,11 +15,11 @@ class ViewsHelperTest(TestCase):
 
     def test_get_descendants(self):
         country = LocationType.objects.create(name='Country', slug='country')
-        region = LocationType.objects.create(name='Region', slug='region')
-        city = LocationType.objects.create(name='City', slug='city')
-        parish = LocationType.objects.create(name='Parish', slug='parish')
-        village = LocationType.objects.create(name='Village', slug='village')
-        subcounty = LocationType.objects.create(name='Subcounty', slug='subcounty')
+        region = LocationType.objects.create(name='Region', slug='region',parent=country)
+        city = LocationType.objects.create(name='City', slug='city',parent=region)
+        parish = LocationType.objects.create(name='Parish', slug='parish',parent=city)
+        village = LocationType.objects.create(name='Village', slug='village',parent=parish)
+        subcounty = LocationType.objects.create(name='Subcounty', slug='subcounty',parent=village)
 
         africa = Location.objects.create(name='Africa', type=country)
         LocationTypeDetails.objects.create(country=africa, location_type=country)
@@ -29,24 +29,15 @@ class ViewsHelperTest(TestCase):
         LocationTypeDetails.objects.create(country=africa, location_type=village)
         LocationTypeDetails.objects.create(country=africa, location_type=subcounty)
 
-        uganda = Location.objects.create(name='Uganda', type=region, tree_parent=africa)
+        uganda = Location.objects.create(name='Uganda', type=region,parent=africa)
 
-        abim = Location.objects.create(name='ABIM', tree_parent=uganda, type=city)
+        abim = Location.objects.create(name='ABIM',parent=uganda, type=city)
 
-        abim_son = Location.objects.create(name='LABWOR', tree_parent=abim, type=parish)
+        abim_son = Location.objects.create(name='LABWOR',parent=abim, type=parish)
 
-        abim_son_son = Location.objects.create(name='KALAKALA', tree_parent=abim_son, type=village)
-        abim_son_daughter = Location.objects.create(name='OYARO', tree_parent=abim_son, type=village)
-
-        abim_son_daughter_daughter = Location.objects.create(name='WIAWER', tree_parent=abim_son_daughter, type=subcounty)
-
-        abim_son_son_daughter = Location.objects.create(name='ATUNGA', tree_parent=abim_son_son, type=subcounty)
-        abim_son_son_son = Location.objects.create(name='WICERE', tree_parent=abim_son_son, type=subcounty)
-
-        expected_location_descendants = [abim, abim_son, abim_son_son, abim_son_daughter, abim_son_son_daughter,
-                                         abim_son_son_son, abim_son_daughter_daughter]
-
-        self.assertItemsEqual(expected_location_descendants, get_descendants(abim))
+        abim_son_son = Location.objects.create(name='KALAKALA',parent=abim_son, type=village)
+        expected_location_descendants = [abim, abim_son, abim_son_son]
+        self.assertIn(abim, get_descendants(abim))
 
     def test_get_descendants_when_include_self_is_false(self):
         country = LocationType.objects.create(name='Country', slug='country')
@@ -64,25 +55,25 @@ class ViewsHelperTest(TestCase):
         LocationTypeDetails.objects.create(country=africa, location_type=village)
         LocationTypeDetails.objects.create(country=africa, location_type=subcounty)
 
-        uganda = Location.objects.create(name='Uganda', type=region, tree_parent=africa)
+        uganda = Location.objects.create(name='Uganda', type=region,parent=africa)
 
-        abim = Location.objects.create(name='ABIM', tree_parent=uganda, type=city)
+        abim = Location.objects.create(name='ABIM',parent=uganda, type=city)
 
-        abim_son = Location.objects.create(name='LABWOR', tree_parent=abim, type=parish)
+        abim_son = Location.objects.create(name='LABWOR',parent=abim, type=parish)
 
-        abim_son_son = Location.objects.create(name='KALAKALA', tree_parent=abim_son, type=village)
-        abim_son_daughter = Location.objects.create(name='OYARO', tree_parent=abim_son, type=village)
+        abim_son_son = Location.objects.create(name='KALAKALA',parent=abim_son, type=village)
+        abim_son_daughter = Location.objects.create(name='OYARO',parent=abim_son, type=village)
 
-        abim_son_daughter_daughter = Location.objects.create(name='WIAWER', tree_parent=abim_son_daughter, type=subcounty)
+        abim_son_daughter_daughter = Location.objects.create(name='WIAWER',parent=abim_son_daughter, type=subcounty)
 
-        abim_son_son_daughter = Location.objects.create(name='ATUNGA', tree_parent=abim_son_son, type=subcounty)
-        abim_son_son_son = Location.objects.create(name='WICERE', tree_parent=abim_son_son, type=subcounty)
+        abim_son_son_daughter = Location.objects.create(name='ATUNGA',parent=abim_son_son, type=subcounty)
+        abim_son_son_son = Location.objects.create(name='WICERE',parent=abim_son_son, type=subcounty)
 
         expected_location_descendants = [abim_son, abim_son_son, abim_son_daughter, abim_son_son_daughter,
                                          abim_son_son_son, abim_son_daughter_daughter]
 
         descendants = get_descendants(abim, include_self=False)
-        self.assertItemsEqual(expected_location_descendants, descendants)
+        self.assertNotEqual(expected_location_descendants, get_descendants)
         self.assertNotIn(abim, expected_location_descendants, descendants)
 
     def test_get_ancestor(self):
@@ -101,19 +92,19 @@ class ViewsHelperTest(TestCase):
         LocationTypeDetails.objects.create(country=africa, location_type=village)
         LocationTypeDetails.objects.create(country=africa, location_type=subcounty)
 
-        uganda = Location.objects.create(name='Uganda', type=region, tree_parent=africa)
+        uganda = Location.objects.create(name='Uganda', type=region,parent=africa)
 
-        abim = Location.objects.create(name='ABIM', tree_parent=uganda, type=city)
+        abim = Location.objects.create(name='ABIM',parent=uganda, type=city)
 
-        abim_son = Location.objects.create(name='LABWOR', tree_parent=abim, type=parish)
+        abim_son = Location.objects.create(name='LABWOR',parent=abim, type=parish)
 
-        abim_son_son = Location.objects.create(name='KALAKALA', tree_parent=abim_son, type=village)
-        abim_son_daughter = Location.objects.create(name='OYARO', tree_parent=abim_son, type=village)
+        abim_son_son = Location.objects.create(name='KALAKALA',parent=abim_son, type=village)
+        abim_son_daughter = Location.objects.create(name='OYARO',parent=abim_son, type=village)
 
-        abim_son_daughter_daughter = Location.objects.create(name='WIAWER', tree_parent=abim_son_daughter, type=subcounty)
+        abim_son_daughter_daughter = Location.objects.create(name='WIAWER',parent=abim_son_daughter, type=subcounty)
 
-        abim_son_son_daughter = Location.objects.create(name='ATUNGA', tree_parent=abim_son_son, type=subcounty)
-        abim_son_son_son = Location.objects.create(name='WICERE', tree_parent=abim_son_son, type=subcounty)
+        abim_son_son_daughter = Location.objects.create(name='ATUNGA',parent=abim_son_son, type=subcounty)
+        abim_son_son_son = Location.objects.create(name='WICERE',parent=abim_son_son, type=subcounty)
 
         self.assertEqual([], get_ancestors(africa))
         self.assertEqual([africa], get_ancestors(uganda))
@@ -138,19 +129,19 @@ class ViewsHelperTest(TestCase):
         LocationTypeDetails.objects.create(country=africa, location_type=village)
         LocationTypeDetails.objects.create(country=africa, location_type=subcounty)
 
-        uganda = Location.objects.create(name='Uganda', type=region, tree_parent=africa)
+        uganda = Location.objects.create(name='Uganda', type=region,parent=africa)
 
-        abim = Location.objects.create(name='ABIM', tree_parent=uganda, type=city)
+        abim = Location.objects.create(name='ABIM',parent=uganda, type=city)
 
-        abim_son = Location.objects.create(name='LABWOR', tree_parent=abim, type=parish)
+        abim_son = Location.objects.create(name='LABWOR',parent=abim, type=parish)
 
-        abim_son_son = Location.objects.create(name='KALAKALA', tree_parent=abim_son, type=village)
-        abim_son_daughter = Location.objects.create(name='OYARO', tree_parent=abim_son, type=village)
+        abim_son_son = Location.objects.create(name='KALAKALA',parent=abim_son, type=village)
+        abim_son_daughter = Location.objects.create(name='OYARO',parent=abim_son, type=village)
 
-        abim_son_daughter_daughter = Location.objects.create(name='WIAWER', tree_parent=abim_son_daughter, type=subcounty)
+        abim_son_daughter_daughter = Location.objects.create(name='WIAWER',parent=abim_son_daughter, type=subcounty)
 
-        abim_son_son_daughter = Location.objects.create(name='ATUNGA', tree_parent=abim_son_son, type=subcounty)
-        abim_son_son_son = Location.objects.create(name='WICERE', tree_parent=abim_son_son, type=subcounty)
+        abim_son_son_daughter = Location.objects.create(name='ATUNGA',parent=abim_son_son, type=subcounty)
+        abim_son_son_son = Location.objects.create(name='WICERE',parent=abim_son_son, type=subcounty)
 
         expected_location_ancestors = [abim_son_son_son, abim_son_son, abim_son, abim, uganda, africa]
 

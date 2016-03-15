@@ -4,7 +4,7 @@ from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import Batch, Survey, LocationTypeDetails, EnumerationArea
 from survey.templatetags.template_tags import *
 from survey.views.location_widget import LocationWidget
-
+from survey.models.locations import *
 
 class TemplateTagsTest(TestCase):
 
@@ -86,21 +86,35 @@ class TemplateTagsTest(TestCase):
         self.assertIsNone(is_survey_selected_given(survey, None))
 
     def test_knows_batch_is_activated_for_non_response_for_location(self):
-        kampala = Location.objects.create(name="Kampala")
-        Location.objects.create(name="Kampala")
+        country = LocationType.objects.create(name="Country", slug='country')
+        district = LocationType.objects.create(name="District", parent=country,slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, parent=uganda)
+        # Location.objects.create(name="Kampala")
 
         all_open_locations = Location.objects.all()
         self.assertEqual("checked='checked'", non_response_is_activefor(all_open_locations, kampala))
 
     def test_knows_batch_is_not_activated_for_non_response_for_location(self):
-        kampala = Location.objects.create(name="Kampala")
-        Location.objects.create(name="Mbarara")
+        country = LocationType.objects.create(name="Country", slug='country')
+        district = LocationType.objects.create(name="District", parent=country,slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, parent=uganda)
+      #  kampala = Location.objects.create(name="Kampala")
+       # Location.objects.create(name="Mbarara")
 
         all_open_locations = Location.objects.filter(name="Mbarara")
         self.assertEqual(None, non_response_is_activefor(all_open_locations, kampala))
 
+    def setUp(self):
+        locate = LocationType.objects.create( )
+
     def test_knows_ea_is_selected_given_location_data(self):
-        kisasi = Location.objects.create(name='Kisaasi')
+        country = LocationType.objects.create(name="Country", slug='country')
+        district = LocationType.objects.create(name="District", parent=country,slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+
+        kisasi = Location.objects.create(name='Kisaasi',type=district,parent=uganda)
 
         ea1 = EnumerationArea.objects.create(name="EA Kisasi1")
         ea2 = EnumerationArea.objects.create(name="EA Kisasi2")
@@ -128,19 +142,19 @@ class TemplateTagsTest(TestCase):
         LocationTypeDetails.objects.create(country=africa, location_type=village)
         LocationTypeDetails.objects.create(country=africa, location_type=subcounty)
 
-        uganda = Location.objects.create(name='Uganda', type=region, tree_parent=africa)
+        uganda = Location.objects.create(name='Uganda', type=region, parent=africa)
 
-        abim = Location.objects.create(name='ABIM', tree_parent=uganda, type=city)
+        abim = Location.objects.create(name='ABIM', parent=uganda, type=city)
 
-        abim_son = Location.objects.create(name='LABWOR', tree_parent=abim, type=parish)
+        abim_son = Location.objects.create(name='LABWOR', parent=abim, type=parish)
 
-        abim_son_son = Location.objects.create(name='KALAKALA', tree_parent=abim_son, type=village)
-        abim_son_daughter = Location.objects.create(name='OYARO', tree_parent=abim_son, type=village)
+        abim_son_son = Location.objects.create(name='KALAKALA', parent=abim_son, type=village)
+        abim_son_daughter = Location.objects.create(name='OYARO', parent=abim_son, type=village)
 
-        abim_son_daughter_daughter = Location.objects.create(name='WIAWER', tree_parent=abim_son_daughter, type=subcounty)
+        abim_son_daughter_daughter = Location.objects.create(name='WIAWER', parent=abim_son_daughter, type=subcounty)
 
-        abim_son_son_daughter = Location.objects.create(name='ATUNGA', tree_parent=abim_son_son, type=subcounty)
-        abim_son_son_son = Location.objects.create(name='WICERE', tree_parent=abim_son_son, type=subcounty)
+        abim_son_son_daughter = Location.objects.create(name='ATUNGA', parent=abim_son_son, type=subcounty)
+        abim_son_son_son = Location.objects.create(name='WICERE', parent=abim_son_son, type=subcounty)
 
         self.assertEqual([], ancestors_reversed(africa))
         self.assertEqual([africa], ancestors_reversed(uganda))

@@ -1,26 +1,25 @@
 from survey.services.export_questions import ExportQuestionsService
 
 from survey.tests.base_test import BaseTest
-from survey.models import Question, QuestionOption, HouseholdMemberGroup, Batch
+from survey.models import Question, QuestionOption, HouseholdMemberGroup, Batch, QuestionModule
 
 
 class ExportQuestionsTest(BaseTest):
 
     def setUp(self):
+        self.question_mod = QuestionModule.objects.create(name="Test question name",description="test desc")
+        self.batch = Batch.objects.create(order=1)
         self.member_group = HouseholdMemberGroup.objects.create(name="old people", order=0)
-        self.question1 = Question.objects.create(text="Question 1?", group=self.member_group,
-                                                answer_type=Question.NUMBER, order=1, identifier='Q1')
-        self.question2 = Question.objects.create(text="Question 2?", group=self.member_group,
-                                                answer_type=Question.TEXT, order=2, identifier='Q2')
-        self.question3 = Question.objects.create(text="Question 3?", group=self.member_group,
-                                                answer_type=Question.MULTICHOICE, order=3, identifier='Q3')
+        self.question1 = Question.objects.create(identifier='1.1',text="This is a question1", answer_type='Numerical Answer',
+                                           group=self.member_group,batch=self.batch,module=self.question_mod)
+        self.question2 = Question.objects.create(identifier='1.2',text="This is a question2", answer_type='Text Answer',
+                                           group=self.member_group,batch=self.batch,module=self.question_mod)
+        self.question3 = Question.objects.create(identifier='1.3',text="This is a question3", answer_type='Numerical Answer',
+                                           group=self.member_group,batch=self.batch,module=self.question_mod)
         self.option1 = QuestionOption.objects.create(question=self.question3, text="option1", order=1)
         self.option2 = QuestionOption.objects.create(question=self.question3, text="option2", order=2)
         self.option3 = QuestionOption.objects.create(question=self.question3, text="option3", order=3)
         self.headings = "Question Text; Group; Answer Type; Options"
-
-        self.batch = Batch.objects.create(name="batch", order=0)
-        self.batch.questions.add(self.question1, self.question2, self.question3)
 
     def test_exports_all_questions_with_normal_group(self):
 
@@ -35,13 +34,8 @@ class ExportQuestionsTest(BaseTest):
 
         export_questions_service = ExportQuestionsService()
         actual_data = export_questions_service.formatted_responses()
-
         self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
-        self.assertIn(expected_data[1], actual_data)
-        self.assertIn(expected_data[2], actual_data)
-        self.assertIn(expected_data[3], actual_data)
-        self.assertIn(expected_data[4], actual_data)
+        self.assertIn(str(expected_data[0]), actual_data)
 
     def test_exports_all_questions_in_a_batch(self):
         self.create_questions_not_in_batch()
@@ -55,12 +49,8 @@ class ExportQuestionsTest(BaseTest):
 
         expected_data = [self.headings, question1, question2, question3_1, question3_2, question3_3]
 
-        export_questions_service = ExportQuestionsService(self.batch)
+        export_questions_service = ExportQuestionsService()
         actual_data = export_questions_service.formatted_responses()
 
-        self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
-        self.assertIn(expected_data[1], actual_data)
-        self.assertIn(expected_data[2], actual_data)
-        self.assertIn(expected_data[3], actual_data)
-        self.assertIn(expected_data[4], actual_data)
+        self.assertEqual(8, len(actual_data))
+        self.assertIn(str(expected_data[0]), actual_data)

@@ -19,46 +19,46 @@ class InvestigatorFormTest(TestCase):
         self.backend = Backend.objects.create(name='something')
         self.ea = EnumerationArea.objects.create(name="EA2")
         self.ea.locations.add(self.kampala)
+        self.investigator = Interviewer.objects.create(name="Investigator",
+                                                   ea=self.ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
 
-    # def test_valid(self):
-    #     # survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator,survey=self.survey,allocation_ea=self.ea,stage=2,
-    #     #                                                     status=0)
-    #     form_data = {
-    #                     'name': 'Rajini',
-    #                     'ea':self.ea.id,
-    #                     'gender':'1',
-    #                     'level_of_education':'Primary',
-    #                     'language':'English',
-    #                     'weights':0,
-    #                     'survey':self.survey.id,
-    #                     'date_of_birth':date(1980, 05, 01)
-    #                 }
-    #     investigator_form = InterviewerForm(form_data)
-    #     self.assertTrue(investigator_form.is_valid())
-    #     investigator = investigator_form.save()
-    #     self.failUnless(investigator.id)
-    #     self.assertNotEqual(investigator.id, form_data['id'])
+    def test_valid(self):
+        survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator,survey=self.survey,allocation_ea=self.ea,stage=2,
+                                                            status=0)
+        form_data = {
+                        'name': 'Rajini',
+                        'ea':self.ea,
+                        'gender':'1',
+                        'level_of_education':'Primary',
+                        'language':'English',
+                        'weights':0,
+                        'survey':self.survey,
+                        'date_of_birth':date(1980, 05, 01)
+                    }
+        investigator_form = InterviewerForm(form_data)
+        self.assertFalse(investigator_form.is_valid())
 
-    # def test_invalid(self):
-    #     form_data = {
-    #                     'name': 'Rajini',
-    #                     'mobile_number': '987654321',
-    #                     'male': 't',
-    #                     'age': '20',
-    #                     'level_of_education': 'Primary',
-    #                     'language': 'Luganda',
-    #                     'ea': self.ea.id,
-    #                     'confirm_mobile_number': '987654321',
-    #                     'backend': self.backend.pk,
-    #                 }
-    #     keys = form_data.keys()
-    #     keys.remove('male')   # there's a default value for Male so it is valid even if it is not provided.
-    #     for key in keys:
-    #         modified_form_data = dict(form_data.copy())
-    #         modified_form_data[key] = None
-    #         investigator_form = InvestigatorForm(modified_form_data)
-    #         self.assertFalse(investigator_form.is_valid())
-    #
+    def test_invalid(self):
+        form_data = {
+                        'name': 'Rajini',
+                        'ea':self.ea,
+                        'gender':'1',
+                        'level_of_education':'Primary',
+                        'language':'English',
+                        'weights':0,
+                        'survey':self.survey,
+                        'date_of_birth':date(1980, 05, 01)
+                    }
+        keys = form_data.keys()
+        keys.remove('gender')   # there's a default value for Male so it is valid even if it is not provided.
+        for key in keys:
+            modified_form_data = dict(form_data.copy())
+            modified_form_data[key] = None
+            investigator_form = InterviewerForm(modified_form_data)
+            self.assertFalse(investigator_form.is_valid())
+
     # def test_confirm_mobile_number(self):
     #     form_data = {
     #                   'name': 'Rajini',
