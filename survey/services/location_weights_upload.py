@@ -1,9 +1,8 @@
 from rapidsms.contrib.locations.models import Location
-
 from django.utils.timezone import utc
 from survey.models import LocationWeight, UploadErrorLog
 from survey.services.csv_uploader import UploadService
-
+from survey.models.locations import *
 
 class UploadLocationWeights(UploadService):
     MODEL = 'WEIGHTS'
@@ -16,7 +15,7 @@ class UploadLocationWeights(UploadService):
 
     def check_location_errors(self, index, row, headers):
         lowest_location = row[-2]
-        location = Location.objects.filter(name=lowest_location, tree_parent__name__iexact=row[-3].lower())
+        location = Location.objects.filter(name=lowest_location, parent__name__iexact=row[-3].lower())
         if not location.exists():
             self.log_error(index+1, 'There is no %s with name: %s, in %s.' % (headers[-2].lower(), row[-2], row[-3]))
             return
