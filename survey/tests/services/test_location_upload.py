@@ -1,48 +1,48 @@
-# import os
-# from rapidsms.contrib.locations.models import LocationType, Location
-# from survey.models.locations import *
-# from survey.models import LocationTypeDetails, UploadErrorLog
-# from survey.services.location_upload import UploadLocation
-# from survey.tests.base_test import BaseTest
-#
-#
-# class LocationUploadHelper(BaseTest):
-#     def setUp(self):
-#         self.data = [['RegionName', 'DistrictName', 'CountyName'],
-#                      ['region1', 'district1', 'county1'],
-#                      ['region2', 'district2', 'county2']]
-#
-#         self.write_to_csv('wb', self.data)
-#         self.filename = 'test.csv'
-#         file = open(self.filename, 'rb')
-#         self.uploader = UploadLocation(file)
-#         self.region = LocationType.objects.create(name='Region', slug='region')
-#         self.district = LocationType.objects.create(name='District', slug='district', parent=self.region)
-#         self.county = LocationType.objects.create(name='County', slug='county', parent=self.district)
-#         LocationTypeDetails.objects.create(location_type=self.region, required=True, has_code=False)
-#         LocationTypeDetails.objects.create(location_type=self.district, required=True, has_code=False)
-#         LocationTypeDetails.objects.create(location_type=self.county, required=True, has_code=False)
-#
-#     def tearDown(self):
-#         os.system("rm -rf %s"%self.filename)
-#
-#     # def test_should_create_locations(self):
-#     #     self.uploader.upload()
-#     #     types = [type_name.replace('Name', '') for type_name in self.data[0]]
-#     #     for locations in self.data[1:]:
-#     #         [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for
-#     #          index, location_name in enumerate(locations)]
-#
-#     def test_should_log_error_if_a_required_location_type_is_left_blank(self):
-#         missing_fields_data = [['region3', '', 'county3']]
-#         self.write_to_csv('ab', missing_fields_data)
-#         file = open('test.csv', 'rb')
-#         self.uploader = UploadLocation(file)
-#         self.uploader.upload()
-#         error_log = UploadErrorLog.objects.filter(model=self.uploader.MODEL, filename=self.filename)
-#         self.assertEqual(1, error_log.count())
-#         self.failUnless(error_log.filter(row_number=4,
-#                                          error='Missing data: DistrictName should not be empty.'))
+import os
+from rapidsms.contrib.locations.models import LocationType, Location
+from survey.models.locations import *
+from survey.models import LocationTypeDetails, UploadErrorLog
+from survey.services.location_upload import UploadLocation
+from survey.tests.base_test import BaseTest
+
+
+class LocationUploadHelper(BaseTest):
+    def setUp(self):
+        self.data = [['RegionName', 'DistrictName', 'CountyName'],
+                     ['region1', 'district1', 'county1'],
+                     ['region2', 'district2', 'county2']]
+
+        self.write_to_csv('wb', self.data)
+        self.filename = 'test.csv'
+        file = open(self.filename, 'rb')
+        self.uploader = UploadLocation(file)
+        self.region = LocationType.objects.create(name='Region', slug='region')
+        self.district = LocationType.objects.create(name='District', slug='district', parent=self.region)
+        self.county = LocationType.objects.create(name='County', slug='county', parent=self.district)
+        LocationTypeDetails.objects.create(location_type=self.region, required=True, has_code=False)
+        LocationTypeDetails.objects.create(location_type=self.district, required=True, has_code=False)
+        LocationTypeDetails.objects.create(location_type=self.county, required=True, has_code=False)
+
+    def tearDown(self):
+        os.system("rm -rf %s"%self.filename)
+
+    # def test_should_create_locations(self):
+    #     self.uploader.upload()
+    #     types = [type_name.replace('Name', '') for type_name in self.data[0]]
+    #     for locations in self.data[1:]:
+    #         [self.failUnless(Location.objects.filter(name=location_name, type__name__iexact=types[index].lower())) for
+    #          index, location_name in enumerate(locations)]
+    #
+    # def test_should_log_error_if_a_required_location_type_is_left_blank(self):
+    #     missing_fields_data = [['region3', '', 'county3']]
+    #     self.write_to_csv('ab', missing_fields_data)
+    #     file = open('test.csv', 'rb')
+    #     self.uploader = UploadLocation(file)
+    #     self.uploader.upload()
+    #     error_log = UploadErrorLog.objects.filter(model=self.uploader.MODEL, filename=self.filename)
+    #     self.assertEqual(1, error_log.count())
+    #     self.failUnless(error_log.filter(row_number=4,
+    #                                      error='Missing data: DistrictName should not be empty.'))
 #     #
 #     # def test_regroup_with_code(self):
 #     #     a = [1, 2, 3, 4, 5, 6, 7, 8]

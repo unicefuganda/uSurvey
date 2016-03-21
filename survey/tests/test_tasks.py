@@ -11,8 +11,8 @@ class UploadTaskTest(BaseTest):
     def test_should_call_upload_on_upload_form(self, mock_upload):
         mock_upload.return_value =(True, 'some message')
         upload_form = UploadWeightsForm()
-        task_result = upload_task.delay(upload_form)
-        status, message = task_result.get()
+        task_result = upload_task(upload_form)
+        status, message = task_result
         self.assertTrue(status)
         self.assertEqual('some message', message)
-        self.assertTrue(task_result.successful())
+        self.assertTrue(task_result)

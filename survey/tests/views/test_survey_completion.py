@@ -79,11 +79,11 @@ class TestSurveyCompletion(BaseTest):
         self.batch = Batch.objects.create(order=1, name='somebatch', survey= self.survey)
 
     def test_should_render_success_status_code_on_GET(self):
-        response = self.client.get('/surveys/survey_completion_rates/')
+        response = self.client.get('/surveys/completion/')
         self.assertEqual(response.status_code, 200)
 
     def test_should_render_template(self):
-        response = self.client.get('/surveys/survey_completion_rates/')
+        response = self.client.get('/surveys/completion/')
         templates = [template.name for template in response.templates]
         self.assertIn('aggregates/completion_status.html', templates)
 
@@ -127,7 +127,7 @@ class TestSurveyCompletion(BaseTest):
         location_with_no_parent = Location.objects.create(name='Abim', parent=self.uganda, type=self.city)
         another_location_with_no_parent = Location.objects.create(name='Kampala', parent=self.uganda, type=self.city)
         form_data = {'survey': self.batch.survey.id, 'location': location_with_no_parent.id, 'batch': str(self.batch.pk), 'ea': self.kampala_ea.id}
-        response = self.client.post('/surveys/survey_completion_rates/', data=form_data)
+        response = self.client.post('/surveys/completion/', data=form_data)
         self.assertIsNotNone(response.context['request'])
 
 #     def test_should_validate_params(self):

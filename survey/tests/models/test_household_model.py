@@ -4,7 +4,8 @@ from django.test import TestCase
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
-from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, NumericalAnswer, Survey, EnumerationArea
+from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, \
+    NumericalAnswer, Survey, EnumerationArea, QuestionModule
 # from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.households import Household, HouseholdListing, HouseholdMember, SurveyHouseholdListing
 from survey.models.backend import Backend
@@ -47,7 +48,7 @@ class HouseholdTest(TestCase):
                                                           registrar=self.investigator,registration_channel="ODK Access")
 
     # def test_location_hierarchy(self):
-    #     self.assertEquals(self.household.location_hierarchy(), {'Country': self.uganda, 'City': self.kampala})
+    #     self.assertEquals(self.household.location_hierarchy(), {'Country': self.uganda, 'City': self.kampala})"
 
     def test_fields(self):
         hHead = Household()

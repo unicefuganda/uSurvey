@@ -1,10 +1,12 @@
 from datetime import date
 from django.test import TestCase
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models import Batch, Survey, LocationTypeDetails, EnumerationArea
+from survey.models import Batch, Survey, LocationTypeDetails, EnumerationArea, Household, HouseholdListing, SurveyHouseholdListing, QuestionModule
 from survey.templatetags.template_tags import *
 from survey.views.location_widget import LocationWidget
 from survey.models.locations import *
+from survey.models.households import HouseholdMemberGroup
+from survey.models.questions import *
 
 class TemplateTagsTest(TestCase):
 
@@ -58,6 +60,47 @@ class TemplateTagsTest(TestCase):
     def test_should_return_url_given_url_name_and_ids(self):    
         self.assertEqual('/surveys/1/delete/', get_url_with_ids( 1, 'delete_survey'))
         self.assertEqual('/surveys/1/batches/2/', get_url_with_ids("1, 2", 'batch_show_page'))
+
+    def test_get_odk_mem_question(self):
+        household_member_group = HouseholdMemberGroup.objects.create(name="test name1324", order=12)
+        question_mod = QuestionModule.objects.create(name="Test question name",description="test desc")
+        batch = Batch.objects.create(order=1)
+        question = Question.objects.create(identifier='123.1',text="This is a question", answer_type='Numerical Answer',
+                                           group=household_member_group,batch=batch,module=question_mod)
+        print get_odk_mem_question(question),"?????????????????/"
+        self.assertEqual(question.text,get_odk_mem_question(question))
+
+    def test_is_relavent_odk(self):
+        household_member_group = HouseholdMemberGroup.objects.create(name="test name1324", order=12)
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
+        # household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                   ea=ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
+        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
+        household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+        question_mod = QuestionModule.objects.create(name="Test question name",description="test desc")
+        batch = Batch.objects.create(order=1)
+        question = Question.objects.create(identifier='123.1',text="This is a question", answer_type='Numerical Answer',
+                                           group=household_member_group,batch=batch,module=question_mod)
+        surname = HouseholdMember._meta.get_field('surname')
+        batch.survey = survey
+        batch.start_question=question
+        first_name = HouseholdMember._meta.get_field('first_name')
+        gender = HouseholdMember._meta.get_field('gender')
+        context = {
+        surname.verbose_name.upper().replace(' ', '_') :
+                mark_safe('<output value="/survey/household/householdMember/surname"/>'),
+        first_name.verbose_name.upper().replace(' ', '_') :
+                mark_safe('<output value="/survey/household/householdMember/firstName"/>'),
+        gender.verbose_name.upper().replace(' ', '_') :
+            mark_safe('<output value="/survey/household/householdMember/sex"/>'),
+        }
+        print is_relevant_odk(context, question, investigator, household)
+        # self.assertEqual(question.text,get_odk_mem_question(question))
 
     def test_should_return_concatenated_ints_in_a_single_string(self):    
         self.assertEqual('1, 2', add_string(1,2))
@@ -125,6 +168,81 @@ class TemplateTagsTest(TestCase):
 
         self.assertEqual("selected='selected'", is_ea_selected(location_widget, ea1))
         self.assertIsNone(is_ea_selected(location_widget, ea2))
+
+    def test_is_location_selected(self):
+        country = LocationType.objects.create(name="Country1", slug='country')
+        district = LocationType.objects.create(name="District1", parent=country,slug='district')
+        uganda = Location.objects.create(name="Uganda1", type=country)
+
+        kisasi = Location.objects.create(name='Kisaasi1',type=district,parent=uganda)
+
+        ea1 = EnumerationArea.objects.create(name="EA Kisasi11")
+        ea2 = EnumerationArea.objects.create(name="EA Kisasi12")
+        ea1.locations.add(kisasi)
+        ea2.locations.add(kisasi)
+
+        location_widget = LocationWidget(selected_location=kisasi, ea=ea1)
+        self.assertIsNone(is_location_selected(location_widget,ea1))
+
+    def test_batch_is_selected(self):
+        batch = Batch.objects.create(order=1, name="Batch name")
+        self.assertFalse(batch.is_open())
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', parent=country, slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, parent=uganda)
+        batch.open_for_location(kampala)
+        expected = "selected='selected'"
+        self.assertEqual(expected,is_selected(batch,batch))
+
+    def test_is_batch_open_for_location(self):
+        batch = Batch.objects.create(order=1, name="Batch name")
+        self.assertFalse(batch.is_open())
+        country = LocationType.objects.create(name='Country', slug='country')
+        district = LocationType.objects.create(name='District', parent=country, slug='district')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        kampala = Location.objects.create(name="Kampala", type=district, parent=uganda)
+        batch.open_for_location(kampala)
+        open_locations=[uganda,kampala]
+        self.assertEqual("checked='checked'",is_batch_open_for_location(open_locations,kampala))
+
+    def test_condition(self):
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="EQUALS")
+        self.assertEqual("EQUALS",condition.condition)
+
+    def test_quest_validation_opts(self):
+        batch = Batch.objects.create(order=1, name="Batch name")
+        condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
+        print quest_validation_opts(batch)
+        print validation_args(batch)
+
+    # def test_household_completion(self):
+    #     self.location_type_country = LocationType.objects.create(name="Country", slug='country')
+    #     self.location_type_district = LocationType.objects.create(name="District", parent=self.location_type_country,slug='district')
+    #     self.location_type_county = LocationType.objects.create(name="County", parent=self.location_type_district,slug='county')
+    #     self.location_type_subcounty = LocationType.objects.create(name="SubCounty", parent=self.location_type_county,slug='subcounty')
+    #     self.location_type_parish = LocationType.objects.create(name="Parish", parent=self.location_type_subcounty,slug='parish')
+    #     self.location_type_village = LocationType.objects.create(name="Village", parent=self.location_type_parish,slug='village')
+    #     self.location = Location.objects.create(name="Kampala", type=self.location_type_country, code=256
+    #                                             )
+    #     ea = EnumerationArea.objects.create(name="Kampala EA A")
+    #     survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
+    #     # household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
+    #     investigator = Interviewer.objects.create(name="Investigator",
+    #                                                ea=ea,
+    #                                                gender='1',level_of_education='Primary',
+    #                                                language='Eglish',weights=0)
+    #     household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
+    #     household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    #     survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
+    #     household_member = HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
+    #                                                       household=household,survey_listing=survey_householdlisting,
+    #                                                       registrar=investigator,registration_channel="ODK Access")
+    #     batch = Batch.objects.create(order=1)
+    #     batch.open_for_location(self.location)
+    #
+    #     print households_for_open_survey(investigator),"I"
 
     def test_ancestors_reversed_reversed(self):
         country = LocationType.objects.create(name='Country', slug='country')

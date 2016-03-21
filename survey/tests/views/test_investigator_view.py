@@ -107,6 +107,11 @@ class InvestigatorsViewTest(BaseTest):
 #         locations = json.loads(response.content)
 #         self.failUnlessEqual(locations, {})
 #
+    # def test_interviewer_list(self):
+    #     print "R"
+    #     response = self.client.get('/interviewers/')
+    #     self.assertEqual(response.status_code,200)
+
     def test_create_investigators_success(self):
         ea = EnumerationArea.objects.create(name="EA2")
         ea.locations.add(self.uganda)
@@ -150,7 +155,6 @@ class InvestigatorsViewTest(BaseTest):
                                                    ea=ea,
                                                    gender='1',level_of_education='Primary',
                                                    language='Eglish',weights=0)
-        print "+++"
         response = self.client.post('/interviewers/export/')
 
 #     @patch('django.contrib.messages.error')

@@ -819,19 +819,6 @@ class QuestionsViews(BaseTest):
 #         [self.assertEqual(self.module, question.module) for question in  response.context['questions'] ]
 #         self.assertNotIn(different_module_question, response.context['questions'])
 #
-#     def test_add_new_subquestion(self):
-#         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)
-#         question = Question.objects.create(text="some qn?", group=group, order=1, module=self.module, identifier='Q22')
-#         response = self.client.get('/questions/%d/sub_questions/new/' % question.id)
-#         self.failUnlessEqual(response.status_code, 200)
-#         templates = [template.name for template in response.templates]
-#         self.assertIn('questions/new.html', templates)
-#         self.assertIsInstance(response.context['questionform'], QuestionForm)
-#         self.assertEqual(response.context['button_label'], 'Create')
-#         self.assertEqual(response.context['id'], 'add-sub_question-form')
-#         self.assertEqual(response.context['parent_question'], question)
-#         self.assertEqual(response.context['heading'], "Add SubQuestion")
-#         self.assertEqual(response.context['class'], 'question-form')
 #
 #     def test_post_sub_question(self):
 #         group = HouseholdMemberGroup.objects.create(name="0 to 6 years", order=0)

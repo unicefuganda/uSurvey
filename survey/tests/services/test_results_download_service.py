@@ -98,6 +98,14 @@ class ResultsDownloadServiceTest(BaseTest):
              'Male' if household_head_4.household.head_sex else 'Female'],
             [u'Kampala', unicode(self.ea.name),household_head_5.household.house_number, unicode(household5),AGE, '01-01-1988',
              'Male' if household_head_5.household.head_sex else 'Female']]
+        batch = Batch.objects.create(name="Batch name", description='description')
+        group_1 = HouseholdMemberGroup.objects.create(name="Group 11", order=10)
+        group_2 = HouseholdMemberGroup.objects.create(name="Group 12", order=11)
+        group_3 = HouseholdMemberGroup.objects.create(name="Group 13", order=12)
+        household_member_group = HouseholdMemberGroup.objects.create(name="Greater than 65 years", order=19)
+        question_mod = QuestionModule.objects.create(name="Test question name",description="test desc")
+        question_1 = Question.objects.create(identifier='1.1',text="This is a question1", answer_type='Numerical Answer',
+                                            group=group_3,batch=batch,module=question_mod)
         actual_csv_data = result_down_load_service.get_summarised_answers()
         self.assertEqual(5, len(actual_csv_data))
         for i in range(5):
