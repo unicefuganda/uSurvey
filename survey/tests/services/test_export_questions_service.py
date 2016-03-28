@@ -55,10 +55,4 @@ class ExportQuestionsTest(BaseTest):
         self.assertEqual(8, len(actual_data))
         self.assertIn(str(expected_data[0]), actual_data)
 
-#     def test_get_question_template_as_dump(self):
-# #        export_questions_service = ExportQuestionsService()
-#         question1 = "%s; %s; %s; %s; %s; %s" %(self.question1, self.question1.text, self.question1.answer_type.upper(),
-#                                                self.option1.text,self.question1.group.name,self.question1.module.name
-#                                                )
-#         print get_question_template_as_dump(question1)
 

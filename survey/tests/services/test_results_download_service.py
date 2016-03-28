@@ -54,14 +54,6 @@ class ResultsDownloadServiceTest(BaseTest):
         self.yes_option = QuestionOption.objects.create(question=self.question_2, text="Yes", order=1)
         self.no_option = QuestionOption.objects.create(question=self.question_2, text="No", order=2)
 
-        # self.question_1.batches.add(self.batch)
-        # self.question_2.batches.add(self.batch)
-        # self.question_3.batches.add(self.batch)
-
-        # BatchQuestionOrder.objects.create(question=self.question_1, batch=self.batch, order=1)
-        # BatchQuestionOrder.objects.create(question=self.question_2, batch=self.batch, order=2)
-        # BatchQuestionOrder.objects.create(question=self.question_3, batch=self.batch, order=3)
-
     def test_formats_headers_for_csv_leaving_out_country(self):
         result_down_load_service = ResultsDownloadService(batch=self.batch)
         header_structure = [unicode(self.district.name), unicode(self.county.name), unicode(self.subcounty.name), unicode(self.parish.name),

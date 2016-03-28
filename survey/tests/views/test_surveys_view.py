@@ -152,9 +152,6 @@ class SurveyViewTest(BaseTest):
         response = self.client.get('/surveys/%s/delete/' % survey.id)
         self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
         error_message = "Survey cannot be deleted."
-        # error_message = "Survey cannot be deleted as it is open."
-        # print response.cookies.keys()
-        # self.assertIn(error_message, response.cookies['messages'].value)
 
     def test_survey_does_not_exist(self):
         message = "Survey does not exist."

@@ -92,8 +92,6 @@ class UploadLocationsFormTest(BaseTest):
         upload_location_form = UploadLocationsForm({}, data_file)
 
         self.assertEqual(True, upload_location_form.is_valid())
-        # self.assertIn('DistrictCode column should be before DistrictName column. Please refer to input file format.',
-        #               upload_location_form.non_field_errors())
 
     def test_invalid_if_not_has_code_but_code_still_supplied(self):
         data = [['RegionName', 'DistrictCode', 'DistrictName', 'CountyName'],
@@ -107,5 +105,3 @@ class UploadLocationsFormTest(BaseTest):
         upload_location_form = UploadLocationsForm({}, data_file)
 
         self.assertEqual(True, upload_location_form.is_valid())
-        # self.assertIn('District has no code. The column DistrictCode should be removed. Please refer to input file format.',
-        #               upload_location_form.non_field_errors())

@@ -67,14 +67,12 @@ class TemplateTagsTest(TestCase):
         batch = Batch.objects.create(order=1)
         question = Question.objects.create(identifier='123.1',text="This is a question", answer_type='Numerical Answer',
                                            group=household_member_group,batch=batch,module=question_mod)
-        print get_odk_mem_question(question),"?????????????????/"
         self.assertEqual(question.text,get_odk_mem_question(question))
 
     def test_is_relavent_odk(self):
         household_member_group = HouseholdMemberGroup.objects.create(name="test name1324", order=12)
         ea = EnumerationArea.objects.create(name="Kampala EA A")
         survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
-        # household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
         investigator = Interviewer.objects.create(name="Investigator",
                                                    ea=ea,
                                                    gender='1',level_of_education='Primary',
@@ -100,7 +98,6 @@ class TemplateTagsTest(TestCase):
             mark_safe('<output value="/survey/household/householdMember/sex"/>'),
         }
         print is_relevant_odk(context, question, investigator, household)
-        # self.assertEqual(question.text,get_odk_mem_question(question))
 
     def test_should_return_concatenated_ints_in_a_single_string(self):    
         self.assertEqual('1, 2', add_string(1,2))
@@ -133,7 +130,6 @@ class TemplateTagsTest(TestCase):
         district = LocationType.objects.create(name="District", parent=country,slug='district')
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=district, parent=uganda)
-        # Location.objects.create(name="Kampala")
 
         all_open_locations = Location.objects.all()
         self.assertEqual("checked='checked'", non_response_is_activefor(all_open_locations, kampala))
@@ -143,8 +139,6 @@ class TemplateTagsTest(TestCase):
         district = LocationType.objects.create(name="District", parent=country,slug='district')
         uganda = Location.objects.create(name="Uganda", type=country)
         kampala = Location.objects.create(name="Kampala", type=district, parent=uganda)
-      #  kampala = Location.objects.create(name="Kampala")
-       # Location.objects.create(name="Mbarara")
 
         all_open_locations = Location.objects.filter(name="Mbarara")
         self.assertEqual(None, non_response_is_activefor(all_open_locations, kampala))
@@ -215,34 +209,6 @@ class TemplateTagsTest(TestCase):
         condition = GroupCondition.objects.create(attribute="AGE", value=2, condition="GREATER_THAN")
         print quest_validation_opts(batch)
         print validation_args(batch)
-
-    # def test_household_completion(self):
-    #     self.location_type_country = LocationType.objects.create(name="Country", slug='country')
-    #     self.location_type_district = LocationType.objects.create(name="District", parent=self.location_type_country,slug='district')
-    #     self.location_type_county = LocationType.objects.create(name="County", parent=self.location_type_district,slug='county')
-    #     self.location_type_subcounty = LocationType.objects.create(name="SubCounty", parent=self.location_type_county,slug='subcounty')
-    #     self.location_type_parish = LocationType.objects.create(name="Parish", parent=self.location_type_subcounty,slug='parish')
-    #     self.location_type_village = LocationType.objects.create(name="Village", parent=self.location_type_parish,slug='village')
-    #     self.location = Location.objects.create(name="Kampala", type=self.location_type_country, code=256
-    #                                             )
-    #     ea = EnumerationArea.objects.create(name="Kampala EA A")
-    #     survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
-    #     # household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
-    #     investigator = Interviewer.objects.create(name="Investigator",
-    #                                                ea=ea,
-    #                                                gender='1',level_of_education='Primary',
-    #                                                language='Eglish',weights=0)
-    #     household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
-    #     household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
-    #                                          last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
-    #     survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
-    #     household_member = HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
-    #                                                       household=household,survey_listing=survey_householdlisting,
-    #                                                       registrar=investigator,registration_channel="ODK Access")
-    #     batch = Batch.objects.create(order=1)
-    #     batch.open_for_location(self.location)
-    #
-    #     print households_for_open_survey(investigator),"I"
 
     def test_ancestors_reversed_reversed(self):
         country = LocationType.objects.create(name='Country', slug='country')

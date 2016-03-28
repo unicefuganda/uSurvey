@@ -121,9 +121,6 @@ class LocationWeightUploadHelper(BaseTest):
         district = Location.objects.create(name="district1", parent=region, type=dtype)
         Location.objects.create(name="county1", parent=district, type=ctype)
 
-        # rtype=LocationType.objects.create(name="region", slug='region')
-        # dtype=LocationType.objects.create(name="district", slug='district', parent=rtype)
-        # ctype=LocationType.objects.create(name="county", slug='county', parent=dtype)
         region = Location.objects.create(name="region2", type=rtype)
         district = Location.objects.create(name="district2", parent=region, type=dtype)
         Location.objects.create(name="county2", parent=district, type=ctype)

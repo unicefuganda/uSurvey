@@ -98,32 +98,6 @@ class EAUploadTest(BaseTest):
         self.assertEqual(1, error_log.count())
         self.assertEqual(1, error_log[0].row_number)
 
-    # def test_should_return_true__and_success_message_if_valid_csv_provided(self):
-    #     data = [
-    #             ['Regiontype', 'Districttype', 'Counttype', 'EA',  'Parishtype', 'EA'],
-    #             ['region1',    'district1',    'county1',   '',     'parish_1',   'ea_under_parish']]
-    #     self.write_to_csv('wb', data)
-    #     _file = open(self.filename, 'rb')
-    #
-    #     rtype1=LocationType.objects.create(name="Region1",slug="region")
-    #     region = Location.objects.create(name="r1", type=rtype1)
-    #     dtype1=LocationType.objects.create(name="District",slug="district",parent=rtype1)
-    #     district = Location.objects.create(name="district1",parent=region,type=dtype1)
-    #     ctype1=LocationType.objects.create(name="County",slug="county",parent=dtype1)
-    #     county = Location.objects.create(name="county1", parent=district,type=ctype1)
-    #     ptype1=LocationType.objects.create(name="Parish",slug="parish",parent=ctype1)
-    #     parish = Location.objects.create(name="parish_1", parent=county,type=ptype1)
-    #
-    #     uploader = UploadEA(_file)
-    #
-    #     uploader.upload(self.survey)
-    #     error_log = UploadErrorLog.objects.filter(model=self.uploader.MODEL, filename=self.filename)
-    #     # self.failIf(error_log)
-    #
-    #     retrieved_ea = EnumerationArea.objects.filter(name=data[1][-1], survey=self.survey)
-    #     self.failUnless(retrieved_ea)
-    #     self.assertIn(parish, retrieved_ea[0].locations.all())
-
     def test_not_csv_file(self):
         EnumerationArea.objects.all().delete()
         self.filename = 'not_csv.xls'
