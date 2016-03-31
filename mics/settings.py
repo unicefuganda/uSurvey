@@ -225,6 +225,8 @@ INSTALLED_BACKENDS = {
     # },
 }
 
+COUNTRY_CODE = 'UG'
+
 PRODUCTION = False
 
 # cookies settings
