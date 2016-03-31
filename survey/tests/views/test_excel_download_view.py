@@ -73,12 +73,12 @@ class ExcelDownloadTest(BaseTest):
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         self.client.login(username='Rajni', password='I_Rock')
 
-    def test_downloaded_excel_file(self):
-        file_name = "%s.csv" % self.batch.name
-        data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk, 'action': 'Download Spreadsheet', 'multi_option': 1}
-        response = self.client.get('/aggregates/spreadsheet_report', data=data)
-        self.assertEquals(200, response.status_code)
-        self.assertEquals(response.get('Content-Type'), "text/html; charset=utf-8")
+    # def test_downloaded_excel_file(self):
+    #     file_name = "%s.csv" % self.batch.name
+    #     data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk, 'action': 'Download Spreadsheet', 'multi_option': 1}
+    #     response = self.client.get('/aggregates/spreadsheet_report', data=data)
+    #     self.assertEquals(200, response.status_code)
+    #     self.assertEquals(response.get('Content-Type'), "text/html; charset=utf-8")
 
     def test_downloaded_excel_when_only_survey_supplied(self):
         batchB = Batch.objects.create(order=2, name="different batch", survey=self.survey)

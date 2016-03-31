@@ -162,7 +162,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django_nose',
-    'south',
+    # 'south',
     'lettuce.django',
     'django_extensions',
     'rapidsms.contrib.locations',

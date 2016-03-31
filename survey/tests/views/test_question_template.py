@@ -17,8 +17,7 @@ from survey.forms.filters import MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFA
 from survey.models.householdgroups import HouseholdMemberGroup
 # from survey.views.questions import _rule_exists, _get_questions_based_on_filter
 
-
-class QuestionsViews(BaseTest):
+class QuestionsTemplateViews(BaseTest):
     def setUp(self):
         self.client = Client()
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com',
@@ -35,20 +34,20 @@ class QuestionsViews(BaseTest):
         self.question_2 = Question.objects.create(identifier='1.2',text="This is a question2", answer_type='Numerical Answer',
                                             group=self.household_member_group,batch=self.batch,module=self.module)
 
-        self.form_data={
-            'groups':"All",
-            'modules':"All",
-            'question_types':"All",
-            'number_of_questions_per_page':50
-        }
-
-    def test_get_index_per_batch(self):
-        QuestionFlow.objects.create(question=self.question_1,validation_test="starts_with",name="test",desc="test",
-                                    next_question=self.question_2)
-        response = self.client.get('/batches/%d/questions/' % self.batch.id)
+    def test_index(self):
+        response = self.client.get('/question_library/')
         self.failUnlessEqual(response.status_code, 200)
-        templates = [template.name for template in response.templates]
-        self.assertIn('questions/index.html', templates)
-        self.assertEqual(self.batch, response.context['batch'])
-        self.assertEqual(DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, response.context['max_question_per_page'])
-        self.assertIsNotNone(response.context['request'])
+
+    def test_export(self):
+        response = self.client.get('/question_library/export/')
+        self.failUnlessEqual(response.status_code, 200)
+
+    def test_add(self):
+        data={'group': [self.household_member_group.id], 'text': [self.question_1.text],
+              'module': [self.module.id], 'answer_type': ['Numerical Answer']}
+        response = self.client.post('/question_library/new/',data=data)
+        self.failUnlessEqual(response.status_code, 200)
+
+    def test_filter(self):
+        response = self.client.get('/question_library/json_filter/')
+        self.failUnlessEqual(response.status_code, 200)

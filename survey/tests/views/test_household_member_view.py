@@ -49,7 +49,7 @@ class HouseholdMemberViewsTest(BaseTest):
                                                           registrar=self.investigator,registration_channel="ODK Access")
 
     def test_new_should_have_household_member_form_in_response_context_for_get(self):
-        response = self.client.get('/households/%d/member/new/' % int(self.household.id))
+        response = self.client.post('/households/%d/member/new/' % int(self.household.id))
 
         self.assertEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]

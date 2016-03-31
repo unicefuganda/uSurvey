@@ -84,6 +84,14 @@ class HouseholdViewTest(BaseTest):
         result_investigator = json.loads(response.content)
         self.failUnlessEqual(result_investigator, {u'Investigator': 1})
 
+    def testlist_households(self):
+        response = self.client.get('/households/')
+        self.failUnlessEqual(response.status_code, 200)
+
+    def testlist_households(self):
+        response = self.client.get('/households/download/')
+        self.failUnlessEqual(response.status_code, 200)
+
     def test_get_investigators_returns_investigators_with_no_location_if_location_empty(self):
         country = LocationType.objects.create(name="Country", slug="country")
         uganda = Location.objects.create(name="Uganda", type=country)

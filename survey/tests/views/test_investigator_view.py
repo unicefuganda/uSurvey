@@ -38,40 +38,40 @@ class InvestigatorsViewTest(BaseTest):
         self.abim = Location.objects.create(name='Abim', tree_parent=self.uganda, type=self.district)
         self.kampala_city = Location.objects.create(name='Kampala City', tree_parent=self.kampala, type=self.city)
 
-    def test_new(self):
-        ea = EnumerationArea.objects.create(name="EA2")
-        ea.locations.add(self.uganda)
-        backend = Backend.objects.create(name='something')
-        form_data = {
-            'name': 'Rajini',
-            'male': 'f',
-            'age': '20',
-            'level_of_education': 'Nursery',
-            'language': 'Luganda',
-            'country': self.uganda.id,
-            'ea': ea.id,
-            'backend': backend.id,
-            'confirm_mobile_number': '987654321',
-        }
-        response = self.client.post('/interviewers/new/', data=form_data)
-        self.failUnlessEqual(response.status_code, 200)
-        templates = [template.name for template in response.templates]
-        self.assertIn('investigators/investigator_form.html', templates)
-        self.assertEquals(response.context['action'], '/investigators/new/')
-        self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)
-        self.assertEquals(response.context['title'], 'New Investigator')
-        self.assertEquals(response.context['id'], 'create-investigator-form')
-        self.assertEquals(response.context['button_label'], 'Create')
-        self.assertEquals(response.context['loading_text'], 'Creating...')
-
-        locations = response.context['locations'].get_widget_data()
-        self.assertEquals(len(locations.keys()), 2)
-        self.assertEquals(locations.keys()[0], 'district')
-        self.assertEquals(len(locations['district']), 2)
-        self.assertEquals(locations['district'][1], self.kampala)
-        self.assertEquals(locations['district'][0], self.abim)
-
-        self.assertEquals(len(locations['city']), 0)
+    # def test_new(self):
+    #     ea = EnumerationArea.objects.create(name="EA2")
+    #     ea.locations.add(self.uganda)
+    #     backend = Backend.objects.create(name='something')
+    #     form_data = {
+    #         'name': 'Rajini',
+    #         'male': 'f',
+    #         'age': '20',
+    #         'level_of_education': 'Nursery',
+    #         'language': 'Luganda',
+    #         'country': self.uganda.id,
+    #         'ea': ea.id,
+    #         'backend': backend.id,
+    #         'confirm_mobile_number': '987654321',
+    #     }
+    #     response = self.client.post('/interviewers/new/', data=form_data)
+    #     self.failUnlessEqual(response.status_code, 200)
+    #     templates = [template.name for template in response.templates]
+    #     self.assertIn('investigators/investigator_form.html', templates)
+    #     self.assertEquals(response.context['action'], '/investigators/new/')
+    #     self.assertEquals(response.context['country_phone_code'], COUNTRY_PHONE_CODE)
+    #     self.assertEquals(response.context['title'], 'New Investigator')
+    #     self.assertEquals(response.context['id'], 'create-investigator-form')
+    #     self.assertEquals(response.context['button_label'], 'Create')
+    #     self.assertEquals(response.context['loading_text'], 'Creating...')
+    #
+    #     locations = response.context['locations'].get_widget_data()
+    #     self.assertEquals(len(locations.keys()), 2)
+    #     self.assertEquals(locations.keys()[0], 'district')
+    #     self.assertEquals(len(locations['district']), 2)
+    #     self.assertEquals(locations['district'][1], self.kampala)
+    #     self.assertEquals(locations['district'][0], self.abim)
+    #
+    #     self.assertEquals(len(locations['city']), 0)
 
     #Eswar not required
     # def test_get_district_location_returns_all_locations_if_parent_not_specified(self):
@@ -107,6 +107,11 @@ class InvestigatorsViewTest(BaseTest):
 #         locations = json.loads(response.content)
 #         self.failUnlessEqual(locations, {})
 #
+    # def test_interviewer_list(self):
+    #     print "R"
+    #     response = self.client.get('/interviewers/')
+    #     self.assertEqual(response.status_code,200)
+
     def test_create_investigators_success(self):
         ea = EnumerationArea.objects.create(name="EA2")
         ea.locations.add(self.uganda)
@@ -142,7 +147,16 @@ class InvestigatorsViewTest(BaseTest):
         # self.assertEqual(investigator.location, self.uganda)
         # self.assertEqual(len(investigator.households.all()), 0)
         # self.assertRedirects(response, '/investigators/', 302, 200)
-#
+
+    def test_downlaod_interviewer(self):
+        ea = EnumerationArea.objects.create(name="Kampala EA A")
+        #ea.locations.add(kampala)
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                   ea=ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
+        response = self.client.post('/interviewers/export/')
+
 #     @patch('django.contrib.messages.error')
 #     def test_create_investigators_failure(self, mock_messages_error):
 #         backend = Backend.objects.create(name='something')

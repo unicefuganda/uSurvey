@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models.locations import *
 from django.template.defaultfilters import slugify
 import csv
 
@@ -13,5 +14,5 @@ class Command(BaseCommand):
         for items in csv_file:
             tree_parent = None
             for index, item in enumerate(items):
-                Location.objects.get_or_create(name=item.strip(), type=country, tree_parent=tree_parent)
+                Location.objects.get_or_create(name=item.strip(), type=country, parent=tree_parent)
         self.stdout.write('Successfully imported!')

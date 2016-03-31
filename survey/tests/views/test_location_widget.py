@@ -121,25 +121,9 @@ class LocationWidgetTest(BaseTest):
 
         location_widget = LocationWidget(selected_location=bukoto, ea=ea1,level=3)
         widget_data = location_widget.get_ea_data()
-        print widget_data,"++++++++++++++++???????????"
         self.assertEqual(2, len(widget_data))
         self.assertIn(ea1, widget_data)
         self.assertIn(ea2, widget_data)
-
-    # def test_location_widget_appends_empty_ea_data_if_level_is_set(self):
-    #     village = LocationType.objects.create(name='Village', parent=self.city, slug='village')
-    #     LocationTypeDetails.objects.create(location_type=village, country=self.uganda)
-    #     bukoto = Location.objects.create(name='Bukoto', parent=self.kampala_city, type=village)
-    #     some_type = LocationType.objects.create(name='Sometype', parent=village, slug='sometype')
-    #     LocationTypeDetails.objects.create(location_type=some_type, country=self.uganda)
-    #     kisasi = Location.objects.create(name='Kisaasi', parent=bukoto, type=some_type)
-    #
-    #     ea1 = EnumerationArea.objects.create(name="EA Kisasi1")
-    #     ea2 = EnumerationArea.objects.create(name="EA Kisasi2")
-    #     ea1.locations.add(kisasi)
-    #     ea2.locations.add(kisasi)
-    #     location_widget = LocationWidget(selected_location=kisasi, ea=ea1, level=3)
-    #     self.failIf(location_widget.get_ea_data())
 
     def test_location_widget_appends_siblings_ea_if_ea_is_directly_under_parish(self):
         village = LocationType.objects.create(name='Village', parent=self.city, slug='village')
@@ -182,34 +166,3 @@ class LocationWidgetTest(BaseTest):
         self.assertEqual(3, len(widget_data))
         self.assertIn(ea1, widget_data)
         self.assertIn(ea2, widget_data)
-
-    # def test_location_widget_does_not_append_ea_data_of_other_parishes(self):
-    #     village = LocationType.objects.create(name='Village', slug='village')
-    #     LocationTypeDetails.objects.create(location_type=village, country=self.uganda)
-    #     bukoto = Location.objects.create(name='Bukoto', parent=self.kampala_city, type=village)
-    #     some_type = LocationType.objects.create(name='Sometype', parent=village, slug='sometype')
-    #     LocationTypeDetails.objects.create(location_type=some_type, country=self.uganda)
-    #     kisasi = Location.objects.create(name='Kisaasi', parent=bukoto, type=some_type)
-    #     kisasi_2 = Location.objects.create(name='Kisaasi 2', parent=bukoto, type=some_type)
-    #     kisasi_3 = Location.objects.create(name='Kisaasi 2', parent=bukoto, type=some_type)
-    #
-    #
-    #     ea1 = EnumerationArea.objects.create(name="EA Kisasi1")
-    #     ea2 = EnumerationArea.objects.create(name="EA Kisasi2")
-    #     ea1.locations.add(kisasi)
-    #     ea1.locations.add(kisasi_2)
-    #     ea2.locations.add(kisasi_3)
-    #
-    #     bukoto_2 = Location.objects.create(name='Bukoto 2', parent=self.kampala_city, type=village)
-    #     kisasi_of_bukoto_2 = Location.objects.create(name='Kisaasi', parent=bukoto_2, type=some_type)
-    #
-    #     ea3 = EnumerationArea.objects.create(name="EA Kisasi of Bukoto 2")
-    #     ea3.locations.add(kisasi_of_bukoto_2)
-    #
-    #     location_widget = LocationWidget(selected_location=bukoto, ea=ea1, level=2)
-    #     widget_data = location_widget.get_ea_data()
-    #
-    #     self.assertEqual(2, len(widget_data))
-    #     self.assertIn(ea1, widget_data)
-    #     self.assertIn(ea2, widget_data)
-    #     self.assertNotIn(ea3, widget_data)

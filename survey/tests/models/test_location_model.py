@@ -32,25 +32,3 @@ class LocationTest(TestCase):
         self.assertIn(some_sub_county, report_locations)
         self.assertIn(some_parish, report_locations)
         self.assertIn(some_village, report_locations)
-
-
-# class LocationAutoCompleteTest(TestCase):
-#     def test_store(self):
-#         self.assertEqual(len(LocationAutoComplete.objects.all()), 0)
-#         uganda = Location.objects.create(name="Uganda")
-#         self.assertEqual(len(LocationAutoComplete.objects.all()), 1)
-#         self.assertEqual(uganda.auto_complete_text(), "Uganda")
-#         self.assertEqual(LocationAutoComplete.objects.all()[0].text, "Uganda")
-#
-#         kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
-#         self.assertEqual(kampala.auto_complete_text(), "Uganda > Kampala")
-#
-#         soroti = Location.objects.create(name="Soroti", tree_parent=kampala)
-#         self.assertEqual(soroti.auto_complete_text(), "Uganda > Kampala > Soroti")
-#
-#         kampala.name = "Kampala Changed"
-#         kampala.save()
-#         self.assertEqual(kampala.auto_complete_text(), "Uganda > Kampala Changed")
-#
-#         soroti = Location.objects.get(name="Soroti")
-#         self.assertEqual(soroti.auto_complete_text(), "Uganda > Kampala Changed > Soroti")

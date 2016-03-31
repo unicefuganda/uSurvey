@@ -267,48 +267,95 @@ class FormulaTest(BaseTest):
     #     expected_answer = investigator_multi_choice_numerator/(10+40)
     #     self.assertEqual(expected_answer, formula_denominator.compute_for_household_with_sub_options(survey, investigator))
     #
+    #survey/models/formula.py === interviewers = Interviewer.lives_under_location(location) no method lives_under_location available
     # def test_compute_numerical_answers(self):
-    #     uganda = Location.objects.create(name="Uganda")
-    #     kampala = Location.objects.create(name="Kampala", tree_parent=uganda)
-    #     abim = Location.objects.create(name="Abim", tree_parent=uganda)
+    #     location_type_country = LocationType.objects.create(name="Country", slug='country')
+    #     location_type_district = LocationType.objects.create(name="District", parent=location_type_country,slug='district')
+    #     uganda = Location.objects.create(name="Uganda", type=location_type_country)
+    #     kampala = Location.objects.create(name="Kampala", parent=uganda, type=location_type_district)
+    #     abim = Location.objects.create(name="Abim", parent=uganda, type=location_type_district)
     #     backend = Backend.objects.create(name='something')
     #     survey = Survey.objects.create(name="huhu")
-    #     ea = EnumerationArea.objects.create(name="EA2", survey=survey)
+    #     ea = EnumerationArea.objects.create(name="EA2")
     #     ea.locations.add(kampala)
     #
-    #     ea_2 = EnumerationArea.objects.create(name="EA2", survey=survey)
+    #     ea_2 = EnumerationArea.objects.create(name="EA2")
     #     ea_2.locations.add(abim)
     #
-    #     investigator = Interviewer.objects.create(name="Investigator 1", mobile_number="1", ea=ea,
-    #                                                backend=backend, weights=0.3)
-    #     household_1 = Household.objects.create(investigator=investigator, uid=1, ea=investigator.ea)
-    #     household_2 = Household.objects.create(investigator=investigator, uid=2, ea=investigator.ea)
+    #     investigator = Interviewer.objects.create(name="Investigator",
+    #                                                ea=ea,
+    #                                                gender='1',level_of_education='Primary',
+    #                                                language='Eglish',weights=0)
+    #     household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
+    #     household_1 = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    #     household_2 = Household.objects.create(house_number=1234567,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
     #
-    #     investigator_1 = Interviewer.objects.create(name="Investigator 2", mobile_number="2", ea=ea_2,
-    #                                                  backend=backend, weights=0.9)
-    #     household_3 = Household.objects.create(investigator=investigator_1, uid=3, ea=investigator_1.ea)
-    #     household_4 = Household.objects.create(investigator=investigator_1, uid=4, ea=investigator_1.ea)
+    #     investigator_1 = Interviewer.objects.create(name="Investigator123",
+    #                                                ea=ea,
+    #                                                gender='1',level_of_education='Primary',
+    #                                                language='Eglish',weights=0)
+    #     household_3 = Household.objects.create(house_number=1234568,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=investigator_1,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    #     household_4 = Household.objects.create(house_number=1234569,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=investigator_1,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
     #
-    #     member_1 = self.create_household_member(household_1)
-    #     member_2 = self.create_household_member(household_2)
-    #     member_3 = self.create_household_member(household_3)
-    #     member_4 = self.create_household_member(household_4)
+    #     household_member_group = HouseholdMemberGroup.objects.create(name="test name1234", order=11)
+    #     health_module = QuestionModule.objects.create(name="Health4")
+    #     batch = Batch.objects.create(name="Batch")
+    #     indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
+    #                                          module=health_module, batch=batch)
     #
-    #     formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2)
-    #     investigator.member_answered(self.question_1, member_1, 20, self.batch)
-    #     investigator.member_answered(self.question_2, member_1, 200, self.batch)
-    #     investigator.member_answered(self.question_1, member_2, 10, self.batch)
-    #     investigator.member_answered(self.question_2, member_2, 100, self.batch)
-    #
-    #     investigator_1.member_answered(self.question_1, member_3, 40, self.batch)
-    #     investigator_1.member_answered(self.question_2, member_3, 400, self.batch)
-    #     investigator_1.member_answered(self.question_1, member_4, 50, self.batch)
-    #     investigator_1.member_answered(self.question_2, member_4, 500, self.batch)
-    #
+    #     formula = Formula.objects.create(numerator=self.question_1, groups=household_member_group,denominator=self.question_2,
+    #                                      count=self.question_1, indicator=indicator)
     #     self.assertEquals(formula.compute_for_location(kampala), 3)
     #     self.assertEquals(formula.compute_for_location(abim), 9)
     #     self.assertEquals(formula.compute_for_location(uganda), 6)
-    #
+
+    def test_compute_for_next_location_type_in_the_hierarchy(self):
+        location_type_country = LocationType.objects.create(name="Country", slug='country')
+        location_type_district = LocationType.objects.create(name="District", parent=location_type_country,slug='district')
+        uganda = Location.objects.create(name="Uganda", type=location_type_country)
+        kampala = Location.objects.create(name="Kampala", parent=uganda, type=location_type_district)
+        abim = Location.objects.create(name="Abim", parent=uganda, type=location_type_district)
+        backend = Backend.objects.create(name='something')
+        survey = Survey.objects.create(name="huhu")
+        ea = EnumerationArea.objects.create(name="EA2")
+        ea.locations.add(kampala)
+
+        ea_2 = EnumerationArea.objects.create(name="EA2")
+        ea_2.locations.add(abim)
+
+        investigator = Interviewer.objects.create(name="Investigator",
+                                                   ea=ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
+        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
+        household_1 = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+        household_2 = Household.objects.create(house_number=1234567,listing=household_listing,physical_address='Test address',
+                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+
+        investigator_1 = Interviewer.objects.create(name="Investigator123",
+                                                   ea=ea,
+                                                   gender='1',level_of_education='Primary',
+                                                   language='Eglish',weights=0)
+        household_3 = Household.objects.create(house_number=1234568,listing=household_listing,physical_address='Test address',
+                                             last_registrar=investigator_1,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+        household_4 = Household.objects.create(house_number=1234569,listing=household_listing,physical_address='Test address',
+                                             last_registrar=investigator_1,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+
+        household_member_group = HouseholdMemberGroup.objects.create(name="test name1234", order=11)
+        health_module = QuestionModule.objects.create(name="Health4")
+        batch = Batch.objects.create(name="Batch")
+        indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
+                                             module=health_module, batch=batch)
+
+        formula = Formula.objects.create(numerator=self.question_1, groups=household_member_group,denominator=self.question_2,
+                                         count=self.question_1, indicator=indicator)
+        self.assertEquals(len(formula.compute_for_next_location_type_in_the_hierarchy(kampala)), 0)
+
     # def test_compute_multichoice_answer(self):
     #     uganda = Location.objects.create(name="Uganda")
     #     kampala = Location.objects.create(name="Kampala", tree_parent=uganda)

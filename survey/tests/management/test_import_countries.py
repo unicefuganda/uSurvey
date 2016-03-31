@@ -1,5 +1,6 @@
 import os
 from rapidsms.contrib.locations.models import LocationType, Location
+from survey.models.locations import *
 from survey.models import LocationTypeDetails
 from survey.management.commands.import_countries import Command
 from survey.tests.base_test import BaseTest
@@ -38,4 +39,4 @@ class ImportCountriesTest(BaseTest):
     def test_should_create_countries_without_tree_parent(self):
         self.importer.handle(self.filename)
         for country_name in self.data:
-            self.failUnless(Location.objects.filter(name=country_name[0], type__name__iexact="country", tree_parent=None))
+            self.failUnless(Location.objects.filter(name=country_name[0], type__name__iexact="country", parent=None))

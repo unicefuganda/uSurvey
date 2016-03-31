@@ -1,5 +1,6 @@
 import os
 from rapidsms.contrib.locations.models import Location
+from survey.models.locations import *
 from survey.models import Survey, UploadErrorLog, LocationWeight
 from survey.services.location_weights_upload import UploadLocationWeights
 from survey.tests.base_test import BaseTest
@@ -37,9 +38,12 @@ class LocationWeightUploadHelper(BaseTest):
         self.write_to_csv('wb', data)
         _file = open(self.filename, 'rb')
 
-        region = Location.objects.create(name="region1")
-        district = Location.objects.create(name="district1", tree_parent=region)
-        Location.objects.create(name="county1", tree_parent=district)
+        rtype=LocationType.objects.create(name="region", slug='region')
+        dtype=LocationType.objects.create(name="district", slug='district', parent=rtype)
+        ctype=LocationType.objects.create(name="county", slug='county', parent=dtype)
+        region = Location.objects.create(name="region1", type=rtype)
+        district = Location.objects.create(name="district1", parent=region, type=dtype)
+        Location.objects.create(name="county1", parent=district, type=ctype)
 
         uploader = UploadLocationWeights(_file)
         uploader.upload(self.survey)
@@ -49,9 +53,13 @@ class LocationWeightUploadHelper(BaseTest):
                                          error='There is no county with name: , in district1.'))
 
     def test_should_return_false__and_message_if_location_tree_parent_does_not_match_one_provided(self):
-        region = Location.objects.create(name="region name not matching the one in first row of file")
-        district = Location.objects.create(name="district1", tree_parent=region)
-        Location.objects.create(name="county1", tree_parent=district)
+
+        rtype=LocationType.objects.create(name="region", slug='region')
+        dtype=LocationType.objects.create(name="district", slug='district', parent=rtype)
+        ctype=LocationType.objects.create(name="county", slug='county', parent=dtype)
+        region = Location.objects.create(name="region name not matching the one in first row of file", type=rtype)
+        district = Location.objects.create(name="district1", parent=region, type=dtype)
+        Location.objects.create(name="county1", parent=district, type=ctype)
         self.uploader.upload(self.survey)
         error_log = UploadErrorLog.objects.filter(model=self.uploader.MODEL, filename=self.filename)
         self.assertEqual(2, error_log.count())
@@ -64,9 +72,12 @@ class LocationWeightUploadHelper(BaseTest):
         self.write_to_csv('wb', data)
         _file = open(self.filename, 'rb')
 
-        region = Location.objects.create(name="region1")
-        district = Location.objects.create(name="district1", tree_parent=region)
-        Location.objects.create(name="county1", tree_parent=district)
+        rtype=LocationType.objects.create(name="region", slug='region')
+        dtype=LocationType.objects.create(name="district", slug='district', parent=rtype)
+        ctype=LocationType.objects.create(name="county", slug='county', parent=dtype)
+        region = Location.objects.create(name="region1", type=rtype)
+        district = Location.objects.create(name="district1", parent=region, type=dtype)
+        Location.objects.create(name="county1", parent=district, type=ctype)
 
         uploader = UploadLocationWeights(_file)
 
@@ -82,9 +93,12 @@ class LocationWeightUploadHelper(BaseTest):
         self.write_to_csv('wb', data)
         _file = open(self.filename, 'rb')
 
-        region = Location.objects.create(name="region1")
-        district = Location.objects.create(name="district1", tree_parent=region)
-        Location.objects.create(name="county1", tree_parent=district)
+        rtype=LocationType.objects.create(name="region", slug='region')
+        dtype=LocationType.objects.create(name="district", slug='district', parent=rtype)
+        ctype=LocationType.objects.create(name="county", slug='county', parent=dtype)
+        region = Location.objects.create(name="region1", type=rtype)
+        district = Location.objects.create(name="district1", parent=region, type=dtype)
+        Location.objects.create(name="county1", parent=district, type=ctype)
 
         uploader = UploadLocationWeights(_file)
 
@@ -100,13 +114,16 @@ class LocationWeightUploadHelper(BaseTest):
         self.write_to_csv('wb', data)
         _file = open(self.filename, 'rb')
 
-        region = Location.objects.create(name="region1")
-        district = Location.objects.create(name="district1", tree_parent=region)
-        Location.objects.create(name="county1", tree_parent=district)
+        rtype=LocationType.objects.create(name="region", slug='region')
+        dtype=LocationType.objects.create(name="district", slug='district', parent=rtype)
+        ctype=LocationType.objects.create(name="county", slug='county', parent=dtype)
+        region = Location.objects.create(name="region1", type=rtype)
+        district = Location.objects.create(name="district1", parent=region, type=dtype)
+        Location.objects.create(name="county1", parent=district, type=ctype)
 
-        region = Location.objects.create(name="region2")
-        district = Location.objects.create(name="district2", tree_parent=region)
-        Location.objects.create(name="county2", tree_parent=district)
+        region = Location.objects.create(name="region2", type=rtype)
+        district = Location.objects.create(name="district2", parent=region, type=dtype)
+        Location.objects.create(name="county2", parent=district, type=ctype)
 
         uploader = UploadLocationWeights(_file)
 

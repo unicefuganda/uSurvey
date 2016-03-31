@@ -1,15 +1,17 @@
 from survey.models import Location
 from survey.models import Household
+from decimal import *
 
 
 class BatchCompletionRates:
+    getcontext().prec=6
     def __init__(self, batch):
         self.batch = batch
 
     def calculate_percent(self, numerator, denominator):
         try:
-            return numerator * 100 / denominator
-        except ZeroDivisionError:
+            return Decimal(numerator) * 100 / Decimal(denominator)
+        except InvalidOperation:
             return 0
 
     def percent_completed_households(self, location, survey, ea=None):
@@ -22,6 +24,7 @@ class BatchCompletionRates:
 
 
 class BatchLocationCompletionRates(BatchCompletionRates):
+    getcontext().prec=6
     def __init__(self, batch, location=None, ea=None, specific_households=None):
         self.batch = batch
         self.ea = ea
@@ -75,5 +78,5 @@ class BatchSurveyCompletionRates:
             percent_completed = 0.0
             percent_completed = reduce(lambda percent_completed, rate: percent_completed + rate,
                                        map(lambda batch: BatchLocationCompletionRates(batch, location).percent_completed_households(), all_batches))
-            completion_rates_dict[location.name.upper()] = percent_completed/number_of_batches #if survey.is_open_for(location) else -1
+            completion_rates_dict[location.name.upper()] = Decimal(percent_completed)/Decimal(number_of_batches) #if survey.is_open_for(location) else -1
         return completion_rates_dict

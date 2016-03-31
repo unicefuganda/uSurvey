@@ -17,9 +17,6 @@ class LocationTypeDetailsTest(BaseTest):
 
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
-        # location_type_details = LocationTypeDetails.objects.create(required=True, has_code=False,
-        #                                                            length_of_code=6,location_type=country,country=uganda,
-        #                                                            order=1)
         district = LocationType.objects.create(name='district', slug='district')
         location = Location.objects.create(name="Kampala", type=district, parent=uganda)
 

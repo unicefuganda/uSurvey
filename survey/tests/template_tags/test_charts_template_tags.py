@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.utils.datastructures import SortedDict
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.templatetags.chart_template_tags import get_computational_value_by_answer
+from survey.models.locations import *
 
 
 class ChartTemplateTagsTest(TestCase):
@@ -12,10 +13,10 @@ class ChartTemplateTagsTest(TestCase):
 
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
 
-        self.central = Location.objects.create(name="EAST", type=self.region, tree_parent=self.uganda, )
-        self.west = Location.objects.create(name="WEST", type=self.region, tree_parent=self.uganda, )
-        self.kampala = Location.objects.create(name="Kampala", tree_parent=self.central, type=self.district)
-        self.mbarara = Location.objects.create(name="Mbarara", tree_parent=self.west, type=self.district)
+        self.central = Location.objects.create(name="EAST", type=self.region, parent=self.uganda, )
+        self.west = Location.objects.create(name="WEST", type=self.region, parent=self.uganda, )
+        self.kampala = Location.objects.create(name="Kampala", parent=self.central, type=self.district)
+        self.mbarara = Location.objects.create(name="Mbarara", parent=self.west, type=self.district)
 
     def test_formats_title_for_bar_chart_given_formula_and_locations(self):
         hierarchical_data = SortedDict()
