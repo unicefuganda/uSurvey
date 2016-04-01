@@ -2,7 +2,7 @@ from datetime import date, timedelta, datetime
 from django.conf import settings
 from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 from django.db import models
-from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, COUNTRY_PHONE_CODE, INTERVIEWER_MIN_AGE, INTERVIEWER_MAX_AGE
+from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, INTERVIEWER_MIN_AGE, INTERVIEWER_MAX_AGE
 from survey.models.base import BaseModel
 from survey.models.access_channels import USSDAccess, ODKAccess, InterviewerAccess
 from survey.models.locations import Location
