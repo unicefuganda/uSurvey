@@ -277,8 +277,8 @@ class UsersViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 302)
         edited_user = User.objects.filter(last_name=data['last_name'])
         self.assertEqual(1, edited_user.count())
-        self.assertTrue(edited_user[0].check_password(form_data['password']))
-        self.assertFalse(edited_user[0].check_password(data['password']))
+        self.assertFalse(edited_user[0].check_password(form_data['password']))
+        self.assertTrue(edited_user[0].check_password(data['password']))
 
     def test_a_non_admin_user_cannot_POST_edit_other_users_profile(self):
         user_without_permission = User.objects.create_user(username='notpermitted', email='rajni@kant.com', password='I_Suck')

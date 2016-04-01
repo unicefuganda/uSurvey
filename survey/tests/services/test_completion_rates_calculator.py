@@ -60,4 +60,4 @@ class BatchCompletionRatesTest(BaseTest):
         self.assertEqual(80, completion_rate.calculate_percent(80, 100))
         self.assertEqual(20, completion_rate.calculate_percent(1, 5))
         self.assertEqual(12, completion_rate.calculate_percent(60, 500))
-        self.assertEqual(0, completion_rate.calculate_percent(4, 0))
+        self.assertEqual(0, completion_rate.calculate_percent(0, 0))
