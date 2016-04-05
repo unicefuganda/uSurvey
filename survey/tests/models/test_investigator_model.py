@@ -10,7 +10,7 @@ from survey.models import HouseholdHead, EnumerationArea, LocationTypeDetails
 # from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.locations import *
 from survey.models.batch import Batch
-from survey.interviewer_configs import COUNTRY_PHONE_CODE
+# from survey.interviewer_configs import COUNTRY_PHONE_CODE
 from survey.models.household_batch_completion import HouseholdMemberBatchCompletion
 from survey.models.backend import Backend
 from survey.models.households import Household, HouseholdMember

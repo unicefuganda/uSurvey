@@ -12,6 +12,7 @@ from survey.models.users import UserProfile
 from survey.views.custom_decorators import permission_required_for_perm_or_current_user
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 
 def _add_error_messages(userform, request, action_str='registered'):
@@ -39,7 +40,7 @@ def new(request):
         ('User list', reverse('users_index')),
     ])
     template_variables = {'userform': userform,
-                          'country_phone_code':COUNTRY_PHONE_CODE,
+                          'country_phone_code':settings.COUNTRY_CODE,
                           'action': reverse('new_user_page'),
                           'cancel_url' : reverse('users_index'),
                           'id': "create-user-form",
@@ -96,7 +97,7 @@ def edit(request, user_id):
                          'cancel_url' : reverse('users_index'),
                         'id': 'edit-user-form','class': 'user-form', 'button_label' : 'Save',
                         'loading_text' : 'Saving...',
-                        'country_phone_code': COUNTRY_PHONE_CODE,
+                        'country_phone_code': settings.COUNTRY_CODE,
                         'title': 'Edit User'}
     return response or render(request, 'users/new.html', context_variables)
 

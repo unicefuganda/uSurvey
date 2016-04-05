@@ -40,7 +40,7 @@ def add_condition(request):
         condition_form = GroupConditionForm(data=request.POST)
         _process_condition_form(request, condition_form)
         conditions = _get_conditions_hash()
-        return HttpResponse(json.dumps(conditions), mimetype='application/json')
+        return HttpResponse(json.dumps(conditions), content_type='application/json')
 
     elif request.method == 'POST':
         condition_form = GroupConditionForm(data=request.POST)

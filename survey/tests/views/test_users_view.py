@@ -27,7 +27,7 @@ class UsersViewTest(BaseTest):
         self.assertEquals(response.context['class'], 'user-form')
         self.assertEquals(response.context['button_label'], 'Create')
         self.assertEquals(response.context['loading_text'], 'Creating...')
-        self.assertEquals(response.context['country_phone_code'], '256')
+        self.assertEquals(response.context['country_phone_code'], 'UG')
         self.assertIsInstance(response.context['userform'], UserForm)
         self.assertEqual(response.context['title'], 'New User')
 
@@ -185,7 +185,7 @@ class UsersViewTest(BaseTest):
         self.assertEquals(response.context['title'], 'Edit User')
         self.assertEquals(response.context['button_label'], 'Save')
         self.assertEquals(response.context['loading_text'], 'Saving...')
-        self.assertEquals(response.context['country_phone_code'], '256')
+        self.assertEquals(response.context['country_phone_code'], 'UG')
         self.assertIsInstance(response.context['userform'], EditUserForm)
 
     def test_edit_user_updates_user_information(self):
