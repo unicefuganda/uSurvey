@@ -1,12 +1,12 @@
-Django==1.7.1
+Django==1.7
 psycopg2==2.5
-django-nose==1.1
+django-nose==1.4
 sure==1.2.3
 lettuce==0.2.21
 splinter==0.5.2
 django-extensions==1.1.1
 RapidSMS==0.14.0
-django-mptt==0.6.0
+django-mptt>=0.8
 Werkzeug==0.8.3
 django-autocomplete-light==1.2.0
 git+git://github.com/tgdn/django-bootstrap-pagination.git
@@ -18,7 +18,7 @@ newrelic==1.13.1.31
 dateutils
 xlwt
 selenium==2.35.0
-django-model-utils==2.2
+django-model-utils
 djangohttpdigest==0.2.3
 lxml
 Hiredis==0.2.0
