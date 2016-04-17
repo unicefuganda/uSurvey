@@ -124,6 +124,7 @@ urlpatterns = patterns('',
     url(r'^questions/(?P<batch_id>\d+)/new/$', 'survey.views.questions.new', name='new_batch_question_page'),
     url(r'^questions/(?P<question_id>\d+)/edit/$', 'survey.views.questions.edit', name='edit_question_page'),
     url(r'^questions/(?P<question_id>\d+)/sub_questions_json/$', 'survey.views.questions.get_sub_questions_for_question', name='questions_subquestion_json_page'),
+    url(r'^questions/(?P<question_id>\d+)/prev_questions_json/$', 'survey.views.questions.get_prev_questions_for_question', name='prev_inline_questions_json_page'),
     url(r'^questions/(?P<question_id>\d+)/delete/$', 'survey.views.questions.delete', name='delete_question_page'),
 
     url(r'^enumeration_area/new/$', 'survey.views.enumeration_area.new', name='new_enumeration_area_page'),

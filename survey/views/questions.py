@@ -78,7 +78,7 @@ def _save_subquestion(request, batch_id, instance=None):
             question = questionform.save(zombie=zombify)
             if request.is_ajax():
                 return HttpResponse(json.dumps({'id' : question.pk, 'text' : question.text,
-                                                'identifier': question.identifier}), mimetype='application/json')
+                                                'identifier': question.identifier}), content_type='application/json')
             messages.info(request, 'Sub Question saved')
     if instance:
         heading = 'Edit Subquestion'
@@ -104,6 +104,10 @@ def get_sub_questions_for_question(request, question_id):
     question = Question.objects.get(id=question_id)
     return _create_question_hash_response(Question.zombies(question.batch))
 
+def get_prev_questions_for_question(request, question_id):
+    question = Question.objects.get(id=question_id)
+    return _create_question_hash_response(question.previous_inlines())
+
 def get_questions_for_batch(request, batch_id, question_id):
     batch = Batch.objects.get(id=batch_id)
     questions = batch.questions_inline()
@@ -112,7 +116,7 @@ def get_questions_for_batch(request, batch_id, question_id):
 
 def _create_question_hash_response(questions):
     questions_to_display = map(lambda question: {'id': str(question.id), 'text': question.text, 'identifier' : question.identifier}, questions)
-    return HttpResponse(json.dumps(questions_to_display), mimetype='application/json')
+    return HttpResponse(json.dumps(questions_to_display), content_type='application/json')
 
 @permission_required('auth.can_view_batches')
 def edit_subquestion(request, question_id, batch_id=None):

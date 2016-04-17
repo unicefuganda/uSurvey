@@ -10,6 +10,7 @@ from survey.models.access_channels import InterviewerAccess
 # from survey.models.enumeration_area import EnumerationArea
 from survey.models.interviews import AnswerAccessDefinition, Answer
 from survey.models.access_channels import ODKAccess
+from django.core.exceptions import ValidationError
 from ordered_set import OrderedSet
 
 ALL_GROUPS = HouseholdMemberGroup.objects.all()
@@ -112,6 +113,19 @@ class Batch(BaseModel):
             return inlines
         else:
             return []
+
+    def previous_inlines(self, question):
+        inlines = self.questions_inline()
+        if question not in inlines:
+            raise ValidationError('%s not inline' % question.identifier)
+        previous = []
+        for q in inlines:
+            if q.identifier == question.identifier:
+                break
+            else:
+                previous.append(q)
+        return set(previous)
+
         
     def zombie_questions(self):
         return Question.zombies(self)
