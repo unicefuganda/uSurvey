@@ -158,13 +158,13 @@ def add_logic(request, batch_id, question_id):
     return response or render(request, "questions/logic.html", context)
 
 @permission_required('auth.can_view_batches')
-def delete_logic(request, batch_id, flow_id):
-    batch = get_object_or_404(Batch, pk=batch_id)
+def delete_logic(request, flow_id):
     flow = QuestionFlow.objects.get(id=flow_id)
+    batch = flow.question.batch
     flow.delete()
     _kill_zombies(batch.zombie_questions())
     messages.success(request, "Logic successfully deleted.")
-    return HttpResponseRedirect('/batches/%s/questions/' % batch_id)
+    return HttpResponseRedirect('/batches/%s/questions/' % batch.id)
 
 @permission_required('auth.can_view_batches')
 def edit(request, question_id):

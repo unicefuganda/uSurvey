@@ -7,7 +7,7 @@
         <h4 class="modal-title">{{ action_str.capitalize|default:'Delete' }} {{ name|space_replace:'_' }}</h4>
       </div>
       <div class="modal-body">
-        <span class="alert_confirm">Confirm:</span> Are you sure you want to {{ action_str|default:'delete' }} {{ object_name }}?
+        <span class="alert_confirm">Confirm:</span> Are you sure you want to {{ action_str|default:'delete' }} <strong><em>{{ object_name }}</em></strong>?
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
