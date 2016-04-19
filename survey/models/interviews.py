@@ -19,11 +19,11 @@ def reply_test(cls, func):
 
 class Interview(BaseModel):
     interviewer = models.ForeignKey("Interviewer", null=True, related_name="interviews")
-    householdmember = models.ForeignKey("HouseholdMember", null=True, related_name="interviews")
-    batch = models.ForeignKey("Batch", related_name='interviews')
+    householdmember = models.ForeignKey("HouseholdMember", null=True, related_name="interviews",db_index=True)
+    batch = models.ForeignKey("Batch", related_name='interviews',db_index=True)
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
-    ea = models.ForeignKey('EnumerationArea', related_name='interviews')
+    ea = models.ForeignKey('EnumerationArea', related_name='interviews',db_index=True)
     last_question = models.ForeignKey("Question", related_name='ongoing', null=True, blank=True)
 
     def __unicode__(self):
@@ -126,10 +126,10 @@ class Interview(BaseModel):
 
 
 class Answer(BaseModel):
-    interview = models.ForeignKey(Interview, related_name='%(class)s')
+    interview = models.ForeignKey(Interview, related_name='%(class)s',db_index=True)
 #     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
 #                                                             #value shall hold the exact worth of the response
-    question = models.ForeignKey("Question", null=True, related_name="%(class)s", on_delete=models.PROTECT)
+    question = models.ForeignKey("Question", null=True, related_name="%(class)s", on_delete=models.PROTECT,db_index=True)
 
     @classmethod
     def create(cls, interview, question, answer):

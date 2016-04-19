@@ -4,8 +4,9 @@ from django.test import TestCase
 from mock import patch
 from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
-from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, NumericalAnswer, Survey, EnumerationArea
-from survey.models.batch_question_order import BatchQuestionOrder
+from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, \
+    NumericalAnswer, Survey, EnumerationArea, QuestionModule
+# from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.households import Household, HouseholdListing, HouseholdMember, SurveyHouseholdListing
 from survey.models.backend import Backend
 from survey.models.interviewer import Interviewer
@@ -36,25 +37,24 @@ class HouseholdTest(TestCase):
                                                    gender='1',level_of_education='Primary',
                                                    language='Eglish',weights=0)
 
-        survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
-        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
-        self.household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+        self.survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
+        self.household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=self.survey)
+        self.household = Household.objects.create(house_number=123456,listing=self.household_listing,physical_address='Test address',
                                              last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
 #        fields_data = dict(surname='xyz', male=True, date_of_birth=date(1980, 05, 01), household=household)
-        survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
+        self.survey_householdlisting = SurveyHouseholdListing.objects.create(listing=self.household_listing,survey=self.survey)
         self.household_member = HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
-                                                          household=self.household,survey_listing=survey_householdlisting,
+                                                          household=self.household,survey_listing=self.survey_householdlisting,
                                                           registrar=self.investigator,registration_channel="ODK Access")
 
     # def test_location_hierarchy(self):
-    #     self.assertEquals(self.household.location_hierarchy(), {'Country': self.uganda, 'City': self.kampala})
+    #     self.assertEquals(self.household.location_hierarchy(), {'Country': self.uganda, 'City': self.kampala})"
 
     def test_fields(self):
         hHead = Household()
         fields = [str(item.attname) for item in hHead._meta.fields]
         print fields
         self.assertEqual(len(fields), 10)
-        print fields
         for field in ['id', 'created', 'modified', 'house_number', 'listing_id',
                       'physical_address', 'last_registrar_id', 'registration_channel', 'head_desc', 'head_sex']:
             self.assertIn(field, fields)
@@ -74,35 +74,40 @@ class HouseholdTest(TestCase):
         self.failUnless(household.created)
         self.failUnless(household.modified)
 
-    def test_knows_next_uid_for_households(self):
-        ea = EnumerationArea.objects.create(name="Kampala EA A1243")
-        investigator = Interviewer.objects.create(name="Investigator123",
-                                                   ea=ea,
-                                                   gender='1',level_of_education='Primary',
-                                                   language='Eglish',weights=0)
-        survey = Survey.objects.create(name="Test Survey3214",description="Desc234",sample_size=10,has_sampling=True)
-        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
-        Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
-                                             last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
-        self.assertEqual(123457, Household.next_new_house(household_listing))
+    # def test_knows_next_uid_for_households(self):
+    #     ea = EnumerationArea.objects.create(name="Kampala EA A1243")
+    #     investigator = Interviewer.objects.create(name="Investigator123",
+    #                                                ea=ea,
+    #                                                gender='1',level_of_education='Primary',
+    #                                                language='Eglish',weights=0)
+    #     survey = Survey.objects.create(name="Test Survey3214",description="Desc234",sample_size=10,has_sampling=True)
+    #     household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
+    #     Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    #     self.assertEqual(123457, Household.next_new_house(household_listing))
 
-    def test_knows_next_uid_for_households_if_survey_is_open_is_survey_dependent(self):
-        open_survey = Survey.objects.create(name="Test Survey3214",description="Desc234",sample_size=10,has_sampling=True)
+    # def test_knows_next_uid_for_households_if_survey_is_open_is_survey_dependent(self):
+    #     open_survey = Survey.objects.create(name="Test Survey3214",description="Desc234",sample_size=10,has_sampling=True)
+    #
+    #     ea = EnumerationArea.objects.create(name="Kampala EA A1243")
+    #     investigator = Interviewer.objects.create(name="Investigator123",
+    #                                                ea=ea,
+    #                                                gender='1',level_of_education='Primary',
+    #                                                language='Eglish',weights=0)
+    #     household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=open_survey)
+    #     Household.objects.create(house_number=1234567,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    #     Household.objects.create(house_number=1234568,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    #     Household.objects.create(house_number=1234569,listing=household_listing,physical_address='Test address',
+    #                                          last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    #
+    #     self.assertEqual(1234570, Household.next_new_house(open_survey))
 
-        ea = EnumerationArea.objects.create(name="Kampala EA A1243")
-        investigator = Interviewer.objects.create(name="Investigator123",
-                                                   ea=ea,
-                                                   gender='1',level_of_education='Primary',
-                                                   language='Eglish',weights=0)
-        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=open_survey)
-        Household.objects.create(house_number=1234567,listing=household_listing,physical_address='Test address',
-                                             last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
-        Household.objects.create(house_number=1234568,listing=household_listing,physical_address='Test address',
-                                             last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
-        Household.objects.create(house_number=1234569,listing=household_listing,physical_address='Test address',
-                                             last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
+    # def test_get_or_create_survey_listing(self):
+    #     survey_householdlisting123 = SurveyHouseholdListing.objects.create(listing=self.household_listing,survey=self.survey)
+    #     print survey_householdlisting123.get_or_create_survey_listing(self.investigator,self.survey),"++++++++++++++++++++++++++++"
 
-        self.assertEqual(1234570, Household.next_new_house(open_survey))
     # Eswar error in get_related_location
     # def test_should_know_household_related_location_to_village_level(self):
     #     country = LocationType.objects.create(name="Country1", slug='country')

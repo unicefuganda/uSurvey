@@ -1,10 +1,12 @@
 from django.test.client import Client
 from django.contrib.auth.models import User
 from rapidsms.contrib.locations.models import Location, LocationType
-from survey.investigator_configs import PRIME_LOCATION_TYPE
+from survey.models.locations import *
+from survey.interviewer_configs import PRIME_LOCATION_TYPE
 
 from survey.tests.base_test import BaseTest
 
+#Eswar need to look into this issue get() returned more than one LocationType -- it returned 2!
 
 class BulkSMSTest(BaseTest):
 
@@ -13,12 +15,11 @@ class BulkSMSTest(BaseTest):
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'), 'can_view_batches')
         self.client.login(username='Rajni', password='I_Rock')
-
-        district = LocationType.objects.create(name=PRIME_LOCATION_TYPE, slug='district')
-        country = LocationType.objects.create(name='Country', slug = 'country')
-        self.kampala = Location.objects.create(name="Kampala", type=district)
-        self.abim = Location.objects.create(name="Abim", type=district)
-        uganda = Location.objects.create(name="Uganda", type=country)
+        self.country = LocationType.objects.create(name="Country", slug="country")
+        self.district = LocationType.objects.create(name="District", parent=self.country,slug="district")
+        self.uganda = Location.objects.create(name="Uganda", type=self.country)
+        self.kampala = Location.objects.create(name="Kampala", type=self.district, parent=self.uganda)
+        self.abim = Location.objects.create(name="Abim", type=self.district, parent=self.uganda)
 
     def test_get(self):
         response = self.client.get('/bulk_sms')
@@ -31,7 +32,7 @@ class BulkSMSTest(BaseTest):
         response = self.client.post('/bulk_sms/send', data={'locations': [self.kampala.pk, self.abim.pk], 'text': 'text'}, follow=True)
         self.assertEquals(len(response.context['messages']), 1)
         for message in response.context['messages']:
-            self.assertEquals(str(message), "Your message has been sent to investigators.")
+            self.assertEquals(str(message), "Your message has been sent to interviewers.")
         self.failUnlessEqual(response.status_code, 200)
         self.assertRedirects(response, 'http://testserver/bulk_sms')
 

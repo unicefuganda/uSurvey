@@ -330,7 +330,7 @@ class EditUserFormTest(TestCase):
 
         self.assertEqual(user_retrieved, user)
         self.assertEqual(self.user_to_be_edited.password, user_retrieved.password)
-        self.assertFalse(user_retrieved.check_password(SOME_PASSWD))
+        self.assertTrue(user_retrieved.check_password(SOME_PASSWD))
 
 
 class UserProfileFormTest(TestCase):

@@ -10,6 +10,7 @@ class LogicForm(forms.Form):
     END_INTERVIEW = 'END_INTERVIEW'
     REANSWER = 'REANSWER'
     ASK_SUBQUESTION = 'ASK_SUBQUESTION'
+    BACK_TO = 'BACK_TO'
     def __init__(self, initial=None, question=None, *args, **kwargs):
         super(LogicForm, self).__init__(initial=initial, *args, **kwargs)
         data = kwargs.get('data', None)
@@ -20,11 +21,13 @@ class LogicForm(forms.Form):
             self.END_INTERVIEW : 'END INTERVIEW',
             self.SKIP_TO: 'SKIP TO',
             self.REANSWER: 'RECONFIRM',
+            self.BACK_TO: 'BACK TO',
             self.ASK_SUBQUESTION: 'ASK SUBQUESTION',
         }
         self.fields['condition'] = forms.ChoiceField(label='Eligibility criteria', choices=[], widget=forms.Select,
                                   required=False)
-        self.fields['attribute'] = forms.ChoiceField(label='Attribute', choices=[('value', 'Value'), ], widget=forms.Select, required=False)
+        self.fields['attribute'] = forms.ChoiceField(label='Attribute', choices=[('value', 'Value'), ],
+                                                     widget=forms.Select, required=False)
         self.fields['condition'].choices = [(validator.__name__, validator.__name__.upper()) \
                                            for validator in Answer.get_class(question.answer_type).validators()]
         if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
@@ -116,7 +119,7 @@ class LogicForm(forms.Form):
     def save(self, *args, **kwargs):
         next_question = None
         desc = self._make_desc()
-        if self.cleaned_data['action'] in [self.ASK_SUBQUESTION, self.SKIP_TO]:
+        if self.cleaned_data['action'] in [self.ASK_SUBQUESTION, self.SKIP_TO, self.BACK_TO]:
             next_question = Question.objects.get(pk=self.cleaned_data['next_question'])
         if self.cleaned_data['action'] == self.REANSWER:
             next_question = self.question

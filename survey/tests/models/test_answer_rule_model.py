@@ -6,7 +6,7 @@ from survey.models.locations import LocationType, Location
 #from survey.models import Interviewer, Backend, HouseholdMemberGroup, GroupCondition, Household, Batch, NumericalAnswer, Question, AnswerRule, QuestionOption, MultiChoiceAnswer, Answer, EnumerationArea
 from survey.models import Interviewer, Backend, HouseholdMemberGroup, SurveyHouseholdListing,GroupCondition, Household, Batch, NumericalAnswer, Question, QuestionOption, MultiChoiceAnswer, Answer, EnumerationArea, HouseholdListing
 from survey.models.surveys import Survey
-from survey.models.batch_question_order import BatchQuestionOrder
+# from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.households import HouseholdMember
 from survey.models.question_module import QuestionModule
 #Eswar removed AnswerRule as model not available
@@ -37,7 +37,7 @@ class AnswerRuleTest(TestCase):
         household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=self.investigator,initial_survey=survey)
         self.household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
                                              last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
-
+        self.question_mod = QuestionModule.objects.create(name="Test question name",description="test desc")
         survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
         self.household_member = HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
                                                           household=self.household,survey_listing=survey_householdlisting,
@@ -58,8 +58,8 @@ class AnswerRuleTest(TestCase):
     #     # question_1.batches.add(self.batch)
     #     # question_2.batches.add(self.batch)
     #
-    #     BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
-    #     BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+    #     # BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+    #     # BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
     #
     #     next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=self.batch)
     #     # self.assertEqual(next_question, question_2)
@@ -73,11 +73,11 @@ class AnswerRuleTest(TestCase):
     #
     #     next_question = self.investigator.member_answered(question_1, self.household_member, answer=0, batch=self.batch)
     #     self.assertEqual(next_question, None)
-
+    #
     # def test_numerical_equals_and_skip_to_rule(self):
     #     NumericalAnswer.objects.all().delete()
-    #     question_1 = Question.objects.create(text="Question 1?",
-    #                                          answer_type=Question.NUMBER, order=1, group=self.member_group)
+    #     question_1 = Question.objects.create(identifier='1.1',text="This is a question", answer_type='Numerical Answer',
+    #                                        group=self.member_group,batch=self.batch,module=question_mod)
     #     question_2 = Question.objects.create(text="Question 2?",
     #                                          answer_type=Question.NUMBER, order=2, group=self.member_group)
     #     question_3 = Question.objects.create(text="Question 3?",
@@ -86,9 +86,9 @@ class AnswerRuleTest(TestCase):
     #     question_2.batches.add(self.batch)
     #     question_3.batches.add(self.batch)
     #
-    #     BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
-    #     BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
-    #     BatchQuestionOrder.objects.create(question=question_3, batch=self.batch, order=3)
+    #     # BatchQuestionOrder.objects.create(question=question_1, batch=self.batch, order=1)
+    #     # BatchQuestionOrder.objects.create(question=question_2, batch=self.batch, order=2)
+    #     # BatchQuestionOrder.objects.create(question=question_3, batch=self.batch, order=3)
     #
     #     next_question = self.investigator.member_answered(question_1, self.household_member, answer=1, batch=self.batch)
     #     self.assertEqual(next_question, question_2)
@@ -100,7 +100,7 @@ class AnswerRuleTest(TestCase):
     #
     #     next_question = self.investigator.member_answered(question_1, self.household_member, answer=0, batch=self.batch)
     #     self.assertEqual(next_question, question_3)
-    #
+
     # def test_numerical_greater_than_value_and_reanswer(self):
     #     NumericalAnswer.objects.all().delete()
     #     question_0 = Question.objects.create( text="How are you?", answer_type=Question.NUMBER,

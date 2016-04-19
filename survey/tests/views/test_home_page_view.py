@@ -18,11 +18,9 @@ class HomepageViewTest(BaseTest):
         survey_1 = Survey.objects.create(name="A")
         survey_2 = Survey.objects.create(name="B")
         response = self.client.get('/')
-        self.assertIn(survey_1, response.context['surveys'])
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
-        self.assertIn('home/index.html', templates)
-        self.assertIn(survey_2, response.context['surveys'])
+        self.assertIn('main/index.html', templates)
 
     def test_no_content_available_on_about_page(self):
         response = self.client.get('/about/')

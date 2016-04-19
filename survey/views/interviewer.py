@@ -35,12 +35,13 @@ def _create_or_edit(request, action_text, interviewer=None):
         ea = get_object_or_404(EnumerationArea, pk=request.POST['ea'])
         data = dict([(loc.type.name, loc.pk) for loc in ea.parent_locations()])
     if interviewer:
-        extra = 0
         title = 'Edit Interviewer'
         odk_accesses = interviewer.odk_access
         if odk_accesses.exists():
             odk_instance = odk_accesses[0]
         data = data or dict([(loc.type.name, loc.pk) for loc in interviewer.ea.parent_locations()])
+    if interviewer.ussd_access.exists():
+        extra = 0
     else:
         extra = 1
     locations_filter = LocationsFilterForm(data=data)
@@ -58,19 +59,20 @@ def _create_or_edit(request, action_text, interviewer=None):
         ussd_access_form = USSDAccessFormSet(request.POST, prefix='ussd_access', instance=interviewer)
 #         odk_access_form = ODKAccessFormSet(request.POST, prefix='odk_access', instance=interviewer)
         odk_access_form = ODKAccessForm(request.POST, instance=odk_instance)
-        if interviewer_form.is_valid() and ussd_access_form.is_valid() and odk_access_form.is_valid():
+        if interviewer_form.is_valid()  and odk_access_form.is_valid():
             interviewer = interviewer_form.save()
             ussd_access_form.instance = interviewer
-            ussd_access_form.save()
-            odk_access = odk_access_form.save(commit=False) 
-            odk_access.interviewer = interviewer
-            odk_access.save()
-            messages.success(request, "Interviewer successfully %sed." % action_text )
+            if ussd_access_form.is_valid():
+                ussd_access_form.save()
+                odk_access = odk_access_form.save(commit=False)
+                odk_access.interviewer = interviewer
+                odk_access.save()
+                messages.success(request, "Interviewer successfully %sed." % action_text )
             return HttpResponseRedirect(redirect_url)
     else:
         interviewer_form = InterviewerForm(eas, instance=interviewer)
     loc_types = LocationType.in_between()
-    return response or render(request, 'interviewers/interviewer_form.html', {'country_phone_code': COUNTRY_PHONE_CODE,
+    return response or render(request, 'interviewers/interviewer_form.html', {
                                                                   'form': interviewer_form,
                                                                   'ussd_access_form' : ussd_access_form,
                                                                   'odk_access_form' : odk_access_form, 

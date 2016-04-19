@@ -1,4 +1,5 @@
 from rapidsms.contrib.locations.models import Location, LocationType
+from survey.models.locations import *
 
 from survey.models import UploadErrorLog, EnumerationArea
 from survey.services.csv_uploader import UploadService
@@ -15,7 +16,7 @@ class UploadEA(UploadService):
 
     def check_errors_(self, index,  row, headers, skip_column, lowest_location_column):
         lowest_location_name = row[lowest_location_column]
-        location = Location.objects.filter(name=lowest_location_name, tree_parent__name__iexact=row[skip_column-1].lower())
+        location = Location.objects.filter(name=lowest_location_name, parent__name__iexact=row[skip_column-1].lower())
         if not location.exists():
             self.log_error(index+1, 'There is no %s with name: %s, in %s.' %
                                     (headers[lowest_location_column].lower(), row[lowest_location_column], row[skip_column-1]))

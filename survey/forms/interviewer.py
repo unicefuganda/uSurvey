@@ -4,6 +4,7 @@ from survey.models import Interviewer, ODKAccess, USSDAccess, BatchLocationStatu
 from django.forms.models import inlineformset_factory
 from django.conf import settings
 from django.core.exceptions import ValidationError
+import phonenumbers
 
 
 class InterviewerForm(ModelForm):
@@ -90,19 +91,18 @@ class USSDAccessForm(ModelForm):
 
     def clean_user_identifier(self):
         identifier = self.cleaned_data.get('user_identifier', '')
-        if identifier.isdigit() == False:
-            raise ValidationError('Mobile number must contain only numbers')
-        accesses = USSDAccess.objects.filter(user_identifier=identifier)
-        if self.instance:
-            try:
-                accesses = accesses.exclude(interviewer=self.instance.interviewer)
-            except Interviewer.DoesNotExist:
-                pass
-        if accesses.exists():
+        try:
+            identifier = phonenumbers.parse(identifier, settings.COUNTRY_CODE)
+            if phonenumbers.is_valid_number_for_region(identifier, settings.COUNTRY_CODE):
+                self.cleaned_data['user_identifier'] = identifier.national_number
+            else:
+                raise ValidationError('Invalid mobile number for your region')
+        except phonenumbers.NumberParseException:
+            raise ValidationError('Invalid mobile number')
+        accesses = USSDAccess.objects.filter(user_identifier=identifier.national_number)
+        if self.instance and accesses.exclude(interviewer=self.instance.interviewer).exists():
             raise ValidationError('This mobile number is already in use by %s' % accesses[0].interviewer.name)
         return self.cleaned_data['user_identifier']
-        
-
 
 class ODKAccessForm(ModelForm):
     user_identifier = forms.CharField(label='ODK ID')

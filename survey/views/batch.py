@@ -260,7 +260,7 @@ def list_batches(request):
     if request.is_ajax():
         batches = Batch.objects.values('id', 'name').order_by('name')
         json_dump = json.dumps(list(batches), cls=DjangoJSONEncoder)
-        return HttpResponse(json_dump, mimetype='application/json')
+        return HttpResponse(json_dump, content_type='application/json')
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
     ])

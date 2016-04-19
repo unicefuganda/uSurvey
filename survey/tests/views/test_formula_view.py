@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from survey.forms.formula import FormulaForm
-from survey.models import Survey, Batch, QuestionModule, Indicator, Formula, HouseholdMemberGroup, Question, BatchQuestionOrder, QuestionOption
+from survey.models import Survey, Batch, QuestionModule, Indicator, Formula, HouseholdMemberGroup, Question, QuestionOption
 from survey.tests.base_test import BaseTest
+# from survey.models.batch_question_order import *
 from django.test.client import Client
 
 
@@ -15,7 +16,7 @@ class IndicatorFormulaViewsTest(BaseTest):
         raj = self.assign_permission_to(raj, 'can_view_investigators')
 
         self.client.login(username='Rajni', password='I_Rock')
-        self.survey = Survey.objects.create(name='survey name', description='survey descrpition', type=False,
+        self.survey = Survey.objects.create(name='survey name', description='survey descrpition',
                                             sample_size=10)
         self.batch = Batch.objects.create(order=1, name="Batch A", survey=self.survey)
         self.module = QuestionModule.objects.create(name='Education', description='Educational Module')
@@ -23,21 +24,16 @@ class IndicatorFormulaViewsTest(BaseTest):
                                              module=self.module, description="Indicator 1", batch=self.batch)
 
         self.group = HouseholdMemberGroup.objects.create(name="Females", order=1)
-
-        self.question_1 = Question.objects.create(group=self.group, text="Question 1?", module=self.module, answer_type=Question.NUMBER,
-                                             order=1)
-        self.question_2 = Question.objects.create(group=self.group, text="Question 2?", module=self.module, answer_type=Question.NUMBER,
-                                             order=2)
-        self.question_3 = Question.objects.create(group=self.group, text="Question 3?", module=self.module, answer_type=Question.NUMBER,
-                                             order=3)
-
-        self.question_1.batches.add(self.batch)
-        self.question_2.batches.add(self.batch)
-        self.question_3.batches.add(self.batch)
-
-        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_1, order=1)
-        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_2, order=2)
-        BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_3, order=3)
+        self.question_mod = QuestionModule.objects.create(name="Test question name",description="test desc")
+        self.question_1 = Question.objects.create(identifier='123.1',text="This is a question123.1", answer_type='Numerical Answer',
+                                           group=self.group,batch=self.batch,module=self.question_mod)
+        self.question_2 = Question.objects.create(identifier='123.2',text="This is a question123.2", answer_type='Numerical Answer',
+                                           group=self.group,batch=self.batch,module=self.question_mod)
+        self.question_3 = Question.objects.create(identifier='123.3',text="This is a question123.3", answer_type='Numerical Answer',
+                                           group=self.group,batch=self.batch,module=self.question_mod)
+        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_1, order=1)
+        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_2, order=2)
+        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_3, order=3)
 
         self.existing_formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2,
                                                        indicator=self.indicator)
@@ -78,12 +74,11 @@ class IndicatorFormulaViewsTest(BaseTest):
                                                indicator=self.indicator))
 
     def test_post_new_for_percentage_indicator_with_multichoice_denominator_question(self):
-        multichoice_question = Question.objects.create(group=self.group, text="Question 4?", module=self.module,
-                                                  answer_type=Question.MULTICHOICE, order=4)
-
-        option_1 = QuestionOption.objects.create(question=multichoice_question, text='Yes', order=1)
-        option_2 = QuestionOption.objects.create(question=multichoice_question, text='No', order=2)
-        option_3 = QuestionOption.objects.create(question=multichoice_question, text='Maybe', order=3)
+        multichoice_question = Question.objects.create(identifier='123.4',text="This is a question123.4", answer_type='Numerical Answer',
+                                           group=self.group,batch=self.batch,module=self.question_mod)
+        option_1 = QuestionOption.objects.create(question=multichoice_question, text="OPTION 1", order=1)
+        option_2 = QuestionOption.objects.create(question=multichoice_question, text="OPTION 2", order=2)
+        option_3 = QuestionOption.objects.create(question=multichoice_question, text="Others", order=3)
         option_4 = QuestionOption.objects.create(question=multichoice_question, text='Not Known', order=4)
 
         data = {'numerator': self.question_1.id,
@@ -93,8 +88,7 @@ class IndicatorFormulaViewsTest(BaseTest):
 
         all_formula_options = [option_1, option_2, option_3, option_4]
 
-        multichoice_question.batches.add(self.batch)
-        BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
+        # BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
 
         new_formula_url = '/indicators/%s/formula/new/' % self.indicator.id
         response = self.client.post(new_formula_url, data=data)
@@ -109,8 +103,8 @@ class IndicatorFormulaViewsTest(BaseTest):
         [self.assertIn(option, saved_formula_question_options) for option in all_formula_options]
 
     def test_post_new_for_percentage_indicator_with_multichoice_numerator_question(self):
-        multichoice_question = Question.objects.create(group=self.group, text="Question 4?", module=self.module,
-                                                  answer_type=Question.MULTICHOICE, order=4)
+        multichoice_question = Question.objects.create(identifier='123.4',text="This is a question123.4", answer_type='Numerical Answer',
+                                           group=self.group,batch=self.batch,module=self.question_mod)
 
         option_1 = QuestionOption.objects.create(question=multichoice_question, text='Yes', order=1)
         option_2 = QuestionOption.objects.create(question=multichoice_question, text='No', order=2)
@@ -123,9 +117,7 @@ class IndicatorFormulaViewsTest(BaseTest):
                 'denominator_type': 'QUESTION'}
 
         all_formula_options = [option_1, option_2, option_3, option_4]
-
-        multichoice_question.batches.add(self.batch)
-        BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
+        # BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
 
         new_formula_url = '/indicators/%s/formula/new/' % self.indicator.id
         response = self.client.post(new_formula_url, data=data)
@@ -141,8 +133,8 @@ class IndicatorFormulaViewsTest(BaseTest):
         [self.assertIn(option, saved_formula_question_options) for option in all_formula_options]
 
     def test_post_new_for_percentage_indicator_with_multichoice_numerator_and_denominator_question(self):
-        multichoice_question = Question.objects.create(group=self.group, text="Question 4?", module=self.module,
-                                                  answer_type=Question.MULTICHOICE, order=4)
+        multichoice_question = Question.objects.create(identifier='123.4',text="This is a question123.4", answer_type='Numerical Answer',
+                                           group=self.group,batch=self.batch,module=self.question_mod)
 
         option_1 = QuestionOption.objects.create(question=multichoice_question, text='Yes', order=1)
         option_2 = QuestionOption.objects.create(question=multichoice_question, text='No', order=2)
@@ -158,9 +150,7 @@ class IndicatorFormulaViewsTest(BaseTest):
         all_numerator_formula_options = [option_1, option_2]
         excluded_numerator_formula_options = [option_3, option_4]
         all_denominator_formula_options = [option_1, option_2, option_3, option_4]
-
-        multichoice_question.batches.add(self.batch)
-        BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
+        # BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
 
         new_formula_url = '/indicators/%s/formula/new/' % self.indicator.id
         response = self.client.post(new_formula_url, data=data)
@@ -215,25 +205,31 @@ class IndicatorFormulaViewsTest(BaseTest):
         self.assertEqual(0, len(saved_formula[0].denominator_options.all()))
 
     def test_post_new_for_count_indicator_with_multichoice_count_question(self):
-        multichoice_question = Question.objects.create(group=self.group, text="Question 4?", module=self.module,
-                                                  answer_type=Question.MULTICHOICE, order=4)
 
-        option_1 = QuestionOption.objects.create(question=multichoice_question, text='Yes', order=1)
-        option_2 = QuestionOption.objects.create(question=multichoice_question, text='No', order=2)
-        option_3 = QuestionOption.objects.create(question=multichoice_question, text='Maybe', order=3)
-        option_4 = QuestionOption.objects.create(question=multichoice_question, text='Not Known', order=4)
+        multichoice_question = Question.objects.create(identifier='123.4',text="This is a question123.4", answer_type='Numerical Answer',
+                                           group=self.group,batch=self.batch,module=self.question_mod)
+        option_1 = QuestionOption.objects.create(question=multichoice_question, text="OPTION 1", order=1)
+        option_2 = QuestionOption.objects.create(question=multichoice_question, text="OPTION 2", order=2)
+        option_3 = QuestionOption.objects.create(question=multichoice_question, text="Others", order=3)
+
+        # multichoice_question = Question.objects.create(group=self.group, text="Question 4?", module=self.module,
+        #                                           answer_type=Question.MULTICHOICE, order=4)
+        #
+        # option_1 = QuestionOption.objects.create(question=multichoice_question, text='Yes', order=1)
+        # option_2 = QuestionOption.objects.create(question=multichoice_question, text='No', order=2)
+        # option_3 = QuestionOption.objects.create(question=multichoice_question, text='Maybe', order=3)
+        # option_4 = QuestionOption.objects.create(question=multichoice_question, text='Not Known', order=4)
 
         count_indicator = Indicator.objects.create(name='Test Indicator', measure=Indicator.MEASURE_CHOICES[1][1],
                                              module=self.module, description="Indicator 1", batch=self.batch)
 
         data = {'count': multichoice_question.id,
-                'denominator_options': [option_1.id, option_2.id, option_3.id, option_4.id],
+                'denominator_options': [option_1.id, option_2.id, option_3.id],
                 'denominator_type': 'QUESTION'}
 
-        all_formula_options = [option_1, option_2, option_3, option_4]
+        all_formula_options = [option_1, option_2, option_3]
 
-        multichoice_question.batches.add(self.batch)
-        BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
+        # BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
 
         new_formula_url = '/indicators/%s/formula/new/' % count_indicator.id
         response = self.client.post(new_formula_url, data=data)

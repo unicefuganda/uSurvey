@@ -63,6 +63,17 @@ class Question(BaseModel):
         if resulting_flow:
             return resulting_flow.next_question
 
+    def previous_inlines(self):
+        inlines = self.batch.questions_inline()
+        if self not in inlines:
+            raise ValidationError('%s not inline' % self.identifier)
+        previous = []
+        for q in inlines:
+            if q.identifier == self.identifier:
+                break
+            else:
+                previous.append(q)
+        return set(previous)
     
     def conditional_flows(self):
         return self.flows.filter( validation_test__isnull=False)

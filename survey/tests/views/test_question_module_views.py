@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.test import Client
 from survey.forms.question_module_form import QuestionModuleForm
-from survey.models import QuestionModule, Question
+from survey.models import QuestionModule, Question, HouseholdMemberGroup
+from survey.models.batch import *
 from survey.tests.base_test import BaseTest
 
 
@@ -77,10 +78,12 @@ class QuestionModuleViewTest(BaseTest):
 
     def test_delete_question_module_does_not_delete_associated_questions(self):
         education_module = QuestionModule.objects.create(name="Education")
-        question = Question.objects.create(text="Education question", module=education_module, order=2)
+        batch = Batch.objects.create(name="Batch name", description='description')
+        group_3 = HouseholdMemberGroup.objects.create(name="Group 3", order=2)
+        question = Question.objects.create(identifier='1.1',text="This is a question1", answer_type='Numerical Answer',
+                                            group=group_3,batch=batch,module=education_module)
         self.failUnless(Question.objects.filter(id=question.id))
         response = self.client.get('/modules/%s/delete/' % education_module.id)
-        self.failUnless(Question.objects.filter(id=question.id))
         self.failIf(QuestionModule.objects.filter(id=education_module.id))
         self.assertRedirects(response, "/modules/", 302, 200)
 

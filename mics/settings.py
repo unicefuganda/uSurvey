@@ -183,7 +183,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django_nose',
-    'south',
+    # 'south',
     'lettuce.django',
     'django_extensions',
     'rapidsms.contrib.locations',
@@ -245,6 +245,9 @@ INSTALLED_BACKENDS = {
     #     "ENGINE": "rapidsms.backends.database.DatabaseBackend",
     # },
 }
+
+COUNTRY_CODE = 'UG'
+COUNTRY_PHONE_CODE = '256'
 
 PRODUCTION = False
 

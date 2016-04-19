@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from rapidsms.contrib.locations.models import *
-
+from survey.models.locations import *
 from django.template.defaultfilters import slugify
 from django.core.exceptions import ValidationError
 

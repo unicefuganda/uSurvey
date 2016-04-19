@@ -85,9 +85,7 @@ class TextAnswerTest(TestCase):
 
 class MultiChoiceAnswerTest(TestCase):
     def test_store(self):
-        #kampala = Location.objects.create(name="Kampala")
         ea = EnumerationArea.objects.create(name="Kampala EA A")
-        #ea.locations.add(kampala)
         investigator = Interviewer.objects.create(name="Investigator",
                                                    ea=ea,
                                                    gender='1',level_of_education='Primary',

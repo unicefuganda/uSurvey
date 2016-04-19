@@ -38,7 +38,7 @@ def filter(request):
     question_filter_form = QuestionFilterForm(data=request.GET)
     questions =  question_filter_form.filter(question_lib).values('id', 'text', 'answer_type', 'group', 'module').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
-    return HttpResponse(json_dump, mimetype='application/json')
+    return HttpResponse(json_dump, content_type='application/json')
 
 def _process_question_form(request, response, instance=None):
     question_form = QuestionTemplateForm(data=request.POST, instance=instance)

@@ -57,7 +57,7 @@ def location_filter(request):
     locations_filter = LocationsFilterForm(data=request.GET)
     locations =  locations_filter.get_locations().values('id', 'name', ).order_by('name')
     json_dump = json.dumps(list(locations), cls=DjangoJSONEncoder)
-    return HttpResponse(json_dump, mimetype='application/json')
+    return HttpResponse(json_dump, content_type='application/json')
 
 @permission_required('auth.can_view_batches')
 def open_surveys(request):
@@ -65,7 +65,7 @@ def open_surveys(request):
     ea = get_object_or_404(EnumerationArea, pk=ea_id)
     open_surveys = [dict([('id', s.pk), ('name', s.name)]) for s in  ea.open_surveys()]
     json_dump = json.dumps(open_surveys, cls=DjangoJSONEncoder)
-    return HttpResponse(json_dump, mimetype='application/json')
+    return HttpResponse(json_dump, content_type='application/json')
 
 @permission_required('auth.can_view_batches')
 def enumeration_area_filter(request):
@@ -73,7 +73,7 @@ def enumeration_area_filter(request):
     enumeration_areas = locations_filter.get_enumerations()
     eas =  enumeration_areas.values('id', 'name', ).order_by('name')
     json_dump = json.dumps(list(eas), cls=DjangoJSONEncoder)
-    return HttpResponse(json_dump, mimetype='application/json')
+    return HttpResponse(json_dump, content_type='application/json')
 
 @permission_required('auth.can_view_batches')
 def location_sub_types(request):
@@ -83,7 +83,7 @@ def location_sub_types(request):
     child_locations = Location.objects.filter(**kwargs)
     locations =  child_locations.values('id', 'name', ).order_by('name')
     json_dump = json.dumps({'sub_type': child_locations[0].type.name, 'locations': list(locations)}, cls=DjangoJSONEncoder)
-    return HttpResponse(json_dump, mimetype='application/json')
+    return HttpResponse(json_dump, content_type='application/json')
 
 @permission_required('auth.can_view_batches')
 def delete(request, ea_id):

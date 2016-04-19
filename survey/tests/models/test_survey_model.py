@@ -4,7 +4,7 @@ from survey.models.locations import Location, LocationType
 from survey.forms.surveys import SurveyForm
 from survey.models import Batch, Interviewer, SurveyAllocation,Backend, Household, HouseholdHead, \
     HouseholdMemberBatchCompletion, EnumerationArea, Question, HouseholdMemberGroup, QuestionModule
-from survey.models.batch_question_order import BatchQuestionOrder
+# from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.households import HouseholdMember, HouseholdListing, SurveyHouseholdListing
 from survey.models.surveys import Survey
 
@@ -69,8 +69,6 @@ class SurveyTest(TestCase):
         batch = Batch.objects.create(order=1, survey=survey)
         survey_allocation = SurveyAllocation.objects.create(interviewer=self.investigator,survey=survey,allocation_ea=ea,stage=2,
                                                             status=0)
-        # investigator_location = survey_allocation.allocation_ea
-        # print investigator_location,"+++++++++++++++++++++"
         batch.open_for_location(kampala)
         self.assertTrue(survey.is_open())
 
@@ -148,7 +146,6 @@ class SurveyTest(TestCase):
         survey = Survey.objects.create(name="survey name", description="rajni survey")
         self.assertEqual(survey.name, str(survey))
 
-    #Eswar Commented as curently_open_survey() is not there anymore
     def test_knows_currently_open_survey(self):
         country = LocationType.objects.create(name='Country', slug='country')
         district = LocationType.objects.create(name='District', slug='district')
@@ -164,7 +161,6 @@ class SurveyTest(TestCase):
         another_closed_batch = Batch.objects.create(order=3, name="Another Closed Batch", survey=another_closed_survey)
 
         open_batch.open_for_location(kampala)
-        print closed_survey.is_open(),"+++++++++++++++++=="
         self.assertTrue(open_survey.is_open())
         self.assertFalse(closed_survey.is_open())
 
@@ -182,7 +178,6 @@ class SurveyTest(TestCase):
         closed_batch = Batch.objects.create(order=2, name="Closed Batch", survey=closed_survey)
         another_closed_batch = Batch.objects.create(order=3, name="Another Closed Batch", survey=another_closed_survey)
 
-        print open_batch.open_for_location(kampala),"+++++++++++++++++++++++++++++++++"
         self.assertFalse(None, open_batch.open_for_location(kampala)[1])
 
     def test__survey_knows_is_currently_open_for_location(self):
@@ -202,26 +197,6 @@ class SurveyTest(TestCase):
         self.assertTrue(open_survey.is_open_for(kampala))
         self.assertTrue(open_survey.is_open_for(masaka))
         self.assertFalse(open_survey.is_open_for(wakiso))
-
-    #Eswar need to look
-    # def test_survey_knows_opened_for_parent_means_opened_for_children(self):
-    #     country = LocationType.objects.create(name='Country', slug='country')
-    #     district = LocationType.objects.create(name='District', slug='district')
-    #     uganda = Location.objects.create(name="Uganda", type=country)
-    #     kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
-    #     masaka = Location.objects.create(name="masaka", type=district, tree_parent=uganda)
-    #
-    #     open_survey = Survey.objects.create(name="open survey", description="open survey")
-    #
-    #     open_batch = Batch.objects.create(order=1, name="Open Batch", survey=open_survey)
-    #     open_batch.open_for_location(uganda)
-    #     self.assertTrue(open_survey.is_open_for(kampala))
-    #     self.assertTrue(open_survey.is_open_for(masaka))
-    #Eswar Error in register_households model
-    # def test_survey_returns_zero_if_no_households_have_completed(self):
-    #     survey = Survey.objects.create(name="open survey", description="open survey", has_sampling=True)
-    #     Batch.objects.create(order=1, survey=survey)
-    #     self.assertEqual(0, survey.registered_households())
 
     def test_survey_knows_count_of_respondents_in_a_location(self):
         country = LocationType.objects.create(name='Country', slug='country')
@@ -273,31 +248,3 @@ class SurveyTest(TestCase):
                                                 interviewer=investigator_2)
         household_2.batch_completed(batch,investigator)
         self.assertEqual(1, len(survey.generate_completion_report(batch)))
-
-
-    # def test_knows_all_questions(self):
-        # survey = Survey.objects.create(name="haha")
-        # batch1 = Batch.objects.create(name="haha batch", survey=survey)
-        # batch2 = Batch.objects.create(name="haha batch1", survey=survey)
-        # batch3 = Batch.objects.create(name="batch not in a survey")
-        #
-        # member_group = HouseholdMemberGroup.objects.create(name="House member group3", order=11)
-        # question_mod = QuestionModule.objects.create(name="Test question name3",description="test desc3")
-        #
-        # question1 = Question.objects.create(identifier='3.1',text="This is a question1", answer_type='Numerical Answer',
-        #                                    group=member_group,batch=batch1,module=question_mod)
-        # question2 = Question.objects.create(identifier='3.2',text="This is a question2", answer_type='Numerical Answer',
-        #                                    group=member_group,batch=batch1,module=question_mod)
-        # question3 = Question.objects.create(identifier='3.3',text="This is a question3", answer_type='Numerical Answer',
-        #                                    group=member_group,batch=batch1,module=question_mod)
-        # BatchQuestionOrder.objects.create(question=question1, batch=batch1, order=1)
-        # BatchQuestionOrder.objects.create(question=question2, batch=batch2, order=2)
-        # BatchQuestionOrder.objects.create(question=question3, batch=batch3, order=3)
-        #
-        # survey_questions = batch1.survey_questions()
-        # print survey_questions,"+++++++++++++++++++++++++++"
-        #
-        # self.assertEquals(2, len(survey_questions))
-        # self.assertEquals(question1, survey_questions[0])
-        # self.assertEquals(question2, survey_questions[1])
-        # self.assertNotIn(question3, survey_questions)
