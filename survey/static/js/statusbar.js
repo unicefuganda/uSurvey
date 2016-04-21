@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
     var ws4redis = WS4Redis({
-        uri: ws_uri+'statusbar?subscribe-broadcast&publish-broadcast&echo',
+        uri: ws_uri+'statusbar?subscribe-user&subscribe-broadcast&subscribe-group',
         connecting: on_connecting,
         connected: on_connected,
         receive_message: receiveMessage,
