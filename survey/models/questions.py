@@ -11,8 +11,6 @@ from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
 from collections import OrderedDict
 from ordered_set import OrderedSet
-from survey.forms.logic import LogicForm
-
 
 
 class Question(BaseModel):
@@ -105,6 +103,7 @@ class Question(BaseModel):
         return set(previous)
 
     def direct_sub_questions(self):
+        from survey.forms.logic import LogicForm
         sub_flows = self.flows.filter(desc=LogicForm.SUBQUESTION_ACTION, validation_test__isnull=False)
         return OrderedSet([flow.question for flow in sub_flows])
     
