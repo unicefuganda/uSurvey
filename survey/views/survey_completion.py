@@ -124,7 +124,7 @@ def completion_json(request, survey_id):
     location_type = LocationType.largest_unit()
     completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
     json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
-    return HttpResponse(json_dump, mimetype='application/json')
+    return HttpResponse(json_dump, content_type='application/json')
 
 @login_required
 @permission_required('survey.view_completed_survey')
