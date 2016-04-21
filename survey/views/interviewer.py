@@ -29,6 +29,7 @@ def _create_or_edit(request, action_text, interviewer=None):
     request.breadcrumbs([
         ('Interviewers', reverse('interviewers_page')),
     ])
+    extra = 1
     title = 'New Interviewer'
     odk_instance = None
     data = request.GET
