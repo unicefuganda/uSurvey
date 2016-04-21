@@ -142,13 +142,10 @@ class Batch(BaseModel):
         inline_ques = self.questions_inline()
         questions = OrderedSet(inline_ques)
         survey_questions = OrderedSet()
-        other_flows = QuestionFlow.objects.exclude(validation_test__isnull=True,
-                                                   question__pk__in=[q.pk for q in inline_ques]).exclude(
-                                                    next_question__pk__in=[q.pk for q in inline_ques] #skip questions
-                                                    )
         for ques in inline_ques:
             survey_questions.append(ques)
-            map(lambda q: survey_questions.add(q), sub_questions(ques, other_flows))
+            map(lambda q: survey_questions.add(q), ques.direct_sub_questions()) #boldly assuming subquests dont go
+                                                                #more than quest subquestion deep for present implemnt
         return survey_questions
 
     def activate_non_response_for(self, location):
@@ -157,19 +154,19 @@ class Batch(BaseModel):
     def deactivate_non_response_for(self, location):
         self.open_locations.filter(location=location).update(non_response=False)
 
-def sub_questions(question, flows):
-    questions = OrderedSet()
-    try:
-        qflows = flows.filter(question=question).exclude(next_question=question)
-        if qflows:
-            for flow in qflows:
-                if flow.next_question:
-                    questions.add(flow.next_question)
-                    subsequent = sub_questions(flow.next_question, flows)
-                    map(lambda q: questions.add(q), subsequent)
-    except QuestionFlow.DoesNotExist:
-        return OrderedSet()
-    return questions
+# def sub_questions(question, flows):
+#     questions = OrderedSet()
+#     try:
+#         qflows = flows.filter(question=question).exclude(next_question=question)
+#         if qflows:
+#             for flow in qflows:
+#                 if flow.next_question:
+#                     questions.add(flow.next_question)
+#                     subsequent = sub_questions(flow.next_question, flows)
+#                     map(lambda q: questions.add(q), subsequent)
+#     except QuestionFlow.DoesNotExist:
+#         return OrderedSet()
+#     return questions
 
 
 def next_inline_question(question, flows, groups=ALL_GROUPS, answer_types=ALL_ANSWERS, exclude_groups=[]):

@@ -143,7 +143,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 			{% for question in batch.survey_questions %}
 				{% get_question_path question as question_path %}
 				{% if question.is_loop_start %}
-			     <repeat nodeset="/survey/b{{batch.pk}}/q{{question.looper_flow.question.pk}}q{{question.pk}}">
+				<group>
+					<label>{{question.text}}</label>
+			     	<repeat nodeset="/survey/b{{batch.pk}}/q{{question.looper_flow.question.pk}}q{{question.pk}}">
 			    {% endif %}
 				{% get_odk_mem_question question as member_question %}
 				{% if question.answer_type == answer_types.multichoiceanswer %}
@@ -189,6 +191,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 				{% endif %}
 				{% if question.is_loop_end %}
 				 </repeat>
+				</group>
 				{% endif %}
 			{% endfor %}
 		</group>
