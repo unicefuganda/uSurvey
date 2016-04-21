@@ -12,6 +12,7 @@ from dateutil import relativedelta
 from datetime import date
 import json, inspect
 from django.utils import html
+from survey.forms.logic import LogicForm
 
 register = template.Library()
 
@@ -203,6 +204,9 @@ def  get_download_url(request, url_name, instance=None):
     else:
         return request.build_absolute_uri(reverse(url_name, args=(instance.pk, )))
 
+def get_question_path(question):
+    pass
+
 @register.assignment_tag
 def  get_odk_mem_question(question):
     surname = HouseholdMember._meta.get_field('surname')
@@ -231,7 +235,7 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                                 ' or '.join(context.get(question.pk, [default_relevance, ])),
                                 is_relevant_by_group(context, question, registered_households)
                                 )
-    flows = question.flows.all()
+    flows = question.flows.exclude(desc=LogicForm.BACK_TO_ACTION) #do not include back to flows to this
     node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
     flow_conditions = []
     if flows:

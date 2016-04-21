@@ -126,7 +126,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.contrib.messages.context_processors.messages",
     "survey.context_processor.context_extras",
-    "django.core.context_processors.request"
+    "django.core.context_processors.request",
+    'ws4redis.context_processors.default',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -144,7 +145,8 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'mics.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'mics.wsgi.application'
+#WSGI_APPLICATION = 'mics.wsgi.application'
+WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -173,6 +175,7 @@ INSTALLED_APPS = (
     'rapidsms.backends.database',
     'rapidsms.contrib.httptester',
     'django_rq',
+    'ws4redis',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -215,6 +218,10 @@ LOGGING = {
 }
 
 '''
+
+
+#DJANGO-WS CONFIG
+WEBSOCKET_URL = '/ws/'
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 

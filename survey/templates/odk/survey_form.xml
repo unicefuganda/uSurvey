@@ -160,6 +160,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 					</input>
 				{% endif %}
 				{% for question in batch.survey_questions %}
+					{% if question.loop_ender %}
+				       <repeat>
+					{% endif %}
 					{% if question.answer_type == answer_types.multichoiceanswer %}
 						<select1 ref="/survey/household/householdMember/b{{batch.pk}}/q{{question.pk}}">
 							<label>{{question.text}}</label>
@@ -201,7 +204,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 						<label>{{question.text}}</label>
 					</input>
 					{% endif %}
-
+					{% if question.loop_starter %}
+					</repeat>
+					{% endif %}
 				{% endfor %}
 			</group>
 		{% endfor %}

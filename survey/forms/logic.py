@@ -11,19 +11,20 @@ class LogicForm(forms.Form):
     REANSWER = 'REANSWER'
     ASK_SUBQUESTION = 'ASK_SUBQUESTION'
     BACK_TO = 'BACK_TO'
+    BACK_TO_ACTION = 'BACK TO'
+    ACTIONS = {
+            END_INTERVIEW : 'END INTERVIEW',
+            SKIP_TO: 'SKIP TO',
+            REANSWER: 'RECONFIRM',
+            BACK_TO: BACK_TO_ACTION,
+            ASK_SUBQUESTION: 'ASK SUBQUESTION',
+    }
     def __init__(self, initial=None, question=None, *args, **kwargs):
         super(LogicForm, self).__init__(initial=initial, *args, **kwargs)
         data = kwargs.get('data', None)
         batch = question.batch
         self.question = question
         self.batch = batch
-        self.ACTIONS = {
-            self.END_INTERVIEW : 'END INTERVIEW',
-            self.SKIP_TO: 'SKIP TO',
-            self.REANSWER: 'RECONFIRM',
-            self.BACK_TO: 'BACK TO',
-            self.ASK_SUBQUESTION: 'ASK SUBQUESTION',
-        }
         self.fields['condition'] = forms.ChoiceField(label='Eligibility criteria', choices=[], widget=forms.Select,
                                   required=False)
         self.fields['attribute'] = forms.ChoiceField(label='Attribute', choices=[('value', 'Value'), ],

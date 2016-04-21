@@ -25,6 +25,7 @@ def _add_error_response_message(interviewer, request,action_text):
     messages.error(request, error_message + "See errors below.")
 
 def _create_or_edit(request, action_text, interviewer=None):
+    extra = 1
     request.breadcrumbs([
         ('Interviewers', reverse('interviewers_page')),
     ])
@@ -40,10 +41,8 @@ def _create_or_edit(request, action_text, interviewer=None):
         if odk_accesses.exists():
             odk_instance = odk_accesses[0]
         data = data or dict([(loc.type.name, loc.pk) for loc in interviewer.ea.parent_locations()])
-    if interviewer.ussd_access.exists():
-        extra = 0
-    else:
-        extra = 1
+        if interviewer.ussd_access.exists():
+            extra = 0
     locations_filter = LocationsFilterForm(data=data)
     if data:
         eas = locations_filter.get_enumerations()

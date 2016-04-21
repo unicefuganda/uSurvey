@@ -251,4 +251,3 @@ def submission(request):
                                                         "desc" : str(ex)
                                                     }, {'desc' : str(ex)}, request, logging.WARNING)
         return OpenRosaServerError(u"An error occurred. Please try again")
-

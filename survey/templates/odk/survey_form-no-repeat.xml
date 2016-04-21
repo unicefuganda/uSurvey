@@ -32,7 +32,13 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% for batch in survey_batches %}
 		<b{{batch.pk}}>
 	   		{% for question in batch.survey_questions %}
-				<q{{question.pk}} />
+	           {% if question.is_loop_start %}
+	   			  <q{{question.pk}}q{{question.loop_ender.pk}}>
+	           {% endif %}
+					<q{{question.pk}} />
+	   			{% if question.is_loop_end %}
+	   			  <q{{question.loop_starter.pk}}q{{question.pk}}>
+	           {% endif %}
 			{% endfor %}
 		</b{{batch.pk}}>
 	{% endfor %}
@@ -134,6 +140,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 			<label>{{ batch.name }}</label>
 			<hint>{{ batch.description }}</hint>
 			{% for question in batch.survey_questions %}
+				{% if question.is_loop_start %}
+			     <repeat nodeset="/survey/b{{batch.pk}}/q{{question.pk}}q{{question.loop_ender.pk}}">
+			    {% endif %}
 				{% get_odk_mem_question question as member_question %}
 				{% if question.answer_type == answer_types.multichoiceanswer %}
 					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
@@ -176,7 +185,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<label>{{member_question}}</label>
 				</input>
 				{% endif %}
-
+				{% if question.is_loop_end %}
+				 </repeat>
+				{% endif %}
 			{% endfor %}
 		</group>
 	{% endfor %}
