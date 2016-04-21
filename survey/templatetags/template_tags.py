@@ -265,7 +265,9 @@ def is_relevant_odk(context, question, interviewer, registered_households):
         connecting_flows = question.connecting_flows.all()
         if null_flows:
             null_flow = null_flows[0]
-            null_condition = ["string-length(%s) &gt; 0" % node_path, ]
+            null_condition = ['true()', ]
+            if question.flows.filter(desc=LogicForm.BACK_TO_ACTION).exists() is False:
+                null_condition.append("string-length(%s) &gt; 0" % node_path)
             # null_condition = ['true()', ]
             if len(flow_conditions) > 0:
                 null_condition.append('not (%s)' % ' or '.join(flow_conditions))
