@@ -12,6 +12,7 @@ from dateutil import relativedelta
 from datetime import date
 import json, inspect
 from django.utils import html
+from survey.forms.logic import LogicForm
 
 register = template.Library()
 
@@ -204,6 +205,10 @@ def  get_download_url(request, url_name, instance=None):
         return request.build_absolute_uri(reverse(url_name, args=(instance.pk, )))
 
 @register.assignment_tag
+def get_question_path(question):
+    return get_node_path(question)
+
+@register.assignment_tag
 def  get_odk_mem_question(question):
     surname = HouseholdMember._meta.get_field('surname')
     first_name = HouseholdMember._meta.get_field('first_name')
@@ -219,6 +224,15 @@ def  get_odk_mem_question(question):
     question_context = template.Context(context)
     return template.Template(html.escape(question.text)).render(question_context)
 
+def get_node_path(question):
+    looper_flow = question.looper_flow
+    batch = question.batch
+    if looper_flow:
+        return '/survey/b%s/q%sq%s/q%s' % (batch.pk,
+                                          looper_flow.question.pk, looper_flow.next_question.pk,
+                                          question.pk)
+    #should take account with looping question
+    return '/survey/b%s/q%s' % (batch.pk, question.pk)
 
 @register.assignment_tag(takes_context=True)
 def is_relevant_odk(context, question, interviewer, registered_households):
@@ -231,8 +245,8 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                                 ' or '.join(context.get(question.pk, [default_relevance, ])),
                                 is_relevant_by_group(context, question, registered_households)
                                 )
-    flows = question.flows.all()
-    node_path = '/survey/b%s/q%s' % (batch.pk, question.pk)
+    flows = question.flows.exclude(desc=LogicForm.BACK_TO_ACTION) #do not include back to flows to this
+    node_path = get_node_path(question)
     flow_conditions = []
     if flows:
         for flow in flows:

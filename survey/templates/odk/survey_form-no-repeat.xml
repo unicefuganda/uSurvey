@@ -32,7 +32,13 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% for batch in survey_batches %}
 		<b{{batch.pk}}>
 	   		{% for question in batch.survey_questions %}
-				<q{{question.pk}} />
+	           {% if question.is_loop_start %}
+	   			  <q{{question.looper_flow.question.pk}}q{{question.pk}}>
+	           {% endif %}
+					<q{{ question.pk }} />
+	   			{% if question.is_loop_end %}
+	   			  </q{{question.pk}}q{{question.looper_flow.next_question.pk}}>
+	           {% endif %}
 			{% endfor %}
 		</b{{batch.pk}}>
 	{% endfor %}
@@ -59,8 +65,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 
 	{% for batch in survey_batches  %}
 		{% for question in batch.survey_questions %}
+		{% get_question_path question as question_path %}
 		{% is_relevant_odk question interviewer registered_households as relevance_context %}
-			<bind nodeset="/survey/b{{batch.pk}}/q{{question.pk}}"
+			<bind nodeset="{{ question_path }}"
 				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
 				required="true()"
 				relevant="{{ relevance_context }}"/>
@@ -134,9 +141,13 @@ xmlns:jr="http://openrosa.org/javarosa">
 			<label>{{ batch.name }}</label>
 			<hint>{{ batch.description }}</hint>
 			{% for question in batch.survey_questions %}
+				{% get_question_path question as question_path %}
+				{% if question.is_loop_start %}
+			     <repeat nodeset="/survey/b{{batch.pk}}/q{{question.looper_flow.question.pk}}q{{question.pk}}">
+			    {% endif %}
 				{% get_odk_mem_question question as member_question %}
 				{% if question.answer_type == answer_types.multichoiceanswer %}
-					<select1 ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+					<select1 ref="{{ question_path }}">
 						<label>{{member_question}}</label>
 						{% for option in question.options.all %}
 						<item>
@@ -146,7 +157,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 						{% endfor %}
 					</select1>
 				{% elif question.answer_type == answer_types.multiselectanswer %}
-					<select ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+					<select ref="{{ question_path }}">
 						<label>{{member_question}}</label>
 						{% for option in question.options.all %}
 						<item>
@@ -156,27 +167,29 @@ xmlns:jr="http://openrosa.org/javarosa">
 						{% endfor %}
 					</select>
 				{% elif question.answer_type == answer_types.imageanswer %}
-					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
+					<upload ref="{{ question_path }}"   appearance="annotate" mediatype="image/*">
 						<label>{{member_question}}</label>
 					</upload>
 				{% elif question.answer_type == answer_types.audioanswer %}
-					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}"   mediatype="audio/*">
+					<upload ref="{{ question_path }}"   mediatype="audio/*">
 						<label>{{member_question}}</label>
 					</upload>
 				{% elif question.answer_type == answer_types.videoanswer %}
-					<upload ref="/survey/b{{batch.pk}}/q{{question.pk}}" mediatype="video/*">
+					<upload ref="{{ question_path }}" mediatype="video/*">
 						<label>{{member_question}}</label>
 					</upload>
                 {% elif question.answer_type == answer_types.dateanswer %}
-				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}" appearance="no-calendar">
+				<input ref="{{ question_path }}" appearance="no-calendar">
 					<label>{{member_question}}</label>
 				</input>
 				{% else %}
-				<input ref="/survey/b{{batch.pk}}/q{{question.pk}}">
+				<input ref="{{ question_path }}">
 					<label>{{member_question}}</label>
 				</input>
 				{% endif %}
-
+				{% if question.is_loop_end %}
+				 </repeat>
+				{% endif %}
 			{% endfor %}
 		</group>
 	{% endfor %}

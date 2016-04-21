@@ -195,7 +195,14 @@
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-
+    {% if user.is_authenticated %}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/ws4redis.js"></script>
+    <script>
+        ws_uri = '{{ WEBSOCKET_URI }}';
+        ws_heartbeat = '{{WS4REDIS_HEARTBEAT}}';
+    </script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/statusbar.js"></script>
+    {% endif %}
 </head>
 <body>
 <div id="loader-wrapper">

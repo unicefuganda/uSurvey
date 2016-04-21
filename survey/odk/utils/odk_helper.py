@@ -382,7 +382,7 @@ def response_with_mimetype_and_name(
             response = HttpResponseNotFound(
                 _(u"The requested file could not be found."))
     else:
-        response = HttpResponse(mimetype=mimetype)
+        response = HttpResponse(content_type=mimetype)
     response['Content-Disposition'] = disposition_ext_and_date(
         name, extension, show_date)
     return response

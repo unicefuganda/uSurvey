@@ -6,6 +6,7 @@ from survey.models.surveys import Survey
 from survey.models.base import BaseModel
 from survey.utils.views_helper import get_descendants
 from survey.models.questions import Question, QuestionFlow
+from survey.forms.logic import LogicForm
 from survey.models.access_channels import InterviewerAccess
 # from survey.models.enumeration_area import EnumerationArea
 from survey.models.interviews import AnswerAccessDefinition, Answer
@@ -40,6 +41,12 @@ class Batch(BaseModel):
 
     def can_be_deleted(self):
         return True, ''
+
+    def get_looper_flow(self, question):
+        try:
+            return question.connecting_flows.get(desc=LogicForm.BACK_TO_ACTION)
+        except QuestionFlow.DoesNotExist:
+            return first_inline_flow_with_desc(question, LogicForm.BACK_TO_ACTION)
 
     def non_response_enabled(self, ea):
         locations = set()
@@ -190,6 +197,17 @@ def last_inline(question, flows):
     except QuestionFlow.DoesNotExist:
         return question
 
+
+def first_inline_flow_with_desc(question, desc):
+    try:
+        if question.flows.filter(desc=desc).exists():
+            return question.flows.get(desc=desc)
+        if question.connecting_flows.filter(desc=desc).exists():
+            return None
+        iflow = question.flows.get(validation_test__isnull=True, next_question__isnull=False)
+        return first_inline_flow_with_desc(iflow.next_question, desc)
+    except QuestionFlow.DoesNotExist:
+        return None
 
 def inline_questions(question, flows):
     questions = [question, ]

@@ -12,6 +12,7 @@ from model_utils.managers import InheritanceManager
 from collections import OrderedDict
 
 
+
 class Question(BaseModel):
     ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
     identifier = models.CharField(max_length=100, blank=False, null=True, verbose_name='Variable Name')
@@ -27,6 +28,32 @@ class Question(BaseModel):
     class Meta:
         app_label = 'survey'        
         unique_together = [('identifier', 'batch'), ]
+
+    def is_loop_start(self):
+        from survey.forms.logic import LogicForm
+        return self.connecting_flows.filter(desc=LogicForm.BACK_TO_ACTION).exists() #actually the more correct way is to
+                                                                 # check if the next is previous
+
+    def is_loop_end(self):
+        from survey.forms.logic import LogicForm
+        return self.flows.filter(desc=LogicForm.BACK_TO_ACTION).exists() #actually the more correct way is
+                                                                        #to check if connecting quest is asked after
+
+    @property
+    def loop_ender(self):
+        try:
+            from survey.forms.logic import LogicForm
+            return self.connecting_flows.get(desc=LogicForm.BACK_TO_ACTION).question
+        except QuestionFlow.DoesNotExist:
+            inlines = self.batch.questions_inline()
+
+
+    @property
+    def looper_flow(self):
+        return self.batch.get_looper_flow(self)
+
+    # def loop_inlines(self):
+
 
     def delete(self, using=None):
         '''
