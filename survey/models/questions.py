@@ -10,6 +10,8 @@ from survey.models.households import Household
 from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
 from collections import OrderedDict
+from ordered_set import OrderedSet
+from survey.forms.logic import LogicForm
 
 
 
@@ -101,6 +103,10 @@ class Question(BaseModel):
             else:
                 previous.append(q)
         return set(previous)
+
+    def direct_sub_questions(self):
+        sub_flows = self.flows.filter(desc=LogicForm.SUBQUESTION_ACTION, validation_test__isnull=False)
+        return OrderedSet([flow.question for flow in sub_flows])
     
     def conditional_flows(self):
         return self.flows.filter( validation_test__isnull=False)

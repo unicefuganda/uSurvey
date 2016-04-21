@@ -12,12 +12,13 @@ class LogicForm(forms.Form):
     ASK_SUBQUESTION = 'ASK_SUBQUESTION'
     BACK_TO = 'BACK_TO'
     BACK_TO_ACTION = 'BACK TO'
+    SUBQUESTION_ACTION = 'ASK SUBQUESTION'
     ACTIONS = {
             END_INTERVIEW : 'END INTERVIEW',
             SKIP_TO: 'SKIP TO',
             REANSWER: 'RECONFIRM',
             BACK_TO: BACK_TO_ACTION,
-            ASK_SUBQUESTION: 'ASK SUBQUESTION',
+            ASK_SUBQUESTION: SUBQUESTION_ACTION,
     }
     def __init__(self, initial=None, question=None, *args, **kwargs):
         super(LogicForm, self).__init__(initial=initial, *args, **kwargs)
