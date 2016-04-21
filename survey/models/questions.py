@@ -105,7 +105,7 @@ class Question(BaseModel):
     def direct_sub_questions(self):
         from survey.forms.logic import LogicForm
         sub_flows = self.flows.filter(desc=LogicForm.SUBQUESTION_ACTION, validation_test__isnull=False)
-        return OrderedSet([flow.question for flow in sub_flows])
+        return OrderedSet([flow.next_question for flow in sub_flows])
     
     def conditional_flows(self):
         return self.flows.filter( validation_test__isnull=False)
