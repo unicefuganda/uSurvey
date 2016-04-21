@@ -49,12 +49,8 @@ class Question(BaseModel):
 
 
     @property
-    def loop_starter(self):
-        try:
-            from survey.forms.logic import LogicForm
-            return self.flows.get(desc=LogicForm.BACK_TO_ACTION).next_question
-        except QuestionFlow.DoesNotExist:
-            pass
+    def looper_flow(self):
+        return self.batch.get_looper_flow(self)
 
     # def loop_inlines(self):
 
