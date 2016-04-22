@@ -51,6 +51,7 @@ Filenaming convention:
 * for tests: test_[[OBJECT]]_[[ACTION]].py
 e.g: test_location_form.py, test_location_model.py, test_location_views.py
 
+
 ====
 
 
