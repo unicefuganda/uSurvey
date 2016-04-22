@@ -21,7 +21,7 @@ from survey.models import Survey, Interviewer, Interview, SurveyAllocation, ODKA
             SurveyHouseholdListing, HouseholdListing
 from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.odk.utils.log import logger
-from survey.tasks import execute
+#from survey.tasks import execute
 from functools import wraps
 from survey.utils.zip import InMemoryZip
 from django.contrib.sites.models import Site
