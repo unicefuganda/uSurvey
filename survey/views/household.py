@@ -74,7 +74,7 @@ def household_filter(request):
         all_households = get_filterset(all_households, request.GET['q'], search_fields)
     all_households =  all_households.values('id', 'house_number', ).order_by('name')
     json_dump = json.dumps(list(all_households), cls=DjangoJSONEncoder)
-    return HttpResponse(json_dump, mimetype='application/json')
+    return HttpResponse(json_dump, content_type='application/json')
 
 def view_household(request, household_id):
     household = Household.objects.get(id=household_id)
