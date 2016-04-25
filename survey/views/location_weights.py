@@ -9,11 +9,6 @@ from survey.models import LocationType, Location
 from survey.forms.upload_csv_file import UploadWeightsForm
 from survey.models import LocationWeight, LocationTypeDetails, UploadErrorLog, Survey
 from survey.forms.enumeration_area import LocationsFilterForm
-<<<<<<< HEAD
-from django_rq import job
-=======
-#from survey.tasks import upload_task
->>>>>>> fcf474e45aa7683ef9c85f0027e830aa0915965a
 from survey.views.location_widget import LocationWidget
 from survey.utils.views_helper import contains_key
 from django.core.urlresolvers import reverse
@@ -33,12 +28,7 @@ def upload(request):
     if request.method == 'POST':
         upload_form = UploadWeightsForm(request.POST, request.FILES)
         if upload_form.is_valid():
-<<<<<<< HEAD
             begin_upload.delay(upload_form)
-=======
-            #upload_task.delay(upload_form)
-            uploadtask.delay(composer)
->>>>>>> fcf474e45aa7683ef9c85f0027e830aa0915965a
             messages.warning(request, "Upload in progress. This could take a while.")
             return HttpResponseRedirect('/locations/weights/upload/')
 

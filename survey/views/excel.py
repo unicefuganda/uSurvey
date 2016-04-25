@@ -11,10 +11,6 @@ from survey.models import Survey, Interviewer
 from survey.models import Batch, LocationType, Household
 from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 from survey.utils.views_helper import contains_key
-<<<<<<< HEAD
-=======
-#from survey.tasks import email_task
->>>>>>> fcf474e45aa7683ef9c85f0027e830aa0915965a
 from survey.forms.enumeration_area import LocationsFilterForm
 from django.core.urlresolvers import reverse
 from survey.utils.zip import InMemoryZip
