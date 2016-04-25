@@ -1,3 +1,4 @@
+python-Levenshtein
 Django==1.8
 psycopg2==2.5
 django-nose==1.4
