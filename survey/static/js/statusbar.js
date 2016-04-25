@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
     }
 
 var downloadStatus = null;
-var presentCotext = null;
+var presentContext = null;
 var indeterminateProgress = null;
 get_status_update = function(status) {
     switch(status) {
@@ -51,13 +51,12 @@ updateDownloadStatus = function(msg) {
     if(msg.expired)
         return status_msg.html('...');
     //handle status update on screen
-    if(presentCotext==null || msg.context_id == presentCotext) {
+    if(presentContext==null || msg.context_id == presentContext) {
         status_update = get_status_update(msg.status);
         present_status = get_status_update(downloadStatus);
         if(status_update > present_status) {
             var status_bar = $('#status-bar');
             status_bar.show();
-
             switch(msg.status){
                 case 'WIP':
                     status_msg.html(msg.content);
@@ -75,7 +74,7 @@ updateDownloadStatus = function(msg) {
             };
         };
     };
-    presentCotext = msg.context_id;
+    presentContext = msg.context_id;
 };
 
 

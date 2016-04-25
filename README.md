@@ -22,10 +22,12 @@ Installation
 
         mkvirtualenv mics
 
-        pip install -r pip-requires.txt
+        pip install -U -r pip-requires.txt
 
         python manage.py syncdb --noinput
 
+        python manage.py makemigrations
+        
         python manage.py migrate
 
         python manage.py runserver
