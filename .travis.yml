@@ -38,11 +38,8 @@ before_script:
 
 # command to run tests
 script:
-  - coverage run manage.py test
+  - python manage.py test
   - python manage.py harvest survey
-
-after_success:
-  - coveralls
 
 after_failure:
   - tar -cvzf screenshots-$TRAVIS_BUILD_ID-$TRAVIS_JOB_ID.tar.gz screenshots
