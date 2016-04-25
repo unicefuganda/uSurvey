@@ -1,7 +1,6 @@
 from django.template.defaultfilters import slugify
 from django.test import TestCase
 from survey.forms.locations import LocationTypeForm, LocationForm
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 
 

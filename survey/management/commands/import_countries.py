@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand, CommandError
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from django.template.defaultfilters import slugify
 import csv

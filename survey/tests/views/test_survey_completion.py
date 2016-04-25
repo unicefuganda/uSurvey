@@ -108,8 +108,8 @@ class TestSurveyCompletion(BaseTest):
 
     def test_knows_to_retrieve_completion_for_locations_that_have_no_tree_parent_if_country_type_does_not_exist(self):
         LocationType.objects.filter(name__iexact='country').delete()
-        location_with_no_parent = Location.objects.create(name='Abim', parent=self.uganda, type=self.city)
-        another_location_with_no_parent = Location.objects.create(name='Kampala', parent=self.uganda, type=self.city)
+        location_with_no_parent = Location.objects.create(name='Unganda1', type=self.country)
+        another_location_with_no_parent = Location.objects.create(name='Unganda12', type=self.country)
         form_data = {'survey': self.batch.survey.id, 'location': location_with_no_parent.id, 'batch': str(self.batch.pk), 'ea': self.kampala_ea.id}
         response = self.client.post('/surveys/completion/', data=form_data)
         self.assertIsNotNone(response.context['request'])
