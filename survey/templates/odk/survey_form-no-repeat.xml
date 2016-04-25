@@ -67,6 +67,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% for question in batch.survey_questions %}
 		{% get_question_path question as question_path %}
 		{% is_relevant_odk question interviewer registered_households as relevance_context %}
+	        {% if question.is_loop_start %}
+			<bind nodeset="/survey/b{{batch.pk}}/q{{question.looper_flow.question.pk}}q{{question.pk}}" relevant="{{ relevance_context }}" />
+			{% endif %}
 			<bind nodeset="{{ question_path }}"
 				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
 				required="true()"
