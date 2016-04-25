@@ -1,5 +1,4 @@
 from random import randint
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.models import LocationTypeDetails, EnumerationArea
 from survey.tests.base_test import BaseTest

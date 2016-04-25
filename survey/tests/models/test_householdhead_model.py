@@ -1,7 +1,6 @@
 from datetime import date
 from django.test import TestCase
 from django.template.defaultfilters import slugify
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import LocationType, Location
 from survey.models import Interviewer, Backend, EnumerationArea
 from survey.models.households import HouseholdHead, Household, HouseholdMember, HouseholdListing, SurveyHouseholdListing

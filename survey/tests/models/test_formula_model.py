@@ -1,8 +1,6 @@
-# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from datetime import date
 from random import randint
 
-from rapidsms.contrib.locations.models import Location
 from survey.models.locations import Location,LocationType
 from survey.models import Batch, HouseholdMemberGroup, QuestionModule, HouseholdListing,GroupCondition, Question, Formula, Backend, Interviewer, Household, QuestionOption, Survey, EnumerationArea
 from survey.models import HouseholdHead, LocationTypeDetails

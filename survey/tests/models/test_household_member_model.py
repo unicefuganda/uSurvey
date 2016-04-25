@@ -1,7 +1,6 @@
 from datetime import date, datetime, timedelta
 
 from django.template.defaultfilters import slugify
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from django.utils.timezone import utc
 from mock import patch

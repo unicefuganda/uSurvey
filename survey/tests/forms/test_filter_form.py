@@ -1,5 +1,4 @@
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location
 from survey.models.locations import *
 from survey.forms.filters import QuestionFilterForm, IndicatorFilterForm, LocationFilterForm, SurveyBatchFilterForm
 from survey.models import Question, QuestionModule, HouseholdMemberGroup, Indicator, Batch, Survey, EnumerationArea

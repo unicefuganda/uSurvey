@@ -1,6 +1,5 @@
 from datetime import date, datetime
 from django.test import TestCase
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import LocationType, Location
 from survey.models import HouseholdMemberGroup, LocationTypeDetails, GroupCondition, Backend, Interviewer, Household, Question, HouseholdMemberBatchCompletion, Batch, QuestionModule, EnumerationArea
 # from survey.models.batch_question_order import BatchQuestionOrder

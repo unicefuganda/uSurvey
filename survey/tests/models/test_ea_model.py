@@ -1,4 +1,3 @@
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import Location, LocationType
 from survey.models import Survey, LocationTypeDetails, Interviewer, Household, HouseholdListing, SurveyHouseholdListing, HouseholdMember
 from survey.models.householdgroups import HouseholdMemberGroup

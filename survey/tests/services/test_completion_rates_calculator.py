@@ -1,7 +1,6 @@
 from datetime import date, datetime
 from django.template.defaultfilters import slugify
 from mock import patch
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.models import Batch, Interviewer, Household, Question, Backend, Survey, HouseholdMemberBatchCompletion, EnumerationArea, \
     HouseholdListing, SurveyHouseholdListing, QuestionModule, HouseholdMemberGroup

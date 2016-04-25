@@ -6,7 +6,6 @@ from mock import *
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.models import LocationTypeDetails, EnumerationArea, HouseholdListing
 from survey.models.households import HouseholdMember, HouseholdHead, Household

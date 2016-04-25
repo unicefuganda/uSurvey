@@ -1,6 +1,5 @@
 from datetime import date
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models import Batch, Survey, LocationTypeDetails, EnumerationArea, Household, HouseholdListing, SurveyHouseholdListing, QuestionModule
 from survey.templatetags.template_tags import *
 from survey.views.location_widget import LocationWidget

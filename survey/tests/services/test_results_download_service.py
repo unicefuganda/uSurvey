@@ -1,5 +1,4 @@
 from datetime import date
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
 from survey.models import Survey, HouseholdMember, Batch, Interviewer, Backend, HouseholdMemberGroup, \
     QuestionModule, Question, LocationTypeDetails, QuestionOption, GroupCondition, EnumerationArea, \

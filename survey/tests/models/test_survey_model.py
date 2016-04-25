@@ -1,10 +1,8 @@
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import Location, LocationType
 from survey.forms.surveys import SurveyForm
 from survey.models import Batch, Interviewer, SurveyAllocation,Backend, Household, HouseholdHead, \
     HouseholdMemberBatchCompletion, EnumerationArea, Question, HouseholdMemberGroup, QuestionModule
-# from survey.models.batch_question_order import BatchQuestionOrder
 from survey.models.households import HouseholdMember, HouseholdListing, SurveyHouseholdListing
 from survey.models.surveys import Survey
 

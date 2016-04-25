@@ -5,7 +5,6 @@ from django.test.client import Client
 from django.contrib.auth.models import User, Group, Permission
 
 from django.contrib.contenttypes.models import ContentType
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.forms.filters import SurveyBatchFilterForm
 from survey.models import GroupCondition, HouseholdMemberGroup, EnumerationArea, QuestionModule

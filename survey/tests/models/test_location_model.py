@@ -1,9 +1,5 @@
-# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from django.test import TestCase
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import LocationType, Location
-#Eswar commented LocationAutoComplete as model not available
-# from survey.models import LocationAutoComplete
 
 
 class LocationTest(TestCase):

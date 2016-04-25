@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadEAForm
 from survey.models import Survey, LocationTypeDetails, EnumerationArea, Batch

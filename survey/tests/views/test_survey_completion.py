@@ -3,7 +3,6 @@ import json
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.test import Client
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
 from survey.models import Survey, Batch, Indicator, Household, Question, HouseholdMemberGroup, \
     HouseholdMemberBatchCompletion, Backend, LocationTypeDetails, EnumerationArea, Interviewer, HouseholdListing, \

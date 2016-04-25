@@ -2,7 +2,6 @@ from django.template.defaultfilters import slugify
 from datetime import date, datetime, timedelta
 from django.test import TestCase
 from mock import patch
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
 from survey.models import HouseholdMemberGroup, GroupCondition, Question, Batch, HouseholdMemberBatchCompletion, \
     NumericalAnswer, Survey, EnumerationArea, QuestionModule

@@ -1,5 +1,4 @@
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location
 from survey.models import EnumerationArea
 
 from survey.models.batch import Batch

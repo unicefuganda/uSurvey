@@ -2,7 +2,6 @@ from datetime import date
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test.client import Client
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import Location,LocationType
 from survey.forms.householdMember import HouseholdMemberForm
 from survey.models.households import HouseholdMember, HouseholdHead, Household, HouseholdListing, SurveyHouseholdListing
@@ -11,7 +10,6 @@ from survey.models.interviewer import Interviewer
 from survey.tests.base_test import BaseTest
 from survey.models import EnumerationArea, Survey
 
-#Eswar check HouseholdForm with Tony
 class HouseholdMemberViewsTest(BaseTest):
     def setUp(self):
         raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')

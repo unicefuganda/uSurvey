@@ -1,7 +1,6 @@
 from datetime import date
 from django.test.client import Client
 from django.contrib.auth.models import User
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.interviewer_configs import PRIME_LOCATION_TYPE
 from survey.models import HouseholdMemberGroup, QuestionModule, Interviewer, GroupCondition, EnumerationArea

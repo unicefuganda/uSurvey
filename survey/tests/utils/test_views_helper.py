@@ -1,5 +1,4 @@
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.models import LocationTypeDetails
 from survey.utils.views_helper import contains_key, get_descendants, get_ancestors, clean_query_params, prepend_to_keys

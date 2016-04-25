@@ -1,5 +1,4 @@
 import os
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
 from survey.models import LocationTypeDetails, UploadErrorLog
 from survey.services.location_upload import UploadLocation

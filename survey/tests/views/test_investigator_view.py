@@ -3,7 +3,6 @@ import json
 from django.test.client import Client
 from mock import *
 from django.template.defaultfilters import slugify
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from django.contrib.auth.models import User
 # from survey.interviewer_configs import COUNTRY_PHONE_CODE
