@@ -16,9 +16,6 @@ from django.core.urlresolvers import reverse
 from survey.utils.zip import InMemoryZip
 from django_rq import job, get_scheduler
 from rq import get_current_job
-from ws4redis.redis_store import SELF
-from ws4redis.publisher import RedisPublisher
-from ws4redis.redis_store import RedisMessage
 import json
 from django.core.cache import cache
 from channels import Group

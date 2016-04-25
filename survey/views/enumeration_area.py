@@ -13,7 +13,6 @@ from survey.services.ea_upload import UploadEACSVLayoutHelper
 from django_rq import job
 import json
 from survey.utils.query_helper import get_filterset
-from django_rq import job
 
 
 @job('upload_task')
