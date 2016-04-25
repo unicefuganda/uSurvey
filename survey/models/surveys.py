@@ -8,7 +8,7 @@ from survey.models.households import Household
 class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False, null=True, unique=True)
     description = models.CharField(max_length=300, blank=True, null=True)
-    sample_size = models.PositiveIntegerField(max_length=2, null=False, blank=False, default=10)
+    sample_size = models.PositiveIntegerField(null=False, blank=False, default=10)
     has_sampling = models.BooleanField(default=True, verbose_name='Survey Type')
     preferred_listing = models.ForeignKey('Survey', related_name='householdlist_users',
                                           help_text='Select which survey household listing to reuse. Leave empty for fresh listing',

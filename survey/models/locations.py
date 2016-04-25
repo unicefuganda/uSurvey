@@ -1,11 +1,26 @@
 from django.db import models
 # from django.db.models.signals import post_save
-# from django.dispatch import receiver
-    # from rapidsms.contrib.locations.models import Location, LocationType, Point
-from rapidsms.contrib.locations.models import Point
 from mptt.models import MPTTModel, TreeForeignKey
 from mptt.managers import TreeManager
 from survey.models.base import BaseModel
+
+
+class Point(BaseModel):
+    """
+    This model represents an anonymous point on the globe. It should be
+    replaced with something from GeoDjango soon, but I can't seem to get
+    Spatialite to build right now...
+    """
+
+    latitude  = models.DecimalField(max_digits=13, decimal_places=10)
+    longitude = models.DecimalField(max_digits=13, decimal_places=10)
+
+    def __unicode__(self):
+        return "%s, %s" % (self.latitude, self.longitude)
+
+    def __repr__(self):
+        return '<%s: %s>' %\
+            (type(self).__name__, self)
 
 
 class LocationType(MPTTModel, BaseModel):

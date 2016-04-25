@@ -19,9 +19,7 @@ from survey.models import Survey, Interviewer, Interview, SurveyAllocation, ODKA
             Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer, \
             VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer, GeopointAnswer, \
             SurveyHouseholdListing, HouseholdListing
-from survey.interviewer_configs import NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.odk.utils.log import logger
-from survey.tasks import execute
 from functools import wraps
 from survey.utils.zip import InMemoryZip
 from django.contrib.sites.models import Site
@@ -266,7 +264,7 @@ def save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing):
             )
     return non_responses
 
-@transaction.autocommit
+#@transaction.autocommit
 def process_submission(interviewer, xml_file, media_files=[], request=None):
     """
     extract surveys and for this xml file and for specified household member

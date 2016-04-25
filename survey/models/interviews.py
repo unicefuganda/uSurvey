@@ -6,7 +6,7 @@ from django.db import models
 from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
 from survey.models.base import BaseModel
 from dateutil.parser import parse as extract_date
-from rapidsms.contrib.locations.models import Point
+from survey.models.locations import Point
 from django import template
 from survey.interviewer_configs import MESSAGES
 from survey.utils.decorators import static_var
@@ -246,7 +246,7 @@ class Answer(BaseModel):
         get_latest_by = 'created'
 
 class NumericalAnswer(Answer):
-    value = models.PositiveIntegerField(max_length=5, null=True)
+    value = models.PositiveIntegerField(null=True)
 
     @classmethod
     def validators(cls):
@@ -356,7 +356,7 @@ class MultiChoiceAnswer(Answer):
         return super(MultiChoiceAnswer, cls).equals(answer, txt)
 
 class MultiSelectAnswer(Answer):
-    value = models.ManyToManyField("QuestionOption", null=True)
+    value = models.ManyToManyField("QuestionOption", )
 
     @classmethod
     def create(cls, interview, question, answer):

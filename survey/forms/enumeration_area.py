@@ -16,6 +16,7 @@ class EnumerationAreaForm(ModelForm):
 
     class Meta:
         model = EnumerationArea
+        exclude = []
         widgets = {
             'name': forms.TextInput(attrs={"id": 'ea_name', "class": 'enumeration_area'}),
             'total_households' : forms.TextInput({'id' : 'total_households',  "class": 'enumeration_area'}),

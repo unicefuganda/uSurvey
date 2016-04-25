@@ -17,7 +17,7 @@ from ordered_set import OrderedSet
 ALL_GROUPS = HouseholdMemberGroup.objects.all()
 ALL_ANSWERS = Answer.answer_types()
 class Batch(BaseModel):
-    order = models.PositiveIntegerField(max_length=2, null=True)
+    order = models.PositiveIntegerField(null=True)
     name = models.CharField(max_length=100, blank=False, null=True,db_index=True)
     description = models.CharField(max_length=300, blank=True, null=True)
     survey = models.ForeignKey(Survey, null=True, related_name="batches")

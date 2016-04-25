@@ -187,7 +187,7 @@ class QuestionFlow(BaseModel):
 
 class TestArgument(models.Model):
     objects = InheritanceManager()
-    flow = models.ForeignKey(QuestionFlow, related_name='"%(class)s"')
+    flow = models.ForeignKey(QuestionFlow, related_name='%(class)s')
     position = models.PositiveIntegerField()
     
     @classmethod

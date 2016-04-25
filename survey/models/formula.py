@@ -9,8 +9,8 @@ class Formula(BaseModel):
     numerator = models.ForeignKey(Question, null=True, related_name="as_numerator")
     groups = models.ForeignKey("HouseholdMemberGroup", null=True, blank=True, related_name="as_group")
     denominator = models.ForeignKey(Question, null=True, blank=True, related_name="as_denominator")
-    numerator_options = models.ManyToManyField(QuestionOption, null=True, blank=True, related_name='numerator_options')
-    denominator_options = models.ManyToManyField(QuestionOption, null=True, blank=True, related_name='denominator_options')
+    numerator_options = models.ManyToManyField(QuestionOption, related_name='numerator_options')
+    denominator_options = models.ManyToManyField(QuestionOption, related_name='denominator_options')
     count = models.ForeignKey(Question, null=True, blank=True, related_name="as_count")
     indicator = models.ForeignKey("Indicator", null=True, related_name="formula")
 

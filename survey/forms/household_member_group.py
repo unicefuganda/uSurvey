@@ -10,6 +10,7 @@ class HouseholdMemberGroupForm(ModelForm):
 
     class Meta:
         model = HouseholdMemberGroup
+        exclude = []
 
     def add_conditions(self, group):
         group.conditions.clear()

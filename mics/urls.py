@@ -7,6 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
+    (r'^admin/rq/', include('django_rq_dashboard.urls')),
     # Examples:
     # url(r'^$', 'mics.views.home', name='home'),
     # url(r'^mics/', include('mics.foo.urls')),
