@@ -60,61 +60,6 @@ class IndicatorFormulaViewsTest(BaseTest):
         self.assertRedirects(response, '/indicators/', 302, 200)
         self.assertIn(message, response.cookies['messages'].value)
 
-    def test_post_new_for_percentage_indicator_with_multichoice_denominator_question(self):
-        multichoice_question = Question.objects.create(identifier='123.4',text="This is a question123.4", answer_type='Numerical Answer',
-                                           group=self.group,batch=self.batch,module=self.question_mod)
-        option_1 = QuestionOption.objects.create(question=multichoice_question, text="OPTION 1", order=1)
-        option_2 = QuestionOption.objects.create(question=multichoice_question, text="OPTION 2", order=2)
-        option_3 = QuestionOption.objects.create(question=multichoice_question, text="Others", order=3)
-        option_4 = QuestionOption.objects.create(question=multichoice_question, text='Not Known', order=4)
-
-        data = {'numerator': self.question_1.id,
-                'denominator': multichoice_question.id,
-                'denominator_options': [option_1.id, option_2.id, option_3.id, option_4.id],
-                'denominator_type': 'QUESTION'}
-
-        all_formula_options = [option_1, option_2, option_3, option_4]
-
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
-
-        new_formula_url = '/indicators/%s/formula/new/' % self.indicator.id
-        response = self.client.post(new_formula_url, data=data)
-        message = "Formula for Indicator %s" % self.indicator.name
-
-        self.assertIn(message, response.content)
-        saved_formula = Formula.objects.filter(numerator=1, denominator=2)
-        saved_formula_question_options = saved_formula[0].denominator_options.all()
-
-        self.failUnless(saved_formula)
-
-    def test_post_new_for_percentage_indicator_with_multichoice_numerator_question(self):
-        multichoice_question1 = Question.objects.create(identifier='123.4',text="This is a question123.4", answer_type='Numerical Answer',
-                                           group=self.group,batch=self.batch,module=self.question_mod)
-
-        option_1 = QuestionOption.objects.create(question=multichoice_question1, text='Yes', order=1)
-        option_2 = QuestionOption.objects.create(question=multichoice_question1, text='No', order=2)
-        option_3 = QuestionOption.objects.create(question=multichoice_question1, text='Maybe', order=3)
-        option_4 = QuestionOption.objects.create(question=multichoice_question1, text='Not Known', order=4)
-
-        data = {'numerator': multichoice_question1.id,
-                'denominator': self.question_2.id,
-                'numerator_options': option_1.id,
-                'denominator_type': 'QUESTION'}
-
-        all_formula_options = [option_1, option_2, option_3, option_4]
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
-
-        new_formula_url = '/indicators/%s/formula/new/' % self.indicator.id
-        response = self.client.post(new_formula_url, data=data)
-        message = "Formula for Indicator %s" % self.indicator.name
-
-        self.assertIn(message, response.content)
-        saved_formula = Formula.objects.filter(numerator=1, denominator=self.question_2.id,
-                                               )
-        saved_formula_question_options = saved_formula[0].numerator_options.all()
-
-        self.failUnless(saved_formula)
-
     def test_post_new_for_percentage_indicator_with_multichoice_numerator_and_denominator_question(self):
         multichoice_question = Question.objects.create(identifier='123.4',text="This is a question123.4", answer_type='Numerical Answer',
                                            group=self.group,batch=self.batch,module=self.question_mod)

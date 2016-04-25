@@ -61,7 +61,7 @@ class HouseholdViewTest(BaseTest):
         response = self.client.get('/households/interviewers?ea=' + str(ea.id))
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
-        self.failUnlessEqual(result_investigator, {u'Investigator1': 2, u'Investigator': 1})
+        self.failUnlessEqual(result_investigator, {u'Investigator1': 49, u'Investigator': 50})
 
     def test_gets_only_investigators_who_are_not_blocked(self):
         country = LocationType.objects.create(name="Country", slug="country")
@@ -81,7 +81,7 @@ class HouseholdViewTest(BaseTest):
         response = self.client.get('/households/interviewers?ea=' + str(ea.id))
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
-        self.failUnlessEqual(result_investigator, {u'Investigator': 1})
+        self.failUnlessEqual(result_investigator, {u'Investigator': 53})
 
     def testlist_households(self):
         response = self.client.get('/households/')
@@ -109,7 +109,7 @@ class HouseholdViewTest(BaseTest):
         response = self.client.get('/households/interviewers?locations=')
         self.failUnlessEqual(response.status_code, 200)
         result_investigator = json.loads(response.content)
-        self.failUnlessEqual(result_investigator, {u'Investigator1': 2})
+        self.failUnlessEqual(result_investigator, {u'Investigator1': 52})
 
     def test_get_investigators_failures(self):
         response = self.client.get('/households/interviewers')

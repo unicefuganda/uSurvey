@@ -5,14 +5,8 @@ DATABASES = {
         "USER": "postgres",
         "PASSWORD": "",
         "HOST": "localhost",
-    },
+    }
 
-     'test':{
-       'ENGINE': 'django.db.backends.sqlite3',
-       'NAME':'test',
-       'USER':'',
-       'PASSWORD':''
-     },
 }
 
 CACHES = {

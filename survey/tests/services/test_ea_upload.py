@@ -62,7 +62,7 @@ class EAUploadTest(BaseTest):
 
     def test_should_return_false__and_message_if_location_tree_parent_does_not_match_one_provided(self):
         rtype1=LocationType.objects.create(name="Region1",slug="region")
-        region = Location.objects.create(name="region name not matching the one in first row of file", type=rtype1)
+        region = Location.objects.create(name="region name not matching", type=rtype1)
         dtype1=LocationType.objects.create(name="District",slug="district",parent=rtype1)
         district = Location.objects.create(name="district1",parent=region,type=dtype1)
         ctype1=LocationType.objects.create(name="County",slug="county",parent=dtype1)

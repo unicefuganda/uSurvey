@@ -21,7 +21,7 @@ def _process_new_request(request, formula_form, new_formula_url, indicator):
             denominator_question = formula_form.cleaned_data.get('denominator', None)
             numerator_question = formula_form.cleaned_data.get('numerator', None)
             numerator_question_options = formula_form.cleaned_data.get('numerator_options', None)
-            
+
             formula = Formula.objects.create(numerator=numerator_question, denominator=denominator_question,
                                              indicator=indicator, groups=groups)
             formula.save_numerator_options(numerator_question_options)
