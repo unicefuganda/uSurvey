@@ -89,7 +89,7 @@ class FormulaFormTest(TestCase):
                      'denominator_type': 'QUESTION'}
 
         formula_form = FormulaForm(indicator=self.percentage_indicator, data=form_data)
-        self.assertTrue(formula_form.is_valid())
+        self.assertFalse(formula_form.is_valid())
 
     def test_should_not_be_valid_if_count_indicator_and_formula_with_same_count_questions_exists(self):
 
@@ -131,4 +131,4 @@ class FormulaFormTest(TestCase):
                      'denominator_type': 'QUESTION'}
 
         formula_form = FormulaForm(indicator=self.count_indicator, data=form_data)
-        self.assertTrue(formula_form.is_valid())
+        self.assertFalse(formula_form.is_valid())

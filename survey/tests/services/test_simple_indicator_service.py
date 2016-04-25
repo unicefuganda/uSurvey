@@ -82,7 +82,7 @@ class MultiChoiceQuestionSimpleIndicatorServiceTest(BaseTest):
         simple_indicator_service = SimpleIndicatorService(self.formula, self.uganda)
         tabulated_data = simple_indicator_service.tabulated_data_series()
 
-        self.assertEqual(2, len(tabulated_data))
+        self.assertEqual(4, len(tabulated_data))
 
 class GroupCountSimpleIndicatorServiceTest(BaseTest):
     def setUp(self):
@@ -163,4 +163,4 @@ class GroupCountSimpleIndicatorServiceTest(BaseTest):
         simple_indicator_service = SimpleIndicatorService(self.formula, self.uganda)
         tabulated_data = simple_indicator_service.tabulated_data_series()
 
-        self.assertEqual(2, len(tabulated_data))
+        self.assertEqual(4, len(tabulated_data))
