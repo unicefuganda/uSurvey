@@ -10,11 +10,20 @@ from django.utils.timezone import utc
 from survey.forms.upload_csv_file import UploadEAForm
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 from survey.services.ea_upload import UploadEACSVLayoutHelper
+<<<<<<< HEAD
 from django_rq import job
+=======
+#from survey.tasks import upload_task
+>>>>>>> fcf474e45aa7683ef9c85f0027e830aa0915965a
 import json
 from survey.utils.query_helper import get_filterset
 
+from django_rq import job
 
+
+@job('upload_task')
+def uploadtask(composer):
+    composer.uploadtask()
 
 @login_required
 @permission_required('auth.can_view_batches')
@@ -130,7 +139,11 @@ def upload(request):
     if request.method == 'POST':
         upload_form = UploadEAForm(request.POST, request.FILES)
         if upload_form.is_valid():
+<<<<<<< HEAD
             begin_upload.delay(upload_form)
+=======
+            uploadtask.delay(composer)
+>>>>>>> fcf474e45aa7683ef9c85f0027e830aa0915965a
             messages.warning(request, "Upload in progress. This could take a while.")
             return HttpResponseRedirect('/locations/enumeration_area/upload/')
 

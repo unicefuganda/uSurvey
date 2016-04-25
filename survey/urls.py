@@ -15,7 +15,11 @@ urlpatterns = patterns('',
     url(r'^about/$', 'survey.views.home_page.about', name='about_page'),
     url(r'^about/edit/$', 'survey.views.home_page.edit', name='edit_about_page'),
 #     url(r'^locations/hierarchy/add/$', 'survey.views.location_hierarchy.add', name='add_location_hierarchy'),
+<<<<<<< HEAD
 #    url(r'^locations/upload/$', 'survey.views.location_hierarchy.upload', name='upload_locations'),
+=======
+    #url(r'^locations/upload/$', 'survey.views.location_hierarchy.upload', name='upload_locations'),
+>>>>>>> fcf474e45aa7683ef9c85f0027e830aa0915965a
     url(r'^locations/weights/upload/$', 'survey.views.location_weights.upload', name='upload_weights'),
     url(r'^locations/enumeration_area/upload/$', 'survey.views.enumeration_area.upload', name='upload_ea'),
     url(r'^locations/weights/$', 'survey.views.location_weights.list_weights', name='list_weights_page'),

@@ -316,6 +316,11 @@ RQ_QUEUES = {
     'PORT': 6379,
     'DB': 0,
     },
+    'upload_task': {
+    'HOST': 'localhost',
+    'PORT': 6379,
+    'DB': 0,
+    }
 }
 
 ##end USSD config ##
