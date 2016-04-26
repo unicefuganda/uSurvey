@@ -22,7 +22,9 @@ def ws_message(message):
 
 @channel_session_user
 def ws_disconnect(message):
-    pass
+    path = message.content['path']
+    if message.user.is_authenticated():
+        Group(get_group_path(message.user, path)).discard(message.reply_channel)
 
 channel_routing = [
     route("websocket.connect", ws_add, path=r"^%s$" % settings.WEBSOCKET_URL),

@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.test.client import Client
-from rapidsms.contrib.locations.models import Location, LocationType
-from survey.models.locations import *
+from survey.models.locations import Location, LocationType
 from survey.models import HouseholdMemberGroup, Survey, GroupCondition, QuestionModule, Indicator, LocationTypeDetails, \
     Batch, EnumerationArea, HouseholdListing, SurveyHouseholdListing
 from survey.models.backend import Backend
