@@ -35,7 +35,6 @@ class InvestigatorTest(TestCase):
                                                    gender='1',level_of_education='Primary',
                                                    language='Eglish',weights=0)
 
-        # self.survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
         self.household_listing = HouseholdListing.objects.create(ea=self.ea,list_registrar=self.investigator,initial_survey=self.survey)
         self.household = Household.objects.create(house_number=123456,listing=self.household_listing,physical_address='Test address',
                                              last_registrar=self.investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')

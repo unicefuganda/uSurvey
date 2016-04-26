@@ -118,7 +118,6 @@ class UploadWeightsErrorLogTest(BaseTest):
 
 
         self.assertEqual(0, response.context['error_logs'].count())
-        # self.assertIn(error_log, response.context['error_logs'])
         self.assertEqual(error_log.created.replace(hour=0, minute=0, second=0, microsecond=0), response.context['selected_from_date'])
         self.assertEqual(error_log.created.replace(hour=0, minute=0, second=0, microsecond=0), response.context['selected_to_date'])
 

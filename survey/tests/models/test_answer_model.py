@@ -15,9 +15,7 @@ from survey.models.access_channels import InterviewerAccess, ODKAccess
 
 class NumericalAnswerTest(TestCase):
     def test_store(self):
-        #kampala = Location.objects.create(name="Kampala")
         ea = EnumerationArea.objects.create(name="Kampala EA A")
-        #ea.locations.add(kampala)
         investigator = Interviewer.objects.create(name="Investigator",
                                                    ea=ea,
                                                    gender='1',level_of_education='Primary',
@@ -35,7 +33,6 @@ class NumericalAnswerTest(TestCase):
         batch = Batch.objects.create(order=1)
         question = Question.objects.create(identifier='1.1',text="This is a question", answer_type='Numerical Answer',
                                            group=household_member_group,batch=batch,module=question_mod)
-        # question.batches.add(batch)
         interviewer_access= InterviewerAccess.objects.create(interviewer=investigator,user_identifier="test",is_active=True,
                                                              reponse_timeout=100,duration="120")
         odk_access = ODKAccess.objects.create(interviewer=investigator,user_identifier="test",is_active=True,
@@ -50,9 +47,7 @@ class NumericalAnswerTest(TestCase):
 
 class TextAnswerTest(TestCase):
     def test_store(self):
-        #kampala = Location.objects.create(name="Kampala")
         ea = EnumerationArea.objects.create(name="Kampala EA A")
-        #ea.locations.add(kampala)
         investigator = Interviewer.objects.create(name="Investigator",
                                                    ea=ea,
                                                    gender='1',level_of_education='Primary',
@@ -70,7 +65,6 @@ class TextAnswerTest(TestCase):
         batch = Batch.objects.create(order=1)
         question = Question.objects.create(identifier='1.1',text="This is a question", answer_type='Numerical Answer',
                                            group=household_member_group,batch=batch,module=question_mod)
-        # question.batches.add(batch)
         interviewer_access= InterviewerAccess.objects.create(interviewer=investigator,user_identifier="test",is_active=True,
                                                              reponse_timeout=100,duration="120")
         odk_access = ODKAccess.objects.create(interviewer=investigator,user_identifier="test",is_active=True,
@@ -102,7 +96,6 @@ class MultiChoiceAnswerTest(TestCase):
         batch = Batch.objects.create(order=1)
         question = Question.objects.create(identifier='1.1',text="This is a question", answer_type='Numerical Answer',
                                            group=household_member_group,batch=batch,module=question_mod)
-        # question.batches.add(batch)
         interviewer_access= InterviewerAccess.objects.create(interviewer=investigator,user_identifier="test",is_active=True,
                                                              reponse_timeout=100,duration="120")
         odk_access = ODKAccess.objects.create(interviewer=investigator,user_identifier="test",is_active=True,
@@ -115,45 +108,3 @@ class MultiChoiceAnswerTest(TestCase):
         answer = MultiChoiceAnswer.objects.create(interview=interview, question=question,
                                                   value=option1)
         self.failUnless(answer.id)
-#
-#     def test_pagination(self):
-#         #kampala = Location.objects.create(name="Kampala")
-#         ea = EnumerationArea.objects.create(name="Kampala EA A")
-#         #ea.locations.add(kampala)
-#         investigator = Interviewer.objects.create(name="Investigator",
-#                                                    ea=ea,
-#                                                    gender='1',level_of_education='Primary',
-#                                                    language='Eglish',weights=0)
-#         survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
-#         household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
-#         household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
-#                                              last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
-#         batch = Batch.objects.create(order=1)
-#         question = Question.objects.create(text="This is a question", answer_type=Question.MULTICHOICE)
-#         question.batches.add(batch)
-#         option_1 = QuestionOption.objects.create(question=question, text="OPTION 1", order=1)
-#         option_2 = QuestionOption.objects.create(question=question, text="OPTION 2", order=2)
-#         option_3 = QuestionOption.objects.create(question=question, text="OPTION 3", order=3)
-#         option_4 = QuestionOption.objects.create(question=question, text="OPTION 4", order=4)
-#         option_5 = QuestionOption.objects.create(question=question, text="OPTION 5", order=5)
-#         option_6 = QuestionOption.objects.create(question=question, text="OPTION 6", order=6)
-#         option_7 = QuestionOption.objects.create(question=question, text="OPTION 7", order=7)
-#         back_text = Question.PREVIOUS_PAGE_TEXT
-#         next_text = Question.NEXT_PAGE_TEXT
-#
-#         question_in_text = "%s\n1: %s\n2: %s\n3: %s\n%s" % (
-#             question.text, option_1.text, option_2.text, option_3.text, next_text)
-#         self.assertEqual(question.to_ussd(), question_in_text)
-#
-#         question_in_text = "%s\n1: %s\n2: %s\n3: %s\n%s" % (
-#             question.text, option_1.text, option_2.text, option_3.text, next_text)
-#         self.assertEqual(question.to_ussd(1), question_in_text)
-#
-#         question_in_text = "%s\n4: %s\n5: %s\n6: %s\n%s\n%s" % (
-#             question.text, option_4.text, option_5.text, option_6.text, back_text, next_text)
-#         self.assertEqual(question.to_ussd(2), question_in_text)
-#
-#         question_in_text = "%s\n7: %s\n%s" % (question.text, option_7.text, back_text)
-#         self.assertEqual(question.to_ussd(3), question_in_text)
-#
-#

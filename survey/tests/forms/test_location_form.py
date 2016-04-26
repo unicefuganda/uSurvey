@@ -43,36 +43,3 @@ class LocationFormTest(TestCase):
                             'type':self.district.pk,
                             'parent':self.uganda.id
                         }
-    # def test_valid(self):
-    #     location_form = LocationForm(self.form_data)
-    #     self.assertTrue(location_form.is_valid())
-    #
-    # def test_valid_if_editing_instance(self):
-    #     data = self.form_data.copy()
-    #     data['type'] = self.district
-    #     data['parent'] = self.uganda
-    #
-    #     Location.objects.create(**data)
-    #     location_form = LocationForm(initial=data, data=self.form_data)
-    #     self.assertTrue(location_form.is_valid())
-#
-#     def test_name_is_required(self):
-#         form_data = self.form_data
-#         form_data['name']=''
-#         location_form = LocationForm(form_data)
-#         self.assertFalse(location_form.is_valid())
-#         self.assertEquals(location_form.errors['name'], ['This field is required.'])
-#
-#     def test_type_is_required(self):
-#         form_data = self.form_data
-#         form_data['type']=''
-#         location_form = LocationForm(form_data)
-#         self.assertFalse(location_form.is_valid())
-#         self.assertEquals(location_form.errors['type'], ['This field is required.'])
-#
-#     def test_form_should_be_invalid_if_location_already_exists(self):
-#         Location.objects.create(name=self.form_data['name'], type=self.district, tree_parent=self.uganda)
-#         location_form = LocationForm(self.form_data)
-#         self.assertFalse(location_form.is_valid())
-#         self.assertEquals(location_form.errors['__all__'], ['This location already exists.'])
-#

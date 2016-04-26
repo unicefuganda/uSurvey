@@ -21,7 +21,6 @@ class SurveyTest(TestCase):
         self.failUnless(survey.id)
         self.failUnless(survey.created)
         self.failUnless(survey.modified)
-        # self.assertFalse(survey.type)
         self.assertEquals(10, survey.sample_size)
         self.assertTrue(survey.has_sampling)
 

@@ -22,14 +22,6 @@ class FormulaFormTest(TestCase):
                                            group=self.group,batch=self.batch,module=self.module)
 
 
-        # self.question_1.batches.add(self.batch)
-        # self.question_2.batches.add(self.batch)
-        # self.question_4.batches.add(self.batch)
-
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_1, order=1)
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_2, order=2)
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_4, order=3)
-
         self.percentage_indicator = Indicator.objects.create(name='Test Indicator', measure=Indicator.MEASURE_CHOICES[0][1],
                                              module=self.module, description="Indicator 1", batch=self.batch)
         self.count_indicator = Indicator.objects.create(name='Test Indicator', measure=Indicator.MEASURE_CHOICES[1][1],

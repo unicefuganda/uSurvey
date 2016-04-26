@@ -54,8 +54,6 @@ class TestSurveyCompletion(BaseTest):
                                                    gender='1',level_of_education='Primary',
                                                    language='Eglish',weights=0)
 
-        # self.household_1 = Household.objects.create(investigator=self.investigator_1, ea=self.kampala_ea,
-        #                                             survey=self.survey)
         self.household_listing = HouseholdListing.objects.create(ea=self.kampala_ea,list_registrar=self.investigator_1,initial_survey=self.survey)
         self.household = Household.objects.create(house_number=123456,listing=self.household_listing,physical_address='Test address',
                                              last_registrar=self.investigator_1,registration_channel="ODK Access",head_desc="Head",

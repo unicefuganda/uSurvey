@@ -31,9 +31,6 @@ class IndicatorFormulaViewsTest(BaseTest):
                                            group=self.group,batch=self.batch,module=self.question_mod)
         self.question_3 = Question.objects.create(identifier='123.3',text="This is a question123.3", answer_type='Numerical Answer',
                                            group=self.group,batch=self.batch,module=self.question_mod)
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_1, order=1)
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_2, order=2)
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=self.question_3, order=3)
 
         self.existing_formula = Formula.objects.create(numerator=self.question_1, denominator=self.question_2,
                                                        indicator=self.indicator)
@@ -104,14 +101,6 @@ class IndicatorFormulaViewsTest(BaseTest):
         option_2 = QuestionOption.objects.create(question=multichoice_question, text="OPTION 2", order=2)
         option_3 = QuestionOption.objects.create(question=multichoice_question, text="Others", order=3)
 
-        # multichoice_question = Question.objects.create(group=self.group, text="Question 4?", module=self.module,
-        #                                           answer_type=Question.MULTICHOICE, order=4)
-        #
-        # option_1 = QuestionOption.objects.create(question=multichoice_question, text='Yes', order=1)
-        # option_2 = QuestionOption.objects.create(question=multichoice_question, text='No', order=2)
-        # option_3 = QuestionOption.objects.create(question=multichoice_question, text='Maybe', order=3)
-        # option_4 = QuestionOption.objects.create(question=multichoice_question, text='Not Known', order=4)
-
         count_indicator = Indicator.objects.create(name='Test Indicator', measure=Indicator.MEASURE_CHOICES[1][1],
                                              module=self.module, description="Indicator 1", batch=self.batch)
 
@@ -120,8 +109,6 @@ class IndicatorFormulaViewsTest(BaseTest):
                 'denominator_type': 'QUESTION'}
 
         all_formula_options = [option_1, option_2, option_3]
-
-        # BatchQuestionOrder.objects.create(batch=self.batch, question=multichoice_question, order=4)
 
         new_formula_url = '/indicators/%s/formula/new/' % count_indicator.id
         response = self.client.post(new_formula_url, data=data)

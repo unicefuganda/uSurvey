@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from survey.models.locations import *
 from survey.interviewer_configs import PRIME_LOCATION_TYPE
 from survey.models import HouseholdMemberGroup, QuestionModule, Interviewer, GroupCondition, EnumerationArea
-# from survey.models.batch_question_order import *
 from survey.models.households import HouseholdMember, Household
 from survey.models.surveys import Survey
 from survey.models.questions import Question, QuestionFlow
@@ -40,15 +39,6 @@ class BatchViewsTest(BaseTest):
 
         self.ea = EnumerationArea.objects.create(name="EA2")
 
-    #Eswar in views while calling can_be_deleted it always returing true
-    # def test_should_not_delete_batch_if_open(self):
-    #     response = self.client.get('/surveys/%d/batches/%d/delete/' % (self.survey.id, self.batch.id))
-    #     recovered_batch = Batch.objects.filter(id=self.batch.id)
-    #     self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
-    #                          target_status_code=200, msg_prefix='')
-    #     self.assertIn("Batch cannot be deleted because it is open in Abim District", response.cookies['messages'].value)
-    #     self.failUnless(recovered_batch)
-
     def test_get_index(self):
         response = self.client.get('/surveys/%d/batches/' % self.survey.id)
         self.failUnlessEqual(response.status_code, 200)
@@ -73,97 +63,16 @@ class BatchViewsTest(BaseTest):
         self.assertFalse(another_batch in response.context['batches'])
         self.assertEquals(self.survey, response.context['survey'])
 
-    # def test_get_batch_view(self):
-    #     self.batch.activate_non_response_for(self.abim)
-    #     response = self.client.get('/surveys/%d/batches/%d/' % (self.survey.id, self.batch.pk))
-    #     self.failUnlessEqual(response.status_code, 200)
-    #     templates = [template.name for template in response.templates]
-    #     self.assertIn('batches/show.html', templates)
-    #     self.assertEquals(self.batch, response.context['batch'])
-    #     self.assertIn(self.kampala, response.context['locations'])
-    #     self.assertIn(self.abim, response.context['open_locations'])
-    #     self.assertIn(self.abim, response.context['non_response_active_locations'])
-
-    # def test_get_batch_view_with_only_non_response_active_locations_in_context(self):
-    #     self.batch.activate_non_response_for(self.abim)
-    #     self.batch.open_for_location(self.kampala)
-    #     response = self.client.get('/surveys/%d/batches/%d/' % (self.survey.id, self.batch.pk))
-    #     self.assertIn(self.abim, response.context['non_response_active_locations'])
-    #     self.assertNotIn(self.kampala, response.context['non_response_active_locations'])
-
     def test_open_batch_for_location(self):
         self.assertFalse(self.batch.is_open_for(self.kampala))
         response = self.client.post('/batches/' + str(self.batch.pk) + "/open_to",
                                     data={'location_id': self.kampala.pk})
         self.failUnlessEqual(response.status_code, 200)
-        # for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
         self.batch.open_for_location(self.kampala)
         self.assertFalse(self.batch.is_open_for(self.kampala))
         json_response = json.loads(response.content)
         self.assertEqual('', json_response)
 
-    #Eswar not required non_response_is_activated_for not there for batch
-    # def test_should_not_activate_non_response_if_batch_is_not_open_for_location(self):
-    #     self.assertFalse(self.batch.is_open_for(self.kampala))
-    #     response = self.client.post('/batches/%s/non_response/activate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
-    #     self.failUnlessEqual(response.status_code, 200)
-    #
-    #     for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
-    #         self.assertFalse(self.batch.non_response_is_activated_for(loc))
-    #
-    #     json_response = json.loads(response.content)
-    #     self.assertEqual('%s is not open for %s'%(self.batch.name, self.kampala.name), json_response)
-
-    #Eswar not required non_response_is_activated_for not there for batch
-    # def test_should_activate_non_response_only_if_batch_is_already_open_for_location(self):
-    #     self.batch.open_for_location(self.kampala)
-    #     self.assertFalse(self.batch.non_response_is_activated_for(self.kampala))
-    #     response = self.client.post('/batches/%s/non_response/activate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
-    #     self.failUnlessEqual(response.status_code, 200)
-    #
-    #     for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
-    #         self.assertTrue(self.batch.non_response_is_activated_for(loc))
-    #
-    #     json_response = json.loads(response.content)
-    #     self.assertEqual('', json_response)
-
-    #Eswar not required non_response_is_activated_for not there for batch
-    # def test_de_activate_non_response_for_batch_and_location(self):
-    #     self.batch.open_for_location(self.kampala)
-    #     self.batch.activate_non_response_for(self.kampala)
-    #     self.assertTrue(self.batch.non_response_is_activated_for(self.kampala))
-    #     response = self.client.post('/batches/%s/non_response/deactivate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
-    #     self.failUnlessEqual(response.status_code, 200)
-    #
-    #     for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
-    #         self.assertFalse(self.batch.non_response_is_activated_for(loc))
-    #
-    #     json_response = json.loads(response.content)
-    #     self.assertEqual('', json_response)
-    #
-    #Eswar not required non_response_is_activated_for not there for batch
-    # def test_de_activate_non_response_for_batch_only_if_active_location(self):
-    #     self.batch.open_for_location(self.kampala)
-    #
-    #     response = self.client.post('/batches/%s/non_response/deactivate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
-    #     for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
-    #         self.assertFalse(self.batch.non_response_is_activated_for(loc))
-    #
-    #     json_response = json.loads(response.content)
-    #     self.assertEqual('', json_response)
-
-    #Eswar not required non_response_is_activated_for not there for batch
-    # def test_deactivate_non_response_does_nothing_if_not_open(self):
-    #     self.batch.close_for_location(self.kampala)
-    #
-    #     response = self.client.post('/batches/%s/non_response/deactivate/' % str(self.batch.pk), data={'non_response_location_id': self.kampala.pk})
-    #     for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
-    #         self.assertTrue(self.batch.is_closed_for(loc))
-    #         self.assertFalse(self.batch.non_response_is_activated_for(loc))
-    #
-    #     json_response = json.loads(response.content)
-    #     self.assertEqual('', json_response)
-    #
     def test_should_not_allow_open_batch_for_location_if_already_open_for_another_survey(self):
         another_survey = Survey.objects.create(name='survey name 2', description='survey descrpition 2',
                                                sample_size=10)
@@ -175,7 +84,6 @@ class BatchViewsTest(BaseTest):
         response = self.client.post('/batches/' + str(self.batch.pk) + "/open_to",
                                     data={'location_id': self.kampala.pk})
         self.failUnlessEqual(response.status_code, 200)
-        # self.assertEqual(open_batch_error_message, json_response)
 
     def test_open_batch_does_not_allow_questions_to_be_assigned(self):
         another_survey = Survey.objects.create(name='survey name 2', description='survey descrpition 2',
@@ -190,7 +98,7 @@ class BatchViewsTest(BaseTest):
         self.assertRedirects(response, "/batches/%s/questions/" % str(another_batch.pk), 302, 200)
         self.assertIn("Questions cannot be assigned to open batch: %s." % another_batch.name.capitalize(),
                       response.cookies['messages'].value)
-    #
+
     def test_close_batch_for_location(self):
         uganda123 = Location.objects.create(name="Uganda123", type=self.country)
         for loc in [self.kampala, self.kampala_city, self.bukoto, self.kamoja]:
@@ -238,12 +146,6 @@ class BatchViewsTest(BaseTest):
         response = self.client.post('/surveys/%d/batches/new/' % self.survey.id, data=data)
         self.assertEqual(len(Batch.objects.filter(survey__id=self.survey.id, **data)), 0)
 
-    # def test_post_add_new_batch_redirects_to_batches_table_if_valid(self):
-    #     response = self.client.post('/surveys/%d/batches/new/' % self.survey.id,
-    #                                 data={'name': 'Batch1', 'description': 'description'})
-    #     self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
-    #                          target_status_code=200, msg_prefix='')
-
     def test_post_add_new_batch_should_add_batch_to_the_survey(self):
         batch = Batch.objects.create(order=1, name="Some Batch", description="some description", survey=self.survey)
         form_data = {'name': 'Some Batch', 'description': 'some description'}
@@ -268,19 +170,6 @@ class BatchViewsTest(BaseTest):
         self.assertEqual(response.context['action'], '/surveys/%d/batches/%d/edit/' % (self.survey.id, batch.id))
         self.assertEqual(response.context['id'], 'edit-batch-form')
 
-    #Eswar check with Tony on this response code errors
-    # def test_save_edited_batch(self):
-    #     batch = Batch.objects.create(survey=self.survey, name="batch aaa", description="batch a description")
-    #     form_data = {
-    #         'name': 'batch aaa',
-    #         'description': batch.description
-    #     }
-    #     response = self.client.post('/surveys/%d/batches/%d/edit/' % (self.survey.id, batch.id), data=form_data)
-    #     updated_batch = Batch.objects.get(name=form_data['name'])
-    #     self.failUnless(updated_batch)
-    #     self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
-    #                          target_status_code=200, msg_prefix='')
-
     def test_delete_batch(self):
         self.batch.close_for_location(self.abim)
         self.assertFalse(self.batch.is_open())
@@ -289,84 +178,6 @@ class BatchViewsTest(BaseTest):
         self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
                              target_status_code=200, msg_prefix='')
         self.failIf(recovered_batch)
-
-
-    #Eswar in views while calling can_be_deleted it always returing true
-    # def test_should_not_delete_batch_if_batches_questions_have_been_responded_to(self):
-    #     self.ea.locations.add(self.kampala)
-    #     from survey.models.households import HouseholdMember, HouseholdListing, SurveyHouseholdListing
-    #     investigator = Interviewer.objects.create(name="Investigator",
-    #                                                ea=self.ea,
-    #                                                gender='1',level_of_education='Primary',
-    #                                                language='Eglish',weights=0)
-    #     household_listing = HouseholdListing.objects.create(ea=self.ea,list_registrar=investigator,initial_survey=self.survey)
-    #     household = Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
-    #                                          last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",
-    #                                          head_sex='MALE')
-    #     survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=self.survey)
-    #     member = HouseholdMember.objects.create(surname="sur", first_name='fir', gender='MALE', date_of_birth="1988-01-01",
-    #                                                       household=household,survey_listing=survey_householdlisting,
-    #                                                       registrar=investigator,registration_channel="ODK Access")
-    #     group = HouseholdMemberGroup.objects.create(name="Females", order=1)
-    #     female = GroupCondition.objects.create(attribute="gender", value=True, condition="EQUALS")
-    #     group.conditions.add(female)
-    #     module = QuestionModule.objects.create(name="Education")
-    #     question_1 = Question.objects.create(identifier='1.1',text="This is a question1", answer_type='Numerical Answer',
-    #                                        group=group,batch=self.batch,module=module)
-    #     question_2 = Question.objects.create(identifier='1.2',text="This is a question2", answer_type='Numerical Answer',
-    #                                        group=group,batch=self.batch,module=module)
-    #     question_3 = Question.objects.create(identifier='1.3',text="This is a question3", answer_type='Numerical Answer',
-    #                                        group=group,batch=self.batch,module=module)
-    #
-    #     # question_1.batches.add(self.batch)
-    #     # question_2.batches.add(self.batch)
-    #     # question_3.batches.add(self.batch)
-    #
-    #     BatchQuestionOrder.objects.create(batch=self.batch, question=question_1, order=1)
-    #     BatchQuestionOrder.objects.create(batch=self.batch, question=question_2, order=2)
-    #     BatchQuestionOrder.objects.create(batch=self.batch, question=question_3, order=3)
-    #
-    #     self.batch.open_for_location(self.kampala)
-    #     # investigator.member_answered(question_1, member, 1, self.batch)
-    #     # investigator.member_answered(question_2, member, 1, self.batch)
-    #     # investigator.member_answered(question_3, member, 1, self.batch)
-    #     self.batch.close_for_location(self.kampala)
-    #     response = self.client.get('/surveys/%d/batches/%d/delete/' % (self.survey.id, self.batch.id))
-    #     recovered_batch = Batch.objects.filter(id=self.batch.id)
-    #     self.assertRedirects(response, expected_url='/surveys/%d/batches/' % self.survey.id, status_code=302,
-    #                          target_status_code=200, msg_prefix='')
-    #     self.assertIn("Batch cannot be deleted because it has responses.", response.cookies['messages'].value)
-    #     self.failUnless(recovered_batch)
-    #
-    # def test_assign_question_to_the_batch_should_show_list_of_questions(self):
-    #     group = HouseholdMemberGroup.objects.create(name="Females", order=1)
-    #     module_1 = QuestionModule.objects.create(name="Education")
-    #     module_2 = QuestionModule.objects.create(name="Health")
-    #     question_1 = Question.objects.create(identifier='1.1',text="This is a question1", answer_type='Numerical Answer',
-    #                                        group=group,batch=self.batch,module=module_1)
-    #     question_2 = Question.objects.create(identifier='1.2',text="This is a question2", answer_type='Numerical Answer',
-    #                                        group=group,batch=self.batch,module=module_1)
-    #     question_3 = Question.objects.create(identifier='1.3',text="This is a question3", answer_type='Numerical Answer',
-    #                                        group=group,batch=self.batch,module=module_1)
-    #
-    #     self.batch.close_for_location(self.abim)
-    #     # print self.batch.id,"id"
-    #     response = self.client.post('/batches/%d/assign_questions/' % (self.batch.id))
-    #     self.failUnlessEqual(response.status_code, 200)
-    #     templates = [template.name for template in response.templates]
-    #     self.assertIn('batches/assign.html', templates)
-    #     # print response.context['batch_questions_form'],"+++++++++++++"
-    #     self.assertEqual(3, len(response.context['batch_questions_form'].fields['questions']._queryset))
-    #     self.assertIn(question_1, response.context['batch_questions_form'].fields['questions']._queryset)
-    #     self.assertIn(question_2, response.context['batch_questions_form'].fields['questions']._queryset)
-    #     self.assertIn(question_3, response.context['batch_questions_form'].fields['questions']._queryset)
-    #     self.assertEqual(self.batch, response.context['batch'])
-    #     self.assertIsInstance(response.context['batch_questions_form'], BatchQuestionsForm)
-    #     self.assertEqual(response.context['button_label'], 'Save')
-    #     self.assertEqual(response.context['id'], 'assign-question-to-batch-form')
-    #     self.assertEqual(1, len(response.context['groups']))
-    #     self.assertIn(group, response.context['groups'])
-    #     [self.assertIn(module, response.context['modules']) for module in [module_1, module_2]]
 
     def test_post_assign_questions_to_batch_should_save_questions(self):
         group = HouseholdMemberGroup.objects.create(name="Females", order=1)
@@ -406,8 +217,6 @@ class BatchViewsTest(BaseTest):
                                            group=group,batch=batch,module=module_1)
         q2 = Question.objects.create(identifier='1.2',text="This is a question2", answer_type='Numerical Answer',
                                            group=group,batch=batch,module=module_1)
-        # BatchQuestionOrder.objects.create(batch=batch, question=q1, order=1)
-        # BatchQuestionOrder.objects.create(batch=batch, question=q2, order=2)
         batch.start_question=q1
         batch.save()
         QuestionFlow.objects.create(question=q1,validation_test="starts_with",name="test",desc="desc",next_question=q2)
@@ -422,9 +231,6 @@ class BatchViewsTest(BaseTest):
                                            group=group,batch=batch,module=module_1)
         q2 = Question.objects.create(identifier='1.12',text="This is a question12", answer_type='Numerical Answer',
                                            group=group,batch=batch,module=module_1)
-
-        # BatchQuestionOrder.objects.create(batch=batch, question=q1, order=1)
-        # BatchQuestionOrder.objects.create(batch=batch, question=q2, order=2)
         batch.start_question=q1
         batch.save()
         QuestionFlow.objects.create(question=q1,validation_test="starts_with",name="test",desc="desc",next_question=q2)
@@ -433,12 +239,6 @@ class BatchViewsTest(BaseTest):
         order_update_form_data = {'order_information': ['%s-%s' % (order_two, q1.id), '%s-%s' % (order_one, q2.id)]}
 
         response = self.client.post('/batches/%s/update_question_orders/' % batch.id, data=order_update_form_data)
-
-        # question_order_1 = BatchQuestionOrder.objects.get(order=order_one)
-        # question_order_2 = BatchQuestionOrder.objects.get(order=order_two)
-
-        # self.assertEqual(question_order_1.question, q1)
-        # self.assertEqual(question_order_2.question, q2)
 
         self.assertRedirects(response, "/batches/%s/questions/" % batch.id, status_code=302, target_status_code=200)
         message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
@@ -452,8 +252,6 @@ class BatchViewsTest(BaseTest):
                                            group=group,batch=batch,module=module_1)
         q2 = Question.objects.create(identifier='1.12',text="This is a question12", answer_type='Numerical Answer',
                                            group=group,batch=batch,module=module_1)
-        # BatchQuestionOrder.objects.create(batch=batch, question=q1, order=1)
-        # BatchQuestionOrder.objects.create(batch=batch, question=q2, order=2)
         batch.start_question=q1
         batch.save()
         QuestionFlow.objects.create(question=q1,validation_test="starts_with",name="test",desc="desc",next_question=q2)
@@ -462,12 +260,6 @@ class BatchViewsTest(BaseTest):
         order_update_form_data = {'order_information': ['%s-%s' % (order_two, q1.id), '%s-%s' % (order_one, q2.id)]}
 
         response = self.client.post('/batches/%s/update_question_orders/' % batch.id, data=order_update_form_data)
-
-        # question_order_1 = BatchQuestionOrder.objects.get(order=order_one)
-        # question_order_2 = BatchQuestionOrder.objects.get(order=order_two)
-
-        # self.assertEqual(question_order_1.question, q1)
-        # self.assertEqual(question_order_2.question, q2)
 
         self.assertRedirects(response, "/batches/%s/questions/" % batch.id, status_code=302, target_status_code=200)
         message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
@@ -481,8 +273,6 @@ class BatchViewsTest(BaseTest):
                                            group=group,batch=batch,module=module_1)
         q2 = Question.objects.create(identifier='1.12',text="This is a question12", answer_type='Numerical Answer',
                                            group=group,batch=batch,module=module_1)
-        # BatchQuestionOrder.objects.create(batch=batch, question=q1, order=1)
-        # BatchQuestionOrder.objects.create(batch=batch, question=q2, order=2)
         batch.start_question=q1
         batch.save()
         QuestionFlow.objects.create(question=q1,validation_test="starts_with",name="test",desc="desc",next_question=q2)
@@ -493,23 +283,6 @@ class BatchViewsTest(BaseTest):
         self.assertRedirects(response, "/batches/%s/questions/" % batch.id, status_code=302, target_status_code=200)
         error_message = "No questions orders were updated."
         self.assertIn(error_message, response.cookies['messages'].value)
-
-    #Eswar to be checked
-    # def test_ajax_request_batch_list_under_a_survey(self):
-    #     survey_1 = Survey.objects.create(name="survey A")
-    #     survey_2 = Survey.objects.create(name="survey B")
-    #     batch_1 = Batch.objects.create(name="batch1", order=1, survey=survey_1)
-    #     batch_2 = Batch.objects.create(name="batch2", order=2, survey=survey_1)
-    #     response = self.client.get('/surveys/%s/batches/' % survey_1.id, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-    #     self.assertEqual(200, response.status_code)
-    #     print response.context,"contet"
-    #     content = json.loads(response.context)
-    #     self.assertEquals(len(content), 2)
-    #
-    #     self.assertEqual(batch_1.id, content[0]['id'])
-    #     self.assertEqual(batch_1.name, content[0]['name'])
-    #     self.assertEqual(batch_2.id, content[1]['id'])
-    #     self.assertEqual(batch_2.name, content[1]['name'])
 
     def test_ajax_request_batch_list_all(self):
         Batch.objects.all().delete()

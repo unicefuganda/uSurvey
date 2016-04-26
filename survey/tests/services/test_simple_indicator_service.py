@@ -44,7 +44,6 @@ class MultiChoiceQuestionSimpleIndicatorServiceTest(BaseTest):
         self.yes_option = QuestionOption.objects.create(question=self.question_3, text="Yes", order=1)
         self.no_option = QuestionOption.objects.create(question=self.question_3, text="No", order=2)
 
-        # self.question_3.batches.add(self.batch)
 
         self.indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
                                              batch=self.batch, module=health_module)

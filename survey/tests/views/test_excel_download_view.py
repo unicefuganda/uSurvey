@@ -98,6 +98,8 @@ class ExcelDownloadViewTest(BaseTest):
         self.assert_restricted_permission_for('/aggregates/download_spreadsheet')
 
 
+
+
 class ReportForCompletedInvestigatorTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -153,7 +155,6 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         household_1 = Household.objects.create(house_number=223456,listing=household_listing_1,physical_address='Test address',
                                              last_registrar=investigator_1,registration_channel="ODK Access",head_desc="Head",
                                              head_sex='MALE')
-        # household_listing_2 = HouseholdListing.objects.create(ea=ea,list_registrar=investigator_2,initial_survey=survey)
         household_2 = Household.objects.create(house_number=223457,listing=household_listing_1,physical_address='Test address',
                                              last_registrar=investigator_2,registration_channel="ODK Access",head_desc="Head",
                                              head_sex='MALE')

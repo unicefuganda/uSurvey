@@ -119,58 +119,6 @@ class CompletionLocationFilterFormTest(TestCase):
                      'location': self.another_location.id,
                      'ea': self.ea.id}
 
-    # def test_valid(self):
-    #     location_filter_form = LocationFilterForm(self.data)
-    #     self.assertTrue(location_filter_form.is_valid())
-#
-#     def assert_invalid_if_field_does_not_exist(self, field_key):
-#         form_data = self.data.copy()
-#         non_existing_survey_id = 666
-#         form_data[field_key] = non_existing_survey_id
-#         location_filter_form = LocationFilterForm(form_data)
-#         self.assertFalse(location_filter_form.is_valid())
-#         message = "Select a valid choice. That choice is not one of the available choices."
-#         self.assertEqual([message], location_filter_form.errors[field_key])
-#
-#     def assert_invalid_if_field_is_non_sense(self, field_key):
-#         form_data = self.data.copy()
-#         form_data[field_key] = 'non_sense_hohoho_&^%$#'
-#         location_filter_form = LocationFilterForm(form_data)
-#         self.assertFalse(location_filter_form.is_valid())
-#         message = "Select a valid choice. That choice is not one of the available choices."
-#         self.assertEqual([message], location_filter_form.errors[field_key])
-
-#     def test_invalid_if_batch_is_not_under_survey(self):
-#         form_data = self.data.copy()
-#         form_data['survey'] = self.survey.id
-#         form_data['batch'] = self.batch_1.id
-#         location_filter_form = LocationFilterForm(form_data)
-#         self.assertFalse(location_filter_form.is_valid())
-#         message = "Select a valid choice. That choice is not one of the available choices."
-#         self.assertEqual([message], location_filter_form.errors['batch'])
-#
-#     def test_invalid_if_ea_is_not_under_survey(self):
-#         another_ea = EnumerationArea.objects.create(name="another ea not in survey")
-#         form_data = self.data.copy()
-#         form_data['ea'] = another_ea.id
-#         location_filter_form = LocationFilterForm(form_data)
-#         self.assertFalse(location_filter_form.is_valid())
-#         message = "Select a valid choice. That choice is not one of the available choices."
-#         self.assertEqual([message], location_filter_form.errors['ea'])
-#
-#     def test_valid_even_if_location_is_empty(self):
-#         form_data = self.data.copy()
-#         form_data['location'] = ''
-#         location_filter_form = LocationFilterForm(form_data)
-#         self.assertTrue(location_filter_form.is_valid())
-#
-#     def test_valid_even_if_ea_is_empty(self):
-#         form_data = self.data.copy()
-#         form_data['ea'] = ''
-#         location_filter_form = LocationFilterForm(form_data)
-#         self.assertTrue(location_filter_form.is_valid())
-#
-#
 class SurveyBatchFilterFormTest(TestCase):
     def setUp(self):
         self.survey = Survey.objects.create(name="Survey A")
