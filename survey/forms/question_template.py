@@ -25,6 +25,7 @@ class QuestionTemplateForm(ModelForm):
     
     class Meta:
         model = QuestionTemplate
+        exclude = []
         widgets ={
             'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"}),
         }

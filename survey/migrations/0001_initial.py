@@ -15,7 +15,6 @@ import django.core.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('locations', '__first__'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -31,7 +30,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='AnswerAccessDefinition',
@@ -42,9 +40,6 @@ class Migration(migrations.Migration):
                 ('answer_type', models.CharField(max_length=100, choices=[('Numerical Answer', 'Numerical Answer'), ('Text Answer', 'Text Answer'), ('Multi Choice Answer', 'Multi Choice Answer'), ('Multi Select Answer', 'Multi Select Answer'), ('Date Answer', 'Date Answer'), ('Audio Answer', 'Audio Answer'), ('Video Answer', 'Video Answer'), ('Image Answer', 'Image Answer'), ('Geopoint Answer', 'Geopoint Answer')])),
                 ('channel', models.CharField(max_length=100, choices=[('Ussd Access', 'Ussd Access'), ('Odk Access', 'Odk Access'), ('Web Access', 'Web Access')])),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Attachment',
@@ -55,9 +50,6 @@ class Migration(migrations.Migration):
                 ('media_file', models.FileField(upload_to=survey.models.odk_submission.upload_to)),
                 ('mimetype', models.CharField(default=b'', max_length=50, blank=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='AudioAnswer',
@@ -70,7 +62,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Backend',
@@ -78,9 +69,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(unique=True, max_length=20)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Batch',
@@ -88,13 +76,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
-                ('order', models.PositiveIntegerField(max_length=2, null=True)),
+                ('order', models.PositiveIntegerField(null=True)),
                 ('name', models.CharField(max_length=100, null=True, db_index=True)),
                 ('description', models.CharField(max_length=300, null=True, blank=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='BatchChannel',
@@ -105,9 +90,6 @@ class Migration(migrations.Migration):
                 ('channel', models.CharField(max_length=100, choices=[('Ussd Access', 'Ussd Access'), ('Odk Access', 'Odk Access'), ('Web Access', 'Web Access')])),
                 ('batch', models.ForeignKey(related_name='access_channels', to='survey.Batch')),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='BatchCommencement',
@@ -119,7 +101,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='BatchLocationStatus',
@@ -133,7 +114,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='DateAnswer',
@@ -146,7 +126,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='EnumerationArea',
@@ -160,7 +139,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Formula',
@@ -169,9 +147,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='GeopointAnswer',
@@ -183,7 +158,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='GroupCondition',
@@ -195,9 +169,6 @@ class Migration(migrations.Migration):
                 ('attribute', models.CharField(default=b'AGE', max_length=20, choices=[(b'GENDER', b'GENDER'), (b'AGE', b'AGE'), (b'GENERAL', b'ROLE')])),
                 ('condition', models.CharField(default=b'EQUALS', max_length=20, choices=[(b'GREATER_THAN', b'GREATER_THAN'), (b'LESS_THAN', b'LESS_THAN'), (b'EQUALS', b'EQUALS')])),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Household',
@@ -211,9 +182,6 @@ class Migration(migrations.Migration):
                 ('head_desc', models.CharField(max_length=200)),
                 ('head_sex', models.BooleanField(default=False)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='HouseholdBatchCompletion',
@@ -227,7 +195,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='HouseholdListing',
@@ -237,9 +204,6 @@ class Migration(migrations.Migration):
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('ea', models.ForeignKey(related_name='household_enumeration_area', to='survey.EnumerationArea', null=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='HouseholdMember',
@@ -256,20 +220,6 @@ class Migration(migrations.Migration):
             options={
                 'get_latest_by': 'created',
             },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='HouseholdHead',
-            fields=[
-                ('householdmember_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.HouseholdMember')),
-                ('occupation', models.CharField(default=b'16', max_length=100, verbose_name=b'Occupation / Main Livelihood')),
-                ('level_of_education', models.CharField(default=b'Primary', max_length=100, null=True, verbose_name=b'Highest level of education completed', choices=[(b'Did not attend school', b'Did not attend school'), (b'Nursery', b'Nursery'), (b'Primary', b'Primary'), (b"'O' Level", b"'O' Level"), (b"'A' Level", b"'A' Level"), (b'Tertiary', b'Tertiary'), (b'University', b'University')])),
-                ('resident_since', models.DateField(null=True, verbose_name=b'Since when have you lived here', blank=True)),
-            ],
-            options={
-                'verbose_name': 'Main Respondent',
-            },
-            bases=('survey.householdmember',),
         ),
         migrations.CreateModel(
             name='HouseholdMemberBatchCompletion',
@@ -278,12 +228,10 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('batch', models.ForeignKey(related_name='completed_households', to='survey.Batch', null=True)),
-                ('householdmember', models.ForeignKey(related_name='completed_member_batches', to='survey.HouseholdMember', null=True)),
             ],
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='HouseholdMemberGroup',
@@ -292,11 +240,8 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('name', models.CharField(max_length=50)),
-                ('order', models.PositiveIntegerField(default=0, unique=True, max_length=5)),
+                ('order', models.PositiveIntegerField(default=0, unique=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='HouseMemberSurveyCompletion',
@@ -304,12 +249,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
-                ('householdmember', models.ForeignKey(related_name='completion_register', to='survey.HouseholdMember', null=True)),
             ],
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='HouseSurveyCompletion',
@@ -322,7 +265,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='ImageAnswer',
@@ -335,7 +277,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Indicator',
@@ -351,7 +292,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Interview',
@@ -362,11 +302,7 @@ class Migration(migrations.Migration):
                 ('closure_date', models.DateTimeField(null=True, editable=False, blank=True)),
                 ('batch', models.ForeignKey(related_name='interviews', to='survey.Batch')),
                 ('ea', models.ForeignKey(related_name='interviews', to='survey.EnumerationArea')),
-                ('householdmember', models.ForeignKey(related_name='interviews', to='survey.HouseholdMember', null=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Interviewer',
@@ -383,9 +319,6 @@ class Migration(migrations.Migration):
                 ('weights', models.FloatField(default=0)),
                 ('ea', models.ForeignKey(related_name='interviewers', verbose_name=b'Enumeration Area', to='survey.EnumerationArea', null=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='InterviewerAccess',
@@ -398,9 +331,6 @@ class Migration(migrations.Migration):
                 ('reponse_timeout', models.PositiveIntegerField(default=1000, help_text=b'Max time to wait for response before ending interview', null=True, blank=True)),
                 ('duration', models.CharField(default=b'H', max_length=100, null=True, blank=True, choices=[(b'D', b'Days'), (b'H', b'Hours'), (b'M', b'Minutes'), (b'S', b'Seconds')])),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Location',
@@ -415,9 +345,6 @@ class Migration(migrations.Migration):
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('level', models.PositiveIntegerField(editable=False, db_index=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='LocationType',
@@ -434,9 +361,6 @@ class Migration(migrations.Migration):
                 ('level', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('parent', mptt.fields.TreeForeignKey(related_name='sub_types', blank=True, to='survey.LocationType', null=True)),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='LocationTypeDetails',
@@ -454,7 +378,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='LocationWeight',
@@ -468,7 +391,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='MultiChoiceAnswer',
@@ -481,7 +403,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='MultiSelectAnswer',
@@ -494,7 +415,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='NonResponseAnswer',
@@ -509,7 +429,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='NumericalAnswer',
@@ -517,35 +436,12 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
-                ('value', models.PositiveIntegerField(max_length=5, null=True)),
+                ('value', models.PositiveIntegerField(null=True)),
                 ('interview', models.ForeignKey(related_name='numericalanswer', to='survey.Interview')),
             ],
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='ODKAccess',
-            fields=[
-                ('intervieweraccess_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.InterviewerAccess')),
-                ('odk_token', models.CharField(default=b'12345', max_length=10)),
-            ],
-            options={
-            },
-            bases=('survey.intervieweraccess',),
-        ),
-        migrations.CreateModel(
-            name='ODKGeoPoint',
-            fields=[
-                ('point_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='locations.Point')),
-                ('altitude', models.DecimalField(max_digits=10, decimal_places=3)),
-                ('precision', models.DecimalField(max_digits=10, decimal_places=3)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=('locations.point',),
         ),
         migrations.CreateModel(
             name='ODKSubmission',
@@ -558,12 +454,20 @@ class Migration(migrations.Migration):
                 ('instance_id', models.CharField(max_length=256)),
                 ('xml', models.TextField()),
                 ('household', models.ForeignKey(related_name='odk_submissions', blank=True, to='survey.Household', null=True)),
-                ('household_member', models.ForeignKey(related_name='odk_submissions', blank=True, to='survey.HouseholdMember', null=True)),
-                ('interviewer', models.ForeignKey(related_name='odk_submissions', to='survey.Interviewer')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Point',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('latitude', models.DecimalField(max_digits=13, decimal_places=10)),
+                ('longitude', models.DecimalField(max_digits=13, decimal_places=10)),
             ],
             options={
+                'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Question',
@@ -577,9 +481,6 @@ class Migration(migrations.Migration):
                 ('batch', models.ForeignKey(related_name='batch_questions', to='survey.Batch')),
                 ('group', models.ForeignKey(related_name='questions', to='survey.HouseholdMemberGroup')),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='QuestionFlow',
@@ -593,9 +494,6 @@ class Migration(migrations.Migration):
                 ('next_question', models.ForeignKey(related_name='connecting_flows', on_delete=django.db.models.deletion.SET_NULL, blank=True, to='survey.Question', null=True)),
                 ('question', models.ForeignKey(related_name='flows', to='survey.Question')),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='QuestionModule',
@@ -609,7 +507,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='QuestionOption',
@@ -624,7 +521,6 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ['order'],
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='QuestionTemplate',
@@ -638,9 +534,6 @@ class Migration(migrations.Migration):
                 ('group', models.ForeignKey(related_name='question_templates', to='survey.HouseholdMemberGroup')),
                 ('module', models.ForeignKey(related_name='question_templates', to='survey.QuestionModule')),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='RandomSelection',
@@ -653,7 +546,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Survey',
@@ -663,7 +555,7 @@ class Migration(migrations.Migration):
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('name', models.CharField(max_length=100, unique=True, null=True)),
                 ('description', models.CharField(max_length=300, null=True, blank=True)),
-                ('sample_size', models.PositiveIntegerField(default=10, max_length=2)),
+                ('sample_size', models.PositiveIntegerField(default=10)),
                 ('has_sampling', models.BooleanField(default=True, verbose_name=b'Survey Type')),
                 ('preferred_listing', models.ForeignKey(related_name='householdlist_users', blank=True, to='survey.Survey', help_text=b'Select which survey household listing to reuse. Leave empty for fresh listing', null=True)),
             ],
@@ -671,7 +563,6 @@ class Migration(migrations.Migration):
                 'ordering': ['name'],
                 'permissions': (('view_completed_survey', 'Can view Completed interviewers'),),
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='SurveyAllocation',
@@ -685,9 +576,6 @@ class Migration(migrations.Migration):
                 ('interviewer', models.ForeignKey(related_name='assignments', to='survey.Interviewer')),
                 ('survey', models.ForeignKey(related_name='work_allocation', to='survey.Survey')),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='SurveyHouseholdListing',
@@ -698,9 +586,6 @@ class Migration(migrations.Migration):
                 ('listing', models.ForeignKey(related_name='survey_houselistings', to='survey.HouseholdListing')),
                 ('survey', models.ForeignKey(related_name='survey_house_listings', to='survey.Survey')),
             ],
-            options={
-            },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='TemplateOption',
@@ -715,7 +600,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='TestArgument',
@@ -726,27 +610,6 @@ class Migration(migrations.Migration):
             options={
                 'get_latest_by': 'position',
             },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='NumberArgument',
-            fields=[
-                ('testargument_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TestArgument')),
-                ('param', models.IntegerField()),
-            ],
-            options={
-            },
-            bases=('survey.testargument',),
-        ),
-        migrations.CreateModel(
-            name='DateArgument',
-            fields=[
-                ('testargument_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TestArgument')),
-                ('param', models.DateField()),
-            ],
-            options={
-            },
-            bases=('survey.testargument',),
         ),
         migrations.CreateModel(
             name='TextAnswer',
@@ -761,17 +624,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='TextArgument',
-            fields=[
-                ('testargument_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TestArgument')),
-                ('param', models.TextField()),
-            ],
-            options={
-            },
-            bases=('survey.testargument',),
         ),
         migrations.CreateModel(
             name='UploadErrorLog',
@@ -787,7 +639,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='UserProfile',
@@ -798,19 +649,6 @@ class Migration(migrations.Migration):
                 ('mobile_number', models.CharField(unique=True, max_length=10, validators=[django.core.validators.MinLengthValidator(9), django.core.validators.MaxLengthValidator(9)])),
                 ('user', models.OneToOneField(related_name='userprofile', to=settings.AUTH_USER_MODEL)),
             ],
-            options={
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='USSDAccess',
-            fields=[
-                ('intervieweraccess_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.InterviewerAccess')),
-                ('aggregator', models.CharField(default=b'testAggregator', max_length=100, null=True, blank=True, choices=[(b'testAggregator', b'testAggregator')])),
-            ],
-            options={
-            },
-            bases=('survey.intervieweraccess',),
         ),
         migrations.CreateModel(
             name='VideoAnswer',
@@ -825,242 +663,398 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='DateArgument',
+            fields=[
+                ('testargument_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TestArgument')),
+                ('param', models.DateField()),
+            ],
+            bases=('survey.testargument',),
+        ),
+        migrations.CreateModel(
+            name='HouseholdHead',
+            fields=[
+                ('householdmember_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.HouseholdMember')),
+                ('occupation', models.CharField(default=b'16', max_length=100, verbose_name=b'Occupation / Main Livelihood')),
+                ('level_of_education', models.CharField(default=b'Primary', max_length=100, null=True, verbose_name=b'Highest level of education completed', choices=[(b'Did not attend school', b'Did not attend school'), (b'Nursery', b'Nursery'), (b'Primary', b'Primary'), (b"'O' Level", b"'O' Level"), (b"'A' Level", b"'A' Level"), (b'Tertiary', b'Tertiary'), (b'University', b'University')])),
+                ('resident_since', models.DateField(null=True, verbose_name=b'Since when have you lived here', blank=True)),
+            ],
+            options={
+                'verbose_name': 'Main Respondent',
+            },
+            bases=('survey.householdmember',),
+        ),
+        migrations.CreateModel(
+            name='NumberArgument',
+            fields=[
+                ('testargument_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TestArgument')),
+                ('param', models.IntegerField()),
+            ],
+            bases=('survey.testargument',),
+        ),
+        migrations.CreateModel(
+            name='ODKAccess',
+            fields=[
+                ('intervieweraccess_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.InterviewerAccess')),
+                ('odk_token', models.CharField(default=b'12345', max_length=10)),
+            ],
+            bases=('survey.intervieweraccess',),
+        ),
+        migrations.CreateModel(
+            name='ODKGeoPoint',
+            fields=[
+                ('point_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.Point')),
+                ('altitude', models.DecimalField(max_digits=10, decimal_places=3)),
+                ('precision', models.DecimalField(max_digits=10, decimal_places=3)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=('survey.point',),
+        ),
+        migrations.CreateModel(
+            name='TextArgument',
+            fields=[
+                ('testargument_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TestArgument')),
+                ('param', models.TextField()),
+            ],
+            bases=('survey.testargument',),
+        ),
+        migrations.CreateModel(
+            name='USSDAccess',
+            fields=[
+                ('intervieweraccess_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.InterviewerAccess')),
+                ('aggregator', models.CharField(default=b'testAggregator', max_length=100, null=True, blank=True, choices=[(b'testAggregator', b'testAggregator')])),
+            ],
+            bases=('survey.intervieweraccess',),
         ),
         migrations.CreateModel(
             name='WebAccess',
             fields=[
                 ('intervieweraccess_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.InterviewerAccess')),
             ],
-            options={
-            },
             bases=('survey.intervieweraccess',),
         ),
         migrations.AddField(
             model_name='testargument',
             name='flow',
-            field=models.ForeignKey(related_name='"testargument"', to='survey.QuestionFlow'),
-            preserve_default=True,
+            field=models.ForeignKey(related_name='testargument', to='survey.QuestionFlow'),
         ),
         migrations.AddField(
             model_name='randomselection',
             name='survey',
             field=models.ForeignKey(related_name='random_selections', to='survey.Survey'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='question',
             name='module',
             field=models.ForeignKey(related_name='questions', default=b'', to='survey.QuestionModule'),
-            preserve_default=True,
         ),
-        migrations.AlterUniqueTogether(
-            name='question',
-            unique_together=set([('identifier', 'batch')]),
+        migrations.AddField(
+            model_name='odksubmission',
+            name='household_member',
+            field=models.ForeignKey(related_name='odk_submissions', blank=True, to='survey.HouseholdMember', null=True),
+        ),
+        migrations.AddField(
+            model_name='odksubmission',
+            name='interviewer',
+            field=models.ForeignKey(related_name='odk_submissions', to='survey.Interviewer'),
         ),
         migrations.AddField(
             model_name='odksubmission',
             name='survey',
             field=models.ForeignKey(related_name='odk_submissions', to='survey.Survey'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='numericalanswer',
             name='question',
             field=models.ForeignKey(related_name='numericalanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='nonresponseanswer',
             name='survey_listing',
             field=models.ForeignKey(related_name='non_response_answers', to='survey.SurveyHouseholdListing'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='multiselectanswer',
             name='question',
             field=models.ForeignKey(related_name='multiselectanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='multiselectanswer',
             name='value',
-            field=models.ManyToManyField(to='survey.QuestionOption', null=True),
-            preserve_default=True,
+            field=models.ManyToManyField(to='survey.QuestionOption'),
         ),
         migrations.AddField(
             model_name='multichoiceanswer',
             name='question',
             field=models.ForeignKey(related_name='multichoiceanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='multichoiceanswer',
             name='value',
             field=models.ForeignKey(to='survey.QuestionOption', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='locationweight',
             name='survey',
             field=models.ForeignKey(related_name='location_weight', to='survey.Survey'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='location',
             name='coordinates',
-            field=models.ManyToManyField(related_name='admin_div_locations', to='locations.Point'),
-            preserve_default=True,
+            field=models.ManyToManyField(related_name='admin_div_locations', to='survey.Point'),
         ),
         migrations.AddField(
             model_name='location',
             name='parent',
             field=mptt.fields.TreeForeignKey(related_name='sub_locations', blank=True, to='survey.Location', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='location',
             name='type',
             field=models.ForeignKey(related_name='locations', to='survey.LocationType'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='intervieweraccess',
             name='interviewer',
             field=models.ForeignKey(related_name='intervieweraccess', to='survey.Interviewer'),
-            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='interview',
+            name='householdmember',
+            field=models.ForeignKey(related_name='interviews', to='survey.HouseholdMember', null=True),
         ),
         migrations.AddField(
             model_name='interview',
             name='interview_channel',
             field=models.ForeignKey(related_name='interviews', to='survey.InterviewerAccess'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='interview',
             name='interviewer',
             field=models.ForeignKey(related_name='interviews', to='survey.Interviewer', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='interview',
             name='last_question',
             field=models.ForeignKey(related_name='ongoing', blank=True, to='survey.Question', null=True),
-            preserve_default=True,
-        ),
-        migrations.AlterUniqueTogether(
-            name='interview',
-            unique_together=set([('householdmember', 'batch')]),
         ),
         migrations.AddField(
             model_name='indicator',
             name='module',
             field=models.ForeignKey(related_name='indicator', to='survey.QuestionModule'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='imageanswer',
             name='interview',
             field=models.ForeignKey(related_name='imageanswer', to='survey.Interview'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='imageanswer',
             name='question',
             field=models.ForeignKey(related_name='imageanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='housesurveycompletion',
             name='interviewer',
             field=models.ForeignKey(related_name='house_completion', to='survey.Interviewer', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='housesurveycompletion',
             name='survey',
             field=models.ForeignKey(related_name='house_completion', to='survey.Survey'),
-            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='housemembersurveycompletion',
+            name='householdmember',
+            field=models.ForeignKey(related_name='completion_register', to='survey.HouseholdMember', null=True),
         ),
         migrations.AddField(
             model_name='housemembersurveycompletion',
             name='interviewer',
             field=models.ForeignKey(related_name='house_member_completion', to='survey.Interviewer', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='housemembersurveycompletion',
             name='survey',
             field=models.ForeignKey(related_name='completion_register', to='survey.Survey'),
-            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='householdmemberbatchcompletion',
+            name='householdmember',
+            field=models.ForeignKey(related_name='completed_member_batches', to='survey.HouseholdMember', null=True),
         ),
         migrations.AddField(
             model_name='householdmemberbatchcompletion',
             name='interviewer',
             field=models.ForeignKey(related_name='completed_batches', to='survey.Interviewer', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='householdmember',
             name='household',
             field=models.ForeignKey(related_name='household_members', to='survey.Household'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='householdmember',
             name='registrar',
             field=models.ForeignKey(related_name='registered_household_members', to='survey.Interviewer'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='householdmember',
             name='survey_listing',
             field=models.ForeignKey(related_name='house_members', to='survey.SurveyHouseholdListing'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='householdlisting',
             name='initial_survey',
             field=models.ForeignKey(related_name='listings', to='survey.Survey'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='householdlisting',
             name='list_registrar',
             field=models.ForeignKey(related_name='listings', verbose_name=b'Interviewer', to='survey.Interviewer'),
-            preserve_default=True,
-        ),
-        migrations.AlterUniqueTogether(
-            name='householdlisting',
-            unique_together=set([('initial_survey', 'ea')]),
         ),
         migrations.AddField(
             model_name='householdbatchcompletion',
             name='interviewer',
             field=models.ForeignKey(related_name='batch_completed_households', to='survey.Interviewer', null=True),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='household',
             name='last_registrar',
             field=models.ForeignKey(related_name='registered_households', verbose_name=b'Interviewer', to='survey.Interviewer'),
-            preserve_default=True,
         ),
         migrations.AddField(
             model_name='household',
             name='listing',
             field=models.ForeignKey(related_name='households', to='survey.HouseholdListing'),
-            preserve_default=True,
-        ),
-        migrations.AlterUniqueTogether(
-            name='household',
-            unique_together=set([('house_number', 'listing')]),
         ),
         migrations.AddField(
             model_name='groupcondition',
             name='groups',
             field=models.ManyToManyField(related_name='conditions', to='survey.HouseholdMemberGroup'),
-            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='geopointanswer',
+            name='interview',
+            field=models.ForeignKey(related_name='geopointanswer', to='survey.Interview'),
+        ),
+        migrations.AddField(
+            model_name='geopointanswer',
+            name='question',
+            field=models.ForeignKey(related_name='geopointanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
+        ),
+        migrations.AddField(
+            model_name='formula',
+            name='count',
+            field=models.ForeignKey(related_name='as_count', blank=True, to='survey.Question', null=True),
+        ),
+        migrations.AddField(
+            model_name='formula',
+            name='denominator',
+            field=models.ForeignKey(related_name='as_denominator', blank=True, to='survey.Question', null=True),
+        ),
+        migrations.AddField(
+            model_name='formula',
+            name='denominator_options',
+            field=models.ManyToManyField(related_name='denominator_options', to='survey.QuestionOption'),
+        ),
+        migrations.AddField(
+            model_name='formula',
+            name='groups',
+            field=models.ForeignKey(related_name='as_group', blank=True, to='survey.HouseholdMemberGroup', null=True),
+        ),
+        migrations.AddField(
+            model_name='formula',
+            name='indicator',
+            field=models.ForeignKey(related_name='formula', to='survey.Indicator', null=True),
+        ),
+        migrations.AddField(
+            model_name='formula',
+            name='numerator',
+            field=models.ForeignKey(related_name='as_numerator', to='survey.Question', null=True),
+        ),
+        migrations.AddField(
+            model_name='formula',
+            name='numerator_options',
+            field=models.ManyToManyField(related_name='numerator_options', to='survey.QuestionOption'),
+        ),
+        migrations.AddField(
+            model_name='enumerationarea',
+            name='locations',
+            field=models.ManyToManyField(related_name='enumeration_areas', to='survey.Location'),
+        ),
+        migrations.AddField(
+            model_name='dateanswer',
+            name='interview',
+            field=models.ForeignKey(related_name='dateanswer', to='survey.Interview'),
+        ),
+        migrations.AddField(
+            model_name='dateanswer',
+            name='question',
+            field=models.ForeignKey(related_name='dateanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
+        ),
+        migrations.AddField(
+            model_name='batchlocationstatus',
+            name='location',
+            field=models.ForeignKey(related_name='open_batches', to='survey.Location', null=True),
+        ),
+        migrations.AddField(
+            model_name='batchcommencement',
+            name='ea',
+            field=models.ForeignKey(related_name='commencement_registry', to='survey.EnumerationArea', null=True),
+        ),
+        migrations.AddField(
+            model_name='batchcommencement',
+            name='survey',
+            field=models.ForeignKey(related_name='commencement_registry', to='survey.Survey', null=True),
+        ),
+        migrations.AddField(
+            model_name='batch',
+            name='start_question',
+            field=models.OneToOneField(related_name='starter_batch', null=True, on_delete=django.db.models.deletion.SET_NULL, blank=True, to='survey.Question'),
+        ),
+        migrations.AddField(
+            model_name='batch',
+            name='survey',
+            field=models.ForeignKey(related_name='batches', to='survey.Survey', null=True),
+        ),
+        migrations.AddField(
+            model_name='audioanswer',
+            name='interview',
+            field=models.ForeignKey(related_name='audioanswer', to='survey.Interview'),
+        ),
+        migrations.AddField(
+            model_name='audioanswer',
+            name='question',
+            field=models.ForeignKey(related_name='audioanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
+        ),
+        migrations.AddField(
+            model_name='attachment',
+            name='submission',
+            field=models.ForeignKey(related_name='attachments', to='survey.ODKSubmission'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='answeraccessdefinition',
+            unique_together=set([('answer_type', 'channel')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='question',
+            unique_together=set([('identifier', 'batch')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='interview',
+            unique_together=set([('householdmember', 'batch')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='householdlisting',
+            unique_together=set([('initial_survey', 'ea')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='household',
+            unique_together=set([('house_number', 'listing')]),
         ),
         migrations.AlterUniqueTogether(
             name='groupcondition',
@@ -1068,140 +1062,15 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='geopointanswer',
-            name='interview',
-            field=models.ForeignKey(related_name='geopointanswer', to='survey.Interview'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='geopointanswer',
-            name='question',
-            field=models.ForeignKey(related_name='geopointanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='geopointanswer',
             name='value',
             field=models.ForeignKey(to='survey.ODKGeoPoint', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='formula',
-            name='count',
-            field=models.ForeignKey(related_name='as_count', blank=True, to='survey.Question', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='formula',
-            name='denominator',
-            field=models.ForeignKey(related_name='as_denominator', blank=True, to='survey.Question', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='formula',
-            name='denominator_options',
-            field=models.ManyToManyField(related_name='denominator_options', null=True, to='survey.QuestionOption', blank=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='formula',
-            name='groups',
-            field=models.ForeignKey(related_name='as_group', blank=True, to='survey.HouseholdMemberGroup', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='formula',
-            name='indicator',
-            field=models.ForeignKey(related_name='formula', to='survey.Indicator', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='formula',
-            name='numerator',
-            field=models.ForeignKey(related_name='as_numerator', to='survey.Question', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='formula',
-            name='numerator_options',
-            field=models.ManyToManyField(related_name='numerator_options', null=True, to='survey.QuestionOption', blank=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='enumerationarea',
-            name='locations',
-            field=models.ManyToManyField(related_name='enumeration_areas', null=True, to='survey.Location'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='dateanswer',
-            name='interview',
-            field=models.ForeignKey(related_name='dateanswer', to='survey.Interview'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='dateanswer',
-            name='question',
-            field=models.ForeignKey(related_name='dateanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='batchlocationstatus',
-            name='location',
-            field=models.ForeignKey(related_name='open_batches', to='survey.Location', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='batchcommencement',
-            name='ea',
-            field=models.ForeignKey(related_name='commencement_registry', to='survey.EnumerationArea', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='batchcommencement',
-            name='survey',
-            field=models.ForeignKey(related_name='commencement_registry', to='survey.Survey', null=True),
-            preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
             name='batchchannel',
             unique_together=set([('batch', 'channel')]),
         ),
-        migrations.AddField(
-            model_name='batch',
-            name='start_question',
-            field=models.OneToOneField(related_name='starter_batch', null=True, on_delete=django.db.models.deletion.SET_NULL, blank=True, to='survey.Question'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='batch',
-            name='survey',
-            field=models.ForeignKey(related_name='batches', to='survey.Survey', null=True),
-            preserve_default=True,
-        ),
         migrations.AlterUniqueTogether(
             name='batch',
             unique_together=set([('survey', 'name')]),
-        ),
-        migrations.AddField(
-            model_name='audioanswer',
-            name='interview',
-            field=models.ForeignKey(related_name='audioanswer', to='survey.Interview'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='audioanswer',
-            name='question',
-            field=models.ForeignKey(related_name='audioanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='attachment',
-            name='submission',
-            field=models.ForeignKey(related_name='attachments', to='survey.ODKSubmission'),
-            preserve_default=True,
-        ),
-        migrations.AlterUniqueTogether(
-            name='answeraccessdefinition',
-            unique_together=set([('answer_type', 'channel')]),
         ),
     ]

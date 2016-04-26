@@ -95,18 +95,6 @@ class HouseholdMemberGroupTest(BaseTest):
         raj = self.assign_permission_to(raj, 'can_view_household_groups')
         self.client.login(username='Rajni', password='I_Rock')
 
-    #Eswar check with Tony
-    # def test_view_groups_list(self):
-    #     hmg_1 = HouseholdMemberGroup.objects.create(name="group 1", order=1)
-    #     hmg_2 = HouseholdMemberGroup.objects.create(name="group 2", order=2)
-    #     response = self.client.get('/groups/')
-    #     self.assertEqual(200, response.status_code)
-    #     templates = [template.name for template in response.templates]
-    #     self.assertIn('household_member_groups/index.html', templates)
-    #     self.assertIn(hmg_1, response.context['groups'])
-    #     self.assertIn(hmg_2, response.context['groups'])
-    #     self.assertIsNotNone(response.context['request'])
-
     def test_restricted_permissions(self):
         self.assert_restricted_permission_for('/groups/')
 
@@ -143,7 +131,6 @@ class HouseholdMemberGroupTest(BaseTest):
         self.assertEquals(1, len(associated_conditions))
         self.assertEquals(hmg_1, associated_conditions[0])
 
-        # self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')
         assert mock_success.called
 
     def test_add_group_with_non_existing_condition(self):
@@ -375,6 +362,5 @@ class HouseholdMemberGroupTest(BaseTest):
         conditions_for_deleted_group = [condition_1, condition_2, condition_3]
         [self.assertIn(condition, all_conditions) for  condition in conditions_for_deleted_group]
         [self.assertNotIn(group, condition.groups.all()) for condition in conditions_for_deleted_group]
-        # self.assertRedirects(response, expected_url='/groups/', status_code=302, target_status_code=200, msg_prefix='')
         success_message = 'Group successfully deleted.'
         self.assertIn(success_message, response.cookies['messages'].value)

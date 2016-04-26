@@ -1,12 +1,9 @@
 from django.test.client import Client
 from django.contrib.auth.models import User
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.interviewer_configs import PRIME_LOCATION_TYPE
 
 from survey.tests.base_test import BaseTest
-
-#Eswar need to look into this issue get() returned more than one LocationType -- it returned 2!
 
 class BulkSMSTest(BaseTest):
 

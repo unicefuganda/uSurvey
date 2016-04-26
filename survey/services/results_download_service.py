@@ -96,12 +96,14 @@ class ResultsDownloadService(object):
                     try:
                         answers = list(location_ancestors)
                         member_gender = 'Male' if member.gender == HouseholdMember.MALE else 'Female'
-                        answers.extend([household.listing.ea.name, household.house_number, '%s-%s' % (member.surname, member.first_name), str(member.age),
+                        answers.extend([household.listing.ea.name, household.house_number, '%s-%s' %
+                                        (member.surname, member.first_name), str(member.age),
                                              member.date_of_birth.strftime(settings.DATE_FORMAT),
                                              member_gender])
                         for question in self.questions:
                             reply = member.reply(question)
-                            if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]\
+                            if question.answer_type in [MultiChoiceAnswer.choice_name(),
+                                                        MultiSelectAnswer.choice_name()]\
                                     and self.multi_display == self.AS_LABEL:
                                 label = q_opts.get((question.pk, reply), None)
                                 if label is None:

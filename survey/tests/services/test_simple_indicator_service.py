@@ -1,5 +1,4 @@
 from random import randint
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
 from survey.models import Backend, Interviewer, QuestionModule, Question, QuestionOption, Indicator, Formula, \
     Household, HouseholdHead, Batch, MultiChoiceAnswer, HouseholdMemberGroup, Survey, GroupCondition, EnumerationArea, HouseholdListing, \
@@ -45,7 +44,6 @@ class MultiChoiceQuestionSimpleIndicatorServiceTest(BaseTest):
         self.yes_option = QuestionOption.objects.create(question=self.question_3, text="Yes", order=1)
         self.no_option = QuestionOption.objects.create(question=self.question_3, text="No", order=2)
 
-        # self.question_3.batches.add(self.batch)
 
         self.indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Percentage',
                                              batch=self.batch, module=health_module)
@@ -82,7 +80,7 @@ class MultiChoiceQuestionSimpleIndicatorServiceTest(BaseTest):
         simple_indicator_service = SimpleIndicatorService(self.formula, self.uganda)
         tabulated_data = simple_indicator_service.tabulated_data_series()
 
-        self.assertEqual(2, len(tabulated_data))
+        self.assertEqual(4, len(tabulated_data))
 
 class GroupCountSimpleIndicatorServiceTest(BaseTest):
     def setUp(self):
@@ -163,4 +161,4 @@ class GroupCountSimpleIndicatorServiceTest(BaseTest):
         simple_indicator_service = SimpleIndicatorService(self.formula, self.uganda)
         tabulated_data = simple_indicator_service.tabulated_data_series()
 
-        self.assertEqual(2, len(tabulated_data))
+        self.assertEqual(4, len(tabulated_data))

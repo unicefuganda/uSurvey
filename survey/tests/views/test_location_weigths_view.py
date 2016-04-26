@@ -2,7 +2,6 @@ import datetime
 from django.contrib.auth.models import User
 from django.test import Client
 from mock import patch
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadWeightsForm
 from survey.models import LocationWeight, Survey, UploadErrorLog, LocationTypeDetails
@@ -61,143 +60,10 @@ class UploadWeightsTest(BaseTest):
         [self.assertIn(_type, response.context['location_types']) for _type in expected_types]
         self.assertIsInstance(response.context['upload_form'], UploadWeightsForm)
 
-    #Eswar getting error in tasks upload_task
-    # def test_should_redirect_after_post(self):
-    #     data = {'file': self.file,
-    #             'survey': self.survey.id}
-    #     response = self.client.post("/locations/weights/upload/", data=data)
-    #     self.assertRedirects(response, '/locations/weights/upload/', status_code=302, target_status_code=200, msg_prefix='')
-
-    # @patch('survey.services.location_weights_upload.UploadLocationWeights.upload')
-    # def test_should_give_uploading_message(self, mock_upload):
-    #     data = {'file': self.file,
-    #             'survey': self.survey.id}
-    #     response = self.client.post('/locations/weights/upload/', data=data)
-    #     assert mock_upload.called
-    #     self.assertIn('Upload in progress. This could take a while.', response.cookies['messages'].value)
-    #
-    # def test_should_upload_csv_sucess(self):
-    #     data = {'file': self.file,
-    #             'survey': self.survey.id}
-    #     response = self.client.post('/locations/weights/upload/', data=data)
-    #
-    #     for row in self.filedata[1:]:
-    #         location = Location.objects.get(name=row[-2], tree_parent__name=row[-3])
-    #         self.failUnless(LocationWeight.objects.filter(location=location, selection_probability=row[-1]))
-    #         parents_names = location.get_ancestors().values_list('name', flat=True)
-    #         [self.assertIn(location_name, parents_names) for location_name in row[0:-2]]
-
-#     def test_upload_csv_failure_if_selection_probability_is_NaN(self):
-#         filedata = [['RegionName', 'DistrictName', 'CountyName', 'Selection Probability'],
-#                             ['region1',  'district1', 'county1', 'bla bli blo not a number'],
-#                             ['region2', 'district2', 'county2', '0.1']]
-#         self.write_to_csv('wb', filedata, self.filename)
-#         file = open(self.filename, 'rb')
-#
-#         data = {'file': file,
-#                 'survey': self.survey.id}
-#
-#         row = filedata[1]
-#         location = Location.objects.get(name=row[-2], tree_parent__name=row[-3])
-#         LocationWeight.objects.filter(location=location).delete()
-#         response = self.client.post('/locations/weights/upload/', data=data)
-#         self.failIf(LocationWeight.objects.filter(location=location))
-#
-#         location = Location.objects.get(name="county2", tree_parent__name="district2")
-#         self.failUnless(LocationWeight.objects.filter(location=location, selection_probability=0.1))
-#
     def test_assert_restricted_permissions(self):
         self.assert_login_required('/locations/weights/upload/')
         self.assert_restricted_permission_for('/locations/weights/upload/')
 
-    #Eswar parameters for locations/weights/?
-    # def test_should_get_list_and_returns_success_with_template(self):
-    #     country = LocationType.objects.create(name="Country", slug="country")
-    #     region = Location.objects.create(name="region1", type=self.reqion_type)
-    #     district = Location.objects.create(name="district1", parent=region, type=self.district_type)
-    #     county = Location.objects.create(name="county1", parent=district, type=self.county_type)
-    #
-    #     region1 = Location.objects.create(name="region2", type=self.reqion_type)
-    #     district1 = Location.objects.create(name="district2", parent=region1, type=self.district_type)
-    #     county1 = Location.objects.create(name="county2", parent=district1, type=self.county_type)
-    #     location_weight_1 = LocationWeight.objects.create(location=county, selection_probability=0.1, survey=self.survey)
-    #     location_weight_2 = LocationWeight.objects.create(location=county1, selection_probability=0.2, survey=self.survey)
-    #
-    #     response = self.client.get('/locations/weights/')
-    #     self.assertEqual(200, response.status_code)
-    #     templates = [template.name for template in response.templates]
-    #     self.assertIn('locations/weights/index.html', templates)
-    #
-    #     self.assertIn(location_weight_1, response.context['location_weights'])
-    #     self.assertIn(location_weight_2, response.context['location_weights'])
-    #     expected_location_types = [self.reqion_type, self.district_type, self.county_type]
-    #     [self.assertIn(_type, response.context['location_types']) for _type in expected_location_types]
-    #     self.assertNotIn(country, response.context['location_types'])
-    #
-    #     self.assertIsInstance(response.context['location_data'], LocationWidget)
-    #     self.assertEqual(1, len(response.context['surveys']))
-    #     self.assertIn(self.survey, response.context['surveys'])
-    #     self.assertIsNone(response.context['selected_survey'])
-    #     self.assertIsNotNone(response.context['request'])
-#
-    # def test_filter_list_weights_by_location(self):
-    #     district = Location.objects.create(name="district1", type=self.district_type)
-    #     county = Location.objects.create(name="county1", tree_parent=district, type=self.county_type)
-    #     region1 = Location.objects.create(name="region2", type=self.reqion_type)
-    #     district1 = Location.objects.create(name="district2", tree_parent=region1, type=self.district_type)
-    #     county1 = Location.objects.create(name="county2", tree_parent=district1, type=self.county_type)
-    #     weight_1 = LocationWeight.objects.create(location=county, selection_probability=0.1, survey=self.survey)
-    #     weight_2 = LocationWeight.objects.create(location=county1, selection_probability=0.2, survey=self.survey)
-    #
-    #     response = self.client.get('/locations/weights/?location=%d' % county1.id)
-    #
-    #     self.assertEqual(1, len(response.context['location_weights']))
-    #     self.assertIn(weight_2, response.context['location_weights'])
-    #     self.assertIsNone(response.context['selected_survey'])
-
-#     def test_filter_list_weights_by_survey(self):
-#         hoho_survey = Survey.objects.create(name="what hohoho")
-#         district = Location.objects.create(name="district1", type=self.district_type)
-#         county = Location.objects.create(name="county1", tree_parent=district, type=self.county_type)
-#
-#         region1 = Location.objects.create(name="region2", type=self.reqion_type)
-#         district1 = Location.objects.create(name="district2", tree_parent=region1, type=self.district_type)
-#         county1 = Location.objects.create(name="county2", tree_parent=district1, type=self.county_type)
-#         weight_1 = LocationWeight.objects.create(location=county, selection_probability=0.1, survey=self.survey)
-#         weight_2 = LocationWeight.objects.create(location=county1, selection_probability=0.2, survey=hoho_survey)
-#
-#         response = self.client.get('/locations/weights/?survey=%d' % self.survey.id)
-#
-#         self.assertEqual(1, len(response.context['location_weights']))
-#         self.assertIn(weight_1, response.context['location_weights'])
-#         self.assertEqual(self.survey, response.context['selected_survey'])
-#         self.assertEqual(2, len(response.context['surveys']))
-#         self.assertIn(self.survey, response.context['surveys'])
-#         self.assertIn(hoho_survey, response.context['surveys'])
-#
-#         self.assertIn('list_weights_page', response.context['action'])
-#
-#     def test_filter_list_weights_by_location_and_survey(self):
-#         hoho_survey = Survey.objects.create(name="what hohoho")
-#         district = Location.objects.create(name="district1", type=self.district_type)
-#         county = Location.objects.create(name="county1", tree_parent=district, type=self.county_type)
-#
-#         region1 = Location.objects.create(name="region2", type=self.reqion_type)
-#         district1 = Location.objects.create(name="district2", tree_parent=region1, type=self.district_type)
-#         county1 = Location.objects.create(name="county2", tree_parent=district1, type=self.county_type)
-#         weight_1 = LocationWeight.objects.create(location=county, selection_probability=0.1, survey=self.survey)
-#         weight_2 = LocationWeight.objects.create(location=county1, selection_probability=0.2, survey=self.survey)
-#
-#         response = self.client.get('/locations/weights/?survey=%d&location=%d' % (self.survey.id, county1.id))
-#
-#         self.assertEqual(1, len(response.context['location_weights']))
-#         self.assertIn(weight_2, response.context['location_weights'])
-#         self.assertEqual(self.survey, response.context['selected_survey'])
-#         self.assertEqual(2, len(response.context['surveys']))
-#         self.assertIn(self.survey, response.context['surveys'])
-#         self.assertIn(hoho_survey, response.context['surveys'])
-#
-#
 class UploadWeightsErrorLogTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -252,7 +118,6 @@ class UploadWeightsErrorLogTest(BaseTest):
 
 
         self.assertEqual(0, response.context['error_logs'].count())
-        # self.assertIn(error_log, response.context['error_logs'])
         self.assertEqual(error_log.created.replace(hour=0, minute=0, second=0, microsecond=0), response.context['selected_from_date'])
         self.assertEqual(error_log.created.replace(hour=0, minute=0, second=0, microsecond=0), response.context['selected_to_date'])
 

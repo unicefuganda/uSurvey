@@ -3,7 +3,6 @@ import json
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.test import Client
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
 from survey.models import Survey, Batch, Indicator, Household, Question, HouseholdMemberGroup, \
     HouseholdMemberBatchCompletion, Backend, LocationTypeDetails, EnumerationArea, Interviewer, HouseholdListing, \
@@ -55,8 +54,6 @@ class TestSurveyCompletion(BaseTest):
                                                    gender='1',level_of_education='Primary',
                                                    language='Eglish',weights=0)
 
-        # self.household_1 = Household.objects.create(investigator=self.investigator_1, ea=self.kampala_ea,
-        #                                             survey=self.survey)
         self.household_listing = HouseholdListing.objects.create(ea=self.kampala_ea,list_registrar=self.investigator_1,initial_survey=self.survey)
         self.household = Household.objects.create(house_number=123456,listing=self.household_listing,physical_address='Test address',
                                              last_registrar=self.investigator_1,registration_channel="ODK Access",head_desc="Head",
@@ -109,8 +106,8 @@ class TestSurveyCompletion(BaseTest):
 
     def test_knows_to_retrieve_completion_for_locations_that_have_no_tree_parent_if_country_type_does_not_exist(self):
         LocationType.objects.filter(name__iexact='country').delete()
-        location_with_no_parent = Location.objects.create(name='Abim', parent=self.uganda, type=self.city)
-        another_location_with_no_parent = Location.objects.create(name='Kampala', parent=self.uganda, type=self.city)
+        location_with_no_parent = Location.objects.create(name='Unganda1', type=self.country)
+        another_location_with_no_parent = Location.objects.create(name='Unganda12', type=self.country)
         form_data = {'survey': self.batch.survey.id, 'location': location_with_no_parent.id, 'batch': str(self.batch.pk), 'ea': self.kampala_ea.id}
         response = self.client.post('/surveys/completion/', data=form_data)
         self.assertIsNotNone(response.context['request'])

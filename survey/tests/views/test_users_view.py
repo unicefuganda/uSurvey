@@ -88,9 +88,6 @@ class UsersViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         user = User.objects.filter(username=form_data['username'])
         self.failIf(user)
-        print response.context['messages']._loaded_messages[0].message
-        print dir(response.context['messages']._loaded_messages[0].message)
-        # assert False
         self.assertEqual(1, len(response.context['messages']._loaded_messages))
         self.assertIn("User not registered. See errors below.", response.context['messages']._loaded_messages[0].message)
 

@@ -1,7 +1,6 @@
 from datetime import date
 from django.test import TestCase
 from django.template.defaultfilters import slugify
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import LocationType, Location
 from survey.models import Interviewer, Backend, EnumerationArea
 from survey.models.households import HouseholdHead, Household, HouseholdMember, HouseholdListing, SurveyHouseholdListing
@@ -13,7 +12,6 @@ class HouseholdHeadTest(TestCase):
     def test_fields(self):
         hHead = HouseholdHead()
         fields = [str(item.attname) for item in hHead._meta.fields]
-        print fields,"++++++++++++++++++"
         self.assertEqual(len(fields), 15)
         for field in ['id', 'created', 'modified', 'surname', 'first_name', 'gender', 'date_of_birth', 'household_id', 'survey_listing_id',
                       'registrar_id', 'registration_channel', 'householdmember_ptr_id', 'occupation', 'level_of_education', 'resident_since']:
@@ -33,14 +31,7 @@ class HouseholdHeadTest(TestCase):
                                                 )
         self.county = Location.objects.create(name="County", type=self.location_type_county, parent=self.district,code=256
                                                  )
-        # self.subcounty= Location.objects.create(name="Subcounty", type=self.location_type_subcountry, parent=self.country,code=256
-        #                                         )
-        # self.parish= Location.objects.create(name="Parish", type=self.location_type_parish, parent=self.subcountry,code=256
-        #                                         )
-        # self.village= Location.objects.create(name="Village", type=self.location_type_village, parent=self.parish,code=256
-        #                                         )
         ea = EnumerationArea.objects.create(name="Kampala EA A")
-        # some_village = Location.objects.create(name="Some village", type=village)
         investigator = Interviewer.objects.create(name="Investigator",
                                                    ea=ea,
                                                    gender='1',level_of_education='Primary',
@@ -61,7 +52,6 @@ class HouseholdHeadTest(TestCase):
 
     def test_knows_household_member_from_head(self):
         ea = EnumerationArea.objects.create(name="Kampala EA A")
-        # some_village = Location.objects.create(name="Some village", type=village)
         investigator = Interviewer.objects.create(name="Investigator",
                                                    ea=ea,
                                                    gender='1',level_of_education='Primary',

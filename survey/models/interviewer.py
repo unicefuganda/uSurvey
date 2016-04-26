@@ -12,7 +12,6 @@ from dateutil.relativedelta import relativedelta
 from survey.models.household_batch_completion import HouseSurveyCompletion, HouseholdBatchCompletion
 from survey.models.households import Household, SurveyHouseholdListing, HouseholdListing, RandomSelection
 from survey.utils.sms import send_sms
-from rapidsms.router import send
 
 def validate_min_date_of_birth(value):
     if relativedelta(datetime.utcnow().date(), value).years < INTERVIEWER_MIN_AGE:

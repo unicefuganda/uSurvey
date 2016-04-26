@@ -195,11 +195,18 @@
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-    {% if user.is_authenticated %}
-    <script type="text/javascript" src="{{ STATIC_URL }}js/ws4redis.js"></script>
+    {% if perms.auth.can_view_aggregates %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/mprogress.min.css"/>
+    <script src="{{ STATIC_URL }}js/mprogress.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/reconnecting-websocket.min.js"></script>
     <script>
-        ws_uri = '{{ WEBSOCKET_URI }}';
-        ws_heartbeat = '{{WS4REDIS_HEARTBEAT}}';
+        var myHostname = window.location.hostname;
+        var myPort = window.location.port;
+        var scheme = "ws";
+        if(document.location.protocol === "https:") {
+              scheme += "s";
+          }
+        ws_uri = scheme + "://" + myHostname + ':' + myPort + "{{ WEBSOCKET_URL }}";
     </script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/statusbar.js"></script>
     {% endif %}
@@ -355,7 +362,12 @@
 {% for breadcrumb in request.breadcrumbs %} 
 <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
 {% endfor %}
-<span class="breadnavbarblue">{% block title %}{% endblock %}</span></div></div>
+<span class="breadnavbarblue">{% block title %}{% endblock %}</span>
+<div id="status-bar" class="status-bar right">
+    <span id="status-msg">...</span>
+</div>
+</div>
+</div>
 <br />
 <div id="content" class="container">
     <div class="container">

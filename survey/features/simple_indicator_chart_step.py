@@ -1,6 +1,5 @@
 from random import randint
 from lettuce import *
-from rapidsms.contrib.locations.models import *
 from survey.models.locations import *
 from survey.features.page_objects.indicators import ListIndicatorPage, SimpleIndicatorGraphPage
 from survey.models import HouseholdMemberGroup, Indicator, LocationTypeDetails, EnumerationArea

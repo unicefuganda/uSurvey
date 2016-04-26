@@ -148,7 +148,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.messages.context_processors.messages",
     "survey.context_processor.context_extras",
     "django.core.context_processors.request",
-    'ws4redis.context_processors.default',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -157,7 +156,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'bootstrap_pagination.middleware.PaginationMiddleware',
+    'pagination_bootstrap.middleware.PaginationMiddleware',
     'breadcrumbs.middleware.BreadcrumbsMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -166,8 +165,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'mics.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-#WSGI_APPLICATION = 'mics.wsgi.application'
-WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+WSGI_APPLICATION = 'mics.wsgi.application'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -185,27 +183,29 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django_nose',
-    # 'south',
     'lettuce.django',
     'django_extensions',
-    'rapidsms.contrib.locations',
-    'rapidsms.contrib.locations.nested',
-    'bootstrap_pagination',
+    'pagination_bootstrap',
     'survey',
     'mptt',
-    'rapidsms.backends.database',
-    'rapidsms.contrib.httptester',
     'django_rq',
-    'ws4redis',
+    'django_rq_dashboard',
+    'channels',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
 
-SOUTH_MIGRATION_MODULES = {
-
-    }
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+        "ROUTING": "mics.routing.channel_routing",
+    },
+}
 
 
 # A sample logging configuration. The only tangible logging
@@ -213,7 +213,6 @@ SOUTH_MIGRATION_MODULES = {
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
-'''
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -238,11 +237,15 @@ LOGGING = {
     }
 }
 
-'''
+
 
 
 #DJANGO-WS CONFIG
-WEBSOCKET_URL = '/ws/'
+WEBSOCKET_URL = '/ws/statusbar'
+WS_HEARTBEAT = 3
+UPDATE_INTERVAL = 3 #INTERVAL BETWEEN UPDATES IN SECS
+DOWNLOAD_CACHE_DURATION=1800 #how long downloaded results would cached in secs before discarded
+DOWNLOAD_CACHE_KEY='/DOWNLOADS/%(user_id)s/'
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
@@ -325,6 +328,16 @@ RQ_QUEUES = {
     'DEFAULT_TIMEOUT': 360,
     },
     'email': {
+    'HOST': 'localhost',
+    'PORT': 6379,
+    'DB': 0,
+    },
+    'ws-notice': {
+    'HOST': 'localhost',
+    'PORT': 6379,
+    'DB': 0,
+    },
+    'upload_task': {
     'HOST': 'localhost',
     'PORT': 6379,
     'DB': 0,
