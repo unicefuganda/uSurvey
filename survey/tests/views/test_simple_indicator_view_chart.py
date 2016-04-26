@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.test.client import Client
-from survey.models.locations import Location, LocationType
+from survey.models.locations import *
 from survey.models import HouseholdMemberGroup, Survey, GroupCondition, QuestionModule, Indicator, LocationTypeDetails, \
     Batch, EnumerationArea, HouseholdListing, SurveyHouseholdListing
 from survey.models.backend import Backend
@@ -30,11 +30,9 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.district = LocationType.objects.create(name='District', parent=self.country, slug='district')
         self.village = LocationType.objects.create(name='Village', parent=self.district, slug='village')
 
-        # region = LocationType.objects.create(name="Region", slug="region")
         self.uganda = Location.objects.create(name="Uganda", type=self.country)
 
         LocationTypeDetails.objects.create(location_type=self.country, country=self.uganda)
-        # LocationTypeDetails.objects.create(location_type=region, country=self.uganda)
         LocationTypeDetails.objects.create(location_type=self.district, country=self.uganda)
         LocationTypeDetails.objects.create(location_type=self.village, country=self.uganda)
 
@@ -67,7 +65,6 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.yes_option = QuestionOption.objects.create(question=self.question_3, text="Yes", order=1)
         self.no_option = QuestionOption.objects.create(question=self.question_3, text="No", order=2)
 
-        # self.question_3.batches.add(self.batch)
 
         self.indicator = Indicator.objects.create(name="ITN 4.5", description="rajni indicator", measure='Percentage',
                                              batch=self.batch, module=self.health_module)

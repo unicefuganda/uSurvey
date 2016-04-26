@@ -1,5 +1,4 @@
 from django.test import TestCase
-from rapidsms.contrib.locations.models import Location
 from survey.models import Batch, Interviewer, Backend, Household, Survey, LocationTypeDetails
 from survey.models.household_batch_completion import HouseholdBatchCompletion
 from survey.models.locations import Location, LocationType

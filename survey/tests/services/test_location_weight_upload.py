@@ -1,5 +1,4 @@
 import os
-from rapidsms.contrib.locations.models import Location
 from survey.models.locations import *
 from survey.models import Survey, UploadErrorLog, LocationWeight
 from survey.services.location_weights_upload import UploadLocationWeights
@@ -57,7 +56,7 @@ class LocationWeightUploadHelper(BaseTest):
         rtype=LocationType.objects.create(name="region", slug='region')
         dtype=LocationType.objects.create(name="district", slug='district', parent=rtype)
         ctype=LocationType.objects.create(name="county", slug='county', parent=dtype)
-        region = Location.objects.create(name="region name not matching the one in first row of file", type=rtype)
+        region = Location.objects.create(name="region name not matching", type=rtype)
         district = Location.objects.create(name="district1", parent=region, type=dtype)
         Location.objects.create(name="county1", parent=district, type=ctype)
         self.uploader.upload(self.survey)

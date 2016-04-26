@@ -1,6 +1,5 @@
 from django import forms
 from django.forms.formsets import BaseFormSet
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.models import LocationTypeDetails
 

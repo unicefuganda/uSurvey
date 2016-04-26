@@ -1,6 +1,5 @@
 from datetime import date, datetime
 from django.test import TestCase
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import LocationType, Location
 from survey.models import HouseholdMemberGroup, LocationTypeDetails, GroupCondition, Backend, Interviewer, Household, Question, HouseholdMemberBatchCompletion, Batch, QuestionModule, EnumerationArea
 # from survey.models.batch_question_order import BatchQuestionOrder
@@ -43,23 +42,6 @@ class BatchTest(TestCase):
         batch_1 = Batch.objects.create(name="Batch name_1", description='description')
         batch_1 = Batch.objects.get(name='Batch name_1')
         self.assertEqual(batch_1.order, 2)
-
-    #Waiting for conformation--Eswar-- not able to do it for sublocations
-    # def test_should_open_batch_for_parent_and_descendant_locations(self):
-    #     country = LocationType.objects.create(name='Country', slug='country')
-    #
-    #     uganda = Location.objects.create(name="Uganda", type=country)
-    #     LocationTypeDetails.objects.create(country=uganda, location_type=country)
-    #     district = LocationType.objects.create(name='District', slug='district')
-    #     kampala = Location.objects.create(name="Kampala", type=district, tree_parent=uganda)
-    #     # masaka = Location.objects.create(name="masaka", type=district)
-    #     # uganda.is_ancestor_of(kampala)
-    #     batch = Batch.objects.create(order=1)
-    #
-    #     batch.open_for_location(uganda)
-    #     # self.assertTrue(batch.is_open_for(uganda))
-    #     self.assertTrue(batch.is_open_for(kampala))
-    #     # self.assertTrue(batch.is_open_for(masaka))
 
     def test_should_be_unique_together_batch_name_and_survey_id(self):
         survey = Survey.objects.create(name="very fast")
@@ -477,12 +459,9 @@ class BatchLocationStatusTest(TestCase):
                                                    ea=ea_2,
                                                    gender='1',level_of_education='Primary',
                                                    language='Eglish',weights=0)
-
-        # self.assertEqual(len(investigator_1.get_open_batch()), 0)
-        # self.assertEqual(len(investigator_2.get_open_batch()), 0)
         batch.open_for_location(kampala)
         batch.activate_non_response_for(kampala)
-        self.assertEquals(kampala,list(batch.get_non_response_active_locations())[0])
+        self.assertEquals(bukoto,list(batch.get_non_response_active_locations())[0])
 
         batch.deactivate_non_response_for(kampala)
         self.assertEquals(0,len(list(batch.get_non_response_active_locations())))

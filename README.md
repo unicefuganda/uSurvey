@@ -30,6 +30,8 @@ Installation
         
         python manage.py migrate
 
+        python manage.py load_parameters
+
         python manage.py runserver
 
 ==
@@ -38,24 +40,9 @@ Installation
 
         python manage.py test
 
-* run lettuce test
-adjust testsettings for test_db setup
-first install phantomjs if not already installed (brew install phantomjs in OSX).
-
-        python manage.py syncdb --settings=mics.testsettings
-        python manage.py migrate --settings=mics.testsettings
-        python manage.py harvest
-
-Done!! you're good to go :)
-
-Filenaming convention:
-----------------------
-* for tests: test_[[OBJECT]]_[[ACTION]].py
-e.g: test_location_form.py, test_location_model.py, test_location_views.py
-
 
 ====
 
 
-[![Build Status](https://travis-ci.org/unicefuganda/mics.png?branch=master)](https://travis-ci.org/unicefuganda/mics)
+[![Build Status](https://travis-ci.org/antsmc2/mics.svg?branch=uSurvey)](https://travis-ci.org/unicefuganda/mics)
 [![Coverage Status](https://coveralls.io/repos/unicefuganda/mics/badge.png)](https://coveralls.io/r/unicefuganda/mics)

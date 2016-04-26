@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.utils.datastructures import SortedDict
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.templatetags.chart_template_tags import get_computational_value_by_answer
 from survey.models.locations import *
 

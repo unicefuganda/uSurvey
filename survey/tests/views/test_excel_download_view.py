@@ -5,7 +5,6 @@ from django.test.client import Client
 from django.contrib.auth.models import User, Group, Permission
 
 from django.contrib.contenttypes.models import ContentType
-from rapidsms.contrib.locations.models import Location, LocationType
 from survey.models.locations import *
 from survey.forms.filters import SurveyBatchFilterForm
 from survey.models import GroupCondition, HouseholdMemberGroup, EnumerationArea, QuestionModule
@@ -73,43 +72,6 @@ class ExcelDownloadTest(BaseTest):
         user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
         self.client.login(username='Rajni', password='I_Rock')
 
-    # def test_downloaded_excel_file(self):
-    #     file_name = "%s.csv" % self.batch.name
-    #     data = {'batch': self.batch.pk, 'survey': self.batch.survey.pk, 'action': 'Download Spreadsheet', 'multi_option': 1}
-    #     response = self.client.get('/aggregates/spreadsheet_report', data=data)
-    #     self.assertEquals(200, response.status_code)
-    #     self.assertEquals(response.get('Content-Type'), "text/html; charset=utf-8")
-
-    def test_downloaded_excel_when_only_survey_supplied(self):
-        batchB = Batch.objects.create(order=2, name="different batch", survey=self.survey)
-        question_1B = Question.objects.create(identifier='123.7',text="This is a question123.7", answer_type='Numerical Answer',
-                                           group=self.member_group,batch=self.batch,module=self.question_mod)
-        question_2B = Question.objects.create(identifier='123.5',text="This is a question123.5", answer_type='Numerical Answer',
-                                           group=self.member_group,batch=self.batch,module=self.question_mod)
-        question_3B = Question.objects.create(identifier='123.6',text="This is a question123.6", answer_type='Numerical Answer',
-                                           group=self.member_group,batch=self.batch,module=self.question_mod)
-
-        yes_option = QuestionOption.objects.create(question=question_1B, text="OPTION 1", order=1)
-        no_option = QuestionOption.objects.create(question=question_1B, text="OPTION 2", order=2)
-
-        header_structure = ['Location', 'Household ID', 'Name', 'Age', 'Month of Birth', 'Year of Birth', 'Gender',
-                            self.question_1.identifier, self.question_2.identifier, '', self.question_3.identifier,
-                            question_1B.identifier, question_2B.identifier, '', question_3B.identifier]
-
-        expected_csv_data = ['Kampala', self.household.physical_address, 'Surname', '14', '9',  '2000',   'Male',
-                             '1',       '1', 'OPTION 1',  'ANSWER', str(1), str(no_option.order), no_option.text, '1']
-
-        contents = "%s\r\n%s\r\n" % (",".join(header_structure), ",".join(expected_csv_data))
-
-        file_name = "%s.csv" % self.survey.name
-        response = self.client.get('/aggregates/spreadsheet_report', data={'survey': self.survey.pk, 'batch':''})
-        self.assertEquals(200, response.status_code)
-        self.assertEquals(response.get('Content-Type'), "text/html; charset=utf-8")
-
-    def test_restricted_permssion(self):
-        self.assert_restricted_permission_for('/aggregates/spreadsheet_report')
-
-
 class ExcelDownloadViewTest(BaseTest):
 
     def test_get(self):
@@ -134,6 +96,8 @@ class ExcelDownloadViewTest(BaseTest):
 
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/download_spreadsheet')
+
+
 
 
 class ReportForCompletedInvestigatorTest(BaseTest):
@@ -191,7 +155,6 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         household_1 = Household.objects.create(house_number=223456,listing=household_listing_1,physical_address='Test address',
                                              last_registrar=investigator_1,registration_channel="ODK Access",head_desc="Head",
                                              head_sex='MALE')
-        # household_listing_2 = HouseholdListing.objects.create(ea=ea,list_registrar=investigator_2,initial_survey=survey)
         household_2 = Household.objects.create(house_number=223457,listing=household_listing_1,physical_address='Test address',
                                              last_registrar=investigator_2,registration_channel="ODK Access",head_desc="Head",
                                              head_sex='MALE')

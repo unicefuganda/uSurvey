@@ -1,5 +1,4 @@
 import os
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.locations import *
 from survey.models import LocationTypeDetails
 from survey.management.commands.import_countries import Command

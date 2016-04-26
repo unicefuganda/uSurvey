@@ -1,7 +1,6 @@
 import json
 from django.test.client import Client
 from django.contrib.auth.models import User
-from rapidsms.contrib.locations.models import Location
 from survey.models.locations import *
 from survey.models import Batch, Interviewer, Backend, EnumerationArea
 from survey.models.surveys import Survey
@@ -127,8 +126,6 @@ class SurveyViewTest(BaseTest):
 
         self.assertRedirects(response, '/surveys/', status_code=302, target_status_code=200, msg_prefix='')
         success_message = "Survey cannot be deleted."
-        # print response.cookies["sessionid"],"+++++++++++++++++++"
-        # self.assertIn(success_message, response.cookies['messages'].value)
 
     def test_should_throw_error_if_deleting_non_existing_survey(self):
         message = "Survey does not exist."

@@ -1,4 +1,3 @@
-from rapidsms.contrib.locations.models import LocationType, Location
 from survey.models.location_type_details import LocationTypeDetails
 from survey.models.locations import LocationType, Location
 from survey.tests.base_test import BaseTest

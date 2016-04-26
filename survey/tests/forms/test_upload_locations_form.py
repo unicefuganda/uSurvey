@@ -1,6 +1,5 @@
 import os
 from django.core.files.uploadedfile import SimpleUploadedFile
-from rapidsms.contrib.locations.models import LocationType
 from survey.models.locations import *
 from survey.forms.upload_csv_file import UploadWeightsForm, UploadLocationsForm
 from survey.models import Survey, LocationTypeDetails

@@ -6,6 +6,7 @@ DATABASES = {
         "PASSWORD": "",
         "HOST": "localhost",
     }
+
 }
 
 CACHES = {
