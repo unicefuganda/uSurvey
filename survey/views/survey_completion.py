@@ -15,7 +15,7 @@ from survey.utils.views_helper import contains_key, is_not_digit_nor_empty
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
 from survey.services.results_download_service import ResultsDownloadService
-
+import redis
 
 
 
@@ -120,10 +120,9 @@ def show(request):
 
 
 def completion_json(request, survey_id):
-    survey = Survey.objects.get(id=survey_id)
-    location_type = LocationType.largest_unit()
-    completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
-    json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
+    r_server = redis.Redis('localhost')
+    json_dump=r_server.get(int(survey_id))
+    print json_dump
     return HttpResponse(json_dump, content_type='application/json')
 
 @login_required
