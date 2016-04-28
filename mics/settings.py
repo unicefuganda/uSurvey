@@ -293,6 +293,8 @@ SHAPE_FILE_URI = '/static/map_resources/uganda_districts_2011_005.json'
 SHAPE_FILE_LOC_FIELD ='DNAME_2010'
 SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
 
+RESULT_REFRESH_FREQ=6
+
 RQ_QUEUES = {
     'default': {
     'HOST': 'localhost',
