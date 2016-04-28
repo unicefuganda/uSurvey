@@ -226,6 +226,8 @@ UPDATE_INTERVAL = 3 #INTERVAL BETWEEN UPDATES IN SECS
 DOWNLOAD_CACHE_DURATION=1800 #how long downloaded results would cached in secs before discarded
 DOWNLOAD_CACHE_KEY='/DOWNLOADS/%(user_id)s/'
 
+SURVEY_REDIS_KEY = "/usurvey/completion_rates/%(survey_id)s"
+
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 

@@ -22,7 +22,7 @@ def add_to_redis():
     r_server = redis.Redis()
     survey_all = Survey.objects.all().values_list("id")
     for id in survey_all:
-        key = "/usurvey/completion_rates/%s" %str(id[0])
+        key = settings.SURVEY_REDIS_KEY%{'survey_id':str(id[0])}
         survey = Survey.objects.get(id=id[0])
         location_type = LocationType.largest_unit()
         expire_time = (settings.RESULT_REFRESH_FREQ*60+30)*60
