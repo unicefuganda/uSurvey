@@ -120,7 +120,7 @@ def show(request):
 
 
 def completion_json(request, survey_id):
-    r_server = redis.Redis('localhost')
+    r_server = redis.Redis()
     json_dump=r_server.get(int(survey_id))
     print json_dump
     return HttpResponse(json_dump, content_type='application/json')

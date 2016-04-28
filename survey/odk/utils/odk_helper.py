@@ -25,6 +25,7 @@ from survey.utils.zip import InMemoryZip
 from django.contrib.sites.models import Site
 from dateutils import relativedelta
 from django.db.utils import IntegrityError
+from django_rq import job
 
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
@@ -238,7 +239,7 @@ def save_household_list(interviewer, survey, survey_tree, survey_listing):
                                      physical_address=_get_nodes('./physicalAddress', tree=node)[0].text,
                                      head_desc=_get_nodes('./headDesc', tree=node)[0].text,
                                      head_sex=_get_nodes('./headSex', tree=node)[0].text,
-                        )
+                            )
             house_number = house_number + 1
             households.append(household)
     except IntegrityError:
@@ -263,6 +264,46 @@ def save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing):
                 )
             )
     return non_responses
+
+@job('odk')
+def save_survey_questions(survey, interviewer, survey_tree, media_files):
+    form_id = _get_form_id(survey_tree)
+    member = _get_or_create_household_member(interviewer, survey, survey_tree)
+    response_dict = _get_responses(interviewer, survey_tree, survey)
+    treated_batches = {}
+    interviews = {}
+    if response_dict:
+        for (b_id, q_id), answer in response_dict.items():
+            question = Question.objects.get(pk=q_id)
+            batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
+            if answer is not None:
+                if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(), VideoAnswer.choice_name()]:
+                    answer = media_files.get(answer, None)
+                interview = interviews.get(b_id, None)
+                if interview is None:
+                    interview, _ = Interview.objects.get_or_create(
+                                               interviewer=interviewer,
+                                               householdmember=member,
+                                               batch=batch,
+                                               interview_channel=interviewer.odk_access[0],
+                                               ea=interviewer.ea
+                                           )
+                    interviews[b_id] = interview
+                created = record_interview_answer(interview, question, answer)
+            if b_id not in treated_batches.keys():
+                treated_batches[b_id] = batch
+        map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
+        member.survey_completed()
+        if member.household.has_completed(survey):
+            map(lambda batch: member.household.batch_completed(batch, interviewer), treated_batches.values())
+            member.household.survey_completed(survey, interviewer)
+    household = member.household
+    submission = ODKSubmission.objects.create(interviewer=interviewer,
+                survey=survey, form_id= form_id, description=SURVEY_DESC,
+                instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
+                xml=etree.tostring(survey_tree, pretty_print=True))
+    #    execute.delay(submission.save_attachments, media_files)
+    submission.save_attachments(media_files.values())
 
 #@transaction.autocommit
 def process_submission(interviewer, xml_file, media_files=[], request=None):
@@ -296,43 +337,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                     household_member=member, household=non_response.household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
     else:
-        member = _get_or_create_household_member(interviewer, survey, survey_tree)
-        response_dict = _get_responses(interviewer, survey_tree, survey)
-        treated_batches = {}
-        interviews = {}
-        if response_dict:
-            for (b_id, q_id), answer in response_dict.items():
-                question = Question.objects.get(pk=q_id)
-                batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-                if answer is not None:
-                    if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(), VideoAnswer.choice_name()]:
-                        answer = media_files.get(answer, None)
-                    interview = interviews.get(b_id, None)
-                    if interview is None:
-                        interview, _ = Interview.objects.get_or_create(
-                                                   interviewer=interviewer,
-                                                   householdmember=member,
-                                                   batch=batch,
-                                                   interview_channel=interviewer.odk_access[0],
-                                                   ea=interviewer.ea
-                                               )
-
-                        interviews[b_id] = interview
-                    created = record_interview_answer(interview, question, answer)
-                if b_id not in treated_batches.keys():
-                    treated_batches[b_id] = batch
-            map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
-            member.survey_completed()
-            if member.household.has_completed(survey):
-                map(lambda batch: member.household.batch_completed(batch, interviewer), treated_batches.values())
-                member.household.survey_completed(survey, interviewer)
-        household = member.household
-        submission = ODKSubmission.objects.create(interviewer=interviewer,
-                    survey=survey, form_id= form_id, description=SURVEY_DESC,
-                    instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
-                    xml=etree.tostring(survey_tree, pretty_print=True))
-        #    execute.delay(submission.save_attachments, media_files)
-        submission.save_attachments(media_files.values())
+        save_survey_questions.delay(survey, interviewer, survey_tree, media_files)
     return submission
 
 def get_survey(interviewer):
