@@ -118,7 +118,8 @@ def show(request):
     content['filter'] = location_filter_form
     return render(request, 'aggregates/completion_status.html', content)
 
-
+@login_required
+@permission_required('auth.can_view_aggregates')
 def completion_json(request, survey_id):
     r_server = redis.Redis()
     key=settings.SURVEY_REDIS_KEY%{'survey_id':str(survey_id)}
