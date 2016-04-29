@@ -121,7 +121,8 @@ def show(request):
 
 def completion_json(request, survey_id):
     r_server = redis.Redis()
-    json_dump=r_server.get(int(survey_id))
+    key = "/usurvey/completion_rates/%s" %str(survey_id)
+    json_dump=r_server.get(key)
     print json_dump
     return HttpResponse(json_dump, content_type='application/json')
 
