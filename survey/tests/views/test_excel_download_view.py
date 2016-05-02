@@ -130,7 +130,7 @@ class ExcelDownloadViewTest(BaseTest):
         response = self.client.get(url)
         rq_queues=django_rq.get_queue('results-queue')
         keys=rq_queues.connection.keys()
-        self.assertIn('rq:finished:results-queue',keys )
+        self.assertIn('rq:queue:results-queue',keys )
 
     def test_email(self):
         country = LocationType.objects.create(name='Country', slug='country')
@@ -165,7 +165,7 @@ class ExcelDownloadViewTest(BaseTest):
         rq_queues=django_rq.get_queue('results-queue')
         keys=rq_queues.connection.keys()
         print "checkig asserts"
-        self.assertIn('rq:wip:email',keys)
+        self.assertIn('rq:queue:email',keys)
         self.assertNotIn("testkey",keys)
 
 class ReportForCompletedInvestigatorTest(BaseTest):
