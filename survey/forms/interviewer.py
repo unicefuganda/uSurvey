@@ -101,7 +101,8 @@ class USSDAccessForm(ModelForm):
             raise ValidationError('Invalid mobile number')
         accesses = USSDAccess.objects.filter(user_identifier=identifier.national_number)
         if self.instance and accesses.exclude(interviewer=self.instance.interviewer).exists():
-            raise ValidationError('This mobile number is already in use by %s' % accesses[0].interviewer.name)
+            raise ValidationError('This mobile number is already in use by %s' % accesses.
+                                  exclude(interviewer=self.instance.interviewer)[0].interviewer.name)
         return self.cleaned_data['user_identifier']
 
 class ODKAccessForm(ModelForm):

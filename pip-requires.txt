@@ -11,8 +11,6 @@ django-mptt>=0.8.0
 Werkzeug==0.8.3
 django-autocomplete-light==1.2.0
 git+git://github.com/staticdev/django-pagination-bootstrap.git
-uWSGI >=1.9.20
-gunicorn==0.17.4
 Fabric==1.6.1
 mock
 newrelic==1.13.1.31

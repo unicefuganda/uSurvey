@@ -7,7 +7,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from survey.models.locations import *
 from survey.forms.filters import SurveyBatchFilterForm
-from survey.models import GroupCondition, HouseholdMemberGroup, EnumerationArea, QuestionModule
+from survey.models import GroupCondition, HouseholdMemberGroup, EnumerationArea, QuestionModule, LocationTypeDetails
 from survey.models.batch import Batch
 # from survey.models.batch_question_order import *
 from survey.models.households import HouseholdHead, Household, HouseholdMember, HouseholdListing,SurveyHouseholdListing
@@ -17,7 +17,8 @@ from survey.models.interviewer import Interviewer
 from survey.models.questions import Question, QuestionOption
 from survey.models.surveys import Survey
 from survey.tests.base_test import BaseTest
-
+from django.http.request import QueryDict, MultiValueDict
+import django_rq
 
 class ExcelDownloadTest(BaseTest):
 
@@ -97,8 +98,75 @@ class ExcelDownloadViewTest(BaseTest):
     def test_restricted_permssion(self):
         self.assert_restricted_permission_for('/aggregates/download_spreadsheet')
 
+    def test_excel_download(self):
+        country = LocationType.objects.create(name='Country', slug='country')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
 
+        district_type = LocationType.objects.create(name="Districttype", slug='districttype',parent=country)
+        county_type = LocationType.objects.create(name="Countytype", slug='countytype',parent=district_type)
+        subcounty_type = LocationType.objects.create(name="subcountytype", slug='subcountytype',parent=county_type)
+        parish_type = LocationType.objects.create(name="Parishtype", slug='parishtype',parent=county_type)
 
+        district = Location.objects.create(name="district1", parent=uganda, type=district_type)
+        county_1 = Location.objects.create(name="county1", parent=district, type=county_type)
+        subcounty_1 = Location.objects.create(name="subcounty_1", parent=county_1, type=subcounty_type)
+        parish_1 = Location.objects.create(name="parish_1", parent=subcounty_1, type=parish_type)
+        survey = Survey.objects.create(name='survey name', description='survey descrpition',
+                                            sample_size=10)
+        batch = Batch.objects.create(order=1, name="Batch A", survey=survey)
+        client = Client()
+        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+
+        some_group = Group.objects.create(name='some group')
+        auth_content = ContentType.objects.get_for_model(Permission)
+        permission, out = Permission.objects.get_or_create(codename='can_view_aggregates', content_type=auth_content)
+        some_group.permissions.add(permission)
+        some_group.user_set.add(raj)
+
+        self.client.login(username='Rajni', password='I_Rock')
+        url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Download+Spreadsheet' %(survey.id,batch.id)
+        response = self.client.get(url)
+        rq_queues=django_rq.get_queue('results-queue')
+        keys=rq_queues.connection.keys()
+        self.assertIn('rq:queue:results-queue',keys )
+
+    def test_email(self):
+        country = LocationType.objects.create(name='Country', slug='country')
+        uganda = Location.objects.create(name="Uganda", type=country)
+        LocationTypeDetails.objects.create(country=uganda, location_type=country)
+
+        district_type = LocationType.objects.create(name="Districttype", slug='districttype',parent=country)
+        county_type = LocationType.objects.create(name="Countytype", slug='countytype',parent=district_type)
+        subcounty_type = LocationType.objects.create(name="subcountytype", slug='subcountytype',parent=county_type)
+        parish_type = LocationType.objects.create(name="Parishtype", slug='parishtype',parent=county_type)
+
+        district = Location.objects.create(name="district1", parent=uganda, type=district_type)
+        county_1 = Location.objects.create(name="county1", parent=district, type=county_type)
+        subcounty_1 = Location.objects.create(name="subcounty_1", parent=county_1, type=subcounty_type)
+        parish_1 = Location.objects.create(name="parish_1", parent=subcounty_1, type=parish_type)
+        survey = Survey.objects.create(name='survey nam1e', description='survey descrpition',
+                                            sample_size=10)
+        batch = Batch.objects.create(order=11, name="Batch 1A", survey=survey)
+        client = Client()
+        raj = User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock')
+        user_without_permission = User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+
+        some_group = Group.objects.create(name='some group')
+        auth_content = ContentType.objects.get_for_model(Permission)
+        permission, out = Permission.objects.get_or_create(codename='can_view_aggregates', content_type=auth_content)
+        some_group.permissions.add(permission)
+        some_group.user_set.add(raj)
+
+        self.client.login(username='Rajni', password='I_Rock')
+        url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Email+Spreadsheet' %(survey.id,batch.id)
+        response = self.client.get(url)
+        rq_queues=django_rq.get_queue('results-queue')
+        keys=rq_queues.connection.keys()
+        print "checkig asserts"
+        self.assertIn('rq:queue:email',keys)
+        self.assertNotIn("testkey",keys)
 
 class ReportForCompletedInvestigatorTest(BaseTest):
     def setUp(self):
@@ -181,7 +249,7 @@ class ReportForCompletedInvestigatorTest(BaseTest):
         row1.extend(list(LocationType.objects.all().values_list('name', flat=True)))
         contents = "%s\r\n" % (",".join(row1))
         [self.assertNotIn(investigator_details, response.content) for investigator_details in unexpected_data]
-#
+
     def test_restricted_permission(self):
         self.assert_login_required('/interviewers/completed/download/')
         self.assert_restricted_permission_for('/interviewers/completed/download/')

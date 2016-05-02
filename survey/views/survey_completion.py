@@ -15,8 +15,8 @@ from survey.utils.views_helper import contains_key, is_not_digit_nor_empty
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
 from survey.services.results_download_service import ResultsDownloadService
-
-
+import redis
+from django.conf import settings
 
 
 def is_valid(params):
@@ -118,12 +118,18 @@ def show(request):
     content['filter'] = location_filter_form
     return render(request, 'aggregates/completion_status.html', content)
 
-
+@login_required
+@permission_required('auth.can_view_aggregates')
 def completion_json(request, survey_id):
-    survey = Survey.objects.get(id=survey_id)
-    location_type = LocationType.largest_unit()
-    completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
-    json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
+    r_server = redis.Redis()
+    key=settings.SURVEY_REDIS_KEY%{'survey_id':str(survey_id)}
+    if r_server.exists(key):
+        json_dump=r_server.get(key)
+    else:
+        survey = Survey.objects.get(id=survey_id)
+        location_type = LocationType.largest_unit()
+        completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
+        json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, content_type='application/json')
 
 @login_required

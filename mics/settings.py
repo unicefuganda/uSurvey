@@ -70,7 +70,7 @@ CACHES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = [ ]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -247,6 +247,8 @@ UPDATE_INTERVAL = 3 #INTERVAL BETWEEN UPDATES IN SECS
 DOWNLOAD_CACHE_DURATION=1800 #how long downloaded results would cached in secs before discarded
 DOWNLOAD_CACHE_KEY='/DOWNLOADS/%(user_id)s/'
 
+SURVEY_REDIS_KEY = "/usurvey/completion_rates/%(survey_id)s"
+
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 
@@ -314,6 +316,8 @@ SHAPE_FILE_URI = '/static/map_resources/uganda_districts_2011_005.json'
 SHAPE_FILE_LOC_FIELD ='DNAME_2010'
 SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
 
+RESULT_REFRESH_FREQ=6
+
 RQ_QUEUES = {
     'default': {
     'HOST': 'localhost',
@@ -338,6 +342,11 @@ RQ_QUEUES = {
     'DB': 0,
     },
     'upload_task': {
+    'HOST': 'localhost',
+    'PORT': 6379,
+    'DB': 0,
+    },
+    'odk': {
     'HOST': 'localhost',
     'PORT': 6379,
     'DB': 0,
