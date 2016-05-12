@@ -35,7 +35,7 @@ Installation
         supervisord
 
         supervisorctl
-        (If any service is stopped, start that service eg: >start <servicename>)
+        (If any service is stopped, start that service eg: supervisor> start [servicename])
 
 ==
 
