@@ -32,7 +32,10 @@ Installation
 
         python manage.py load_parameters
 
-        python manage.py runserver
+        supervisord
+
+        supervisorctl
+        (If any service is stopped, start that service eg: >start <servicename>)
 
 ==
 
