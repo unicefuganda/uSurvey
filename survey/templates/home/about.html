@@ -1,14 +1,386 @@
-{% extends "layout.html" %}
-{% block title %}
-  About
-{% endblock %}
-{% block content %}
-    {% if perms.auth.can_view_users %}
-        <div class="btn-group pull-right">
-            <a class="btn" href="{% url 'edit_about_page' %}" id="edit-about_us"><i class="icon icon-pencil"></i> Edit</a>
-        </div>
-        <br class="clear"/> <br/>
-    {% endif %}
+<!doctype html>
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><html lang="en" class="no-js"> <![endif]-->
+<html lang="en">
 
-    {{ about_content.content|safe }}
-{% endblock%}
+<head>
+
+  <!-- Basic -->
+  <title> uSurvey | About Us</title>
+
+  <!-- Define Charset -->
+  <meta charset="utf-8">
+
+  <!-- Responsive etatag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Page Description and Author -->
+  <meta name="description" content="uSurvey - Website">
+  <meta name="author" content="Tolulope Owolabi">
+
+
+  <link rel="stylesheet" href=" {{ STATIC_URL }}asset/css/bootstrap.min.css" type="text/css" media="screen">
+
+  <!-- Font Awesome CSS -->
+  <link rel="stylesheet" href=" {{ STATIC_URL }}css/font-awesome.min.css" type="text/css" media="screen">
+
+  <!-- Slicknav -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/slicknav.css" media="screen">
+
+  <!-- Margo CSS Styles  -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/style.css" media="screen">
+
+  <!-- Responsive CSS Styles  -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/responsive.css" media="screen">
+
+  <!-- Css3 Transitions Styles  -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/animate.css" media="screen">
+
+  <!-- Color CSS Styles  -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/red.css" title="red" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/jade.css" title="jade" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/blue.css" title="blue" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/beige.css" title="beige" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/cyan.css" title="cyan" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/green.css" title="green" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/orange.css" title="orange" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/peach.css" title="peach" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/pink.css" title="pink" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/purple.css" title="purple" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/sky-blue.css" title="sky-blue" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/yellow.css" title="yellow" media="screen" />
+
+
+  <!-- Margo JS  -->
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.migrate.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/modernizrr.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}asset/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/owl.carousel.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/nivo-lightbox.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.isotope.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.appear.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/count-to.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.textillate.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.lettering.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.easypiechart.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.nicescroll.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.parallax.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.slicknav.js"></script>
+
+  <!--[if IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+</head>
+
+<body>
+
+  <!-- Container -->
+  <div id="container">
+
+    <!-- Start Header -->
+    <div class="hidden-header"></div>
+    <header class="clearfix">
+
+      <!-- Start Top Bar -->
+      <div class="top-bar">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Start Contact Info -->
+              <ul class="contact-details">
+                <li><a href="#"><i class="fa fa-envelope-o"></i> info@usurvey.uniceflabs.org</a>
+                </li>
+                <li><a href="#"><i class="fa fa-phone"></i> +12 345 678 000</a>
+                </li>
+              </ul>
+              <!-- End Contact Info -->
+            </div>
+            <div class="col-md-6">
+              <!-- Start Social Links -->
+              <ul class="social-list">
+                <li>
+                  <a class="facebook itl-tooltip" data-placement="bottom" title="Facebook" href="#"><i class="fa fa-facebook"></i></a>
+                </li>
+                <li>
+                  <a class="twitter itl-tooltip" data-placement="bottom" title="Twitter" href="#"><i class="fa fa-twitter"></i></a>
+                </li>
+                <li>
+                  <a class="google itl-tooltip" data-placement="bottom" title="Google Plus" href="#"><i class="fa fa-google-plus"></i></a>
+                </li>
+                <li>
+                  <a class="linkdin itl-tooltip" data-placement="bottom" title="Linkedin" href="#"><i class="fa fa-linkedin"></i></a>
+                </li>
+                <li>
+                  <a class="instgram itl-tooltip" data-placement="bottom" title="Instagram" href="#"><i class="fa fa-instagram"></i></a>
+                </li>
+              </ul>
+              <!-- End Social Links -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Top Bar -->
+
+      <!-- Start Header ( Logo & Naviagtion ) -->
+      <div class="navbar navbar-default navbar-top">
+        <div class="container">
+          <div class="navbar-header">
+            <!-- Stat Toggle Nav Link For Mobiles -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <i class="fa fa-bars"></i>
+            </button>
+            <!-- End Toggle Nav Link For Mobiles -->
+            <a class="navbar-brand" href="index.html"><img alt="" src="{{ STATIC_URL }}images/uSurvey.png"></a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <!-- Stat Search -->
+            <!--<div class="search-side">-->
+             <!--{% if user.is_authenticated %}-->
+              <!--<ul class="nav  "><li><a class="ulogin" href="{% url 'home_page' %}">SURVEY</a></li></ul>-->
+
+<!--{% else %}-->
+              <!--<ul class="nav  "><li> <a class="ulogin" href="{% url 'login_page' %}" class="ulogin">LOGIN</a></li></ul>-->
+
+<!--{% endif%}-->
+            <!--</div>-->
+            <!-- End Search -->
+            <!-- Start Navigation List -->
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="/">Home</a></li>
+              <li><a class="active" href="{% url 'about_page' %}">About Us</a></li>
+              <li><a href="#content">Discover</a></li>
+              <li><a href="">Contact</a></li>
+              {% if user.is_authenticated %}
+              <li><a class="ulogin" href="{% url 'home_page' %}">SURVEY</a></li>
+              {% else %}
+              <li> <a class="ulogin" href="{% url 'login_page' %}" class="ulogin">LOGIN</a></li>
+              {% endif %}
+            </ul>
+            <!-- End Navigation List -->
+          </div>
+        </div>
+
+        <!-- Mobile Menu Start -->
+        <ul class="wpb-mobile-menu">
+          <li><a href="/">Home</a></li>
+          <li><a class="active" href="{% url 'about_page' %}">About Us</a></li>
+          <li><a href="#content">Discover</a></li>
+          <li><a href="#" >Contact</a></li>
+          {% if user.is_authenticated %}
+          <li><a class="ulogin" href="{% url 'home_page' %}">SURVEY</a></li>
+          {% else %}
+          <li> <a class="ulogin" href="{% url 'login_page' %}" class="ulogin">LOGIN</a></li>
+          {% endif %}
+        </ul>
+        <!-- Mobile Menu End -->
+
+      </div>
+      <!-- End Header ( Logo & Naviagtion ) -->
+
+    </header>
+    <!-- End Header -->
+
+
+    <!-- Start Page Banner -->
+    <div class="page-banner" style="padding:40px 0; background: url(images/slide-02-bg.jpg) center #f9f9f9;">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <h2>About uSurvey</h2>
+          </div>
+          <div class="col-md-6">
+            <ul class="breadcrumbs">
+              <li><a href="#">Home</a></li>
+              <li>About uSurvey</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Page Banner -->
+
+
+    <!-- Start Content -->
+    <div id="content">
+      <div class="container">
+        <div class="page-content">
+
+
+          <div class="row">
+
+            <div class="col-md-12">
+
+              <!-- Classic Heading -->
+              <h4 class="classic-title"><span>About uSurvey</span></h4>
+
+              <!-- Some Text -->
+<h3>Introduction</h3>
+    <p> uSurvey is a web-based data collection tool designed in partnership with the Uganda Bureau of Statistics (UBOS) to 
+              <ol type="i">           
+<li> Enhance timely release of survey results, </li>
+<li> Increase frequency of collection of information on indicators that would otherwise be updated after long time intervals, (e.g. every 4-5 years); and </li>
+<li> Facilitatethe collection of more disaggregated data (i.e. smaller geographical units), thereby enabling the identification and collection of information on marginalized communities. </li>
+</ol>
+</p>
+<h3>USSD and ODK Channel</h3>
+<p> uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via  USSD and ODK channels. This secure and interactive connection enables communication through the relay of survey questions from the server to the hand-held mobile device and the instant transmission of each response from the mobile device to the server. The off-line ODK (Open Data Kit) based mobile application to optimize its utilization in locations with intermittent mobile connections. </p>
+
+<h3>Sampled and Non Sampled Survey</h3>
+
+<p> uSurvey has been developed to collect information from a scientifically selected sample in standard surveys. To this end, it possesses in-built capabilities to randomly select a representative sample from a population of interest and generate a list of unique identification numbers for each sampling unit (e.g. households, institutions, etc.) to be included in the sample. Just like for traditional surveys techniques, uSurvey results can be used to make inferences about the population from which the sample was selected. </p>
+
+<p> uSurvey has an in-built “questions bank” to enable the speedy design of survey questionnaires through selection of applicable questions, with automated validation and skip logic, for each survey instead of typing them every time they are needed for a survey. Further, interviewers/enumerators can be appointed in advance and assigned to his/her Enumeration Area (EA) by phone number. The system will automatically assign the data from that phone number to the EA. The survey can be launched centrally to collect data over a USSD channel or by downloading the survey on any smartphone. </p>
+<br><br></div>
+
+<div class="col-md-12">
+              <img class="img-responsive text-center" alt="" src="{{ STATIC_URL }}images/question.jpg">
+</div>
+
+<div class="col-md-12"> 
+<h3>Real Time Monitoring:</h3>
+
+<p> uSurvey eliminates the use of paper questionnaires and associated delays in the release of survey results oftentimes due to the time required for data capture, editing and cleaning. The tool enables remote review and (if necessary) editing of captured data in real time, while the data collectors are still in the field. This feature enables the use of smaller field teams through the removal of field-based editors. In addition, the system has in-built data summarization and visualization features and is, therefore, capable to produce graphic or tabulated descriptive statistics such as frequencies, proportions, means, basic charts and distribution maps for variables selected by the user. </p>
+
+<p> To ensure that the information entered into the system was captured from the correct sampling unit, uSurvey captures sampling units geo-codes as well as the time when the enumeration of each sampling unit was done. The tool also has in-built automated edit checks that can be selected in association with questions to ensure that only valid responses are captured against each question. This caters for edit checks typically built in programmes developed for survey data capture when paper questionnaires are used for data collection during surveys. </p>
+
+<p> uSurvey will significantly contribute to the Agenda 2030 requirement of a data revolution to provide evidence for development programming, and enable the monitoring of SDG indicators, by implementing one of the three recommendations of the UN Secretary-General appointed Independent Expert Advisory Group on a Data Revolution for Sustainable Development (IEAG): Fostering and promoting innovation to fill data gaps. This tool is expected to improve the quality of survey data through:
+(i) shortened time lag between surveydata collection and results release,
+(ii) increased levels of geographical disaggregation of collected data, and
+(iii) increased frequency of survey data collection. Furthermore, uSurvey will contribute to addressing the two big global challenges highlighted with regards to the current state of data by IEAG:
+</p>
+The challenge of invisibility <br>
+The challenge of inequality
+
+</div>
+
+          </div>
+        
+        </div>
+      </div>
+    </div>
+    <!-- End content -->
+
+
+    <!-- Start Footer -->
+    <footer>
+      <div class="container">
+        <div class="row footer-widgets">
+
+          <!-- Start Subscribe & Social Links Widget -->
+          <div class="col-md-3">
+            <div class="footer-widget social-widget">
+              <h4>Follow Us<span class="head-line"></span></h4>
+              <ul class="social-icons">
+                <li>
+                  <a class="facebook" href="#"><i class="fa fa-facebook"></i></a>
+                </li>
+                <li>
+                  <a class="twitter" href="#"><i class="fa fa-twitter"></i></a>
+                </li>
+                <li>
+                  <a class="google" href="#"><i class="fa fa-google-plus"></i></a>
+                </li>
+                <li>
+                  <a class="instgram" href="#"><i class="fa fa-instagram"></i></a>
+                </li>
+               </ul>
+            </div>
+          </div>
+          <!-- .col-md-3 -->
+          <!-- End Subscribe & Social Links Widget -->
+
+
+          <!-- Start Twitter Widget -->
+          <div class="col-md-3">
+            <div class="footer-widget twitter-widget">
+              <h4>Twitter Feed<span class="head-line"></span></h4>
+              <div> <!-- TWITTER FEED HERE--> 
+                <a class="twitter-timeline" style="color: #FFF !important;" data-border-color="#E6E6E6" data-tweet-limit="2" width="450px" height="430px" data-theme="white" data-chrome="noheader nofooter noscrollbar transparent"
+			href="https://twitter.com/StatisticsUg" data-widget-id="638385587934887936">Loading...</a></span>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+              
+              </div>
+            </div>
+          </div>
+          <!-- .col-md-3 -->
+          <!-- End Twitter Widget -->
+
+
+          <!-- Start Flickr Widget -->
+          <div class="col-md-3">
+            <div class="footer-widget flickr-widget">
+              <h4>Facebook Box<span class="head-line"></span></h4>
+              <div> <!-- FACEBOOK BOX HERE--> 
+<div class="fb-page" data-href="https://www.facebook.com/unicefuganda"
+data-width="370" data-height="430" data-small-header="true"
+data-adapt-container-width="false" style="background-color:#000000"
+data-hide-cover="true" data-show-facepile="false"
+data-show-posts="true" colorscheme="dark"><div
+class="fb-xfbml-parse-ignore"><blockquote
+cite="https://www.facebook.com/unicefuganda"><a
+href="https://www.facebook.com/unicefuganda">Loading...</a></blockquote></div></div>
+
+              </div>
+            </div>
+          </div>
+          <!-- .col-md-3 -->
+          <!-- End Flickr Widget -->
+
+
+          <!-- Start Contact Widget -->
+          <div class="col-md-3">
+            <div class="footer-widget contact-widget">
+              <h4><img src="{{ STATIC_URL }}images/footer-uSurvey.png" class="img-responsive" alt="Footer Logo" /></h4>
+              <p>uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via USSD and ODK channels. This secure and interactive connection enables communication through the relay of survey questions from the server to the hand-held mobile device and the instant transmission of each response from the mobile device to the server. </p>
+              <ul>
+                <!--li><span>Phone Number:</span> +01 234 567 890</li-->
+                <li><span>Email:</span> info@usurvey.uniceflabs.org</li>
+                <li><span>Website:</span> usurvey.uniceflabs.org</li>
+              </ul>
+            </div>
+          </div>
+          <!-- .col-md-3 -->
+          <!-- End Contact Widget -->
+
+
+        </div>
+        <!-- .row -->
+
+        <!-- Start Copyright -->
+        <div class="copyright-section">
+          <div class="row">
+            <div class="col-md-6">
+              <p>&copy; 2013 - 2016 UNICEF & UBOS  - All Rights Reserved  </p>
+            </div>
+            <div class="col-md-6">
+              <ul class="footer-nav">
+                <li><a href="#">About</a></li>
+                <li><a href="#">Support</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- End Copyright -->
+
+      </div>
+    </footer>
+    <!-- End Footer -->
+
+  </div>
+  <!-- End Container -->
+
+  <!-- Go To Top Link -->
+  <a href="#" class="back-to-top"><i class="fa fa-angle-up"></i></a>
+
+
+  <script type="text/javascript" src="{{ STATIC_URL }}js/script.js"></script>
+
+</body>
+
+</html>

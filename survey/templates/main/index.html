@@ -1,576 +1,423 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><html lang="en" class="no-js"> <![endif]-->
+<html lang="en">
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-    <title>{{ PROJECT_TITLE }} :: Home</title>
-<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet" type="text/css" />
-<script src="{{ STATIC_URL }}js/jquery.min.js"></script>
-<script src="{{ STATIC_URL }}css/jquery.flexslider-min.js"></script>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/flexslider.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" />
-	<script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>
-<script type="text/javascript">
-        var $j = jQuery.noConflict();
-        $j(window).load(function() {
-            $j('.flexslider').flexslider({
-                animation: "slide",
-                slideshow: true,
-                slideshowSpeed: 10000,
-                pauseOnHover: true,
-                animationSpeed: 1000,
-                controlNav: true
-            });
-        });
-    </script>
 
-<script>
-$(document).ready( function(){	
-	// Click snowman to expand
-	$('.snowman').click(function() {
-		$(this).toggleClass('expanded');
-	});
-});
-</script>
-<script>$( document ).ready( function() {
-      var now = new Date();
-      var currentMonth = now.getMonth();//returns 0-11
-      //based on month hide or show your div
-      if( currentMonth > 0 && currentMonth < 10 ) {
-      $( "#winter-panel").show();
-	  $( "#winter-panel-xmas" ).hide();
-      } 
-      else {
-      $( "#winter-panel-xmas" ).show();
-	   $( "#winter-panel").hide();
-      }
-    });</script>
+  <!-- Basic -->
+  <title>uSurvey | Home</title>
+  <meta charset="utf-8">
 
-    <style type="text/css">
-     #loader-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 100000;
-}
-#loader {
-    display: block;
-    position: relative;
-    left: 50%;
-    top: 50%;
-    width: 50px;
-    height: 50px;
-    margin: -75px 0 0 -75px;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    border-top-color: #3498db;
+  <!-- Responsive Metatag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    -webkit-animation: spin 2s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-    animation: spin 2s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+  <!-- Page Description and Author -->
+  <meta name="description" content="uSurvey - Website">
+  <meta name="author" content="TolulopeOwolabi">
 
-    z-index: 1001;
-}
+  <!-- Bootstrap CSS  -->
+    <link rel="stylesheet" href=" {{ STATIC_URL }}asset/css/bootstrap.min.css" type="text/css" media="screen">
 
-    #loader:before {
-        content: "";
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        right: 5px;
-        bottom: 5px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #e74c3c;
+  <!-- Font Awesome CSS -->
+  <link rel="stylesheet" href=" {{ STATIC_URL }}css/font-awesome.min.css" type="text/css" media="screen">
 
-        -webkit-animation: spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-        animation: spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-    }
+  <!-- Slicknav -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/slicknav.css" media="screen">
 
-    #loader:after {
-        content: "";
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        bottom: 15px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #f9c922;
+  <!-- Margo CSS Styles  -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/style.css" media="screen">
 
-        -webkit-animation: spin 1.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-          animation: spin 1.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-    }
+  <!-- Responsive CSS Styles  -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/responsive.css" media="screen">
 
-    @-webkit-keyframes spin {
-        0%   {
-            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(0deg);  /* IE 9 */
-            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-        100% {
-            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(360deg);  /* IE 9 */
-            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-    }
-    @keyframes spin {
-        0%   {
-            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(0deg);  /* IE 9 */
-            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-        100% {
-            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(360deg);  /* IE 9 */
-            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-    }
+  <!-- Css3 Transitions Styles  -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/animate.css" media="screen">
 
-    #loader-wrapper .loader-section {
-        position: fixed;
-        top: 0;
-        width: 51%;
-        height: 100%;
-        background: #FFFFFF;
-        z-index: 1000;
-        -webkit-transform: translateX(0);  /* Chrome, Opera 15+, Safari 3.1+ */
-        -ms-transform: translateX(0);  /* IE 9 */
-        transform: translateX(0);  /* Firefox 16+, IE 10+, Opera */
-    }
-
-    #loader-wrapper .loader-section.section-left {
-        left: 0;
-    }
-
-    #loader-wrapper .loader-section.section-right {
-        right: 0;
-    }
-
-    /* Loaded */
-    .loaded #loader-wrapper .loader-section.section-left {
-        -webkit-transform: translateX(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateX(-100%);  /* IE 9 */
-                transform: translateX(-100%);  /* Firefox 16+, IE 10+, Opera */
-
-        -webkit-transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-                transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-    }
-
-    .loaded #loader-wrapper .loader-section.section-right {
-        -webkit-transform: translateX(100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateX(100%);  /* IE 9 */
-                transform: translateX(100%);  /* Firefox 16+, IE 10+, Opera */
-
--webkit-transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-        transition: all 0.3s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
-    }
-
-    .loaded #loader {
-        opacity: 0;
-        -webkit-transition: all 0.3s ease-out;
-                transition: all 0.3s ease-out;
-    }
-    .loaded #loader-wrapper {
-        visibility: hidden;
-
-        -webkit-transform: translateY(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateY(-100%);  /* IE 9 */
-                transform: translateY(-100%);  /* Firefox 16+, IE 10+, Opera */
-
-        -webkit-transition: all 0.3s 1s ease-out;
-                transition: all 0.3s 1s ease-out;
-    }
-
-    /* JavaScript Turned Off */
-    .no-js #loader-wrapper {
-        display: none;
-    }
-
-    #content {
-        margin: 0 auto;
-    }
+  <!-- Color CSS Styles  -->
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/red.css" title="red" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/jade.css" title="jade" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/blue.css" title="blue" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/beige.css" title="beige" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/cyan.css" title="cyan" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/green.css" title="green" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/orange.css" title="orange" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/peach.css" title="peach" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/pink.css" title="pink" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/purple.css" title="purple" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/sky-blue.css" title="sky-blue" media="screen" />
+  <link rel="stylesheet" type="text/css" href=" {{ STATIC_URL }}css/colors/yellow.css" title="yellow" media="screen" />
 
 
-    </style>
+  <!-- Margo JS  -->
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.migrate.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/modernizrr.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}asset/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.fitvids.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/owl.carousel.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/nivo-lightbox.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.isotope.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.appear.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/count-to.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.textillate.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.lettering.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.easypiechart.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.nicescroll.min.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.parallax.js"></script>
+  <script type="text/javascript" src=" {{ STATIC_URL }}js/jquery.slicknav.js"></script>
+
+  <!--[if IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
 </head>
+
 <body>
-<!-- div id="loader-wrapper">
-			<div id="loader"></div>
 
-			<div class="loader-section section-left"></div>
-            <div class="loader-section section-right"></div>
+  <!-- Container -->
+  <div id="container">
 
-		</div -->
+    <!-- Start Header -->
+    <div class="hidden-header"></div>
+    <header class="clearfix">
 
-		<div id="content">
-
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.4";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="tbanner">
-      <tr>
-        <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td height="2" align="left" valign="top"></td>
-          </tr>
-          <tr>
-            <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td width="34%" align="left" valign="top"><img src="{{ STATIC_URL }}img/uSurvey.png" /></td>
-                <td width="66%" align="left" valign="middle"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td width="83%" align="left" valign="top"><table width="100%" border="0" cellspacing="2" cellpadding="0">
-                      <tr>
-                        <td width="4%"><img src="{{ STATIC_URL }}img/home.png" width="19" height="18" /></td>
-                        <td width="96%" align="left" valign="top"> <span class="utopnav"><a href="{% url 'main_page' %}">HOME</a></span> <span class="utopnav"><a href="#C4">DISCOVER</a></span> <span class="utopnav"><a href="{% url 'about_page' %}">ABOUT</a></span> <span class="utopnav">CONTACT</span> </td>
-                      </tr>
-                    </table></td>
-
-{% if user.is_authenticated %}
-<td width="17%" align="center" valign="top" class="ulogin"><a href="{% url 'home_page' %}">SURVEY</a></td>
-{% else %}
-<td width="17%" align="center" valign="top" class="ulogin"><a href="{% url 'login_page' %}" class="ulogin">LOGIN</a></td>
-{% endif%}
-                  </tr>
-                </table></td>
-              </tr>
-            </table></td>
-          </tr>
-        </table></td>
-      </tr>
-    </table></td>
-  </tr>
-<tr><td><div class="breadnavbar2"></div></td></tr>
-  <tr>
-<!-- Go to www.addthis.com/dashboard to customize your tools -->
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-559606700145ffd2" async="async"></script>
-    <td align="center" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td valign="top">
-<div class="container-fluid slides">
-    <section class="row-fluid">
-        <div class="slider">
-            <div class="flexslider custom-flexslider">
-                <ul class="slides">
-                    
-                    <li>
-                        <img src="{{ STATIC_URL }}img/u1.jpg" class="img-responsive" alt="" />
-<div class="forleft">
-
-                        </div>
-                    </li>
-                    <li>
-                        <img src="{{ STATIC_URL }}img/u2.jpg" class="img-responsive" alt="" />
-<div class="forleft">
-
-                        </div>
-
-                    </li>
-                    <li>
-                        <img src="{{ STATIC_URL }}img/u3.jpg" class="img-responsive" alt="" />
-<div class="forleft">
-                           
-                        </div>
-
-                    </li>
-                  </ul>
+      <!-- Start Top Bar -->
+      <div class="top-bar">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Start Contact Info -->
+              <ul class="contact-details">
+                <li><a href="#"><i class="fa fa-envelope-o"></i> info@usurvey.uniceflabs.org</a>
+                </li>
+                 <li>  <a href="#"> <i class="fa fa-phone"></i>  +12 345 678 000</a>
+                </li>
+              </ul>
+              <!-- End Contact Info -->
             </div>
+            <div class="col-md-6">
+              <!-- Start Social Links -->
+              <ul class="social-list">
+                <li>
+                  <a class="facebook itl-tooltip" data-placement="bottom" title="Facebook" href="#"><i class="fa fa-facebook"></i></a>
+                </li>
+                <li>
+                  <a class="twitter itl-tooltip" data-placement="bottom" title="Twitter" href="#"><i class="fa fa-twitter"></i></a>
+                </li>
+                <li>
+                  <a class="google itl-tooltip" data-placement="bottom" title="Google Plus" href="#"><i class="fa fa-google-plus"></i></a>
+                </li>
+                <li>
+                  <a class="linkdin itl-tooltip" data-placement="bottom" title="Linkedin" href="#"><i class="fa fa-linkedin"></i></a>
+                </li>
+                <li>
+                  <a class="instgram itl-tooltip" data-placement="bottom" title="Instagram" href="#"><i class="fa fa-instagram"></i></a>
+                </li>
+              </ul>
+              <!-- End Social Links -->
+            </div>
+          </div>
         </div>
+      </div>
+      <!-- End Top Bar -->
+
+      <!-- Start Header ( Logo & Naviagtion ) -->
+      <div class="navbar navbar-default navbar-top">
+        <div class="container">
+          <div class="navbar-header">
+            <!-- Stat Toggle Nav Link For Mobiles -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <i class="fa fa-bars"></i>
+            </button>
+            <!-- End Toggle Nav Link For Mobiles -->
+            <a class="navbar-brand" href="index.html"><img alt="" src="{{ STATIC_URL }}images/uSurvey.png"></a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <!-- Stat Search -->
+            <!--<div class="search-side">-->
+             <!--{% if user.is_authenticated %}-->
+              <!--<ul class="nav  "><li><a class="ulogin" href="{% url 'home_page' %}">SURVEY</a></li></ul>-->
+
+<!--{% else %}-->
+              <!--<ul class="nav  "><li> <a class="ulogin" href="{% url 'login_page' %}" class="ulogin">LOGIN</a></li></ul>-->
+
+<!--{% endif%}-->
+            <!--</div>-->
+            <!-- End Search -->
+            <!-- Start Navigation List -->
+            <ul class="nav navbar-nav navbar-right">
+              <li><a class="active" href="/">Home</a></li>
+              <li><a href="{% url 'about_page' %}">About Us</a></li>
+              <li><a href="#content">Discover</a></li>
+              <li><a href="">Contact</a></li>
+              {% if user.is_authenticated %}
+              <li><a class="ulogin" href="{% url 'home_page' %}">SURVEY</a></li>
+              {% else %}
+              <li> <a class="ulogin" href="{% url 'login_page' %}" class="ulogin">LOGIN</a></li>
+              {% endif %}
+            </ul>
+            <!-- End Navigation List -->
+          </div>
+        </div>
+
+        <!-- Mobile Menu Start -->
+        <ul class="wpb-mobile-menu">
+          <li><a class="active" href="/">Home</a></li>
+          <li><a href="{% url 'about_page' %}">About Us</a></li>
+          <li><a href="#content">Discover</a></li>
+          <li><a href="#" >Contact</a></li>
+          {% if user.is_authenticated %}
+          <li><a class="ulogin" href="{% url 'home_page' %}">SURVEY</a></li>
+          {% else %}
+          <li> <a class="ulogin" href="{% url 'login_page' %}" class="ulogin">LOGIN</a></li>
+          {% endif %}
+        </ul>
+        <!-- Mobile Menu End -->
+
+      </div>
+      <!-- End Header ( Logo & Naviagtion ) -->
+
+    </header>
+    <!-- End Header -->
+
+
+    <!-- Start HomePage Slider -->
+
+    <section id="home">
+      <!-- Carousel -->
+      <div id="main-slide" class="carousel slide" data-ride="carousel">
+
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+          <li data-target="#main-slide" data-slide-to="0" class="active"></li>
+          <li data-target="#main-slide" data-slide-to="1"></li>
+        </ol>
+        <!--/ Indicators end-->
+
+        <!-- Carousel inner -->
+        <div class="carousel-inner">
+          <div class="item active">
+            <img class="img-responsive" src="{{ STATIC_URL }}images/slider/bg1.jpg" alt="slider">
+            <div class="slider-content">
+              <div class="col-md-12 text-center">
+              </div>
+            </div>
+          </div>
+          <!--/ Carousel item end -->
+          <div class="item">
+            <img class="img-responsive" src="{{ STATIC_URL }}images/slider/bg2.jpg" alt="slider">
+            <div class="slider-content">
+              <div class="col-md-12 text-center">
+              </div>
+            </div>
+          </div>
+          <!--/ Carousel item end -->
+          
+          <!--/ Carousel item end -->
+        </div>
+        <!-- Carousel inner end-->
+
+        <!-- Controls -->
+        <a class="left carousel-control" href="#main-slide" data-slide="prev">
+          <span><i class="fa fa-angle-left"></i></span>
+        </a>
+        <a class="right carousel-control" href="#main-slide" data-slide="next">
+          <span><i class="fa fa-angle-right"></i></span>
+        </a>
+      </div>
+      <!-- /carousel -->
     </section>
-</div>
-</td>
- </tr>
-</table>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td align="left" valign="top">&nbsp;</td>
-          </tr>
-<tr>
-            <td align="left" valign="top">&nbsp;</td>
-          </tr>
-                    <tr>
-            <td align="center" valign="top"  id="C4" class="udiscover">Discover</td>
-          </tr>
-          <tr>
-            <td align="left" valign="top">&nbsp;</td>
-          </tr>
-          <tr>
-            <td align="left" valign="top">&nbsp;</td>
-          </tr>
-          <tr>
-            <td align="center" valign="top"><table width="90%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td align="center" valign="middle"><img src="{{ STATIC_URL }}img/imgussd.png" width="203" height="203" /></td>
-                    <td align="center" valign="middle"><img src="{{ STATIC_URL }}img/imgmor.png" width="203" height="203" /></td>
-                    <td align="center" valign="middle"><img src="{{ STATIC_URL }}img/imgsam.png" width="203" height="203" /></td>
-                  </tr>
-                  <tr>
-                    <td align="center" valign="middle" class="uhimgs">&nbsp;</td>
-                    <td align="center" valign="middle" class="uhimgs">&nbsp;</td>
-                    <td align="center" valign="middle" class="uhimgs">&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td align="center" valign="middle" class="uhimgs">USSD AND ODK CHANNELS</td>
-                    <td align="center" valign="middle" class="uhimgs">REAL TIME MONITORING</td>
-                    <td align="center" valign="middle" class="uhimgs">SAMPLE AND NON SAMPLE SURVEY</td>
-                  </tr>
-                  <tr>
-                    <td align="center" valign="middle" class="uhtxt">uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via
+    <!-- End HomePage Slider -->
 
-USSD and ODK channels. This secure and interactive connection enables communication through
 
-the relay of survey questions from the server to the hand-held mobile device and the instant
+    <!-- Start Content -->
+    <div id="content">
+      <div class="container">
 
-transmission of each response from the mobile device to the server. The off-line ODK (Open Data
+        <!-- Start Services Icons -->
+        <div class="row">
+        <h1 class="text-center accent-color red"> DISCOVER </h1>
 
-Kit) based mobile application to optimize its utilization in locations with intermittent mobile
+          <!-- Start Service Icon 1 -->
+          <div class="col-md-4 col-sm-6 service-box service-center">
+          <div class="service-boxed">
+            <div class="service-icon" style="margin-top:-25px;">
+              <i class="fa fa-magic icon-medium-effect icon-effect-2"></i>
+            </div>
+            <div class="service-content">
+              <h4>USSD AND ODK CHANNELS</h4>
+              <p>uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via USSD and ODK channels. This secure and interactive connection enables communication through the relay of survey questions from the server to the hand-held mobile device and the instant transmission of each response from the mobile device to the server. The off-line ODK (Open Data Kit) based mobile application to optimize its utilization in locations with intermittent mobile connections.</p>
+              <div class="button-side" style="margin-top:4px;"><a href="#" class="btn-system border-btn btn-small">Learn more </a></div>
+            </div>
+            </div>
+          </div>
+          <!-- End Service Icon 1 -->
 
-connections.</td>
-                    <td align="center" valign="middle" class="uhtxt">uSurvey eliminates the use of paper questionnaires and associated delays in the release of survey
+          <!-- Start Service Icon 2 -->
+          <div class="col-md-4 col-sm-6 service-box service-center">
+           <div class="service-boxed">
+            <div class="service-icon" style="margin-top:-25px;">
+              <i class="fa fa-eye icon-medium-effect icon-effect-2"></i>
+            </div>
+            <div class="service-content">
+              <h4>REAL TIME MONITORING</h4>
+              <p>uSurvey eliminates the use of paper questionnaires and associated delays in the release of survey results oftentimes due to the time required for data capture, editing and cleaning. The tool enables remote review and (if necessary) editing of captured data in real time, while the data collectors are still in the field.</p><br><br><br><br>
+              <div class="button-side" style="margin-top:4px;"><a href="#" class="btn-system border-btn btn-small">Learn more </a></div>
+            </div>
+           </div>
+          </div>
+          <!-- End Service Icon 2 -->
 
-results oftentimes due to the time required for data capture, editing and cleaning. The tool enables
+          <!-- Start Service Icon 3 -->
+          <div class="col-md-4 col-sm-6 service-box service-center">
+           <div class="service-boxed">
+            <div class="service-icon" style="margin-top:-25px;">
+              <i class="fa fa-file icon-medium-effect icon-effect-2"></i>
+            </div>
+            <div class="service-content">
+              <h4>SAMPLE AND NON SAMPLE SURVEY</h4>
+              <p>uSurvey possesses in-built capabilities to randomly select a representative sample from a population of interest and generate a list of unique identification numbers for each sampling unit (e.g. households, institutions, etc.) to be included in the sample. Just like for traditional surveys techniques, uSurvey results can be used to make inferences about the population from which the sample was selected.</p>
+              <br><br>
+              <div class="button-side" style="margin-top:4px;"><a href="#" class="btn-system border-btn btn-small">Learn more </a></div>
+            </div>
+           </div>
+          </div>
+          <!-- End Service Icon 3 -->
 
-remote review and (if necessary) editing of captured data in real time, while the data collectors are
+        </div>
+        <!-- End Services Icons -->
 
-still in the field.</td>
-                    <td align="center" valign="middle" class="uhtxt">uSurvey possesses in-built capabilities to randomly select a representative sample from a population
+        <!-- Divider -->
+        <div class="hr1 margin-top"></div>
 
-of interest and generate a list of unique identification numbers for each sampling unit (e.g.
 
-households, institutions, etc.) to be included in the sample. Just like for traditional surveys techniques, uSurvey results can be used to make inferences about the population from which the
+        <!-- Start Call Action -->
+        <div class="call-action call-action-boxed call-action-style1 clearfix">
+          <!-- Call Action Button -->
+          
+          <!-- Call Action Text -->
+          <h2 class="primary"><strong>uSurvey</strong> Tools </h2>
+          <p>uSurvey has been developed to collect information from a scientifically selected sample in standard surveys. To this end, it possesses in-built capabilities to randomly select a representative sample from a population of interest and generate a list of unique identification numbers for each sampling unit (e.g. households, institutions, etc.) to be included in the sample. Just like for traditional surveys techniques, uSurvey results can be used to make inferences about the population from which the sample was selected...</p>
+        </div>
+        <!-- End Call Action -->
 
-sample was selected..</td>
-                  </tr>
-                  <tr>
-                    <td align="center" valign="middle">&nbsp;</td>
-                    <td align="center" valign="middle">&nbsp;</td>
-                    <td align="center" valign="middle">&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td align="center" valign="middle"><a href="{% url 'about_page' %}"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
-                    <td align="center" valign="middle"><a href="{% url 'about_page' %}"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
-                    <td align="center" valign="middle"><a href="{% url 'about_page' %}"><img src="{{ STATIC_URL }}img/learnmore.png" width="101" height="27" border="0" /></a></td>
-                  </tr>
-                  
-                </table></td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-              </tr>
-              
-            </table></td>
-          </tr>
-          <tr>
-            <td align="left" valign="top">&nbsp;</td>
-          </tr>
-          <tr>
-            <td align="left" valign="top">&nbsp;</td>
-          </tr>
-        </table></td>
-      </tr>
-    </table></td>
-  </tr>
-  <tr>
-    <td align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="whitebg">
-      <tr>
-        <td align="center" valign="top"><table width="1000" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td align="left" valign="top">&nbsp;</td>
-              </tr>
+      </div>
+    </div>
+    <!-- End content -->
 
-              <tr>
-                <td align="center" valign="top" class="udiscover">uSurvey Tools </td>
-              </tr>
-              <tr>
-                <td align="left" valign="top">&nbsp;</td>
-              </tr>
-              <tr>
-                <td align="center" valign="top"><table width="90%" border="0" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td align="left" valign="top" class="uhtxt">uSurvey has been developed to collect information from a scientifically selected sample in standard
 
-surveys. To this end, it possesses in-built capabilities to randomly select a representative sample
+    <!-- Start Footer -->
+    <footer>
+      <div class="container">
+        <div class="row footer-widgets">
 
-from a population of interest and generate a list of unique identification numbers for each sampling
+          <!-- Start Subscribe & Social Links Widget -->
+          <div class="col-md-3">
+            <div class="footer-widget social-widget">
+              <h4>Follow Us<span class="head-line"></span></h4>
+              <ul class="social-icons">
+                <li>
+                  <a class="facebook" href="#"><i class="fa fa-facebook"></i></a>
+                </li>
+                <li>
+                  <a class="twitter" href="#"><i class="fa fa-twitter"></i></a>
+                </li>
+                <li>
+                  <a class="google" href="#"><i class="fa fa-google-plus"></i></a>
+                </li>
+                <li>
+                  <a class="instgram" href="#"><i class="fa fa-instagram"></i></a>
+                </li>
+               </ul>
+            </div>
+          </div>
+          <!-- .col-md-3 -->
+          <!-- End Subscribe & Social Links Widget -->
 
-unit (e.g. households, institutions, etc.) to be included in the sample. Just like for traditional surveys
 
-techniques, uSurvey results can be used to make inferences about the population from which the
-
-sample was selected..</td>
-                  </tr>
-                </table></td>
-              </tr>
-              <tr>
-                <td align="left" valign="top">&nbsp;</td>
-              </tr>
-              <tr>
-                <td align="left" valign="top">&nbsp;</td>
-              </tr>
-              <tr>
-                <td align="left" valign="top">&nbsp;</td>
-              </tr>
-              <tr>
-                <td align="left" valign="top">&nbsp;</td>
-              </tr>
-            </table></td>
-          </tr>
-        </table></td>
-      </tr>
-    </table></td>
-  </tr>
-
-  <tr>
-    <td align="center" valign="top" class="usocilbg"><table width="1000" border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td align="center" valign="top" class="udiscover">Media &amp; Social</td>
-      </tr>
-      <tr>
-        <td align="left" valign="top">&nbsp;</td>
-      </tr>
-      <tr>
-        <td align="left" valign="top">&nbsp;</td>
-      </tr>
-      <tr>
-        <td align="center" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td align="left" valign="top"><table width="450" border="0" cellpadding="0" cellspacing="0">
-              <tr>
-                <td align="left" valign="middle"><table width="90%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="10%" align="left" valign="top">&nbsp;</td>
-                      <td width="90%" align="left" valign="middle" class="upad"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-                          <tr>
-                             <td align="left" valign="top">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td align="left" valign="top">
-<div class="fb-page" data-href="https://www.facebook.com/unicefuganda"
-data-width="370" data-height="430" data-small-header="true"
-data-adapt-container-width="false" style="background-color:#000000"
-data-hide-cover="true" data-show-facepile="false"
-data-show-posts="true" colorscheme="dark"><div
-class="fb-xfbml-parse-ignore"><blockquote
-cite="https://www.facebook.com/unicefuganda"><a
-href="https://www.facebook.com/unicefuganda">Loading...</a></blockquote></div></div>
-
-                             </td>
-                          </tr>
-                      </table></td>
-                    </tr>
-                </table></td>
-              </tr>
-            </table></td>
-            <td align="right" valign="top"><table width="450" border="0" cellpadding="0" cellspacing="0">
-              <tr>
-                <td align="left" valign="middle"><table width="95%" border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td width="10%" align="left" valign="top">&nbsp;</td>
-                      <td width="90%" align="left" valign="middle" class="upad"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-                          <tr>
-                            <td align="left" valign="top">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td align="left" valign="top" class="uhtxt">
-
-<a class="twitter-timeline" data-border-color="#E6E6E6" data-tweet-limit="4" width="450px" height="430px" data-theme="white" data-chrome="noheader nofooter noscrollbar transparent"
+          <!-- Start Twitter Widget -->
+          <div class="col-md-3">
+            <div class="footer-widget twitter-widget">
+              <h4>Twitter Feed<span class="head-line"></span></h4>
+              <div> <!-- TWITTER FEED HERE--> 
+                <a class="twitter-timeline" style="color: #FFF !important;" data-border-color="#E6E6E6" data-tweet-limit="2" width="450px" height="430px" data-theme="white" data-chrome="noheader nofooter noscrollbar transparent"
 			href="https://twitter.com/StatisticsUg" data-widget-id="638385587934887936">Loading...</a></span>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
 
-</td>
-                          </tr>
-                      </table></td>
-                    </tr>
-                </table></td>
-              </tr>
-            </table></td>
-          </tr>         
-                </table></td>
-              </tr>
-            </table></td>
-          </tr>
-          <tr>
-            <td align="left" valign="top" class="usocilbg">&nbsp;</td>
-            <td align="right" valign="top" class="usocilbg">&nbsp;</td>
-          </tr>
-          <tr>
-                    </tr>
-                    </table></td>
-                  </tr>
-                </table></td>
-              </tr>
-            </table></td>
-          </tr>
-        </table></td>
-      </tr>
-      <tr>
-        <td align="left" valign="top" class="usocilbg">&nbsp;</td>
-      </tr>
-    </table></td>
-  </tr>
-  <tr>
-    <td align="left" valign="top" class="usocilbg">&nbsp;</td>
-  </tr>
-  <tr>
-    <td align="left" valign="top" class="usocilbg">&nbsp;</td>
-  </tr>
-  <tr>
-    <td align="left" valign="top"><table width="100%" height="40" border="0" cellpadding="0" cellspacing="0" class="footer">
-      <tr>
-        <td align="center" valign="middle"><table width="90%" border="0" cellspacing="0" cellpadding="0">
-            <tr>
-              <td width="54%" align="left" valign="bottom">About | Support | Terms  Privacy </td>
-              <td width="46%" align="right" valign="bottom">&copy; UNICEF &amp; UBOS 2013 - <script language="JavaScript" type="text/javascript">
-
-var now = new Date();
-
-var dayNames = new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
-
-var monNames = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
-
-document.write(" "+ now.getFullYear());
-
-      </script> </td>
-            </tr>
-        </table></td>
-      </tr>
-    </table></td>
-  </tr>
-</table>
-
+              
+              </div>
             </div>
+          </div>
+          <!-- .col-md-3 -->
+          <!-- End Twitter Widget -->
 
-	<script src="{{ STATIC_URL }}js/jquery.min.js"></script>
-	<script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-	<script src="{{ STATIC_URL }}js/main.js"></script>
+
+          <!-- Start Flickr Widget -->
+          <div class="col-md-3">
+            <div class="footer-widget flickr-widget">
+              <h4>Facebook Box<span class="head-line"></span></h4>
+              <div> <!-- FACEBOOK BOX HERE--> 
+<div class="fb-page" data-href="https://www.facebook.com/unicefuganda" data-width="370" data-height="430" data-small-header="true" data-adapt-container-width="false" style="background-color:#000000" data-hide-cover="true" data-show-facepile="false" data-show-posts="true" colorscheme="dark"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/unicefuganda"><a href="https://www.facebook.com/unicefuganda">Loading...</a></blockquote></div></div>
+
+              </div>
+            </div>
+          </div>
+          <!-- .col-md-3 -->
+          <!-- End Flickr Widget -->
+
+
+          <!-- Start Contact Widget -->
+          <div class="col-md-3">
+            <div class="footer-widget contact-widget">
+              <h4><img src="{{ STATIC_URL }}images/footer-uSurvey.png" class="img-responsive" alt="Footer Logo" /></h4>
+              <p>uSurvey enables real-time data collection and storage using mobile device (tablet/phone) through via USSD and ODK channels. This secure and interactive connection enables communication through the relay of survey questions from the server to the hand-held mobile device and the instant transmission of each response from the mobile device to the server. </p>
+              <ul>
+                <!--li><span>Phone Number:</span> +01 234 567 890</li-->
+                <li><span>Email:</span> info@usurvey.uniceflabs.org</li>
+                <li><span>Website:</span> usurvey.uniceflabs.org</li>
+              </ul>
+            </div>
+          </div>
+          <!-- .col-md-3 -->
+          <!-- End Contact Widget -->
+
+
+        </div>
+        <!-- .row -->
+
+        <!-- Start Copyright -->
+        <div class="copyright-section">
+          <div class="row">
+            <div class="col-md-6">
+              <p>&copy; 2013 - 2016 UNICEF & UBOS  - All Rights Reserved  </p>
+            </div>
+            <div class="col-md-6">
+              <ul class="footer-nav">
+                <li><a href="#">About</a></li>
+                <li><a href="#">Support</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- End Copyright -->
+
+      </div>
+    </footer>
+    <!-- End Footer -->
+
+  </div>
+  <!-- End Container -->
+
+  <!-- Go To Top Link -->
+  <a href="#" class="back-to-top"><i class="fa fa-angle-up"></i></a>
+
+  <!-- Style Switcher -->
+
+  <script type="text/javascript" src="{{ STATIC_URL }}js/script.js"></script>
+
 </body>
+
 </html>
