@@ -6,10 +6,10 @@
     {% block prefilter %}
 
     {% endblock %}
-    <table class="{{ class }} horizontal-filter">
-        <tr id="control-group">
+    <ul class="{{ class }} horizontal-filter">
+        <li id="control-group">
             {% for field in a_form.visible_fields %}
-                <td valign="top">
+                <li valign="top">
                   <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label>
                  {% if field.label_tag|is_mobile_number %}
                    <div class="input-prepend">
@@ -17,7 +17,7 @@
                     </div>
                   {% endif %}
                    <span class="horiselect">{{field}}</span>
-                </td>
+                </li>
             {% endfor %}
             {% if not no_button %}
                 {% block submit_button %}
@@ -26,7 +26,7 @@
                     </td>
                 {% endblock %}
             {% endif %}
-        </tr>
+        </li>
         {% if show_errors %}
         <tr id="error">
             {% for field in a_form.visible_fields %}
@@ -43,7 +43,7 @@
         </tr>
         {% endif %}
 
-</table>
+</ul>
 {% block postfilter %}
 
 {% endblock %}

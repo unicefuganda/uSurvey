@@ -7,7 +7,7 @@
 {% load pagination_tags %}
 {% autopaginate interviewers 50 %}
     {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
-<br>
+    <br>
 <div>
 	<form accept-charset="utf-8" action="{% url 'download_interviewers' %}" method="get" id="download_interviewers" class="pull-right">
                 {% csrf_token %}
