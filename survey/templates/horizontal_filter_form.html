@@ -1,24 +1,23 @@
 {% load template_tags %}
-<form id="{{ filter_id }}" action="{{ action }}" method="{% if method %}{{method}}{% else %}get{% endif %}"
-      class="pull-left padded-bottom" accept-charset="utf-8" xmlns="http://www.w3.org/1999/html">
+<form id="{{ filter_id }}" action="{{ action }}" method="{% if method %}{{method}}{% else %}get{% endif %}" class="pull-left padded-bottom" accept-charset="utf-8">
     {% if method and not method.lower == 'get' %}
         {% csrf_token %}
     {% endif %}
     {% block prefilter %}
 
     {% endblock %}
-    <ul class="{{ class }} horizontal-filter">
-        <li id="control-group">
+    <table class="{{ class }} horizontal-filter">
+        <tr id="control-group">
             {% for field in a_form.visible_fields %}
-                <li valign="top">
-                  <label for="{{field.auto_id}}" class="horititle">{{field.label }}</label></li>
+                <td valign="top">
+                  <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label>
                  {% if field.label_tag|is_mobile_number %}
-                   <div class="ccode">
+                   <div class="input-prepend">
                        <span class="add-on">{{ country_phone_code }}</span>
                     </div>
                   {% endif %}
                    <span class="horiselect">{{field}}</span>
-                </li>
+                </td>
             {% endfor %}
             {% if not no_button %}
                 {% block submit_button %}
@@ -27,7 +26,7 @@
                     </td>
                 {% endblock %}
             {% endif %}
-        </li>
+        </tr>
         {% if show_errors %}
         <tr id="error">
             {% for field in a_form.visible_fields %}
@@ -44,7 +43,7 @@
         </tr>
         {% endif %}
 
-</ul>
+</table>
 {% block postfilter %}
 
 {% endblock %}
