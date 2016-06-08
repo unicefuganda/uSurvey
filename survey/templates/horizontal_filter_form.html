@@ -10,7 +10,7 @@
         <tr id="control-group">
             {% for field in a_form.visible_fields %}
                 <td valign="top">
-                  <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label>
+                  <label for="{{field.auto_id}}" class="horititle" style="display:block">{{ field.label }}</label>
                  {% if field.label_tag|is_mobile_number %}
                    <div class="input-prepend">
                        <span class="add-on">{{ country_phone_code }}</span>
