@@ -124,12 +124,17 @@ def completion_json(request, survey_id):
     r_server = redis.Redis()
     key=settings.SURVEY_REDIS_KEY%{'survey_id':str(survey_id)}
     if r_server.exists(key):
+        print "Getting data from cache"
         json_dump=r_server.get(key)
     else:
+        print "Getting data from DB"
         survey = Survey.objects.get(id=survey_id)
         location_type = LocationType.largest_unit()
         completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
+        expire_time = (settings.RESULT_REFRESH_FREQ*60+30)*60
         json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
+        r_server.set(key, json_dump)
+        r_server.expire(key,expire_time)
     return HttpResponse(json_dump, content_type='application/json')
 
 @login_required
