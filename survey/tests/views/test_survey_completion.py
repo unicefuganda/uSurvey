@@ -111,3 +111,10 @@ class TestSurveyCompletion(BaseTest):
         form_data = {'survey': self.batch.survey.id, 'location': location_with_no_parent.id, 'batch': str(self.batch.pk), 'ea': self.kampala_ea.id}
         response = self.client.post('/surveys/completion/', data=form_data)
         self.assertIsNotNone(response.context['request'])
+
+    def test_survey_completion(self):
+        response = self.client.get('/survey/%d/completion/json/' %(self.survey.id))
+        result = json.loads(response.getvalue())
+        self.assertEqual(response.status_code, 200)
+        location = self.uganda.name.upper()
+        self.assertEqual(int(result[location]), 0)
