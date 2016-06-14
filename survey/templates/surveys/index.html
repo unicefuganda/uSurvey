@@ -6,14 +6,10 @@
 {% load pagination_tags %}
 {% autopaginate surveys 50 %}
 {% load template_tags %}
-
-    
-    
-    
 <a href="#new_survey" data-toggle="modal" class="btn btn_primary pull-right padded-bottom" id="add_survey">Create New Survey</a>
 {% include "search_form.html" %}
  <br />
-  <table class="col-sm-1 col-md-10 col-lg-10 table table-striped table-bordered table-hover table-sort">
+  <table class="table table-striped table-bordered table-hover table-sort">
     <thead>
       <tr>
         <th>

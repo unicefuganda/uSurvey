@@ -7,7 +7,7 @@
 {% load pagination_tags %}
 {% autopaginate interviewers 50 %}
     {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
-    <br>
+<br>
 <div>
 	<form accept-charset="utf-8" action="{% url 'download_interviewers' %}" method="get" id="download_interviewers" class="pull-right">
                 {% csrf_token %}
@@ -81,7 +81,8 @@
 {% endblock %}
 
 {% block javascripts %}
-  <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}/js/interviewer.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
   //$("#a-interviewer-list").hide();
   <!--{% for location_type in location_filter_types %}-->

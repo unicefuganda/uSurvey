@@ -1,7 +1,6 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-
     <title>
         {{ PROJECT_TITLE }}
     </title>
@@ -175,20 +174,10 @@
             display: none;
         }
     </style>
-	
-	
-	
 <link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
           charset="utf-8">
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
           charset="utf-8">
-		  
-		   <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-theme.min.css" type="text/css" media="screen" charset="utf-8">
-		  
-		   <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" type="text/css" media="screen" charset="utf-8">
-		  <script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/jquery.min.js"></script>
-		  
-		  
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
           charset="utf-8">
     <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
@@ -206,103 +195,7 @@
     <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
     <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-    {% if perms.auth.can_view_aggregates %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/mprogress.min.css"/>
-    <script src="{{ STATIC_URL }}js/mprogress.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/reconnecting-websocket.min.js"></script>
- <style type="text/css">
-    @media screen and (max-width: 640px) {
-    table {
-        overflow-x: auto;
-        display: block;
-    }
 
-
-}
-
-
-@media
-only screen and (max-width: 760px),
-(min-device-width: 768px) and (max-device-width: 1024px)  {
-
-
-    .coy {
-        display: block;
-    }
-}
-
-
-    </style>
-
-    <style>
-    @media screen and (max-width: 640px) {
-    table {
-        overflow-x: auto;
-        display: block;
-    }
-
-
-    .tbanner {
-
-    box-shadow: 1px 1px 1px 1px;
-    color: #ffffff;
-    font-size: 17px;
-    height: auto;
-    position: relative;
-    top: 0;
-    width: 100%;
-    z-index: 10000;
-}
-
-    .nav-collapse .nav > li > a, .nav-collapse .dropdown-menu a {
-    border-radius: 3px;
-    color: #fff;
-    font-weight: bold;
-    padding: 9px 25px;
-}
-
-
-}
-
-
-@media
-only screen and (max-width: 760px),
-(min-device-width: 768px) and (max-device-width: 1024px)  {
-
-
-    .coy {
-        display: block;
-    }
-
-    .tbanner {
-
-    box-shadow: 1px 1px 1px 1px;
-    color: #ffffff;
-    font-size: 17px;
-    height: auto;
-    position: relative;
-    top: 0;
-    width: 100%;
-    z-index: 10000;
-}
-
-
-}
-
-
-
-    </style>
-    <script>
-        var myHostname = window.location.hostname;
-        var myPort = window.location.port;
-        var scheme = "ws";
-        if(document.location.protocol === "https:") {
-              scheme += "s";
-          }
-        ws_uri = scheme + "://" + myHostname + ':' + myPort + "{{ WEBSOCKET_URL }}";
-    </script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/statusbar.js"></script>
-    {% endif %}
 </head>
 <body>
 <div id="loader-wrapper">
@@ -332,7 +225,7 @@ only screen and (max-width: 760px),
                     <ul class="nav">
                         {% if perms.auth.can_view_interviewers %}
                         <li>
-                            <a id="home" class="dropdown-toggle" role="button" href="{% url 'main_page' %}">Home</a>
+                            <a id="about" class="dropdown-toggle" role="button" href="{% url 'main_page' %}">Home</a>
                         </li>
                         <li>
                             <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
@@ -455,12 +348,7 @@ only screen and (max-width: 760px),
 {% for breadcrumb in request.breadcrumbs %} 
 <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
 {% endfor %}
-<span class="breadnavbarblue">{% block title %}{% endblock %}</span>
-<div id="status-bar" class="status-bar right">
-    <span id="status-msg">...</span>
-</div>
-</div>
-</div>
+<span class="breadnavbarblue">{% block title %}{% endblock %}</span></div></div>
 <br />
 <div id="content" class="container">
     <div class="container">
