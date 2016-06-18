@@ -37,6 +37,7 @@ def get_survey_xform(interviewer, survey):
         template_file = 'odk/non-response-no-repeat.xml'
     registered_households = interviewer.generate_survey_households(survey)
     batches = interviewer.ea.open_batches(survey)
+    # batches_map =
     return render_to_string(template_file, {
         'interviewer': interviewer,
         'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),

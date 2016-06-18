@@ -208,6 +208,11 @@ def  get_download_url(request, url_name, instance=None):
 def get_question_path(question):
     return get_node_path(question)
 
+
+def get_non_loop_question_path(question):
+    batch = question.batch
+    return '/survey/b%s/q%s' % (batch.pk, question.pk)
+
 @register.assignment_tag
 def  get_odk_mem_question(question):
     surname = HouseholdMember._meta.get_field('surname')
@@ -225,14 +230,14 @@ def  get_odk_mem_question(question):
     return template.Template(html.escape(question.text)).render(question_context)
 
 def get_node_path(question):
-    looper_flow = question.looper_flow
     batch = question.batch
+    looper_flow = question.looper_flow
     if looper_flow:
         return '/survey/b%s/q%sq%s/q%s' % (batch.pk,
                                           looper_flow.question.pk, looper_flow.next_question.pk,
                                           question.pk)
     #should take account with looping question
-    return '/survey/b%s/q%s' % (batch.pk, question.pk)
+    return get_non_loop_question_path(question)
 
 @register.assignment_tag(takes_context=True)
 def is_relevant_odk(context, question, interviewer, registered_households):

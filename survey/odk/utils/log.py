@@ -12,7 +12,7 @@ logger.addHandler(handler)
 if settings.DEBUG:
     logger.setLevel(logging.DEBUG)
 else:
-    logger.setLevel(logging.WARNING)
+    logger.setLevel(logging.INFO)
 
 class Enum(object):
     __name__= "Enum"
