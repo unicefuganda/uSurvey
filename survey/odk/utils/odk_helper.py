@@ -304,6 +304,7 @@ def save_survey_questions(survey, interviewer, survey_tree, media_files):
                 xml=etree.tostring(survey_tree, pretty_print=True))
     #    execute.delay(submission.save_attachments, media_files)
     submission.save_attachments(media_files.values())
+    return submission
 
 #@transaction.autocommit
 def process_submission(interviewer, xml_file, media_files=[], request=None):
@@ -337,7 +338,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                     household_member=member, household=non_response.household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
     else:
-        save_survey_questions.delay(survey, interviewer, survey_tree, media_files)
+        submission = save_survey_questions(survey, interviewer, survey_tree, media_files)
     return submission
 
 def get_survey(interviewer):
