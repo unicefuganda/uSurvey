@@ -32,11 +32,11 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% for batch in survey_batches %}
 		<b{{batch.pk}}>
 	   		{% for question in batch.survey_questions %}
-	           {% if question.is_loop_start %}
+	           {% if question in loop_starters %}
 	   			  <q{{question.looper_flow.question.pk}}q{{question.pk}}>
 	           {% endif %}
 					<q{{ question.pk }} />
-	   			{% if question.is_loop_end %}
+	   			{% if question in loop_enders %}
 	   			  </q{{question.pk}}q{{question.looper_flow.next_question.pk}}>
 	           {% endif %}
 			{% endfor %}
@@ -67,7 +67,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% for question in batch.survey_questions %}
 		{% get_question_path question as question_path %}
 		{% is_relevant_odk question interviewer registered_households as relevance_context %}
-	        {% if question.is_loop_start %}
+	        {% if question in loop_starters %}
 			<bind nodeset="/survey/b{{batch.pk}}/q{{question.looper_flow.question.pk}}q{{question.pk}}" relevant="{{ relevance_context }}" />
 			{% endif %}
 			<bind nodeset="{{ question_path }}"
@@ -145,7 +145,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 			<hint>{{ batch.description }}</hint>
 			{% for question in batch.survey_questions %}
 				{% get_question_path question as question_path %}
-				{% if question.is_loop_start %}
+				{% if question in loop_starters %}
 				<group>
 					<label>{{question.text}}</label>
 			     	<repeat nodeset="/survey/b{{batch.pk}}/q{{question.looper_flow.question.pk}}q{{question.pk}}">
@@ -192,7 +192,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					<label>{{member_question}}</label>
 				</input>
 				{% endif %}
-				{% if question.is_loop_end %}
+				{% if question in loop_enders %}
 				 </repeat>
 				</group>
 				{% endif %}

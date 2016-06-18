@@ -48,6 +48,16 @@ class Batch(BaseModel):
         except QuestionFlow.DoesNotExist:
             return first_inline_flow_with_desc(question, LogicForm.BACK_TO_ACTION)
 
+    def loop_starters(self):
+        from survey.forms.logic import LogicForm
+        flows = QuestionFlow.objects.filter(next_question__batch=self, desc=LogicForm.BACK_TO_ACTION)
+        return set([f.next_question for f in flows])
+
+    def loop_enders(self):
+        from survey.forms.logic import LogicForm
+        flows = QuestionFlow.objects.filter(question__batch=self, desc=LogicForm.BACK_TO_ACTION)
+        return set([f.question for f in flows])
+
     def non_response_enabled(self, ea):
         locations = set()
         ea_locations = ea.locations.all()
