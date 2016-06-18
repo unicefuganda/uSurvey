@@ -208,7 +208,7 @@ def  get_download_url(request, url_name, instance=None):
 def get_question_path(question):
     return get_node_path(question)
 
-
+@register.assignment_tag
 def get_non_loop_question_path(question):
     batch = question.batch
     return '/survey/b%s/q%s' % (batch.pk, question.pk)

@@ -64,7 +64,6 @@ def get_household_list_xform(interviewer, survey, house_listing):
         })
 
 def get_on_response_xform(interviewer, survey):
-    registered_households = interviewer.generate_survey_households(survey)
     batches = interviewer.ea.open_batches(survey)
     return render_to_string("odk/survey_form-no-repeat.xml", {
         'interviewer': interviewer,
