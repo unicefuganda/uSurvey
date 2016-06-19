@@ -61,7 +61,7 @@ def generate_result_link(current_user, download_service, file_name):
     scheduled_job = scheduler.schedule(datetime.utcnow(), safe_push_msg,
                                 args=[current_user, {
                                 'msg_type' : 'notice',
-                                'content': reverse('download_export_results', args=(batch_id)),
+                                'content': reverse('download_export_results', args=(batch_id, )),
                                 'status': 'DONE',
                                 'context': 'download-data',
                                 'description': download_service.batch.name
