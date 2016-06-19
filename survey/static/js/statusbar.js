@@ -67,7 +67,7 @@ updateDownloadStatus = function(msg) {
                 break;
             case 'DONE':
                 if(indeterminateProgress != undefined)
-                    indeterminateProgress.stop();
+                    indeterminateProgress.end();
                 status_msg.html('<a href="' + msg.content +'" class="blue">download-' + msg.description + '</a>');
         };
     };
