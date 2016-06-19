@@ -38,6 +38,10 @@ def get_survey_xform(interviewer, survey):
     registered_households = interviewer.generate_survey_households(survey)
     batches = interviewer.ea.open_batches(survey)
     # batches_map =
+    loop_starters = set()
+    map(lambda batch: loop_starters.update(batch.loop_starters()), batches)
+    loop_enders = set()
+    map(lambda batch: loop_enders.update(batch.loop_enders()), batches)
     return render_to_string(template_file, {
         'interviewer': interviewer,
         'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
@@ -45,8 +49,8 @@ def get_survey_xform(interviewer, survey):
         'survey' : survey,
         'survey_batches' : batches,
         'messages' : MESSAGES,
-        'loop_starters' : batch.loop_starters(),
-        'loop_enders' : batch.loop_enders(),
+        'loop_starters' : loop_starters,
+        'loop_enders' : loop_enders,
         'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
         })
 

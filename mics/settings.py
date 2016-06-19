@@ -245,7 +245,7 @@ WEBSOCKET_URL = '/ws/statusbar'
 WS_HEARTBEAT = 3
 UPDATE_INTERVAL = 3 #INTERVAL BETWEEN UPDATES IN SECS
 DOWNLOAD_CACHE_DURATION=1800 #how long downloaded results would cached in secs before discarded
-DOWNLOAD_CACHE_KEY='/DOWNLOADS/%(user_id)s/%(batch_id)s'
+DOWNLOAD_CACHE_KEY='/DOWNLOADS/EXPORT/BATCH/%(user_id)s/%(batch_id)s'
 
 SURVEY_REDIS_KEY = "/usurvey/completion_rates/%(survey_id)s"
 
