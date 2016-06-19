@@ -29,7 +29,8 @@ def send_mail(composer):
 def safe_push_msg(user, msg):
     print 'request to send: ', msg
     #redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':user.id, 'batch_id': batch_id}
-    # j = get_current_job()
+    j = get_current_job()
+    msg['ref_id'] = j.id
     # if cache.get(redis_key) is False: //to look at this later
     #     msg['expired'] = True #only add context id if entry still exists
     Group(get_group_path(user, settings.WEBSOCKET_URL)).send({'text': json.dumps(msg), })
