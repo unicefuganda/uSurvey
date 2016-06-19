@@ -33,9 +33,8 @@ jQuery(document).ready(function($) {
         }
     }
 
-var downloadStatus = null;
-var presentContext = null;
-var indeterminateProgress = null;
+var downloadStatus = {};
+var indeterminateProgress = undefined;
 get_status_update = function(status) {
     switch(status) {
         case 'DONE':
@@ -51,30 +50,29 @@ updateDownloadStatus = function(msg) {
     if(msg.expired)
         return status_msg.html('...');
     //handle status update on screen
-    if(presentContext==null || msg.context_id == presentContext) {
-        status_update = get_status_update(msg.status);
-        present_status = get_status_update(downloadStatus);
-        if(status_update > present_status) {
-            var status_bar = $('#status-bar');
-            status_bar.show();
-            switch(msg.status){
-                case 'WIP':
-                    status_msg.html(msg.content);
-                    var intObj = {
-                      template: 3,
-                      parent: '#status-bar' // this option will insert bar HTML into this parent Element
-                    };
-                    indeterminateProgress = new Mprogress(intObj);
-                    indeterminateProgress.start();
-                    break;
-                case 'DONE':
-                    if(indeterminateProgress)
-                        indeterminateProgress.stop();
-                    status_msg.html('<a href="' + msg.content +'" class="blue">download-' + msg.description + '</a>');
-            };
+    status_update = get_status_update(msg.status);
+    present_status = get_status_update(downloadStatus[msg.context_id]); //naturally defaults to -1 if undefined
+    if(status_update > present_status) {
+        var status_bar = $('#status-bar');
+        status_bar.show();
+        switch(msg.status){
+            case 'WIP':
+                status_msg.html(msg.content);
+                var intObj = {
+                  template: 3,
+                  parent: '#status-bar' // this option will insert bar HTML into this parent Element
+                };
+                indeterminateProgress = new Mprogress(intObj);
+                indeterminateProgress.start();
+                break;
+            case 'DONE':
+                if(indeterminateProgress != undefined)
+                    indeterminateProgress.stop();
+                status_msg.html('<a href="' + msg.content +'" class="blue">download-' + msg.description + '</a>');
         };
     };
-    presentContext = msg.context_id;
+
+    downloadStatus[msg.context_id] = msg.status;
 };
 
 
