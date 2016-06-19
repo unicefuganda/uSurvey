@@ -28,7 +28,7 @@ def send_mail(composer):
 
 def safe_push_msg(user, msg):
     print 'request to send: ', msg
-    redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':user.id}
+    #redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':user.id, 'batch_id': batch_id}
     j = get_current_job()
     msg['context_id'] = j.get_id()
     # if cache.get(redis_key) is False: //to look at this later
@@ -38,7 +38,8 @@ def safe_push_msg(user, msg):
 @job('results-queue')
 def generate_result_link(current_user, download_service, file_name):
     scheduler = get_scheduler('ws-notice')
-    redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':current_user.id, 'batch_id': download_service.batch.id}
+    batch_id = download_service.batch.id
+    redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':current_user.id, 'batch_id': batch_id}
     repeat_times = settings.DOWNLOAD_CACHE_DURATION/settings.UPDATE_INTERVAL
     if cache.has_key(redis_key) is False:
         scheduled_job = scheduler.schedule(datetime.utcnow(), safe_push_msg,
@@ -60,7 +61,7 @@ def generate_result_link(current_user, download_service, file_name):
     scheduled_job = scheduler.schedule(datetime.utcnow(), safe_push_msg,
                                 args=[current_user, {
                                 'msg_type' : 'notice',
-                                'content': reverse('download_export_results', args=(download_service.batch.id)),
+                                'content': reverse('download_export_results', args=(batch_id)),
                                 'status': 'DONE',
                                 'context': 'download-data',
                                 'description': download_service.batch.name
