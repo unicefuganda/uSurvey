@@ -38,29 +38,32 @@ def safe_push_msg(user, msg):
 @job('results-queue')
 def generate_result_link(current_user, download_service, file_name):
     scheduler = get_scheduler('ws-notice')
+    redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':current_user.id, 'batch_id': download_service.batch.id}
     repeat_times = settings.DOWNLOAD_CACHE_DURATION/settings.UPDATE_INTERVAL
-    scheduled_job = scheduler.schedule(datetime.utcnow(), safe_push_msg,
-                                args=[current_user, {'msg_type' : 'notice',
-                                                     'content': 'Computing results...',
-                                                      'status': 'WIP',
-                                                     'context': 'download-data'
-                                                      }],
-                                interval=settings.UPDATE_INTERVAL,
-                                repeat=repeat_times, #keep sending this update until 30mins
-                                result_ttl=settings.DOWNLOAD_CACHE_DURATION)
-    data = download_service.generate_interview_reports()
-    #when you are done extracting, cancel job
-    scheduled_job.cancel()
-    #now save the cache the result in redis
-    redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':current_user.id}
-    cache.set(redis_key, {'filename': file_name, 'data': data}, settings.DOWNLOAD_CACHE_DURATION)
+    if cache.has_key(redis_key) is False:
+        scheduled_job = scheduler.schedule(datetime.utcnow(), safe_push_msg,
+                                    args=[current_user, {'msg_type' : 'notice',
+                                                         'content': 'Computing results...',
+                                                          'status': 'WIP',
+                                                         'context': 'download-data',
+                                                         'description': download_service.batch.name
+                                                          }],
+                                    interval=settings.UPDATE_INTERVAL,
+                                    repeat=repeat_times, #keep sending this update until 30mins
+                                    result_ttl=settings.DOWNLOAD_CACHE_DURATION)
+        data = download_service.generate_interview_reports()
+        #when you are done extracting, cancel job
+        scheduled_job.cancel()
+        #now save the cache the result in redis
+        cache.set(redis_key, {'filename': file_name, 'data': data}, settings.DOWNLOAD_CACHE_DURATION)
     #keep notifying for download link, probably until it's downloaded
     scheduled_job = scheduler.schedule(datetime.utcnow(), safe_push_msg,
                                 args=[current_user, {
                                 'msg_type' : 'notice',
-                                'content': reverse('download_export_results'),
+                                'content': reverse('download_export_results', args=(download_service.batch.id)),
                                 'status': 'DONE',
-                                'context': 'download-data'
+                                'context': 'download-data',
+                                'description': download_service.batch.name
                                  }],
                                 interval=settings.UPDATE_INTERVAL,
                                 repeat=repeat_times, #keep sending this update until 30mins
@@ -68,8 +71,8 @@ def generate_result_link(current_user, download_service, file_name):
 
 @login_required
 @permission_required('auth.can_view_aggregates')
-def download_results(request):
-    redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':request.user.id}
+def download_results(request, batch_id):
+    redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':request.user.id, 'batch_id' : batch_id}
     download = cache.get(redis_key)
     if download:
         response = HttpResponse(content_type='text/csv')

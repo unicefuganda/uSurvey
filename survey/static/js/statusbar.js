@@ -70,7 +70,7 @@ updateDownloadStatus = function(msg) {
                 case 'DONE':
                     if(indeterminateProgress)
                         indeterminateProgress.stop();
-                    status_msg.html('<a href="' + msg.content +'" class="blue">download result</a>');
+                    status_msg.html('<a href="' + msg.content +'" class="blue">download-' + msg.description + '</a>');
             };
         };
     };

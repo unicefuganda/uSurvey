@@ -13,6 +13,9 @@ from datetime import date
 import json, inspect
 from django.utils import html
 from survey.forms.logic import LogicForm
+import redis
+
+store = redis.Redis()
 
 register = template.Library()
 
@@ -72,6 +75,10 @@ def join_list(list, delimiter):
 @register.filter
 def get_value(dict, key):
     return dict.get(key, "")
+
+@register.filter
+def get_cached_result(key, default):
+    return cache.get(key, default)
 
 @register.filter
 def batches_enabled(survey, ea):
