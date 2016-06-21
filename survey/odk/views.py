@@ -32,7 +32,8 @@ from survey.interviewer_configs import MESSAGES
 from collections import OrderedDict
 
 
-def get_survey_xform(interviewer, survey):
+def get_survey_xform(allocation):
+    interviewer, survey = allocation.interviewer, allocation.survey
     template_file = "odk/survey_form-no-repeat.xml"
     if BatchLocationStatus.objects.filter(batch__survey=survey, non_response=True).exists():
         template_file = 'odk/non-response-no-repeat.xml'
@@ -50,6 +51,7 @@ def get_survey_xform(interviewer, survey):
         'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
         'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
         'survey' : survey,
+        'allocation' : allocation,
         'survey_batches' : batches,
         'messages' : MESSAGES,
         'loop_starters' : loop_starters,
@@ -155,8 +157,8 @@ def download_xform(request, survey_id):
                 survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
                 survey_xform = get_household_list_xform(interviewer, survey, survey_listing.listing)
             else:
-                survey_xform = get_survey_xform(interviewer, survey)
-            form_id = '%s'% survey_id
+                survey_xform = get_survey_xform(allocation)
+            form_id = '%s'% allocation.pk
 
             audit = {
                 "xform": form_id
@@ -166,7 +168,7 @@ def download_xform(request, survey_id):
                                                                  "interviewer": interviewer.name,
                                                                 "id_string": form_id
                                                             }, audit, request)
-            response = response_with_mimetype_and_name('xml', 'survey-%s' %survey_id,
+            response = response_with_mimetype_and_name('xml', 'survey-%s' % allocation.pk,
                                                        show_date=False, full_mime='text/xml')
             response.content = survey_xform
             return response

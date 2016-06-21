@@ -212,8 +212,8 @@ def  get_download_url(request, url_name, instance=None):
         return request.build_absolute_uri(reverse(url_name, args=(instance.pk, )))
 
 @register.assignment_tag
-def get_question_path(question):
-    return get_node_path(question)
+def get_question_path(question, loop_boundaries):
+    return get_node_path(question, loop_boundaries)
 
 @register.assignment_tag
 def get_non_loop_question_path(question):

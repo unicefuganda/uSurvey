@@ -10,7 +10,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 </h:title>
   <model>
   <instance>
-   <survey id="{{ survey.pk }}" >
+   <survey id="alloc-{{ allocation.pk }}" >
      <meta>
        <instanceID />
        <instanceName />
@@ -33,11 +33,11 @@ xmlns:jr="http://openrosa.org/javarosa">
 		<b{{batch.pk}}>
 	   		{% for question in batch.survey_questions %}
 	           {% if question in loop_starters %}
-	   			  <q{{question.looper_flow.question.pk}}q{{question.pk}}>
+	   			  <q{{question.loop_boundary.0}}q{{question.loop_boundary.1}}>
 	           {% endif %}
 					<q{{ question.pk }} />
 	   			{% if question in loop_enders %}
-	   			  </q{{question.pk}}q{{question.looper_flow.next_question.pk}}>
+	   			  </q{{question.loop_boundary.0}}q{{question.loop_boundary.1}}>
 	           {% endif %}
 			{% endfor %}
 		</b{{batch.pk}}>
@@ -49,7 +49,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat(/survey/household/houseNumber, ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
+           readonly="true()" calculate="concat(/survey/household/houseNumber, ' - ', '{{ allocation.allocation_ea.name }}', ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
   <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}int{% endif %}"  required="true()" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" />
   <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()"  />
@@ -68,7 +68,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% get_question_path question loop_boundaries as question_path %}
 		{% is_relevant_odk question interviewer registered_households loop_boundaries as relevance_context %}
 	        {% if question in loop_starters %}
-			<bind nodeset="/survey/b{{batch.pk}}/q{{question.looper_flow.question.pk}}q{{question.pk}}" relevant="{{ relevance_context }}" />
+			<bind nodeset="/survey/b{{batch.pk}}/q{{question.loop_boundary.0}}q{{question.loop_boundary.1}}" relevant="{{ relevance_context }}" />
 			{% endif %}
 			<bind nodeset="{{ question_path }}"
 				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
@@ -148,7 +148,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 				{% if question in loop_starters %}
 				<group>
 					<label>{{question.text}}</label>
-			     	<repeat nodeset="/survey/b{{batch.pk}}/q{{question.looper_flow.question.pk}}q{{question.pk}}">
+			     	<repeat nodeset="/survey/b{{batch.pk}}/q{{question.loop_boundary.0}}q{{question.loop_boundary.1}}">
 			    {% endif %}
 				{% get_odk_mem_question question as member_question %}
 				{% if question.answer_type == answer_types.multichoiceanswer %}

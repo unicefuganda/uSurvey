@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 continue
             else:
                 if len(row) > total_divisions:
-                    ea_name = row.pop(-1)
+                    ea_name = row.pop(total_divisions)
                 row = row[:total_divisions]
 
             with transaction.atomic():

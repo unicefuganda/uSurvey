@@ -148,7 +148,7 @@ class Batch(BaseModel):
         for q in survey_questions:
             if q in loop_starters:
                 start = q
-                present_loop = [q, ]
+                present_loop = []
             if q in loop_enders:
                 present_loop.append(q)
                 loop_desc[(start.pk, q.pk)] = present_loop

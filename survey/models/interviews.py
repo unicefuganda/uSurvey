@@ -12,6 +12,7 @@ from survey.interviewer_configs import MESSAGES
 from survey.utils.decorators import static_var
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db.models import Max
 
 def reply_test(cls, func):
     func.is_reply_test = True
@@ -86,8 +87,6 @@ class Interview(BaseModel):
         self.save()
         return response_text
 
-
-
     # @property
     # def has_pending_questions(self):
     #     return self.last_question is not None and self.last_question.flows.filter(next_question__isnull=False).exists()
@@ -126,14 +125,18 @@ class Interview(BaseModel):
 
 
 class Answer(BaseModel):
+    NO_LOOP = -1
     interview = models.ForeignKey(Interview, related_name='%(class)s',db_index=True)
 #     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
 #                                                             #value shall hold the exact worth of the response
-    question = models.ForeignKey("Question", null=True, related_name="%(class)s", on_delete=models.PROTECT,db_index=True)
+    question = models.ForeignKey("Question", null=True, related_name="%(class)s",
+                                            on_delete=models.PROTECT, db_index=True)
+    loop_id = models.IntegerField(default=-1) #used to identify answers belonging to
+                                                                # same question loop for looping flows
 
     @classmethod
-    def create(cls, interview, question, answer):
-        return cls.objects.create(question=question, value=answer, interview=interview)
+    def create(cls, interview, question, answer, loop_id=NO_LOOP):
+        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
 
     @classmethod
     def supported_answers(cls):
@@ -253,11 +256,11 @@ class NumericalAnswer(Answer):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
 
     @classmethod
-    def create(cls, interview, question, answer):
+    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
         try:
             value = int(answer)
         except Exception: raise
-        return cls.objects.create(question=question, value=answer, interview=interview)
+        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
 
     @classmethod
     def greater_than(cls, answer, value):
@@ -324,13 +327,13 @@ class MultiChoiceAnswer(Answer):
     value = models.ForeignKey("QuestionOption", null=True)
 
     @classmethod
-    def create(cls, interview, question, answer):
+    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
         try:
             answer = int(answer)
             answer = question.options.get(order=answer)
         except:
             pass
-        return cls.objects.create(question=question, value=answer, interview=interview)
+        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
 
     class Meta:
         app_label = 'survey'
@@ -359,7 +362,7 @@ class MultiSelectAnswer(Answer):
     value = models.ManyToManyField("QuestionOption", )
 
     @classmethod
-    def create(cls, interview, question, answer):
+    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
         if isinstance(answer, basestring):
             answer = answer.split(' ')
         if isinstance(answer, list):
@@ -369,7 +372,7 @@ class MultiSelectAnswer(Answer):
             selected = question.options.filter(pk__in=chosen)
         else:
             selected = answer
-        ans = cls.objects.create(question=question, interview=interview)
+        ans = cls.objects.create(question=question, interview=interview, loop_id=loop_id)
         for opt in selected:
             ans.value.add(opt)
         return ans
@@ -419,11 +422,11 @@ class DateAnswer(Answer):
     value = models.DateField(null=True)
 
     @classmethod
-    def create(cls, interview, question, answer):
+    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
         if isinstance(answer, basestring):
             answer = extract_date(answer, fuzzy=True)
         question = question
-        return cls.objects.create(question=question, value=answer, interview=interview)
+        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
 
     class Meta:
         app_label = 'survey'
@@ -480,11 +483,11 @@ class GeopointAnswer(Answer):
     value = models.ForeignKey(ODKGeoPoint, null=True)
 
     @classmethod
-    def create(cls, interview, question, answer):
+    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
         if isinstance(answer, basestring):
             answer = answer.split(' ')
             answer = ODKGeoPoint(latitude=answer[0], longitude=answer[1], altitude=[2], precision=answer[3])
-        return cls.objects.create(question=question, value=answer, interview=interview)
+        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
 
     class Meta:
         app_label = 'survey'

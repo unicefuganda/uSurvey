@@ -7,6 +7,7 @@ from datetime import datetime
 import csv, StringIO, string
 from collections import OrderedDict
 import dateutils
+from survey.odk.utils.log import logger
 
 
 class ResultComposer:
@@ -72,7 +73,13 @@ class ResultsDownloadService(object):
 
     def question_headers(self):
         header = []
+        # loop_starters = self.batch.loop_starters()
         for question in self.questions:
+        #     if question in loop_starters:
+        #         boundary = question.loop_boundary()
+        #         loop_questions = self.batch.loop_backs_questions()[boundary]
+        #         for i in range(settings.LOOP_QUESTION_REPORT_DEPT-1):
+        #             map(lambda q: header.append(q.identifier), loop_questions)
             header.append(question.identifier)
         return header
 
@@ -150,13 +157,16 @@ class ResultsDownloadService(object):
             answer_data = answer_class.objects.filter(interview__batch=self.batch, **filter_args).\
                 values_list('interview__householdmember__pk', 'question__pk', *query_args).\
                         order_by('interview__ea__locations', 'interview__ea',
-                                 'interview__householdmember__household').distinct(
-                                                                            'interview__ea__locations',
-                                                                            'interview__ea',
-                                                                            'interview__householdmember__household',
-                                                                            'interview__householdmember__pk',
-                                                                            'question__pk'
-                                                                            )
+                                 'interview__householdmember__household', 'interview__householdmember__pk',
+                                 'pk', 'loop_id')
+                                                    # .distinct(
+                                                    #                         'interview__ea__locations',
+                                                    #                         'interview__ea',
+                                                    #                         'interview__householdmember__household',
+                                                    #                         #'interview__householdmember__pk',
+                                                    #                         #'question__pk'
+                                                    #                        )
+
             answer_data = list(answer_data)
             # print 'answer data ', len(answer_data)
             #now grab member reports
@@ -171,15 +181,39 @@ class ResultsDownloadService(object):
                     report_data[-2] = 'M' if report_data[-2] else 'F'
                     member_details = [ unicode(md).encode('utf8') for md in report_data[:-1]]
                     hm_data = OrderedDict([('mem_details' , member_details), ])
-                hm_data[question_pk] =  unicode(report_data[-1]).encode('utf8')
+                hm_question_data = hm_data.get(question_pk, [])
+                hm_question_data.append(unicode(report_data[-1]).encode('utf8'))
+                hm_data[question_pk] =  hm_question_data
                 member_reports[hm_pk] = hm_data
 
         for hm in member_reports.values():
-            answers = hm['mem_details']
+            answers = hm.pop('mem_details', [])
+            #for question_pk, response_data in hm.items():
+            loop_starters = self.batch.loop_starters()
+            loop_enders = self.batch.loop_enders()
+            started = False
+            dept = 0
             for question in self.questions:
-                answers.append(hm.get(question.pk, ''))
+                # loop_extras = []
+                # boundary = question.loop_boundary()
+                # if question in loop_starters:
+                #     loop_extras = []
+                #     loop_questions = self.batch.loop_backs_questions()[boundary]
+                #     for i in range(1, settings.LOOP_QUESTION_REPORT_DEPT):
+                #         for q in loop_questions:
+                #             question_responses = hm.get(question.pk, [])
+                #             if len(question_responses) > i:
+                #                 resp = question_responses[i]
+                #             else:
+                #                 resp = ''
+                #             loop_extras.append(resp)
+                #     import pdb; pdb.set_trace()
+                # if question in loop_enders:
+                #     answers.extend(loop_extras)
+                answers.append('>'.join(hm.get(question.pk, ['', ])))
             report.append(answers)
         return report
+
 
     def generate_report(self):
         data = [self.set_report_headers(), ]

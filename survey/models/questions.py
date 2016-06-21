@@ -53,6 +53,9 @@ class Question(BaseModel):
         #if self.is_loop_start() or self.is_loop_end():
         return self.batch.get_looper_flow(self)
 
+    def loop_boundary(self):
+        return self.batch.loop_back_boundaries().get(self.pk, None)
+
     # def loop_inlines(self):
 
 

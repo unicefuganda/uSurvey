@@ -41,7 +41,7 @@ def survey_completion_summary(request, household_id, batch_id):
     if allocations.exists():
         completion_rates = BatchLocationCompletionRates(batch, ea=ea, specific_households=[household_id, ])
         result_service = ResultsDownloadService(batch=batch, specific_households=[household_id, ])
-        reports = result_service.generate_report()
+        reports = result_service.generate_interview_reports()
         reports_headers = reports.pop(0)
         context.update({
         'household' : household,

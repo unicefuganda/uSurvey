@@ -5,7 +5,7 @@
     <xform>
         {% get_download_url request 'download_odk_householdlist_form'  as household_download_url %}
         <formID>{{ allocation.pk }}</formID>
-        <name>Household List Form - {{ allocation.survey.name }}</name>
+        <name>Household List Form - {{ allocation.survey.name }} - {{ allocation.allocation_ea.name }}</name>
         <majorMinorVersion/>
         <version/>
         <hash />
@@ -16,8 +16,8 @@
   {% else %}
      {% get_download_url request 'download_odk_survey_form' survey as download_url %}
       <xform>
-        <formID>{{ survey.pk }} </formID>
-        <name>{{ survey.name }}</name>
+        <formID>{{ allocation.pk }}</formID>
+        <name>{{ survey.name }} - {{ allocation.allocation_ea.name }}</name>
         <majorMinorVersion/>
         <version/>
         <hash />

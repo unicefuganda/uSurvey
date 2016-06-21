@@ -131,7 +131,8 @@ def _get_selected_household_member(survey_tree):
     member_id = (_get_nodes(hm_path, tree=survey_tree)[0].text).split(HOUSEHOLD_MEMBER_ID_DELIMITER)[1]
     return HouseholdMember.objects.get(pk=member_id)
 
-def _get_or_create_household_member(interviewer, survey, survey_tree):
+def _get_or_create_household_member(survey_allocation, survey_tree):
+    interviewer, survey = survey_allocation.interviewer, survey_allocation.survey
     house_number = _get_household_house_number(survey_tree)
     survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
     house_listing = survey_listing.listing
@@ -176,7 +177,7 @@ def _get_or_create_household_member(interviewer, survey, survey_tree):
     else:
         return HouseholdMember.objects.create(**kwargs)
 
-def record_interview_answer(interview, question, answer):
+def record_interview_answer(interview, question, answer, loop_id=Answer.NO_LOOP):
     if not isinstance(answer, NonResponseAnswer):
         answer_class = Answer.get_class(question.answer_type)
         print 'answer type ', answer_class.__name__
@@ -184,7 +185,8 @@ def record_interview_answer(interview, question, answer):
         print 'question pk is ', question.pk
         print 'interview is ', interview
         print 'answer text is ', answer
-        return answer_class.create(interview, question, answer)
+        answer = answer_class.create(interview, question, answer, loop_id=loop_id)
+        return answer
     else:
         answer.interview = interview
         answer.save()
@@ -222,13 +224,13 @@ def _get_responses(interviewer, survey_tree, survey):
                 base_path = template.Template(LOOP_ANSWER_BASE_PATH).render(template.Context({'start_id' : start_id,
                                                                         'batch_id': batch.pk, 'end_id': end_id}))
             else:
-                base_path = template.Template(LOOP_ANSWER_BASE_PATH).render(template.Context({'batch_id': batch.pk }))
+                base_path = template.Template(ANSWER_BASE_PATH).render(template.Context({'batch_id': batch.pk }))
             base_nodes = _get_nodes(base_path, tree=survey_tree)
             for node in base_nodes:
                 responses = response_dict.get((batch.pk, question.pk), [])
                 resp_text = _get_nodes('./q%s' % question.pk, node)
-                if resp_text and resp_text[0]:
-                    responses.append(resp_text[0])
+                if len(resp_text) > 0 and resp_text[0] is not None:
+                    responses.append(resp_text[0].text)
                 response_dict[(batch.pk, question.pk)] = responses
     return response_dict
                 
@@ -241,6 +243,11 @@ def _get_form_id(survey_tree):
 def _get_survey(survey_tree):
     pk = _get_nodes(FORM_ID_PATH, tree=survey_tree)[0]
     return Survey.objects.get(pk=pk)
+
+def _get_allocation(survey_tree):
+    pk = _get_nodes(FORM_ID_PATH, tree=survey_tree)[0].strip('alloc-')
+    return SurveyAllocation.objects.get(pk=pk)
+
 
 def _get_form_type(survey_tree):
     return _get_nodes(FORM_TYPE_PATH, tree=survey_tree)[0].text
@@ -288,9 +295,11 @@ def save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing):
     return non_responses
 
 @job('odk')
-def save_survey_questions(survey, interviewer, survey_tree, media_files):
+def save_survey_questions(survey_allocation, survey_tree, media_files):
+    interviewer = survey_allocation.interviewer
+    survey = survey_allocation.survey
     form_id = _get_form_id(survey_tree)
-    member = _get_or_create_household_member(interviewer, survey, survey_tree)
+    member = _get_or_create_household_member(survey_allocation, survey_tree)
     response_dict = _get_responses(interviewer, survey_tree, survey)
     treated_batches = {}
     interviews = {}
@@ -298,7 +307,10 @@ def save_survey_questions(survey, interviewer, survey_tree, media_files):
         for (b_id, q_id), answers in response_dict.items():
             question = Question.objects.get(pk=q_id)
             batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-            for answer in answers:
+            loop_id = Answer.NO_LOOP
+            for idx, answer in enumerate(answers):
+                if len(answers) > 0:
+                    loop_id = idx
                 if answer is not None:
                     if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
                                                 VideoAnswer.choice_name()]:
@@ -310,10 +322,10 @@ def save_survey_questions(survey, interviewer, survey_tree, media_files):
                                                    householdmember=member,
                                                    batch=batch,
                                                    interview_channel=interviewer.odk_access[0],
-                                                   ea=interviewer.ea
+                                                   ea=survey_allocation.allocation_ea
                                                )
                         interviews[b_id] = interview
-                    created = record_interview_answer(interview, question, answer)
+                    created = record_interview_answer(interview, question, answer, loop_id)
             if b_id not in treated_batches.keys():
                 treated_batches[b_id] = batch
         map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches
@@ -339,8 +351,12 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     reports =  []
     survey_tree = _get_tree(xml_file)
     form_id = _get_form_id(survey_tree)
-    survey = _get_survey(survey_tree)
-    survey_allocation = get_survey_allocation(interviewer)
+    if form_id.startswith('alloc-'):
+        survey_allocation = _get_allocation(survey_tree)
+        survey = survey_allocation.survey
+    else:
+        survey = _get_survey(survey_tree)
+        survey_allocation = get_survey_allocation(interviewer)
     household = None
     member = None
     survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
@@ -362,7 +378,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                     household_member=member, household=non_response.household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
     else:
-        submission = save_survey_questions(survey, interviewer, survey_tree, media_files)
+        submission = save_survey_questions(survey_allocation, survey_tree, media_files)
     return submission
 
 def get_survey(interviewer):
