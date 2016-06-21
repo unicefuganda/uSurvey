@@ -6,7 +6,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 {% load template_tags %}
 <h:head>
 <h:title> 
-  {{survey.name}}
+  {{survey.name}} - {{ allocation.allocation_ea.name }}
 </h:title>
   <model>
   <instance>
@@ -49,7 +49,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/survey/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/survey/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat(/survey/household/houseNumber, ' - ', '{{ allocation.allocation_ea.name }}', ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
+           readonly="true()" calculate="concat(/survey/household/houseNumber, ' ', /survey/household/householdMember/surname, '_', /survey/household/householdMember/firstName)" />
   <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}int{% endif %}"  required="true()" />
   <bind nodeset="/survey/household/householdMember/surname" type="string"  required="true()" />
   <bind nodeset="/survey/household/householdMember/firstName" type="string"  required="true()"  />

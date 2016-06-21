@@ -210,7 +210,7 @@ class ResultsDownloadService(object):
                 #     import pdb; pdb.set_trace()
                 # if question in loop_enders:
                 #     answers.extend(loop_extras)
-                answers.append('>'.join(hm.get(question.pk, ['', ])))
+                answers.append(' > '.join(hm.get(question.pk, ['', ])))
             report.append(answers)
         return report
 
