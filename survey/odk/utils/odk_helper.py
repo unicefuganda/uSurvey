@@ -39,6 +39,8 @@ HOUSEHOLD_MEMBER_ID_DELIMITER = '_'
 MANUAL_HOUSEHOLD_SAMPLE_PATH = '//survey/household/houseNumber'
 MANUAL_HOUSEHOLD_MEMBER_PATH = '//survey/household/householdMember'
 ANSWER_PATH = '//survey/b{{batch_id}}/q{{question_id}}'
+ANSWER_BASE_PATH = '//survey/b{{batch_id}}'
+LOOP_ANSWER_BASE_PATH = '//survey/b{{batch_id}}/q{{start_id}}q{{end_id}}'
 INSTANCE_ID_PATH = '//survey/meta/instanceID'
 FORM_ID_PATH = '//survey/@id'
 # ONLY_HOUSEHOLD_PATH = '//survey/onlyHousehold'
@@ -188,6 +190,18 @@ def record_interview_answer(interview, question, answer):
         answer.save()
         return answer
 
+def get_answer_path(batch, question):
+    loop_boundaries = batch.loop_back_boundaries()
+    batch = question.batch
+    boundary = loop_boundaries.get(question.pk, None)
+    if boundary:
+        start_id, end_id = boundary
+        return '//survey/b%s/q%sq%s/q%s' % (batch.pk,
+                                          start_id, end_id,
+                                          question.pk)
+    #should take account with looping question
+    return '//survey/b%s/q%s' % (batch.pk, question.pk)
+
 def _get_responses(interviewer, survey_tree, survey):
     response_dict = {}
     batches = interviewer.ea.open_batches(survey)
@@ -200,14 +214,22 @@ def _get_responses(interviewer, survey_tree, survey):
         #     resp = NonResponseAnswer(batch.start_question, _get_nodes(nrsp_answer_path, tree=survey_tree)[0].text)
         #     response_dict[(batch.pk, batch.start_question.pk)] = resp
         # else:
+        loop_boundaries = batch.loop_back_boundaries()
         for question in batch.survey_questions:
-            context['question_id'] = question.pk
-            # context = template.Context({'batch_id': batch.pk, 'question_id' : question.pk})
-            answer_path = template.Template(ANSWER_PATH).render(context)
-            resp_text, resp_node = None, _get_nodes(answer_path, tree=survey_tree)
-            if resp_node: #if question is relevant but
-                resp_text = resp_node[0].text
-            response_dict[(batch.pk, question.pk)] = resp_text
+            boundary = loop_boundaries.get(question.pk, None)
+            if boundary:
+                start_id, end_id = boundary
+                base_path = template.Template(LOOP_ANSWER_BASE_PATH).render(template.Context({'start_id' : start_id,
+                                                                        'batch_id': batch.pk, 'end_id': end_id}))
+            else:
+                base_path = template.Template(LOOP_ANSWER_BASE_PATH).render(template.Context({'batch_id': batch.pk }))
+            base_nodes = _get_nodes(base_path, tree=survey_tree)
+            for node in base_nodes:
+                responses = response_dict.get((batch.pk, question.pk), [])
+                resp_text = _get_nodes('./q%s' % question.pk, node)
+                if resp_text and resp_text[0]:
+                    responses.append(resp_text[0])
+                response_dict[(batch.pk, question.pk)] = responses
     return response_dict
                 
 def _get_instance_id(survey_tree):
@@ -273,23 +295,25 @@ def save_survey_questions(survey, interviewer, survey_tree, media_files):
     treated_batches = {}
     interviews = {}
     if response_dict:
-        for (b_id, q_id), answer in response_dict.items():
+        for (b_id, q_id), answers in response_dict.items():
             question = Question.objects.get(pk=q_id)
             batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-            if answer is not None:
-                if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(), VideoAnswer.choice_name()]:
-                    answer = media_files.get(answer, None)
-                interview = interviews.get(b_id, None)
-                if interview is None:
-                    interview, _ = Interview.objects.get_or_create(
-                                               interviewer=interviewer,
-                                               householdmember=member,
-                                               batch=batch,
-                                               interview_channel=interviewer.odk_access[0],
-                                               ea=interviewer.ea
-                                           )
-                    interviews[b_id] = interview
-                created = record_interview_answer(interview, question, answer)
+            for answer in answers:
+                if answer is not None:
+                    if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
+                                                VideoAnswer.choice_name()]:
+                        answer = media_files.get(answer, None)
+                    interview = interviews.get(b_id, None)
+                    if interview is None:
+                        interview, _ = Interview.objects.get_or_create(
+                                                   interviewer=interviewer,
+                                                   householdmember=member,
+                                                   batch=batch,
+                                                   interview_channel=interviewer.odk_access[0],
+                                                   ea=interviewer.ea
+                                               )
+                        interviews[b_id] = interview
+                    created = record_interview_answer(interview, question, answer)
             if b_id not in treated_batches.keys():
                 treated_batches[b_id] = batch
         map(lambda batch: member.batch_completed(batch), treated_batches.values()) #create batch completion for question batches

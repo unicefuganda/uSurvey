@@ -191,7 +191,8 @@ INSTALLED_APPS = (
     'django_rq',
     'django_rq_dashboard',
     'channels',
-    # Uncomment the next line to enable the admin:
+    'memoize',
+   # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
@@ -317,6 +318,7 @@ SHAPE_FILE_LOC_FIELD ='DNAME_2010'
 SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
 
 RESULT_REFRESH_FREQ=6
+MEMORIZE_TIMEOUT = 120
 
 RQ_QUEUES = {
     'default': {

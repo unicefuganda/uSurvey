@@ -13,6 +13,9 @@ from survey.models.interviews import AnswerAccessDefinition, Answer
 from survey.models.access_channels import ODKAccess
 from django.core.exceptions import ValidationError
 from ordered_set import OrderedSet
+from collections import OrderedDict
+from memoize import memoize
+from django.conf import settings
 
 ALL_GROUPS = HouseholdMemberGroup.objects.all()
 ALL_ANSWERS = Answer.answer_types()
@@ -131,6 +134,38 @@ class Batch(BaseModel):
         else:
             return []
 
+    @memoize(timeout=settings.MEMORIZE_TIMEOUT)
+    def loop_backs_questions(self):
+        '''
+        :return: loop question structure for this batch (q_start_pk, q_end_pk) = []
+        '''
+        survey_questions = self.survey_questions
+        loop_starters = self.loop_starters()
+        loop_enders = self.loop_enders()
+        start = None
+        loop_desc = OrderedDict()
+        present_loop = []
+        for q in survey_questions:
+            if q in loop_starters:
+                start = q
+                present_loop = [q, ]
+            if q in loop_enders:
+                present_loop.append(q)
+                loop_desc[(start.pk, q.pk)] = present_loop
+                start = None
+            if start:
+                present_loop.append(q)
+        #just transpose
+        return loop_desc
+
+    @memoize(timeout=settings.MEMORIZE_TIMEOUT)
+    def loop_back_boundaries(self):
+        loop_desc = self.loop_backs_questions()
+        quest_map = OrderedDict()
+        for boundary, loop_questions in loop_desc.items():
+            map(lambda q: quest_map.update({q.pk : boundary}), loop_questions)
+        return quest_map
+
     def previous_inlines(self, question):
         inlines = self.questions_inline()
         if question not in inlines:
@@ -148,6 +183,7 @@ class Batch(BaseModel):
         return Question.zombies(self)
 
     @property
+    @memoize(timeout=settings.MEMORIZE_TIMEOUT)
     def survey_questions(self):
         inline_ques = self.questions_inline()
         questions = OrderedSet(inline_ques)

@@ -236,18 +236,19 @@ def  get_odk_mem_question(question):
     question_context = template.Context(context)
     return template.Template(html.escape(question.text)).render(question_context)
 
-def get_node_path(question):
+def get_node_path(question, loop_boundaries):
     batch = question.batch
-    looper_flow = question.looper_flow
-    if looper_flow:
+    boundary = loop_boundaries.get(question.pk, None)
+    if boundary:
+        start_id, end_id = boundary
         return '/survey/b%s/q%sq%s/q%s' % (batch.pk,
-                                          looper_flow.question.pk, looper_flow.next_question.pk,
+                                          start_id, end_id,
                                           question.pk)
     #should take account with looping question
-    return get_non_loop_question_path(question)
+    return '/survey/b%s/q%s' % (batch.pk, question.pk)
 
 @register.assignment_tag(takes_context=True)
-def is_relevant_odk(context, question, interviewer, registered_households):
+def is_relevant_odk(context, question, interviewer, registered_households, loop_boundaries):
     batch = question.batch
     if question.pk == batch.start_question.pk:
         default_relevance = 'true()'
@@ -258,7 +259,7 @@ def is_relevant_odk(context, question, interviewer, registered_households):
                                 is_relevant_by_group(context, question, registered_households)
                                 )
     flows = question.flows.exclude(desc=LogicForm.BACK_TO_ACTION) #do not include back to flows to this
-    node_path = get_node_path(question)
+    node_path = get_node_path(question, loop_boundaries)
     flow_conditions = []
     if flows:
         for flow in flows:

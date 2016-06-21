@@ -29,6 +29,7 @@ from survey.utils.query_helper import get_filterset
 from survey.models import BatchLocationStatus
 from survey.interviewer_configs import LEVEL_OF_EDUCATION, NUMBER_OF_HOUSEHOLD_PER_INTERVIEWER
 from survey.interviewer_configs import MESSAGES
+from collections import OrderedDict
 
 
 def get_survey_xform(interviewer, survey):
@@ -42,6 +43,8 @@ def get_survey_xform(interviewer, survey):
     map(lambda batch: loop_starters.update(batch.loop_starters()), batches)
     loop_enders = set()
     map(lambda batch: loop_enders.update(batch.loop_enders()), batches)
+    loop_boundaries = OrderedDict()
+    map(lambda batch: loop_boundaries.update(batch.loop_back_boundaries()), batches)
     return render_to_string(template_file, {
         'interviewer': interviewer,
         'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
@@ -51,6 +54,7 @@ def get_survey_xform(interviewer, survey):
         'messages' : MESSAGES,
         'loop_starters' : loop_starters,
         'loop_enders' : loop_enders,
+        'loop_boundaries': loop_boundaries,
         'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
         })
 
