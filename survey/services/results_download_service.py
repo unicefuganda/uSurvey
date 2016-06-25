@@ -153,7 +153,7 @@ class ResultsDownloadService(object):
             answer_class = Answer.get_class(answer_type)
             # print 'using query_args ', query_args
             answer_data = answer_class.objects.filter(interview__batch=self.batch, **filter_args).\
-                values_list('pk', 'interview__householdmember__pk', 'question__pk', *query_args).\
+                values_list('interview__householdmember__pk', 'question__pk', *query_args).\
                         order_by('interview__ea__locations', 'interview__ea',
                                  'interview__householdmember__household', 'interview__householdmember__pk',
                                  'pk', 'loop_id')
@@ -169,8 +169,8 @@ class ResultsDownloadService(object):
             # print 'answer data ', len(answer_data)
             #now grab member reports
             for data in answer_data:
-                answer_pk, hm_pk, question_pk = data[:3]
-                report_data = list(data[3:])
+                hm_pk, question_pk = data[:2]
+                report_data = list(data[2:])
                 hm_data = member_reports.get(hm_pk, None)
                 if hm_data is None:
                     report_data.insert(-3, str(dateutils.relativedelta(datetime.utcnow().date(),
@@ -179,9 +179,8 @@ class ResultsDownloadService(object):
                     report_data[-2] = 'M' if report_data[-2] else 'F'
                     member_details = [ unicode(md).encode('utf8') for md in report_data[:-1]]
                     hm_data = OrderedDict([('mem_details' , member_details), ])
-                hm_question_data = hm_data.get(question_pk, {})
-                answer_replies = hm_question_data.get(answer_pk, '') #incase of multichoice
-                hm_question_data[answer_pk] = ';'.join([answer_replies, unicode(report_data[-1]).encode('utf8')])
+                hm_question_data = hm_data.get(question_pk, [])
+                hm_question_data.append(unicode(report_data[-1]).encode('utf8'))
                 hm_data[question_pk] =  hm_question_data
                 member_reports[hm_pk] = hm_data
 
@@ -209,7 +208,7 @@ class ResultsDownloadService(object):
                 #     import pdb; pdb.set_trace()
                 # if question in loop_enders:
                 #     answers.extend(loop_extras)
-                answers.append(' > '.join(hm.get(question.pk, {}).values()))
+                answers.append(' > '.join(hm.get(question.pk, ['', ])))
             report.append(answers)
         return report
 
