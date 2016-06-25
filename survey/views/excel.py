@@ -82,8 +82,8 @@ def download_results(request, batch_id):
         response['Content-Disposition'] = 'attachment; filename="%s.csv"' % download['filename']
         writer = csv.writer(response)
         data = download['data']
-        contents = data[0]
-        for row in data[1:]:
+        #contents = data[0]
+        for row in data:
             writer.writerow(row)
         return response
     else:
@@ -119,7 +119,7 @@ def download(request):
                 file_name = '%s%s' % ('%s-%s-'% (last_selected_loc.type.name, last_selected_loc.name) if
                                       last_selected_loc else '', batch.name if batch else survey.name)
                 generate_result_link.delay(request.user, download_service, file_name)
-                messages.warning(request, "Download is in progress...")
+                messages.warning(request, "Download is in progress. Download link would be available to you shortly")
     loc_types = LocationType.in_between()
     return render(request, 'aggregates/download_excel.html',
                   {
