@@ -96,7 +96,7 @@ class TemplateTagsTest(TestCase):
         gender.verbose_name.upper().replace(' ', '_') :
             mark_safe('<output value="/survey/household/householdMember/sex"/>'),
         }
-        print is_relevant_odk(context, question, investigator, household)
+        print is_relevant_odk(context, question, investigator, household, {})
 
     def test_should_return_concatenated_ints_in_a_single_string(self):    
         self.assertEqual('1, 2', add_string(1,2))
