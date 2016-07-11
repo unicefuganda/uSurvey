@@ -29,6 +29,12 @@ class Question(BaseModel):
         app_label = 'survey'        
         unique_together = [('identifier', 'batch'), ]
 
+    def answers(self):
+        return Answer.get_class(self.answer_type).objects.filter(question=self)
+
+    def total_answers(self): #just utility to get number of times this question has been answered
+        return Answer.get_class(self.answer_type).objects.filter(question=self).count()
+
     def is_loop_start(self):
         from survey.forms.logic import LogicForm
         return self.connecting_flows.filter(desc=LogicForm.BACK_TO_ACTION).exists() #actually the more correct way is to

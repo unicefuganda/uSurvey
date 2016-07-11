@@ -150,7 +150,7 @@ class Answer(BaseModel):
     def get_class(cls, verbose_name):
         verbose_name = verbose_name.strip()
         for cl in Answer.__subclasses__():
-            if cl._meta.verbose_name.title() == verbose_name:
+            if cl.choice_name() == verbose_name:
                 return cl
         ValueError('unknown class')
 

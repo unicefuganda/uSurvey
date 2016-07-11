@@ -254,24 +254,26 @@ def _kill_zombies(zombies):
 def _remove(request, batch_id, question_id):
     question = get_object_or_404(Question, pk=question_id)
     batch = question.batch
-    _kill_zombies(batch.zombie_questions())
-    redirect_url = '/batches/%s/questions/' % batch_id if batch_id else reverse('batch_questions_page', args=(batch.pk, ))
-    if question:
-        success_message = "Question successfully deleted."
-        messages.success(request, success_message) #% ("Sub question" if question.subquestion else "Question"))
+    redirect_url = '/batches/%s/questions/' % batch_id if batch_id else reverse('batch_questions_page',
+                                                                                args=(batch.pk, ))
+    if question.total_answers() > 0:
+        messages.error(request, "Cannot delete question that has been answered at least once.")
     else:
-        messages.error(request, "Question / Subquestion does not exist.")
-    next_question = batch.next_inline(question)
-    previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
-    if previous_inline.exists() and next_question:
-        QuestionFlow.objects.create(question=previous_inline[0].question, next_question=next_question)
-    elif next_question:
-        #need to delete the previous flow for the next question
-        batch.start_question = next_question
-        batch.save()
-    question.connecting_flows.all().delete()
-    question.flows.all().delete()
-    question.delete()
+        _kill_zombies(batch.zombie_questions())
+        if question:
+            success_message = "Question successfully deleted."
+            messages.success(request, success_message) #% ("Sub question" if question.subquestion else "Question"))
+        next_question = batch.next_inline(question)
+        previous_inline = question.connecting_flows.filter(validation_test__isnull=True)
+        if previous_inline.exists() and next_question:
+            QuestionFlow.objects.create(question=previous_inline[0].question, next_question=next_question)
+        elif next_question:
+            #need to delete the previous flow for the next question
+            batch.start_question = next_question
+            batch.save()
+        question.connecting_flows.all().delete()
+        question.flows.all().delete()
+        question.delete()
     return HttpResponseRedirect(redirect_url)
 
 @permission_required('auth.can_view_batches')
