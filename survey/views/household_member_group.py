@@ -78,6 +78,8 @@ def _process_groupform(request, group_form, action, redirect_url):
         group_form.save()
         messages.success(request, 'Group successfully %s.' % action)
         return HttpResponseRedirect(redirect_url)
+    else:
+        messages.error(request, 'Group not added: %s' % group_form.non_field_errors()[0])
 
 
 @permission_required('auth.can_view_household_groups')

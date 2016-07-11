@@ -12,6 +12,18 @@ class HouseholdMemberGroupForm(ModelForm):
         model = HouseholdMemberGroup
         exclude = []
 
+    def clean(self):
+        selected_conditions = self.cleaned_data['conditions']
+        self_pk = None
+        if self.instance:
+            self_pk = self.instance.pk
+        hmgroups = HouseholdMemberGroup.objects.filter(conditions__in=selected_conditions).exclude(pk=self_pk)
+        total_selected = len(selected_conditions)
+        for group in hmgroups:
+            if group.conditions.count() == total_selected:
+                raise forms.ValidationError('Same conditions exist with %s group' % group)
+        return self.cleaned_data
+
     def add_conditions(self, group):
         group.conditions.clear()
         for condition in self.cleaned_data['conditions']:
