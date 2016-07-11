@@ -1,0 +1,94 @@
+   <survey id="alloc-1" >
+     <meta>
+       <instanceID>4</instanceID>
+       <instanceName>Happy thing -1</instanceName>
+     </meta>
+	 <type>S</type>
+    <household>
+        <houseNumber>4</houseNumber>
+		
+			<physicalAddress>873 Rahim close Kenya</physicalAddress>
+		
+		<householdMember>
+            <surname>Raymond</surname>
+            <firstName>Black</firstName>
+            <sex>1</sex>
+            <age>20</age>
+            <isHead>0</isHead>
+        </householdMember>
+    </household>
+	
+		<b1>
+	   		
+	           
+					<q1>Philip Roy</q1>
+	   			
+			
+	           
+					<q2>20</q2>
+	   			
+			
+	           
+	   			  <q3q6>
+	           
+					<q3>Egg</q3>
+	   			
+			
+	           
+					<q5>7</q5>
+	   			
+			
+	           
+					<q4>35</q4>
+	   			
+			
+	           
+					<q6>yes</q6>
+	   			
+	   			  </q3q6>
+	           
+				<q3q6>
+	           
+					<q3>Yams</q3>
+	   			
+			
+	           
+					<q5>5</q5>
+	   			
+			
+	           
+					<q4>20</q4>
+	   			
+			
+	           
+					<q6>yes</q6>
+	   			
+	   			  </q3q6>
+				<q3q6>
+	           
+					<q3>Tomato soup</q3>
+	   			
+			
+	           
+					<q5>3</q5>
+	   			
+			
+	           
+					<q4>10</q4>
+	   			
+			
+	           
+					<q6>no</q6>
+	   			
+	   			  </q3q6>
+	           
+					<q9>1</q9>
+	   			
+			
+	           
+					<q10>Nothing much just finish</q10>
+	   			
+			
+		</b1>
+	
+   </survey>

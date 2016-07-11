@@ -51,4 +51,4 @@ tags
 #odk media submissions
 submissions/*
 answerFiles/*
-
+survey/static/admin/*
