@@ -74,8 +74,11 @@ class NotEnoughHouseholds(ValueError):
 class HouseholdNumberAlreadyExists(IntegrityError):
     pass
 
+def _get_tree_from_blob(blob_contents):
+    return etree.fromstring(blob_contents)
+
 def _get_tree(xml_file):
-    return etree.fromstring(xml_file.read())
+    return etree.fromstring()
 
 def _get_nodes(search_path, tree=None, xml_string=None): #either tree or xml_string must be defined
     if tree is None:
@@ -295,7 +298,8 @@ def save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing):
     return non_responses
 
 @job('odk')
-def save_survey_questions(survey_allocation, survey_tree, media_files):
+def save_survey_questions(survey_allocation, xml_blob, media_files):
+    survey_tree = _get_tree_from_blob(xml_blob)
     interviewer = survey_allocation.interviewer
     survey = survey_allocation.survey
     form_id = _get_form_id(survey_tree)
@@ -349,8 +353,11 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     """
     media_files = dict([(os.path.basename(f.name), f) for f in media_files])
     reports =  []
-    survey_tree = _get_tree(xml_file)
+    xml_blob = xml_file.read()
+    survey_tree = _get_tree_from_blob(xml_blob)
     form_id = _get_form_id(survey_tree)
+    instance_id = _get_instance_id(survey_tree)
+    description = ''
     if form_id.startswith('alloc-'):
         survey_allocation = _get_allocation(survey_tree)
         survey = survey_allocation.survey
@@ -361,25 +368,28 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     member = None
     survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
     if _get_form_type(survey_tree) == LISTING:
+        description = LISTING_DESC
         households = save_household_list(interviewer, survey, survey_tree, survey_listing)
         survey_allocation.stage = SurveyAllocation.SURVEY
         survey_allocation.save()
         for household in households:
             submission = ODKSubmission.objects.create(interviewer=interviewer,
                     survey=survey, form_id= form_id, description=LISTING_DESC,
-                    instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
+                    instance_id=instance_id, household_member=member, household=household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
     elif _get_form_type(survey_tree) == NON_RESPONSE:
+        description = NON_RESPONSE_DESC
         non_responses = save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing)
         for non_response in non_responses:
             submission = ODKSubmission.objects.create(interviewer=interviewer,
                     survey=survey, form_id= form_id, description=NON_RESPONSE_DESC,
-                    instance_id=_get_instance_id(survey_tree),
+                    instance_id=instance_id,
                     household_member=member, household=non_response.household,
                     xml=etree.tostring(survey_tree, pretty_print=True))
     else:
-        submission = save_survey_questions(survey_allocation, survey_tree, media_files)
-    return submission
+        description = SURVEY_DESC
+        save_survey_questions.delay(survey_allocation, xml_blob, media_files)
+    return SubmissionReport(form_id, instance_id, description)
 
 def get_survey(interviewer):
     return SurveyAllocation.get_allocation(interviewer)
@@ -390,12 +400,12 @@ def get_survey_allocation(interviewer):
 class SubmissionReport:
     form_id = None
     instance_id = None
-    report_details = None
+    description = None
 
     def __init__(self, form_id, instance_id, report_details):
         self.form_id = form_id
         self.instance_id = instance_id
-        self.report_details = report_details
+        self.description = report_details
 
 def disposition_ext_and_date(name, extension, show_date=True):
     if name is None:
@@ -430,7 +440,6 @@ def response_with_mimetype_and_name(
     response['Content-Disposition'] = disposition_ext_and_date(
         name, extension, show_date)
     return response
-
 
 class HttpResponseNotAuthorized(HttpResponse):
     status_code = 401

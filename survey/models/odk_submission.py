@@ -10,7 +10,6 @@ from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
 from survey.models.households import HouseholdMember, Household
 
-
 class ODKSubmission(BaseModel):
     interviewer = models.ForeignKey(Interviewer, related_name="odk_submissions")
     survey = models.ForeignKey(Survey, related_name="odk_submissions")

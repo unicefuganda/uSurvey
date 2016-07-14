@@ -162,10 +162,10 @@ class ExcelDownloadViewTest(BaseTest):
         self.client.login(username='Rajni', password='I_Rock')
         url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Email+Spreadsheet' %(survey.id,batch.id)
         response = self.client.get(url)
-        rq_queues=django_rq.get_queue('results-queue')
-        keys=rq_queues.connection.keys()
+        keys=django_rq.get_queue('results-queue').connection.keys()
         print "checkig asserts"
-        self.assertIn('rq:queue:email',keys)
+        #self.assertTrue(('rq:queued:results-queue' in keys) or ('rq:finished:results-queue' in keys))
+        self.assertIn('rq:finished:email', keys)
         self.assertNotIn("testkey",keys)
 
 class ReportForCompletedInvestigatorTest(BaseTest):

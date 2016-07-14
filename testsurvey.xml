@@ -1,17 +1,17 @@
    <survey id="alloc-1" >
      <meta>
-       <instanceID>4</instanceID>
-       <instanceName>Happy thing -1</instanceName>
+       <instanceID>10</instanceID>
+       <instanceName>Happy thing -10</instanceName>
      </meta>
 	 <type>S</type>
     <household>
         <houseNumber>4</houseNumber>
 		
-			<physicalAddress>873 Rahim close Kenya</physicalAddress>
+			<physicalAddress>Aways there way</physicalAddress>
 		
 		<householdMember>
-            <surname>Raymond</surname>
-            <firstName>Black</firstName>
+            <surname>Rayjay</surname>
+            <firstName>Lala</firstName>
             <sex>1</sex>
             <age>20</age>
             <isHead>0</isHead>
@@ -21,17 +21,17 @@
 		<b1>
 	   		
 	           
-					<q1>Philip Roy</q1>
+					<q1>Ola Badmus</q1>
 	   			
 			
 	           
-					<q2>20</q2>
+					<q2>22</q2>
 	   			
 			
 	           
 	   			  <q3q6>
 	           
-					<q3>Egg</q3>
+					<q3>Egg plant</q3>
 	   			
 			
 	           
