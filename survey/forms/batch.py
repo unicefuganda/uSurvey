@@ -4,7 +4,6 @@ from django.forms import ModelForm
 from survey.models import Batch, BatchChannel, QuestionTemplate, WebAccess
 from django.utils.safestring import mark_safe
 from survey.models.formula import *
-from memoize import delete_memoized
 
 
 class BatchForm(ModelForm):
@@ -30,9 +29,6 @@ class BatchForm(ModelForm):
 
     def save(self, commit=True, **kwargs):
         batch = super(BatchForm, self).save(commit=commit)
-        delete_memoized('loop_back_boundaries', batch)
-        delete_memoized('survey_questions', batch)
-        delete_memoized('loop_backs_questions', batch)
         bc = BatchChannel.objects.filter(batch=batch)
         bc.delete()
         for val in kwargs['access_channels']:
