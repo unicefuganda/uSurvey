@@ -164,8 +164,7 @@ class ExcelDownloadViewTest(BaseTest):
         response = self.client.get(url)
         keys=django_rq.get_queue('results-queue').connection.keys()
         print "checkig asserts"
-        self.assertTrue(('rq:queued:email' in keys) or ('rq:finished:email' in keys))
-        #self.assertIn('rq:finished:email', keys)
+        self.assertIn('rq:queue:email', keys)
         self.assertNotIn("testkey",keys)
 
 class ReportForCompletedInvestigatorTest(BaseTest):
