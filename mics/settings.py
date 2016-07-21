@@ -227,8 +227,12 @@ CACHEOPS_REDIS = {
 
 CACHE_REFRESH_DURATION = 10800
 CACHEOPS = {
-    'survey.models.enumeration_area.*': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
-    'survey.models.locations.*': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+    'survey.point': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+    'survey.locationtype': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+    'survey.location': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+    'survey.enumerationarea': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+    'survey.batch': {'ops': (), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs,
+    'survey.survey': {'ops': (), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs,
 }
 
 #DJANGO-WS CONFIG

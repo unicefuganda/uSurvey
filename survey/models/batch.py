@@ -14,7 +14,7 @@ from survey.models.access_channels import ODKAccess
 from django.core.exceptions import ValidationError
 from ordered_set import OrderedSet
 from collections import OrderedDict
-from memoize import memoize
+from cacheops import cached_as
 from django.conf import settings
 
 ALL_GROUPS = HouseholdMemberGroup.objects.all()
@@ -134,37 +134,42 @@ class Batch(BaseModel):
         else:
             return []
 
-    @memoize(timeout=settings.MEMORIZE_TIMEOUT)
+
     def loop_backs_questions(self):
         '''
         :return: loop question structure for this batch (q_start_pk, q_end_pk) = []
         '''
-        survey_questions = self.survey_questions
-        loop_starters = self.loop_starters()
-        loop_enders = self.loop_enders()
-        start = None
-        loop_desc = OrderedDict()
-        present_loop = []
-        for q in survey_questions:
-            if q in loop_starters:
-                start = q
-                present_loop = []
-            if q in loop_enders:
-                present_loop.append(q)
-                loop_desc[(start.pk, q.pk)] = present_loop
-                start = None
-            if start:
-                present_loop.append(q)
-        #just transpose
-        return loop_desc
+        cached_as(Batch.objects.filter(id=self.id))
+        def _loop_backs_questions():
+            survey_questions = self.survey_questions
+            loop_starters = self.loop_starters()
+            loop_enders = self.loop_enders()
+            start = None
+            loop_desc = OrderedDict()
+            present_loop = []
+            for q in survey_questions:
+                if q in loop_starters:
+                    start = q
+                    present_loop = []
+                if q in loop_enders:
+                    present_loop.append(q)
+                    loop_desc[(start.pk, q.pk)] = present_loop
+                    start = None
+                if start:
+                    present_loop.append(q)
+            #just transpose
+            return loop_desc
+        return _loop_backs_questions()
 
-    @memoize(timeout=settings.MEMORIZE_TIMEOUT)
     def loop_back_boundaries(self):
-        loop_desc = self.loop_backs_questions()
-        quest_map = OrderedDict()
-        for boundary, loop_questions in loop_desc.items():
-            map(lambda q: quest_map.update({q.pk : boundary}), loop_questions)
-        return quest_map
+        cached_as(Batch.objects.filter(id=self.id))
+        def _loop_back_boundaries():
+            loop_desc = self.loop_backs_questions()
+            quest_map = OrderedDict()
+            for boundary, loop_questions in loop_desc.items():
+                map(lambda q: quest_map.update({q.pk : boundary}), loop_questions)
+            return quest_map
+        return _loop_back_boundaries()
 
     def previous_inlines(self, question):
         inlines = self.questions_inline()
@@ -178,21 +183,22 @@ class Batch(BaseModel):
                 previous.append(q)
         return set(previous)
 
-        
     def zombie_questions(self):
         return Question.zombies(self)
 
     @property
-    @memoize(timeout=settings.MEMORIZE_TIMEOUT)
     def survey_questions(self):
-        inline_ques = self.questions_inline()
-        questions = OrderedSet(inline_ques)
-        survey_questions = OrderedSet()
-        for ques in inline_ques:
-            survey_questions.append(ques)
-            map(lambda q: survey_questions.add(q), ques.direct_sub_questions()) #boldly assuming subquests dont go
-                                                                #more than quest subquestion deep for present implemnt
-        return survey_questions
+        cached_as(Batch.objects.filter(id=self.id))
+        def _survey_questions():
+            inline_ques = self.questions_inline()
+            questions = OrderedSet(inline_ques)
+            survey_questions = OrderedSet()
+            for ques in inline_ques:
+                survey_questions.append(ques)
+                map(lambda q: survey_questions.add(q), ques.direct_sub_questions()) #boldly assuming subquests dont go
+                                                                    #more than quest subquestion deep for present implemnt
+            return survey_questions
+        return _survey_questions()
 
     def activate_non_response_for(self, location):
         self.open_locations.filter(location=location).update(non_response=True)
