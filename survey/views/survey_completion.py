@@ -15,7 +15,7 @@ from survey.utils.views_helper import contains_key, is_not_digit_nor_empty
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
 from survey.services.results_download_service import ResultsDownloadService
-import redis
+from cacheops import cached_as
 from django.conf import settings
 
 
@@ -121,20 +121,14 @@ def show(request):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def completion_json(request, survey_id):
-    r_server = redis.Redis()
-    key=settings.SURVEY_REDIS_KEY%{'survey_id':str(survey_id)}
-    if r_server.exists(key):
-        print "Getting data from cache"
-        json_dump=r_server.get(key)
-    else:
+    @cached_as(Survey.objects.filter(id=survey_id))
+    def get_result_json():
         print "Getting data from DB"
         survey = Survey.objects.get(id=survey_id)
         location_type = LocationType.largest_unit()
         completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
-        expire_time = (settings.RESULT_REFRESH_FREQ*60+30)*60
-        json_dump = json.dumps(completion_rates, cls=DjangoJSONEncoder)
-        r_server.set(key, json_dump)
-        r_server.expire(key,expire_time)
+        return json.dumps(completion_rates, cls=DjangoJSONEncoder)
+    json_dump = get_result_json()
     return HttpResponse(json_dump, content_type='application/json')
 
 @login_required

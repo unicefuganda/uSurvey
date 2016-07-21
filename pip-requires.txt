@@ -32,4 +32,4 @@ supervisor
 phonenumbers
 channels
 asgi_redis
-django-memoize
+django-cacheops

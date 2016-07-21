@@ -26,28 +26,6 @@ DATABASES = {
     }
 }
 
-'''
-CACHES = {
-    'default': {
-    'BACKEND': 'redis_cache.RedisCache',
-    'LOCATION': [
-    '127.0.0.1:6379',
-    ],
-    'OPTIONS': {
-        'DB': 1,
-        'PARSER_CLASS': 'redis.connection.HiredisParser',
-        'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
-        'CONNECTION_POOL_CLASS_KWARGS': {
-        'max_connections': 50,
-        'timeout': 5000,
-    },
-    'MAX_CONNECTIONS': 1000,
-    'PICKLE_VERSION': -1,
-    },
-   },
-}
-'''
-
 CACHES = {
     'default': {
     'BACKEND': 'redis_cache.RedisCache',
@@ -186,12 +164,12 @@ INSTALLED_APPS = (
     'lettuce.django',
     'django_extensions',
     'pagination_bootstrap',
+    'cacheops',
     'survey',
     'mptt',
     'django_rq',
     'django_rq_dashboard',
     'channels',
-    'memoize',
    # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -238,8 +216,20 @@ LOGGING = {
     }
 }
 
+CACHEOPS_REDIS = {
+    'host': 'localhost', # redis-server is on same machine
+    'port': 6379,        # default redis port
+    'db': 1,             # SELECT non-default redis database
+                         # using separate redis db or redis instance
+                         # is highly recommended
 
+}
 
+CACHE_REFRESH_DURATION = 10800
+CACHEOPS = {
+    'survey.models.enumeration_area.*': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+    'survey.models.locations.*': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+}
 
 #DJANGO-WS CONFIG
 WEBSOCKET_URL = '/ws/statusbar'
