@@ -1,0 +1,34 @@
+fieldset .add-row {
+      float:: right;
+      display:block;
+      background:url(/static/img/add.png) no-repeat center bottom;
+      width:16px;
+      height:16px;
+      margin-right: 0px;
+  }
+
+fieldset .add-m-text {
+    display: block;
+    width: 500px;
+    margin-left: 18px;
+}
+
+fieldset  .delete-row {
+      display:block;
+      background: url(/static/img/delete-icon.png) no-repeat center center;
+      width:16px;
+      height:16px;
+  }
+
+fieldset span.add-on {
+       margin-top: 3px;
+  }
+
+fieldset td.horizontal-formset {
+    background-color: #fff;
+  }
+
+ .horititle {
+      text-align: center;
+  }
+

@@ -1,0 +1,11 @@
+{% extends 'form.html' %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block display_form_fields %}
+    {% include "naked_form.html" with a_form=indicator_form %}
+{% endblock %}
+{% block javascripts %}
+<script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+

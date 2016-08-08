@@ -1,0 +1,114 @@
+[
+
+    {
+        "pk": 91,
+        "model": "auth.permission",
+        "fields": {
+            "codename": "can_view_aggregates",
+            "name": "Can view aggregates tab",
+            "content_type": ["auth", "user"]
+        }
+    },
+
+    {
+        "pk": 92,
+        "model": "auth.permission",
+        "fields": {
+            "codename": "can_view_users",
+            "name": "Can view users tab",
+            "content_type": ["auth", "user"]
+        }
+    },
+
+    {
+        "pk": 93,
+        "model": "auth.permission",
+        "fields": {
+            "codename": "can_view_batches",
+            "name": "Can view batches tab",
+            "content_type": ["auth", "user"]
+        }
+    },
+
+    {
+        "pk": 94,
+        "model": "auth.permission",
+        "fields": {
+            "codename": "can_view_investigators",
+            "name": "Can view investigators tab",
+            "content_type": ["auth", "user"]
+        }
+    },
+
+    {
+        "pk": 95,
+        "model": "auth.permission",
+        "fields": {
+            "codename": "can_view_households",
+            "name": "Can view households tab",
+            "content_type": ["auth", "user"]
+        }
+    },
+
+    {
+    "pk": 96,
+    "model": "auth.permission",
+    "fields": {
+        "codename": "can_view_locations",
+        "name": "Can view locations tab",
+        "content_type": ["auth", "user"]
+    }
+    },
+
+    {
+        "pk": 97,
+        "model": "auth.permission",
+        "fields": {
+            "codename": "can_view_household_groups",
+            "name": "Can view groups tab",
+            "content_type": ["auth", "user"]
+        }
+    },
+
+    {
+        "pk": 98,
+        "model": "auth.permission",
+        "fields": {
+            "codename": "can_add_location_types",
+            "name": "can add location types",
+            "content_type": ["auth", "user"]
+        }
+    },
+
+    {
+        "pk": 1,
+        "model": "auth.group",
+        "fields": {
+            "name": "admin",
+            "permissions": [19, 20, 21, 4, 5, 6, 1, 2, 3, 7, 8, 9, 10, 11, 12, 31, 32, 33, 28, 29, 30, 25,
+                26, 27, 13, 14, 15, 16, 17, 18, 22, 23, 24, 88, 89, 90, 37, 38, 39, 61, 62, 63, 64, 65, 66, 52, 53, 54, 46, 47, 48, 67, 68, 69, 49, 50, 51, 70, 71, 72, 40,
+                41, 42, 43, 44, 45, 85, 86, 87, 79, 80, 81, 73, 74, 75, 76, 77, 78, 58, 59, 60, 82, 83, 84, 34, 35, 36, 55, 56, 57, 91, 92, 93, 94, 95,
+                96, 97, 98]
+        }
+    },
+
+    {
+        "pk": 2,
+        "model": "auth.group",
+        "fields": {
+            "name": "researcher",
+            "permissions": [31, 32, 33, 28, 29, 30, 25, 26, 27, 88, 89, 90, 37, 38, 39, 61, 62, 63,
+                64, 65, 66, 52, 53, 54, 46, 47, 48, 67, 68, 69, 49, 50, 51, 70, 71, 72, 40, 41, 42, 43, 44, 45, 85, 86, 87, 79, 80, 81, 73, 74, 75, 76, 77, 78, 58,
+                59, 60, 82, 83, 84, 34, 35, 36, 55, 56, 57, 95, 94, 93, 91, 96, 97]
+        }
+    },
+
+    {
+        "pk": 3,
+        "model": "auth.group",
+        "fields": {
+            "name": "data entry",
+            "permissions": [52, 53, 54, 46, 47, 48, 49, 50, 51, 40, 41, 42, 55, 56, 57, 95, 94, 96]
+        }
+    }
+]

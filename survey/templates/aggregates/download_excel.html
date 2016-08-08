@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}
+  Download reports
+{% endblock %}
+{% block content %}
+{% load template_tags %}
+<style type="text/css">
+	.form {
+		margin-top: -10px;
+	  }
+
+.forleft {
+    position: relative;
+    top: -28px;
+	left:10;
+}
+</style>
+  <h4>
+    Choose survey to export data
+  </h4>
+<div class="forleft">
+  {% include "aggregates/_download_filter.html" with action="excel_report"|get_url_without_ids filter_id="download-csv-form" a_form=survey_batch_filter_form  %}
+</div>
+<script type="text/javascript">
+$(function(){
+    {% for location_type in location_filter_types %}
+	$('#id_{{ location_type }}').on('change', function () {
+	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+	    	url = "{% url 'location_sub_types' %}";
+	        $.getJSON(url, params, function (data) {
+	        	$('#id_' + data.sub_type).find('option').remove().end()
+	        	.append('<option value="">-------</option>').val('');
+        		$.each(data.locations, function () {
+        			$('#id_' + data.sub_type).append('<option value='+this.id+'>'+this.name+'</option>');
+	            });
+        		$(' .chzn-select').trigger("liszt:updated");
+	        });
+
+	    });
+  	{% endfor %}
+  	});
+</script>
+  {% endblock %}

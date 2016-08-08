@@ -1,0 +1,26 @@
+from survey.models import HouseholdMemberGroup, QuestionModule, Question, QuestionOption
+
+none_response_group = HouseholdMemberGroup.objects.create(name="NON_RESPONSE", order=18)
+module = QuestionModule.objects.create(name='NON RESPONSE')
+non_response_question = Question.objects.create(module=module,
+                                                     text="Why did HH-%s-%s not take the survey",
+                                                     answer_type=Question.MULTICHOICE, order=1,
+                                                     group=none_response_group)
+
+QuestionOption.objects.create(question=non_response_question, text="Refused", order=1)
+QuestionOption.objects.create(question=non_response_question, text="No competent respondent at time of visit", order=2)
+QuestionOption.objects.create(question=non_response_question, text="H/H not known/not found", order=3)
+QuestionOption.objects.create(question=non_response_question, text="HH/Disintegrated", order=4)
+QuestionOption.objects.create(question=non_response_question, text="Not at home for extended period", order=5)
+QuestionOption.objects.create(question=non_response_question, text="Dwelling destroyed", order=6)
+QuestionOption.objects.create(question=non_response_question, text="Moved to another vilage/town/district", order=7)
+QuestionOption.objects.create(question=non_response_question, text="Moved to a neighboring country", order=8)
+QuestionOption.objects.create(question=non_response_question, text="Shifted to unknown location", order=9)
+QuestionOption.objects.create(question=non_response_question, text="Transferred due to work/ education", order=10)
+QuestionOption.objects.create(question=non_response_question, text="Resettled home from the camp", order=11)
+QuestionOption.objects.create(question=non_response_question, text="Moved to another camp", order=12)
+
+member_non_response_question = Question.objects.create(module=module, text="Why did %s not take the survey",
+                                        answer_type=Question.MULTICHOICE, order=2, group=none_response_group)
+QuestionOption.objects.create(question=member_non_response_question, text="Member Refused", order=1)
+QuestionOption.objects.create(question=member_non_response_question, text="Reason", order=2)

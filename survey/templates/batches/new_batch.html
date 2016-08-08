@@ -1,0 +1,16 @@
+<h3>
+  {% block title %} {{ title }} {% endblock %}
+</h3>
+<form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
+  {% csrf_token %}
+  {% include "naked_form.html" with a_form=batchform %}
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary" name="save_button">{{ button_label }}</button>
+    {% if cancel_url %}
+        <a href="{{cancel_url}}" class="btn btn-primary" name="cancel_button">Cancel</a>
+    {% else %}
+        <a href="{% url 'batch_index_page' survey.pk %}" class="btn btn-primary" name="cancel_button">Cancel</a>
+    {% endif %}
+  </div>
+</form>
+<input type="hidden" id="survey_id" value={{batchform.instance.survey.id}} />

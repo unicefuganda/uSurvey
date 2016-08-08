@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+{% block title %}
+    Upload Geographical Locations
+{% endblock %}
+{% block content %}
+{% load template_tags %}
+    <form action="{{ action }}" enctype="multipart/form-data" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
+        {% csrf_token %}
+        <div class="control-group">
+        <label class="control-label" for="{id_country">Country</label>
+        <div class="controls"><input id="id_country" name="country" type="text" disabled="true" value={{ country_name }}>
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse_table">Location Input File Format</a></div>
+        </div>
+        {% include "naked_form.html" with a_form=upload_form %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" name="save_button"
+                    data-disabled-text="{{ loading_text }}">{{ button_label }}</button>
+            <a href="#" class="btn btn-primary" name="cancel_button">Cancel</a>
+            </ul>
+
+        </div>
+    </form>
+    <div id="collapse_table"  class="accordion-body collapse">
+        <div class="accordion-inner">
+            <table class="table-bordered table">
+                <tr>
+                {% for location_type in location_types %}
+					{% if location_type.parent %}                
+	                    {% if location_type.code %}
+	                        <th>
+	                            {{ location_type.name.capitalize }}Code
+	                        </th>
+	                    {% endif %}
+	
+	                    <th>
+	                        {{ location_type.name.capitalize }}Name
+	                    </th>
+	                {% endif %}
+                {% endfor %}
+                        <th>
+	                        EAName
+	                    </th>
+                        <th>
+	                        TotalHouseholds
+	                    </th>
+                </tr>
+                {% for row_count in range %}
+                    <tr>
+                    {% for location_type in location_types %}
+     					{% if location_type.parent %}                  
+	                       <td>
+	                            {{ location_type.name.lower }}{{ row_count }}
+	                        </td>
+	                    {% endif %}
+                    {% endfor %}
+                            <td>
+	                            EA{{ row_count }}
+	                        </td>
+                            <td>
+	                            TotalHouseholds{{ row_count }}
+	                        </td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+
+            <span class="red">Please note:</span>
+            <ul>
+                <li> Column headers have to be exactly as shown above.</li>
+                {% for location_type in location_types %}
+                    {% if location_type.code %}
+                        <li>Each <span class="bold">{{ location_type.name.capitalize }} code</span> have to be exactly <span class="bold">{{ location_type.length_of_code }} digits</span>.</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,101 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+xmlns:h="http://www.w3.org/1999/xhtml"
+xmlns:ev="http://www.w3.org/2001/xml-events"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:jr="http://openrosa.org/javarosa">
+{% load template_tags %}
+<h:head>
+<h:title> 
+  {{survey.name}}
+</h:title>
+  <model>
+  <instance>
+   <survey id="{{ survey.pk }}" >
+     <meta>
+       <instanceID />
+       <instanceName>Non Response{% for batch in survey_batches %}, {{batch.name}}{% endfor %}</instanceName>
+     </meta>
+	 <type>NR</type>
+    <household>
+        <houseNumber />
+		<nr />
+		<qnr />
+		<qnsr />
+    </household>
+  </survey>
+  </instance>
+
+  <!-- bindings -->
+  <bind nodeset="/survey/meta/instanceID" type="string" 
+           readonly="true()" calculate="concat('uuid:',uuid())" />
+  <bind nodeset="/survey/household/houseNumber" type="{%if survey.has_sampling %}select1{% else %}int{% endif %}"  required="true()" />
+  <bind nodeset="/survey/household/nr" type="select1" required="true()" />
+	<bind nodeset="/survey/household/qnr" type="select1"  relevant="selected(/survey/household/nr, '0')"/>
+	<bind nodeset="/survey/household/qnsr" type="select1"  relevant="selected(/survey/household/qnr, '96')"/>
+	 <bind nodeset="/survey/household"   />
+
+  </model>
+</h:head>
+<h:body>
+        <label>Household details</label>
+		{% if survey.has_sampling %}
+			<select1 ref="/survey/household/houseNumber">
+		         <label>Select Household</label>
+		         {% for r_household in registered_households %}
+				    <item>
+						<label>HH-{{r_household.house_number}}{% if r_household.head_desc %}-{{r_household.head_desc}}{% endif %}</label>
+	               		<value>{{r_household.house_number}}</value>
+		            </item>
+		         {% endfor %}
+		    </select1>
+		{% else %}
+       <input ref="/survey/household/houseNumber">
+			<label>Enter household number</label>
+		</input>
+		{% endif %}
+		<select1 ref="/survey/household/nr">
+			<label>Have you completed the survey</label>
+			<item>
+				<label> Yes </label>
+				<value>1</value>
+			</item>
+			<item>
+				<label> No </label>
+				<value>0</value>
+			</item>
+		</select1>
+		<select1 ref="/survey/household/qnr">
+			<label>Select Reason</label>
+			<item>
+				<label>​No household member or no competent respondent</label>
+				<value>2</value>
+			</item>
+			<item>
+				<label>​​Entire household absent</label>
+				<value>3</value>
+			</item>
+			<item>
+				<label>​Refused</label>
+				<value>4</value>
+			</item>
+			<item>
+				<label>​​Dwelling vacant / Address not a dwelling</label>
+				<value>5</value>
+			</item><item>
+				<label>​Dwelling destroyed</label>
+				<value>6</value>
+			</item>
+			<item>
+				<label>​Dwelling not found</label>
+				<value>7</value>
+			</item>
+			<item>
+				<label>​Other</label>
+				<value>96</value>
+			</item>
+		</select1>
+    	<input ref="/survey/household/qnsr">
+			<label>Please specify</label>
+		</input>
+</h:body>
+</h:html>

@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block extra_css %}
+
+<style type="text/css">
+	.button {
+		margin-top: -15px;
+	height:10px;
+	  }
+.forright
+		{
+		position: relative;
+		margin-top: -51px;
+		left:478;
+		}
+</style>
+{% endblock %}
+{% block title %}
+    Completion Rates
+{% endblock %}
+{% block content %}
+   {% load pagination_tags %}
+  <h4>
+    Select Batch and Location to view report
+  </h4>
+{% include "aggregates/completion_status_form.html" with a_form=locations_filter filter_button_name='Refresh Status' survey_form=filter filter_id='aggregates-form' method='post' no_button=True %}
+
+  {% if completion_rates %}
+    {% autopaginate completion_rates.attributes 50 %}
+
+    <table class="table table-striped table-bordered table-sort">
+      <thead>
+        <tr>
+          <th>{% if selection_location_type %}{{selection_location_type}}{% else %}Location{% endif %}</th>
+          <th>Total Household</th>
+          <th>% Completed</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for completion_attributes in completion_rates.attributes %}
+          <tr>
+            <td><a href="{% url 'location_completion_summary'  completion_attributes.location.id  selected_batch.id %}">{{ completion_attributes.location.name }}</a></td>
+            <td>{{ completion_attributes.total_households }}</td>
+            <td>{% if completion_attributes.total_households %}
+                    {{ completion_attributes.completed_households_percent}}
+                {% else %}--{% endif %}
+            </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    {% paginate %}
+{% endif %}
+{% endblock %}
+{% block javascripts %}
+  <script src="{{STATIC_URL}}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}/js/survey_status.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

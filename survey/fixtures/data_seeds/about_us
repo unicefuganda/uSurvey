@@ -1,0 +1,49 @@
+from django.core import serializers
+from survey.models import AboutUs
+content = """
+            <h2>Multiple Indicator Cluster Survey (MICS)</h2>
+            <p>UNICEF assists countries in collecting and analyzing data in order to fill data gaps for monitoring the
+            situation of children and women through its international household survey initiative the Multiple Indicator
+            Cluster Surveys (MICS). Since the mid-1990s, the MICS has enabled many countries to produce statistically
+            sound and internationally comparable estimates of a range of indicators in the areas of health, education,
+            child protection and HIV/AIDS. MICS findings have been used extensively as a basis for policy decisions
+            and programme interventions, and for the purpose of influencing public opinion on the situation of
+            children and women around the world.</p>
+
+            <h3>Survey tools</h3>
+            The MICS survey tools are developed by UNICEF after consultations with relevant experts from various UN
+            organizations as well as with interagency monitoring groups. UNICEF works closely with other household
+            survey programmes, in particular the Demographic and Health Surveys (DHS) programme, to harmonize survey
+            questions and modules and to ensure a coordinated approach to survey implementation, with the objective to
+            provide comparability across surveys and to avoid duplication of efforts.
+            The survey questionnaires are modular tools that can be adapted to the needs of the country
+            <h3>Mobile-based Multiple Indicator Cluster Survey (MICS)</h3>
+            UNICEF Uganda has developed a mobile-based tool to work over the USSD technology to collect household-level.
+            <br/>
+            The advantage of the mobile-based approach is:
+            <ul>
+                <li>
+                    To ease implementation of a potentially large-scale survey across regions/districts with large number of
+                    investigators.
+                </li>
+                <li>
+                    To ensure a shorter processing time-frame so that data is available for analysis and informed decision-making
+                    in real-time
+                </li>
+                <li>
+                    To make it possible to deploy remotely to mobiles and track survey work in real time taking advantage of
+                    prompt review of data quality thus ensuring a quicker audit and respondent tracking process.
+                </li>
+                <li>
+                    To allow flexibility to handle new requests and make modification to on-going interviews while investigators
+                    are already in the field.
+                </li>
+                <li>
+                    To make it easier to provide feedback and to exchange information between stakeholders in real time.
+                </li>
+            </ul>
+        """
+
+about_us = AboutUs.objects.create(content=content)
+data = serializers.serialize("json", [about_us])
+print data

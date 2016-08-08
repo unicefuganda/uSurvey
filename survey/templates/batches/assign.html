@@ -1,0 +1,303 @@
+<!-- script language="JavaScript" type="text/javascript">
+$(document).ready(function() {
+    $('table.batch_assignments').DataTable( {
+        "scrollY":        "200px",
+        "scrollCollapse": true,
+        "paging":         false
+    } );
+} );
+</script -->
+{% extends 'form.html' %}
+{% block title %}
+    Select Questions for {{ batch.survey.name.capitalize }} - {{ batch.name.capitalize }}
+{% endblock %}
+{% block extra_css %}
+	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css" />
+	<style type="text/css">
+/*.table {
+	font-family:Arial, Helvetica, sans-serif;
+	color:#666;
+	font-size:12px;
+	text-shadow: 1px 1px 0px #fff;
+	background:#eaebec;
+	margin:20px;
+	border:#ccc 1px solid;
+
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+
+	-moz-box-shadow: 0 1px 2px #d1d1d1;
+	-webkit-box-shadow: 0 1px 2px #d1d1d1;
+	box-shadow: 0 1px 2px #d1d1d1;
+}*/
+
+div.batch_assignment {
+		<!--height: 10%;-->
+		<!--max-height: 50%;-->
+		overflow:  auto;
+		width: 49%;
+		margin-left: 1%;
+
+}
+
+
+ div.batch_assignment {
+	height: 400px;
+	overflow-y: auto;
+}
+
+
+.search {
+	margin-top: -1px;
+}
+
+th.question, td.question {
+	width: 85%;
+	text-align: left;
+	padding-left: 15px;
+	font-size: 12px;
+}
+
+th.code, td.code {
+	width: 15%;
+	text-align: left;
+	padding-left: 10px;
+	font-size: 12px;
+}
+
+thead {
+	<!--display: block;-->
+}
+
+#lib_questions_table_body, #batch_questions_body {
+	overflow-y: scroll;
+    max-height:100px;
+	<!--display: block;-->
+}
+
+table a:active, a:link, a:visited, table a:hover
+ {
+	text-decoration:none;
+}
+
+table th {
+	padding:8px;
+	border-top:1px solid #eee;
+	border-right:1px solid  #e0e0e0;
+	border-bottom:1px solid #e0e0e0;
+	font-weight: bold;
+    color: #09F;
+    text-transform: uppercase;
+    font-size: 12px;
+
+}
+
+table tr:first-child th:first-child{
+	-moz-border-radius-topleft:3px;
+	-webkit-border-top-left-radius:3px;
+	border-top-left-radius:3px;
+}
+table tr:first-child th:last-child{
+	-moz-border-radius-topright:3px;
+	-webkit-border-top-right-radius:3px;
+	border-top-right-radius:3px;
+
+}
+table tr td:first-child{
+	border-left: 0;
+}
+.tabletrtd {
+	padding:10px;
+	border-top: 1px solid #ffffff;
+	border-bottom:1px solid #e0e0e0;
+	border-left: 1px solid #e0e0e0;
+	background: #fafafa;
+	background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
+	background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
+}
+table tr.even td{
+	background: #f6f6f6;
+	background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#f6f6f6));
+	background: -moz-linear-gradient(top,  #f8f8f8,  #f6f6f6);
+}
+table tr:last-child td{
+	border-bottom:0;
+}
+table tr:last-child td:first-child{
+	-moz-border-radius-bottomleft:3px;
+	-webkit-border-bottom-left-radius:3px;
+	border-bottom-left-radius:3px;
+}
+table tr:last-child td:last-child{
+	-moz-border-radius-bottomright:3px;
+	-webkit-border-bottom-right-radius:3px;
+	border-bottom-right-radius:3px;
+}
+table tr:hover td{
+	background: #ffffff;
+	background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#ffffff));
+	background: -moz-linear-gradient(top,  #ffffff,  #ffffff);
+}
+
+
+
+		#batch_questions {
+			margin-top: -17px;
+		}
+	.forleft
+		{
+		position: relative;
+		top:17px;
+		left:35;
+		}
+	.tip {
+		padding: 0;
+		text-align: center;
+		font-size: 11px;
+	}
+	table tr td a {
+		display:block;
+		height:100%;
+		width:100%;
+		}
+
+	</style>
+{% endblock %}
+{% block pre_form_content %}
+	<div class="filter-form right">
+		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
+    </div>
+    <div class="forleft">
+    	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
+    </div>
+       <div id="batch_assignment" class="clear">
+		<ul>
+			<li class="help tip">
+				Click on code or text to move between tables
+			</li>
+		</ul>
+<div class="batch_assignment" style="float: left;">
+
+					<table id="lib_questions_table" >
+						<thead id="lib_questions_table_head">
+        <tr>
+			<th  colspan="2"  id="lib_title">LIBRARY QUESTIONS</th>
+		</tr>
+		<tr><th align="center" class="code">CODE</th><th align="left" class="question">TEXT</th></tr></thead>
+						 <tbody id="lib_questions_table_body">
+						{% for question in library_questions %}
+							<tr id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move" class="ms-selectable">
+								<td class="tabletrtd code"><a href="#">
+											<input type="hidden" name="identifier" value="{{question.identifier}}" />
+											<input type="hidden" name="text" value="{{question.text}}" />
+											<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
+											<input type="hidden" name="module" value="{{question.module}}" />
+											<input type="hidden" name="group" value="{{question.group}}" />
+										{{question.identifier}}</a>
+								</td>
+								<td class="tabletrtd question"><a href="#">{{question.text}}</a></td>
+							</tr>
+						{% endfor %}
+						 </tbody>
+					</table>
+</div>
+
+{% endblock %}
+{% block display_form_fields %}
+		   		<div class="batch_assignment" style="float: right;">
+						<table id="batch_questions"  width="100%">
+							<br>
+							<thead id="batch_questions_head">
+        <tr>
+           <th  colspan="2">BATCH QUESTIONS</th>
+		</tr>
+		<tr>
+            <th align="center" class="code">CODE</th><th align="left"  class="question">TEXT</th>
+
+        </tr></thead>
+							<tbody id="batch_questions_body"></tbody>
+						</table>
+					</div>
+
+				<input type="hidden" value="{{ batch.id }}" id="batch_id">
+		   	<br class="clear" />
+
+{% endblock %}
+{% block non_form_content %}
+	</div>
+{% endblock %}
+{% block javascripts %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
+{% comment %}
+		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/redips-drag-min.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/redips_drag/script.js"></script>
+{% endcomment %}
+
+<script type="text/javascript">
+<!--$(document).ready( function () {-->
+	<!--libTable =  $('lib_questions_table').dataTable();-->
+	<!--batchTable =  $('batch_questions').dataTable();-->
+	<!--alert(libTable);-->
+	<!--});-->
+
+function Move(tr){
+ while (tr.parentNode&&tr.nodeName.toUpperCase()!='TR'){
+  tr=tr.parentNode
+ }
+ var table1=document.getElementById('lib_questions_table_body');
+ if (!this.rows){
+  var rows=table1.getElementsByTagName('TR');
+  this.rows=[];
+  for (var z0=0;z0<rows.length;z0++){
+   this.rows[z0]=rows[z0];
+   <!--alert(rows[z0].style.background);-->
+   <!--if(z0%2 == 1) {-->
+		<!--this.rows[z0].style.background = '#005580;';-->
+   <!--}-->
+   <!--else-->
+   <!--{-->
+		<!--this.rows[z0].style.background = 'white;';-->
+   <!--}-->
+  }
+ }
+ var table2=document.getElementById('batch_questions_body');
+ if (tr.parentNode!=table2){
+  table2.appendChild(tr);
+ }
+ else {
+  table1.appendChild(tr);
+  for (var z0=0;z0<this.rows.length;z0++){
+   if (this.rows[z0].parentNode==table1){
+	table1.appendChild(this.rows[z0]);
+   }
+  }
+ }
+
+ <!--&lt;!&ndash;$('lib_questions_table').dataTable();&ndash;&gt;-->
+ <!--libTable.fnDraw();-->
+ <!--&lt;!&ndash;$('batch_questions').dataTable();&ndash;&gt;-->
+ <!--batchTable.fnDraw();-->
+}
+
+</script>
+<script type="text/javascript">
+
+	var $table = $('table.scroll'),
+    $bodyCells = $table.find('tbody tr:first').children(),
+    colWidth;
+
+// Adjust the width of thead cells when window resizes
+$(window).resize(function() {
+    // Get the tbody columns width array
+    colWidth = $bodyCells.map(function() {
+        return $(this).width();
+    }).get();
+
+    // Set the width of thead columns
+    $table.find('thead tr').children().each(function(i, v) {
+        $(v).width(colWidth[i]);
+    });
+}).resize(); // Trigger resize handler
+</script>
+{% endblock %}

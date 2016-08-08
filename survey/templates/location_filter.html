@@ -1,0 +1,13 @@
+{% for name, type in location_type.items %}
+  <div class="control-group">
+    <label class="control-label">{{name.capitalize}}</label>
+    <div class="controls">
+      <select name="{{name.lower}}" id="investigator-{{name.lower}}" data-location="true" data-placeholder="Select or Type {{name}} "  single  class="chzn-select" required>
+        <option value="{{type.value}}" selected>{{type.text}}</option>
+        {% for location in type.siblings %}
+          <option value="{{location.id}}">{{location.name}}</option>
+        {% endfor %}
+      </select>
+      </div>
+    </div>
+{% endfor %}

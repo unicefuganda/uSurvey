@@ -1,0 +1,43 @@
+{% load template_tags %}
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+    <tr>
+        <th>
+            Eligibility Criteria
+        </th>
+        <th>
+            Question/Value/Option
+        </th>
+         <th>
+            Action
+        </th>
+         <th>
+            Delete
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for flow in question.conditional_flows %}
+        <tr>
+            <td >
+                {{ flow.validation_test }}
+            </td>
+            <td>
+                {{ flow.test_arguments |join_list:"and" }}
+
+            </td>
+            <td>
+                {{flow.desc }}
+                {% if flow.next_question %}
+                     <span class="muted"> Next Question:</span><span>{{ flow.next_question.text }} </span>
+                {% endif %}
+            </td>
+            <td>
+                <a class="btn btn-small" data-toggle="modal" href="#delete_logic_{{flow.id}}"><i class="icon-trash" id="delete-icon-{{flow.id}}"></i></a>
+            </td>
+            {% include "base/delete_modal.html" with object_name="" id=flow.id name="Logic" url=flow.id|get_url_with_ids:"delete_question_logic_page" %}
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>

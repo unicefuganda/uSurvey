@@ -1,0 +1,1 @@
+/home/manish/projects/uSurvey/mics/mics/settings.py

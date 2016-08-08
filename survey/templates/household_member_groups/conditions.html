@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}
+  Group Condition List
+{% endblock %}
+{% block content %}
+{% load pagination_tags %}
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>
+          Condition
+        </th>
+        <th>
+          Attribute
+        </th>
+        <th>
+          Value
+        </th>
+        <th>
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for condition in conditions %}
+        <tr>
+          <td>
+            <a href="">{{ condition.condition }}</a>
+          </td>
+          <td>
+            {{ condition.attribute }}
+          </td>
+          <td>
+            {{ condition.value }}
+          </td>
+          <td>
+            <a href="">Edit</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

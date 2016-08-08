@@ -1,0 +1,55 @@
+{% load template_tags %}
+
+<fieldset>
+                <legend>{{ legend }}</legend>
+                {{ formset.management_form }}
+                {{ formset.non_form_errors }}
+				<table class="inline">
+				<thead>
+					{% for form in formset %}
+						{% if forloop.first %}
+							{% for field in form.visible_fields %}
+								<td class="horititle">{{field.label}}</td>
+							{% endfor %}
+						{% endif %}
+					{% endfor %}
+				</thead>
+                {% for form in formset %}
+
+					<tbody>
+						<tr  class="{{ class }} {{ formset.prefix }}">
+						{% for field in form.visible_fields %}
+							<td class="horizontal-formset">
+								  {% if field.label_tag|is_mobile_number %}
+								   <div class="ccode">
+									   <span class="add-on">{{ country_phone_code }}</span>
+								  {% endif %}
+									{{field}}
+								  {% if field.label_tag|is_mobile_number %}
+									</div>
+								  {% endif %}
+							</td>
+					{% endfor %}
+						</tr>
+						<tr class="error">
+							{% for field in form.visible_fields %}
+								{% if field.errors %}
+									<label class="error">
+										{% for error in field.errors %}
+												{{ error}}
+										{% endfor %}
+									</label>
+								{% endif %}
+							{% endfor %}
+							<div class="hide">
+                    {% for hidden in form.hidden_fields %}
+					  {{ hidden }}
+					{% endfor %}
+					</div>
+						</tr>
+                {% endfor %}
+				</tbody>
+			</table>
+
+</fieldset>
+

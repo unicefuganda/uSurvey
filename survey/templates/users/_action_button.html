@@ -1,0 +1,12 @@
+{% load template_tags %}
+<div class="btn-group">
+    <a href="{% url 'users_edit'  the_user.id %}" class="btn btn-small" ><i class="icon-pencil"></i> Edit</a>
+    {% if the_user.is_active %}
+        <a href="#deactivate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Deactivate</a>
+    {% else %}
+        <a href="#re-activate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Activate</a>
+    {% endif %}
+
+</div>
+{% include "base/delete_modal.html" with object_name=the_user.username id=the_user.pk name="User" url=the_user.pk|get_url_with_ids:"deactivate_user" action_str="deactivate"%}
+{% include "base/delete_modal.html" with object_name=the_user.username id=the_user.pk name="User" url=the_user.pk|get_url_with_ids:"activate_user" action_str="re-activate"%}

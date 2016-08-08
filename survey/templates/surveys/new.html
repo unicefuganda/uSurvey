@@ -1,0 +1,13 @@
+{% extends "form.html"%}
+
+{% block title %}
+  New Survey
+{% endblock %}
+
+{% block display_form_fields %}
+	{% include "naked_form.html" with a_form=survey_form %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}js/survey.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

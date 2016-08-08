@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% load template_tags %}
+{% block title %}
+  EA Summary
+{% endblock %}
+{% block content %}
+    <h3>Survey Completion by household in {{location.type.name}} {{ location.name }}</h3>
+    {% if selected_ea %}
+        <p><strong>Enumeration Area:</strong> {{ selected_ea.name }}</p>
+    {% endif %}
+    {% if interviewer %}
+    <p><strong>Interviewer:</strong> {{ interviewer.name }} (Mobile Numbers: {{ interviewer.ussd_access | display_list}} )</p>
+    {% endif %}
+    {% if completion_rates %}
+        <p><strong>Percent Completion:</strong> {{ completion_rates.percent_completed_households }}%</p>
+    {% endif %}
+
+    <table class="table table-striped table-bordered table-sort">
+      <thead>
+        <tr>
+          <th>HH Code</th>
+          <th>Household Head</th>
+          <th>Total number of members in Household</th>
+          <th>Total number of members Completed</th>
+          <th>Date Completed</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+        <tbody>
+        {% for interviewed in completion_rates.interviewed_households %}
+            <tr>
+                <td>{{ interviewed.household.house_number }}</td>
+                <td>{{ interviewed.household.get_head.surname.capitalize }}</td>
+                <td>{{ interviewed.household.members.count }}</td>
+                <td>{{ interviewed.number_of_member_interviewed }}</td>
+                <td>{{ interviewed.date_interviewed|default_if_none:'--' }}</td>
+                <td><a href="{% url 'house_completion_summary' interviewed.household.pk batch.pk %}">view</a></td>
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% load template_tags %}
+{% for field in a_form.visible_fields %}
+<style type="text/css">label{
+	margin-top: -7px;
+	}
+    </style>
+  <div class="control-group">
+    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
+    <div class="controls {{ field|is_radio }}">
+      {{field}}
+        &nbsp;&nbsp;<span id="{{field.auto_id}}_tip" class="help tip">{{ field.help_text }}</span>
+        {% if field.errors %}
+        <label class="error" >
+            {% for error in field.errors %}
+                {{ error}}
+            {% endfor %}
+         </label>
+        {% endif %}
+    </div>
+  </div>
+{% endfor %}
+
+{% for hidden in a_form.hidden_fields %}
+  {{ hidden }}
+{% endfor %}

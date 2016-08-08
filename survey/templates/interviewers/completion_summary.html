@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% load template_tags %}
+{% block title %}
+    {{ interviewer.name|capfirst  }} Survey Completion Details
+{% endblock %}
+{% block content %}
+{% load template_tags %}
+<table width="70%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr>
+    <td align="right" valign="top">Name</td>
+    <td align="left" valign="top" class="showdetails">{{ interviewer.name|capfirst }}</td>
+  </tr>
+  <tr>
+    <td align="right" valign="top">Mobile Number</td>
+    <td align="left" valign="top" class="showdetails">{{ interviewer.ussd_access | display_list}}</td>
+  </tr>
+  <tr>
+    <td align="right" valign="top">ODK ID</td>
+    <td align="left" valign="top" class="showdetails">{{ interviewer.odk_access | display_list}}</td>
+  </tr>
+  <tr>
+    <td align="right" valign="top">Total Households in EA</td>
+    <td align="left" valign="top" class="showdetails">{{ interviewer.ea.total_households }}</td>
+  </tr>
+  <tr>
+    <td align="right" valign="top">Total Registered Households</td>
+    <td align="left" valign="top" class="showdetails">{{ interviewer.present_households.count }}</td>
+  </tr>
+  <tr>
+    <td align="right" valign="top">Total Households Completed Survey</td>
+    <td align="left" valign="top" class="showdetails">{{ interviewer.total_households_completed }}
+  </tr>
+  <tr>
+    <td align="right" valign="top">Percentage Household Registered</td>
+    <td align="left" valign="top" class="showdetails">{% widthratio interviewer.present_households.count interviewer.ea.total_households 100 %}</td>
+  </tr>
+  <tr>
+    <td align="right" valign="top">Percentage Household Completed Survey</td>
+    <td align="left" valign="top" class="showdetails">{% widthratio interviewer.total_households_completed interviewer.ea.total_households 100 %}</td>
+  </tr>
+ <tr>
+    <td align="right" valign="top">Enumeration Area</td>
+    <td align="left" valign="top" class="showdetails">{{ interviewer.ea.name }}</td>
+  </tr>
+  <tr>
+    <td align="right" valign="top">&nbsp;</td>
+    <td align="left" valign="top">&nbsp;</td>
+  </tr>
+</table>
+{% endblock %}

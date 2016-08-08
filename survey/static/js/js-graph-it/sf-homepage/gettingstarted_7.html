@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>js-graph.it homepage</title>
+<script type="text/javascript" src="js-graph-it.js"></script>
+<link rel="stylesheet" type="text/css" href="js-graph-it.css" />
+<link rel="stylesheet" type="text/css" href="sf-homepage.css" />
+<style>
+	
+</style>
+<script>
+	<!--
+		function onLoad()
+		{
+			setMenu();
+			resizeCanvas();
+			initPageObjects();
+		}
+		
+		/**
+		 * Resizes the main canvas to the maximum visible height.
+		 */
+		function resizeCanvas()
+		{
+			var divElement = document.getElementById("mainCanvas");
+			var screenHeight = window.innerHeight || document.body.offsetHeight;
+			divElement.style.height = (screenHeight - 16) + "px";
+		}
+	
+		/**
+		 * sets the active menu scanning for a menu item which url is a prefix 
+		 * of the one of the current page ignoring file extension.
+		 * Nice trick!
+		 */
+		function setMenu()
+		{
+			var url = document.location.href;
+			// strip extension
+			url = stripExtension(url);
+			
+			var ulElement = document.getElementById("menu");
+			var links = ulElement.getElementsByTagName("A");
+			var i;
+			for(i = 0; i < links.length; i++)
+			{
+				if(url.indexOf(stripExtension(links[i].href)) == 0)
+				{
+					links[i].className = "active_menu";
+					return;
+				}
+			}
+		}
+		
+		/**
+		 * Strips the file extension and everything after from a url
+		 */
+		function stripExtension(url)
+		{
+			var lastDotPos = url.lastIndexOf('.');
+			if(lastDotPos > 0)
+				return url.substring(0, lastDotPos - 1);
+			else
+				return url;
+		}
+		
+		/**
+		 * this function opens a popup to show samples during explanations.
+		 */
+		function openSample(url)
+		{
+			var popup = window.open(url, "sampleWindow", "width=400,height=300");
+			popup.focus();
+			return false;
+		}
+	//-->
+</script>
+</head>
+<body onload="onLoad();">
+<table class="main_table" style="height: 100%;">
+		<tr>
+			<td width="120" style="vertical-align: top;" class="menu">
+				<ul id="menu">
+					<li><a href="index.html">overview</a></li>
+					<li><a href="story.html">story of this project</a></li>
+					<li><a href="gettingstarted.html">getting started</a></li>
+					<li><a href="http://sourceforge.net/forum/?group_id=170245">forum</a></li>
+					<li><a href="http://sourceforge.net/tracker/?group_id=170245&atid=853532">bugs</a></li>
+					<li><a href="http://sourceforge.net/projects/js-graph-it/">download</a></li>
+				</ul>
+			</td>
+			<td style="vertical-align: top; padding: 0px;">
+				<div id="mainCanvas" class="canvas" style="width: 100%; height: 500px;">
+			
+
+<h1 id="title_block" class="block draggable" style="left: 30px; top: 20px;">Getting started</h1>
+
+<h2 id="subtitle_block" class="block draggable" 
+style="left: 280px; top: 40px; padding-left: 10px; padding-right: 10px; width: 550px;">The connector's labels</h2>
+
+<div class="connector title_block subtitle_block">
+	<img class="connector-end" src="arrow.gif">
+</div>
+
+<div id="code" class="block code" style="left: 280px; top: 100px; padding: 10px; width: 550px; position: absolute; background-color: white;">
+	&lt;html&gt;<br>
+	&nbsp;&nbsp;&lt;head&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&lt;script type="text/javascript" src="../js-graph-it.js"&gt;&lt;/script&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&lt;link rel="stylesheet" type="text/css" href="../js-graph-it.css"&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&lt;style&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.block { position: absolute; }<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&lt;/style&gt;<br>
+	&nbsp;&nbsp;&lt;/head&gt;<br>
+	&nbsp;&nbsp;&lt;body onload="initPageObjects();"&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="canvas" id="mainCanvas"<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;style="width: 350px; height: 250px; border: 1px solid black;"&gt;<br>
+
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;h1 class="block draggable" id="h1_block"<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;style="left: 10px; top: 10px;"&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h1 block<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/h1&gt;<br>
+
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;h2 class="block draggable" id="h2_block"<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;style="left: 200px; top: 100px;"&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h2 block<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/h2&gt;<br>
+
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="connector h1_block h2_block"&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;img src="arrow.gif" class="connector-start"&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;img src="arrow.gif" class="connector-end"&gt;
+<div class="highlighter block" id="source_label">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;label 
+	<span class="highlighter block" id="source_class">class="source-label"</span>&gt;start&lt;/label&gt;
+</div>
+<div class="highlighter block" id="middle_label">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;label 
+    <span class="highlighter block" id="middle_class">class="middle-label"</span>&gt;middle&lt;/label&gt;
+</div>
+<div class="highlighter block" id="destination_label">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;label 
+    <span class="highlighter block" id="destination_class">class="destination-label"</span>&gt;end&lt;/label&gt;
+</div>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;<br>
+	&nbsp;&nbsp;&lt;/body&gt;<br>
+	&lt;/html&gt;
+</div>
+
+<div class="block draggable" id="labels_descr" style="width: 200px; top: 100px; left: 30px;">
+The task now is to add labels on the connector. It is possible to add 3 labels on each connector:
+<ul>
+	<li>the source label, anchored near the source block</li>
+	<li>the middle label, anchored in the middle of the connector</li>
+	<li>the destination label, anchored near the destination block</li>
+</ul>
+</div>
+
+<div class="block draggable" id="tags_descr" style="width: 200px; top: 420px; left: 30px;">
+A connector label can be any html element nested in the connector element.
+In this sample we'll use three <code>label</code> elements (just because of the element's name).
+</div>
+
+<div class="connector tags_descr source_label">
+	<img class="connector-end" src="arrow.gif">
+</div>
+
+<div class="connector tags_descr middle_label">
+	<img class="connector-end" src="arrow.gif">
+</div>
+
+<div class="connector tags_descr destination_label">
+	<img class="connector-end" src="arrow.gif">
+</div>
+
+<div class="block draggable" id="source_class_descr" style="width: 200px; top: 550px; left: 30px;">
+To declare that an element must be used as the source label, we add the <code>source-label</code>
+css class to it.
+</div>
+
+<div class="connector source_class_descr source_class">
+	<img class="connector-end" src="arrow.gif">
+</div>
+
+<div class="block draggable" id="middle_class_descr" style="width: 200px; top: 640px; left: 80px;">
+To declare that an element must be used as the middle label, we add the <code>middle-label</code>
+css class to it.
+</div>
+
+<div class="connector middle_class_descr middle_class">
+	<img class="connector-end" src="arrow.gif">
+</div>
+
+<div class="block draggable" id="destination_class_descr" style="width: 200px; top: 730px; left: 130px;">
+Finally, to declare that an element must be used as the destination label, we use the <code>destination-label</code>
+css class.
+</div>
+
+<div class="connector destination_class_descr destination_class">
+	<img class="connector-end" src="arrow.gif">
+</div>
+
+<div class="block draggable" style="bottom: 10px; right: 130px; width: 80px;">
+	<a href="gettingstarted_6.html">&laquo; previous</a></div>
+
+<div class="block draggable" style="bottom: 10px; right: 30px; width: 80px; text-align: right;">
+	<a href="gettingstarted_8.html">next &raquo;</a></div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	</body>
+</html>

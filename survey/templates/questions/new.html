@@ -1,0 +1,77 @@
+{% extends "form.html" %}
+
+{% block title %}
+  {% if parent_question or heading %}
+    {{ heading }}
+  {% else %}
+    New Question
+  {% endif %}
+{% endblock %}
+{% block pre_form_content %}
+  {% if parent_question %}
+     <h4> to question: {{parent_question.text}} <h4>
+  {% endif %}
+    <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
+{% endblock%}
+{% block display_form_fields %}
+<div class="control-group">
+        <label class="control-label" for="text_counter"></label>
+        <div class="controls">
+            <span id="text-counter"></span>
+        </div>
+  </div>
+{% include "naked_form.html" with a_form=questionform %}
+{% if options %}
+  {% for option in options %}
+   {% if option %}
+    <div class="control-group options question-option">
+        <label class="control-label">Option <span class="number"> {{ option.order }}</span></label>
+        <div class="controls">
+            <input type="text" maxlength="100" name="options" value="{{ option.text }}">
+            <a href="javascript:;" class="add-on btn btn_primary add-option"><i class="icon-plus"></i></a>
+            <a href="javascript:;" class="add-on btn btn_primary remove-option"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+{% endif %}
+{% include "_multiple_options.html" with option_label='Option' id="question-option-template" name='options'%}
+{% if parent_question %}
+<script type="text/template" id="question-group-template">
+    <select id="id_group" name="group">
+      <option value="{{parent_question.group.pk}}" selected="selected">{{parent_question.group.name}}</option>
+    </select>
+</script>
+{% endif %}
+
+{% endblock %}
+    {% block buttons %}
+  <div class="form-actions">
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
+      {% if not questionform.instance.identifier %}
+      <button id="button" type="submit" class="btn btn-primary submit" name="add_to_lib_button" data-disabled-text="{{ loading_text }}">Save and Add to Bank</button>
+      {% endif %}
+    {% if cancel_url %}
+      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel">Cancel</a>
+    {% else %}
+      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+    {% endif %}
+  </div>
+    {% endblock %}
+
+{% block javascripts %}
+    <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            channel_map = {
+                {% for answer_type, channels in questionform.answer_map.items %}
+                    '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
+                {% endfor %}
+            };
+            $('#id_answer_type').change(function(){
+                help_text = channel_map[$('#id_answer_type').val()].join(' and ');
+               // alert($('#id_answer_type_tip').val());
+               $('#id_answer_type_tip').text(help_text);
+            });
+        </script>
+{% endblock %}

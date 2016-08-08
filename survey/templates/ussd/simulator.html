@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block title %}
+  USSD Simulator
+{% endblock %}
+{% block content %}
+<style type="text/css" media="screen">
+  #timer{
+    font:20px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #27ae60;
+    padding: 0.5em 0.7em;
+    color: #ecf0f1;
+    margin-bottom: 50px;
+    cursor: pointer;
+    -webkit-transition: background 0.5s ease-out;
+    transition: background 0.5s ease-out;
+  }
+
+  #timer.ended{
+    background: #c0392b;
+  }
+</style>
+<br>
+<form class="form-horizontal form-search" id="simulator-form">
+  <div class="control-group hide">
+    <label class="control-label">Transaction ID</label>
+    <div class="controls">
+      <input type="text" name="transactionId" id="transactionId">
+    </div>
+  </div>
+  <div class="control-group hide">
+    <label class="control-label">Transaction Time</label>
+    <div class="controls">
+      <input type="text" name="transactionTime" value="00:00:00" id="transactionTime">
+    </div>
+  </div>
+  <div class="control-group hide">
+    <label class="control-label">USSD Service Code</label>
+    <div class="controls">
+      <input type="text" name="ussdServiceCode" value="*153*10#">
+    </div>
+  </div>
+  <div class="control-group hide">
+    <label class="control-label">Response</label>
+    <div class="controls">
+      <label class="radio inline">
+        <input type="radio" name="response" id="response-true" value="true">
+        Yes
+      </label>
+      <label class="radio inline">
+        <input type="radio" name="response" id="response-false" value="false" checked>
+        No
+      </label>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">Mobile Number</label>
+    <div class="controls">
+      <input type="text" name="msisdn" value="{{ country_phone_code }}">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">Use Timeout</label>
+    <div class="controls">
+      <label class="radio inline">
+        <input type="radio" name="timeout" id="timeout-true" value="true" checked>
+        Yes
+      </label>
+      <label class="radio inline">
+        <input type="radio" name="timeout" id="timeout-false" value="false">
+        No
+      </label>
+    </div>
+  </div>
+  <div class="control-group">
+    <textarea rows="10" class="span7 disabled" id="server-response" disabled=""></textarea>
+  </div>
+  <div class="input-append" id="form-control">
+    <input type="text" name="ussdRequestString" class="span6 search-query">
+    <button type="submit" class="btn btn-success">Respond</button>
+  </div>
+  <div id="loader" class="hide offset2">
+    <img src="{{STATIC_URL}}/img/ajax-loader.gif" />
+  </div>
+</form>
+<div id="timer" class="span1">
+  03 min 00 sec
+</div>
+{% endblock %}
+{% block javascripts %}
+<script src="{{STATIC_URL}}/js/jquery.countdown.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{STATIC_URL}}js/simulator.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
