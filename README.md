@@ -43,9 +43,9 @@ Before using the system
 
         python manage.py import_location [LOCATION_FILE_CSV]
 
-        > The first line of the csv file shall be taken as file header. 
+> The first line of the csv file shall be taken as file header. 
 
-        > The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory (administrative_divisions.csv.example).
+> The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory (administrative_divisions.csv.example).
 
 
 Starting up
