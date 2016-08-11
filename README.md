@@ -72,4 +72,4 @@ Testing
 
 ====
 
-[![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg)](https://github.com/unicefuganda/uSurvey)
+[![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg)](https://travis-ci.org/unicefuganda/uSurvey)
