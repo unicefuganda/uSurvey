@@ -45,7 +45,7 @@ Before using the system
 
 > The first line of the csv file shall be taken as file header. 
 
-> The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory (administrative_divisions.csv.example).
+> The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory as administrative_divisions.csv.example.
 
 
 Starting up
@@ -72,4 +72,4 @@ Testing
 
 ====
 
-[![Build Status](https://travis-ci.org/unicefuganda/uSurvey)](https://github.com/unicefuganda/uSurvey)
+[![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg)](https://github.com/unicefuganda/uSurvey)
