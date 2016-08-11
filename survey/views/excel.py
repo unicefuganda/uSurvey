@@ -27,7 +27,7 @@ def send_mail(composer):
     composer.send_mail()
 
 def safe_push_msg(user, msg):
-    print 'request to send: ', msg
+    #print 'request to send: ', msg
     #redis_key = settings.DOWNLOAD_CACHE_KEY%{'user_id':user.id, 'batch_id': batch_id}
     j = get_current_job()
     msg['ref_id'] = j.id

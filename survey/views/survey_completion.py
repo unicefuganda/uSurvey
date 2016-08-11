@@ -123,7 +123,7 @@ def show(request):
 def completion_json(request, survey_id):
     @cached_as(Survey.objects.filter(id=survey_id))
     def get_result_json():
-        print "Getting data from DB"
+        #print "Getting data from DB"
         survey = Survey.objects.get(id=survey_id)
         location_type = LocationType.largest_unit()
         completion_rates = BatchSurveyCompletionRates(location_type).get_completion_formatted_for_json(survey)
@@ -145,7 +145,7 @@ def show_interviewer_completion_summary(request):
         interviewers = interviewers.intervieweraccess.filter(is_active=ast.literal_eval(params['status']))
     locations_filter = LocFilterForm(data=request.GET, include_ea=True)
     if locations_filter.is_valid():
-        print 'locations count: ', locations_filter.get_enumerations().count()
+        #print 'locations count: ', locations_filter.get_enumerations().count()
         interviewers = interviewers.filter(ea__in=locations_filter.get_enumerations()).order_by('name')
     return render(request, 'aggregates/interviewers_summary.html',
                   {'interviewers': interviewers,

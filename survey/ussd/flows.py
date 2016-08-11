@@ -100,8 +100,7 @@ class Task(object):
         self.access = ussd_access
         interviewer = ussd_access.interviewer
         self.interviewer = interviewer
-        if not self.ongoing_command == type(self).__name__:
-            print ' is now cleaning up variable space', type(self).__name__
+        if not self.ongoing_command == type(self).__name:
             self.ongoing_command = type(self).__name__
 
     def intro(self):
@@ -549,7 +548,6 @@ class Interviews(Task):
     @property
     @reads_from_cache(store=LOCALS_NP)
     def _ongoing_interview(self):
-        print 'pending batches is ', self._pending_batches
         if self._pending_batches:
             interview,_ = Interview.objects.get_or_create(interviewer=self.interviewer,
                                                                householdmember=self._house_member,

@@ -39,11 +39,9 @@ def refreshes_cache(store=LOCALS_NP, nps=None):
             access = task.access
             if nps is None:
                 cache.delete_pattern('/interviewer/%s/%s*'%(access.interviewer.pk, store))
-                print 'refreshed cache for ', args, ' store: ', store
             else:
                 for np in nps:
                     cache.delete_pattern('/interviewer/%s/%s/%s'%(access.interviewer.pk, store, np))
-                    print 'refreshed cache for ', args, ' store: ', store, 'pattern: ', np
             result = func(task, *args, **kwargs)
             return result
         return _decorator

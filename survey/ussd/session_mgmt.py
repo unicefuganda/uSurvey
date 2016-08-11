@@ -46,6 +46,6 @@ def manage(msisdn, trnx_id, request_string, access=None):
     if ongoing_command_name is None:
         return flows.Start(access).intro()
     else:
-        print ongoing_command_name
+        
         ongoing_command = getattr(flows, ongoing_command_name)
         return ongoing_command(access).respond(request_string)
