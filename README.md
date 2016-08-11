@@ -32,6 +32,9 @@ Installation
         
         python manage.py migrate
 
+        python manage.py createsuperuser
+        (to create the initial user access)
+
         python manage.py load_parameters
 
 Before using the system
