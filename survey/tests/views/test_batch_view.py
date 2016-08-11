@@ -150,7 +150,7 @@ class BatchViewsTest(BaseTest):
         batch = Batch.objects.create(order=1, name="Some Batch", description="some description", survey=self.survey)
         form_data = {'name': 'Some Batch', 'description': 'some description'}
         response = self.client.post('/surveys/%d/batches/new/' % self.survey.id, data=form_data)
-        print form_data,"form"
+        
         batch = Batch.objects.get(**form_data)
         self.assertEqual(self.survey, batch.survey)
 

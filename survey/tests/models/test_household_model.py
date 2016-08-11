@@ -49,7 +49,7 @@ class HouseholdTest(TestCase):
     def test_fields(self):
         hHead = Household()
         fields = [str(item.attname) for item in hHead._meta.fields]
-        print fields
+         
         self.assertEqual(len(fields), 10)
         for field in ['id', 'created', 'modified', 'house_number', 'listing_id',
                       'physical_address', 'last_registrar_id', 'registration_channel', 'head_desc', 'head_sex']:

@@ -39,7 +39,6 @@ class NumericalAnswerTest(TestCase):
                                                              reponse_timeout=100,duration="120",odk_token="test123")
         interview = Interview.objects.create(interviewer=investigator,householdmember=household_member,batch=batch,
                                              interview_channel=interviewer_access,closure_date="2017-01-01",ea=ea,last_question=question)
-        print interview,"hjagdjhgasjdasjgd"
         answer = NumericalAnswer.objects.create(interview=interview, question=question,
                                                 value=10)
         self.failUnless(answer.id)

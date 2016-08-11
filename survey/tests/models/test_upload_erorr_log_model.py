@@ -7,7 +7,6 @@ class UploadErrorLogTest(BaseTest):
         upload_log = UploadErrorLog()
         fields = [str(item.attname) for item in upload_log._meta.fields]
         self.assertEqual(7, len(fields))
-        print fields
         for field in ['id', 'created', 'modified', 'model', 'filename', 'row_number', 'error']:
             self.assertIn(field, fields)
 

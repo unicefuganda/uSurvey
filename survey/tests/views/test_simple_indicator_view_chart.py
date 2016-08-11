@@ -88,7 +88,7 @@ class SimpleIndicatorChartViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('formula/simple_indicator.html', templates)
-        print response.context.keys(),"keys"
+         
         self.assertIsNotNone(response.context['locations_filter'])
         self.assertIsNotNone(response.context['request'])
         self.assertEquals(response.context['location_names'], [self.central.name, self.west.name])

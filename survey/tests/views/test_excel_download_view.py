@@ -163,7 +163,7 @@ class ExcelDownloadViewTest(BaseTest):
         url = '/aggregates/spreadsheet_report/?District=&County=&Subcounty=&Parish=&survey=%d&batch=%d&multi_option=1&action=Email+Spreadsheet' %(survey.id,batch.id)
         response = self.client.get(url)
         keys=django_rq.get_queue('results-queue').connection.keys()
-        print "checkig asserts"
+         
         self.assertIn('rq:queue:email', keys)
         self.assertNotIn("testkey",keys)
 

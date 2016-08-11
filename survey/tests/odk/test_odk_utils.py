@@ -59,8 +59,4 @@ class ODKHelperTest(TestCase):
                                              interview_channel=interviewer_access,closure_date="2017-01-01",ea=self.ea,last_question=self.question)
         answer = NumericalAnswer.objects.create(interview=interview, question=self.question,
                                                 value=1)
-        # print record_interview_answer(interview, question, 1),"======"
-        # print answer,"---------"
-        # self.assertEqual(answer,record_interview_answer(interview, self.question, 0))
-        # self.assertAlmostEqual(answer,record_interview_answer(interview, self.question, 0))
         self.assertIsNotNone(record_interview_answer(interview, self.question, 0))
