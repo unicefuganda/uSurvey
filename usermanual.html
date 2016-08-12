@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+    <style>
+        body{margin:0px;padding:0px;}
+        .top{width:100%; height:80px; background-color:#0094ff;}
+        .leftside{float:left;width:20%;}
+		dl dt{background:#000; color:#fff;padding:5px; margin:2px 0px;max-width:450px;}
+
+.rightside{float:left;width:80%;}        .content{width:1024px; margin:0 auto}
+
+                                         .menu{margin:0px;}
+                                         .menu li{list-style:none;padding:10px 15px; float:left;line-height:50px;}
+                                         .menu li a{color:#fff;text-decoration:none; font-size:17px;font-weight: bold;font-family: Trebuchet MS, Myriad Pro, Arial;}
+
+    </style>
+</head>
+<body>
+    <div class="top">
+        <div class="content">
+            <div class="leftside">
+                <img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/uSurvey.png?raw=true" style="float:center" />
+            </div>
+            <div class="rightside">
+                <ul class="menu">
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="setup.html">INSTALLATION</a></li>
+		    <li><u><b><a href="usermanual.html">USER MANUAL</a></b></u></li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+
+ <div class="content">
+		 <div style="top:50px; position:relative;">
+
+
+<h3><i>User Manual</i></h3>
+	    <p><b>The General flow for the uSurvey is as follows:</b><br /><br />
+
+1. Admin user creates uSurvey users and assigns them user roles<br /><br />
+
+2. Data researcher user defines Question modules, Household member groups and loads survey with questions into the system<br /></br />
+
+3. Data researcher defines interviewer on the system and assigns them to an Enumeration area and survey to conduct<br /><br />
+
+4. Interviewer goes out on the field to designated enumeration area to conduct the actual survey<br /><br />
+
+5. Interviewer captures household and member details as well as relevant questions asked to the house member. These inputs are sent to uSurvey server via mobile<br /><br />
+
+6. Data collected from Interviewers is then viewed on the uSurvey portal for reporting and analysis<br /><br />
+
+
+At any point on the uSurvey portal, there is bread crumbs that enable easier navigation between related uSurvey screen:<br /><br />
+                <img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/breadcrumbs.png?raw=true" style="float:center" /><br /></p><br />
+
+<p><h4><i>Login</i></h4><br />
+
+To login, uSurvey landing page, click on login link on top right of the page:<br />
+
+            <img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/usurvey_home.png?raw=true" style="float:center" /><br />
+
+This brings out the login page for user to enter user name and password.<br />
+
+
+<h4><i>Map Page</i></h4><br />
+
+The map page is used to display survey report on a country map as per primary Administrative divisions. Eg for Uganda, that would be District, For South Africa, that might correspond to Provinces.<br />
+
+The Map page is accessible only after user login under path <b>/home/</b>.<br />
+
+            <img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/map_page.png?raw=true" style="float:center" /><br />
+
+On the page, the drop down at the left corner of the page contains surveys whose report to display on map.<br />
+
+To get survey report on the map, select the relevant survey and the report is loaded into the map.<br />
+
+Hover over the relevant Administrative division on map to view completion report at the top right of the page.<br />
+
+Bottom right of page shows color codes used to indicate completion status on map.<br />
+
+<h4><i>Interviewer Page</i></h4><br />
+
+The interviewer page is used to manage interviewers and to assign them to a survey. Once logged in, interviewer page is available under <b>Survey Administration >> Interviewers</b><br />
+
+            <img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/interviewer_path.png?raw=true" style="float:center" /><br />
+
+There are a couple of controls/filters on the page:<br />
+
+            <img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/interviewer_home.png?raw=true" style="float:center" /><br />
+
+1. Filter controls are used to narrow down on interviewers displayed on screen based on Administrative divisions of the particular country and Enumeration area.<br />
+
+2. Search box is used to search for interviewers on the page based on search criteria<br />
+
+3. Click on Add Interviewer Button to add interviewer. Click on Export Interviewer to download all interviewers in system.
+
+4. These buttons are used to perform actions on particular interviewers:
+    - Edit button is used to edit interviewer
+    - Block button is used block particular interviewer from all access channels for survey
+
+<b><i> Note:</i></b>
+
+For each interviewer, active numbers/odk access are having green color. The deactivated access credentials are having red color.
+
+<h6><i>Add Interviewer</i></h6>
+
+To add new interviewer, From Interviewer page click on the Add Interviewer Button. Add Interviewer page looks like this:
+
+          <p>  <img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/add_interviewer.png?raw=true" style="margin:0 auto" /></p>
+
+The Administrative Division filters at the top of the page is used to control displayed Enumeration areas to select from (tagged EA Filters in above image).
+
+Multiple Interviewer mobile numbers are allowed. To add multiple numbers to an interviewer, simply click on the <b>add mobile number</b> link to add new mobile number to interviewer.
+
+To disable Any ODK access or Any mobile number for the interviewer, simple uncheck the <b>Activated</b> checkbox for that number or ODK access.
+
+The interviewer can access the survey system with <b>Only</b> active Mobile numbers/ODK credentials. Deactivated access details can not be used by the interviewer until activated.
+
+Once full details is complete, new record is saved by clicking on the Save button. To cancel, click the cancel button.
+
+The add interviewer page also lets users assign survey to an interviewer. Simply select the correct survey to assign to the interviewer before saving the form.
+
+<h4><i>Edit Interviewer</i></h4>
+
+To Edit interviewer record, from interviewer landing page, click on respective interviewer name
+
+           <p> <img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/edit_interviewer.png?raw=true" style="float:center" /></p>
+
+This would lead to page as the add interviewer page. Edit and same accordingly.
+
+
+<h4><i>Managing Enumeration Area</i></h4>
+
+To view available enumeration areas in the system, go to <b>Survey Administratio >> Enumeration Areas</b>
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/enumeration_areas.png?raw=true" style="float:center" /></p>
+
+1. It is possible to filter out enumeration areas using Administrative division filters
+
+2. It is possible to search by EA name and corresponding smallest division names
+
+3. It is possible to edit and delete EA
+
+4. To Add new EA, click on the <b>Add Enumeration Area</b> button
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/new_ea.png?raw=true" style="float:center" /></p>
+
+5. To create new enumeration area, use the Administrative division filters to narrow down the locations to build the
+   enumeration areas from.
+
+6. Name the new enumeration area and save
+
+
+<h4><i>Question Module</i></h4>
+
+Question Module provide a way to categorize questions. Question Module page is available under <b>Survey Administration >> Modules</b>
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/module_page.png?raw=true" style="float:center" /></p>
+
+To add new module, simply click on the add module link at the top right of the page. Fill in the name and description of the module and save.
+
+Editing a module, clock on the Edit button of that module.
+
+<h4><i>House member Group</i></h4>
+
+To define House member groups on the survey, under SurveyAdministration, click on <b>Groups</b>
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/household_group.png?raw=true" style="float:center" /></p>
+
+To add new member group, click on the <b>Add Group</b> link at the top of the page. To edit an existing member group, simply click on the relevant group name for the member group.
+
+
+<h4><i>Question Library</i></h4>
+
+Question Library allows the user to design a library of questions which can be reusable accross survey batches.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/question_bank_index.png?raw=true" style="float:center" /></p>
+
+Question library page has filters at the top of the page to enable filtering of question by member group, Module and Answer type
+
+Search box enables searching by identifier, group name and text.
+
+To add new question to the library, click on the <b>Create New Question</b> button at the top right page.
+
+To edit question in the library, click on the edit button for the relevant question.
+
+To export all questions in the library, click on the <b>Export Question</b> button at the top right of the page.
+
+
+<h6><i>Add/Edit Library Question</i></h6>
+
+To add new question to the library, click on the <b>Create New Question</b> button at the top right page.
+
+To edit question in the library, click on the edit button for the relevant question.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/add_question_to_lib.png?raw=true" style="float:center" /></p>
+
+Enter correct values for Module, text, identifier etc.  Save or Cancel when complete.
+
+<h4><i>Survey Management</i></h4>
+The survey page is available under <b>Survey Administration >> surveys</b>
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/survey_page.png?raw=true" style="float:center" /></p>
+
+On the survey page, it is possible to search by survey name and survey description.
+
+<h6><i>Creating New Survey</i></h6>
+To create a new survey, click on the <b>Create New Survey</b> button at the top right of the page. This would produce a pop of form.
+
+- Enter the survey name and Description.
+
+- For Survey Type, select Sampled if the survey uses sample size. Select census if the survey does not use sample size.
+
+- If fresh survey listing is not required for this survey, select the existing survey listing to use (if it exists for the interviewer EA). Otherwise, leave option as blank for fresh survey listing for each new enumeration area.
+
+
+<h6><i>Modify Survey</i></h6>
+
+To edit survey, click on the relevant survey name and edit the survey. Edit accordingly and save.
+
+<h6><i>Adding Batches to surveys</i></h6>
+
+To add/edit/view batches to a survey, click on view batches of the particular survey.
+
+This leads to the batch page of the particular survey.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/survey_batches.png?raw=true" style="float:center" /></p>
+
+To add new batch, click on the <b>Add Batch</b> button on top right of survey batch page. This brings the survey batch page:
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/new_survey_batch.png?raw=true" style="float:center" /></p>
+
+- Enter name and description of the survey
+
+- Select the access channels for which the batch is applicable.
+
+   <b>Note:</b> Selecting only USSD Access enables question answer types applicable to USSD only (Text, Number and Multichoice)
+             Selecting ODK Access enables all answer types
+
+- Once done click on save or cancel.
+
+To Edit or delete batch, click on the relevant button for the survey batch.
+
+<h6><i>Managing batch questions</i></h6>
+
+To manage batch questions, click on the Add/Edit questions button.
+
+This leads to batch questions page.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/batch_questions.png?raw=true" style="float:center" /></p>
+
+<b>Note: For survey batches, during data collection, following fixed questions pertaining to each house member are asked
+before actual batch questions begin</b>
+
+    1. First name of House member
+
+    2. Family Name of House member
+
+    3. Date of Birth
+
+    4. Gender
+
+    5. House Address (for house head)
+
+    6. Date of Residence (for house head)
+
+    7. Level of Education (for house head)
+
+    8. Occupation (for house head)
+
+The parameters are used for batch question flow logic.
+
+**Do not include this within the batch questions**
+
+1. To Add a brand new question to the batch, click on the <b>Add Question</b> button from the buttons group at the top of the page.
+
+2. To import question from question library into the batch, click on <b>Select Question</b> from the buttons group.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/select_lib_questions.png?raw=true" style="float:center" /></p>
+
+    *  Simply click on questions from the library questions table to move them into the batch questions table.
+
+    *  To narrow options on the question library, enter search criteria on the search box, then move question to batch questions table.
+
+    *  The page also allows filtering down of library questions based on module, group or answer type
+
+    *  When done, click on save/cancel.
+
+3. Once questions has been created into the batch, it is possible to change the order of the survey. To do this, simply
+drag the question up or down to the position of interest.Do this for all required questions until desired flow of
+questions is achieved from first to last question. Once done, click on Update Order to save new batch question flow.
+
+    Internally, uSurvey batch keeps track of the first batch question, then next question is chained to the previous using
+question logic.
+
+4. To add specific logic to batch question flow, simply click on <b>Add Logic</b> button for the batch question. This leads to the question logic page.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/add_logic.png?raw=true" style="float:center" /></p>
+
+    *  Configure the required logic for the selected question and save.
+
+    *  It is possible to view options and logic tied to particular batch questions also.
+
+
+<h4><i>Enabling Batch for data collection</i></h4>
+
+To enable a batch for data collection,
+
+1. Go to the surveys landing page (<b>Survey Administration >> Surveys</b>)
+
+2. Click on view batches for the relevant survey
+
+2. On survey batches page, click on open/close for the batch to be enabled for data collection
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/open_close_batch.png?raw=true" style="float:center" /></p>
+
+3. Enable the batches in the required Primary Administrative division by sliding the division's status button until it shows green
+
+    <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/manage_open_closed.png?raw=true" style="float:center" /></p>
+
+4. For the batches with open status, interviewers would be able to collect survey data if their Enumeration Area falls within the Administrative division
+
+<h4><i>Download Data</i></h4>
+
+Data for completed surveys is available uSurvey under link Downloads/Download Datasheet.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/download_spreadsheet.png?raw=true" style="float:center" /></p>
+
+Simply select survey, batch and either download the reports or email. Email is sent to the registered email address
+of the current logged in user.
+
+The reports contain data entries from both ODK and USSD channels.
+
+<h4><i>Batch Data collecting Interviewers</i></h4>
+
+To download interviewers who collected data for particular batch, Under Downloads, click the Mobile Money sheets link.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/mobile_money_sheets.png?raw=true" style="float:center" /></p>
+
+Select the survey and batch, then download the data.
+
+
+<h4><i>Analysis</i></h4>
+
+<h6><i>Indicators</i></h6>
+
+Indicators page is used to capture specific statistic.Eg, Percentage of householdes having a mobile phone.
+
+Indicators page is accessed under <b>Analysis/Indicators</b>.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/indicators_home.png?raw=true" style="float:center" /></p>
+To use
+
+- Create new Indicator
+
+- Define the formula (criteria) used to calculate the indicator.
+
+- View the Analysis report of the indicator criteria on presently collected data
+
+
+To Add new Indicator, click on the <b>Add Indication</b> button at the top right of the page. Enter the indication
+parameters and save.
+
+
+To Define the formulae for the indicator, click on the formula button of the Indicator.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/indicator_formula.png?raw=true" style="float:center" /></p>
+
+Depending on the type indicator created, define the formula and save.
+
+
+To view Analysis report of an indicator, click on the indicator Analysis button
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/analysis_report.png?raw=true" style="float:center" /></p>
+
+*  Initial page displays analysis reports as per primary Administrative division.
+
+*  To get more fine grained report, use the Administrative division filters starting from primary division.
+    <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/analysis_report_drill_down.png?raw=true" style="float:center" /></p>
+
+*  Supported export formats are PNG, JPEG, PDF and SVG.
+
+
+<h4><i>Survey Completion statistics</i></h4>
+
+Survey completion statistic is available under <b>Analysis/Completion Rates</b>
+
+To get completion statistic for specific administrative division:
+
+1. Select survey
+2. Select batch
+3. Use the Administrative division filter to navigate to the division of interest
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/completion_rates.png?raw=true" style="float:center" /></p>
+
+4. After navigating to the smallest administrative division, select relevant EA to get EA level break down.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/ea_level_completion_rate.png?raw=true" style="float:center" /></p>
+
+    This reveals household completion summary.
+
+5. To view responses from each Household member of a particular household in the Enumeration area,
+    click on the <b>view</b> link under the household actions
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/household_survey_response.png?raw=true" style="float:center" /></p>
+
+    This gives breakdown of responses for the particular household.
+
+
+<h4><i>Managing Users</i></h4>
+
+To access to create/modify users is available under <b>settings/Users</b> link.
+
+            <p><img  src="https://github.com/antsmc2/mics/blob/uSurvey/doc/manage_users.png?raw=true" style="float:center" /></p>
+
+To add new user, simple click the <b>Add User</b> button at the top right of the page.
+
+To Edit User, click on the edit button of the relevant user and enter the user details.
+
+</i></div>
+</i></div>
+</div>
+</body>
+</html>
