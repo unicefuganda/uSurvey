@@ -68,10 +68,9 @@ and enumeration areas</p>
 <dl>
  <dt>$ python manage.py import_location [LOCATION_FILE_CSV]</dt>
 </dl>    
-    <p><i>The first line of the csv file shall be taken as file header. </br></br>
+    <p><i>The first line of the csv file shall be taken as file header. </br><br />
     
-    The file header is expected to contain names as per the Administrative division of the current country in a comma separated format. The last entry of the header can contain EAName</br>  
-    Eg. For Uganda, example headers can be **Country,DistrictName,CountyName,SubCountyName,ParishName,VillageName,EAName </i></p>
+    The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory as administrative_divisions.csv.example</i></p>
     
 <br />
 <h4><i>Setting up Shape file</i></h4>
