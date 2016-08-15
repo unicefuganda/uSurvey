@@ -1,0 +1,9 @@
+site_name: uSurvey
+pages:
+- Home: index.md
+- Getting Started: installation.md
+- User Manual: user_manual.md
+- ODK Guide: odk_guide.md
+- Tests: tests.md
+#theme: readthedocs
+theme: cerulean

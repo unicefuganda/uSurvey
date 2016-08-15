@@ -95,10 +95,11 @@ Required settings are given below:
 Starting Up
 -----------
 
-* Make sure you configure appropriate ports in the supervisord.conf file.
+* **Make sure you configure appropriate ports in the supervisord.conf file.**
 
 * Start the system using supervisor:
 
         supervisord -c supervisord.conf
 
 > In supervisord.conf, the configuration under [program:odk-server] is required to serve ODK requests, while the configuration under [program:django-interface-server] is for serving other requests.
+
