@@ -128,7 +128,7 @@ To add new module, simply click on the add module link at the top right of the p
 
 Editing a module, clock on the Edit button of that module. 
 
-###House member Group
+###House Member Group
 
 To define House member groups on the survey, under SurveyAdministration, click on **Groups**
  
@@ -185,7 +185,7 @@ To create a new survey, click on the ```Create New Survey``` button at the top r
 
 To edit survey, click on the relevant survey name and edit the survey. Edit accordingly and save.
 
-####Adding Batches to surveys
+####Adding Batches To Surveys
 
 To add/edit/view batches to a survey, click on view batches of the particular survey.
 
@@ -208,7 +208,7 @@ To add new batch, click on the ```Add Batch``` button on top right of survey bat
 
 To Edit or delete batch, click on the relevant button for the survey batch.
 
-####Managing batch questions
+####Managing Batch Questions
 
 To manage batch questions, click on the Add/Edit questions button.
 
@@ -269,7 +269,7 @@ question logic.
     *  It is possible to view options and logic tied to particular batch questions also.
     
     
-###Enabling Batch for data collection
+###Enabling Batch For Data Collection
 
 To enable a batch for data collection,
 
@@ -298,7 +298,7 @@ of the current logged in user.
 
 The reports contain data entries from both ODK and USSD channels.
 
-###Batch Data collecting Interviewers
+###Batch Data Collecting Interviewers
 
 To download interviewers who collected data for particular batch, Under Downloads, click the Mobile Money sheets link.
 
@@ -349,7 +349,7 @@ To view Analysis report of an indicator, click on the indicator Analysis button
 *  Supported export formats are PNG, JPEG, PDF and SVG.
 
 
-###Survey Completion statistics
+###Survey Completion Statistics
 
 Survey completion statistic is available under ```Analysis/Completion Rates```
 

@@ -6,4 +6,4 @@ uSurvey is an innovative data collection tool designed to provide statistically 
 The system has been designed to collect a wide range of data for the structured survey; to generate and produce descriptive statistics and graphical representation of the collected information whenever desired, as well as during the process of data collection.
 
 
-Instructions on how to get uSurvey up and running can be found [here](install "Set up instructions")
+Instructions on how to get uSurvey up and running can be found [here](./install.md "Set up instructions")

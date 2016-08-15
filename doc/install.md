@@ -9,7 +9,7 @@ Prerequisites
 * It helps to install python-dev, libxml2-dev, libxslt1-dev, zlib1g-dev and libffi-dev (for a debian based system, the command would be *sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev libffi-dev*)
 
 
-Installation instructions
+Installation Instructions
 -------------------------
 
 * Execute the following commands from your installation directory:
@@ -43,10 +43,10 @@ Installation instructions
         python manage.py load_parameters
 
 
-Before using the system
+Before Using The System
 -----------------------
        
-###Loading location data
+###Loading Location Data
       
 * Before using the setup, you need to load data for administrative divisions of the required country.
 
@@ -58,7 +58,7 @@ Before using the system
 
 > The file header is expected to contain names as per the administrative division in a comma separated format. In addition, there can be an additional header for enumeration area. This header should be named *EAName*. Sample file for Uganda is included in the project directory as administrative_divisions.csv.example.
 
-###Setting up for map reporting
+###Setting Up Map Reporting
 
 To enable uSurvey capture survey data in country map, A few settings needs to be made on the ``mics/settings.py`` file.
 
@@ -88,7 +88,7 @@ Required settings are given below:
 - SHAPE_FILE_LOC_ALT_FIELD: This is the secondary field used to indicate the corresponding Administrative area whose shape file is presented in shape file list item. This entry shall be used if **SHAPE_FILE_LOC_FIELD** is missing in any shape data list item
 
 
-Starting up
+Starting Up
 -----------
 
 * Make sure you configure appropriate ports in the supervisord.conf file.
