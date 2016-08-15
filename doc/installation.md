@@ -1,4 +1,4 @@
-Installation
+Set up Guide
 ============
 
 Prerequisites
@@ -7,6 +7,10 @@ Prerequisites
 * Postgres, redis-server should be running
 
 * It helps to install python-dev, libxml2-dev, libxslt1-dev, zlib1g-dev and libffi-dev (for a debian based system, the command would be *sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev libffi-dev*)
+
+* uSurvey has been tested on python2.7 and is compatible with django 1.8 and django 1.9 as of this time of writing. 
+
+* Required python libraries are contained in the pip-requires.txt file found within the project directory.
 
 
 Installation Instructions
