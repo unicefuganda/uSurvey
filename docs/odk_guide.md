@@ -35,7 +35,7 @@ To use the ODK Collect for uSurvey is easy. Just follow the steps below and you 
 ###Using the ODK collect
 
   - From ODK Collect Main menu, select ‘Get Blank Form’
-  - System will display the open survey at the location assigned to the interviewer
+  - ODK Collect will display the open survey at the location assigned to the interviewer
   - Download the required survey.
   - After downloading the survey form, you start the survey by choosing ‘Fill Blank Form’, then select the particular survey.
   - After completing a survey, you submit completed forms by clicking on the "Send Finalized Form" button.
