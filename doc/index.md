@@ -1,5 +1,5 @@
-uSurvey
-=======
+Overview
+========
 
 uSurvey is an innovative data collection tool designed to provide statistically representative real time estimates of a given indicator. It runs on USSD (Unstructured Supplementary Service Data) interactive secured channel and on ODK (Open Data Kit), for off-line mobile application for use in locations with intermittent mobile network connections.
 
