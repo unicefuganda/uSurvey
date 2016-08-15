@@ -102,4 +102,4 @@ Starting Up
         supervisord -c supervisord.conf
 
 > In supervisord.conf, the configuration under [program:odk-server] is required to serve ODK requests, while the configuration under [program:django-interface-server] is for serving other requests.
-
+> Only the ports configured in [program:odk-server] and [program:django-interface-server] are required to handle requests. Other ports configured on supervisord.conf file are for managing supervisor
