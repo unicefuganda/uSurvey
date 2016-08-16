@@ -30,4 +30,6 @@ Features
 What to do next?
 ----------------
 
-Instructions on how to get uSurvey up and running can be found [here](./installation.md "Set up instructions")
+* Instructions on how to get uSurvey up and running can be found [here](./installation.md "Set up instructions")
+
+* Not a developer? [Here](./user_manual.md "User Manual") is the User Manual
