@@ -4,6 +4,10 @@ Set up Guide
 Prerequisites
 -------------
 
+* Has been tested on Ubuntu and OS X. However it should run on most Linux based machines (since there are no distribution specific dependency).
+
+* Minimum of 1GB RAM is recommended for setup.
+
 * Postgres, redis-server should be running
 
 * It helps to install python-dev, libxml2-dev, libxslt1-dev, zlib1g-dev and libffi-dev (for a debian based system, the command would be *sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev libffi-dev*)
