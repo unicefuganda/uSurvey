@@ -7,18 +7,6 @@ services:
   - redis-server
   - postgresql
 
-env:
-  global:
-    - "ARTIFACTS_S3_BUCKET=unicefuganda-mics"
-    - secure: cc1ZFVP0CWqu3VsvyOAXXy9QaQzxebnxP/91RlqbW5tZpBL1k4+toL0r/fa5MqNHn6vVdqsHmhnFfchkj2rsMlG0XV0EeRFwckoB+FKnQEg3eprjojxRTvWDHvSU936ihOuFvUydyp88ZYR9vsIvT4i52j7dHiwBbLg6itRMFME=
-    - secure: Mucag8v7sxqdpV4S0GSH27o+/dz31IL2PNa/sqSUFvcfw9XTmi2/7Ecxz1PgsldA4sJ+FySvOgVQzUf8Z9309v3LpLF/g6/BJIuNVT2yAvCgpvHoPeu5ItJoSlG010TTNhbAb7s78gZyZgBK3jA/0cTSOhA9QS4978wJ+iDc9eE=
-
-# fix travis phantomjs to 1.9.1
-before_install:
-  - wget http://phantomjs.googlecode.com/files/phantomjs-1.9.1-linux-x86_64.tar.bz2
-  - tar xjf phantomjs-1.9.1-linux-x86_64.tar.bz2
-  - sudo rm -rf /usr/local/phantomjs
-  - sudo mv  phantomjs-1.9.1-linux-x86_64 /usr/local/phantomjs
 
 # command to install dependencies
 install:
@@ -39,8 +27,8 @@ before_script:
 
 # command to run tests
 script:
-  - python manage.py test
+  - coverage run manage.py test
 
-after_failure:
-  - tar -cvzf screenshots-$TRAVIS_BUILD_ID-$TRAVIS_JOB_ID.tar.gz screenshots
-  - travis-artifacts upload --path screenshots-$TRAVIS_BUILD_ID-$TRAVIS_JOB_ID.tar.gz
+after_success:
+  coveralls
+

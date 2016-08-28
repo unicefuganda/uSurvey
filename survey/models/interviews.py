@@ -243,10 +243,19 @@ class Answer(BaseModel):
         return [cls.starts_with, cls.ends_with, cls.equals, cls.between, cls.less_than,
                 cls.greater_than, cls.contains, ]
 
+    @classmethod
+    def validate_test_value(cls, value):
+        '''Shall be used to validate that a given value is appropriate for this answer
+        :return:
+        '''
+        for validator in cls._meta.get_field_by_name('value')[0].validators:
+            validator(value)
+
     class Meta:
         app_label = 'survey'
         abstract = True
         get_latest_by = 'created'
+
 
 class NumericalAnswer(Answer):
     value = models.PositiveIntegerField(null=True)
@@ -293,10 +302,17 @@ class NumericalAnswer(Answer):
     def odk_between(cls, node_path, lowerlmt, upperlmt):
         return "(%s &gt; %s) and (%s &lt; %s)" % (node_path, lowerlmt, node_path, upperlmt)
 
+    @classmethod
+    def validate_test_value(cls, value):
+        try:
+            int(value)
+        except ValueError, ex:
+            raise ValidationError([unicode(ex), ])
 
     class Meta:
         app_label = 'survey'
         abstract = False
+
 
 class ODKGeoPoint(Point):
     altitude = models.DecimalField(decimal_places=3, max_digits=10)
@@ -305,6 +321,7 @@ class ODKGeoPoint(Point):
     class Meta:
         app_label = 'survey'
         abstract = False
+
 
 class TextAnswer(Answer):
     value = models.CharField(max_length=100, blank=False, null=False)
@@ -322,6 +339,7 @@ class TextAnswer(Answer):
         answer = answer.lower()
         value = value.lower()
         return answer == value
+
 
 class MultiChoiceAnswer(Answer):
     value = models.ForeignKey("QuestionOption", null=True)
@@ -357,6 +375,7 @@ class MultiChoiceAnswer(Answer):
     @static_var('label', 'Equals Option')
     def equals(cls, answer, txt):
         return super(MultiChoiceAnswer, cls).equals(answer, txt)
+
 
 class MultiSelectAnswer(Answer):
     value = models.ManyToManyField("QuestionOption", )
@@ -418,6 +437,7 @@ class MultiSelectAnswer(Answer):
     def equals(cls, answer, txt):
         return answer.text.lower() == txt.lower()
 
+
 class DateAnswer(Answer):
     value = models.DateField(null=True)
 
@@ -435,6 +455,17 @@ class DateAnswer(Answer):
     @classmethod
     def validators(cls):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
+
+    @classmethod
+    def validate_test_value(cls, value):
+        '''Shall be used to validate that a given value is appropriate for this answer
+        :return:
+        '''
+        try:
+            extract_date(value, fuzzy=True)
+        except ValueError, ex:
+            raise ValidationError([unicode(ex), ])
+
 
 class AudioAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
@@ -465,6 +496,7 @@ class VideoAnswer(Answer):
     def to_text(self):
         return ''
 
+
 class ImageAnswer(Answer):
     value = models.FileField(upload_to=settings.ANSWER_UPLOADS, null=True)
 
@@ -478,6 +510,7 @@ class ImageAnswer(Answer):
 
     def to_text(self):
         return ''
+
 
 class GeopointAnswer(Answer):
     value = models.ForeignKey(ODKGeoPoint, null=True)
@@ -499,6 +532,7 @@ class GeopointAnswer(Answer):
 
     def to_text(self):
         return ''
+
 
 class NonResponseAnswer(BaseModel):
     household = models.ForeignKey('Household', related_name='non_response_answers')

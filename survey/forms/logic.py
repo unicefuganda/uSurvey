@@ -20,7 +20,8 @@ class LogicForm(forms.Form):
             BACK_TO: BACK_TO_ACTION,
             ASK_SUBQUESTION: SUBQUESTION_ACTION,
     }
-    def __init__(self, initial=None, question=None, *args, **kwargs):
+
+    def __init__(self, question, initial=None, *args, **kwargs):
         super(LogicForm, self).__init__(initial=initial, *args, **kwargs)
         data = kwargs.get('data', None)
         batch = question.batch
@@ -37,8 +38,10 @@ class LogicForm(forms.Form):
             self.fields['option'].choices = [(option.order, option.text) for option in question.options.all()]
         else:
             self.fields['value'] = forms.CharField(label='', required=False)
-            self.fields['min_value'] = forms.CharField(label='', required=False,widget=forms.TextInput(attrs={'placeholder': 'Min Value'}))
-            self.fields['max_value'] = forms.CharField(label='', required=False,widget=forms.TextInput(attrs={'placeholder': 'Max Value'}))
+            self.fields['min_value'] = forms.CharField(label='', required=False,
+                                                       widget=forms.TextInput(attrs={'placeholder': 'Min Value'}))
+            self.fields['max_value'] = forms.CharField(label='', required=False,
+                                                       widget=forms.TextInput(attrs={'placeholder': 'Max Value'}))
             if question.answer_type == DateAnswer.choice_name():
                 self.fields['value'].widget.attrs['class'] = 'datepicker'
                 self.fields['min_value'].widget.attrs['class'] = 'datepicker'
@@ -50,7 +53,8 @@ class LogicForm(forms.Form):
         next_q_choices = [(q.pk, q.text) for q in batch.questions_inline() if q.pk is not self.question.pk]
                           # and q.pk not in existing_nexts]
         next_q_choices.extend([(q.pk, q.text) for q in batch.zombie_questions()])
-        self.fields['next_question'] = forms.ChoiceField(label='', choices=next_q_choices, widget=forms.Select, required=False)
+        self.fields['next_question'] = forms.ChoiceField(label='', choices=next_q_choices, widget=forms.Select,
+                                                         required=False)
         self.fields['next_question'].widget.attrs['class'] = 'chzn-select'
         self.fields['action'].choices = self.ACTIONS.items()
 
@@ -59,15 +63,12 @@ class LogicForm(forms.Form):
     def clean_value(self):
 
         if self.question.answer_type not in  [MultiSelectAnswer.choice_name(), MultiChoiceAnswer.choice_name()] \
-                            and self.cleaned_data['condition'] != 'between' and len(self.cleaned_data['value'].strip()) == 0:
+                            and self.cleaned_data['condition'] != 'between' and \
+                        len(self.cleaned_data['value'].strip()) == 0:
             raise ValidationError("Field is required.")
         value = self.cleaned_data.get('value', '')
         if value:
-            #now check if value is valid answer type
-            try:
-                Answer.get_class(self.question.answer_type)(self.question, value)
-            except:
-                raise ValidationError("Invalid value.")
+            Answer.get_class(self.question.answer_type).validate_test_value(value)
         return self.cleaned_data.get('value', '')
 
     def clean_min_value(self):
@@ -75,10 +76,7 @@ class LogicForm(forms.Form):
             raise ValidationError("Field is required.")
         value = self.cleaned_data.get('min_value', '')
         if value:
-            try:
-                Answer.get_class(self.question.answer_type)(self.question, value)
-            except:
-                raise ValidationError("Invalid value.")
+            Answer.get_class(self.question.answer_type).validate_test_value(value)
         return self.cleaned_data.get('min_value', '')
 
     def clean_max_value(self):
@@ -86,10 +84,7 @@ class LogicForm(forms.Form):
             raise ValidationError("Field is required.")
         value = self.cleaned_data.get('max_value')
         if value:
-            try:
-                Answer.get_class(self.question.answer_type)(self.question, value)
-            except:
-                raise ValidationError("Invalid value.")
+            Answer.get_class(self.question.answer_type).validate_test_value(value)
         return self.cleaned_data.get('max_value', '')
 
     def _make_desc(self):
@@ -105,8 +100,8 @@ class LogicForm(forms.Form):
         if len(flows) > 0:
             for flow in flows:
                 if self.cleaned_data['condition'] == 'between':
-                    min_val = self.cleaned_data['min_value']
-                    max_val = self.cleaned_data['max_value']
+                    min_val = self.cleaned_data.get('min_value')
+                    max_val = self.cleaned_data.get('max_value')
                     min_arg = flow.text_arguments.filter(position=0, param=min_val).exists()
                     max_arg = flow.text_arguments.filter(position=0, param=max_val).exists()
                     if max_arg and min_arg:
