@@ -48,7 +48,7 @@ class EATest(BaseTest):
         ea_new.locations.add(self.kampala)
         self.batch.open_for_location(self.kampala)
         self.assertTrue(self.survey.is_open_for(self.kampala))
-        self.assertEquals(83, ea_new.get_survey_openings(self.survey).values()[0]["batch_id"])
+        self.assertEquals(self.batch.pk, ea_new.get_survey_openings(self.survey).values()[0]["batch_id"])
 
     def test_open_batches(self):
         ea1=EnumerationArea.objects.create(name="new EA")
