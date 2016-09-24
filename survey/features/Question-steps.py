@@ -15,7 +15,8 @@ def and_i_have_100_questions_under_the_batch(step):
         q = Question.objects.create(text="some questions %d" % i,
                                     answer_type=Question.NUMBER, identifier='ID %d' % i, order=i)
         q.batches.add(world.batch)
-        BatchQuestionOrder.objects.create(batch=world.batch, question=q, order=i)
+        BatchQuestionOrder.objects.create(
+            batch=world.batch, question=q, order=i)
 
 
 @step(u'And I visit questions listing page of the batch')
@@ -30,14 +31,17 @@ def then_i_should_see_the_questions_list_paginated(step):
     world.page.validate_pagination()
     world.page.validate_fields()
 
+
 @step(u'When I change to 100 questions per page')
 def when_i_change_to_100_questions_per_page(step):
-    world.page.fill_valid_values({'number_of_questions_per_page':100})
+    world.page.fill_valid_values({'number_of_questions_per_page': 100})
     world.page.click_by_css('#a-question-list')
+
 
 @step(u'Then I should not see pagination')
 def then_i_should_not_see_pagination(step):
     world.page.validate_pagination(False)
+
 
 @step(u'And I have no questions under the batch')
 def and_i_have_no_questions_under_the_batch(step):
@@ -46,7 +50,8 @@ def and_i_have_no_questions_under_the_batch(step):
 
 @step(u'Then I should see error message on the page')
 def then_i_should_see_error_message_on_the_page(step):
-    world.page.is_text_present("There are no questions associated with this batch yet.")
+    world.page.is_text_present(
+        "There are no questions associated with this batch yet.")
 
 
 @step(u'And I click add question button')
@@ -83,7 +88,8 @@ def and_i_should_see_question_successfully_added_message(step):
 
 @step(u'And I have a member group')
 def and_i_have_a_member_group(step):
-    world.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
+    world.household_member_group = HouseholdMemberGroup.objects.create(
+        name='Age 4-5', order=1)
 
 
 @step(u'And I visit add new question page of the batch')
@@ -94,7 +100,8 @@ def and_i_visit_add_new_question_page_of_the_batch(step):
 
 @step(u'And I fill the details for question')
 def and_i_fill_the_details_for_question(step):
-    world.page.fill_valid_values({'identifier': 'ID 1', 'module': world.module.id, 'text': 'hritik  question'})
+    world.page.fill_valid_values(
+        {'identifier': 'ID 1', 'module': world.module.id, 'text': 'hritik  question'})
     world.page.select('group', [world.household_member_group.pk])
 
 
@@ -174,19 +181,24 @@ def and_i_have_a_multichoice_question(step):
     world.multi_choice_question = Question.objects.create(module=world.module, text="Are these insecticide?",
                                                           answer_type=Question.MULTICHOICE, order=6,
                                                           group=world.household_member_group, identifier='ID 1')
-    world.option1 = QuestionOption.objects.create(question=world.multi_choice_question, text="Yes", order=1)
-    world.option2 = QuestionOption.objects.create(question=world.multi_choice_question, text="No", order=2)
-    world.option3 = QuestionOption.objects.create(question=world.multi_choice_question, text="Dont Know", order=3)
+    world.option1 = QuestionOption.objects.create(
+        question=world.multi_choice_question, text="Yes", order=1)
+    world.option2 = QuestionOption.objects.create(
+        question=world.multi_choice_question, text="No", order=2)
+    world.option3 = QuestionOption.objects.create(
+        question=world.multi_choice_question, text="Dont Know", order=3)
 
 
 @step(u'And I click on view options link')
 def and_i_click_on_view_options_link(step):
-    world.page.click_link_by_partial_href("#view_options_%d" % world.multi_choice_question.id)
+    world.page.click_link_by_partial_href(
+        "#view_options_%d" % world.multi_choice_question.id)
 
 
 @step(u'Then I should see the question options in a modal')
 def then_i_should_see_the_question_options_in_a_modal(step):
-    world.page.validate_fields_present([world.multi_choice_question.text, "Text", "Order"])
+    world.page.validate_fields_present(
+        [world.multi_choice_question.text, "Text", "Order"])
 
 
 @step(u'And when I click the close button')
@@ -207,13 +219,15 @@ def and_i_click_on_view_add_subquestion_link(step):
 
 @step(u'Then I should go to add subquestion page')
 def then_i_should_go_to_add_subquestion_page(step):
-    world.page = CreateNewSubQuestionPage(world.browser, question=world.multi_choice_question)
+    world.page = CreateNewSubQuestionPage(
+        world.browser, question=world.multi_choice_question)
     world.page.validate_url()
 
 
 @step(u'When I fill in subquestion details')
 def when_i_fill_in_subquestion_details(step):
-    world.page.fill_valid_values({'module': world.module.id, 'text': 'hritik  question', 'identifier': 'Q001'})
+    world.page.fill_valid_values(
+        {'module': world.module.id, 'text': 'hritik  question', 'identifier': 'Q001'})
     world.page.select('group', [world.household_member_group.pk])
     world.page.select('answer_type', [Question.NUMBER])
 
@@ -278,7 +292,7 @@ def when_i_fill_in_edited_question_details(step):
     world.edited_question_details = {'module': world.module.id,
                                      'text': 'edited question',
                                      'group': world.multi_choice_question.group.id
-    }
+                                     }
     world.page.see_select_option(['Number'], 'answer_type')
     world.page.fill_valid_values(world.edited_question_details)
 
@@ -290,7 +304,8 @@ def then_i_should_see_the_question_successfully_edited(step):
 
 @step(u'And I click on delete question link')
 def and_i_click_on_delete_question_link(step):
-    world.page.click_link_by_partial_href("#delete_question_%d" % world.multi_choice_question.id)
+    world.page.click_link_by_partial_href(
+        "#delete_question_%d" % world.multi_choice_question.id)
 
 
 @step(u'Then I should see a delete question confirmation modal')
@@ -321,7 +336,8 @@ def and_i_have_a_non_multi_choice_question(step):
                                                           answer_type=Question.NUMBER, order=7,
                                                           group=world.household_member_group, identifier='Q921')
     world.multi_choice_question.batches.add(world.batch)
-    BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=1)
+    BatchQuestionOrder.objects.create(
+        batch=world.batch, question=world.multi_choice_question, order=1)
 
 
 @step(u'When I click on the question')
@@ -338,8 +354,10 @@ def then_i_should_see_the_sub_question_below_the_question(step):
 @step(u'And I have a rule linking one option with that subquestion')
 def and_i_have_a_rule_linking_one_option_with_that_subquestion(step):
     world.answer_rule = AnswerRule.objects.create(question=world.multi_choice_question,
-                                                  action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
-                                                  condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
+                                                  action=AnswerRule.ACTIONS[
+                                                      'ASK_SUBQUESTION'],
+                                                  condition=AnswerRule.CONDITIONS[
+                                                      'EQUALS_OPTION'],
                                                   validate_with_option=world.option3, next_question=world.sub_question)
 
 
@@ -352,7 +370,8 @@ def and_i_have_a_subquestion_under_that_question(step):
 
 @step(u'When I fill in duplicate subquestion details')
 def when_i_fill_in_duplicate_subquestion_details(step):
-    world.page.fill_valid_values({'module': world.module.id, 'identifier': 'ID 1', 'text': world.sub_question.text})
+    world.page.fill_valid_values(
+        {'module': world.module.id, 'identifier': 'ID 1', 'text': world.sub_question.text})
     world.page.select('group', [world.household_member_group.pk])
     world.page.select('answer_type', [Question.NUMBER])
 
@@ -365,14 +384,17 @@ def and_i_should_see_subquestion_not_added_message(step):
 @step(u'And I have a rule on value with that subquestion')
 def and_i_have_a_rule_on_value_with_that_subquestion(step):
     world.answer_rule = AnswerRule.objects.create(question=world.multi_choice_question, validate_with_value=1,
-                                                  condition=AnswerRule.CONDITIONS['EQUALS'],
-                                                  action=AnswerRule.ACTIONS['ASK_SUBQUESTION'],
+                                                  condition=AnswerRule.CONDITIONS[
+                                                      'EQUALS'],
+                                                  action=AnswerRule.ACTIONS[
+                                                      'ASK_SUBQUESTION'],
                                                   next_question=world.sub_question, batch=world.batch)
 
 
 @step(u'And I click on view logic link')
 def and_i_click_on_view_logic_link(step):
-    world.page.click_link_by_partial_href("#view_logic_%d" % world.multi_choice_question.id)
+    world.page.click_link_by_partial_href(
+        "#view_logic_%d" % world.multi_choice_question.id)
 
 
 @step(u'Then I should see the logic in a modal')
@@ -451,7 +473,7 @@ def then_i_see_the_sub_question_form_with_values(step):
 def when_i_fill_in_edited_sub_question_details(step):
     world.edited_sub_question_details = {'identifier': 'Q101', 'module': world.module.id, 'text': 'edited question',
                                          'group': world.multi_choice_question.group.id
-    }
+                                         }
     world.page.see_select_option(['Number'], 'answer_type')
     world.page.fill_valid_values(world.edited_sub_question_details)
 
@@ -474,9 +496,11 @@ def and_i_should_see_that_the_logic_was_deleted_successfully(step):
 
 @step(u'And I select multichoice question in batch')
 def and_i_select_multichoice_question_in_batch(step):
-    world.batch = Batch.objects.create(order=1, name="Batch A", description='description', survey=world.survey)
+    world.batch = Batch.objects.create(
+        order=1, name="Batch A", description='description', survey=world.survey)
     world.multi_choice_question.batches.add(world.batch)
-    BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=1)
+    BatchQuestionOrder.objects.create(
+        batch=world.batch, question=world.multi_choice_question, order=1)
 
 
 @step(u'And I have a module')
@@ -491,7 +515,8 @@ def and_i_have_a_location(step):
 
 @step(u'And I have an open batch in that location')
 def and_i_have_an_open_batch_in_that_location(step):
-    world.batch = Batch.objects.create(order=1, name="Batch A", description='description', survey=world.survey)
+    world.batch = Batch.objects.create(
+        order=1, name="Batch A", description='description', survey=world.survey)
     world.batch.open_for_location(world.kampala)
 
 
@@ -506,12 +531,15 @@ def and_i_have_a_multichoice_and_numeric_questions(step):
                                                      identifier='ID', order=1)
     world.multi_choice_question = Question.objects.create(text="Are these insecticide?",
                                                           answer_type=Question.MULTICHOICE, order=6, identifier='ID 1')
-    world.option3 = QuestionOption.objects.create(text="haha", order=1, question=world.multi_choice_question)
+    world.option3 = QuestionOption.objects.create(
+        text="haha", order=1, question=world.multi_choice_question)
 
     world.numeric_question.batches.add(world.batch)
     world.multi_choice_question.batches.add(world.batch)
-    BatchQuestionOrder.objects.create(batch=world.batch, question=world.numeric_question, order=1)
-    BatchQuestionOrder.objects.create(batch=world.batch, question=world.multi_choice_question, order=2)
+    BatchQuestionOrder.objects.create(
+        batch=world.batch, question=world.numeric_question, order=1)
+    BatchQuestionOrder.objects.create(
+        batch=world.batch, question=world.multi_choice_question, order=2)
 
     AnswerRule.objects.create(batch=world.batch, question=world.multi_choice_question,
                               action=AnswerRule.ACTIONS['END_INTERVIEW'],
@@ -523,9 +551,11 @@ def and_i_have_a_multichoice_and_numeric_questions(step):
                               condition=AnswerRule.CONDITIONS['EQUALS_OPTION'],
                               validate_with_value=2)
 
+
 @step(u'Then I should see field required error message')
 def then_i_should_see_field_required_error_message(step):
     world.page.is_text_present("This field is required.")
+
 
 @step(u'And I should be able to export questions')
 def and_i_should_be_able_to_export_questions(step):

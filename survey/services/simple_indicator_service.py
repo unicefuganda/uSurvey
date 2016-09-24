@@ -2,6 +2,7 @@ from django.utils.datastructures import SortedDict
 
 
 class SimpleIndicatorService(object):
+
     def __init__(self, formula, location_parent):
         self.count = formula.get_count_type()
         self.survey = formula.indicator.batch.survey
@@ -41,7 +42,8 @@ class SimpleIndicatorService(object):
 
     def tabulated_data_series(self):
         tabulated_data = []
-        first_level_locations = self.location_parent.get_children().order_by('name')[:10]
+        first_level_locations = self.location_parent.get_children().order_by('name')[
+            :10]
         for location in first_level_locations:
             for child_location, answers in self.hierarchical_count_for(location).items():
                 tab_data = SortedDict({location.type.name: location.name})

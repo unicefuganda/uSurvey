@@ -3,6 +3,7 @@ from survey.forms.aboutus_form import AboutUsForm
 
 
 class AboutUsFormTest(TestCase):
+
     def test_valid(self):
         form_data = {
             'content': 'description goes here',
@@ -16,4 +17,5 @@ class AboutUsFormTest(TestCase):
         }
         aboutus_form = AboutUsForm(form_data)
         self.assertFalse(aboutus_form.is_valid())
-        self.assertEqual(['This field is required.'], aboutus_form .errors['content'])
+        self.assertEqual(['This field is required.'],
+                         aboutus_form .errors['content'])

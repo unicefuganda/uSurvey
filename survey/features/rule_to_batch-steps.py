@@ -36,7 +36,8 @@ def and_i_click_on_add_logic_link(step):
 
 @step(u'Then I should see the add logic page')
 def then_i_should_see_the_add_logic_page(step):
-    world.page = AddLogicToBatchQuestionPage(world.browser, world.batch, world.question)
+    world.page = AddLogicToBatchQuestionPage(
+        world.browser, world.batch, world.question)
     world.page.validate_url()
     world.page.validate_fields()
 
@@ -47,7 +48,7 @@ def when_i_fill_in_skip_rule_details(step):
                  'attribute': 'value',
                  'value': '0',
                  'action': 'END_INTERVIEW',
-    }
+                 }
     world.page.fill_valid_values(form_data)
 
 
@@ -86,7 +87,8 @@ def and_i_should_see_attribute_field_is_disabled(step):
 
 @step(u'And I should see dropdown of all available options')
 def and_i_should_see_dropdown_of_all_available_options(step):
-    options = [option.text for option in QuestionOption.objects.filter(question=world.question)]
+    options = [option.text for option in QuestionOption.objects.filter(
+        question=world.question)]
     world.page.see_select_option(options, 'option')
 
 
@@ -185,7 +187,8 @@ def and_i_should_not_see_option_dropdown_box_and_value_text_box(step):
 
 @step(u'And I should see all the action dropdown options')
 def and_i_should_see_all_the_action_dropdown_options(step):
-    action_options = ['RECONFIRM', 'END INTERVIEW', 'ASK SUBQUESTION', 'SKIP TO']
+    action_options = ['RECONFIRM', 'END INTERVIEW',
+                      'ASK SUBQUESTION', 'SKIP TO']
     world.page.see_select_option(action_options, 'action')
 
 
@@ -206,7 +209,8 @@ def when_i_select_ask_subquestion_from_then_field(step):
 
 @step(u'Then I should see next question populated with subquestions')
 def then_i_should_see_next_question_populated_with_subquestions(step):
-    next_question_options = [world.sub_question1.text, world.sub_question2.text]
+    next_question_options = [
+        world.sub_question1.text, world.sub_question2.text]
     world.page.see_select_option(next_question_options, 'next_question')
 
 
@@ -222,7 +226,8 @@ def when_i_click_add_subquestion_button(step):
 
 @step(u'Then I should see a modal for add subquestion')
 def then_i_should_see_a_modal_for_add_subquestion(step):
-    world.page.validate_fields_present(["New Sub Question", "Text", "Group", "Answer type"])
+    world.page.validate_fields_present(
+        ["New Sub Question", "Text", "Group", "Answer type"])
 
 
 @step(u'When I fill the subquestion details')
@@ -237,6 +242,7 @@ def when_i_fill_the_subquestion_details(step):
 @step(u'And I click save question button on the form')
 def and_i_click_save_question_button_on_the_form(step):
     world.page.click_by_css('#modal_sub_question_button')
+
 
 @step(u'Then I should see the recent subquestion in next question dropdown')
 def then_i_should_see_the_recent_subquestion_in_next_question_dropdown(step):
@@ -319,10 +325,12 @@ def when_i_fill_the_duplicate_subquestion_details(step):
     world.page.select('group', [world.household_member_group.pk])
     world.page.select('answer_type', [Question.NUMBER])
 
+
 @step(u'And I should see error on the form text field')
 def and_i_should_see_error_on_the_form_text_field(step):
     sleep(5)
-    world.page.is_text_present("Sub question for this question with this text already exists.")
+    world.page.is_text_present(
+        "Sub question for this question with this text already exists.")
 
 
 @step(u'When I refill the form with valid values')
@@ -333,17 +341,22 @@ def when_i_refill_the_form_with_valid_values(step):
         'identifier': 'ID 5',
         'group': world.household_member_group.pk
     }
-    world.page.fill_valid_values({'text': world.data['text'], 'identifier': world.data['identifier']})
+    world.page.fill_valid_values(
+        {'text': world.data['text'], 'identifier': world.data['identifier']})
     world.page.select('group', [world.data['group']])
     world.page.select('answer_type', [world.data['answer_type']])
 
+
 @step(u'And I should see already existing logic for the question')
 def and_i_should_see_already_existing_logic_for_the_question(step):
-    world.page.validate_fields_present([world.question.text, "Eligibility Criteria", "Question/Value/Option", "Action"])
+    world.page.validate_fields_present(
+        [world.question.text, "Eligibility Criteria", "Question/Value/Option", "Action"])
+
 
 @step(u'When I select between from the drop down')
 def when_i_select_between_from_the_drop_down(step):
     world.page.select('condition', ['BETWEEN'])
+
 
 @step(u'And I should see two text fields for min and max value')
 def and_i_should_see_two_text_fields_for_min_and_max_value(step):

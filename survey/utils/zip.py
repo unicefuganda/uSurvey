@@ -1,7 +1,9 @@
 import zipfile
 import StringIO
 
+
 class InMemoryZip(object):
+
     def __init__(self):
         # Create the in-memory file-like object
         self.in_memory_zip = StringIO.StringIO()
@@ -10,7 +12,8 @@ class InMemoryZip(object):
         '''Appends a file with name filename_in_zip and contents of 
         file_contents to the in-memory zip.'''
         # Get a handle to the in-memory zip in append mode
-        zf = zipfile.ZipFile(self.in_memory_zip, "a", zipfile.ZIP_DEFLATED, False)
+        zf = zipfile.ZipFile(self.in_memory_zip, "a",
+                             zipfile.ZIP_DEFLATED, False)
 
         # Write the file to the in-memory zip
         zf.writestr(filename_in_zip, file_contents)
@@ -18,7 +21,7 @@ class InMemoryZip(object):
         # Mark the files as having been created on Windows so that
         # Unix permissions are not inferred as 0000
         for zfile in zf.filelist:
-            zfile.create_system = 0        
+            zfile.create_system = 0
 
         return self
 

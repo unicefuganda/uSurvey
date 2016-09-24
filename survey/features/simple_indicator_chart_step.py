@@ -11,36 +11,47 @@ from survey.models.questions import Question, QuestionOption
 
 
 def create_household_head(uid, investigator, household_listing, survey_householdlisting):
-    household = Household.objects.create(house_number=uid,listing=household_listing,physical_address='Test address' + str(randint(1, 9999)),
-                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",head_sex='MALE')
-    return HouseholdHead.objects.create(surname="sur"+ str(randint(1, 9999)), first_name='fir'+ str(randint(1, 9999)), gender='MALE', date_of_birth="1988-01-01",
-                                                          household=household,survey_listing=survey_householdlisting,
-                                                          registrar=investigator,registration_channel="ODK Access",
-                                                      occupation="Agricultural labor",level_of_education="Primary",
-                                                      resident_since='1989-02-02')
+    household = Household.objects.create(house_number=uid, listing=household_listing, physical_address='Test address' + str(randint(1, 9999)),
+                                         last_registrar=investigator, registration_channel="ODK Access", head_desc="Head", head_sex='MALE')
+    return HouseholdHead.objects.create(surname="sur" + str(randint(1, 9999)), first_name='fir' + str(randint(1, 9999)), gender='MALE', date_of_birth="1988-01-01",
+                                        household=household, survey_listing=survey_householdlisting,
+                                        registrar=investigator, registration_channel="ODK Access",
+                                        occupation="Agricultural labor", level_of_education="Primary",
+                                        resident_since='1989-02-02')
 
 
 @step(u'And I have regions and districts')
 def and_i_have_regions_and_districts(step):
     world.country = LocationType.objects.create(name='Country', slug='country')
     world.region = LocationType.objects.create(name='Region', slug='region')
-    world.district = LocationType.objects.create(name='District', slug='district')
+    world.district = LocationType.objects.create(
+        name='District', slug='district')
     world.village = LocationType.objects.create(name='Village', slug='village')
 
     world.uganda = Location.objects.create(name="Uganda", type=world.country)
 
-    LocationTypeDetails.objects.create(location_type=world.country, country=world.uganda)
-    LocationTypeDetails.objects.create(location_type=world.region, country=world.uganda)
-    LocationTypeDetails.objects.create(location_type=world.district, country=world.uganda)
-    LocationTypeDetails.objects.create(location_type=world.village, country=world.uganda)
+    LocationTypeDetails.objects.create(
+        location_type=world.country, country=world.uganda)
+    LocationTypeDetails.objects.create(
+        location_type=world.region, country=world.uganda)
+    LocationTypeDetails.objects.create(
+        location_type=world.district, country=world.uganda)
+    LocationTypeDetails.objects.create(
+        location_type=world.village, country=world.uganda)
 
-    world.west = Location.objects.create(name="WEST", type=world.region, tree_parent=world.uganda)
-    world.central = Location.objects.create(name="CENTRAL", type=world.region, tree_parent=world.uganda)
-    world.kampala = Location.objects.create(name="Kampala", tree_parent=world.central, type=world.district)
-    world.mbarara = Location.objects.create(name="Mbarara", tree_parent=world.west, type=world.district)
+    world.west = Location.objects.create(
+        name="WEST", type=world.region, tree_parent=world.uganda)
+    world.central = Location.objects.create(
+        name="CENTRAL", type=world.region, tree_parent=world.uganda)
+    world.kampala = Location.objects.create(
+        name="Kampala", tree_parent=world.central, type=world.district)
+    world.mbarara = Location.objects.create(
+        name="Mbarara", tree_parent=world.west, type=world.district)
 
-    world.kibungo = Location.objects.create(name="Kibungo", type=world.district, tree_parent=world.west)
-    world.mpigi = Location.objects.create(name="Mpigi", type=world.district, tree_parent=world.central)
+    world.kibungo = Location.objects.create(
+        name="Kibungo", type=world.district, tree_parent=world.west)
+    world.mpigi = Location.objects.create(
+        name="Mpigi", type=world.district, tree_parent=world.central)
 
     world.ea = EnumerationArea.objects.get_or_create(name="EA")[0]
     world.ea.locations.add(world.kampala)
@@ -48,24 +59,31 @@ def and_i_have_regions_and_districts(step):
     world.ea_mbarara = EnumerationArea.objects.get_or_create(name="EA2")[0]
     world.ea_mbarara.locations.add(world.mbarara)
 
+
 @step(u'And I have an indicator in that survey')
 def and_i_have_an_indicator_in_that_survey(step):
     world.indicator = Indicator.objects.create(name="ITN 1.23", description="rajni indicator",
                                                measure='Percentage',
                                                batch=world.batch_1, module=world.health_module_1)
 
-    world.formula = Formula.objects.create(count=world.question_3, indicator=world.indicator)
+    world.formula = Formula.objects.create(
+        count=world.question_3, indicator=world.indicator)
+
 
 @step(u'And I have a multichoice  question')
 def and_i_have_a_multichoice_question(step):
-    world.member_group = HouseholdMemberGroup.objects.create(name="GENERAL", order=1)
+    world.member_group = HouseholdMemberGroup.objects.create(
+        name="GENERAL", order=1)
     world.question_3 = Question.objects.create(text="This is a question", module=world.health_module_1,
                                                answer_type=Question.MULTICHOICE, order=3, group=world.member_group)
 
-    world.yes_option = QuestionOption.objects.create(question=world.question_3, text="Yes", order=1)
-    world.no_option = QuestionOption.objects.create(question=world.question_3, text="No", order=2)
+    world.yes_option = QuestionOption.objects.create(
+        question=world.question_3, text="Yes", order=1)
+    world.no_option = QuestionOption.objects.create(
+        question=world.question_3, text="No", order=2)
     world.question_3.batches.add(world.batch_1)
-    BatchQuestionOrder.objects.create(question=world.question_3, batch=world.batch_1, order=1)
+    BatchQuestionOrder.objects.create(
+        question=world.question_3, batch=world.batch_1, order=1)
 
 
 @step(u'And I have households in in those districts')
@@ -94,16 +112,25 @@ def and_i_have_investigators_in_those_districts(step):
 
 @step(u'And I have responses for that question')
 def and_i_have_responses_for_that_question(step):
-    world.investigator.member_answered(world.question_3, world.household_head_1, world.yes_option.order, world.batch_1)
-    world.investigator.member_answered(world.question_3, world.household_head_2, world.yes_option.order, world.batch_1)
-    world.investigator.member_answered(world.question_3, world.household_head_3, world.yes_option.order, world.batch_1)
-    world.investigator.member_answered(world.question_3, world.household_head_4, world.no_option.order, world.batch_1)
-    world.investigator.member_answered(world.question_3, world.household_head_5, world.no_option.order, world.batch_1)
+    world.investigator.member_answered(
+        world.question_3, world.household_head_1, world.yes_option.order, world.batch_1)
+    world.investigator.member_answered(
+        world.question_3, world.household_head_2, world.yes_option.order, world.batch_1)
+    world.investigator.member_answered(
+        world.question_3, world.household_head_3, world.yes_option.order, world.batch_1)
+    world.investigator.member_answered(
+        world.question_3, world.household_head_4, world.no_option.order, world.batch_1)
+    world.investigator.member_answered(
+        world.question_3, world.household_head_5, world.no_option.order, world.batch_1)
 
-    world.investigator_2.member_answered(world.question_3, world.household_head_6, world.yes_option.order, world.batch_1)
-    world.investigator_2.member_answered(world.question_3, world.household_head_7, world.yes_option.order, world.batch_1)
-    world.investigator_2.member_answered(world.question_3, world.household_head_8, world.no_option.order, world.batch_1)
-    world.investigator_2.member_answered(world.question_3, world.household_head_9, world.no_option.order, world.batch_1)
+    world.investigator_2.member_answered(
+        world.question_3, world.household_head_6, world.yes_option.order, world.batch_1)
+    world.investigator_2.member_answered(
+        world.question_3, world.household_head_7, world.yes_option.order, world.batch_1)
+    world.investigator_2.member_answered(
+        world.question_3, world.household_head_8, world.no_option.order, world.batch_1)
+    world.investigator_2.member_answered(
+        world.question_3, world.household_head_9, world.no_option.order, world.batch_1)
 
 
 @step(u'Given I am on the indicator listing page')
@@ -125,7 +152,8 @@ def then_i_should_see_indicator_result_page(step):
 
 @step(u'And I should see indicator graph for the country')
 def and_i_should_see_indicator_graph_for_the_country(step):
-    world.page.validate_fields_present(['Yes', 'No', '%s Count per %s' % (world.indicator.name, world.region.name)])
+    world.page.validate_fields_present(
+        ['Yes', 'No', '%s Count per %s' % (world.indicator.name, world.region.name)])
 
 
 @step(u'And I should see indicator data table for the country')
@@ -145,10 +173,13 @@ def and_i_have_an_indicator_with_out_a_formula(step):
                                                                measure='Percentage',
                                                                batch=world.batch_1, module=world.health_module_1)
 
+
 @step(u'Then I should see indicator has no formula message')
 def then_i_should_see_indicator_has_no_formula_message(step):
     world.page.see_message("No formula was found in this indicator")
 
+
 @step(u'And I click that indicators analysis link')
 def and_i_click_that_indicators_analysis_link(step):
-    world.page.click_by_css("#analyse-indicator_%s" % world.indicator_with_no_formula.id)
+    world.page.click_by_css("#analyse-indicator_%s" %
+                            world.indicator_with_no_formula.id)

@@ -12,7 +12,7 @@ class Point(BaseModel):
     Spatialite to build right now...
     """
 
-    latitude  = models.DecimalField(max_digits=13, decimal_places=10)
+    latitude = models.DecimalField(max_digits=13, decimal_places=10)
     longitude = models.DecimalField(max_digits=13, decimal_places=10)
 
     def __unicode__(self):
@@ -25,7 +25,8 @@ class Point(BaseModel):
 
 class LocationType(MPTTModel, BaseModel):
     name = models.CharField(max_length=200, unique=True)
-    parent = TreeForeignKey('self', null=True, blank=True, related_name='sub_types', db_index=True)
+    parent = TreeForeignKey('self', null=True, blank=True,
+                            related_name='sub_types', db_index=True)
     location_code = models.PositiveIntegerField(null=True, blank=True)
     slug = models.SlugField()
 
@@ -67,8 +68,11 @@ class Location(MPTTModel, BaseModel):
     name = models.CharField(max_length=50)
     type = models.ForeignKey(LocationType, related_name='locations')
     code = models.CharField(max_length=100, null=True, blank=True)
-    parent = TreeForeignKey('self', null=True, blank=True, related_name='sub_locations', db_index=True)
-    coordinates = models.ManyToManyField(Point, related_name='admin_div_locations') #would use this in the future. But ignore for now
+    parent = TreeForeignKey('self', null=True, blank=True,
+                            related_name='sub_locations', db_index=True)
+    # would use this in the future. But ignore for now
+    coordinates = models.ManyToManyField(
+        Point, related_name='admin_div_locations')
     tree = TreeManager()
     objects = models.Manager()
 

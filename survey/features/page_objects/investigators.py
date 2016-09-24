@@ -11,10 +11,12 @@ class NewInvestigatorPage(PageObject):
     url = "/investigators/new/"
 
     def valid_page(self):
-        fields = ['name', 'mobile_number', 'confirm_mobile_number', 'male', 'age', 'backend']
+        fields = ['name', 'mobile_number',
+                  'confirm_mobile_number', 'male', 'age', 'backend']
         for field in fields:
             assert self.browser.is_element_present_by_name(field)
-        assert self.browser.find_by_css("span.add-on")[0].text == COUNTRY_PHONE_CODE
+        assert self.browser.find_by_css(
+            "span.add-on")[0].text == COUNTRY_PHONE_CODE
 
     def get_investigator_values(self):
         return self.values
@@ -23,7 +25,8 @@ class NewInvestigatorPage(PageObject):
         assert self.browser.url == django_url(self.url)
 
     def fill_valid_values(self, values, ea):
-        self.browser.find_by_id("location-value").value = Location.objects.create(name="Uganda").id
+        self.browser.find_by_id(
+            "location-value").value = Location.objects.create(name="Uganda").id
         kampala = Location.objects.get(name="Kampala")
         kampala_county = Location.objects.get(name="Kampala County")
         kampala_subcounty = Location.objects.get(name="Subcounty")
@@ -45,7 +48,8 @@ class InvestigatorsListPage(PageObject):
     url = '/investigators/'
 
     def validate_fields(self):
-        self.validate_fields_present(["Investigators List", "Name", "Mobile Number", "Action"])
+        self.validate_fields_present(
+            ["Investigators List", "Name", "Mobile Number", "Action"])
 
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
@@ -55,13 +59,15 @@ class InvestigatorsListPage(PageObject):
         assert self.browser.is_text_present(values['mobile_number'])
 
     def no_registered_invesitgators(self):
-        assert self.browser.is_text_present("There are no investigators currently registered for this location.")
+        assert self.browser.is_text_present(
+            "There are no investigators currently registered for this location.")
 
     def visit_investigator(self, investigator):
         self.browser.click_link_by_text(investigator.name)
 
     def see_confirm_block_message(self, confirmation_type, investigator):
-        self.is_text_present("Confirm: Are you sure you want to %s investigator %s" % (confirmation_type, investigator.name))
+        self.is_text_present("Confirm: Are you sure you want to %s investigator %s" % (
+            confirmation_type, investigator.name))
 
     def validate_successful_edited_message(self):
         self.is_text_present("Investigator successfully edited.")
@@ -71,15 +77,18 @@ class InvestigatorsListPage(PageObject):
 
 
 class FilteredInvestigatorsListPage(InvestigatorsListPage):
+
     def __init__(self, browser, location_id):
         self.browser = browser
         self.url = '/investigators/?location=' + str(location_id)
 
     def no_registered_invesitgators(self):
-        assert self.browser.is_text_present("There are no investigators currently registered for this county.")
+        assert self.browser.is_text_present(
+            "There are no investigators currently registered for this county.")
 
 
 class EditInvestigatorPage(PageObject):
+
     def __init__(self, browser, investigator):
         self.browser = browser
         self.investigator = investigator
@@ -98,7 +107,7 @@ class EditInvestigatorPage(PageObject):
             'level_of_education': self.investigator.level_of_education,
             'language': self.investigator.language,
             'location': self.investigator.location,
-            }
+        }
         self.browser.fill_form(self.values)
 
     def assert_user_saved_sucessfully(self):
@@ -106,6 +115,7 @@ class EditInvestigatorPage(PageObject):
 
 
 class InvestigatorDetailsPage(PageObject):
+
     def __init__(self, browser, investigator):
         self.browser = browser
         self.investigator = investigator

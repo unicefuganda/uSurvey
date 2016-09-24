@@ -13,12 +13,14 @@ from survey.models.batch import Batch, BatchLocationStatus
 
 @step(u'And I have a batch')
 def and_i_have_prime_locations(step):
-    world.batch = Batch.objects.create(order=1, name="Batch A", description='description', survey=world.survey)
+    world.batch = Batch.objects.create(
+        order=1, name="Batch A", description='description', survey=world.survey)
 
 
 @step(u'And I have prime locations')
 def and_i_have_prime_locations(step):
-    district = LocationType.objects.create(name=PRIME_LOCATION_TYPE, slug=PRIME_LOCATION_TYPE)
+    district = LocationType.objects.create(
+        name=PRIME_LOCATION_TYPE, slug=PRIME_LOCATION_TYPE)
     world.districts = (
         Location.objects.create(name="Kampala", type=district),
         Location.objects.create(name="Abim", type=district),
@@ -40,6 +42,7 @@ def and_i_visit_the_first_batch_listed(step):
 def then_i_should_see_all_the_prime_locations_with_open_close_toggles(step):
     world.page.batch_closed_for_all_locations()
 
+
 @step(u'And I open batch for a location')
 @step(u'When I open batch for a location')
 def when_i_open_batch_for_a_location(step):
@@ -48,8 +51,10 @@ def when_i_open_batch_for_a_location(step):
 
 @step(u'Then I should see it is open for that location in db')
 def then_i_should_see_it_is_open_for_that_location_in_db(step):
-    assert BatchLocationStatus.objects.filter(location=world.districts[1]).count() == 1
-    assert BatchLocationStatus.objects.filter(location=world.districts[0]).count() == 0
+    assert BatchLocationStatus.objects.filter(
+        location=world.districts[1]).count() == 1
+    assert BatchLocationStatus.objects.filter(
+        location=world.districts[0]).count() == 0
 
 
 @step(u'When I close batch for a location')
@@ -196,13 +201,16 @@ def when_i_select_some_questions(step):
 
 @step(u'Then I should see the questions successfully assigned to that batch')
 def then_i_should_see_the_questions_successfully_assigned_to_that_batch(step):
-    world.page.see_success_message("Questions", "assigned to batch: %s" % world.batch.name.capitalize())
+    world.page.see_success_message(
+        "Questions", "assigned to batch: %s" % world.batch.name.capitalize())
 
 
 @step(u'And I have 2 questions')
 def and_i_have_2_questions(step):
-    world.question_1 = Question.objects.create(text="question1", answer_type=Question.NUMBER, order=1)
-    world.question_2 = Question.objects.create(text="question2", answer_type=Question.TEXT, order=2)
+    world.question_1 = Question.objects.create(
+        text="question1", answer_type=Question.NUMBER, order=1)
+    world.question_2 = Question.objects.create(
+        text="question2", answer_type=Question.TEXT, order=2)
 
 
 @step(u'And I visit the assign question to page batch')
@@ -233,7 +241,8 @@ def and_i_have_one_question_belonging_to_that_group(step):
 
 @step(u'And another question which does not')
 def and_another_question_which_does_not(step):
-    world.question_2 = Question.objects.create(text="question2", answer_type=Question.TEXT)
+    world.question_2 = Question.objects.create(
+        text="question2", answer_type=Question.TEXT)
 
 
 @step(u'And I click add batch modal button')
@@ -249,16 +258,22 @@ def then_i_should_see_the_add_batch_modal(step):
 
 @step(u'And I have 2 member groups')
 def and_i_have_2_member_groups(step):
-    world.household_member_group = HouseholdMemberGroup.objects.create(name='Age 4-5', order=1)
-    world.member_group_2 = HouseholdMemberGroup.objects.create(name='Age 15-49', order=2)
+    world.household_member_group = HouseholdMemberGroup.objects.create(
+        name='Age 4-5', order=1)
+    world.member_group_2 = HouseholdMemberGroup.objects.create(
+        name='Age 15-49', order=2)
 
 
 @step(u'And I have questions belonging to those groups')
 def and_i_have_questions_belonging_to_those_groups(step):
-    world.question_1_with_group_1 = create_question_for_group(world.household_member_group)
-    world.question_2_with_group_1 = create_question_for_group(world.household_member_group)
-    world.question_1_with_group_2 = create_question_for_group(world.member_group_2)
-    world.question_2_with_group_2 = create_question_for_group(world.member_group_2)
+    world.question_1_with_group_1 = create_question_for_group(
+        world.household_member_group)
+    world.question_2_with_group_1 = create_question_for_group(
+        world.household_member_group)
+    world.question_1_with_group_2 = create_question_for_group(
+        world.member_group_2)
+    world.question_2_with_group_2 = create_question_for_group(
+        world.member_group_2)
 
 
 @step(u'And I select a question from the list')
@@ -275,7 +290,8 @@ def then_i_should_see_in_selected_list_the_question_which_belong_to_that_group(s
 
 @step(u'And I should see the previously selected questions on the page')
 def and_i_should_see_the_previously_selected_questions_on_the_page(step):
-    world.page.see_the_selected_question(True, world.question_1_with_group_2.id)
+    world.page.see_the_selected_question(
+        True, world.question_1_with_group_2.id)
 
 
 @step(u'When I fill the same name of the batch')
@@ -293,7 +309,8 @@ def then_i_should_see_batch_name_already_exists_error_message(step):
 def and_if_i_have_an_open_batch_in_another_survey_in_this_location(step):
     world.survey1 = Survey.objects.create(name='another survey', description='another survey descrpition', type=False,
                                           sample_size=10)
-    batch = Batch.objects.create(order=1, name="Batch B", description='description', survey=world.survey1)
+    batch = Batch.objects.create(
+        order=1, name="Batch B", description='description', survey=world.survey1)
     batch.open_for_location(world.districts[1])
 
 
@@ -316,8 +333,10 @@ def when_i_activate_non_response_for_batch_and_location(step):
 
 @step(u'Then I should see it is activated for that location in db')
 def then_i_should_see_it_is_activated_for_that_location_in_db(step):
-    assert world.batch.non_response_is_activated_for(world.districts[0]) is True
-    assert world.batch.non_response_is_activated_for(world.districts[1]) is False
+    assert world.batch.non_response_is_activated_for(
+        world.districts[0]) is True
+    assert world.batch.non_response_is_activated_for(
+        world.districts[1]) is False
 
 
 @step(u'When I deactivate non response for batch and location')
@@ -327,39 +346,51 @@ def when_i_deactivate_non_response_for_batch_and_location(step):
 
 @step(u'Then I should see it is deactivated for that location in db')
 def then_i_should_see_it_is_deactivated_for_that_location_in_db(step):
-    assert world.batch.non_response_is_activated_for(world.districts[0]) is False
-    assert world.batch.non_response_is_activated_for(world.districts[1]) is False
+    assert world.batch.non_response_is_activated_for(
+        world.districts[0]) is False
+    assert world.batch.non_response_is_activated_for(
+        world.districts[1]) is False
+
 
 @step(u'Then I should see message batch is closed that location')
 def then_i_should_see_message_batch_is_closed_that_location(step):
-    world.page.is_text_present("%s is not open for %s" % (world.batch.name, world.districts[1]))
+    world.page.is_text_present("%s is not open for %s" %
+                               (world.batch.name, world.districts[1]))
+
 
 @step(u'And I should not be able to activate this batch')
 def and_i_should_not_be_able_to_activate_this_batch(step):
     world.page.is_disabled("open_close_switch_%s" % world.districts[1].id)
 
+
 @step(u'When I open batch for a different location')
 def when_i_open_batch_for_a_different_location(step):
     world.batch.open_for_location(world.districts[0])
 
+
 @step(u'And I activate non response for that location')
 def and_i_activate_non_response_for_that_location(step):
     world.page.activate_non_response_for_batch_and(world.districts[0])
+
 
 @step(u'When I visit the home page')
 def when_i_visit_the_home_page(step):
     world.page = HomePage(world.browser)
     world.page.visit()
 
+
 @step(u'Then I should see that it is still activated')
 def then_i_should_see_that_it_is_still_activated_for_that_location_in_db(step):
     world.page.is_text_present("On")
+
 
 @step(u'When I close the batch of the other survey')
 def when_i_close_the_batch_of_the_other_survey(step):
     world.batch.close_for_location(world.districts[1])
 
+
 @step(u'Then the non-response switch for that location is active')
 def then_the_non_response_switch_for_that_location_is_active(step):
     world.page.is_disabled('activate_non_response_switch_%d' % world.batch.id)
-    world.page.is_text_present("%s is not open for %s" % (world.batch.name, world.districts[1]), False)
+    world.page.is_text_present("%s is not open for %s" % (
+        world.batch.name, world.districts[1]), False)

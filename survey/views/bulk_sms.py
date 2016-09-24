@@ -17,14 +17,17 @@ def view(request):
     locations = Location.objects.filter(type=location_type).order_by('name')
     return render(request, 'bulk_sms/index.html', {'locations': locations})
 
+
 @login_required
 @permission_required('auth.can_view_batches')
 def send(request):
     params = dict(request.POST)
     if valid_parameters(params, request):
         locations = Location.objects.filter(id__in=params['locations'])
-        Interviewer.sms_interviewers_in_locations(locations=locations, text=params['text'][0])
-        messages.success(request, "Your message has been sent to interviewers.")
+        Interviewer.sms_interviewers_in_locations(
+            locations=locations, text=params['text'][0])
+        messages.success(
+            request, "Your message has been sent to interviewers.")
     return HttpResponseRedirect(reverse('bulk_sms'))
 
 

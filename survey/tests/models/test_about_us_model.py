@@ -3,6 +3,7 @@ from survey.models import AboutUs
 
 
 class AboutUsContentTest(TestCase):
+
     def test_fields(self):
         about_us_content = AboutUs()
         fields = [str(item.attname) for item in about_us_content._meta.fields]

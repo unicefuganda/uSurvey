@@ -3,46 +3,52 @@ from django.forms import ModelForm, ValidationError
 import re
 from django.conf import settings
 from survey.models import QuestionTemplate, TemplateOption, Answer, QuestionModule, \
-            HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
+    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
 
 
 class QuestionTemplateForm(ModelForm):
 
-    options = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
-    
+    options = forms.CharField(
+        max_length=50, widget=forms.HiddenInput(), required=False)
+
     def __init__(self, *args, **kwargs):
         super(QuestionTemplateForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder = ['module', 'text', 'identifier', 'group', 'answer_type']
+        self.fields.keyOrder = ['module', 'text',
+                                'identifier', 'group', 'answer_type']
         instance = kwargs.get('instance', None)
         if instance:
-            self.help_text = ' and '.join(AnswerAccessDefinition.access_channels(instance.answer_type))
+            self.help_text = ' and '.join(
+                AnswerAccessDefinition.access_channels(instance.answer_type))
             self.fields['answer_type'].help_text = self.help_text
         self.answer_map = {}
         definitions = AnswerAccessDefinition.objects.all()
         for defi in definitions:
-            self.answer_map[defi.answer_type] = self.answer_map.get(defi.answer_type, [])
+            self.answer_map[defi.answer_type] = self.answer_map.get(
+                defi.answer_type, [])
             self.answer_map[defi.answer_type].append(defi.channel)
-    
+
     class Meta:
         model = QuestionTemplate
         exclude = []
-        widgets ={
-            'text': forms.Textarea(attrs={"rows":4, "cols":100,"maxlength":"150"}),
+        widgets = {
+            'text': forms.Textarea(attrs={"rows": 4, "cols": 100, "maxlength": "150"}),
         }
-        
+
     def clean_identifier(self):
         answer_type = self.cleaned_data.get('identifier', None)
         qts = QuestionTemplate.objects.filter(identifier__iexact=answer_type)
         if qts.exists():
             if not self.instance or not (self.instance.identifier == answer_type):
-                raise ValidationError('Identifier already in use the question library')
+                raise ValidationError(
+                    'Identifier already in use the question library')
         return self.cleaned_data['identifier']
-        
+
     def clean_options(self):
         options = dict(self.data).get('options')
         if options:
             options = filter(lambda text: text.strip(), options)
-            options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
+            options = map(lambda option: re.sub(
+                "[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
             options = map(lambda option: re.sub("  ", ' ', option), options)
             self.cleaned_data['options'] = options
         return options
@@ -52,7 +58,8 @@ class QuestionTemplateForm(ModelForm):
         answer_type = self.cleaned_data.get('answer_type', None)
         options = self.cleaned_data.get('options', None)
         text = self.cleaned_data.get('text', None)
-        self._check__multichoice_and_options_compatibility(answer_type, options)
+        self._check__multichoice_and_options_compatibility(
+            answer_type, options)
         self._strip_special_characters_for_ussd(text)
 #         import pdb; pdb.set_trace()
         return self.cleaned_data
@@ -81,10 +88,12 @@ class QuestionTemplateForm(ModelForm):
         # options.sort()
         for text in options:
             order += 1
-            TemplateOption.objects.create(question=question, text=text, order=order)
+            TemplateOption.objects.create(
+                question=question, text=text, order=order)
 
     def save(self, commit=True, *args, **kwargs):
-        question = super(QuestionTemplateForm, self).save(commit=commit, *args, **kwargs)
+        question = super(QuestionTemplateForm, self).save(
+            commit=commit, *args, **kwargs)
         if self.options_supplied(commit):
             self.save_question_options(question)
         return question

@@ -1,4 +1,5 @@
-import os, string
+import os
+import string
 from datetime import datetime
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -14,18 +15,26 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Max
 
+
 def reply_test(cls, func):
     func.is_reply_test = True
     return func
 
+
 class Interview(BaseModel):
-    interviewer = models.ForeignKey("Interviewer", null=True, related_name="interviews")
-    householdmember = models.ForeignKey("HouseholdMember", null=True, related_name="interviews",db_index=True)
-    batch = models.ForeignKey("Batch", related_name='interviews',db_index=True)
-    interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')
+    interviewer = models.ForeignKey(
+        "Interviewer", null=True, related_name="interviews")
+    householdmember = models.ForeignKey(
+        "HouseholdMember", null=True, related_name="interviews", db_index=True)
+    batch = models.ForeignKey(
+        "Batch", related_name='interviews', db_index=True)
+    interview_channel = models.ForeignKey(
+        InterviewerAccess, related_name='interviews')
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
-    ea = models.ForeignKey('EnumerationArea', related_name='interviews',db_index=True)
-    last_question = models.ForeignKey("Question", related_name='ongoing', null=True, blank=True)
+    ea = models.ForeignKey(
+        'EnumerationArea', related_name='interviews', db_index=True)
+    last_question = models.ForeignKey(
+        "Question", related_name='ongoing', null=True, blank=True)
 
     def __unicode__(self):
         return '%s-%s: %s' % (self.interviewer.name, self.householdmember.first_name, self.batch.name)
@@ -40,7 +49,8 @@ class Interview(BaseModel):
     def get_anwser(self, question, capwords=True):
         if self.householdmember.belongs_to(question.group):
             answer_class = Answer.get_class(question.answer_type)
-            answers = answer_class.objects.filter(interview=self, question=question)
+            answers = answer_class.objects.filter(
+                interview=self, question=question)
             if answers.exists():
                 reply = unicode(answers[0].to_text())
                 if capwords:
@@ -62,34 +72,36 @@ class Interview(BaseModel):
             return self.householdmember.get_composed(self.last_question.display_text(USSDAccess.choice_name()))
         next_question = None
         if self.has_started:
-            #save reply
+            # save reply
             answer_class = Answer.get_class(self.last_question.answer_type)
             answer_class.create(self, self.last_question, reply)
-            #compute nnext
+            # compute nnext
             next_question = self.last_question.next_question(reply)
         else:
             next_question = self.batch.start_question
-        #now confirm the question is applicable
-        if next_question and (self.householdmember.belongs_to(next_question.group) \
-                and AnswerAccessDefinition.is_valid(channel, next_question.answer_type)) is False:
-                next_question = self.batch.next_inline(self.last_question, groups=self.householdmember.groups,
-                                                       channel=channel) #if not get next line question
+        # now confirm the question is applicable
+        if next_question and (self.householdmember.belongs_to(next_question.group)
+                              and AnswerAccessDefinition.is_valid(channel, next_question.answer_type)) is False:
+            next_question = self.batch.next_inline(self.last_question, groups=self.householdmember.groups,
+                                                   channel=channel)  # if not get next line question
         response_text = None
         if next_question:
             self.last_question = next_question
-            response_text = self.householdmember.get_composed(next_question.display_text(USSDAccess.choice_name()))
+            response_text = self.householdmember.get_composed(
+                next_question.display_text(USSDAccess.choice_name()))
         else:
             print 'interview batch ', self.batch.name
             # if self.batch.name == 'Test5':
             #     import pdb; pdb.set_trace()
-            #no more questions to ask. capture this time as closure
+            # no more questions to ask. capture this time as closure
             self.closure_date = datetime.now()
         self.save()
         return response_text
 
     # @property
     # def has_pending_questions(self):
-    #     return self.last_question is not None and self.last_question.flows.filter(next_question__isnull=False).exists()
+    # return self.last_question is not None and
+    # self.last_question.flows.filter(next_question__isnull=False).exists()
 
     @classmethod
     def pending_batches(cls, house_member, ea, survey, available_batches):
@@ -98,18 +110,20 @@ class Interview(BaseModel):
         print 'available batches: ', available_batches
         completed_interviews = Interview.objects.filter(householdmember=house_member, batch__in=available_batches,
                                                         closure_date__isnull=False)
-        completed_batches = [interview.batch for interview in completed_interviews]
+        completed_batches = [
+            interview.batch for interview in completed_interviews]
         return [batch for batch in available_batches if batch.start_question and batch not in completed_batches]
 
     @classmethod
     def interviews(cls, house_member, interviewer, survey):
         available_batches = interviewer.ea.open_batches(survey, house_member)
-        interviews = Interview.objects.filter(householdmember=house_member, batch__in=available_batches)
-        #return (completed_interviews, pending_interviews)
+        interviews = Interview.objects.filter(
+            householdmember=house_member, batch__in=available_batches)
+        # return (completed_interviews, pending_interviews)
         return (interviews.filter(closure_date__isnull=False), interviews.filter(closure_date__isnull=True))
 #         completed_batches = [interview.batch for interview in completed_interviews]
-#         return [batch for batch in available_batches if batch not in completed_batches]
-
+# return [batch for batch in available_batches if batch not in
+# completed_batches]
 
     def members_with_open_batches(self):
         pass
@@ -126,13 +140,15 @@ class Interview(BaseModel):
 
 class Answer(BaseModel):
     NO_LOOP = -1
-    interview = models.ForeignKey(Interview, related_name='%(class)s',db_index=True)
+    interview = models.ForeignKey(
+        Interview, related_name='%(class)s', db_index=True)
 #     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
 #                                                             #value shall hold the exact worth of the response
     question = models.ForeignKey("Question", null=True, related_name="%(class)s",
-                                            on_delete=models.PROTECT, db_index=True)
-    loop_id = models.IntegerField(default=-1) #used to identify answers belonging to
-                                                                # same question loop for looping flows
+                                 on_delete=models.PROTECT, db_index=True)
+    # used to identify answers belonging to
+    loop_id = models.IntegerField(default=-1)
+    # same question loop for looping flows
 
     @classmethod
     def create(cls, interview, question, answer, loop_id=NO_LOOP):
@@ -231,7 +247,7 @@ class Answer(BaseModel):
 
     @classmethod
     def print_odk_validation(cls, node_path, validator_name, *args):
-        printer = getattr(cls, 'odk_%s'%validator_name)
+        printer = getattr(cls, 'odk_%s' % validator_name)
         return printer(node_path, *args)
 
     @classmethod
@@ -268,7 +284,8 @@ class NumericalAnswer(Answer):
     def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
         try:
             value = int(answer)
-        except Exception: raise
+        except Exception:
+            raise
         return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
 
     @classmethod
@@ -370,7 +387,6 @@ class MultiChoiceAnswer(Answer):
         else:
             return self.value.text
 
-
     @classmethod
     @static_var('label', 'Equals Option')
     def equals(cls, answer, txt):
@@ -391,7 +407,8 @@ class MultiSelectAnswer(Answer):
             selected = question.options.filter(pk__in=chosen)
         else:
             selected = answer
-        ans = cls.objects.create(question=question, interview=interview, loop_id=loop_id)
+        ans = cls.objects.create(
+            question=question, interview=interview, loop_id=loop_id)
         for opt in selected:
             ans.value.add(opt)
         return ans
@@ -519,7 +536,8 @@ class GeopointAnswer(Answer):
     def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
         if isinstance(answer, basestring):
             answer = answer.split(' ')
-            answer = ODKGeoPoint(latitude=answer[0], longitude=answer[1], altitude=[2], precision=answer[3])
+            answer = ODKGeoPoint(latitude=answer[0], longitude=answer[
+                                 1], altitude=[2], precision=answer[3])
         return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
 
     class Meta:
@@ -535,10 +553,13 @@ class GeopointAnswer(Answer):
 
 
 class NonResponseAnswer(BaseModel):
-    household = models.ForeignKey('Household', related_name='non_response_answers')
-    survey_listing = models.ForeignKey('SurveyHouseholdListing', related_name='non_response_answers')
+    household = models.ForeignKey(
+        'Household', related_name='non_response_answers')
+    survey_listing = models.ForeignKey(
+        'SurveyHouseholdListing', related_name='non_response_answers')
     value = models.CharField(max_length=100, blank=False, null=False)
-    interviewer = models.ForeignKey("Interviewer", null=True, related_name='non_response_answers')
+    interviewer = models.ForeignKey(
+        "Interviewer", null=True, related_name='non_response_answers')
 
     class Meta:
         app_label = 'survey'
@@ -550,7 +571,8 @@ class NonResponseAnswer(BaseModel):
 
 
 class AnswerAccessDefinition(BaseModel):
-    ACCESS_CHANNELS = [(name, name) for name in InterviewerAccess.access_channels()]
+    ACCESS_CHANNELS = [(name, name)
+                       for name in InterviewerAccess.access_channels()]
     ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
     answer_type = models.CharField(max_length=100, choices=ANSWER_TYPES)
     channel = models.CharField(max_length=100, choices=ACCESS_CHANNELS)

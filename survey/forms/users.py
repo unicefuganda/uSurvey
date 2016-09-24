@@ -11,23 +11,22 @@ class UserForm(UserCreationForm):
     mobile_number = forms.DecimalField(min_value=100000000,
                                        max_digits=9,
                                        widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
-                                                                   'style':"width:172px;" ,
-                                                                   'maxlength':'10'}))
+                                                                     'style': "width:172px;",
+                                                                     'maxlength': '10'}))
 
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
         self.fields['password2'].label = 'Confirm Password'
-        self.fields.keyOrder= ['username', 'password1', 'password2', 'first_name', 'last_name',
+        self.fields.keyOrder = ['username', 'password1', 'password2', 'first_name', 'last_name',
                                 'mobile_number', 'email', 'groups']
         self.fields['groups'].queryset = Group.objects.all().order_by('name')
-
 
     def _clean_attribute(self, Klass, **kwargs):
         attribute_name = kwargs.keys()[0]
         data_attr = kwargs[attribute_name]
         users_with_same_attr = Klass.objects.filter(**kwargs)
         if users_with_same_attr and self.initial.get(attribute_name, None) != str(data_attr):
-            message = "%s is already associated to a different user."% data_attr
+            message = "%s is already associated to a different user." % data_attr
             self._errors[attribute_name] = self.error_class([message])
             del self.cleaned_data[attribute_name]
         return data_attr
@@ -44,11 +43,11 @@ class UserForm(UserCreationForm):
         email = self.cleaned_data['email']
         return self._clean_attribute(User, email=email)
 
-    def save(self, commit = True, *args, **kwargs):
-        user = super(UserForm, self).save(commit = commit, *args, **kwargs)
+    def save(self, commit=True, *args, **kwargs):
+        user = super(UserForm, self).save(commit=commit, *args, **kwargs)
         if commit:
             self.save_m2m()
-            user_profile,b = UserProfile.objects.get_or_create(user = user)
+            user_profile, b = UserProfile.objects.get_or_create(user=user)
             user_profile.mobile_number = self.cleaned_data['mobile_number']
             user_profile.save()
 
@@ -63,30 +62,32 @@ class EditUserForm(ModelForm):
     mobile_number = forms.DecimalField(min_value=100000000,
                                        max_digits=9,
                                        widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
-                                                                   'style':"width:172px;" ,
-                                                                   'maxlength':'10'}))
+                                                                     'style': "width:172px;",
+                                                                     'maxlength': '10'}))
     password = forms.CharField(label="Password", required=False,
-                                        widget=forms.PasswordInput())
+                               widget=forms.PasswordInput())
 
     confirm_password = forms.CharField(label="Confirm Password",
-                                        required=False,
-                                        widget=forms.PasswordInput())
+                                       required=False,
+                                       widget=forms.PasswordInput())
 
     def __init__(self, user, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
         self.set_form_fields_order(user)
 
     def set_form_fields_order(self, user):
-        self.fields.keyOrder = ['username', 'first_name', 'last_name','mobile_number', 'email',]
+        self.fields.keyOrder = ['username', 'first_name',
+                                'last_name', 'mobile_number', 'email', ]
         if user.has_perm("auth.can_view_users"):
-            self.fields.keyOrder.extend(['password', 'confirm_password', 'groups'])
+            self.fields.keyOrder.extend(
+                ['password', 'confirm_password', 'groups'])
 
     def _clean_attribute(self, Klass, **kwargs):
         attribute_name = kwargs.keys()[0]
         data_attr = kwargs[attribute_name]
         users_with_same_attr = Klass.objects.filter(**kwargs)
         if users_with_same_attr and self.initial.get(attribute_name, None) != str(data_attr):
-            message = "%s is already associated to a different user."% data_attr
+            message = "%s is already associated to a different user." % data_attr
             self._errors[attribute_name] = self.error_class([message])
             del self.cleaned_data[attribute_name]
         return data_attr
@@ -125,7 +126,7 @@ class EditUserForm(ModelForm):
         return cleaned_data
 
     def save(self, commit=True, *args, **kwargs):
-        user = super(EditUserForm, self).save(commit = commit, *args, **kwargs)
+        user = super(EditUserForm, self).save(commit=commit, *args, **kwargs)
         self._change_password(user)
         if commit:
             self._create_or_update_profile(user)
@@ -138,15 +139,15 @@ class EditUserForm(ModelForm):
             user.set_password(password)
 
     def _create_or_update_profile(self, user):
-            user_profile, created = UserProfile.objects.get_or_create(user = user)
-            user_profile.mobile_number = self.cleaned_data['mobile_number']
-            user_profile.save()
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        user_profile.mobile_number = self.cleaned_data['mobile_number']
+        user_profile.save()
 
     class Meta:
         model = User
         fields = ("username", "first_name", "last_name", "email", "groups")
-        widgets={
-                'username':forms.TextInput(attrs={'readonly':'readonly'}),
+        widgets = {
+            'username': forms.TextInput(attrs={'readonly': 'readonly'}),
         }
 
 
@@ -154,5 +155,4 @@ class UserProfileForm(ModelForm):
 
     class Meta:
         model = UserProfile
-        exclude =['user']
-
+        exclude = ['user']

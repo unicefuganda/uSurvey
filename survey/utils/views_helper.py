@@ -50,5 +50,5 @@ def clean_query_params(params):
 def prepend_to_keys(params, text):
     new_params = {}
     for key, value in params.items():
-        new_params[text+key] = value
+        new_params[text + key] = value
     return new_params

@@ -6,6 +6,7 @@ from survey.tests.base_test import BaseTest
 
 
 class HomepageViewTest(BaseTest):
+
     def setUp(self):
         self.client = Client()
         User.objects.create_user(username='useless', email='rajni@kant.com',
@@ -46,12 +47,14 @@ class HomepageViewTest(BaseTest):
         self.failUnlessEqual(response.status_code, 200)
         templates = [template.name for template in response.templates]
         self.assertIn('home/edit.html', templates)
-        self.assertEqual(about_us_content, response.context['about_form'].instance)
+        self.assertEqual(about_us_content, response.context[
+                         'about_form'].instance)
         self.assertIsInstance(response.context['about_form'], AboutUsForm)
 
     def test_post_edit_about_page(self):
         about_us_content = AboutUs.objects.create(content="blah blah")
-        form_data = {'content': about_us_content.content + "more blah blah blah"}
+        form_data = {'content': about_us_content.content +
+                     "more blah blah blah"}
         self.failIf(AboutUs.objects.filter(**form_data))
         response = self.client.post('/about/edit/', data=form_data)
         self.assertRedirects(response, '/about/')

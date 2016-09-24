@@ -8,8 +8,10 @@ from survey.models import LocationTypeDetails
 
 
 class LocationHierarchyFormTest(TestCase):
+
     def setUp(self):
-        country = LocationType.objects.create(name='country',slug=slugify('country'))
+        country = LocationType.objects.create(
+            name='country', slug=slugify('country'))
         self.uganda = Location.objects.create(type=country, name='Uganda')
 
     def test_knows_the_fields_in_form(self):
@@ -25,51 +27,58 @@ class LocationHierarchyFormTest(TestCase):
         all_countries = Location.objects.filter(type__name='country')
         country_choices = hierarchy_form.fields[field].choices
 
-        [self.assertIn((country_option.id, country_option.name), country_choices) for country_option in all_countries]
+        [self.assertIn((country_option.id, country_option.name),
+                       country_choices) for country_option in all_countries]
 
     def test_should_populate_countries_name_case_insensitive(self):
         LocationType.objects.all().delete()
         Location.objects.all().delete()
-        country_1 = LocationType.objects.create(name='Country',slug=slugify('Country'))
-        some_country = Location.objects.create(type=country_1, name='some_country')
+        country_1 = LocationType.objects.create(
+            name='Country', slug=slugify('Country'))
+        some_country = Location.objects.create(
+            type=country_1, name='some_country')
 
         field = 'country'
         hierarchy_form = LocationHierarchyForm()
         all_countries = Location.objects.filter(type__name='country')
         country_choices = hierarchy_form.fields[field].choices
 
-        [self.assertIn((country_option.id, country_option.name), country_choices) for country_option in all_countries]
+        [self.assertIn((country_option.id, country_option.name),
+                       country_choices) for country_option in all_countries]
         self.assertIn((some_country.id, some_country.name), country_choices)
 
     def test_should_not_be_valid_if_country_is_blank(self):
         data = {
-            'country':'',
+            'country': '',
             'levels': 'Region'
         }
         hierarchy_form = LocationHierarchyForm(data=data)
         self.assertFalse(hierarchy_form.is_valid())
 
     def test_form_set_has_error_if_has_code_is_on_but_no_code_supplied(self):
-        DetailsFormSet = formset_factory(LocationDetailsForm, formset=BaseArticleFormSet)
+        DetailsFormSet = formset_factory(
+            LocationDetailsForm, formset=BaseArticleFormSet)
 
         data = {'form-0-levels': 'Region', 'form-MAX_NUM_FORMS': '1000', 'form-0-required': 'on',
                 'form-TOTAL_FORMS': '1', 'form-0-length_of_code': '', 'form-INITIAL_FORMS': '0',
                 'form-0-has_code': 'on'}
 
-        details_formset = DetailsFormSet(data,prefix='form')
+        details_formset = DetailsFormSet(data, prefix='form')
         message = "length of code cannot be blank if has code is checked."
 
         self.assertFalse(details_formset.is_valid())
 
-        self.assertIn(message, details_formset.forms[0].errors['length_of_code'])
+        self.assertIn(message, details_formset.forms[
+                      0].errors['length_of_code'])
 
     def test_form_set_has_error_if_level_field_is_empty(self):
-        DetailsFormSet = formset_factory(LocationDetailsForm, formset=BaseArticleFormSet)
+        DetailsFormSet = formset_factory(
+            LocationDetailsForm, formset=BaseArticleFormSet)
 
         data = {'form-0-levels': '', 'form-MAX_NUM_FORMS': '1000', 'form-0-required': 'on',
                 'form-TOTAL_FORMS': '1', 'form-0-length_of_code': '', 'form-INITIAL_FORMS': '0'}
 
-        details_formset = DetailsFormSet(data,prefix='form')
+        details_formset = DetailsFormSet(data, prefix='form')
         message = "field cannot be empty."
 
         self.assertFalse(details_formset.is_valid())
@@ -78,13 +87,17 @@ class LocationHierarchyFormTest(TestCase):
 
     def test_should_show_used_country_as_available_choices_if_any_otherwise_show_all_countries(self):
         LocationTypeDetails.objects.all().delete()
-        other_country = Location.objects.create(name="some other country", type=self.uganda.type)
-        LocationTypeDetails.objects.create(required=True,has_code=False, location_type=self.uganda.type, country=self.uganda)
+        other_country = Location.objects.create(
+            name="some other country", type=self.uganda.type)
+        LocationTypeDetails.objects.create(
+            required=True, has_code=False, location_type=self.uganda.type, country=self.uganda)
         hierarchy_form = LocationHierarchyForm()
 
         field = 'country'
         country_choices = hierarchy_form.fields[field].choices
 
         self.assertEqual(1, len(country_choices))
-        self.assertNotIn((other_country.id, other_country.name),country_choices)
-        self.assertEqual((self.uganda.id, self.uganda.name), country_choices[0])
+        self.assertNotIn(
+            (other_country.id, other_country.name), country_choices)
+        self.assertEqual((self.uganda.id, self.uganda.name),
+                         country_choices[0])

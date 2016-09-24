@@ -9,24 +9,27 @@ class SurveyForm(ModelForm):
     # survey_listing = forms.CharField(choices=[(survey.pk, survey.name) for survey in Survey.objects.all()],
     #                                  help_text='Select survey household listing to reuse. Leave empty for fresh listing',
     #                                  required=False)
+
     class Meta:
         model = Survey
-        fields = ['name', 'description', 'has_sampling', 'sample_size', 'preferred_listing']
+        fields = ['name', 'description', 'has_sampling',
+                  'sample_size', 'preferred_listing']
         widgets = {
             'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
-            'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')), attrs={'class' : 'has_sampling'}),
+            'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')), attrs={'class': 'has_sampling'}),
         }
 
     def __init__(self, *args, **kwargs):
         super(SurveyForm, self).__init__(*args, **kwargs)
         if kwargs.get('instance', None) and kwargs['instance'].has_sampling is False:
-            self.fields['preferred_listing'].widget.attrs['disabled'] = 'disabled'
+            self.fields['preferred_listing'].widget.attrs[
+                'disabled'] = 'disabled'
         else:
             preferred_listings = [('', '------ None, Create new -------'), ]
             survey_listings = SurveyHouseholdListing.objects.all()
-            preferred_listings.extend(set([(l.survey.pk, l.survey.name) for l in survey_listings]))
+            preferred_listings.extend(
+                set([(l.survey.pk, l.survey.name) for l in survey_listings]))
             self.fields['preferred_listing'].choices = preferred_listings
-
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -34,7 +37,8 @@ class SurveyForm(ModelForm):
         has_sampling = cleaned_data.get('has_sampling', None)
 
         if has_sampling and not cleaned_data.get('sample_size', None):
-            raise ValidationError('Sample size must be specified if has sampling is selected.')
+            raise ValidationError(
+                'Sample size must be specified if has sampling is selected.')
 
         return cleaned_data
 
@@ -49,5 +53,3 @@ class SurveyForm(ModelForm):
             raise ValidationError("Survey with name %s already exist." % name)
 
         return self.cleaned_data['name']
-
-

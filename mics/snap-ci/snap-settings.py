@@ -22,19 +22,19 @@ CACHES = {
 }
 
 INSTALLED_BACKENDS = {
-  "HTTP": {
-      "ENGINE": "rapidsms.backends.database.DatabaseBackend",
-  },
+    "HTTP": {
+        "ENGINE": "rapidsms.backends.database.DatabaseBackend",
+    },
 }
 
 LETTUCE_AVOID_APPS = (
-        'django_nose',
-        'south',
-        'django_extensions',
-        'rapidsms.contrib.locations',
-        'rapidsms.contrib.locations.nested',
-        'bootstrap_pagination',
-        'rapidsms.backends.database',
-        'rapidsms.contrib.httptester',
-        'djcelery',
+    'django_nose',
+    'south',
+    'django_extensions',
+    'rapidsms.contrib.locations',
+    'rapidsms.contrib.locations.nested',
+    'bootstrap_pagination',
+    'rapidsms.backends.database',
+    'rapidsms.contrib.httptester',
+    'djcelery',
 )

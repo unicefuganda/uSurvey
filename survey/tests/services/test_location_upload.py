@@ -6,6 +6,7 @@ from survey.tests.base_test import BaseTest
 
 
 class LocationUploadHelper(BaseTest):
+
     def setUp(self):
         self.data = [['RegionName', 'DistrictName', 'CountyName'],
                      ['region1', 'district1', 'county1'],
@@ -16,12 +17,16 @@ class LocationUploadHelper(BaseTest):
         file = open(self.filename, 'rb')
         self.uploader = UploadLocation(file)
         self.region = LocationType.objects.create(name='Region', slug='region')
-        self.district = LocationType.objects.create(name='District', slug='district', parent=self.region)
-        self.county = LocationType.objects.create(name='County', slug='county', parent=self.district)
-        LocationTypeDetails.objects.create(location_type=self.region, required=True, has_code=False)
-        LocationTypeDetails.objects.create(location_type=self.district, required=True, has_code=False)
-        LocationTypeDetails.objects.create(location_type=self.county, required=True, has_code=False)
+        self.district = LocationType.objects.create(
+            name='District', slug='district', parent=self.region)
+        self.county = LocationType.objects.create(
+            name='County', slug='county', parent=self.district)
+        LocationTypeDetails.objects.create(
+            location_type=self.region, required=True, has_code=False)
+        LocationTypeDetails.objects.create(
+            location_type=self.district, required=True, has_code=False)
+        LocationTypeDetails.objects.create(
+            location_type=self.county, required=True, has_code=False)
 
     def tearDown(self):
-        os.system("rm -rf %s"%self.filename)
-
+        os.system("rm -rf %s" % self.filename)

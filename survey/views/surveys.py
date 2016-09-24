@@ -93,6 +93,7 @@ def new(request):
     ])
     return response or render(request, 'surveys/new.html', context)
 
+
 @handle_object_does_not_exist(message="Survey does not exist.")
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id):
@@ -110,12 +111,13 @@ def edit(request, survey_id):
                'button_label': 'Save',
                'id': 'edit-survey-form',
                'cancel_url': '/surveys/',
-               'action': '/surveys/%s/edit/' %survey_id
+               'action': '/surveys/%s/edit/' % survey_id
                }
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
     ])
     return render(request, 'surveys/new.html', context)
+
 
 @handle_object_does_not_exist(message="Survey does not exist.")
 @permission_required('auth.can_view_batches')

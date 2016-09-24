@@ -2,6 +2,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.filter
 def get_computational_value_by_answer(hierarchial_data):
     options = {}

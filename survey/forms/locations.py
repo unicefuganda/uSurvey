@@ -18,8 +18,9 @@ class LocationTypeForm(ModelForm):
             del self.cleaned_data['name']
         return name
 
-    def save(self, commit = True, *args, **kwargs):
-        a_type = super(LocationTypeForm, self).save(commit = False, *args, **kwargs)
+    def save(self, commit=True, *args, **kwargs):
+        a_type = super(LocationTypeForm, self).save(
+            commit=False, *args, **kwargs)
         a_type.slug = slugify(a_type.name)
         if commit:
             a_type.save()
@@ -49,7 +50,8 @@ class LocationForm(ModelForm):
 
     def clean(self):
         cleaned_data = super(LocationForm, self).clean()
-        locations_with_same_attributes = Location.objects.filter(**cleaned_data)
+        locations_with_same_attributes = Location.objects.filter(
+            **cleaned_data)
         if locations_with_same_attributes and not self.editing_instance(cleaned_data):
             raise ValidationError('This location already exists.')
         return cleaned_data
@@ -58,5 +60,5 @@ class LocationForm(ModelForm):
         model = Location
         exclude = ['point', 'parent_type', 'parent_id']
         widgets = {
-            'tree_parent': forms.Select(attrs={'class':'chzn-select', 'data-placeholder':'Select or Type District'}),
-            }
+            'tree_parent': forms.Select(attrs={'class': 'chzn-select', 'data-placeholder': 'Select or Type District'}),
+        }

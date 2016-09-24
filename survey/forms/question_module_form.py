@@ -4,6 +4,7 @@ from survey.models import QuestionModule
 
 
 class QuestionModuleForm(ModelForm):
+
     def clean_name(self):
         name = self.cleaned_data['name']
         creating_new_module = not self.instance.id

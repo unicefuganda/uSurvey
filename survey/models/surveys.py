@@ -5,18 +5,22 @@ from survey.models.locations import Location, LocationType
 from survey.models.interviewer import Interviewer
 from survey.models.households import Household
 
+
 class Survey(BaseModel):
-    name = models.CharField(max_length=100, blank=False, null=True, unique=True)
+    name = models.CharField(max_length=100, blank=False,
+                            null=True, unique=True)
     description = models.CharField(max_length=300, blank=True, null=True)
-    sample_size = models.PositiveIntegerField(null=False, blank=False, default=10)
-    has_sampling = models.BooleanField(default=True, verbose_name='Survey Type')
+    sample_size = models.PositiveIntegerField(
+        null=False, blank=False, default=10)
+    has_sampling = models.BooleanField(
+        default=True, verbose_name='Survey Type')
     preferred_listing = models.ForeignKey('Survey', related_name='householdlist_users',
                                           help_text='Select which survey household listing to reuse. Leave empty for fresh listing',
                                           null=True, blank=True)
 
     # min_percent_reg_houses = models.IntegerField(verbose_name='Min % Of Registered Households', default=80, validators=[MinValueValidator(0), MaxValueValidator(100)],
-    #                                                     help_text='Enter minimum percentage of total household to be registered before survey can start on ODK channel')
-
+    # help_text='Enter minimum percentage of total household to be registered
+    # before survey can start on ODK channel')
 
     class Meta:
         app_label = 'survey'
@@ -24,10 +28,10 @@ class Survey(BaseModel):
         permissions = (
             ("view_completed_survey", "Can view Completed interviewers"),
         )
-        
+
     def __unicode__(self):
         return self.name
-    
+
     @classmethod
     def save_sample_size(cls, survey_form):
         survey = survey_form.save(commit=False)
@@ -52,7 +56,8 @@ class Survey(BaseModel):
             if interviewer.completed_batch_or_survey(self, batch=batch):
                 row = [interviewer.name, ','.join(interviewer.access_ids)]
                 if interviewer.ea:
-                    row.extend(interviewer.locations_in_hierarchy().values_list('name', flat=True))
+                    row.extend(interviewer.locations_in_hierarchy(
+                    ).values_list('name', flat=True))
                 data.append(row)
         return data
 
@@ -64,7 +69,6 @@ class Survey(BaseModel):
     #         if interviewer.present_households(self).count() < self.sample_size:
     #             return False
     #     return True
-
 
     def bulk_enable_batches(self, eas):
         register = []
@@ -81,9 +85,13 @@ class Survey(BaseModel):
     def disable_batches(self, ea):
         return self.commencement_registry.filter(ea=ea).delete()
 
+
 class SurveySampleSizeReached(Exception):
     pass
 
+
 class BatchCommencement(BaseModel):
-    survey = models.ForeignKey(Survey, null=True, related_name='commencement_registry')
-    ea = models.ForeignKey('EnumerationArea', null=True, related_name='commencement_registry')
+    survey = models.ForeignKey(
+        Survey, null=True, related_name='commencement_registry')
+    ea = models.ForeignKey('EnumerationArea', null=True,
+                           related_name='commencement_registry')

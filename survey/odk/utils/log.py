@@ -1,9 +1,10 @@
-import logging, os
+import logging
+import os
 from datetime import datetime
 from django.conf import settings
 
 APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOG_FILE = os.path.join(APP_DIR, 'mics_odk.log') 
+LOG_FILE = os.path.join(APP_DIR, 'mics_odk.log')
 logger = logging.getLogger('audit_logger')
 handler = logging.FileHandler(LOG_FILE)
 formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(message)s')
@@ -14,8 +15,10 @@ if settings.DEBUG:
 else:
     logger.setLevel(logging.INFO)
 
+
 class Enum(object):
-    __name__= "Enum"
+    __name__ = "Enum"
+
     def __init__(self, **enums):
         self.enums = enums
 
@@ -91,7 +94,7 @@ def audit_log(action, request_user, investigator, message, audit, request, level
         'action': action,
         'request_username': str(request_user),
         'account_username': investigator.name if investigator.name
-            else str(investigator),
+        else str(investigator),
         'client_ip': get_client_ip(request),
         'audit': audit
     }

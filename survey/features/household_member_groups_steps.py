@@ -5,11 +5,13 @@ from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 
 from survey.features.page_objects.household_member_groups import GroupConditionListPage, GroupsListingPage, AddConditionPage, AddGroupPage, GroupConditionModalPage, GroupDetailsPage, AddNewConditionToGroupPage, DeleteHouseholdMemberGroup
 
+
 @step(u'And I have 10 conditions')
 def and_i_have_10_conditions(step):
     for i in xrange(10):
         try:
-            GroupCondition.objects.create(value=i, attribute='AGE', condition="EQUALS")
+            GroupCondition.objects.create(
+                value=i, attribute='AGE', condition="EQUALS")
         except Exception:
             pass
 
@@ -27,7 +29,8 @@ def and_i_should_see_the_conditions_list(step):
 
 @step(u'And I have a condition')
 def and_i_have_a_condition(step):
-    world.condition = GroupCondition.objects.create(value=5, attribute='AGE', condition="EQUALS")
+    world.condition = GroupCondition.objects.create(
+        value=5, attribute='AGE', condition="EQUALS")
 
 
 @step(u'And I have 100 groups with that condition')
@@ -97,7 +100,7 @@ def and_i_visit_the_new_group_page(step):
 def when_i_fill_in_the_group_details(step):
     data = {'name': 'aged between 15 and 49',
             'order': 1,
-    }
+            }
     world.page.fill_valid_values(data)
 
 
@@ -131,14 +134,17 @@ def then_i_should_see_the_condition_was_saved_successfully(step):
 
 @step(u'And I should see the new condition in the groups form')
 def and_i_should_see_the_new_condition_in_the_groups_form(step):
-    latest_condition = GroupCondition.objects.get(value='9', attribute="AGE", condition="EQUALS")
+    latest_condition = GroupCondition.objects.get(
+        value='9', attribute="AGE", condition="EQUALS")
     world.page.validate_latest_condition(latest_condition)
 
 
 @step(u'And I have 2 conditions')
 def and_i_have_2_conditions(step):
-    world.condition_1 = GroupCondition.objects.create(value=False, attribute="GENDER", condition="EQUALS")
-    world.condition_2 = GroupCondition.objects.create(value=40, attribute="AGE", condition="EQUALS")
+    world.condition_1 = GroupCondition.objects.create(
+        value=False, attribute="GENDER", condition="EQUALS")
+    world.condition_2 = GroupCondition.objects.create(
+        value=40, attribute="AGE", condition="EQUALS")
 
 
 @step(u'When I fill name and order')
@@ -150,17 +156,21 @@ def when_i_fll_name_and_order(step):
 
 @step(u'And I select conditions')
 def and_i_select_conditions(step):
-    world.page.select('conditions', [world.condition_1.pk, world.condition_2.pk])
+    world.page.select(
+        'conditions', [world.condition_1.pk, world.condition_2.pk])
 
 
 @step(u'Then I should see the form errors of required fields')
 def then_i_should_see_the_form_errors_of_required_fields(step):
     world.page.is_text_present("This field is required.")
 
+
 @step(u'And I have member group with conditions')
 def and_i_have_member_group_with_conditions(step):
-    world.condition_1 = GroupCondition.objects.create(value='True', attribute="GENDER", condition="EQUALS")
-    world.condition_2 = GroupCondition.objects.create(value=35, attribute="AGE", condition="EQUALS")
+    world.condition_1 = GroupCondition.objects.create(
+        value='True', attribute="GENDER", condition="EQUALS")
+    world.condition_2 = GroupCondition.objects.create(
+        value=35, attribute="AGE", condition="EQUALS")
     world.group = HouseholdMemberGroup.objects.create(order=1, name="group 1")
     world.condition_1.groups.add(world.group)
     world.condition_2.groups.add(world.group)
@@ -184,7 +194,8 @@ def when_i_click_groups_tab(step):
 
 @step(u'Then I should see group dropdown list')
 def then_i_should_see_group_dropdown_list(step):
-    reverse_url_links = ["household_member_groups_page", "new_household_member_groups_page"]
+    reverse_url_links = ["household_member_groups_page",
+                         "new_household_member_groups_page"]
     world.page.see_dropdown(reverse_url_links)
 
 
@@ -261,70 +272,86 @@ def and_when_i_fill_condition_details(step):
     world.data = {
         'attribute': 'AGE',
         'condition': 'EQUALS'
-        }
+    }
     world.page.fill_valid_values(world.data)
     world.page.fill('value', '9')
+
 
 @step(u'And I should see the newly added condition on that page')
 def and_i_should_see_the_newly_added_condition_on_that_page(step):
     world.page.see_success_message("Criteria", "added")
-    world.page.validate_fields_present([world.data['attribute'], world.data['condition'], '9'])
+    world.page.validate_fields_present(
+        [world.data['attribute'], world.data['condition'], '9'])
+
 
 @step(u'And I click edit group link')
 def and_i_click_edit_group_link(step):
     world.page.click_link_by_text(" Edit")
 
+
 @step(u'When I fill in edited group details')
 def when_i_fill_in_edited_group_details(step):
     data = {'name': 'aged between 15 and 39',
             'order': 1,
-    }
+            }
     world.page.fill_valid_values(data)
+
 
 @step(u'Then I should see that the group was edited successfully')
 def then_i_should_see_that_the_group_was_edited_successfully(step):
     world.page.see_success_message("Group", "edited")
+
 
 @step(u'Then I should see the groups details in an edit group form')
 def then_i_should_see_the_groups_details_in_an_edit_group_form(step):
     form = {'name': 'Name',
             'order': 'Order'}
     form_values = {'name': world.group.name,
-                   'order': world.group.order }
+                   'order': world.group.order}
     world.page.validate_form_present(form)
     world.page.validate_form_values(form_values)
 
+
 @step(u'And I select new conditions')
 def and_i_select_new_conditions(step):
-    new_condition = GroupCondition.objects.create(value=39, attribute='AGE', condition="LESS_THAN")
-    world.page.select_multiple('#id_conditions', world.condition_1, new_condition)
+    new_condition = GroupCondition.objects.create(
+        value=39, attribute='AGE', condition="LESS_THAN")
+    world.page.select_multiple(
+        '#id_conditions', world.condition_1, new_condition)
+
 
 @step(u'And I click delete group link')
 def and_i_click_delete_group_link(step):
     world.page.click_link_by_text(" Delete")
     world.page = DeleteHouseholdMemberGroup(world.browser, world.group)
 
+
 @step(u'Then I should see a delete confirmation modal')
 def then_i_should_see_a_delete_confirmation_modal(step):
     world.page.see_confirm_modal_message(world.group.name)
+
 
 @step(u'When I click yes')
 def when_i_click_yes(step):
     world.page.click_link_by_text("Yes")
 
+
 @step(u'Then I should see that the group was deleted successfully')
 def then_i_should_see_that_the_group_was_deleted_successfully(step):
     world.page.see_success_message("Group", "deleted")
 
+
 @step(u'And I click delete condition link')
 def and_i_click_delete_condition_link(step):
     world.page.click_link_by_text(" Delete")
+
 
 @step(u'Then I should see a delete condition confirmation modal')
 def then_i_should_see_a_delete_condition_confirmation_modal(step):
     world.page.see_confirm_modal_message(str(world.condition_1))
     world.page.is_text_present("It is attached to the following groups:")
     world.page.find_link_by_text(world.group.name)
+
 
 @step(u'Then I should see that the condition was deleted successfully')
 def then_i_should_see_that_the_condition_was_deleted_successfully(step):

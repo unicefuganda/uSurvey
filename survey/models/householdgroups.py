@@ -6,8 +6,9 @@ import ast
 
 class HouseholdMemberGroup(BaseModel):
     name = models.CharField(max_length=50)
-    order = models.PositiveIntegerField(null=False, blank=False, unique=True, default=0)
-    
+    order = models.PositiveIntegerField(
+        null=False, blank=False, unique=True, default=0)
+
     def __unicode__(self):
         return self.name
 
@@ -29,16 +30,21 @@ class HouseholdMemberGroup(BaseModel):
         all_households = survey.registered_households.all()
         from survey.models import HouseholdMember
         for location in locations:
-            location_descendants = location.get_leafnodes(include_self=True).values_list('id', flat=True)
-            households = all_households.filter(listing__ea__locations__in=location_descendants).values_list('id', flat=True)
-            all_members = HouseholdMember.objects.filter(household__id__in=households)
-            qualified_members = filter(lambda member: member.belongs_to(self), all_members)
+            location_descendants = location.get_leafnodes(
+                include_self=True).values_list('id', flat=True)
+            households = all_households.filter(
+                listing__ea__locations__in=location_descendants).values_list('id', flat=True)
+            all_members = HouseholdMember.objects.filter(
+                household__id__in=households)
+            qualified_members = filter(
+                lambda member: member.belongs_to(self), all_members)
             data[location] = {self.name: len(qualified_members)}
         return data
 
     def hierarchical_result_for(self, location_parent, survey):
         locations = location_parent.get_children().order_by('name')[:10]
-        answers = self.household_members_count_per_location_in(locations, survey)
+        answers = self.household_members_count_per_location_in(
+            locations, survey)
         return answers
 
     @classmethod
@@ -54,6 +60,7 @@ def household_member_test(func):
     func.is_reply_test = True
     return func
 
+
 class GroupCondition(BaseModel):
     CONDITIONS = {
         'EQUALS': 'EQUALS',
@@ -62,9 +69,9 @@ class GroupCondition(BaseModel):
     }
 
     MATCHING_METHODS = {
-            'EQUALS': 'is_equal',
-            'GREATER_THAN': 'is_greater_than',
-            'LESS_THAN': 'is_less_than',
+        'EQUALS': 'is_equal',
+        'GREATER_THAN': 'is_greater_than',
+        'LESS_THAN': 'is_less_than',
     }
 
     GROUP_TYPES = {
@@ -74,9 +81,12 @@ class GroupCondition(BaseModel):
     }
 
     value = models.CharField(max_length=50)
-    attribute = models.CharField(max_length=20, default='AGE', choices=GROUP_TYPES.items())
-    condition = models.CharField(max_length=20, default='EQUALS', choices=CONDITIONS.items())
-    groups = models.ManyToManyField(HouseholdMemberGroup, related_name='conditions')
+    attribute = models.CharField(
+        max_length=20, default='AGE', choices=GROUP_TYPES.items())
+    condition = models.CharField(
+        max_length=20, default='EQUALS', choices=CONDITIONS.items())
+    groups = models.ManyToManyField(
+        HouseholdMemberGroup, related_name='conditions')
 
     def confirm_head(self, value):
         return bool(value)
@@ -90,7 +100,8 @@ class GroupCondition(BaseModel):
 
     def odk_matches(self, odk_attributes):
         value_path = odk_attributes.get(self.attribute.upper())
-        method = getattr(self, 'odk_%s'%self.MATCHING_METHODS[self.condition])
+        method = getattr(self, 'odk_%s' %
+                         self.MATCHING_METHODS[self.condition])
         return method(value_path)
 
     def matches_condition(self, value):

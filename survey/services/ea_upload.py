@@ -13,13 +13,15 @@ class UploadEA(UploadService):
 
     def check_errors_(self, index,  row, headers, skip_column, lowest_location_column):
         lowest_location_name = row[lowest_location_column]
-        location = Location.objects.filter(name=lowest_location_name, parent__name__iexact=row[skip_column-1].lower())
+        location = Location.objects.filter(
+            name=lowest_location_name, parent__name__iexact=row[skip_column - 1].lower())
         if not location.exists():
-            self.log_error(index+1, 'There is no %s with name: %s, in %s.' %
-                                    (headers[lowest_location_column].lower(), row[lowest_location_column], row[skip_column-1]))
+            self.log_error(index + 1, 'There is no %s with name: %s, in %s.' %
+                           (headers[lowest_location_column].lower(), row[lowest_location_column], row[skip_column - 1]))
             return
-        if not self.parents_locations_match(location[0], row[:skip_column-1]):
-            self.log_error(index+1, 'The location hierarchy %s >> %s does not exist.' % ((' >> '.join(row[:skip_column])), lowest_location_name))
+        if not self.parents_locations_match(location[0], row[:skip_column - 1]):
+            self.log_error(index + 1, 'The location hierarchy %s >> %s does not exist.' %
+                           ((' >> '.join(row[:skip_column])), lowest_location_name))
             return
         return location[0]
 
@@ -33,10 +35,11 @@ class UploadEA(UploadService):
         second_ea_column_number = -1
         ea_name = row[first_ea_column_number] or row[second_ea_column_number]
         if ea_name:
-            ea = EnumerationArea.objects.get_or_create(name=ea_name, survey=survey)[0]
+            ea = EnumerationArea.objects.get_or_create(
+                name=ea_name, survey=survey)[0]
             ea.locations.add(location)
         else:
-            self.log_error(index+1, 'Enumeration Area name required.')
+            self.log_error(index + 1, 'Enumeration Area name required.')
 
     def create_ea(self, reader, headers, survey):
         for index, row in enumerate(reader):
@@ -53,6 +56,7 @@ class UploadEA(UploadService):
         else:
             self.create_ea(reader, cleaned_headers, survey)
 
+
 class UploadEACSVLayoutHelper(object):
 
     def __init__(self):
@@ -60,7 +64,8 @@ class UploadEACSVLayoutHelper(object):
 
     @classmethod
     def _header_format(cls):
-        types = list(LocationType.objects.exclude(name__iexact="country").values_list('name', flat=True))
+        types = list(LocationType.objects.exclude(
+            name__iexact="country").values_list('name', flat=True))
         types.insert(-1, 'EA')
         types.append('EA')
         return types
@@ -68,14 +73,13 @@ class UploadEACSVLayoutHelper(object):
     def table_layout_example(self):
         headers = map(lambda header: header.lower(), self.headers)
         if headers != ['ea', 'ea']:
-            row1 = [header+'_0' for header in headers]
+            row1 = [header + '_0' for header in headers]
             row1[-1] = ''
             row2 = list(row1)
             row2[-2] += '_b'
-            row3 = [header+'_1' for header in headers]
+            row3 = [header + '_1' for header in headers]
             row3[-3] = ''
             row4 = list(row3)
             row4[-1] += '_b'
             return [row1, row2, row3, row4]
         return [["No Location/LocationType added yet. Please add those first."]]
-

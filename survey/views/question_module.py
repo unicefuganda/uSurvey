@@ -32,6 +32,7 @@ def index(request):
     context = {'question_modules': all_question_modules}
     return render(request, "question_module/index.html", context)
 
+
 @permission_required('auth.can_view_batches')
 def delete(request, module_id):
     try:
@@ -50,17 +51,20 @@ def _process_form(request, question_module_form):
         messages.success(request, "Question module successfully edited.")
     return question_module_form, HttpResponseRedirect("/modules/")
 
+
 @permission_required('auth.can_view_batches')
 def edit(request, module_id):
     response = None
     module = QuestionModule.objects.get(id=module_id)
     question_module_form = QuestionModuleForm(instance=module)
     if request.method == 'POST':
-        question_module_form = QuestionModuleForm(instance=module, data=request.POST)
-        question_module_form, response = _process_form(request, question_module_form)
+        question_module_form = QuestionModuleForm(
+            instance=module, data=request.POST)
+        question_module_form, response = _process_form(
+            request, question_module_form)
     request.breadcrumbs([
         ('Modules', reverse('question_module_listing_page')),
     ])
     return response or render(request, 'question_module/new.html',
-                  {'question_module_form': question_module_form, 'title': 'Edit Module', 'button_label': 'Save',
-                   'action': '/modules/%s/edit/' % module.id})
+                              {'question_module_form': question_module_form, 'title': 'Edit Module', 'button_label': 'Save',
+                               'action': '/modules/%s/edit/' % module.id})

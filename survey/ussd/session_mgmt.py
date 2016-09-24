@@ -13,21 +13,24 @@ from functools import wraps
 from utils import reads_from_cache, refreshes_cache, saves_to_cache, ONGOING_COMMAND_NP
 import flows
 
+
 def ussd_login_required(func):
     @wraps(func)
     def _decorator(msisdn, *args, **kwargs):
         try:
-#             request = request.GET if request.method == 'GET' else request.POST
-#             trnx_id = request.get('transactionId')
-#             msisdn = request.get('msisdn')
-#             request_string = request.get('ussdRequestString')
-            access = USSDAccess.objects.get(user_identifier=msisdn, is_active=True)
+            #             request = request.GET if request.method == 'GET' else request.POST
+            #             trnx_id = request.get('transactionId')
+            #             msisdn = request.get('msisdn')
+            #             request_string = request.get('ussdRequestString')
+            access = USSDAccess.objects.get(
+                user_identifier=msisdn, is_active=True)
             kwargs['access'] = access
 #            cache.set('/interviewer/%s/access' % access.interviewer.pk, access)
             return func(msisdn, *args, **kwargs)
         except USSDAccess.DoesNotExist:
             return flows.MESSAGES['USER_NOT_REGISTERED']
     return _decorator
+
 
 class Mock(object):
 
@@ -46,6 +49,6 @@ def manage(msisdn, trnx_id, request_string, access=None):
     if ongoing_command_name is None:
         return flows.Start(access).intro()
     else:
-        
+
         ongoing_command = getattr(flows, ongoing_command_name)
         return ongoing_command(access).respond(request_string)

@@ -21,7 +21,8 @@ def conditions(request):
 
 @permission_required('auth.can_view_interviewers')
 def index(request):
-    groups = HouseholdMemberGroup.objects.all().order_by('order').exclude(name='REGISTRATION GROUP')
+    groups = HouseholdMemberGroup.objects.all().order_by(
+        'order').exclude(name='REGISTRATION GROUP')
     return render(request, 'household_member_groups/index.html', {'groups': groups, 'request': request})
 
 
@@ -57,7 +58,8 @@ def add_condition(request):
 
 def has_valid_condition(data):
     if contains_key(data, 'conditions'):
-        corresponding_condition = GroupCondition.objects.filter(id=int(data['conditions']))
+        corresponding_condition = GroupCondition.objects.filter(
+            id=int(data['conditions']))
         return corresponding_condition
     return False
 
@@ -68,7 +70,8 @@ def _process_condition_form(request, condition_form):
         messages.success(request, 'Condition successfully added.')
         redirect_url = '/conditions/'
     else:
-        messages.error(request, 'Condition not added: %s' % condition_form.non_field_errors()[0])
+        messages.error(request, 'Condition not added: %s' %
+                       condition_form.non_field_errors()[0])
         redirect_url = '/conditions/new/'
     return HttpResponseRedirect(redirect_url)
 
@@ -88,11 +91,13 @@ def _process_groupform(request, group_form, action, redirect_url):
 def add_group(request):
     params = request.POST
     response = None
-    group_form = HouseholdMemberGroupForm(initial={'order': HouseholdMemberGroup.max_order() + 1})
+    group_form = HouseholdMemberGroupForm(
+        initial={'order': HouseholdMemberGroup.max_order() + 1})
 
     if request.method == 'POST':
         group_form = HouseholdMemberGroupForm(params)
-        response = _process_groupform(request, group_form, action='added', redirect_url='/groups/')
+        response = _process_groupform(
+            request, group_form, action='added', redirect_url='/groups/')
     context = {'groups_form': group_form,
                'conditions': GroupCondition.objects.all(),
                'title': "New Group",
@@ -157,7 +162,8 @@ def edit_group(request, group_id):
         group_form = HouseholdMemberGroupForm(params, instance=group)
         redirect_url = "/groups/%s/" % group_id
         performed_action = 'edited'
-        response = _process_groupform(request, group_form, performed_action, redirect_url)
+        response = _process_groupform(
+            request, group_form, performed_action, redirect_url)
     context = {'groups_form': group_form,
                'conditions': GroupCondition.objects.all(),
                'title': "Edit Group",

@@ -31,49 +31,56 @@ class GroupConditionTest(TestCase):
     def test_knows_age_condition_equal_to_a_specific_value(self):
         age_value = 20
         attribute_type = "age"
-        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value)
+        age_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=age_value)
 
         self.assertTrue(age_condition.matches_condition(age_value))
 
     def test_knows_age_condition_not_equal_to_a_specific_value(self):
         age_value = 20
         attribute_type = "age"
-        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value)
+        age_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=age_value)
 
         self.assertFalse(age_condition.matches_condition(age_value + 2))
 
     def test_knows_to_match_greater_than_condition(self):
         age_value = 20
         attribute_type = "age"
-        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value, condition='GREATER_THAN')
+        age_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=age_value, condition='GREATER_THAN')
 
-        self.assertTrue(age_condition.matches_condition(age_value+2))
+        self.assertTrue(age_condition.matches_condition(age_value + 2))
 
     def test_knows_to_match_greater_than_condition_if_condition_is_not_met(self):
         age_value = 20
         attribute_type = "age"
-        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value, condition='GREATER_THAN')
+        age_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=age_value, condition='GREATER_THAN')
 
-        self.assertFalse(age_condition.matches_condition(age_value-2))
+        self.assertFalse(age_condition.matches_condition(age_value - 2))
 
     def test_knows_to_match_less_than_condition(self):
         age_value = 20
         attribute_type = "age"
-        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value, condition='LESS_THAN')
+        age_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=age_value, condition='LESS_THAN')
 
-        self.assertTrue(age_condition.matches_condition(age_value-2))
+        self.assertTrue(age_condition.matches_condition(age_value - 2))
 
     def test_knows_to_match_less_than_condition_if_condition_is_not_met(self):
         age_value = 20
         attribute_type = "age"
-        age_condition = GroupCondition.objects.create(attribute=attribute_type, value=age_value, condition='LESS_THAN')
+        age_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=age_value, condition='LESS_THAN')
 
-        self.assertFalse(age_condition.matches_condition(age_value+2))
+        self.assertFalse(age_condition.matches_condition(age_value + 2))
 
     def test_knows_to_match_equal_to_condition_for_gender_if_false(self):
         gender_value = False
         attribute_type = "gender"
-        gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
+        gender_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=gender_value, condition='EQUALS')
 
         self.assertTrue(gender_condition.matches_condition(gender_value))
         self.assertFalse(gender_condition.matches_condition(not gender_value))
@@ -83,7 +90,8 @@ class GroupConditionTest(TestCase):
         attribute_type = "GENDER"
         is_male = "MALE"
         is_female = "FEMALE"
-        gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
+        gender_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=gender_value, condition='EQUALS')
         self.assertTrue(gender_condition.matches_condition(is_female))
         self.assertFalse(gender_condition.matches_condition(is_male))
 
@@ -92,7 +100,8 @@ class GroupConditionTest(TestCase):
         attribute_type = "GENDER"
         is_male = "MALE"
         is_female = "FEMALE"
-        gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
+        gender_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=gender_value, condition='EQUALS')
 
         self.assertTrue(gender_condition.matches_condition(is_male))
         self.assertFalse(gender_condition.matches_condition(is_female))
@@ -101,21 +110,24 @@ class GroupConditionTest(TestCase):
         value = "HEAD"
         attribute_type = "GENERAL"
         is_head = "HEAD"
-        general_condition = GroupCondition.objects.create(attribute=attribute_type, value=value, condition='EQUALS')
+        general_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=value, condition='EQUALS')
 
         self.assertTrue(general_condition.matches_condition(is_head))
 
         value = "HEAD"
         attribute_type = "gender"
         is_head = False
-        general_condition = GroupCondition.objects.create(attribute=attribute_type, value=value, condition='EQUALS')
+        general_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=value, condition='EQUALS')
 
         self.assertFalse(general_condition.matches_condition(is_head))
 
     def test_should_not_match_general_condition_to_head_is_false(self):
         value = "HEAD"
         attribute_type = "GENERAL"
-        general_condition = GroupCondition.objects.create(attribute=attribute_type, value=value, condition='EQUALS')
+        general_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=value, condition='EQUALS')
 
         is_head = False
 
@@ -125,8 +137,10 @@ class GroupConditionTest(TestCase):
         gender_value = "Male"
         attribute_type = "gender"
 
-        gender_condition = GroupCondition.objects.create(attribute=attribute_type, value=gender_value, condition='EQUALS')
+        gender_condition = GroupCondition.objects.create(
+            attribute=attribute_type, value=gender_value, condition='EQUALS')
         self.failUnless(gender_condition)
 
-        duplicate_condition = GroupCondition(attribute=attribute_type, value=gender_value, condition='EQUALS')
+        duplicate_condition = GroupCondition(
+            attribute=attribute_type, value=gender_value, condition='EQUALS')
         self.assertRaises(IntegrityError, duplicate_condition.save)

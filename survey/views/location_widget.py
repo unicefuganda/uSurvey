@@ -22,11 +22,13 @@ class LocationWidget(object):
         data = SortedDict()
         location_types_excluding_country_and_village = self.get_all_location_types()
         for ltype in location_types_excluding_country_and_village:
-            data[ltype.slug] = old_data[ltype.slug] if old_data.has_key(ltype.slug) else []
+            data[ltype.slug] = old_data[
+                ltype.slug] if old_data.has_key(ltype.slug) else []
         return data
 
     def get_all_location_types(self):
-        types = LocationType.objects.exclude(name__iexact='country').exclude(pk=LocationType.smallest_unit().pk)
+        types = LocationType.objects.exclude(name__iexact='country').exclude(
+            pk=LocationType.smallest_unit().pk)
         if not self.level:
             return list(types)
         return types.filter(level__lte=self.level)[1:]
@@ -43,7 +45,8 @@ class LocationWidget(object):
         return self.sorted_by_hierarchy(data)
 
     def get_siblings_data(self, data, location):
-        data[location.type.slug] = location.get_siblings(include_self=True).order_by('name')
+        data[location.type.slug] = location.get_siblings(
+            include_self=True).order_by('name')
 
     def get_ancestors_data(self, data, location):
         location = location.parent
@@ -60,8 +63,10 @@ class LocationWidget(object):
 
     def get_parent(self):
         largest_loc_type = LocationType.largest_unit()
-        locations = Location.objects.filter(type=largest_loc_type).order_by('name')
-        return {largest_loc_type.slug: locations } #self.sorted_by_hierarchy({largest_loc_type.slug: locations }) if locations else {}
+        locations = Location.objects.filter(
+            type=largest_loc_type).order_by('name')
+        # self.sorted_by_hierarchy({largest_loc_type.slug: locations }) if locations else {}
+        return {largest_loc_type.slug: locations}
 
     def next_type_in_hierarchy(self):
         children = self.selected_location.get_children()

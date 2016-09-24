@@ -3,6 +3,7 @@ from survey.models import Indicator, QuestionModule, Batch
 
 
 class IndicatorTest(TestCase):
+
     def test_fields(self):
         indicator = Indicator()
         fields = [str(item.attname) for item in indicator._meta.fields]
@@ -36,4 +37,3 @@ class IndicatorTest(TestCase):
         indicator = Indicator.objects.create(name="indicator name", description="rajni indicator", measure='Count',
                                              module=health_module, batch=batch)
         self.assertFalse(indicator.is_percentage_indicator())
-

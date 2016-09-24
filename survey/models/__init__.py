@@ -1,7 +1,7 @@
 from survey.models.interviewer import Interviewer, SurveyAllocation
 from survey.models.interviews import NumericalAnswer, Interview, TextAnswer, MultiChoiceAnswer, \
-        MultiSelectAnswer, Answer, ODKGeoPoint, DateAnswer, VideoAnswer, \
-        ImageAnswer, AudioAnswer, GeopointAnswer, NonResponseAnswer
+    MultiSelectAnswer, Answer, ODKGeoPoint, DateAnswer, VideoAnswer, \
+    ImageAnswer, AudioAnswer, GeopointAnswer, NonResponseAnswer
 from survey.models.backend import Backend
 from survey.models.questions import Question, QuestionOption, QuestionFlow, TextArgument, TestArgument
 from survey.models.question_templates import QuestionTemplate, TemplateOption
@@ -12,7 +12,7 @@ from survey.models.household_batch_completion import HouseholdMemberBatchComplet
     HouseholdBatchCompletion, HouseMemberSurveyCompletion, HouseSurveyCompletion
 from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
 from survey.models.households import Household, HouseholdHead, HouseholdMember, HouseholdListing, SurveyHouseholdListing, \
-                RandomSelection
+    RandomSelection
 from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess, WebAccess
 from survey.models.location_weight import LocationWeight
 # from survey.models.locations import LocationAutoComplete, LocationCode
@@ -29,7 +29,7 @@ from survey.models.interviews import AnswerAccessDefinition
 from survey.models.locations import Location, LocationType
 
 __all__ = [
-#     'ULocation'
+    #     'ULocation'
     'InterviewerAccess',
     'TemplateOption',
     'WebAccess',
@@ -44,11 +44,11 @@ __all__ = [
     'NumericalAnswer',
     'MultiChoiceAnswer',
     'MultiSelectAnswer',
-    'ODKGeoPoint', 
+    'ODKGeoPoint',
     'DateAnswer',
     'GeopointAnswer',
-    'VideoAnswer', 
-    'ImageAnswer', 
+    'VideoAnswer',
+    'ImageAnswer',
     'AudioAnswer',
     'NonResponseAnswer',
     'Interview',
@@ -71,7 +71,7 @@ __all__ = [
     'Interviewer',
     'BatchCommencement',
     'SurveyHouseholdListing',
-#     'LocationAutoComplete',
+    #     'LocationAutoComplete',
     'Survey',
     'UserProfile',
     'QuestionModule',
@@ -79,8 +79,8 @@ __all__ = [
     'TextArgument',
     'TestArgument',
     'LocationTypeDetails',
-#     'BatchQuestionOrder',
-#     'LocationCode',
+    #     'BatchQuestionOrder',
+    #     'LocationCode',
     'Indicator',
     'LocationWeight',
     'UploadErrorLog',

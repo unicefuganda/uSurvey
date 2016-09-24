@@ -6,13 +6,20 @@ from survey.models.questions import Question, QuestionOption
 
 
 class Formula(BaseModel):
-    numerator = models.ForeignKey(Question, null=True, related_name="as_numerator")
-    groups = models.ForeignKey("HouseholdMemberGroup", null=True, blank=True, related_name="as_group")
-    denominator = models.ForeignKey(Question, null=True, blank=True, related_name="as_denominator")
-    numerator_options = models.ManyToManyField(QuestionOption, related_name='numerator_options')
-    denominator_options = models.ManyToManyField(QuestionOption, related_name='denominator_options')
-    count = models.ForeignKey(Question, null=True, blank=True, related_name="as_count")
-    indicator = models.ForeignKey("Indicator", null=True, related_name="formula")
+    numerator = models.ForeignKey(
+        Question, null=True, related_name="as_numerator")
+    groups = models.ForeignKey(
+        "HouseholdMemberGroup", null=True, blank=True, related_name="as_group")
+    denominator = models.ForeignKey(
+        Question, null=True, blank=True, related_name="as_denominator")
+    numerator_options = models.ManyToManyField(
+        QuestionOption, related_name='numerator_options')
+    denominator_options = models.ManyToManyField(
+        QuestionOption, related_name='denominator_options')
+    count = models.ForeignKey(
+        Question, null=True, blank=True, related_name="as_count")
+    indicator = models.ForeignKey(
+        "Indicator", null=True, related_name="formula")
 
     class Meta:
         app_label = 'survey'
@@ -37,14 +44,16 @@ class Formula(BaseModel):
     def compute_numerical_question_for_interviewers(self, interviewers):
         values = []
         for interviewer in interviewers:
-            values.append(self.compute_numerical_question_for_interviewer(interviewer))
+            values.append(
+                self.compute_numerical_question_for_interviewer(interviewer))
         return sum(values) / len(values)
 
     def compute_multichoice_question_for_interviewers(self, interviewers):
         values = []
         computed_dict = {}
         for interviewer in interviewers:
-            values.append(self.compute_multichoice_question_for_interviewer(interviewer))
+            values.append(
+                self.compute_multichoice_question_for_interviewer(interviewer))
 
         denominator = len(values)
         for option in self.numerator.options.all():
@@ -57,10 +66,12 @@ class Formula(BaseModel):
 
     def compute_multichoice_question_for_interviewer(self, interviewer):
         values = {}
-        denominator = self.answer_sum_for_interviewer(self.denominator, interviewer)
+        denominator = self.answer_sum_for_interviewer(
+            self.denominator, interviewer)
         for option in self.numerator.options.all():
             numerator = self.compute_numerator_for_option(option, interviewer)
-            values[option.text] = self.process_formula(numerator, denominator, interviewer)
+            values[option.text] = self.process_formula(
+                numerator, denominator, interviewer)
         return values
 
     def compute_numerator_for_option(self, option, interviewer):
@@ -76,8 +87,10 @@ class Formula(BaseModel):
             aggregate(Sum('answer'))['answer__sum']
 
     def compute_numerical_question_for_interviewer(self, interviewer):
-        denominator = self.answer_sum_for_interviewer(self.denominator, interviewer)
-        numerator = self.answer_sum_for_interviewer(self.numerator, interviewer)
+        denominator = self.answer_sum_for_interviewer(
+            self.denominator, interviewer)
+        numerator = self.answer_sum_for_interviewer(
+            self.numerator, interviewer)
         return self.process_formula(numerator, denominator, interviewer)
 
     def get_denominator_sum_based_on_question_type(self, interviewer, question):
@@ -88,7 +101,8 @@ class Formula(BaseModel):
             denominator_number = len(question.answer_class().objects.filter(interviewer=interviewer,
                                                                             answer__id__in=option_ids))
         else:
-            denominator_number = self.answer_sum_for_interviewer(question, interviewer)
+            denominator_number = self.answer_sum_for_interviewer(
+                question, interviewer)
         return denominator_number
 
     def numerator_computation(self, interviewer, question):
@@ -100,7 +114,8 @@ class Formula(BaseModel):
             numerator_number = len(question.answer_class().objects.filter(interviewer=interviewer,
                                                                           answer__id__in=option_ids))
         else:
-            numerator_number = self.answer_sum_for_interviewer(question, interviewer)
+            numerator_number = self.answer_sum_for_interviewer(
+                question, interviewer)
         return numerator_number
 
     def denominator_computation(self, interviewer, survey):
@@ -109,21 +124,25 @@ class Formula(BaseModel):
         if self.groups:
             all_members_in_group = []
             for household in survey.survey_household.all().filter(interviewer=interviewer):
-                all_members_in_group.append(household.members_belonging_to_group(self.groups))
+                all_members_in_group.append(
+                    household.members_belonging_to_group(self.groups))
 
             denominator_number = len(all_members_in_group)
         elif self.count:
-            denominator_number = self.get_denominator_sum_based_on_question_type(interviewer, self.count)
+            denominator_number = self.get_denominator_sum_based_on_question_type(
+                interviewer, self.count)
 
         elif self.denominator:
-            denominator_number = self.get_denominator_sum_based_on_question_type(interviewer, self.denominator)
+            denominator_number = self.get_denominator_sum_based_on_question_type(
+                interviewer, self.denominator)
 
         return denominator_number
 
     def compute_for_household_with_sub_options(self, survey, interviewer):
-        numerator_number = self.numerator_computation(interviewer, self.numerator)
+        numerator_number = self.numerator_computation(
+            interviewer, self.numerator)
         denominator_number = self.denominator_computation(interviewer, survey)
-        return numerator_number/denominator_number
+        return numerator_number / denominator_number
 
     def save_denominator_options(self, question_options):
         for option in question_options:

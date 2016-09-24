@@ -10,22 +10,23 @@ from survey.forms.logic import LogicForm
 class LogicFormTest(TestCase):
 
     def setUp(self):
-        #create some questions
+        # create some questions
         self.survey = Survey.objects.create(name='test')
         self.batch = Batch.objects.create(name='test', survey=self.survey)
         self.module = QuestionModule.objects.create(name='test')
         self.group = HouseholdMemberGroup.objects.create(name='test', order=1)
 
     def test_correct_validators_is_applied_as_per_question_answer_type(self):
-        answer_types = Answer.supported_answers() #different types of questions
+        answer_types = Answer.supported_answers()  # different types of questions
         for answer_type in answer_types:
             q = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                    identifier=answer_type.choice_name(), text='test',
+                                        identifier=answer_type.choice_name(), text='test',
                                         answer_type=answer_type.choice_name())
             l = LogicForm(q)
             answer_choice_names = [(validator.__name__, validator.__name__.upper())
                                    for validator in answer_type.validators()]
-            self.assertEqual(set(l.fields['condition'].choices), set(answer_choice_names))
+            self.assertEqual(
+                set(l.fields['condition'].choices), set(answer_choice_names))
 
     def test_logic_form_has_options_for_multi_type_questions(self):
         for answer_type in [MultiSelectAnswer.choice_name(), MultiChoiceAnswer.choice_name()]:
@@ -49,19 +50,19 @@ class LogicFormTest(TestCase):
         :return:
         '''
         q1 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test1',
+                                     identifier='test1',
                                      text='test1', answer_type=NumericalAnswer.choice_name())
         q2 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test2',
+                                     identifier='test2',
                                      text='test2', answer_type=NumericalAnswer.choice_name())
         q3 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test3',
+                                     identifier='test3',
                                      text='test3', answer_type=NumericalAnswer.choice_name())
         q4 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test4',
+                                     identifier='test4',
                                      text='test4', answer_type=NumericalAnswer.choice_name())
         q5 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test5',
+                                     identifier='test5',
                                      text='test5', answer_type=NumericalAnswer.choice_name())
         test_condition = NumericalAnswer.validators()[0].__name__
         test_param = '15'
@@ -79,9 +80,11 @@ class LogicFormTest(TestCase):
         l = LogicForm(q1, data=form_data)
         if l.is_valid():
             l.save()
-            #now check if equivalent Question flow and test arguments were created
+            # now check if equivalent Question flow and test arguments were
+            # created
             try:
-                qf = QuestionFlow.objects.get(question=q1, next_question=q4, validation_test=test_condition)
+                qf = QuestionFlow.objects.get(
+                    question=q1, next_question=q4, validation_test=test_condition)
                 TextArgument.objects.get(flow=qf, param=test_param)
                 self.assertTrue(True)
                 return
@@ -101,19 +104,19 @@ class LogicFormTest(TestCase):
         :return:
         '''
         q1 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test1',
+                                     identifier='test1',
                                      text='test1', answer_type=TextAnswer.choice_name())
         q2 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test2',
+                                     identifier='test2',
                                      text='test2', answer_type=TextAnswer.choice_name())
         q3 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test3',
+                                     identifier='test3',
                                      text='test3', answer_type=TextAnswer.choice_name())
         q4 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test4',
+                                     identifier='test4',
                                      text='test4', answer_type=TextAnswer.choice_name())
         q5 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test5',
+                                     identifier='test5',
                                      text='test5', answer_type=TextAnswer.choice_name())
         self.batch.start_question = q1
         QuestionFlow.objects.create(question=q1, next_question=q3)
@@ -121,19 +124,22 @@ class LogicFormTest(TestCase):
         test_condition = TextAnswer.validators()[0].__name__
         test_param = 'Hey you!!'
         form_data = {
-            'action' : LogicForm.ASK_SUBQUESTION,
+            'action': LogicForm.ASK_SUBQUESTION,
             'next_question': q4.pk,
             'condition': test_condition,
-            'value' : test_param
+            'value': test_param
         }
         l = LogicForm(q1, data=form_data)
         if l.is_valid():
             l.save()
-            #now check if equivalent Question flow and test arguments were created
+            # now check if equivalent Question flow and test arguments were
+            # created
             try:
-                qf = QuestionFlow.objects.get(question=q1, next_question=q4, validation_test=test_condition)
+                qf = QuestionFlow.objects.get(
+                    question=q1, next_question=q4, validation_test=test_condition)
                 TextArgument.objects.get(flow=qf, param=test_param)
-                qf = QuestionFlow.objects.get(question=q1, next_question=q3, validation_test__isnull=True)
+                qf = QuestionFlow.objects.get(
+                    question=q1, next_question=q3, validation_test__isnull=True)
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
@@ -146,26 +152,25 @@ class LogicFormTest(TestCase):
             self.assertTrue(False, 'Invalid form: %s' % l.errors)
         self.assertTrue(False)
 
-
     def test_subquestion_selection_in_form_question_creates_branch_flow(self):
         '''
 
         :return:
         '''
         q1 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test1',
+                                     identifier='test1',
                                      text='test1', answer_type=TextAnswer.choice_name())
         q2 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test2',
+                                     identifier='test2',
                                      text='test2', answer_type=TextAnswer.choice_name())
         q3 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test3',
+                                     identifier='test3',
                                      text='test3', answer_type=TextAnswer.choice_name())
         q4 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test4',
+                                     identifier='test4',
                                      text='test4', answer_type=TextAnswer.choice_name())
         q5 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test5',
+                                     identifier='test5',
                                      text='test5', answer_type=TextAnswer.choice_name())
         self.batch.start_question = q1
         QuestionFlow.objects.create(question=q1, next_question=q3)
@@ -173,19 +178,22 @@ class LogicFormTest(TestCase):
         test_condition = TextAnswer.validators()[0].__name__
         test_param = 'Hey you!!'
         form_data = {
-            'action' : LogicForm.ASK_SUBQUESTION,
+            'action': LogicForm.ASK_SUBQUESTION,
             'next_question': q4.pk,
             'condition': test_condition,
-            'value' : test_param
+            'value': test_param
         }
         l = LogicForm(q1, data=form_data)
         if l.is_valid():
             l.save()
-            #now check if equivalent Question flow and test arguments were created
+            # now check if equivalent Question flow and test arguments were
+            # created
             try:
-                qf = QuestionFlow.objects.get(question=q1, next_question=q4, validation_test=test_condition)
+                qf = QuestionFlow.objects.get(
+                    question=q1, next_question=q4, validation_test=test_condition)
                 TextArgument.objects.get(flow=qf, param=test_param)
-                qf = QuestionFlow.objects.get(question=q1, next_question=q3, validation_test__isnull=True)
+                qf = QuestionFlow.objects.get(
+                    question=q1, next_question=q3, validation_test__isnull=True)
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
@@ -204,19 +212,19 @@ class LogicFormTest(TestCase):
         :return:
         '''
         q1 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test1',
+                                     identifier='test1',
                                      text='test1', answer_type=DateAnswer.choice_name())
         q2 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test2',
+                                     identifier='test2',
                                      text='test2', answer_type=DateAnswer.choice_name())
         q3 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test3',
+                                     identifier='test3',
                                      text='test3', answer_type=DateAnswer.choice_name())
         q4 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test4',
+                                     identifier='test4',
                                      text='test4', answer_type=DateAnswer.choice_name())
         q5 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test5',
+                                     identifier='test5',
                                      text='test5', answer_type=DateAnswer.choice_name())
         self.batch.start_question = q1
         QuestionFlow.objects.create(question=q1, next_question=q2)
@@ -227,7 +235,7 @@ class LogicFormTest(TestCase):
         test_param_upper = datetime.now()
         test_param_lower = datetime.now() - timedelta(days=3)
         form_data = {
-            'action' : LogicForm.REANSWER,
+            'action': LogicForm.REANSWER,
             'condition': test_condition,
             'min_value': test_param_lower,
             'max_value': test_param_upper
@@ -235,13 +243,19 @@ class LogicFormTest(TestCase):
         l = LogicForm(q2, data=form_data)
         if l.is_valid():
             l.save()
-            #now check if equivalent Question flow and test arguments were created
+            # now check if equivalent Question flow and test arguments were
+            # created
             try:
-                qf = QuestionFlow.objects.get(question=q2, next_question=q2, validation_test=test_condition)
-                TextArgument.objects.get(flow=qf, position=0, param=test_param_lower)
-                TextArgument.objects.create(flow=qf, position=1, param=test_param_upper)
-                QuestionFlow.objects.get(question=q1, next_question=q2, validation_test__isnull=True)
-                QuestionFlow.objects.get(question=q2, next_question=q3, validation_test__isnull=True)
+                qf = QuestionFlow.objects.get(
+                    question=q2, next_question=q2, validation_test=test_condition)
+                TextArgument.objects.get(
+                    flow=qf, position=0, param=test_param_lower)
+                TextArgument.objects.create(
+                    flow=qf, position=1, param=test_param_upper)
+                QuestionFlow.objects.get(
+                    question=q1, next_question=q2, validation_test__isnull=True)
+                QuestionFlow.objects.get(
+                    question=q2, next_question=q3, validation_test__isnull=True)
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
@@ -254,7 +268,6 @@ class LogicFormTest(TestCase):
             self.assertTrue(False, 'Invalid form')
         self.assertTrue(False)
 
-
     def test_end_interview_selection_in_form_question_creates_flow_to_with_no_next_question(self):
         '''
 
@@ -263,21 +276,21 @@ class LogicFormTest(TestCase):
         yes = 'yes'
         no = 'no'
         q1 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test1',
+                                     identifier='test1',
                                      text='test1', answer_type=DateAnswer.choice_name())
         q2 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test2',
+                                     identifier='test2',
                                      text='test2', answer_type=MultiChoiceAnswer.choice_name())
         q_o1 = QuestionOption.objects.create(question=q2, text=yes, order=1)
         QuestionOption.objects.create(question=q2, text=no, order=2)
         q3 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test3',
+                                     identifier='test3',
                                      text='test3', answer_type=DateAnswer.choice_name())
         q4 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test4',
+                                     identifier='test4',
                                      text='test4', answer_type=DateAnswer.choice_name())
         q5 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test5',
+                                     identifier='test5',
                                      text='test5', answer_type=DateAnswer.choice_name())
         self.batch.start_question = q1
         QuestionFlow.objects.create(question=q1, next_question=q2)
@@ -286,19 +299,23 @@ class LogicFormTest(TestCase):
         QuestionFlow.objects.create(question=q4, next_question=q5)
         test_condition = MultiChoiceAnswer.validators()[0].__name__
         form_data = {
-            'action' : LogicForm.END_INTERVIEW,
+            'action': LogicForm.END_INTERVIEW,
             'condition': test_condition,
             'option': q_o1.order
         }
         l = LogicForm(q2, data=form_data)
         if l.is_valid():
             l.save()
-            #now check if equivalent Question flow and test arguments were created
+            # now check if equivalent Question flow and test arguments were
+            # created
             try:
-                qf = QuestionFlow.objects.get(question=q2, next_question__isnull=True, validation_test=test_condition)
+                qf = QuestionFlow.objects.get(
+                    question=q2, next_question__isnull=True, validation_test=test_condition)
                 TextArgument.objects.get(flow=qf, position=0, param=q_o1.order)
-                QuestionFlow.objects.get(question=q1, next_question=q2, validation_test__isnull=True)
-                QuestionFlow.objects.get(question=q2, next_question=q3, validation_test__isnull=True)
+                QuestionFlow.objects.get(
+                    question=q1, next_question=q2, validation_test__isnull=True)
+                QuestionFlow.objects.get(
+                    question=q2, next_question=q3, validation_test__isnull=True)
                 self.assertTrue(True)
                 return
             except QuestionFlow.DoesNotExist:
@@ -317,19 +334,19 @@ class LogicFormTest(TestCase):
         :return:
         '''
         q1 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test1',
+                                     identifier='test1',
                                      text='test1', answer_type=NumericalAnswer.choice_name())
         q2 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test2',
+                                     identifier='test2',
                                      text='test2', answer_type=NumericalAnswer.choice_name())
         q3 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test3',
+                                     identifier='test3',
                                      text='test3', answer_type=NumericalAnswer.choice_name())
         q4 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test4',
+                                     identifier='test4',
                                      text='test4', answer_type=NumericalAnswer.choice_name())
         q5 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test5',
+                                     identifier='test5',
                                      text='test5', answer_type=NumericalAnswer.choice_name())
         test_condition = NumericalAnswer.validators()[0].__name__
         test_param = '6267fe'
@@ -347,9 +364,11 @@ class LogicFormTest(TestCase):
         l = LogicForm(q1, data=form_data)
         if l.is_valid():
             l.save()
-            #now check if equivalent Question flow and test arguments were created
+            # now check if equivalent Question flow and test arguments were
+            # created
             try:
-                qf = QuestionFlow.objects.get(question=q1, next_question=q4, validation_test=test_condition)
+                qf = QuestionFlow.objects.get(
+                    question=q1, next_question=q4, validation_test=test_condition)
                 TextArgument.objects.get(flow=qf, param=test_param)
                 self.assertTrue(False, 'completely wrong. value saved as good')
                 return
@@ -357,12 +376,11 @@ class LogicFormTest(TestCase):
                 self.assertTrue(False, 'form valid but flow not existing')
                 pass
             except TextArgument:
-                self.assertTrue(False, 'form valid but text agrunments not saved')
+                self.assertTrue(
+                    False, 'form valid but text agrunments not saved')
                 pass
         else:
             self.assertTrue(True)
-
-
 
     def test_specify_wrong_max_value_gives_form_error(self):
         '''
@@ -370,19 +388,19 @@ class LogicFormTest(TestCase):
         :return:
         '''
         q1 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test1',
+                                     identifier='test1',
                                      text='test1', answer_type=DateAnswer.choice_name())
         q2 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test2',
+                                     identifier='test2',
                                      text='test2', answer_type=DateAnswer.choice_name())
         q3 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test3',
+                                     identifier='test3',
                                      text='test3', answer_type=DateAnswer.choice_name())
         q4 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test4',
+                                     identifier='test4',
                                      text='test4', answer_type=DateAnswer.choice_name())
         q5 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test5',
+                                     identifier='test5',
                                      text='test5', answer_type=DateAnswer.choice_name())
         self.batch.start_question = q1
         QuestionFlow.objects.create(question=q1, next_question=q2)
@@ -393,7 +411,7 @@ class LogicFormTest(TestCase):
         test_param_upper = 'now()'
         test_param_lower = datetime.now() - timedelta(days=3)
         form_data = {
-            'action' : LogicForm.REANSWER,
+            'action': LogicForm.REANSWER,
             'condition': test_condition,
             'min_value': test_param_lower,
             'max_value': test_param_upper
@@ -401,25 +419,31 @@ class LogicFormTest(TestCase):
         l = LogicForm(q2, data=form_data)
         if l.is_valid():
             l.save()
-            #now check if equivalent Question flow and test arguments were created
+            # now check if equivalent Question flow and test arguments were
+            # created
             try:
-                qf = QuestionFlow.objects.get(question=q2, next_question=q2, validation_test=test_condition)
-                TextArgument.objects.get(flow=qf, position=0, param=test_param_lower)
-                TextArgument.objects.create(flow=qf, position=1, param=test_param_upper)
-                QuestionFlow.objects.get(question=q1, next_question=q2, validation_test__isnull=True)
-                QuestionFlow.objects.get(question=q2, next_question=q3, validation_test__isnull=True)
-                self.assertTrue(False, 'completely wrong. bad values was saved as good!!')
+                qf = QuestionFlow.objects.get(
+                    question=q2, next_question=q2, validation_test=test_condition)
+                TextArgument.objects.get(
+                    flow=qf, position=0, param=test_param_lower)
+                TextArgument.objects.create(
+                    flow=qf, position=1, param=test_param_upper)
+                QuestionFlow.objects.get(
+                    question=q1, next_question=q2, validation_test__isnull=True)
+                QuestionFlow.objects.get(
+                    question=q2, next_question=q3, validation_test__isnull=True)
+                self.assertTrue(
+                    False, 'completely wrong. bad values was saved as good!!')
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'form valid flow not existing')
                 pass
             except TextArgument:
-                self.assertTrue(False, 'Form valid but text agrunments not saved')
+                self.assertTrue(
+                    False, 'Form valid but text agrunments not saved')
                 pass
         else:
             self.assertTrue(True)
-
-
 
     def test_specify_wrong_min_value_gives_form_error(self):
         '''
@@ -427,19 +451,19 @@ class LogicFormTest(TestCase):
         :return:
         '''
         q1 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test1',
+                                     identifier='test1',
                                      text='test1', answer_type=DateAnswer.choice_name())
         q2 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test2',
+                                     identifier='test2',
                                      text='test2', answer_type=DateAnswer.choice_name())
         q3 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test3',
+                                     identifier='test3',
                                      text='test3', answer_type=DateAnswer.choice_name())
         q4 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test4',
+                                     identifier='test4',
                                      text='test4', answer_type=DateAnswer.choice_name())
         q5 = Question.objects.create(group=self.group, module=self.module, batch=self.batch,
-                                            identifier='test5',
+                                     identifier='test5',
                                      text='test5', answer_type=DateAnswer.choice_name())
         self.batch.start_question = q1
         QuestionFlow.objects.create(question=q1, next_question=q2)
@@ -450,7 +474,7 @@ class LogicFormTest(TestCase):
         test_param_upper = datetime.now()
         test_param_lower = 'some time ago'
         form_data = {
-            'action' : LogicForm.REANSWER,
+            'action': LogicForm.REANSWER,
             'condition': test_condition,
             'min_value': test_param_lower,
             'max_value': test_param_upper
@@ -458,20 +482,28 @@ class LogicFormTest(TestCase):
         l = LogicForm(q2, data=form_data)
         if l.is_valid():
             l.save()
-            #now check if equivalent Question flow and test arguments were created
+            # now check if equivalent Question flow and test arguments were
+            # created
             try:
-                qf = QuestionFlow.objects.get(question=q2, next_question=q2, validation_test=test_condition)
-                TextArgument.objects.get(flow=qf, position=0, param=test_param_lower)
-                TextArgument.objects.create(flow=qf, position=1, param=test_param_upper)
-                QuestionFlow.objects.get(question=q1, next_question=q2, validation_test__isnull=True)
-                QuestionFlow.objects.get(question=q2, next_question=q3, validation_test__isnull=True)
-                self.assertTrue(False, 'completely wrong. bad values was saved as good!!')
+                qf = QuestionFlow.objects.get(
+                    question=q2, next_question=q2, validation_test=test_condition)
+                TextArgument.objects.get(
+                    flow=qf, position=0, param=test_param_lower)
+                TextArgument.objects.create(
+                    flow=qf, position=1, param=test_param_upper)
+                QuestionFlow.objects.get(
+                    question=q1, next_question=q2, validation_test__isnull=True)
+                QuestionFlow.objects.get(
+                    question=q2, next_question=q3, validation_test__isnull=True)
+                self.assertTrue(
+                    False, 'completely wrong. bad values was saved as good!!')
                 return
             except QuestionFlow.DoesNotExist:
                 self.assertTrue(False, 'form valid flow not existing')
                 pass
             except TextArgument:
-                self.assertTrue(False, 'Form valid but text agrunments not saved')
+                self.assertTrue(
+                    False, 'Form valid but text agrunments not saved')
                 pass
         else:
             self.assertTrue(True)

@@ -5,9 +5,11 @@ from channels import Channel, Group
 from channels.sessions import channel_session
 from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
 
+
 def get_group_path(user, path):
     path = path.strip("/")
     return '%s/%s' % (path, user.pk)
+
 
 @channel_session_user_from_http
 def ws_add(message):
@@ -16,15 +18,18 @@ def ws_add(message):
     if message.user.is_authenticated():
         Group(get_group_path(message.user, path)).add(message.reply_channel)
 
+
 @channel_session_user
 def ws_message(message):
     pass
+
 
 @channel_session_user
 def ws_disconnect(message):
     path = message.content['path']
     if message.user.is_authenticated():
-        Group(get_group_path(message.user, path)).discard(message.reply_channel)
+        Group(get_group_path(message.user, path)
+              ).discard(message.reply_channel)
 
 channel_routing = [
     route("websocket.connect", ws_add, path=r"^%s$" % settings.WEBSOCKET_URL),

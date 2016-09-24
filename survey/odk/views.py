@@ -1,5 +1,9 @@
 from datetime import datetime
-import pytz, os, base64, random, logging
+import pytz
+import os
+import base64
+import random
+import logging
 from functools import wraps
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET, require_POST
@@ -45,20 +49,23 @@ def get_survey_xform(allocation):
     loop_enders = set()
     map(lambda batch: loop_enders.update(batch.loop_enders()), batches)
     loop_boundaries = OrderedDict()
-    map(lambda batch: loop_boundaries.update(batch.loop_back_boundaries()), batches)
+    map(lambda batch: loop_boundaries.update(
+        batch.loop_back_boundaries()), batches)
     return render_to_string(template_file, {
         'interviewer': interviewer,
-        'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
-        'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
-        'survey' : survey,
-        'allocation' : allocation,
-        'survey_batches' : batches,
-        'messages' : MESSAGES,
-        'loop_starters' : loop_starters,
-        'loop_enders' : loop_enders,
+        # interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
+        'registered_households': registered_households,
+        'title': '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
+        'survey': survey,
+        'allocation': allocation,
+        'survey_batches': batches,
+        'messages': MESSAGES,
+        'loop_starters': loop_starters,
+        'loop_enders': loop_enders,
         'loop_boundaries': loop_boundaries,
-        'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
-        })
+        'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
+    })
+
 
 def get_household_list_xform(interviewer, survey, house_listing):
     selectable_households = None
@@ -67,30 +74,35 @@ def get_household_list_xform(interviewer, survey, house_listing):
     #     selectable_households = [idx+1 for idx in range(total_households)]
     return render_to_string("odk/household_listing-repeat.xml", {
         'interviewer': interviewer,
-        'survey' : survey,
-        'educational_levels' : LEVEL_OF_EDUCATION,
-        'messages' : MESSAGES,
-        'selectable_households' : selectable_households,
-        })
+        'survey': survey,
+        'educational_levels': LEVEL_OF_EDUCATION,
+        'messages': MESSAGES,
+        'selectable_households': selectable_households,
+    })
+
 
 def get_on_response_xform(interviewer, survey):
     batches = interviewer.ea.open_batches(survey)
     return render_to_string("odk/survey_form-no-repeat.xml", {
         'interviewer': interviewer,
-        'registered_households': registered_households, #interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
-        'title' : '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
-        'survey' : survey,
-        'survey_batches' : batches,
-        'messages' : MESSAGES,
-        'answer_types' : dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
-        })
+        # interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
+        'registered_households': registered_households,
+        'title': '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
+        'survey': survey,
+        'survey_batches': batches,
+        'messages': MESSAGES,
+        'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
+    })
+
 
 @login_required
 @permission_required('auth.can_view_aggregates')
 def download_submission_attachment(request, submission_id):
     odk_submission = ODKSubmission.objects.get(pk=submission_id)
-    filename = '%s-%s-%s.zip' % (odk_submission.survey.name, odk_submission.household_member.pk, odk_submission.interviewer.pk)
-    attachment_dir = os.path.join(settings.SUBMISSION_UPLOAD_BASE, str(odk_submission.pk), 'attachments')
+    filename = '%s-%s-%s.zip' % (odk_submission.survey.name,
+                                 odk_submission.household_member.pk, odk_submission.interviewer.pk)
+    attachment_dir = os.path.join(
+        settings.SUBMISSION_UPLOAD_BASE, str(odk_submission.pk), 'attachments')
     response = HttpResponse(content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     response.write(get_zipped_dir(attachment_dir))
@@ -105,10 +117,12 @@ def submission_list(request):
                      'household_member__household__house_number', 'household_member__surname',
                      'household_member__first_name', 'form_id', 'instance_id']
     if request.GET.has_key('q'):
-        odk_submissions = get_filterset(odk_submissions, request.GET['q'], search_fields)
-    return render(request, 'odk/submission_list.html', { 'submissions' : odk_submissions,
-                                                         'placeholder': 'interviewer, house, member, survey',
+        odk_submissions = get_filterset(
+            odk_submissions, request.GET['q'], search_fields)
+    return render(request, 'odk/submission_list.html', {'submissions': odk_submissions,
+                                                        'placeholder': 'interviewer, house, member, survey',
                                                         'request': request})
+
 
 @http_digest_interviewer_auth
 @require_GET
@@ -118,30 +132,32 @@ def form_list(request):
     """
     interviewer = request.user
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
-    #to do - Make fetching households more e
+    # to do - Make fetching households more e
     allocation = get_survey_allocation(interviewer)
     if allocation and interviewer.ea.open_batches:
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
-              _("survey allocation %s" % allocation.survey), {}, request)
+                  _("survey allocation %s" % allocation.survey), {}, request)
         survey = allocation.survey
-        survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
+        survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
+            interviewer, survey)
         audit = {}
 
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
-              _("Requested forms list. for %s" % interviewer.name), audit, request)
+                  _("Requested forms list. for %s" % interviewer.name), audit, request)
         content = render_to_string("odk/xformsList.xml", {
-        'allocation' : allocation,
-        'survey' : survey,
-        'interviewer' : interviewer,
-        'request' : request,
-         'survey_listing': survey_listing,
-          'Const': SurveyAllocation
+            'allocation': allocation,
+            'survey': survey,
+            'interviewer': interviewer,
+            'request': request,
+            'survey_listing': survey_listing,
+            'Const': SurveyAllocation
         })
         response = BaseOpenRosaResponse(content)
         response.status_code = 200
         return response
     else:
         return OpenRosaResponseNotFound('No survey allocated presently')
+
 
 @http_digest_interviewer_auth
 def download_xform(request, survey_id):
@@ -154,20 +170,22 @@ def download_xform(request, survey_id):
                 if allocation.stage is None:
                     allocation.stage = SurveyAllocation.LISTING
                     allocation.save()
-                survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
-                survey_xform = get_household_list_xform(interviewer, survey, survey_listing.listing)
+                survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
+                    interviewer, survey)
+                survey_xform = get_household_list_xform(
+                    interviewer, survey, survey_listing.listing)
             else:
                 survey_xform = get_survey_xform(allocation)
-            form_id = '%s'% allocation.pk
+            form_id = '%s' % allocation.pk
 
             audit = {
                 "xform": form_id
             }
-            audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                        _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
-                                                                 "interviewer": interviewer.name,
-                                                                "id_string": form_id
-                                                            }, audit, request)
+            audit_log(Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
+                      _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
+                          "interviewer": interviewer.name,
+                          "id_string": form_id
+                      }, audit, request)
             response = response_with_mimetype_and_name('xml', 'survey-%s' % allocation.pk,
                                                        show_date=False, full_mime='text/xml')
             response.content = survey_xform
@@ -186,21 +204,24 @@ def download_houselist_xform(request):
     response = OpenRosaResponseNotFound()
     if allocation:
         survey = allocation.survey
-        survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(interviewer, survey)
-        householdlist_xform = get_household_list_xform(interviewer, survey, survey_listing.listing)
-        form_id = 'allocation-%s'% allocation.id
+        survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
+            interviewer, survey)
+        householdlist_xform = get_household_list_xform(
+            interviewer, survey, survey_listing.listing)
+        form_id = 'allocation-%s' % allocation.id
         audit = {
             "xform": form_id
         }
-        audit_log( Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                    _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
-                                                            "interviewer": interviewer.name,
-                                                            "id_string": form_id
-                                                        }, audit, request)
+        audit_log(Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
+                  _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
+                      "interviewer": interviewer.name,
+                      "id_string": form_id
+                  }, audit, request)
         response = response_with_mimetype_and_name('xml', 'household_listing-%s' % survey.pk,
                                                    show_date=False, full_mime='text/xml')
         response.content = householdlist_xform
     return response
+
 
 @http_digest_interviewer_auth
 @require_http_methods(["POST"])
@@ -218,48 +239,49 @@ def submission(request):
         if len(xml_file_list) != 1:
             return OpenRosaResponseBadRequest(u"There should be a single XML submission file.")
         media_files = request.FILES.values()
-        submission_report = process_submission(interviewer, xml_file_list[0], media_files=media_files)
+        submission_report = process_submission(
+            interviewer, xml_file_list[0], media_files=media_files)
         logger.info(submission_report)
         context = Context({
-        'message' : settings.ODK_SUBMISSION_SUCCESS_MSG,
-        'instanceID' : u'uuid:%s' % submission_report.instance_id,
-        'formid' : submission_report.form_id,
-        'submissionDate' : submission_date,
-        'markedAsCompleteDate' : submission_date
+            'message': settings.ODK_SUBMISSION_SUCCESS_MSG,
+            'instanceID': u'uuid:%s' % submission_report.instance_id,
+            'formid': submission_report.form_id,
+            'submissionDate': submission_date,
+            'markedAsCompleteDate': submission_date
         })
         t = loader.get_template('odk/submission.xml')
         audit = {}
-        audit_log( Actions.SUBMISSION_CREATED, request.user, interviewer, 
-            _("'%(interviewer)s' Submitted XML for form '%(id_string)s'. Desc: '%(desc)s'") % {
-                                                        "interviewer": interviewer.name,
-                                                        "desc" : submission_report.description,
-                                                        "id_string": submission_report.form_id
-                                                    }, audit, request)
+        audit_log(Actions.SUBMISSION_CREATED, request.user, interviewer,
+                  _("'%(interviewer)s' Submitted XML for form '%(id_string)s'. Desc: '%(desc)s'") % {
+                      "interviewer": interviewer.name,
+                      "desc": submission_report.description,
+                      "id_string": submission_report.form_id
+                  }, audit, request)
         response = BaseOpenRosaResponse(t.render(context))
         response.status_code = 201
         response['Location'] = request.build_absolute_uri(request.path)
         return response
     except NotEnoughHouseholds:
         desc = 'Not enough households'
-        audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer,
-            _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
-                                                        "interviewer": interviewer.name,
-                                                        "desc" : desc
-                                                    }, {'desc' : desc}, request, logging.WARNING)
+        audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
+                  _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                      "interviewer": interviewer.name,
+                      "desc": desc
+                  }, {'desc': desc}, request, logging.WARNING)
         return OpenRosaRequestForbidden(u"Not Enough Households")
     except HouseholdNumberAlreadyExists:
         desc = 'House number already exists'
-        audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer,
-            _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
-                                                        "interviewer": interviewer.name,
-                                                        "desc" : desc
-                                                    }, {'desc' : desc}, request, logging.WARNING)
+        audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
+                  _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                      "interviewer": interviewer.name,
+                      "desc": desc
+                  }, {'desc': desc}, request, logging.WARNING)
         # return OpenRosaRequestConflict(u'Household Number Already exists')
         return OpenRosaResponseNotAllowed(u'Household Number Already exists')
     except Exception, ex:
-        audit_log( Actions.SUBMISSION_REQUESTED, request.user, interviewer, 
-            _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
-                                                        "interviewer": interviewer.name,
-                                                        "desc" : str(ex)
-                                                    }, {'desc' : str(ex)}, request, logging.WARNING)
+        audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
+                  _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
+                      "interviewer": interviewer.name,
+                      "desc": str(ex)
+                  }, {'desc': str(ex)}, request, logging.WARNING)
         return OpenRosaServerError(u"An error occurred. Please try again")

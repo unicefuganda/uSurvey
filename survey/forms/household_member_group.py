@@ -18,11 +18,13 @@ class HouseholdMemberGroupForm(ModelForm):
         self_pk = None
         if self.instance:
             self_pk = self.instance.pk
-        hmgroups = HouseholdMemberGroup.objects.filter(conditions__in=selected_conditions).exclude(pk=self_pk)
+        hmgroups = HouseholdMemberGroup.objects.filter(
+            conditions__in=selected_conditions).exclude(pk=self_pk)
         total_selected = len(selected_conditions)
         for group in hmgroups:
             if group.conditions.count() == total_selected:
-                raise forms.ValidationError('Same conditions exist with %s group' % group)
+                raise forms.ValidationError(
+                    'Same conditions exist with %s group' % group)
         return cleaned_data
 
     def add_conditions(self, group):
@@ -31,15 +33,17 @@ class HouseholdMemberGroupForm(ModelForm):
             condition.groups.add(group)
 
     def save(self, commit=True, *args, **kwargs):
-        group = super(HouseholdMemberGroupForm, self).save(commit=commit, *args, **kwargs)
+        group = super(HouseholdMemberGroupForm, self).save(
+            commit=commit, *args, **kwargs)
         if commit:
             self.add_conditions(group)
         return group
 
     def clean_order(self):
         order = self.cleaned_data['order']
-        if HouseholdMemberGroup.objects.filter(order=order).count()>0 and self.initial.get('order', None) != int(order):
-            message = 'This order already exists. The minimum available is %d.'% (HouseholdMemberGroup.max_order()+1)
+        if HouseholdMemberGroup.objects.filter(order=order).count() > 0 and self.initial.get('order', None) != int(order):
+            message = 'This order already exists. The minimum available is %d.' % (
+                HouseholdMemberGroup.max_order() + 1)
             self._errors['order'] = self.error_class([message])
             del self.cleaned_data['order']
         return order

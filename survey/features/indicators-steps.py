@@ -46,13 +46,16 @@ def when_i_visit_indicator_listing_page(step):
 
 @step(u'Then I should see all indicators listed')
 def then_i_should_see_indicators_listed(step):
-    world.page.see_indicators([world.indicator_1, world.indicator_2, world.indicator_3])
+    world.page.see_indicators(
+        [world.indicator_1, world.indicator_2, world.indicator_3])
 
 
 @step(u'And I have three batches')
 def and_i_have_three_batches(step):
-    world.batch_1 = Batch.objects.create(name="New Batch 1", survey=world.survey)
-    world.batch_2 = Batch.objects.create(name="New Batch 2", survey=world.survey)
+    world.batch_1 = Batch.objects.create(
+        name="New Batch 1", survey=world.survey)
+    world.batch_2 = Batch.objects.create(
+        name="New Batch 2", survey=world.survey)
     world.batch_3 = Batch.objects.create(name="New Batch 3")
 
 
@@ -83,7 +86,8 @@ def when_i_select_a_survey(step):
 
 @step(u'And I should see action buttons')
 def and_i_should_see_action_buttons(step):
-    world.page.validate_fields_present(["Delete", "Edit", "Formula", "Analysis"])
+    world.page.validate_fields_present(
+        ["Delete", "Edit", "Formula", "Analysis"])
 
 
 @step(u'And I click on get list')
@@ -93,7 +97,8 @@ def and_i_click_on_get_list(step):
 
 @step(u'Then I should see indicators in that survey')
 def then_i_should_see_indicators_in_that_survey(step):
-    world.page.see_indicators([world.indicator_1, world.indicator_1b, world.indicator_2])
+    world.page.see_indicators(
+        [world.indicator_1, world.indicator_1b, world.indicator_2])
     world.page.is_text_present(world.indicator_3.name, False)
 
 
@@ -138,22 +143,27 @@ def then_i_should_see_add_indicator_page(step):
     world.page = NewIndicatorPage(world.browser)
     world.page.validate_url()
 
+
 @step(u'And I click the delete indicator link')
 def and_i_click_the_delete_indicator_link(step):
     world.page.click_by_css("#delete-indicator_%s" % world.indicator_1.id)
 
+
 @step(u'Then I should see confirm indicator batch')
 def then_i_should_see_confirm_indicator_batch(step):
     world.page.see_confirm_modal_message(world.indicator_1.name)
+
 
 @step(u'Then I should go back to indicator listing page')
 def then_i_should_go_back_to_indicator_listing_page(step):
     world.page = ListIndicatorPage(world.browser)
     world.page.validate_url()
 
+
 @step(u'And I should see the indicator successfully deleted')
 def and_i_should_see_the_indicator_successfully_deleted(step):
     world.page.see_success_message("Indicator", "deleted")
+
 
 @step(u'And I click the edit indicator link')
 def and_i_click_the_edit_indicator_link(step):
@@ -168,6 +178,7 @@ def then_i_should_see_the_indicator_details_in_the_form(step):
     world.page.validate_form_values(world.form_data)
     world.page.is_text_present(world.indicator_1.batch.name)
     world.page.is_text_present(world.indicator_1.module.name)
+
 
 @step(u'When I fill in the new values for the indicator')
 def when_i_fill_in_the_new_values_for_the_indicator(step):

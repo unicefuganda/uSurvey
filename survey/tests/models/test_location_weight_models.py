@@ -5,6 +5,7 @@ from survey.tests.base_test import BaseTest
 
 
 class LocationTypeDetailsTest(BaseTest):
+
     def test_fields(self):
         location_weight = LocationWeight()
         fields = [str(item.attname) for item in location_weight._meta.fields]
@@ -16,11 +17,14 @@ class LocationTypeDetailsTest(BaseTest):
 
         country = LocationType.objects.create(name='country', slug='country')
         uganda = Location.objects.create(name="Uganda", type=country)
-        district = LocationType.objects.create(name='district', slug='district')
-        location = Location.objects.create(name="Kampala", type=district, parent=uganda)
+        district = LocationType.objects.create(
+            name='district', slug='district')
+        location = Location.objects.create(
+            name="Kampala", type=district, parent=uganda)
 
         survey = Survey.objects.create(name="Kampala Survey")
-        location_weight = LocationWeight.objects.create(location=location, survey=survey, selection_probability=0.2)
+        location_weight = LocationWeight.objects.create(
+            location=location, survey=survey, selection_probability=0.2)
         self.failUnless(location_weight.id)
         self.assertEqual(location_weight.selection_probability, 0.2)
         self.assertEqual(location_weight.survey, survey)

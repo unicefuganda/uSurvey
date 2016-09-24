@@ -4,6 +4,7 @@ from survey.forms.householdMember import HouseholdMemberForm
 
 
 class HouseholdMemberFormTest(TestCase):
+
     def test_should_have_name_month_year_and_gender_fields(self):
         member_form = HouseholdMemberForm()
 
@@ -19,7 +20,7 @@ class HouseholdMemberFormTest(TestCase):
         form_data = {'surname': 'xyz',
                      'date_of_birth': date(1980, 05, 01),
                      'Sex': True
-        }
+                     }
 
         member_form = HouseholdMemberForm(data=form_data)
         self.assertTrue(member_form.is_valid())

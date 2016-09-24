@@ -3,6 +3,7 @@ from nose.tools import assert_equals
 
 
 class BatchQuestionsListPage(PageObject):
+
     def __init__(self, browser, batch):
         self.browser = browser
         self.batch = batch
@@ -38,13 +39,15 @@ class ListAllQuestionsPage(PageObject):
     url = "/questions/"
 
     def validate_fields(self):
-        self.validate_fields_present(['Questions List', 'Question', 'Type', 'Group', 'Actions'])
+        self.validate_fields_present(
+            ['Questions List', 'Question', 'Type', 'Group', 'Actions'])
 
     def click_delete_subquestion(self):
         self.click_by_css("#delete_subquestion")
 
 
 class AddQuestionPage(PageObject):
+
     def __init__(self, browser, batch):
         self.browser = browser
         self.batch = batch
@@ -73,6 +76,7 @@ class CreateNewQuestionPage(PageObject):
 
 
 class CreateNewSubQuestionPage(PageObject):
+
     def __init__(self, browser, question):
         self.browser = browser
         self.question = question
@@ -80,8 +84,8 @@ class CreateNewSubQuestionPage(PageObject):
 
 
 class EditQuestionPage(PageObject):
-  
+
     def __init__(self, browser, question):
-      super(EditQuestionPage, self).__init__(browser)
-      self.question = question
-      self.url = "/questions/%d/edit/" % question.id
+        super(EditQuestionPage, self).__init__(browser)
+        self.question = question
+        self.url = "/questions/%d/edit/" % question.id

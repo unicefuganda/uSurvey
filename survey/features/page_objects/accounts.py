@@ -17,7 +17,8 @@ class ResetPasswordPage(PageObject):
         self.browser.find_by_name("save_changes").first.click()
 
     def is_incorrect_oldpassword_error_visible(self):
-        self.is_text_present("Your old password was entered incorrectly. Please enter it again.")
+        self.is_text_present(
+            "Your old password was entered incorrectly. Please enter it again.")
 
     def is_password_mismatch(self):
         self.is_text_present("The two password fields didn't match.")
@@ -40,7 +41,7 @@ class LoginPage(PageObject):
         user.save()
         details = {'username': user.username,
                    'password': 'secret',
-        }
+                   }
 
         self.browser.fill_form(details)
         self.submit()

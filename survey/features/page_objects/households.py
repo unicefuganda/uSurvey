@@ -41,7 +41,8 @@ class NewHouseholdPage(PageObject):
         self.browser.fill_form(self.values)
 
     def validate_household_created(self):
-        assert self.browser.is_text_present("Household successfully registered.")
+        assert self.browser.is_text_present(
+            "Household successfully registered.")
 
     def has_children(self, value):
         self.choose_radio('has_children', value)
@@ -53,10 +54,12 @@ class NewHouseholdPage(PageObject):
         self.are_children_below_5_fields_disabled(is_disabled=is_disabled)
 
     def is_no_below_5_checked(self):
-        assert self.browser.find_by_id('household-children-has_children_below_5_1').selected == True
+        assert self.browser.find_by_id(
+            'household-children-has_children_below_5_1').selected == True
 
     def cannot_say_yes_to_below_5(self):
-        assert self.is_disabled("household-children-has_children_below_5_0") == True
+        assert self.is_disabled(
+            "household-children-has_children_below_5_0") == True
         self.are_children_fields_disabled()
 
     def has_children_below_5(self, value):
@@ -97,6 +100,7 @@ class NewHouseholdPage(PageObject):
 
 
 class HouseholdDetailsPage(PageObject):
+
     def __init__(self, browser, household):
         super(HouseholdDetailsPage, self).__init__(browser)
         self.browser = browser
@@ -113,14 +117,14 @@ class HouseholdDetailsPage(PageObject):
             'Occupation / Main Livelihood': household_head.occupation,
             'Highest level of education completed': household_head.level_of_education,
             'Since when have you lived here': str(household_head.resident_since_year),
-            }
+        }
         for label, text in details.items():
             self.is_text_present(label)
             self.is_text_present(text)
         self.is_text_present(MONTHS[household_head.resident_since_month][1])
 
     def validate_household_member_details_table_headings(self):
-        member_details_headings =['Family Name', 'Date of birth', 'Sex']
+        member_details_headings = ['Family Name', 'Date of birth', 'Sex']
         for heading in member_details_headings:
             self.is_text_present(heading)
 
@@ -142,7 +146,8 @@ class HouseholdDetailsPage(PageObject):
         self.browser.find_link_by_text('Delete')
 
     def click_delete_link(self, member_id):
-        self.browser.click_link_by_partial_href("#delete_member_%d"%member_id)
+        self.browser.click_link_by_partial_href(
+            "#delete_member_%d" % member_id)
 
 
 class HouseholdsListPage(PageObject):
@@ -150,17 +155,19 @@ class HouseholdsListPage(PageObject):
 
     def validate_fields(self):
         self.validate_fields_present(["Households List", "Household ID", "Household Head",
-        "District","County", "Sub County", "Parish", "Village", "Investigator"])
+                                      "District", "County", "Sub County", "Parish", "Village", "Investigator"])
 
     def validate_pagination(self):
         self.browser.click_link_by_text("2")
 
     def no_registered_huseholds(self):
-        self.browser.is_text_present('There are  no households currently registered  for this country.')
+        self.browser.is_text_present(
+            'There are  no households currently registered  for this country.')
 
 
 class EditHouseholdsPage(PageObject):
+
     def __init__(self, browser, household):
         self.browser = browser
         self.household = household
-        self.url = '/households/%s/edit/' %  str(household.id)
+        self.url = '/households/%s/edit/' % str(household.id)

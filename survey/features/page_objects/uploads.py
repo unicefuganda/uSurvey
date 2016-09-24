@@ -3,19 +3,21 @@ from survey.features.page_objects.base import PageObject
 
 
 class UploadLocationsPage(PageObject):
+
     def __init__(self, browser):
         super(UploadLocationsPage, self).__init__(browser)
         self.url = '/locations/upload/'
 
     def validate_typecode_appear_before_typename(self, type_name, length_of_code):
         headers = self.browser.find_by_css('th')
-        assert headers[0].value == type_name.capitalize()+'Code'
-        assert headers[1].value == type_name.capitalize()+'Name'
+        assert headers[0].value == type_name.capitalize() + 'Code'
+        assert headers[1].value == type_name.capitalize() + 'Name'
 
-        self.is_text_present('0'*length_of_code )
+        self.is_text_present('0' * length_of_code)
 
 
 class UploadBase(PageObject):
+
     def submit(self):
         self.browser.find_by_name('save_button').first.click()
 
@@ -25,12 +27,14 @@ class UploadBase(PageObject):
 
 
 class UploadWeightsPage(UploadBase):
+
     def __init__(self, browser):
         super(UploadWeightsPage, self).__init__(browser)
         self.url = '/locations/weights/upload/'
 
 
 class UploadEAPage(UploadBase):
+
     def __init__(self, browser):
         super(UploadEAPage, self).__init__(browser)
         self.url = '/locations/enumeration_area/upload/'

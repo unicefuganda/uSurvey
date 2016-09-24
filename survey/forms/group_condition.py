@@ -4,7 +4,7 @@ from survey.models.householdgroups import GroupCondition
 
 
 class GroupConditionForm(ModelForm):
-    
+
     def clean_gender_condition(self):
         self.condition_should_be_equal_for('GENDER')
 
@@ -17,7 +17,8 @@ class GroupConditionForm(ModelForm):
             attribute = self.cleaned_data['attribute']
 
             if attribute == GroupCondition.GROUP_TYPES[attribute_str] and condition != GroupCondition.CONDITIONS['EQUALS']:
-                message = "%s can only have condition: %s."% (GroupCondition.GROUP_TYPES[attribute_str], GroupCondition.CONDITIONS['EQUALS'])
+                message = "%s can only have condition: %s." % (
+                    GroupCondition.GROUP_TYPES[attribute_str], GroupCondition.CONDITIONS['EQUALS'])
                 self._errors['condition'] = self.error_class([message])
                 del self.cleaned_data['condition']
             return self.cleaned_data
@@ -28,7 +29,8 @@ class GroupConditionForm(ModelForm):
             attribute = self.cleaned_data['attribute']
 
             if attribute == GroupCondition.GROUP_TYPES['GENDER'] and str(value) not in ['1', '0']:
-                message = "%s can only have male or female values." % GroupCondition.GROUP_TYPES['GENDER']
+                message = "%s can only have male or female values." % GroupCondition.GROUP_TYPES[
+                    'GENDER']
                 self._errors['value'] = self.error_class([message])
                 del self.cleaned_data['value']
             return self.cleaned_data
@@ -48,8 +50,8 @@ class GroupConditionForm(ModelForm):
                         message = "Age cannot be negative."
                         self.set_value_error_message(message)
                 except ValueError:
-                        message = "Age must be a whole number."
-                        self.set_value_error_message(message)
+                    message = "Age must be a whole number."
+                    self.set_value_error_message(message)
 
             return self.cleaned_data
 
@@ -58,7 +60,8 @@ class GroupConditionForm(ModelForm):
             value = self.cleaned_data['value']
             attribute = self.cleaned_data['attribute']
             if attribute == 'GENERAL' and str(value) not in ['1', '0']:
-                message = "%s can only have the value: HEAD. or Not HEAD" % GroupCondition.GROUP_TYPES['GENERAL']
+                message = "%s can only have the value: HEAD. or Not HEAD" % GroupCondition.GROUP_TYPES[
+                    'GENERAL']
                 self._errors['value'] = self.error_class([message])
                 del self.cleaned_data['value']
             return self.cleaned_data
@@ -69,12 +72,12 @@ class GroupConditionForm(ModelForm):
         self.clean_gender_condition()
         self.clean_general_values()
         self.clean_general_condition()
-        self.cleaned_data = super(GroupConditionForm, self).clean()        
+        self.cleaned_data = super(GroupConditionForm, self).clean()
         return self.cleaned_data
-        
+
     class Meta:
         model = GroupCondition
-        fields =['attribute', 'condition', 'value']
+        fields = ['attribute', 'condition', 'value']
         widgets = {
-            'value': forms.TextInput(attrs={'type':'number', 'min':0, 'max':100}),
+            'value': forms.TextInput(attrs={'type': 'number', 'min': 0, 'max': 100}),
         }

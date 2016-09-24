@@ -11,7 +11,8 @@ class UsersListPage(PageObject):
         self.is_text_present('Users List')
 
     def validate_displayed_headers(self):
-        self.validate_fields_present(["Full name", "Role", "Mobile number", "Actions"])
+        self.validate_fields_present(
+            ["Full name", "Role", "Mobile number", "Actions"])
 
     def validate_users_paginated(self):
         self.browser.click_link_by_text("2")
@@ -21,14 +22,18 @@ class UsersListPage(PageObject):
 
 
 class EditUserDetailsPage(PageObject):
+
     def set_user(self, user):
         self.user = user
         self.url = "/users/" + str(user.pk) + "/edit/"
 
     def assert_form_has_infomation(self):
-        assert self.browser.find_by_name("username").first.value == self.user.username
-        assert self.browser.find_by_name("mobile_number").first.value == self.user.userprofile.mobile_number
-        assert self.browser.find_by_name("email").first.value == self.user.email
+        assert self.browser.find_by_name(
+            "username").first.value == self.user.username
+        assert self.browser.find_by_name(
+            "mobile_number").first.value == self.user.userprofile.mobile_number
+        assert self.browser.find_by_name(
+            "email").first.value == self.user.email
 
     def modify_users_information(self):
         assert self.browser.find_by_name('mobile_number')
@@ -42,7 +47,7 @@ class EditUserDetailsPage(PageObject):
 
     def assert_username_is_readonly(self):
         try:
-           assert self.browser.find_by_css('#id_username[readonly]').first
+            assert self.browser.find_by_css('#id_username[readonly]').first
         except Exception, e:
             return False
 
@@ -52,12 +57,13 @@ class EditUserDetailsPage(PageObject):
         else:
             assert not self.browser.find_by_name("groups")
 
+
 class UserDetailsPage(PageObject):
 
     def __init__(self, browser, user):
         self.browser = browser
         self.user = user
-        self.url = '/users/%d/'%user.id
+        self.url = '/users/%d/' % user.id
 
     def validate_page_content(self):
         details = {
@@ -67,7 +73,7 @@ class UserDetailsPage(PageObject):
             'Mobile number': self.user.userprofile.mobile_number,
             'Email': self.user.email,
             'Groups': ", ".join(self.user.groups.all().values_list('name', flat=True)),
-            }
+        }
         for label, text in details.items():
             self.is_text_present(label)
             self.is_text_present(text)

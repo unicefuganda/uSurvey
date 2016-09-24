@@ -7,9 +7,11 @@ from survey.tests.base_test import BaseTest
 
 
 class QuestionModuleViewTest(BaseTest):
+
     def setUp(self):
         self.client = Client()
-        User.objects.create_user(username='useless', email='rajni@kant.com', password='I_Suck')
+        User.objects.create_user(
+            username='useless', email='rajni@kant.com', password='I_Suck')
         raj = self.assign_permission_to(User.objects.create_user('Rajni', 'rajni@kant.com', 'I_Rock'),
                                         'can_view_batches')
         self.assign_permission_to(raj, 'can_view_investigators')
@@ -21,7 +23,8 @@ class QuestionModuleViewTest(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('question_module/new.html', templates)
         self.assertIsNotNone(response.context['question_module_form'])
-        self.assertIsInstance(response.context['question_module_form'], QuestionModuleForm)
+        self.assertIsInstance(
+            response.context['question_module_form'], QuestionModuleForm)
         self.assertEqual(response.context['title'], "New Module")
         self.assertEqual(response.context['button_label'], "Create")
         self.assertEqual(response.context['action'], "/modules/new/")
@@ -52,17 +55,22 @@ class QuestionModuleViewTest(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('question_module/new.html', templates)
         self.assertIsNotNone(response.context['question_module_form'])
-        self.assertIsInstance(response.context['question_module_form'], QuestionModuleForm)
-        self.assertEqual(response.context['question_module_form'].instance, education_module)
+        self.assertIsInstance(
+            response.context['question_module_form'], QuestionModuleForm)
+        self.assertEqual(response.context[
+                         'question_module_form'].instance, education_module)
         self.assertEqual(response.context['title'], "Edit Module")
         self.assertEqual(response.context['button_label'], "Save")
-        self.assertEqual(response.context['action'], "/modules/%s/edit/" % education_module.id)
+        self.assertEqual(response.context[
+                         'action'], "/modules/%s/edit/" % education_module.id)
 
     def test_post_edit_question_module(self):
         education_module = QuestionModule.objects.create(name="Eductaion")
         education_module_form = {'name': 'Education'}
-        response = self.client.post('/modules/%s/edit/' % education_module.id, data=education_module_form)
-        self.failUnless(QuestionModule.objects.filter(id=education_module.id, **education_module_form))
+        response = self.client.post(
+            '/modules/%s/edit/' % education_module.id, data=education_module_form)
+        self.failUnless(QuestionModule.objects.filter(
+            id=education_module.id, **education_module_form))
         self.assertRedirects(response, "/modules/", 302, 200)
         success_message = "Question module successfully edited."
         self.assertIn(success_message, response.cookies['messages'].value)
@@ -78,10 +86,11 @@ class QuestionModuleViewTest(BaseTest):
 
     def test_delete_question_module_does_not_delete_associated_questions(self):
         education_module = QuestionModule.objects.create(name="Education")
-        batch = Batch.objects.create(name="Batch name", description='description')
+        batch = Batch.objects.create(
+            name="Batch name", description='description')
         group_3 = HouseholdMemberGroup.objects.create(name="Group 3", order=2)
-        question = Question.objects.create(identifier='1.1',text="This is a question1", answer_type='Numerical Answer',
-                                            group=group_3,batch=batch,module=education_module)
+        question = Question.objects.create(identifier='1.1', text="This is a question1", answer_type='Numerical Answer',
+                                           group=group_3, batch=batch, module=education_module)
         self.failUnless(Question.objects.filter(id=question.id))
         response = self.client.get('/modules/%s/delete/' % education_module.id)
         self.failIf(QuestionModule.objects.filter(id=education_module.id))
@@ -89,7 +98,8 @@ class QuestionModuleViewTest(BaseTest):
 
     def test_delete_question_module_returns_error_if_module_does_not_exist(self):
         some_none_existing_module_id = 999999
-        response = self.client.get('/modules/%s/delete/' % some_none_existing_module_id)
+        response = self.client.get(
+            '/modules/%s/delete/' % some_none_existing_module_id)
         self.assertRedirects(response, "/modules/", 302, 200)
         error_message = "Module does not exist."
         self.assertIn(error_message, response.cookies['messages'].value)

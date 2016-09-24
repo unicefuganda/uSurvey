@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from survey.models import Location, LocationType, EnumerationArea
 from django.template.defaultfilters import slugify
-import csv, string
+import csv
+import string
 from django.db import transaction
 from mptt.models import MPTTModel, TreeForeignKey
 import datetime
@@ -13,8 +14,8 @@ class Command(BaseCommand):
 
     # @transaction.commit_on_success
     def handle(self, *args, **kwargs):
-        print datetime.datetime.now(),"start"
-        csv_file = csv.reader(open(args[0],"rb"))
+        print datetime.datetime.now(), "start"
+        csv_file = csv.reader(open(args[0], "rb"))
         headers = csv_file.next()
         location_types = []
         last_entry_empty = False
@@ -50,20 +51,21 @@ class Command(BaseCommand):
                     for index, col in enumerate(row):
                         loc_name = string.capwords(col.strip())
                         loc_type = location_types[index]
-                        parent, _ = Location.objects.get_or_create(name=loc_name, type=loc_type, parent=parent)
+                        parent, _ = Location.objects.get_or_create(
+                            name=loc_name, type=loc_type, parent=parent)
                     if has_ea:
                         if parent:
-                            ea, created = EnumerationArea.objects.get_or_create(name=ea_name, code='%s-%s'%(parent.pk, ea_name))
+                            ea, created = EnumerationArea.objects.get_or_create(
+                                name=ea_name, code='%s-%s' % (parent.pk, ea_name))
                             if created:
                                 ea.locations.add(parent)
             count = count + 1
             if count % 1000 == 0:
-                print 'loaded up to entry...' , row
-        #clean up... delete locations and types having no name
+                print 'loaded up to entry...', row
+        # clean up... delete locations and types having no name
         Location.tree.rebuild()
         LocationType.objects.filter(name='').delete()
         Location.objects.filter(name='').delete()
         EnumerationArea.objects.filter(name='').delete()
-        print datetime.datetime.now(),"completed"
+        print datetime.datetime.now(), "completed"
         self.stdout.write('Successfully imported!')
-

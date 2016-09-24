@@ -10,11 +10,15 @@ from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
 from survey.models.households import HouseholdMember, Household
 
+
 class ODKSubmission(BaseModel):
-    interviewer = models.ForeignKey(Interviewer, related_name="odk_submissions")
+    interviewer = models.ForeignKey(
+        Interviewer, related_name="odk_submissions")
     survey = models.ForeignKey(Survey, related_name="odk_submissions")
-    household_member = models.ForeignKey(HouseholdMember, related_name="odk_submissions", null=True, blank=True)
-    household = models.ForeignKey(Household, related_name="odk_submissions", null=True, blank=True)
+    household_member = models.ForeignKey(
+        HouseholdMember, related_name="odk_submissions", null=True, blank=True)
+    household = models.ForeignKey(
+        Household, related_name="odk_submissions", null=True, blank=True)
     form_id = models.CharField(max_length=256)
     description = models.CharField(max_length=256, null=True, blank=True)
     instance_id = models.CharField(max_length=256)
@@ -30,8 +34,9 @@ class ODKSubmission(BaseModel):
         for f in media_files:
             content_type = f.content_type if hasattr(f, 'content_type') else ''
             attach, created = Attachment.objects.get_or_create(submission=self,
-                                             media_file=f,
-                                             mimetype=content_type)
+                                                               media_file=f,
+                                                               mimetype=content_type)
+
 
 def upload_to(attachment, filename):
     return os.path.join(
@@ -57,4 +62,3 @@ class Attachment(BaseModel):
             if mimetype:
                 self.mimetype = mimetype
         super(Attachment, self).save(*args, **kwargs)
-

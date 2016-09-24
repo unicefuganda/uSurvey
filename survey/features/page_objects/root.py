@@ -23,7 +23,8 @@ class AboutPage(PageObject):
     def see_the_about_text_provided_by_panwar(self):
         self.is_text_present('Multiple Indicator Cluster Survey (MICS)')
         self.is_text_present('Survey tools')
-        self.is_text_present('Mobile-based Multiple Indicator Cluster Survey (MICS)')
+        self.is_text_present(
+            'Mobile-based Multiple Indicator Cluster Survey (MICS)')
 
     def assert_edit_link_absent(self):
         assert not self.browser.find_by_css("#edit-about_us")
@@ -53,7 +54,8 @@ class BulkSMSPage(PageObject):
     def is_message_sent(self):
         self.is_text_present("Your message has been sent to investigators.")
         for investgator in Investigator.objects.all():
-            assert BackendMessage.objects.filter(identity=investgator.identity, text=self.message).count() == 1
+            assert BackendMessage.objects.filter(
+                identity=investgator.identity, text=self.message).count() == 1
 
     def error_message_for(self, field):
         self.is_text_present(self.messages[field])

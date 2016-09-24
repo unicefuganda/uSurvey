@@ -5,6 +5,7 @@ from django.conf import settings
 
 
 class HouseholdMemberForm(ModelForm):
+
     def __init__(self, *args, **kwargs):
         super(HouseholdMemberForm, self).__init__(*args, **kwargs)
 
@@ -16,6 +17,6 @@ class HouseholdMemberForm(ModelForm):
             'first_name': forms.TextInput(attrs={'placeholder': 'Other Names'}),
             'male': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
         }
-    date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT,],
+    date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT, ],
                                     widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                   'class': 'datepicker'}, format=settings.DATE_FORMAT))

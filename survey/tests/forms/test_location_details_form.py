@@ -3,6 +3,7 @@ from survey.forms.location_details import LocationDetailsForm
 
 
 class LocationDetailsFormTest(TestCase):
+
     def test_should_know_the_fields(self):
         details_form = LocationDetailsForm()
 

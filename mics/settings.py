@@ -16,34 +16,38 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.',
+        # Or path to database file if using sqlite3.
+        'NAME': '',
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        # Empty for localhost through domain sockets or '127.0.0.1' for
+        # localhost through TCP.
+        'HOST': '',
         'PORT': '',                      # Set to empty string for default.
     }
 }
 
 CACHES = {
     'default': {
-    'BACKEND': 'redis_cache.RedisCache',
-    'LOCATION': [
-    '127.0.0.1:6379',
-    ],
-    'OPTIONS': {
-        'DB': 1,
-        'PARSER_CLASS': 'redis.connection.HiredisParser',
-        'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
-        'CONNECTION_POOL_CLASS_KWARGS': {
-        'max_connections': 50,
-        'timeout': 500,
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': [
+            '127.0.0.1:6379',
+        ],
+        'OPTIONS': {
+            'DB': 1,
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+            'CONNECTION_POOL_CLASS_KWARGS': {
+                'max_connections': 50,
+                'timeout': 500,
+            },
+            'MAX_CONNECTIONS': 1000,
+            'PICKLE_VERSION': -1,
+        },
     },
-    'MAX_CONNECTIONS': 1000,
-    'PICKLE_VERSION': -1,
-    },
-   },
 }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
@@ -104,7 +108,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -114,7 +118,7 @@ SECRET_KEY = '6-bycz-+xpv@9+u8b^)#$-l&3cheum3i4cb_6$u6s%j6uu6s91'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #     'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -170,7 +174,7 @@ INSTALLED_APPS = (
     'django_rq',
     'django_rq_dashboard',
     'channels',
-   # Uncomment the next line to enable the admin:
+    # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
@@ -217,7 +221,7 @@ LOGGING = {
 }
 
 CACHEOPS_REDIS = {
-    'host': 'localhost', # redis-server is on same machine
+    'host': 'localhost',  # redis-server is on same machine
     'port': 6379,        # default redis port
     'db': 1,             # SELECT non-default redis database
                          # using separate redis db or redis instance
@@ -227,20 +231,27 @@ CACHEOPS_REDIS = {
 
 CACHE_REFRESH_DURATION = 10800
 CACHEOPS = {
-    'survey.point': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
-    'survey.locationtype': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
-    'survey.location': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
-    'survey.enumerationarea': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
-    'survey.batch': {'ops': (), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs,
-    'survey.survey': {'ops': (), 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs,
+    # refresh every 3 hrs
+    'survey.point': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    # refresh every 3 hrs
+    'survey.locationtype': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    # refresh every 3 hrs
+    'survey.location': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    # refresh every 3 hrs
+    'survey.enumerationarea': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    # refresh every 3 hrs,
+    'survey.batch': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
+    # refresh every 3 hrs,
+    'survey.survey': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
 }
 
-#DJANGO-WS CONFIG
+# DJANGO-WS CONFIG
 WEBSOCKET_URL = '/ws/statusbar'
 WS_HEARTBEAT = 3
-UPDATE_INTERVAL = 3 #INTERVAL BETWEEN UPDATES IN SECS
-DOWNLOAD_CACHE_DURATION=1800 #how long downloaded results would cached in secs before discarded
-DOWNLOAD_CACHE_KEY='/DOWNLOADS/EXPORT/BATCH/%(user_id)s/%(batch_id)s'
+UPDATE_INTERVAL = 3  # INTERVAL BETWEEN UPDATES IN SECS
+# how long downloaded results would cached in secs before discarded
+DOWNLOAD_CACHE_DURATION = 1800
+DOWNLOAD_CACHE_KEY = '/DOWNLOADS/EXPORT/BATCH/%(user_id)s/%(batch_id)s'
 
 SURVEY_REDIS_KEY = "/usurvey/completion_rates/%(survey_id)s"
 
@@ -263,7 +274,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1800
 SESSION_SAVE_EVERY_REQUEST = True
 
-#email settings
+# email settings
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -271,25 +282,28 @@ EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_EMAIL_SENDER = ''
 
-#odk settings
-TOKEN_DEFAULT_SIZE=5
-ODK_DEFAULT_TOKEN='12345'
-SUBMISSION_UPLOAD_BASE=os.path.join(BASE_DIR, 'submissions')
-ANSWER_UPLOADS=os.path.join(BASE_DIR, 'answerFiles')
+# odk settings
+TOKEN_DEFAULT_SIZE = 5
+ODK_DEFAULT_TOKEN = '12345'
+SUBMISSION_UPLOAD_BASE = os.path.join(BASE_DIR, 'submissions')
+ANSWER_UPLOADS = os.path.join(BASE_DIR, 'answerFiles')
 TEMP_DIR = os.path.join(BASE_DIR, 'tmp')
-ODK_SUBMISSION_SUCCESS_MSG="Successful submission. Your submission is been Processed"
-INTERVIEWER_EXPORT_HEADERS =  ['ea', 'name', 'age', 'level_of_education', 'language', 'mobile_numbers', 'odk_id']
+ODK_SUBMISSION_SUCCESS_MSG = "Successful submission. Your submission is been Processed"
+INTERVIEWER_EXPORT_HEADERS = [
+    'ea', 'name', 'age', 'level_of_education', 'language', 'mobile_numbers', 'odk_id']
 from collections import OrderedDict
-HOUSEHOLD_EXPORT_HEADERS =  OrderedDict([
-                                    ('HOUSE NUMBER', 'house_number'),
-                                    ('PHYSICAL ADDRESS', 'physical_address'),
-                                    ('HEAD MEMBER',  'head_desc'),
-                                    ('SEX' , 'head_sex'),
-                                    ('ENUMERATION AREA', 'listing__ea__name'),
-                                    ('REGISTRAR', 'last_registrar__name'),
-                                    ('REGISTRATION_CHANNEL', 'registration_channel'),
-                                    ('SURVEY_LISTING', 'listing__initial_survey__name')
-                                    ])
+HOUSEHOLD_EXPORT_HEADERS = OrderedDict([
+    ('HOUSE NUMBER', 'house_number'),
+    ('PHYSICAL ADDRESS', 'physical_address'),
+    ('HEAD MEMBER',  'head_desc'),
+    ('SEX', 'head_sex'),
+    ('ENUMERATION AREA', 'listing__ea__name'),
+    ('REGISTRAR', 'last_registrar__name'),
+    ('REGISTRATION_CHANNEL',
+     'registration_channel'),
+    ('SURVEY_LISTING',
+     'listing__initial_survey__name')
+])
 AGGREGATORS = [('testAggregator', 'testAggregator'), ]
 DEFAULT_AGGREGATOR = 'testAggregator'
 TWITTER_URL = 'https://twitter.com/unicefuganda'
@@ -307,46 +321,46 @@ DEFAULT_TOTAL_HOUSEHOLDS_IN_EA = 1000
 DATE_FORMAT = "%d-%m-%Y"
 MOBILE_NUM_MIN_LENGTH = 9
 MOBILE_NUM_MAX_LENGTH = 9
-LOOP_QUESTION_REPORT_DEPT = 3 #reports up to 5 question loops
+LOOP_QUESTION_REPORT_DEPT = 3  # reports up to 5 question loops
 SHAPE_FILE_URI = '/static/map_resources/uganda_districts_2011_005.json'
-SHAPE_FILE_LOC_FIELD ='DNAME_2010'
+SHAPE_FILE_LOC_FIELD = 'DNAME_2010'
 SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
 
-RESULT_REFRESH_FREQ=6
+RESULT_REFRESH_FREQ = 6
 MEMORIZE_TIMEOUT = 120
 
 RQ_QUEUES = {
     'default': {
-    'HOST': 'localhost',
-    'PORT': 6379,
-    'DB': 0,
-    'DEFAULT_TIMEOUT': 360,
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 360,
     },
     'results-queue': {
-    'HOST': 'localhost',
-    'PORT': 6379,
-    'DB': 0,
-    'DEFAULT_TIMEOUT': 360,
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 360,
     },
     'email': {
-    'HOST': 'localhost',
-    'PORT': 6379,
-    'DB': 0,
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
     },
     'ws-notice': {
-    'HOST': 'localhost',
-    'PORT': 6379,
-    'DB': 0,
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
     },
     'upload_task': {
-    'HOST': 'localhost',
-    'PORT': 6379,
-    'DB': 0,
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
     },
     'odk': {
-    'HOST': 'localhost',
-    'PORT': 6379,
-    'DB': 0,
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
     }
 }
 

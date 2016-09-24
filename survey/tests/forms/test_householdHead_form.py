@@ -9,12 +9,14 @@ from survey.models import Survey, HouseholdListing, EnumerationArea, SurveyHouse
 
 
 class MockDate(datetime):
+
     @classmethod
     def now(cls):
         return cls(datetime.now().year, 1, 1)
 
 
 class HouseholdHeadFormTest(TestCase):
+
     def setUp(self):
         self.form_data = {
             'surname': 'household',
@@ -31,15 +33,18 @@ class HouseholdHeadFormTest(TestCase):
         self.assertTrue(hHead_form.is_valid())
         ea = EnumerationArea.objects.create(name="Kampala EA A")
         investigator = Interviewer.objects.create(name="Investigator",
-                                                   ea=ea,
-                                                   gender='1',level_of_education='Primary',
-                                                   language='Eglish',weights=0)
-        survey = Survey.objects.create(name="Test Survey",description="Desc",sample_size=10,has_sampling=True)
-        household_listing = HouseholdListing.objects.create(ea=ea,list_registrar=investigator,initial_survey=survey)
-        survey_householdlisting = SurveyHouseholdListing.objects.create(listing=household_listing,survey=survey)
-        household =  Household.objects.create(house_number=123456,listing=household_listing,physical_address='Test address',
-                                             last_registrar=investigator,registration_channel="ODK Access",head_desc="Head",
-                                              head_sex='MALE')
+                                                  ea=ea,
+                                                  gender='1', level_of_education='Primary',
+                                                  language='Eglish', weights=0)
+        survey = Survey.objects.create(
+            name="Test Survey", description="Desc", sample_size=10, has_sampling=True)
+        household_listing = HouseholdListing.objects.create(
+            ea=ea, list_registrar=investigator, initial_survey=survey)
+        survey_householdlisting = SurveyHouseholdListing.objects.create(
+            listing=household_listing, survey=survey)
+        household = Household.objects.create(house_number=123456, listing=household_listing, physical_address='Test address',
+                                             last_registrar=investigator, registration_channel="ODK Access", head_desc="Head",
+                                             head_sex='MALE')
         hHead_form.instance.household = household
         hHead_form.instance.survey_listing = survey_householdlisting
         hHead_form.instance.registrar_id = investigator.id

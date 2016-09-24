@@ -75,6 +75,6 @@ def edit(request, indicator_id):
     request.breadcrumbs([
         ('Indicators', reverse('list_indicator_page')),
     ])
-    context = {'indicator_form': indicator_form, 'title': 'Edit Indicator', 'button_label': 'Save', 'cancel_url': reverse('list_indicator_page')}
+    context = {'indicator_form': indicator_form, 'title': 'Edit Indicator',
+               'button_label': 'Save', 'cancel_url': reverse('list_indicator_page')}
     return render(request, 'indicator/new.html', context)
-

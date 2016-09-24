@@ -3,4 +3,6 @@ omit =
         */site-packages/*
         */migrations/*
         */survey/tests/*
+        */survey/features/*
+        */survey/fixtures/*
         */ussd*

@@ -6,8 +6,8 @@ from survey.models import Formula, HouseholdMemberGroup
 
 class FormulaForm(ModelForm):
     OPTIONS = (
-                ("GROUP", "GROUP"),
-                ("QUESTION", "QUESTION"),
+        ("GROUP", "GROUP"),
+        ("QUESTION", "QUESTION"),
     )
 
     def __init__(self, indicator=None, *args, **kwargs):
@@ -27,7 +27,8 @@ class FormulaForm(ModelForm):
             self.fields['numerator'].choices = question_choices
             self.fields['denominator'].choices = question_choices
             self.fields['count'].choices = question_choices
-            self.fields['groups'].choices = [(group.id, group.name) for group in groups]
+            self.fields['groups'].choices = [
+                (group.id, group.name) for group in groups]
 
         if indicator:
             self.delete_fields_based_on(indicator)
@@ -65,10 +66,12 @@ class FormulaForm(ModelForm):
 
         if self.indicator and not self.indicator.is_percentage_indicator():
             if count:
-                existing_formula = Formula.objects.filter(indicator=self.indicator, count=count)
+                existing_formula = Formula.objects.filter(
+                    indicator=self.indicator, count=count)
 
             if groups and not is_question_selected:
-                existing_formula = Formula.objects.filter(indicator=self.indicator, groups=groups)
+                existing_formula = Formula.objects.filter(
+                    indicator=self.indicator, groups=groups)
 
         if existing_formula:
             raise ValidationError(error_message)
@@ -80,4 +83,5 @@ class FormulaForm(ModelForm):
         fields = ['numerator', 'numerator_options', 'denominator_type', 'groups', 'denominator', 'count',
                   'denominator_options']
 
-    denominator_type = forms.CharField(label="Denominator", widget=forms.Select(choices=OPTIONS))
+    denominator_type = forms.CharField(
+        label="Denominator", widget=forms.Select(choices=OPTIONS))

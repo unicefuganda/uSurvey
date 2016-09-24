@@ -7,6 +7,7 @@ from nose.tools import assert_equals
 
 
 class PageObject(object):
+
     def __init__(self, browser):
         self.browser = browser
 
@@ -24,7 +25,8 @@ class PageObject(object):
 
     def is_disabled(self, element_id):
         try:
-            element = self.browser.find_by_css('#%s[disabled]' % element_id).first
+            element = self.browser.find_by_css(
+                '#%s[disabled]' % element_id).first
             return True
         except Exception, e:
             return False
@@ -43,12 +45,13 @@ class PageObject(object):
         assert self.browser.find_by_css("#drop-user-settings")
 
     def see_logged_in_status(self, user):
-        assert self.browser.find_link_by_partial_text("Logged in as: %s" % user.get_full_name())
+        assert self.browser.find_link_by_partial_text(
+            "Logged in as: %s" % user.get_full_name())
 
     def see_the_about_link(self):
         assert self.browser.find_link_by_text('About')
 
-    def find_link_by_text(self,text):
+    def find_link_by_text(self, text):
         assert self.browser.find_link_by_text(text)
 
     def click_the_about_link(self):
@@ -90,11 +93,13 @@ class PageObject(object):
         assert not self.browser.find_link_by_text('Notifications')
 
     def choose_radio(self, name, value):
-        js = "$('input:radio[name=%s][value=%s]').prop('checked', true).change()" % (name, value)
+        js = "$('input:radio[name=%s][value=%s]').prop('checked', true).change()" % (
+            name, value)
         self.browser.execute_script(js)
 
     def see_user_settings_link(self, user):
-        assert self.browser.find_link_by_partial_text("%s" % str(user.get_full_name()))
+        assert self.browser.find_link_by_partial_text(
+            "%s" % str(user.get_full_name()))
 
     def click_user_settings(self):
         self.click_by_css("#fold-menu")
@@ -134,7 +139,8 @@ class PageObject(object):
 
     def select_multiple(self, field_id=None, *data):
         for item in data:
-            script = "$('%s').multiSelect('select', '%s')" % (field_id, item.pk)
+            script = "$('%s').multiSelect('select', '%s')" % (
+                field_id, item.pk)
             self.browser.execute_script(script)
 
     def validate_fields_present(self, fields, status=True):
@@ -179,13 +185,15 @@ class PageObject(object):
 
     def option_not_present(self, option_list, field_name):
         for option in option_list:
-            assert not option in self.browser.find_by_name(field_name).first.text
+            assert not option in self.browser.find_by_name(
+                field_name).first.text
 
     def see_message(self, text):
         assert self.browser.is_text_present(text)
 
     def see_confirm_modal_message(self, name, action_str="delete"):
-        self.is_text_present("Confirm: Are you sure you want to %s %s?" % (action_str, name))
+        self.is_text_present(
+            "Confirm: Are you sure you want to %s %s?" % (action_str, name))
 
     def validate_form_present(self, form):
         for key in form.keys():
@@ -194,7 +202,8 @@ class PageObject(object):
 
     def validate_form_values(self, form_values):
         for key in form_values.keys():
-            assert self.browser.find_by_name(key).first.value == str(form_values[key])
+            assert self.browser.find_by_name(
+                key).first.value == str(form_values[key])
 
     def field_not_present(self, field_name):
         assert not self.browser.find_by_name(field_name)
@@ -206,12 +215,13 @@ class PageObject(object):
         assert self.browser.find_by_css(selector).first
 
     def is_hidden(self, field, status=True):
-        assert_equals(status, not self.browser.find_by_css('.hide').first.visible)
+        assert_equals(status, not self.browser.find_by_css(
+            '.hide').first.visible)
 
-    def find_by_name(self,name):
+    def find_by_name(self, name):
         assert self.browser.find_by_name(name)
 
-    def click_by_name(self,name):
+    def click_by_name(self, name):
         self.browser.find_by_name(name).first.click()
 
     def input_file(self, filename):
