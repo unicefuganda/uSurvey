@@ -75,12 +75,12 @@ With the already highlighted recommendations on sizing, it is easy to plan for a
 
 ![Deployment Architecture](./uSurvey-Deployment-Architecture.jpg)
 
-Although the redis cluster has been separated in the design, there is no reason why they cannot all be distributed within the two application servers so avoid the need for extra infrastructure.  
+Although the redis cluster has been separated in the design, there is no reason why they cannot all be distributed within the two uSurvey machines so avoid the need for extra infrastructure.  
 
 Key components here are:
 
-* 1 Load balancer expected to distribute requests evenly between the two servers 
-* 2 Application servers both on Host standby
+* 1 Load balancer expected to distribute requests evenly across all available uSurvey servers 
+* 2 Web Servers both on Host standby
 * 2 Postgres servers running in Master-Slave configuration
 * 2 Redis server per server instance (though 1 per instance is equally usable)
 
