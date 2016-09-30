@@ -19,7 +19,7 @@ The uSurvey solution is composed of the following software components:
 3. Daphne is used as app server for web requests and to support server side notifications on uSurvey
 4. Redis Server is used as application cache, for background tasks and for as channel backend for the ASGI interface server.
 5. Application framework itself is django 
-6. For web server, Nginx is the recommended choice. Ssample configuration has been added in the project folder (nginx.snippet file).
+6. For web server, Nginx is the recommended choice. A sample configuration has been added in the project folder (nginx.snippet file).
 
 Deployment
 ----------
