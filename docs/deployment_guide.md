@@ -95,5 +95,5 @@ As an option, three models exist for hosting uSurvey:
   
 1. Local instance deployed and managed on your servers.
 2. Dedicated hosting deployed and managed in the cloud.
-3. Shared hosting where your instance would coexist in parallel with others (although your data would be collected separately).
+3. Shared hosting where your instance would coexist with others (although your data would be collected separately).
    
