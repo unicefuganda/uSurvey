@@ -18,6 +18,6 @@ What do I need to conduct survey on USSD?
         * `msisdn:` This parameter holds the mobile number of the responding interviewer.
         * `ussdRequestString:` This parameter holds the input string sent by the interviewer.
         * `transactionId:` This parameter holds the session ID of the USSD Interaction.
-5. You to maintain connectivity to your mobile network (Since USSD participation requires an active USSD session).  
+5. You need to maintain connectivity to your mobile network (Since USSD participation requires an active USSD session).  
 6. Now assign the interviewer to the relevant Survey and Enumeration area (for more info on this see the relevant section in the [User manual](./user_manual.md "#Interviewer Page"))
       
