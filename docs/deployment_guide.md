@@ -6,7 +6,7 @@ Deploying uSurvey requires the setup of a few supporting software for the applic
 Application Architecture
 ------------------------
 
-The diagram below depicts the basic architecture of uSurvey. While requests can be sent directly to uSurvey Application servers, we recommend you route this through a web server like Nginx so that static resources can be served more efficiently and any additional layer of performance tuning can be applied there.
+The diagram below depicts the basic architecture of uSurvey. While requests can be sent directly to uSurvey Application servers, we recommend you route this through a web server like Nginx so that static resources can be served more efficiently and any additional layer of performance tuning or request routing can be applied there.
  
 ![uSurvey Architecture](./uSurvey-Software-Architecture.jpg)
 
