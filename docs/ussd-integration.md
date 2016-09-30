@@ -11,8 +11,8 @@ What do I need to conduct survey on USSD?
 1. Any mobile phone would do.
 2. You need a USSD Aggregator.
 3. You need to choose a mobile network which supports your chosen USSD Aggregator.
-4. You need your chosen USSD Aggregator to forward USSD messages to uSurvey in the as follows:
-    * Requests should be sent to as a HTTP GET or a POST to uSurvey USSD end point.
+4. You need your chosen USSD Aggregator to forward USSD messages to uSurvey as follows:
+    * Requests can be sent as a HTTP GET or a POST to uSurvey USSD end point.
     * If you have hosted uSurvey with host IP `HOST_IP` and port `APP_PORT`, the USSD end point is `HTTP(s)://HOST_IP:APP_PORT/ussd`.
     * At a minimum, following parameters need to be sent to uSurvey USSD API from the aggregator:
         * `msisdn:` This parameter holds the mobile number of the responding interviewer.
