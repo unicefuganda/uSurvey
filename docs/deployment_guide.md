@@ -49,7 +49,7 @@ For development purpose, please see following considerations:
 
 ###Production Setup
 
-For a production setup, uSurvey can be deployed as a stand alone instance or in a clustered environment for high availability and distributed load. uSurvey also performs well either on a virtual machine or on physical hardware. Although there are benefits to running uSurvey on a virtual machine since system resource can be upgraded when needed.
+For a production setup, uSurvey can be deployed as a stand alone instance or in a clustered environment for high availability and distributed load. uSurvey also performs well either on a virtual machine or on physical hardware (Although there are benefits to running uSurvey on a virtual machine since system resource can be upgraded when needed).
   
 ####Recommendations on Infrastructure Sizing
   
