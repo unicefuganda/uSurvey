@@ -1,3 +1,27 @@
+Offline Data Collection
+=======================
+
+Once a survey is designed on the uSurvey portal, the data can be collected online using the USSD channel or offline using ODK Collect.
+
+Offline data collection on uSurvey happens with the use of [ODK Collect](./https://play.google.com/store/apps/details?id=org.odk.collect.android&hl=en). 
+
+ODK Collect provides support for richer datasets compared to USSD (for example, it supports media files and GPS location capture). 
+
+Because data collection on ODK is entirely offline, it enables data collection in regions where network connectivity might be an issue. For this, data can be collected seamlessly for as many participants as possible into corresponding Android device and upon completion, all the data can be uploaded once to the server in a location with connectivity.
+  
+
+###What do I need to collect data offline?
+
+1. An Android device able to run [ODK Collect](./https://play.google.com/store/apps/details?id=org.odk.collect.android&hl=en). Typically Jelly Bean and newer versions should be fine.
+2. The Android device needs to have some space to keep collected data (If your survey does not require the upload of media files, 100MB space would usually be big enough. But having 1GB dedicated for uSurvey is best). 
+2. You need to configure ODK collect to use the in-built ODK aggregator in uSurvey (described below).
+3. Enter your interviewer credentials and download the survey allocated to you
+
+Once you have completed the above steps, you can collect the survey data completely offline! Upon completion, you move to a location with network connectivity to upload to uSurvey.  
+
+
+
+
 How To Use ODK Collect For uSurvey?
 ==================================
 

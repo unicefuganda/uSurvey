@@ -3,7 +3,7 @@ pages:
 - Home: index.md
 - Getting Started: installation.md
 - User Manual: user_manual.md
-- ODK Guide: odk_guide.md
+- Offline Data Collection: odk_guide.md
 - USSD Integration: ussd-integration.md
 - Deployment Guide: deployment_guide.md
 - Tests: tests.md

@@ -6,7 +6,7 @@ uSurvey fully supports survey participation on USSD using the interactive menu c
 ![USSD Participation](./ussd-code-example.jpg)
 
 What do I need to conduct survey on USSD?
------------------------------------------------
+-----------------------------------------
 
 1. Any mobile phone would do.
 2. You need a USSD Aggregator.

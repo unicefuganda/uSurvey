@@ -19,3 +19,4 @@ Travis builds are a pass only when the the project builds without errors and all
 
 
 [![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg)](https://travis-ci.org/unicefuganda/uSurvey)
+[![Coverage Status](https://coveralls.io/repos/unicefuganda/uSurvey/badge.png)](https://coveralls.io/r/unicefuganda/uSurvey)
