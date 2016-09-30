@@ -30,12 +30,13 @@ This section discusses deployment considerations for uSurvey. For information on
 
 ####Minimum Requirements
 
+For development purpose, please see following considerations:
 
 * uSurvey has been tested on Ubuntu and OS X. However it should run on most Linux machines (since there are no distribution specific dependency).
 
-* Minimum of 1GB RAM, 1 CPU core, 20GB disk space for setup and testing.
+* Minimum of 1GB RAM, 1 CPU core, 20GB disk space is required for setup and testing.
 
-* Postgres, redis-server needs to be installed and should be running (all can run on same machine)
+* Postgres and redis-server needs to be installed and should be running (all can run on same machine)
 
 * It helps to install python-dev, libxml2-dev, libxslt1-dev, zlib1g-dev and libffi-dev (for a debian based system, the command would be *sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev libffi-dev*)
 
@@ -48,7 +49,7 @@ This section discusses deployment considerations for uSurvey. For information on
 
 ###Production Setup
 
-For a production setup, uSurvey can be deployed as a stand alone instance or in a clustered environment for high availability and distributed load. uSurvey also performs well either on a virtual machine or on physical hardware, although it has its benefits to run on virtual machine so that system resource can be upgraded when needed.
+For a production setup, uSurvey can be deployed as a stand alone instance or in a clustered environment for high availability and distributed load. uSurvey also performs well either on a virtual machine or on physical hardware. Although there are benefits to running uSurvey on a virtual machine since system resource can be upgraded when needed.
   
 ####Recommendations on Infrastructure Sizing
   
@@ -56,7 +57,7 @@ Sizing considerations for infrastructure would largely depend on the expected tr
  
 For a typical production setup for a self sufficient server instance capable of handling a million hits per day, uSurvey requires:
  
-* Linux machine (tested on Ubuntu 12+ and Mac Os X)
+* A Linux machine (tested on Ubuntu 12+ and Mac Os X)
 * 8GB RAM, Octa-core Xeon Processor
 * 1 or more Redis servers either running on same machine or on a separately managed cluster
 
