@@ -1,6 +1,3 @@
-How To Use ODK Collect For uSurvey?
-==================================
-
 To use the ODK Collect for uSurvey is easy. Just follow the steps below and you are good to go.
 
 ###Download ODK collect from Google Play
