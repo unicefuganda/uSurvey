@@ -7,7 +7,7 @@ The system has been designed to collect a wide range of data for the structured 
 
 Official documentation is available on [http://usurvey.readthedocs.io/](http://usurvey.readthedocs.io/).
 
-Installation
+Set Up Guide
 ------------
 * Postgres, redis-server should be running
 
