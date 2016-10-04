@@ -1,7 +1,7 @@
 
 
 Prerequisites
--------------
+------------- 
 
 * Has been tested on Ubuntu and OS X. However it should run on most Linux machines (since there are no distribution specific dependency).
 
@@ -19,11 +19,15 @@ Prerequisites
 Installation Instructions
 -------------------------
 
-* Execute the following commands from your installation directory:
+* Clone the uSurvey Application from Github 
 
         git clone https://github.com/unicefuganda/uSurvey.git
 
+* Go to mics folder in uSurvey 
+
         cd uSurvey/mics
+
+* Copy customized settings in localsettings.py 
 
         cp travis-settings.py localsettings.py
         (adjust localsettings.py for db and test_db setup)
