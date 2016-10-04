@@ -31,8 +31,12 @@ Installation Instructions
 
         cp travis-settings.py localsettings.py
         (adjust localsettings.py for db and test_db setup)
+        
+* Go to survey folder in uSurvey
 
         cd ../survey
+
+* Copy config file interviewer_configs.py
 
         cp interviewer_configs.py.example interviewer_configs.py
 
