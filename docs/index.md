@@ -10,7 +10,7 @@ Source code for this project is available on github [here](https://github.com/un
 Features
 --------
 
-* Admin Portal to enable the management of uSurvey features, including:
+* **Admin Portal** to enable the management of uSurvey features, including:
       - User creation & access level definition.
       - Survey questions and question logic management
       - Interview channel assignment for interviewers
@@ -18,13 +18,13 @@ Features
       - Definition of report indicators 
       - Map based reporting of captured data
       
-* Online participation via USSD channel
+* **Online participation** via USSD channel
 
-* Offline participation via ODK collect
+* **Offline participation** via ODK collect
 
-* Dynamic xform generation from defined survey questions logic from the administrative portal
+* **Dynamic xform generation** from defined survey questions logic from the administrative portal
 
-* Support for simple conditional question flow
+* **Support** for simple conditional question flow
 
 
 Getting Started
