@@ -17,7 +17,7 @@ Features
       - Enumeration area oriented survey participation
       - Definition of report indicators 
       - Map based reporting of captured data
-
+      
 * Online participation via USSD channel
 
 * Offline participation via ODK collect
@@ -27,7 +27,7 @@ Features
 * Support for simple conditional question flow
 
 
-What to do next?
+Getting Started
 ----------------
 
 * Instructions on how to get uSurvey up and running can be found [here](./installation.md "Set up instructions")
