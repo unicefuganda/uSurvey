@@ -1,5 +1,4 @@
-Set up Guide
-============
+
 
 Prerequisites
 -------------
