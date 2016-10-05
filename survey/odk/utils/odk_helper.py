@@ -506,7 +506,8 @@ class BaseOpenRosaResponse(HttpResponse):
 
     def __init__(self, *args, **kwargs):
         super(BaseOpenRosaResponse, self).__init__(*args, **kwargs)
-
+        if self.status_code > 201:
+            self.reason_phrase = self.content
         self[OPEN_ROSA_VERSION_HEADER] = OPEN_ROSA_VERSION
         tz = pytz.timezone(settings.TIME_ZONE)
         dt = datetime.now(tz).strftime('%a, %d %b %Y %H:%M:%S %Z')

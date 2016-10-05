@@ -1,10 +1,10 @@
 site_name: uSurvey
 pages:
 - Home: index.md
-- Set up Guide: installation.md
 - User Manual: user_manual.md
 - Offline Data Collection: odk_guide.md
 - USSD Integration: ussd-integration.md
+- Set up Guide: installation.md
 - Deployment Guide: deployment_guide.md
 - Tests: tests.md
 #theme: readthedocs

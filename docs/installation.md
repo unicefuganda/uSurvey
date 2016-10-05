@@ -6,7 +6,7 @@ Prerequisites
 
 * Has been tested on Ubuntu and OS X. However it should run on most Linux machines (since there are no distribution specific dependency).
 
-* Minimum of 1GB RAM, 1 CPU core for setup and medium sized testing.
+* For development server, minimum of 1GB RAM, 1.6GHz 1 CPU core is required for setup (for production sizing requirements see the relevant section in the [Deployment guide](./deployment_guide.md#deployment-considerations "Deployment Guide")).
 
 * Postgres, redis-server should be running
 

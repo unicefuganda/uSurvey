@@ -21,22 +21,20 @@ The uSurvey solution is composed of the following software components:
 5. Application framework itself is django 
 6. For web server, Nginx is the recommended choice. A sample configuration has been added in the project folder (nginx.snippet file).
 
-Deployment
-----------
+Deployment Considerations
+-------------------------
 
 This section discusses deployment considerations for uSurvey. For information on how to install uSurvey on a machine, see the [installation instruction](./installation.md "Installation Instruction")
 
 ###Development Server
 
-####Minimum Requirements
-
 For development purpose, please see following considerations:
 
 * uSurvey has been tested on Ubuntu and OS X. However it should run on most Linux machines (since there are no distribution specific dependency).
 
-* Minimum of 1GB RAM, 1 CPU core, 20GB disk space is required for setup and testing.
+* Minimum of 1GB RAM, 1.6GHz 1 CPU core, 20GB disk space is required for setup and testing.
 
-* Postgres and redis-server needs to be installed and should be running (all can run on same machine)
+* Postgres and redis-server needs to be installed and should be running (all can run on same machine, but you'll get better experience with higher RAM and CPU specs in that case)
 
 * It helps to install python-dev, libxml2-dev, libxslt1-dev, zlib1g-dev and libffi-dev (for a debian based system, the command would be *sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev libffi-dev*)
 
@@ -58,13 +56,13 @@ Sizing considerations for infrastructure would largely depend on the expected tr
 For a typical production setup for a self sufficient server instance capable of handling a million hits per day, uSurvey requires:
  
 * A Linux machine (tested on Ubuntu 12+ and Mac Os X)
-* 8GB RAM, Octa-core Xeon Processor
+* 8GB RAM, 2.6GHz Octa-core Xeon Processor
 * 1 or more Redis servers either running on same machine or on a separately managed cluster
 
 For database:
 
 * Linux machine (tested on Ubuntu 12+ and Mac Os X)
-* 8GB RAM, Octa-core Xeon Processor
+* 8GB RAM, 2.4GHz Octa-core Xeon Processor
 * Postgres database
 
 
