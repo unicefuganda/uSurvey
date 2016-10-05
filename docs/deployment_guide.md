@@ -56,13 +56,13 @@ Sizing considerations for infrastructure would largely depend on the expected tr
 For a typical production setup for a self sufficient server instance capable of handling a million hits per day, uSurvey requires:
  
 * A Linux machine (tested on Ubuntu 12+ and Mac Os X)
-* 8GB RAM, 2.6GHz Octa-core Xeon Processor
+* 8GB RAM, 2.6GHz Octa-core Xeon Processor, 80GB disk space
 * 1 or more Redis servers either running on same machine or on a separately managed cluster
 
 For database:
 
 * Linux machine (tested on Ubuntu 12+ and Mac Os X)
-* 8GB RAM, 2.4GHz Octa-core Xeon Processor
+* 8GB RAM, 2.4GHz Octa-core Xeon Processor, 200GB disk space (though you might need to maintain a archiving policy depending on frequency of data collection)
 * Postgres database
 
 
