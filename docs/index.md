@@ -6,12 +6,26 @@ The system has been designed to collect a wide range of data for the structured 
 
 Source code for this project is available on github [here](https://github.com/unicefuganda/uSurvey/ "github repo").
 
+Features
+--------
+
+* Admin management portal
+
+* Highly customizable surveys
+
+* Online data collection via USSD channel
+
+* Offline data collection via ODK collect
+
+* Dynamic generation and download of ODK forms from defined survey questions on the admin portal
+
+* Support for simple conditional question flows
+
+* Inbuilt ODK aggregator.
+
+
 User Guides
 -----------
-*  **Introduction** 
-  * [Overview](./index.md)
-  * [Features](./index.md#features)
-  * [Getting Started](./index.md#what-to-do-next)
 
 * **User Manual**
   * [uSurvey User Manual](./user_manual.md#usurvey-user-manual) 
