@@ -1,5 +1,5 @@
 Welcome to uSurvey’s documentation!
-========
+===================================
 uSurvey is an innovative data collection tool designed to provide statistically representative real time estimates of a given indicator. It runs on USSD (Unstructured Supplementary Service Data) interactive secured channel and on ODK (Open Data Kit), for off-line data collection in locations with intermittent mobile network connections.
 
 The system has been designed to collect a wide range of data for the structured survey; to generate and produce descriptive statistics and graphical representation of the collected information whenever desired, as well as during the process of data collection.
@@ -44,14 +44,14 @@ User Guides
   * [Survey Completion Statistics](./user_manual.md#survey-completion-statistics)
   * [Managing Users](./user_manual.md#managing-users)
 
-* **ODK Module**
+* **Offline Data Collection**
   * [Offline Data Collection](./odk_guide.md#offline-data-collection)
   * [What do I need to collect data offline?](./odk_guide.md#what-do-i-need-to-collect-data-offline)
   * [How To Use ODK Collect For uSurvey?](./odk_guide.md#how-to-use-odk-collect-for-usurvey)
   * [Download ODK collect from Google Play](./odk_guide.md#download-odk-collect-from-google-play)
   * [Using the ODK collect](./odk_guide.md#using-the-odk-collect)
   
-* **USSD Module**
+* **USSD Integration**
   * [USSD Integration](./ussd-integration.md#ussd-integration)
   * [What do I need to conduct survey on USSD?](./ussd-integration.md#what-do-i-need-to-conduct-survey-on-ussd)
 

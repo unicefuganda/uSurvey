@@ -1,5 +1,5 @@
-Offline Data Collection
-=======================
+Introduction
+============
 
 Once a survey is designed on the uSurvey portal, the data can be collected online using the USSD channel or offline using ODK Collect.
 

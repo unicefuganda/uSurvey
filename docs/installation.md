@@ -1,6 +1,3 @@
-Set up Guide
-============
-
 Prerequisites
 -------------
 

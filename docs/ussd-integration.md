@@ -1,5 +1,5 @@
-USSD Integration
-================
+Introduction
+============
 
 uSurvey fully supports survey participation on USSD using the interactive menu capability of the USSD platform. To begin, from uSurvey portal, interviewers are sent SMS with details of the code to dial in order to commence data collection (e.g. *256#). The interviewer dials the code and then the survey starts.
   
