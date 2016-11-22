@@ -1,8 +1,13 @@
-<form action="" method="get" accept-charset="utf-8" id="{{ id }}" class="search {{ class }}">
-    <table align="left">
-    <tr><td align="left" valign="top">
-        <input name="q" type="text" value="{{q}}" id="{{ id }}_val" placeholder="{% if placeholder %}{{placeholder}}{% endif %}"  /></td>
-        <td align="left" valign="top"><input type="submit" class="btnforall" value="Search" id="{{ id }}_button" /></td>
-    </tr>
-    </table>
-</form>
+<div class="dataTables_length" id="dynamic-table_length">
+    <div class="col-xs-6">
+        <form action="" method="get" accept-charset="utf-8" id="{{ id }}" class="search {{ class }}">
+            <!-- table align="left">
+            <tr><td align="left" valign="top">
+                <input name="q" type="text" value="{{q}}" id="{{ id }}_val" placeholder="{% if placeholder %}{{placeholder}}{% endif %}"  /></td>
+                <td align="left" valign="top"><input type="submit" class="btnforall" value="Search" id="{{ id }}_button" /></td>
+            </tr>
+            </table -->
+                <input style="border-radius:20px;" name="q" type="text" value="{{q}}" id="{{ id }}_val" placeholder="{% if placeholder %}{{placeholder}}{% else %}Search...{% endif %}"  />
+        </form>
+    </div>
+</div>

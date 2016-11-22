@@ -8,9 +8,10 @@ from django.contrib import messages
 from survey.interviewer_configs import *
 from survey.models import HouseholdMemberGroup, QuestionModule
 from survey.models import Survey, Location, LocationType
-from survey.models import Survey, Batch, QuestionTemplate, Question, QuestionFlow, QuestionOption
-from survey.models.batch import Batch
-from survey.forms.batch import BatchForm, BatchQuestionsForm
+from survey.models import Survey, Batch, QuestionTemplate, QuestionFlow, QuestionOption
+from survey.models import BatchQuestion as Question
+from survey.forms.batch import BatchQuestionsForm
+from survey.forms.question_set import BatchForm
 from survey.forms.filters import QuestionFilterForm
 
 
@@ -110,7 +111,7 @@ def close(request, batch_id):
 def new(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
     batch_form = BatchForm(initial={'survey': survey})
-    response, batchform = _process_form(request, survey_id, action_str='added')
+    response, batchform = _process_form(request, survey, action_str='added')
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
         (survey.name, reverse('batch_index_page', args=(survey.pk, ))),
@@ -121,27 +122,28 @@ def new(request, survey_id):
     return response or render(request, 'batches/new.html', context)
 
 
-def _process_form(request, survey_id, instance=None, action_str='edited'):
+def _process_form(request, survey, instance=None, action_str='edited'):
     batch_form = BatchForm(instance=instance)
     response = None
     if request.method == 'POST':
         batch_form = BatchForm(data=request.POST, instance=instance)
         if batch_form.is_valid():
-            batch_form.save(**request.POST)
+            batch = batch_form.save(**request.POST)
             messages.success(
-                request, 'Question successfully %sed.' % action_str)
+                request, 'Batch successfully %sed.' % action_str)
             response = HttpResponseRedirect(
-                reverse('batch_index_page', args=(survey_id,)))
+                reverse('batch_index_page', args=(survey.id,)))
         else:
-            messages.error(request, 'Question was not %sed.' % action_str)
+            messages.error(request, 'Batch was not %sed.' % action_str)
     return response, batch_form
 
 
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id, batch_id):
+    survey = Survey.objects.get(id=survey_id)
     batch = Batch.objects.get(id=batch_id, survey__id=survey_id)
     response, batchform = _process_form(
-        request, survey_id, instance=batch, action_str='edited')
+        request, survey, instance=batch, action_str='edited')
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
         (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
@@ -192,9 +194,9 @@ def assign(request, batch_id):
                 question = Question.objects.create(identifier=lib_question.identifier,
                                                    text=lib_question.text,
                                                    answer_type=lib_question.answer_type,
-                                                   group=lib_question.group,
+                                                   #group=lib_question.group,
                                                    module=lib_question.module,
-                                                   batch=batch
+                                                   qset=batch,
                                                    )
                 # assign the options
                 for option in lib_question.options.all():
@@ -213,7 +215,7 @@ def assign(request, batch_id):
         return HttpResponseRedirect(reverse("batch_questions_page",  args=(batch_id, )))
     all_modules = QuestionModule.objects.all()
     used_identifiers = [
-        question.identifier for question in batch.batch_questions.all()]
+        question.identifier for question in batch.questions.all()]
     library_questions = QuestionTemplate.objects.exclude(
         identifier__in=used_identifiers).order_by('identifier')
     question_filter_form = QuestionFilterForm()
@@ -249,7 +251,7 @@ def update_orders(request, batch_id):
         order_details = sorted(
             order_details, key=lambda detail: int(detail[0]))
         # recreate the flows
-        questions = batch.batch_questions.all()
+        questions = batch.questions.all()
         if questions:  # so all questions can be fetched once and cached
             question_id = order_details.pop(0)[1]
             start_question = questions.get(pk=question_id)

@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from survey.models.surveys import Survey, Location, LocationType
+from survey.models import Survey, Location, LocationType, Batch
 from survey.forms.surveys import SurveyForm
 from survey.views.custom_decorators import handle_object_does_not_exist
 from survey.utils.query_helper import get_filterset
@@ -26,7 +26,7 @@ def index(request):
         surveys = surveys.filter(type=ast.literal_eval(request.GET['isopen']))
     context = {'surveys': surveys, 'request': request,
                'placeholder': 'name, description',
-               'survey_form': SurveyForm()}
+               'survey_form': SurveyForm(), 'batch_model': Batch}
     return render(request, 'surveys/index.html',
                   context)
 #

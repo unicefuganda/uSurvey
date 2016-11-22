@@ -1,38 +1,79 @@
 import os
 import string
 from datetime import datetime
+from django_rq import job
+from dateutil.parser import parse as extract_date
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
-from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
-from survey.models.base import BaseModel
-from dateutil.parser import parse as extract_date
-from survey.models.locations import Point
-from django import template
-from survey.interviewer_configs import MESSAGES
-from survey.utils.decorators import static_var
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django import template
 from django.db.models import Max
+from survey.models.base import BaseModel
+from survey.models.access_channels import InterviewerAccess, ODKAccess, USSDAccess
+from survey.models.locations import Point
+from survey.models.surveys import Survey
+from survey.interviewer_configs import MESSAGES
+from survey.utils.decorators import static_var
 
 
-def reply_test(cls, func):
-    func.is_reply_test = True
-    return func
+@job('default')
+def update_model_obj_serial(model_obj, serial_name, filter_criteria):
+    # get last assigned serial for interview survey in the interviewe ea
+    max_serial = model_obj.__class__.objects.filter(**filter_criteria
+                                                    ).aggregate(Max(serial_name)).get('%s__max'%serial_name, 0)
+    setattr(model_obj, serial_name, max_serial + 1)
+    model_obj.save()
+
+
+class InterviewAddress(BaseModel):
+    ''' This one corresponds to the physical facility of where the interview is being conducted
+
+    '''
+    survey = models.ForeignKey(Survey, related_name='interview_addresses', db_index=True)
+    ea = models.ForeignKey(
+        'EnumerationArea', related_name='interview_addresses', db_index=True)
+    structure_number = models.PositiveIntegerField(null=True)
+    address_description = models.TextField(null=True, blank=True)
+    interview_location = models.ForeignKey('ODKGeoPoint', related_name='interview_addresses',
+                                           null=True, blank=True)   # This is experimental presently
+
+    def start_new_station(self):
+        # you have gotten to the physical facility. now start the visit
+        station = InterviewStation.objects.create(address=self)
+        update_model_obj_serial.delay(station, 'station_number', {'ea': self.ea, 'survey': self.survey})
+        return station
+
+    def save(self, *args, **kwargs):
+        _ = super(InterviewAddress, self).save(*args, **kwargs)
+        if self.structure_number is None:   # I'll set it for you if you don't want to
+            update_model_obj_serial.delay(self, 'structure_number', {'ea': self.ea, 'survey': self.survey})
+        return _
+
+
+class InterviewStation(BaseModel):
+    '''
+        This corresponds to the station within the physical facility where each respondent group is being interviewed
+    '''
+    address = models.ForeignKey(InterviewAddress, related_name='interviews')
+    station_number = models.PositiveIntegerField(null=True)
+
+    # def start_interview(self):
+    #     return Interview.objects.create(interview_station=self, survey=self.address.survey,
+    #                                     ea=self.address.ea)
 
 
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name="interviews")
-    householdmember = models.ForeignKey(
-        "HouseholdMember", null=True, related_name="interviews", db_index=True)
-    batch = models.ForeignKey(
-        "Batch", related_name='interviews', db_index=True)
+    question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)    # repeated here for easy reporting
+    ea = models.ForeignKey(
+        'EnumerationArea', related_name='interviews', db_index=True)    # repeated here for easy reporting
     interview_channel = models.ForeignKey(
         InterviewerAccess, related_name='interviews')
+    interview_station = models.ForeignKey(InterviewStation, related_name='interviews')
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
-    ea = models.ForeignKey(
-        'EnumerationArea', related_name='interviews', db_index=True)
     last_question = models.ForeignKey(
         "Question", related_name='ongoing', null=True, blank=True)
 
@@ -128,31 +169,24 @@ class Interview(BaseModel):
     def members_with_open_batches(self):
         pass
 
-
-#     @property
-#     def first_question(self):
-#         question = self.batch.start_question
-
     class Meta:
         app_label = 'survey'
-        unique_together = [('householdmember', 'batch'), ]
 
 
 class Answer(BaseModel):
     NO_LOOP = -1
-    interview = models.ForeignKey(
-        Interview, related_name='%(class)s', db_index=True)
-#     interviewer_response = models.CharField(max_length=200)  #This shall hold the actual response from interviewer
-#                                                             #value shall hold the exact worth of the response
+    # now question_type is used to store the exact question we are answering (Listing, Batch, personal info)
+    question_type = models.CharField(max_length=100)  # I think using generic models is an overkill since they're all
+    # questions
+    interview = models.ForeignKey(Interview, related_name='%(class)s', db_index=True)
     question = models.ForeignKey("Question", null=True, related_name="%(class)s",
                                  on_delete=models.PROTECT, db_index=True)
-    # used to identify answers belonging to
-    loop_id = models.IntegerField(default=-1)
-    # same question loop for looping flows
+    loop_id = models.IntegerField(null=True, blank=True) # for looped questions, to generate the answer identifier
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=NO_LOOP):
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+    def create(cls, interview, question, answer, loop_id=None):
+        return cls.objects.create(question=question, value=answer, question_type=question.__class__.type_name(),
+                                  interview=interview, loop_id=loop_id)
 
     @classmethod
     def supported_answers(cls):
@@ -168,7 +202,7 @@ class Answer(BaseModel):
         for cl in Answer.__subclasses__():
             if cl.choice_name() == verbose_name:
                 return cl
-        ValueError('unknown class')
+        raise ValueError('unknown class')
 
     def to_text(self):
         return self.value
@@ -286,7 +320,7 @@ class NumericalAnswer(Answer):
             value = int(answer)
         except Exception:
             raise
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+        return super(NumericalAnswer, cls).create(interview, question, answer, loop_id)
 
     @classmethod
     def greater_than(cls, answer, value):
@@ -368,7 +402,7 @@ class MultiChoiceAnswer(Answer):
             answer = question.options.get(order=answer)
         except:
             pass
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+        return super(MultiChoiceAnswer, cls).create(interview, question, answer, loop_id)
 
     class Meta:
         app_label = 'survey'
@@ -408,23 +442,11 @@ class MultiSelectAnswer(Answer):
         else:
             selected = answer
         ans = cls.objects.create(
-            question=question, interview=interview, loop_id=loop_id)
+            question=question, question_type=question.__class__.type_name(),
+                                  interview=interview, loop_id=loop_id)
         for opt in selected:
             ans.value.add(opt)
         return ans
-
-    # def __init__(self, question, answer, *args, **kwargs):
-    #     super(MultiSelectAnswer, self).__init__(*args, **kwargs)
-    #     if isinstance(answer, basestring):
-    #         answer = answer.split(' ')
-    #     if isinstance(answer, list):
-    #         selected = [a.lower() for a in answer]
-    #         options = question.options.all()
-    #         chosen = [op.pk for op in options if op.text.lower() in selected]
-    #         self.selected = question.options.filter(pk__in=chosen)
-    #     else:
-    #         self.selected = answer
-    #     self.question = question
 
     class Meta:
         app_label = 'survey'
@@ -462,8 +484,7 @@ class DateAnswer(Answer):
     def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
         if isinstance(answer, basestring):
             answer = extract_date(answer, fuzzy=True)
-        question = question
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+        return super(DateAnswer, cls).create(interview, question, answer, loop_id)
 
     class Meta:
         app_label = 'survey'
@@ -538,7 +559,7 @@ class GeopointAnswer(Answer):
             answer = answer.split(' ')
             answer = ODKGeoPoint(latitude=answer[0], longitude=answer[
                                  1], altitude=[2], precision=answer[3])
-        return cls.objects.create(question=question, value=answer, interview=interview, loop_id=loop_id)
+        return super(GeopointAnswer, cls).create(interview, question, answer, loop_id)
 
     class Meta:
         app_label = 'survey'

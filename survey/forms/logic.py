@@ -1,6 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow, Question, TextArgument
+from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow, \
+    Question, TextArgument, NumericalAnswer
+from survey.models import QuestionLoop
 from survey.models.helper_constants import CONDITIONS
 from django.db import IntegrityError
 
@@ -17,14 +19,14 @@ class LogicForm(forms.Form):
         END_INTERVIEW: 'END INTERVIEW',
         SKIP_TO: 'SKIP TO',
         REANSWER: 'RECONFIRM',
-        BACK_TO: BACK_TO_ACTION,
+        # BACK_TO: BACK_TO_ACTION,
         ASK_SUBQUESTION: SUBQUESTION_ACTION,
     }
 
     def __init__(self, question, initial=None, *args, **kwargs):
         super(LogicForm, self).__init__(initial=initial, *args, **kwargs)
         data = kwargs.get('data', None)
-        batch = question.batch
+        batch = question.qset
         self.question = question
         self.batch = batch
         self.fields['condition'] = forms.ChoiceField(label='Eligibility criteria', choices=[], widget=forms.Select,
@@ -154,4 +156,29 @@ class LogicForm(forms.Form):
                 value = self.cleaned_data['option']
             TextArgument.objects.create(flow=flow, position=0, param=value)
         # clean up now, remove all zombie questions
-        self.question.batch.zombie_questions().delete()
+        self.question.qset.zombie_questions().delete()
+
+
+class LoopingForm(forms.ModelForm):
+    repeat_count = forms.IntegerField()
+
+    def __init__(self, loop_starter, initial=None, *args, **kwargs):
+        super(LoopingForm, self).__init__(initial=initial, *args, **kwargs)
+        self.fields['loop_starter'].widget = forms.HiddenInput()
+        self.fields['loop_starter'].initial = loop_starter.pk
+        self.fields['loop_ender'].label = 'End Loop'
+        self.fields['previous_numeric_values'] = forms.ModelChoiceField(queryset=
+                                                                        Question.objects.filter(
+                                                                            pk__in=loop_starter.previous_inlines(),
+                                                                            answer_type=NumericalAnswer)
+                                                                        )
+        self.f
+
+    class Meta:
+        fields = ['loop_starter', 'loop_label', 'repeat_logic', 'repeat_count',
+                  'previous_numeric_values', 'loop_ender']
+        widgets = {
+            'repeat_count': forms.TextInput(attrs={"id": 'id_repeat_count', "class": 'hide'}),
+            'previous_numeric_values': forms.TextInput({'id': 'id_previous_numeric_values',
+                                                        "class": 'hide'}),
+        }

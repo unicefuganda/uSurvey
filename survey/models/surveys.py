@@ -2,8 +2,6 @@ from django.db import models
 from survey.models.base import BaseModel
 from django.core.validators import MinValueValidator, MaxValueValidator
 from survey.models.locations import Location, LocationType
-from survey.models.interviewer import Interviewer
-from survey.models.households import Household
 
 
 class Survey(BaseModel):
@@ -14,6 +12,7 @@ class Survey(BaseModel):
         null=False, blank=False, default=10)
     has_sampling = models.BooleanField(
         default=True, verbose_name='Survey Type')
+    listing_form = models.ForeignKey('ListingTemplate', related_name='surveys')
     preferred_listing = models.ForeignKey('Survey', related_name='householdlist_users',
                                           help_text='Select which survey household listing to reuse. Leave empty for fresh listing',
                                           null=True, blank=True)
@@ -50,6 +49,7 @@ class Survey(BaseModel):
         return any([batch.is_open() for batch in self.batches.all()])
 
     def generate_completion_report(self, batch=None):
+        from survey.models.interviewer import Interviewer
         data = []
         all_interviewers = Interviewer.objects.all()
         for interviewer in all_interviewers:
@@ -63,6 +63,7 @@ class Survey(BaseModel):
 
     @property
     def registered_households(self):
+        from survey.models.households import Household
         return Household.objects.filter(listing__survey_houselistings__survey=self).distinct()
     # def batches_enabled(self, interviewer):
     #     if self.has_sampling:

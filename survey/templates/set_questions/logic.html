@@ -1,0 +1,63 @@
+{% extends "form.html"%}
+
+{% load template_tags %}
+
+{% block title %}
+    Add Logic
+{% endblock %}
+{% block pre_form_content %}
+    <p>Question: {{ question }}</p>
+{% endblock %}
+
+{% block display_form_fields %}
+    {% for field in logic_form.visible_fields %}
+        {% if field.label != '' %}
+            {% if forloop.counter > 1 %}
+                </div>
+                </div>
+            {% endif %}
+            <div class="control-group">
+            <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
+            <div class="controls {{ field|is_radio }}">
+        {% endif %}
+        {% include 'shared/_standard_field.html' with field=field %}
+    {% endfor %}
+    <a class="btn btn-small" data-toggle="modal" href="#add_sub_question_modal" name="add_subquestion_button" id="add_subquestion"><i class="icon-plus"></i>Add Subquestion</a>
+    </div>
+    </div>
+
+    <input type="hidden" value='{{ question.id }}' id='id_question' >
+    <input type="hidden" value='{{ batch_id }}' id='id_batch' >
+    {% for hidden in a_form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+{% endblock %}
+
+{% block non_form_content %}
+    <div class="modal fade hide" id="add_sub_question_modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="close_modal">&times;</button>
+                    <h4 class="modal-title">New Sub Question</h4>
+                </div>
+                <div class="modal-body">
+                     {% include 'set_questions/_add_question.html' with title="" button_label="Save" id="add-question-form" class="sub_question_modal question-form" %}
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <h4>Existing Logic</h4>
+    {% include 'questions/_view_question_logic.html' %}
+{% endblock %}
+
+
+
+{% block javascripts %}
+    <script type="text/javascript">
+        QUES_VALIDATION_OPTS = {{ batch | quest_validation_opts }}
+        QUES_VALIDATION_PARAMS = {{ batch | validation_args }}
+    </script>
+    <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

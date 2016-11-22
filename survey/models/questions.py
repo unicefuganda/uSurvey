@@ -1,38 +1,31 @@
 import os
+from collections import OrderedDict
+from ordered_set import OrderedSet
+from cacheops import cached_as
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
-from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
-from survey.models.householdgroups import HouseholdMemberGroup
-from survey.models.access_channels import USSDAccess
-from survey.models.base import BaseModel
-from survey.models.households import Household
 from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
-from collections import OrderedDict
-from ordered_set import OrderedSet
+from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer
+from survey.models.householdgroups import HouseholdMemberGroup
+from survey.models.access_channels import USSDAccess, InterviewerAccess
+from survey.models.base import BaseModel
+from survey.models.households import Household
+from survey.models.generics import GenericQuestion
+from survey.models.interviews import AnswerAccessDefinition
+from survey.models.access_channels import ODKAccess
+
+ALL_ANSWERS = Answer.answer_types()
 
 
-class Question(BaseModel):
-    ANSWER_TYPES = [(name, name) for name in Answer.answer_types()]
-    identifier = models.CharField(
-        max_length=100, blank=False, null=True, verbose_name='Variable Name')
-    text = models.CharField(max_length=150, blank=False, null=False,
-                            # help_text="To replace the household member's name \
-                            # in the question, please include the variable
-                            # FAMILY_NAME in curly brackets, e.g. {{
-                            # FAMILY_NAME }}. "
-                            )
-    answer_type = models.CharField(
-        max_length=100, blank=False, null=False, choices=ANSWER_TYPES)
-    group = models.ForeignKey(HouseholdMemberGroup, related_name='questions')
-    batch = models.ForeignKey('Batch', related_name='batch_questions')
-    module = models.ForeignKey(
-        "QuestionModule", related_name="questions", default='')
+class Question(GenericQuestion):
+    objects = InheritanceManager()
+    qset = models.ForeignKey('QuestionSet', related_name='questions')
 
     class Meta:
-        app_label = 'survey'
-        unique_together = [('identifier', 'batch'), ]
+        abstract = False
+        unique_together = [('identifier', 'qset'), ]
 
     def answers(self):
         return Answer.get_class(self.answer_type).objects.filter(question=self)
@@ -59,15 +52,15 @@ class Question(BaseModel):
             from survey.forms.logic import LogicForm
             return self.connecting_flows.get(desc=LogicForm.BACK_TO_ACTION).question
         except QuestionFlow.DoesNotExist:
-            inlines = self.batch.questions_inline()
+            inlines = self.qset.questions_inline()
 
     @property
     def looper_flow(self):
         # if self.is_loop_start() or self.is_loop_end():
-        return self.batch.get_looper_flow(self)
+        return self.qset.get_looper_flow(self)
 
     def loop_boundary(self):
-        return self.batch.loop_back_boundaries().get(self.pk, None)
+        return self.qset.loop_back_boundaries().get(self.pk, None)
 
     # def loop_inlines(self):
 
@@ -107,7 +100,7 @@ class Question(BaseModel):
             return resulting_flow.next_question
 
     def previous_inlines(self):
-        inlines = self.batch.questions_inline()
+        inlines = self.qset.questions_inline()
         if self not in inlines:
             raise ValidationError('%s not inline' % self.identifier)
         previous = []
@@ -139,11 +132,11 @@ class Question(BaseModel):
         return super(Question, self).save(*args, **kwargs)
 
     @classmethod
-    def zombies(cls,  batch):
-        # these are the batch questions that do not belong to any flow in any
+    def zombies(cls,  qset):
+        # these are the qset questions that do not belong to any flow in any
         # way
-        survey_questions = batch.survey_questions
-        return batch.batch_questions.exclude(pk__in=[q.pk for q in survey_questions])
+        flow_questions = qset.flow_questions
+        return qset.questions.exclude(pk__in=[q.pk for q in flow_questions])
 
     def hierarchical_result_for(self, location_parent, survey):
         locations = location_parent.get_children().order_by('name')[:10]
@@ -164,6 +157,7 @@ class QuestionFlow(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
                         for validator in Answer.validators()]
     question = models.ForeignKey(Question, related_name='flows')
+    question_type = models.CharField(max_length=100)
     validation_test = models.CharField(
         max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)
     # if validation passes, classify this flow response as having this value
@@ -172,6 +166,7 @@ class QuestionFlow(BaseModel):
     desc = models.CharField(max_length=200, null=True, blank=True)
     next_question = models.ForeignKey(
         Question, related_name='connecting_flows', null=True, blank=True, on_delete=models.SET_NULL)
+    next_question_type = models.CharField(max_length=100)
 
     class Meta:
         app_label = 'survey'
@@ -197,19 +192,17 @@ class QuestionFlow(BaseModel):
 
     @property
     def test_arguments(self):
-        return TestArgument.objects.filter(flow=self).select_subclasses().order_by('position')
+        return TextArgument.objects.filter(flow=self).order_by('position')
 
     def save(self, *args, **kwargs):
-        # if self.name is None:
-        #     if self.next_question:
-        #         identifier = self.next_question.identifier
-        #     else: identifier = ''
-        #     self.name = "%s %s %s" % (self.question.identifier, self.validation_test or "", identifier)
+        self.question_type = self.question.type_name()
+        if self.next_question:
+            self.next_question_type = self.next_question.type_name()
         return super(QuestionFlow, self).save(*args, **kwargs)
 
 
-class TestArgument(models.Model):
-    objects = InheritanceManager()
+class TestArgument(BaseModel):
+    object = InheritanceManager()
     flow = models.ForeignKey(QuestionFlow, related_name='%(class)s')
     position = models.PositiveIntegerField()
 
@@ -261,3 +254,285 @@ class QuestionOption(BaseModel):
 
     def __unicode__(self):
         return self.text
+
+
+class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
+    objects = InheritanceManager()
+    name = models.CharField(max_length=100, blank=False, null=True, db_index=True)
+    description = models.CharField(max_length=300, blank=True, null=True)
+    start_question = models.OneToOneField(
+        Question, related_name='starter_%(class)s', null=True, blank=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        app_label = 'survey'
+
+    def __unicode__(self):
+        return "%s" % self.name
+
+    @classmethod
+    def verbose_name(cls):
+        return cls._meta.verbose_name
+
+    @classmethod
+    def resolve_tag(cls):
+        return cls._meta.verbose_name.replace(' ', '_')
+
+    def can_be_deleted(self):
+        return True, ''
+
+    def get_looper_flow(self, question):
+        from survey.forms.logic import LogicForm
+        try:
+            return question.connecting_flows.get(desc=LogicForm.BACK_TO_ACTION)
+        except QuestionFlow.DoesNotExist:
+            return first_inline_flow_with_desc(question, LogicForm.BACK_TO_ACTION)
+
+    def loop_starters(self):
+        from survey.forms.logic import LogicForm
+        flows = QuestionFlow.objects.filter(
+            next_question__qset=self, desc=LogicForm.BACK_TO_ACTION)
+        return set([f.next_question for f in flows])
+
+    def loop_enders(self):
+        from survey.forms.logic import LogicForm
+        flows = QuestionFlow.objects.filter(
+            question__qset=self, desc=LogicForm.BACK_TO_ACTION)
+        return set([f.question for f in flows])
+
+    def non_response_enabled(self, ea):
+        locations = set()
+        ea_locations = ea.locations.all()
+        if ea_locations:
+            map(lambda loc: locations.update(
+                loc.get_ancestors(include_self=True)), ea_locations)
+        return self.open_locations.filter(non_response=True, location__pk__in=[location.pk
+                                                                               for location in locations]).exists()
+
+    @property
+    def answer_types(self):
+        access_channels = self.access_channels.values_list(
+            'channel', flat=True)
+        return set(AnswerAccessDefinition.objects.filter(channel__in=access_channels).values_list('answer_type',
+                                                                                                  flat=True))
+
+    def next_inline(self, question, channel=ODKAccess.choice_name()):
+        qflows = QuestionFlow.objects.filter(question__qset=self, validation_test__isnull=True)
+        if qflows.exists():
+            return next_inline_question(question, qflows, AnswerAccessDefinition.answer_types(channel))
+
+    def last_question_inline(self):
+        qflows = QuestionFlow.objects.filter(
+            question__qset=self, validation_test__isnull=True)
+        if qflows.exists():
+            return last_inline(self.start_question, qflows)
+        else:
+            return self.start_question
+
+    def questions_inline(self):
+        qflows = QuestionFlow.objects.filter(
+            question__qset=self, validation_test__isnull=True)
+        if self.start_question:
+            inlines = inline_questions(self.start_question, qflows)
+            if inlines and inlines[-1] is None:
+                inlines.pop(-1)
+            return inlines
+        else:
+            return []
+
+    def loop_backs_questions(self):
+        '''
+        :return: loop question structure for this qset (q_start_pk, q_end_pk) = []
+        '''
+        cached_as(QuestionSet.objects.filter(id=self.id))
+
+        def _loop_backs_questions():
+            survey_questions = self.survey_questions
+            loop_starters = self.loop_starters()
+            loop_enders = self.loop_enders()
+            start = None
+            loop_desc = OrderedDict()
+            present_loop = []
+            for q in survey_questions:
+                if q in loop_starters:
+                    start = q
+                    present_loop = []
+                if q in loop_enders:
+                    present_loop.append(q)
+                    loop_desc[(start.pk, q.pk)] = present_loop
+                    start = None
+                if start:
+                    present_loop.append(q)
+            # just transpose
+            return loop_desc
+        return _loop_backs_questions()
+
+    def loop_back_boundaries(self):
+        cached_as(QuestionSet.objects.filter(id=self.id))
+
+        def _loop_back_boundaries():
+            loop_desc = self.loop_backs_questions()
+            quest_map = OrderedDict()
+            for boundary, loop_questions in loop_desc.items():
+                map(lambda q: quest_map.update(
+                    {q.pk: boundary}), loop_questions)
+            return quest_map
+        return _loop_back_boundaries()
+
+    def previous_inlines(self, question):
+        inlines = self.questions_inline()
+        if question not in inlines:
+            raise ValidationError('%s not inline' % question.identifier)
+        previous = []
+        for q in inlines:
+            if q.identifier == question.identifier:
+                break
+            else:
+                previous.append(q)
+        return set(previous)
+
+    def zombie_questions(self):
+        return Question.zombies(self)
+
+    @property
+    def flow_questions(self):
+        cached_as(QuestionSet.objects.filter(id=self.id))
+
+        def _flow_questions():
+            inline_ques = self.questions_inline()
+            questions = OrderedSet(inline_ques)
+            flow_questions = OrderedSet()
+            for ques in inline_ques:
+                flow_questions.append(ques)
+                # boldly assuming subquests dont go
+                map(lambda q: flow_questions.add(
+                    q), ques.direct_sub_questions())
+                # more than quest subquestion deep for present implemnt
+            return flow_questions
+        return _flow_questions()
+
+    def activate_non_response_for(self, location):
+        self.open_locations.filter(location=location).update(non_response=True)
+
+    def deactivate_non_response_for(self, location):
+        self.open_locations.filter(
+            location=location).update(non_response=False)
+
+
+def next_inline_question(question, flows, answer_types=ALL_ANSWERS):
+    if answer_types is None:
+        answer_types = ALL_ANSWERS
+    try:
+        qflow = flows.get(question=question, validation_test__isnull=True)
+        next_question = qflow.next_question
+        if next_question and next_question.answer_type in answer_types:
+            return next_question
+        else:
+            return next_inline_question(next_question, flows, answer_types=answer_types)
+    except QuestionFlow.DoesNotExist:
+        return None
+
+
+def last_inline(question, flows):
+    try:
+        qflow = flows.get(
+            question=question, validation_test__isnull=True, next_question__isnull=False)
+        return last_inline(qflow.next_question, flows)
+    except QuestionFlow.DoesNotExist:
+        return question
+
+
+def first_inline_flow_with_desc(question, desc):
+    try:
+        if question.flows.filter(desc=desc).exists():
+            return question.flows.get(desc=desc)
+        if question.connecting_flows.filter(desc=desc).exists():
+            return None
+        iflow = question.flows.get(
+            validation_test__isnull=True, next_question__isnull=False)
+        return first_inline_flow_with_desc(iflow.next_question, desc)
+    except QuestionFlow.DoesNotExist:
+        return None
+
+
+def inline_questions(question, flows):
+    questions = [question, ]
+    try:
+        qflow = flows.get(question=question, validation_test__isnull=True)
+        questions.extend(inline_questions(qflow.next_question, flows))
+    except QuestionFlow.DoesNotExist:
+        pass
+    return questions
+
+
+def inline_flows(question, flows):
+    flows = []
+    try:
+        qflow = flows.get(question=question, validation_test__isnull=True)
+        flows.append(qflow)
+        flows.extend(inline_questions(qflow.next_question, flows))
+    except QuestionFlow.DoesNotExist:
+        pass
+    return flows
+
+
+class QuestionSetChannel(BaseModel):
+    ACCESS_CHANNELS = [(name, name)
+                       for name in InterviewerAccess.access_channels()]
+    qset = models.ForeignKey(QuestionSet, related_name='access_channels')
+    channel = models.CharField(max_length=100, choices=ACCESS_CHANNELS)
+
+    class Meta:
+        app_label = 'survey'
+        unique_together = ('qset', 'channel')
+
+
+class LoopCount(BaseModel):
+    loop = models.OneToOneField('QuestionLoop', related_name="%(class)s")
+
+    def get_count(self, interview):
+        pass
+
+    class Meta:
+        abstract = True
+
+
+class FixedLoopCount(LoopCount):
+    value = models.IntegerField()
+
+    def get_count(self, interview):
+        return self.value
+
+    def odk_get_count(self):
+        return self.get_count()
+
+
+class PreviousAnswerCount(LoopCount):
+    value = models.ForeignKey(Question, related_name='loop_count_identifier')
+
+    def get_count(self, interview):
+        return interview.numericalanswer.filter(question=self.value).value      #  previous question must be numeric
+
+    def odk_get_count(self, interview):
+        raise Exception('need to do!') #to do
+
+    def save(self, *args, **kwargs):
+        if self.value.answer_type != NumericalAnswer.choice_name():
+            raise ValidationError('Loop count can only be a number')
+        return super(PreviousAnswerCount, self).save(*args, **kwargs)
+
+
+class QuestionLoop(BaseModel):
+    USER_DEFINED = ''
+    FIXED_REPEATS = FixedLoopCount.__class__.__name__.lower()
+    PREVIOUS_QUESTION = PreviousAnswerCount.__class__.__name__.lower()
+    REPEAT_OPTIONS = [(USER_DEFINED, 'User Defined'),
+                       (FIXED_REPEATS, 'Fixed number of Repeats'),
+                       (PREVIOUS_QUESTION, 'Response from previous question'),
+                       ]
+    loop_label = models.CharField(max_length=64)
+    loop_starter = models.OneToOneField(Question, related_name='loop_started')
+    repeat_logic = models.CharField(max_length=64, choices=REPEAT_OPTIONS)
+    loop_ender = models.OneToOneField(Question, related_name='loop_ended')
+
+
+

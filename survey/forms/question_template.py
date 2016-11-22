@@ -14,7 +14,7 @@ class QuestionTemplateForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(QuestionTemplateForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder = ['module', 'text',
-                                'identifier', 'group', 'answer_type']
+                                'identifier', 'answer_type']
         instance = kwargs.get('instance', None)
         if instance:
             self.help_text = ' and '.join(

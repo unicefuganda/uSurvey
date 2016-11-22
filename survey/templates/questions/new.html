@@ -11,6 +11,9 @@
   {% if parent_question %}
      <h4> to question: {{parent_question.text}} <h4>
   {% endif %}
+  {% if questionform.prev_question %}
+     <h4> Preceeding question: {{questionform.prev_question.text}} <h4>
+  {% endif %}
     <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
 {% endblock%}
 {% block display_form_fields %}

@@ -8,9 +8,11 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import permission_required
-from survey.forms.filters import QuestionFilterForm,  MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
-from survey.models import Question, Batch, QuestionTemplate, QuestionFlow, TextArgument, TemplateOption
-from survey.forms.question import QuestionForm  # , QuestionFlowForm
+from survey.forms.filters import BatchQuestionFilterForm as QuestionFilterForm,  \
+    MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
+from survey.models import BatchQuestion as Question
+from survey.models import Batch, QuestionTemplate, QuestionFlow, TextArgument, TemplateOption, QuestionSet
+from survey.forms.question import get_question_form  # , QuestionFlowForm
 from survey.services.export_questions import get_batch_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
@@ -30,6 +32,9 @@ def _max_number_of_question_per_page(number_sent_in_request):
     return max(given_max_per_page, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
 
 
+QuestionForm = get_question_form(Question)
+
+
 @permission_required('auth.can_view_batches')
 def index(request, batch_id):
     batch = get_object_or_404(Batch, pk=batch_id)
@@ -38,8 +43,8 @@ def index(request, batch_id):
     if request.method == 'GET':
         question_filter_form = QuestionFilterForm(
             data=request.GET, batch=batch)
-        batch_questions = batch.batch_questions.all()
-        search_fields = ['identifier', 'group__name', 'text', ]
+        batch_questions = batch.questions.all()
+        search_fields = ['identifier',  'text', ]
         if request.GET.has_key('q'):
             questions = get_filterset(
                 batch_questions, request.GET['q'], search_fields)
@@ -51,7 +56,6 @@ def index(request, batch_id):
     else:
         question_filter_form = QuestionFilterForm(batch=batch)
     #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
-
     question_form = QuestionForm(batch)
 
     request.breadcrumbs([
@@ -60,7 +64,7 @@ def index(request, batch_id):
     ])
     context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page': max_per_page,
                'question_filter_form': question_filter_form,
-               'placeholder': 'identifier, group name, text',
+               'placeholder': 'identifier, text',
                }
     return render(request, 'questions/index.html', context)
 
@@ -111,17 +115,20 @@ def _save_subquestion(request, batch_id, instance=None):
 
 
 def get_sub_questions_for_question(request, question_id):
-    question = Question.objects.get(id=question_id)
-    return _create_question_hash_response(Question.zombies(question.batch))
+    from survey.models import Question
+    question = Question.get(id=question_id)
+    return _create_question_hash_response(Question.zombies(question.qset))
 
 
 def get_prev_questions_for_question(request, question_id):
-    question = Question.objects.get(id=question_id)
+    from survey.models import Question
+    question = Question.get(id=question_id)
     return _create_question_hash_response(question.previous_inlines())
 
 
 def get_questions_for_batch(request, batch_id, question_id):
-    batch = Batch.objects.get(id=batch_id)
+    from survey.models import QuestionSet
+    batch = QuestionSet.get(id=batch_id)
     questions = batch.questions_inline()
     questions = [q for q in questions if int(q.pk) is not int(question_id)]
     return _create_question_hash_response(questions)
@@ -169,7 +176,7 @@ def add_logic(request, batch_id, question_id):
 
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'rules_for_batch': question_rules_for_batch,
-               'questionform': QuestionForm(parent_question=question, batch=batch),
+               'questionform': QuestionForm(batch, parent_question=question),
                'modal_action': reverse('add_batch_subquestion_page', args=(batch.pk, )),
                'class': 'question-form', 'batch_id': batch_id, 'batch': batch,
                'cancel_url': '/batches/%s/questions/' % batch_id}
@@ -179,7 +186,7 @@ def add_logic(request, batch_id, question_id):
 @permission_required('auth.can_view_batches')
 def delete_logic(request, flow_id):
     flow = QuestionFlow.objects.get(id=flow_id)
-    batch = flow.question.batch
+    batch = flow.question.qset
     flow.delete()
     _kill_zombies(batch.zombie_questions())
     messages.success(request, "Logic successfully deleted.")
@@ -194,7 +201,7 @@ def edit(request, question_id):
         return HttpResponseRedirect(reverse('survey_list_page'))
     question = questions[0]
     response, context = _render_question_view(
-        request, question.batch, question)
+        request, QuestionSet.objects.get_subclass(pk=question.qset.pk), question)
     return response or render(request, 'questions/new.html', context)
 
 
@@ -283,7 +290,7 @@ def _kill_zombies(zombies):
 
 def _remove(request, batch_id, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    batch = question.batch
+    batch = question.qset
     redirect_url = '/batches/%s/questions/' % batch_id if batch_id else reverse('batch_questions_page',
                                                                                 args=(batch.pk, ))
     if question.total_answers() > 0:
@@ -385,3 +392,5 @@ def export_batch_questions(request, batch_id):
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))
     return response
+
+

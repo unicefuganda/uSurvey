@@ -49,7 +49,7 @@ $(function(){
       rules: {
         'text':'required',
         'identifier':'required',
-        'group':'required',
+        //'group':'required',
         'answer_type':'required'
       }
       });

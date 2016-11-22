@@ -56,11 +56,6 @@ class HouseholdMemberGroup(BaseModel):
         app_label = 'survey'
 
 
-def household_member_test(func):
-    func.is_reply_test = True
-    return func
-
-
 class GroupCondition(BaseModel):
     CONDITIONS = {
         'EQUALS': 'EQUALS',

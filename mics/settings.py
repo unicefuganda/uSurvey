@@ -243,6 +243,7 @@ CACHEOPS = {
     'survey.batch': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs,
     'survey.survey': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.questionset': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
 }
 
 # DJANGO-WS CONFIG

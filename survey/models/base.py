@@ -1,4 +1,5 @@
 from django_extensions.db.models import TimeStampedModel
+from model_utils.managers import InheritanceManager
 
 
 class BaseModel(TimeStampedModel):
@@ -13,5 +14,11 @@ class BaseModel(TimeStampedModel):
         else:
             return super(BaseModel, self).__repr__()
 
-    # def __int__(self):
-    #     return self.pk
+    @classmethod
+    def get(cls, **kwargs):
+        if isinstance(cls.objects, InheritanceManager):
+            return cls.objects.get_subclass(**kwargs)
+        else:
+            return cls.objects.get(**kwargs)
+
+

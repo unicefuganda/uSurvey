@@ -120,6 +120,8 @@ def get_url_with_ids(args, url_name):
     if not str(args).isdigit():
         arg_list = [int(arg) for arg in args.split(',')]
         return reverse(url_name, args=arg_list)
+    if isinstance(args, dict):
+        reverse(url_name, kwargs=args)
     return reverse(url_name, args=(args,))
 
 

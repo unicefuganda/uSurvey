@@ -1,9 +1,9 @@
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "mics_test",
+        "NAME": "lusurvey",
         "USER": "postgres",
-        "PASSWORD": "",
+        "PASSWORD": "postgres121",
         "HOST": "localhost",
     }
 
