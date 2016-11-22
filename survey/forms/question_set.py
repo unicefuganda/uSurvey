@@ -31,7 +31,7 @@ def get_question_set_form(model_class):
 
         def clean_name(self):
             name = self.cleaned_data['name'].strip()
-            if model_class.objects.filter(name=name).exists():
+            if self.instance is None and model_class.objects.filter(name=name).exists():
                 raise ValidationError('Name already exists')
             return name
 
