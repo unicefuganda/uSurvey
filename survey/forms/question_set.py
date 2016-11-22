@@ -29,6 +29,12 @@ def get_question_set_form(model_class):
                 'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
             }
 
+        def clean_name(self):
+            name = self.cleaned_data['name'].strip()
+            if model_class.objects.filter(name=name).exists():
+                raise ValidationError('Name already exists')
+            return name
+
         def save(self, commit=True, **kwargs):
             question_set = super(QuestionSetForm, self).save(commit=commit)
             bc = QuestionSetChannel.objects.filter(qset=question_set)

@@ -11,6 +11,7 @@ class ListingTemplate(QuestionSet):
     class Meta:
         app_label = 'survey'
 
+    @classmethod
     def verbose_name(cls):
         return 'Listing Form'
 

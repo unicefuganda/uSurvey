@@ -35,7 +35,6 @@ class QuestionSetView(object):
             raise HttpResponseNotAllowed('Illegal access')
 
     def _set_bread_crumbs(self, request, pre=[], post=[], *args, **kwargs):
-        return
         bread_crumbs = pre
         bread_crumbs.extend([(self.model.verbose_name(), reverse('%s_home'%self.model.resolve_tag())), ])
         bread_crumbs.extend(post)
@@ -63,7 +62,9 @@ class QuestionSetView(object):
                 qset_form = self._save_form(request, qset_form)
                 messages.success(request, '%s successfully added.' % self.model.verbose_name())
                 response = HttpResponseRedirect(reverse('%s_home' % self.model.resolve_tag()))
-        context = {'question_set_form': self.questionSetForm(),
+        else:
+            qset_form = self.questionSetForm()
+        context = {'question_set_form': qset_form,
                    'title': "New Survey",
                    'button_label': 'Create',
                    'id': 'add-question_set-form',
