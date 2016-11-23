@@ -305,6 +305,15 @@ HOUSEHOLD_EXPORT_HEADERS = OrderedDict([
     ('SURVEY_LISTING',
      'listing__initial_survey__name')
 ])
+QUESTION_EXPORT_HEADERS = OrderedDict([
+    ('identifier', 'Question Code'),
+    ('text', 'Question Text'),
+    ('answer_type', 'Answer Type'),
+    ('options', 'Options'),
+    ('group', 'Group'),
+    ('module', 'Module')
+])
+
 AGGREGATORS = [('testAggregator', 'testAggregator'), ]
 DEFAULT_AGGREGATOR = 'testAggregator'
 TWITTER_URL = 'https://twitter.com/unicefuganda'

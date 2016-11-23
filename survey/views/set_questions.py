@@ -16,7 +16,7 @@ from survey.models import Batch, QuestionTemplate, QuestionFlow, TextArgument, T
 from survey.models import QuestionModule, QuestionOption
 from survey.forms.question import get_question_form  # , QuestionFlowForm
 from survey.forms.batch import BatchQuestionsForm
-from survey.services.export_questions import get_batch_question_as_dump
+from survey.services.export_questions import get_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
 from survey.forms.logic import LogicForm, LoopingForm
@@ -501,7 +501,7 @@ def export_all_questions(request):
 def export_batch_questions(request, qset_id):
     batch = QuestionSet.get(pk=qset_id)
     filename = '%s_questions' % batch.name
-    formatted_responses = get_batch_question_as_dump(batch.flow_questions)
+    formatted_responses = get_question_as_dump(batch.flow_questions)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
     response.write("\r\n".join(formatted_responses))

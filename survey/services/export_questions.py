@@ -1,3 +1,4 @@
+from django.conf import settings
 from survey.models import Question, QuestionTemplate
 
 
@@ -55,6 +56,32 @@ def get_batch_question_as_dump(questions):
                                      get_logic_print(question), question.group.name, question.module.name)
                                     ), questions)
     return _formatted_responses
+
+
+def get_question_as_dump(questions):
+    HEADERS = "Question Code,Question Text,Answer Type,Options,Logic"
+    _formatted_responses = [HEADERS, ]
+    map(lambda question:
+        _formatted_responses.append('%s,%s,%s,%s,%s,%s,%s' %
+                                    (question.identifier, question.text.replace('\r\n', ' '), question.answer_type.upper(),
+                                     '|'.join(
+                                         [opt.to_text for opt in question.options.all()]),
+                                     get_logic_print(question))
+                                    ), questions)
+    return _formatted_responses
+
+
+def get_model_as_dump(model_class, **query_crtiteria):
+    # following numenclacure header definition for model class to be call by modelclass_EXPORT_HEADERS in settings
+    report_details = getattr(settings, '%s_EXPORT_HEADERS' % model_class._name__)
+    headers = ','.join(report_details.values())
+    _formatted_responses = [headers, ]
+    keys = report_details.keys()
+    if 'id' not in keys:
+        keys.insert(0, 'id')
+    entries = model_class.objects.filter(**query_crtiteria).values_list(*keys).order_by('id')
+
+    map(lambda entry: ','.join(entry), entries)
 
 
 def get_logic_print(question):

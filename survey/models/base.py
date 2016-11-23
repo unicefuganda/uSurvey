@@ -22,3 +22,4 @@ class BaseModel(TimeStampedModel):
             return cls.objects.get(**kwargs)
 
 
+
