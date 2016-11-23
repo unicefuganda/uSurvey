@@ -74,11 +74,11 @@
                                             <a href="#delete_logic_{{ flow.id }}" data-toggle="modal"
                                                id="delete_subquestion">Delete</a>
                                             &nbsp;&nbsp;
-                                               <a href="{% url 'edit_question_page' flow.next_question.id %}"
+                                               <a href="{% url 'qset_edit_question_page' flow.next_question.id %}"
                                                   id="edit_subquestion_{{ flow.id }}">Edit</a>&nbsp;&nbsp;
                                             <!-- disabled this for now -->
                                             <!-- a href="{% url 'add_question_logic_page' batch.pk  flow.next_question.pk %}" class="add-logic">Add Logic</a -->
-                                            {% include "base/delete_modal.html" with object_name=flow.desc|add:" "|add:flow.next_question.text id=flow.id name='Logic' url=flow.id|get_url_with_ids:"delete_question_logic_page" %}
+                                            {% include "base/delete_modal.html" with object_name=flow.desc|add:" "|add:flow.next_question.text id=flow.id name='Logic' url=flow.id|get_url_with_ids:"delete_qset_question_logic_page" %}
                                             {% endif %}
 
                                         </li>
@@ -101,7 +101,7 @@
             <td>
                 <div class="btn-group">
                     {% if  batch and batch.interviews.count == 0 %}
-                        <a class="btn btn-small" href="{% url 'edit_question_page' question.pk %}" id="edit_question"><i
+                        <a class="btn btn-small" href="{% url 'qset_edit_question_page' question.pk %}" id="edit_question"><i
                                 class="icon-pencil"></i> Edit</a>
                         <a href="{% url 'insert_qset_question_page' question.pk %}" class="btn btn-small"><i
                                 class="icon-plus"></i>Insert Question</a>

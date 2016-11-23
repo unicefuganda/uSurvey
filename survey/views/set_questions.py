@@ -212,13 +212,9 @@ def delete_logic(request, flow_id):
 
 @permission_required('auth.can_view_batches')
 def edit(request, question_id):
-    questions = Question.objects.filter(id=question_id)
-    if not questions:
-        messages.error(request, "Question does not exist.")
-        return HttpResponseRedirect(reverse('survey_list_page'))
-    question = questions[0]
-    response, context = _render_question_view(
-        request, QuestionSet.objects.get_subclass(pk=question.qset.pk), question)
+    question = Question.get(id=question_id)
+    batch = QuestionSet.get(pk=question.qset.pk)
+    response, context = _render_question_view(request, batch, instance=question)
     return response or render(request, 'set_questions/new.html', context)
 
 
