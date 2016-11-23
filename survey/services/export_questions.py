@@ -62,7 +62,7 @@ def get_question_as_dump(questions):
     HEADERS = "Question Code,Question Text,Answer Type,Options,Logic"
     _formatted_responses = [HEADERS, ]
     map(lambda question:
-        _formatted_responses.append('%s,%s,%s,%s,%s,%s,%s' %
+        _formatted_responses.append('%s,%s,%s,%s,%s' %
                                     (question.identifier, question.text.replace('\r\n', ' '), question.answer_type.upper(),
                                      '|'.join(
                                          [opt.to_text for opt in question.options.all()]),
