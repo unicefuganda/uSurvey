@@ -57,7 +57,7 @@
     {% for question in questions %}
         <tr>
             <td>
-                {% if question.loop_started %}&raquo;{% endif %}{% if question.loop_ended %}&laquo;{% endif %}{{ question.identifier }}
+                {% if question.loop_started %}<span style="color: green;">&raquo;</span>{% endif %}{% if question.loop_ended %}<span style="color: red;">&laquo;</span>{% endif %}{{ question.identifier }}
             </td>
             <td class="span8">
                 {% if question.conditional_flows %}
