@@ -105,8 +105,8 @@
                                 class="icon-pencil"></i> Edit</a>
                         <a href="{% url 'insert_qset_question_page' question.pk %}" class="btn btn-small"><i
                                 class="icon-plus"></i>Insert Question</a>
-                        <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="btn btn-small"><i
-                                class="icon-plus"></i>Start Loop</a>
+                        <a href="{% url 'loop_qset_question_page' question.pk %}" class="btn btn-small"><i
+                                class="icon-plus"></i>Manage Loop</a>
                         <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="btn btn-small"><i
                                 class="icon-plus"></i> Add Logic</a>
                         <a class="btn btn-small" href="#remove_question_{{ question.pk }}" data-toggle="modal"

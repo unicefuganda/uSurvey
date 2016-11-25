@@ -4,8 +4,8 @@
 	margin-top: -7px;
 	}
     </style>
-  <div class="control-group">
-    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
+  <div class="control-group {{field.widget.attrs.class}}" id="{{field.auto_id}}-control-group">
+    <label class="control-label {{field.field.widget.attrs.class}}" for="{{field.auto_id}}">{{field.label}}</label>
     <div class="controls {{ field|is_radio }}">
       {{field}}
         &nbsp;&nbsp;<span id="{{field.auto_id}}_tip" class="help tip">{{ field.help_text }}</span>

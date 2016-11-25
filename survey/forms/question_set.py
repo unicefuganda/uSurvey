@@ -20,6 +20,8 @@ def get_question_set_form(model_class):
                 initial['access_channels'] = [
                     c.channel for c in kwargs['instance'].access_channels.all()]
             super(QuestionSetForm, self).__init__(*args, **kwargs)
+            # import pdb; pdb.set_trace()
+
 
         class Meta:
             model = model_class

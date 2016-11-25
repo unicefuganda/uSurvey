@@ -65,9 +65,9 @@ class LocationType(MPTTModel, BaseModel):
 
 
 class Location(MPTTModel, BaseModel):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=200)
     type = models.ForeignKey(LocationType, related_name='locations')
-    code = models.CharField(max_length=100, null=True, blank=True)
+    code = models.CharField(max_length=200, null=True, blank=True)
     parent = TreeForeignKey('self', null=True, blank=True,
                             related_name='sub_locations', db_index=True)
     # would use this in the future. But ignore for now

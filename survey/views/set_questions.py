@@ -13,7 +13,7 @@ from survey.forms.filters import QuestionFilterForm,  \
     MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models import Question, QuestionSet
 from survey.models import Batch, QuestionTemplate, QuestionFlow, TextArgument, TemplateOption, QuestionSet
-from survey.models import QuestionModule, QuestionOption
+from survey.models import QuestionModule, QuestionOption, QuestionLoop
 from survey.forms.question import get_question_form  # , QuestionFlowForm
 from survey.forms.batch import BatchQuestionsForm
 from survey.services.export_questions import get_question_as_dump
@@ -73,8 +73,6 @@ def index(request, qset_id):
 
 
 @permission_required('auth.can_view_batches')
-@not_allowed_when_batch_is_open(message=ADD_SUBQUESTION_ON_OPEN_BATCH_ERROR_MESSAGE,
-                                redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def new_subquestion(request, batch_id):
     return _save_subquestion(request, batch_id)
 
@@ -177,27 +175,33 @@ def add_logic(request, qset_id, question_id):
     return response or render(request, "set_questions/logic.html", context)
 
 
-# def start_loop(request, question_id):
-#     question = Question.get(id=question_id)
-#     response = None
-#     looping_form = LoopingForm(question)
-#     if request.method == "POST":
-#         logic_form = LoopingForm(question, data=request.POST)
-#         if logic_form.is_valid():
-#             logic_form.save()
-#             messages.success(request, 'Logic successfully added.')
-#             response = HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
-#     request.breadcrumbs([
-#         (batch.verbose_name(), reverse('%s_home' % batch.resolve_tag()), ),
-#         (batch.name, reverse('qset_questions_page', args=(batch.pk, ))),
-#     ])
-#     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
-#                'rules_for_batch': question_rules_for_batch,
-#                'questionform': QuestionForm(batch, parent_question=question),
-#                'modal_action': reverse('add_qset_subquestion_page', args=(batch.pk, )),
-#                'class': 'question-form', 'batch_id': qset_id, 'batch': batch,
-#                'cancel_url': reverse('%s_home' % batch.resolve_tag())}
-#     return response or render(request, "set_questions/logic.html", context)
+def manage_loop(request, question_id):
+    question = Question.get(id=question_id)
+    batch = QuestionSet.get(pk=question.qset.pk)
+    response = None
+    existing_loop = getattr(question, 'loop_started', None)
+    looping_form = LoopingForm(question, instance=existing_loop)
+    if request.method == "POST":
+        looping_form = LoopingForm(question, instance=existing_loop, data=request.POST)
+        if looping_form.is_valid():
+            looping_form.save()
+            messages.success(request, 'Loop Logic successfully added.')
+            return HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
+    request.breadcrumbs([
+         (batch.verbose_name(), reverse('%s_home' % batch.resolve_tag()), ),
+        (batch.name, reverse('qset_questions_page', args=(batch.pk, ))),
+    ])
+    # import pdb;pdb.set_trace()
+    context = {'loop_form': looping_form, 'button_label': 'Save', 'question': question,
+               'cancel_url': reverse('%s_home' % batch.resolve_tag())}
+    return render(request, "set_questions/loop.html", context)
+
+def remove_loop(request, loop_id):
+    question_loop = get_object_or_404(QuestionLoop, pk=loop_id)
+    start_question = question_loop.start_question
+    question_loop.delete()
+    messages.success(request, 'Loop removed succesfully')
+    return HttpResponseRedirect(reverse('qset_questions_page', args=(start_question.qset.pk, )))
 
 
 @permission_required('auth.can_view_batches')

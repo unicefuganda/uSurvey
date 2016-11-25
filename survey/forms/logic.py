@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow, \
     Question, TextArgument, NumericalAnswer
-from survey.models import QuestionLoop
+from survey.models import QuestionLoop, FixedLoopCount, PreviousAnswerCount
 from survey.models.helper_constants import CONDITIONS
 from django.db import IntegrityError
 
@@ -160,25 +160,47 @@ class LogicForm(forms.Form):
 
 
 class LoopingForm(forms.ModelForm):
-    repeat_count = forms.IntegerField()
+    FIXED_COUNT = FixedLoopCount.choice_name()
+    PREVIOUS_ANSWER_COUNT = PreviousAnswerCount.choice_name()
+    repeat_count = forms.IntegerField(required=False, initial=10)
 
     def __init__(self, loop_starter, initial=None, *args, **kwargs):
         super(LoopingForm, self).__init__(initial=initial, *args, **kwargs)
         self.fields['loop_starter'].widget = forms.HiddenInput()
         self.fields['loop_starter'].initial = loop_starter.pk
         self.fields['loop_ender'].label = 'End Loop'
-        self.fields['previous_numeric_values'] = forms.ModelChoiceField(queryset=
-                                                                        Question.objects.filter(
-                                                                            pk__in=loop_starter.previous_inlines(),
-                                                                            answer_type=NumericalAnswer)
-                                                                        )
-        self.f
+        self.fields['previous_numeric_values'] = forms.ModelChoiceField(queryset=Question.objects.filter(
+            pk__in=[q.pk for q in loop_starter.previous_inlines() if q.answer_type == NumericalAnswer.choice_name()]
+        ))
+        self.fields['previous_numeric_values'].widget = forms.TextInput(attrs={'disabled': 'disabled'})
+        self.fields['repeat_count'].widget = forms.TextInput(attrs={'disabled': 'disabled'})
+        self.fields['previous_numeric_values'].required = False
+        self.fields.keyOrder = ['loop_starter', 'loop_label', 'repeat_logic', 'repeat_count',
+                  'previous_numeric_values', 'loop_ender']
 
     class Meta:
-        fields = ['loop_starter', 'loop_label', 'repeat_logic', 'repeat_count',
-                  'previous_numeric_values', 'loop_ender']
-        widgets = {
-            'repeat_count': forms.TextInput(attrs={"id": 'id_repeat_count', "class": 'hide'}),
-            'previous_numeric_values': forms.TextInput({'id': 'id_previous_numeric_values',
-                                                        "class": 'hide'}),
-        }
+        model = QuestionLoop
+        exclude = []
+
+    def clean(self):
+        super(LogicForm, self).clean()
+        if self.cleaned_data['repeat_count'] == self.FIXED_COUNT:
+            try:
+                int(self.cleaned_data.get('repeat_count', ''))
+            except ValueError:
+                raise ValidationError('repeat count is required')
+        if self.cleaned_data['repeat_count'] ==  self.PREVIOUS_ANSWER_COUNT and not self.cleaned_data.get(
+                'previous_numeric_values', False):
+            raise ValidationError('No previous answer selected')
+        return self.cleaned_data['repeat_count']
+
+    def save(self, commit=True, *args, **kwargs):
+        loop = super(LoopingForm, self).save(commit, *args, **kwargs)
+        if commit:
+            if loop.repeat_logic == self.FIXED_COUNT:
+                FixedLoopCount.objects.create(value=self.cleaned_data['repeat_count'])
+            elif loop.repeat_logic == self.PREVIOUS_ANSWER_COUNT:
+                PreviousAnswerCount.objects.create(value=self.cleaned_data['previous_numeric_values'])
+        return loop
+
+

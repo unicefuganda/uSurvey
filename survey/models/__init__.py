@@ -4,7 +4,7 @@ from survey.models.interviews import NumericalAnswer, Interview, TextAnswer, Mul
     ImageAnswer, AudioAnswer, GeopointAnswer, NonResponseAnswer
 from survey.models.backend import Backend
 from survey.models.questions import Question, QuestionSet, QuestionOption, QuestionFlow, TextArgument, TestArgument
-from survey.models.questions import QuestionSetChannel, QuestionLoop
+from survey.models.questions import QuestionSetChannel, QuestionLoop, FixedLoopCount, PreviousAnswerCount
 from survey.models.respondents import RespondentGroup, RespondentGroupCondition
 from survey.models.batch_questions import BatchQuestion
 from survey.models.survey_listing import ListingQuestion, ListingTemplate
@@ -43,6 +43,8 @@ __all__ = [
     'RespondentGroupCondition',
     'TemplateOption',
     'QuestionLoop',
+    'FixedLoopCount',
+    'PreviousAnswerCount',
     'WebAccess',
     'SurveyAllocation',
     'Location',

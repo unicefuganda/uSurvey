@@ -1,4 +1,5 @@
 import os
+import string
 from collections import OrderedDict
 from ordered_set import OrderedSet
 from cacheops import cached_as
@@ -100,15 +101,7 @@ class Question(GenericQuestion):
             return resulting_flow.next_question
 
     def previous_inlines(self):
-        inlines = self.qset.questions_inline()
-        if self not in inlines:
-            raise ValidationError('%s not inline' % self.identifier)
-        previous = []
-        for q in inlines:
-            if q.identifier == self.identifier:
-                break
-            else:
-                previous.append(q)
+        previous = self.qset.previous_inlines(self)
         return set(previous)
 
     def direct_sub_questions(self):
@@ -271,7 +264,7 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
 
     @classmethod
     def verbose_name(cls):
-        return cls._meta.verbose_name
+        return string.capwords(cls._meta.verbose_name)
 
     @classmethod
     def resolve_tag(cls):
@@ -380,14 +373,16 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
 
     def previous_inlines(self, question):
         inlines = self.questions_inline()
-        if question not in inlines:
-            raise ValidationError('%s not inline' % question.identifier)
         previous = []
+        found = False
         for q in inlines:
             if q.identifier == question.identifier:
+                found = True
                 break
             else:
                 previous.append(q)
+        if not found:
+            raise ValidationError('%s not inline' % question.identifier)
         return set(previous)
 
     def zombie_questions(self):
@@ -455,6 +450,8 @@ def first_inline_flow_with_desc(question, desc):
 
 
 def inline_questions(question, flows):
+    # to do, optimize this function
+    # questions = [Question.get(pk=question.pk), ]
     questions = [question, ]
     try:
         qflow = flows.get(question=question, validation_test__isnull=True)
@@ -488,6 +485,10 @@ class QuestionSetChannel(BaseModel):
 
 class LoopCount(BaseModel):
     loop = models.OneToOneField('QuestionLoop', related_name="%(class)s")
+
+    @classmethod
+    def choice_name(cls):
+        return cls.__name__.lower()
 
     def get_count(self, interview):
         pass
@@ -523,8 +524,8 @@ class PreviousAnswerCount(LoopCount):
 
 class QuestionLoop(BaseModel):
     USER_DEFINED = ''
-    FIXED_REPEATS = FixedLoopCount.__class__.__name__.lower()
-    PREVIOUS_QUESTION = PreviousAnswerCount.__class__.__name__.lower()
+    FIXED_REPEATS = FixedLoopCount.choice_name()
+    PREVIOUS_QUESTION = PreviousAnswerCount.choice_name()
     REPEAT_OPTIONS = [(USER_DEFINED, 'User Defined'),
                        (FIXED_REPEATS, 'Fixed number of Repeats'),
                        (PREVIOUS_QUESTION, 'Response from previous question'),

@@ -58,21 +58,21 @@
                 <a class="btn btn-small" href='{% url "edit_"|add:model.resolve_tag|add:"_page" question_set.id %}'><i class="icon-pencil"></i> Edit</a>
                 {% if not question_set.interviews.exists %}
                 <a class="btn btn-small " data-toggle="modal" href="#delete_questionset_{{question_set.id}}"><i class="icon-trash"></i> Delete</a>
-                {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name="questionset"
-                url=question_set.id|get_url_with_ids:"delete_"|add:model.resolve_tag %}
+                {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_"|add:model.resolve_tag %}
                 {% endif %}
                 <a class="add_batch btn btn-small" href="{% url 'qset_questions_page' question_set.pk %}">View/Edit Questions</a>
                 {% if question_set.interviews.count %}
                 <a class="add_batch btn btn-small" href="{% url 'set_questions_index_page' question_set.pk %}">View Data</a>
                 {% endif %}
-                {% if model.verbose_name = 'Batch' %}
-                    <a class="btn btn-small" href="{% url 'batch_show_page' batch.survey.id batch.pk %}"><i class="icon-lock"></i> Open/Close</a>
+                {% if question_set.verbose_name = 'Batch' and question_set.flow_questions %}
+                    <a class="btn btn-small" href="{% url 'batch_show_page' question_set.survey.id question_set.pk %}"><i class="icon-lock"></i> Open/Close</a>
                 {% endif %}
                 {% comment %}
-                {% if model.verbose_name == 'Listing Form' %}
+                {% if question_set.verbose_name == 'Listing Form' %}
                     <a class="add_batch btn btn-small" href="{% url 'sampling_criteria' question_set.pk %}">Sampling Criteria</a>
                 {% endif %}
                 {% endcomment %}
+
             </div>
           </td>
         </tr>
@@ -87,7 +87,11 @@
                 <h4 class="modal-title">New {{ model.verbose_name.capitalize }}</h4>
               </div>
               <div class="modal-body">
-                {% include "question_set/inline_new.html" with title="" model=model action="new_"|add:model.resolve_tag|add:"_page"|get_url_without_ids  button_label="Save"%}
+                {% if model.verbose_name == 'Batch' %}
+                    {% include "question_set/inline_new.html" with title="" model=model action=survey.id|get_url_with_ids:"new_batch_page"  button_label="Save"%}
+                {% else %}
+                    {% include "question_set/inline_new.html" with title="" model=model action="new_"|add:model.resolve_tag|add:"_page"|get_url_without_ids  button_label="Save"%}
+                {% endif %}
               </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

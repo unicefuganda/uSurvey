@@ -1,16 +1,35 @@
-import json
-from django.core.serializers.json import DjangoJSONEncoder
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib import messages
-from survey.interviewer_configs import *
-from survey.models import ListingTemplate, Batch
+from django.contrib.auth.decorators import permission_required
+from survey.models import ListingTemplate
+from .question_set import QuestionSetView
+
 
 @permission_required('auth.can_view_batches')
-def sampling_criteria(request, id):
-    listing_template = get_object_or_404(ListingTemplate, pk=id)
+def index(request):
+    return QuestionSetView(model_class=ListingTemplate).index(request, ListingTemplate.objects.all())
+
+
+@permission_required('auth.can_view_batches')
+def new(request):
+    request.breadcrumbs(
+        [ListingTemplate.verbose_name(), reverse('%s_home' % ListingTemplate.resolve_tag())]
+    )
+    return QuestionSetView(model_class=ListingTemplate).new(request)
+
+
+@permission_required('auth.can_view_batches')
+def edit(request, qset_id):
+    request.breadcrumbs(
+        [ListingTemplate.verbose_name(), reverse('%s_home' % ListingTemplate.resolve_tag())]
+    )
+    return QuestionSetView(model_class=ListingTemplate).edit(request, ListingTemplate.get(pk=qset_id))
+
+
+@permission_required('auth.can_view_batches')
+def delete(request, qset_id):
+    return QuestionSetView(model_class=ListingTemplate).delete(request, ListingTemplate.get(pk=qset_id))
+
 
 
 

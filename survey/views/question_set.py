@@ -24,6 +24,7 @@ QuestionsForm = get_question_form(Question)
 
 
 class QuestionSetView(object):
+    # users of this class methods needs to set their own bread crumbs
     model = QuestionSet
     questionSetForm = get_question_set_form(QuestionSet)
 
@@ -34,56 +35,46 @@ class QuestionSetView(object):
         else:
             raise HttpResponseNotAllowed('Illegal access')
 
-    def _set_bread_crumbs(self, request, pre=[], post=[], *args, **kwargs):
-        bread_crumbs = pre
-        bread_crumbs.extend([(self.model.verbose_name(), reverse('%s_home'%self.model.resolve_tag())), ])
-        bread_crumbs.extend(post)
-        request.breadcrumbs(bread_crumbs)
-
     @method_decorator(permission_required('auth.can_view_batches'))
-    def index(self, request, **kwargs):
-        qsets = self.model.objects.filter(**kwargs).order_by('created')
+    def index(self, request, qsets, extra_context={}, template_name='question_set/index.html', **form_extra):
         search_fields = ['name', 'description']
         if request.GET.has_key('q'):
             qsets = get_filterset(qsets, request.GET['q'], search_fields)
-        context = {'question_sets': qsets, 'request': request, 'model': self.model, 'listing_model': ListingTemplate,
-                   'placeholder': 'name, description', 'question_set_form': self.questionSetForm(),
-                   'url_params': kwargs}
-        return render(request, 'question_set/index.html',
+        context = {'question_sets': qsets, 'request': request, 'model': self.model,
+                   'placeholder': 'name, description', 'question_set_form': self.questionSetForm(**form_extra)}
+        context.update(extra_context)
+        return render(request, template_name,
                       context)
 
     @method_decorator(permission_required('auth.can_view_batches'))
-    def new(self, request, **kwargs):
-        self._set_bread_crumbs(request)
+    def new(self, request, extra_context={}, template_name='question_set/new.html', **form_extra):
+        # self._set_bread_crumbs(request)
         response = None
         if request.method == 'POST':
-            qset_form = self.questionSetForm(request.POST)
+            qset_form = self.questionSetForm(request.POST, **form_extra)
             if qset_form.is_valid():
                 qset_form = self._save_form(request, qset_form)
                 messages.success(request, '%s successfully added.' % self.model.verbose_name())
                 response = HttpResponseRedirect(reverse('%s_home' % self.model.resolve_tag()))
         else:
-            qset_form = self.questionSetForm()
+            qset_form = self.questionSetForm(**form_extra)
+        # if qset_form.errors:
+        #     messages.error(request, qset_form.errors.values()[0])
         context = {'question_set_form': qset_form,
-                   'title': "New Survey",
+                   'title': "New %s" % self.model.verbose_name(),
                    'button_label': 'Create',
                    'id': 'add-question_set-form',
                    'model': self.model,
-                   'cancel_url': reverse('%s_home'%self.model.resolve_tag(), kwargs=kwargs),
-                   'url_params': kwargs
+                   'cancel_url': reverse('%s_home'%self.model.resolve_tag()),
                    }
-        return response or render(request, 'question_set/new.html', context)
+        context.update(extra_context)
+        return response or render(request, template_name, context)
 
     def _save_form(self, request, qset_form, **kwargs):
         return qset_form.save(**request.POST)
 
     @method_decorator(permission_required('auth.can_view_batches'))
-    def edit(self, request, **kwargs):
-        self._set_bread_crumbs(request)
-        try:
-            qset = QuestionSet.objects.get_subclass(**kwargs)
-        except QuestionSet.DoesNotExist:
-            return HttpResponseNotFound()
+    def edit(self, request, qset, extra_context={}, template_name='question_set/new.html', **form_extra):
         if request.method == 'POST':
             qset_form = self.questionSetForm(instance=qset, data=request.POST)
             if qset_form.is_valid():
@@ -91,18 +82,15 @@ class QuestionSetView(object):
                 messages.success(request, '%s successfully edited.' % self.model.verbose_name())
                 return HttpResponseRedirect(reverse('%s_home'%self.model.resolve_tag()))
         else:
-            qset_form = self.questionSetForm(instance=qset)
+            qset_form = self.questionSetForm(instance=qset, **form_extra)
         context = {'request': request, 'model': self.model, 'listing_model': ListingTemplate,
                    'id': 'edit-question-set-form', 'placeholder': 'name, description', 'question_set_form': qset_form,
-                   'action': '', 'url_params': kwargs}
-        return render(request, 'question_set/new.html', context)
+                   'action': ''}
+        context.update(extra_context)
+        return render(request, template_name, context)
 
     @permission_required('auth.can_view_batches')
-    def delete(self, request, **kwargs):
-        try:
-            qset = QuestionSet.objects.get_subclass(**kwargs)
-        except QuestionSet.DoesNotExist:
-            return HttpResponseNotFound()
+    def delete(self, request, qset):
         if qset.interviews.exists():
             messages.error(request,
                            "%s cannot be deleted because it already has interviews." % self.model.verbose_name())
@@ -192,32 +180,3 @@ class QuestionSetView(object):
         else:
             messages.error(request, 'No questions orders were updated.')
         return HttpResponseRedirect("/batches/%s/questions/" % qset.id)
-
-
-
-# class BatchView(QuestionSetView):
-#
-#     def _set_bread_crumbs(self, request, pre=[], post=[], *args, **kwargs):
-#         bread_crumbs = [('Surveys', reverse('survey_list_page')),]
-#         request.breadcrumbs(bread_crumbs)
-#
-#     def __init__(self, *args, **kwargs):
-#         super(BatchView, self).__init__(model_class=Batch, *args, **kwargs)
-#
-#     def index(self, request, **kwargs):
-#         request.breadcrumbs([('Surveys', reverse('survey_list_page')),] )
-#         return super(BatchView, self).index(request, **kwargs)
-#
-#     def new(self, request, **kwargs):
-#         data = {}
-#         data['survey__id'] = kwargs['survey_id']
-#         return super(BatchView, self).new(request, **data)
-#
-#     def _save_form(self, request, qset_form, **kwargs):
-#         survey = Survey.objects.get(id=kwargs.get('survey_id'))
-#         kwargs['commit'] = False
-#         question_form = super(BatchView, self)._save_form(request, qset_form, **kwargs)
-#         question_form.survey = survey
-#         return question_form
-#
-#
