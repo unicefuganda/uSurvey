@@ -26,11 +26,17 @@
 {% block javascripts %}
         <script type="text/javascript">
             $(function(){
-                 $('#id_previous_numeric_values-control-group').hide();
-                 $('#id_repeat_count-control-group').hide();
-                 $('#id_previous_numeric_values').prop('disabled', true);
-                 $('#id_repeat_count').prop('disabled', true);
+                 if(!$('#id_previous_numeric_values').val()) {
+                     $('#id_previous_numeric_values-control-group').hide();
+                     $('#id_previous_numeric_values').prop('disabled', true);
+                 }
+                 if(!$('#id_repeat_count').val()){
+                     $('#id_repeat_count-control-group').hide();
+                     $('#id_repeat_count').prop('disabled', true);
+                 }
                  $('#id_repeat_logic').change(function(){
+                    $('#id_repeat_count').val('');
+                    $('#id_previous_numeric_values').val('');
                     switch($(this).val()) {
                         case('{{loop_form.FIXED_COUNT}}'):
                             $('#id_repeat_count-control-group').show();

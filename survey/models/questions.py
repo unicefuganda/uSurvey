@@ -101,8 +101,10 @@ class Question(GenericQuestion):
             return resulting_flow.next_question
 
     def previous_inlines(self):
-        previous = self.qset.previous_inlines(self)
-        return set(previous)
+        return self.qset.previous_inlines(self)
+
+    def upcoming_inlines(self):
+        return self.qset.upcoming_inlines(self)
 
     def direct_sub_questions(self):
         from survey.forms.logic import LogicForm
@@ -373,17 +375,25 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
 
     def previous_inlines(self, question):
         inlines = self.questions_inline()
-        previous = []
-        found = False
-        for q in inlines:
+        q_index = None
+        for idx, q in enumerate(inlines):
             if q.identifier == question.identifier:
-                found = True
+                q_index = idx
                 break
-            else:
-                previous.append(q)
-        if not found:
+        if q_index is None:
             raise ValidationError('%s not inline' % question.identifier)
-        return set(previous)
+        return set(inlines[:idx])
+
+    def upcoming_inlines(self, question):
+        inlines = list(self.questions_inline())
+        q_index = None
+        for idx, q in enumerate(inlines):
+            if q.identifier == question.identifier:
+                q_index = idx
+                break
+        if q_index is None:
+            raise ValidationError('%s not inline' % question.identifier)
+        return set(inlines[q_index:])
 
     def zombie_questions(self):
         return Question.zombies(self)
@@ -498,7 +508,7 @@ class LoopCount(BaseModel):
 
 
 class FixedLoopCount(LoopCount):
-    value = models.IntegerField()
+    value = models.PositiveIntegerField()
 
     def get_count(self, interview):
         return self.value
