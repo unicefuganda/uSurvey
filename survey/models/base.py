@@ -1,3 +1,4 @@
+import string
 from django_extensions.db.models import TimeStampedModel
 from model_utils.managers import InheritanceManager
 
@@ -21,5 +22,12 @@ class BaseModel(TimeStampedModel):
         else:
             return cls.objects.get(**kwargs)
 
+    @classmethod
+    def verbose_name(cls):
+        return string.capwords(cls._meta.verbose_name)
+
+    @classmethod
+    def resolve_tag(cls):
+        return cls._meta.verbose_name.replace(' ', '_')
 
 

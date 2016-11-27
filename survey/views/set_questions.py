@@ -61,10 +61,9 @@ def index(request, qset_id):
         question_filter_form = QuestionFilterForm(qset=batch)
     #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
     question_form = QuestionForm(batch)
-
-    request.breadcrumbs([
-        (batch.verbose_name(), reverse('%s_home' % batch.resolve_tag()), ),
-    ])
+    breadcrumbs = Question.index_breadcrumbs(qset=batch)
+    if breadcrumbs:
+        request.breadcrumbs(breadcrumbs)
     context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page': max_per_page,
                'question_filter_form': question_filter_form,
                'placeholder': 'identifier, text',
@@ -102,10 +101,9 @@ def _save_subquestion(request, batch_id, instance=None):
                'save_url': reverse('%s_home' % batch.resolve_tag()),
                'cancel_url': reverse('qset_questions_page', args=(batch.pk, )), 'class': 'question-form',
                'heading': heading}
-    request.breadcrumbs([
-        (batch.verbose_name(), reverse('%s_home' % batch.resolve_tag()), ),
-        (batch.name, reverse('qset_questions_page', args=(batch.pk, ))),
-    ])
+    breadcrumbs = Question.edit_breadcrumbs(qset=batch)
+    if breadcrumbs:
+        request.breadcrumbs(breadcrumbs)
     template_name = 'set_questions/new.html'
     if request.is_ajax():
         template_name = 'set_questions/_add_question.html'
@@ -162,10 +160,9 @@ def add_logic(request, qset_id, question_id):
             logic_form.save()
             messages.success(request, 'Logic successfully added.')
             response = HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
-    request.breadcrumbs([
-        (batch.verbose_name(), reverse('%s_home' % batch.resolve_tag()), ),
-        (batch.name, reverse('qset_questions_page', args=(batch.pk, ))),
-    ])
+    breadcrumbs = Question.edit_breadcrumbs(qset=batch)
+    if breadcrumbs:
+        request.breadcrumbs(breadcrumbs)
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'rules_for_batch': question_rules_for_batch,
                'questionform': QuestionForm(batch, parent_question=question),
@@ -187,10 +184,9 @@ def manage_loop(request, question_id):
             looping_form.save()
             messages.success(request, 'Loop Logic successfully added.')
             return HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
-    request.breadcrumbs([
-         (batch.verbose_name(), reverse('%s_home' % batch.resolve_tag()), ),
-        (batch.name, reverse('qset_questions_page', args=(batch.pk, ))),
-    ])
+    breadcrumbs = Question.edit_breadcrumbs(qset=batch)
+    if breadcrumbs:
+        request.breadcrumbs(breadcrumbs)
     # import pdb;pdb.set_trace()
     context = {'loop_form': looping_form, 'button_label': 'Save', 'question': question,
                'cancel_url': reverse('%s_home' % batch.resolve_tag())}
@@ -295,10 +291,9 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
         # options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
         # map(lambda option: re.sub("  ", ' ', option), options)
         context['options'] = options
-    request.breadcrumbs([
-        (batch.verbose_name(), reverse('%s_home' % batch.resolve_tag()), ),
-        (batch.name, reverse('qset_questions_page',  args=(batch.pk, )))
-    ])
+    breadcrumbs = Question.edit_breadcrumbs(qset=batch)
+    if breadcrumbs:
+        request.breadcrumbs(breadcrumbs)
     return response, context
 
 @permission_required('auth.can_view_batches')
@@ -344,10 +339,9 @@ def assign(request, qset_id):
         identifier__in=used_identifiers).order_by('identifier')
     question_filter_form = QuestionFilterForm()
 #     library_questions =  question_filter_form.filter(library_questions)
-    request.breadcrumbs([
-        (batch.verbose_name(), reverse('%s_home' % batch.resolve_tag()), ),
-        (batch.name, reverse('qset_questions_page',  args=(batch.pk, )))
-    ])
+    breadcrumbs = Question.edit_breadcrumbs(qset=batch)
+    if breadcrumbs:
+        request.breadcrumbs(breadcrumbs)
     context = {'batch_questions_form': unicode(BatchQuestionsForm()), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form',
                'library_questions': library_questions, 'question_filter_form': question_filter_form}
@@ -430,68 +424,6 @@ def _remove(request, batch_id, question_id):
         question.flows.all().delete()
         question.delete()
     return HttpResponseRedirect(redirect_url)
-
-
-@permission_required('auth.can_view_batches')
-def _index(request, batch_id):
-    batch = get_object_or_404(Batch, pk=batch_id)
-    data = dict(request.GET)
-    question_filter_form = QuestionFilterForm(data=data, batch=batch)
-    question_library = question_filter_form.filter(
-        QuestionTemplate.objects.all())
-    question_form = QuestionForm(batch)
-    question_flow_form = None  # QuestionFlowForm()
-    question_tree = None
-    if batch.start_question:
-        question_tree = batch.batch_questions.all()
-    context = {'batch': batch, 'batch_question_tree': question_tree, 'question_form': question_form, 'button_label': 'Add',
-               'id': 'question_form', 'action': '#',
-               'question_library': question_library, 'question_filter_form': question_filter_form,
-               'question_flow_form': question_flow_form}
-    return render(request, 'questions/batch_question.html', context)
-
-
-def submit(request, batch_id):
-    if request.method == 'POST':
-        batch = get_object_or_404(Batch, pk=batch_id)
-        data = request.POST.get('questions_data')
-        question_graph = json.loads(data)
-        nodes = {}
-        connections = {}
-        targets = []
-        root_question = None
-        for item in question_graph:
-            if item.get('identifier', False):
-                question, _ = Question.objects.get_or_create(identifier=item['identifier'],
-                                                             batch=batch)
-                question.text = item['text']
-                question.answer_type = item['answer_type']
-                question.save()
-                nodes[item['identifier']] = question
-                if int(item.get('level', -1)) == 0:
-                    batch.start_question = question
-                    batch.save()
-            if item.get('source', False):
-                source_identifier = item['source']
-                flows = connections.get(source_identifier, [])
-                flows.append(item)
-                connections[source_identifier] = flows
-        for source_identifier, flows in connections.items():
-            for flow in flows:
-                f, _ = QuestionFlow.objects.get_or_create(question=nodes[source_identifier],
-                                                          next_question=nodes[
-                                                              flow['target']],
-                                                          validation_test=flow[
-                                                              'validation_test']
-                                                          )
-                # now create test arguments
-                for idx, arg in enumerate(flow['validation_arg']):
-                    if arg.strip():
-                        TextArgument.objects.get_or_create(
-                            flow=f, position=idx, param=arg)
-        # remove strayed questions
-        batch.batch_questions.exclude(identifier__in=nodes.keys()).delete()
-    return HttpResponseRedirect(reverse('batch_questions_page', args=(batch_id)))
 
 
 def export_all_questions(request):

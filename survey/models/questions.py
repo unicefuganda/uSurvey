@@ -6,6 +6,7 @@ from cacheops import cached_as
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
+from django.core.urlresolvers import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer
@@ -125,6 +126,23 @@ class Question(GenericQuestion):
         if self.answer_type not in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
             self.options.all().delete()
         return super(Question, self).save(*args, **kwargs)
+
+    @classmethod
+    def index_breadcrumbs(cls, **kwargs):
+        if kwargs.has_key('qset'):
+            return kwargs['qset'].edit_breadcrumbs(**kwargs)  # important to select correct type
+        return []
+
+    @classmethod
+    def edit_breadcrumbs(cls, **kwargs):
+        breadcrumbs = cls.index_breadcrumbs(**kwargs)
+        breadcrumbs.append((kwargs['qset'].name, reverse('qset_questions_page',  args=(kwargs['qset'].pk, ))))
+        return breadcrumbs
+
+    @classmethod
+    def new_breadcrumbs(cls, **kwargs):
+        breadcrumbs = cls.index_breadcrumbs(**kwargs)
+        return cls.edit_breadcrumbs(**kwargs)
 
     @classmethod
     def zombies(cls,  qset):
@@ -264,14 +282,6 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
     def __unicode__(self):
         return "%s" % self.name
 
-    @classmethod
-    def verbose_name(cls):
-        return string.capwords(cls._meta.verbose_name)
-
-    @classmethod
-    def resolve_tag(cls):
-        return cls._meta.verbose_name.replace(' ', '_')
-
     def can_be_deleted(self):
         return True, ''
 
@@ -395,6 +405,22 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
             raise ValidationError('%s not inline' % question.identifier)
         return set(inlines[q_index:])
 
+    def inlines_between(self, start_question, end_question):
+        inlines = list(self.questions_inline())
+        start_index = None
+        end_index = None
+        for idx, q in enumerate(inlines):
+            if q.identifier == start_question.identifier:
+                if end_index:
+                    raise ValidationError('End question before start')
+                start_index = idx
+            if q.identifier == start_question.identifier:
+                end_index = idx
+                break
+        if start_index is None or end_index is None:
+            raise ValidationError('%s not inline' % start_question.identifier)
+        return set(inlines[start_index:end_index])
+
     def zombie_questions(self):
         return Question.zombies(self)
 
@@ -421,6 +447,22 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
     def deactivate_non_response_for(self, location):
         self.open_locations.filter(
             location=location).update(non_response=False)
+
+    @classmethod
+    def index_breadcrumbs(cls, **kwargs):
+        return []
+
+    @classmethod
+    def edit_breadcrumbs(cls, **kwargs):
+        breadcrumbs = cls.index_breadcrumbs(**kwargs)
+        if kwargs.has_key('qset'):
+            cls = kwargs['qset'].__class__
+        breadcrumbs.append((cls.verbose_name(), reverse('%s_home' % cls.resolve_tag())))
+        return breadcrumbs
+
+    @classmethod
+    def new_breadcrumbs(cls, *args, **kwargs):
+        return cls.edit_breadcrumbs(**kwargs)
 
 
 def next_inline_question(question, flows, answer_types=ALL_ANSWERS):

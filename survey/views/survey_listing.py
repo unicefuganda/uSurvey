@@ -12,17 +12,13 @@ def index(request):
 
 @permission_required('auth.can_view_batches')
 def new(request):
-    request.breadcrumbs(
-        [ListingTemplate.verbose_name(), reverse('%s_home' % ListingTemplate.resolve_tag())]
-    )
+    request.breadcrumbs(ListingTemplate.new_breadcrumbs())
     return QuestionSetView(model_class=ListingTemplate).new(request)
 
 
 @permission_required('auth.can_view_batches')
 def edit(request, qset_id):
-    request.breadcrumbs(
-        [ListingTemplate.verbose_name(), reverse('%s_home' % ListingTemplate.resolve_tag())]
-    )
+    request.breadcrumbs(ListingTemplate.edit_breadcrumbs())
     return QuestionSetView(model_class=ListingTemplate).edit(request, ListingTemplate.get(pk=qset_id))
 
 

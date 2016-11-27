@@ -1,11 +1,13 @@
-from django import forms
 from collections import OrderedDict
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.db.models import Q
+from django import forms
 from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow, \
     Question, TextArgument, NumericalAnswer
 from survey.models import QuestionLoop, FixedLoopCount, PreviousAnswerCount
 from survey.models.helper_constants import CONDITIONS
-from django.db import IntegrityError
+
 
 
 class LogicForm(forms.Form):
@@ -224,6 +226,12 @@ class LoopingForm(forms.ModelForm):
                 'previous_numeric_values', False):
             raise ValidationError('No previous answer selected')
         # check for overlapping loops between start and end
+        start_question = self.cleaned_data['loop_starter']
+        end_question = self.cleaned_data['loop_ender']
+        # QuestionFlow.objects.filter(Q(question__in=start_question.qset.inlines_between(start_question, end_question))|
+        #                             Q(next_question__in=start_question.qset.inlines_between(start_question,
+        #                                                                                     end_question)),
+        #                             desc__in=[LogicForm.SKIP_TO, LogicForm.END_INTERVIEW]).exist():
 
         return self.cleaned_data
 

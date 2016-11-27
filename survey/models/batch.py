@@ -1,6 +1,7 @@
 from ordered_set import OrderedSet
 from collections import OrderedDict
 from cacheops import cached_as
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
 from django.db.models import Max
@@ -34,6 +35,21 @@ class Batch(QuestionSet):
 
     def __unicode__(self):
         return "%s" % self.name
+
+    @classmethod
+    def index_breadcrumbs(cls, **kwargs):
+        breadcrumbs = [
+            ('Surveys', reverse('survey_list_page')),
+        ]
+        return breadcrumbs
+
+    @classmethod
+    def edit_breadcrumbs(cls, **kwargs):
+        breadcrumbs = cls.index_breadcrumbs(**kwargs)
+        if kwargs.has_key('survey') or kwargs.has_key('qset'):
+            survey = kwargs.get('survey') or kwargs['qset'].survey
+            breadcrumbs.append((survey.name, reverse('batch_index_page', args=(survey.pk, ))))
+        return breadcrumbs
 
     def non_response_enabled(self, ea):
         locations = set()
