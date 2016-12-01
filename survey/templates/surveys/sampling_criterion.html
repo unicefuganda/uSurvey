@@ -1,0 +1,107 @@
+{% extends "form.html" %}
+
+{% block title %}
+    Sampling Criteria for {{ survey }}
+{% endblock %}
+{% block display_form_fields %}
+
+{% include "naked_form.html" with a_form=sampling_form %}
+
+{% endblock %}
+    {% block buttons %}
+  <div class="form-actions">
+    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
+
+    {% if cancel_url %}
+      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel">Cancel</a>
+    {% else %}
+      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
+    {% endif %}
+  </div>
+    {% endblock %}
+
+{% block javascripts %}
+        <script type="text/javascript">
+            $(function(){
+                 if(!$('#id_value').val()) {
+                     $('#id_value-control-group').hide();
+                     $('#id_value').prop('disabled', true);
+                 }
+                 if(!$('#id_options').val()) {
+                     $('#id_options-control-group').hide();
+                     $('#id_options').prop('disabled', true);
+                 }
+                 if(!$('#id_min').val()){
+                     $('#id_min-control-group').hide();
+                     $('#id_min').prop('disabled', true);
+                 }
+                 if(!$('#id_max').val()){
+                     $('#id_max-control-group').hide();
+                     $('#id_max').prop('disabled', true);
+                 }
+                 var validate_options = {
+                    {% for question in survey.listing_form.questions.all %}
+                        '{{ question.pk }}' : [{% for validator in question.validator_names %}'{{ validator }}',{% endfor %}],
+                    {% endfor %}
+                 }
+                 var question_options = {
+                    {% for question in survey.listing_form.questions.all %}
+                        '{{ question.pk }}' : { {% for opt in question.options.all %}'{{ opt.text }}': '{{ opt.text }}',{% endfor %} },
+                    {% endfor %}
+                 }
+                 $('#id_listing_question').change(function(){
+                    $('#id_validation_test option:gt(0)').remove();
+                    $.each(validate_options[$('#id_listing_question').val()], function(key, value) {
+                      $('#id_validation_test').append($("<option></option>")
+                         .attr("value", value).text(value));
+                    });
+                   if(question_options[$('#id_listing_question').val()])
+                        $.each(question_options[$('#id_listing_question').val()], function(key, value) {
+                          $('#id_options').append($("<option></option>")
+                             .attr("value", key).text(value));
+                        });
+                });
+
+                $('#id_validation_test').change(function(){
+                    switch($(this).val()) {
+                        case('between'):
+                             $('#id_options-control-group').hide();
+                            $('#id_options').prop('disabled', true);
+                            $('#id_value-control-group').hide();
+                            $('#id_value').prop('disabled', true);
+                             $('#id_min-control-group').show();
+                             $('#id_min').prop('disabled', false);
+                             $('#id_max-control-group').show();
+                             $('#id_max').prop('disabled', false);
+                            break;
+                        case('equals'):
+                            if(question_options[$('#id_listing_question').val()]){
+                                $('#id_options-control-group').show();
+                                $('#id_options').prop('disabled', false);
+                                $('#id_value-control-group').hide();
+                                $('#id_value').prop('disabled', true);
+                                 $('#id_min-control-group').hide();
+                                 $('#id_min').prop('disabled', true);
+                                 $('#id_max-control-group').hide();
+                                 $('#id_max').prop('disabled', true);
+                                break;
+                            }
+                        default:
+                            $('#id_options-control-group').hide();
+                            $('#id_options').prop('disabled', true);
+                            $('#id_value-control-group').show();
+                            $('#id_value').prop('disabled', false);
+                             $('#id_min-control-group').hide();
+                             $('#id_min').prop('disabled', true);
+                             $('#id_max-control-group').hide();
+                             $('#id_max').prop('disabled', true);
+                    }
+                });
+            });
+        </script>
+{% endblock %}
+
+{% block non_form_content %}
+    <h4>Existing Criteria</h4>
+    {% include 'surveys/_view_criteria.html' %}
+{% endblock %}
