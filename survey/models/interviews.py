@@ -174,14 +174,12 @@ class Interview(BaseModel):
 
 
 class Answer(BaseModel):
-    NO_LOOP = -1
     # now question_type is used to store the exact question we are answering (Listing, Batch, personal info)
     question_type = models.CharField(max_length=100)  # I think using generic models is an overkill since they're all
     # questions
     interview = models.ForeignKey(Interview, related_name='%(class)s', db_index=True)
     question = models.ForeignKey("Question", null=True, related_name="%(class)s",
                                  on_delete=models.PROTECT, db_index=True)
-    loop_id = models.IntegerField(null=True, blank=True) # for looped questions, to generate the answer identifier
 
     @classmethod
     def create(cls, interview, question, answer, loop_id=None):
@@ -315,12 +313,12 @@ class NumericalAnswer(Answer):
         return [cls.greater_than, cls.equals, cls.less_than, cls.between]
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def create(cls, interview, question, answer):
         try:
             value = int(answer)
         except Exception:
             raise
-        return super(NumericalAnswer, cls).create(interview, question, answer, loop_id)
+        return super(NumericalAnswer, cls).create(interview, question, answer)
 
     @classmethod
     def greater_than(cls, answer, value):
@@ -396,13 +394,13 @@ class MultiChoiceAnswer(Answer):
     value = models.ForeignKey("QuestionOption", null=True)
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def create(cls, interview, question, answer):
         try:
             answer = int(answer)
             answer = question.options.get(order=answer)
         except:
             pass
-        return super(MultiChoiceAnswer, cls).create(interview, question, answer, loop_id)
+        return super(MultiChoiceAnswer, cls).create(interview, question, answer)
 
     class Meta:
         app_label = 'survey'
@@ -431,7 +429,7 @@ class MultiSelectAnswer(Answer):
     value = models.ManyToManyField("QuestionOption", )
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def create(cls, interview, question, answer):
         if isinstance(answer, basestring):
             answer = answer.split(' ')
         if isinstance(answer, list):
@@ -443,7 +441,7 @@ class MultiSelectAnswer(Answer):
             selected = answer
         ans = cls.objects.create(
             question=question, question_type=question.__class__.type_name(),
-                                  interview=interview, loop_id=loop_id)
+                                  interview=interview)
         for opt in selected:
             ans.value.add(opt)
         return ans
@@ -481,10 +479,10 @@ class DateAnswer(Answer):
     value = models.DateField(null=True)
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def create(cls, interview, question, answer):
         if isinstance(answer, basestring):
             answer = extract_date(answer, fuzzy=True)
-        return super(DateAnswer, cls).create(interview, question, answer, loop_id)
+        return super(DateAnswer, cls).create(interview, question, answer)
 
     class Meta:
         app_label = 'survey'
@@ -554,12 +552,12 @@ class GeopointAnswer(Answer):
     value = models.ForeignKey(ODKGeoPoint, null=True)
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=Answer.NO_LOOP):
+    def create(cls, interview, question, answer):
         if isinstance(answer, basestring):
             answer = answer.split(' ')
             answer = ODKGeoPoint(latitude=answer[0], longitude=answer[
                                  1], altitude=[2], precision=answer[3])
-        return super(GeopointAnswer, cls).create(interview, question, answer, loop_id)
+        return super(GeopointAnswer, cls).create(interview, question, answer)
 
     class Meta:
         app_label = 'survey'

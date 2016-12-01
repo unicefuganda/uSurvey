@@ -7,7 +7,8 @@ from survey.models.questions import Question, QuestionSet, QuestionOption, Quest
 from survey.models.questions import QuestionSetChannel, QuestionLoop, FixedLoopCount, PreviousAnswerCount
 from survey.models.respondents import RespondentGroup, RespondentGroupCondition
 from survey.models.batch_questions import BatchQuestion
-from survey.models.survey_listing import ListingQuestion, ListingTemplate
+from survey.models.survey_listing import ListingQuestion, ListingTemplate, RandomizationCriterion, ListingSample
+from survey.models.survey_listing import CriterionTestArgument
 from survey.models.question_templates import QuestionTemplate, TemplateOption
 from survey.models.base import BaseModel
 from survey.models.batch import Batch, BatchLocationStatus, BatchChannel
@@ -37,6 +38,9 @@ __all__ = [
     'BatchQuestion',
     'ListingQuestion',
     'ListingTemplate',
+    'RandomizationCriterion',
+    'ListingSample',
+    'CriterionTestArgument',
     'QuestionSet',
     'InterviewerAccess',
     'RespondentGroup',

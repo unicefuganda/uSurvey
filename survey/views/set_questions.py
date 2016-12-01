@@ -192,6 +192,7 @@ def manage_loop(request, question_id):
                'cancel_url': reverse('%s_home' % batch.resolve_tag())}
     return render(request, "set_questions/loop.html", context)
 
+
 def remove_loop(request, loop_id):
     question_loop = get_object_or_404(QuestionLoop, pk=loop_id)
     start_question = question_loop.start_question

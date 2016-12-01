@@ -32,6 +32,12 @@ class Question(GenericQuestion):
     def answers(self):
         return Answer.get_class(self.answer_type).objects.filter(question=self)
 
+    def validators(self):
+        return Answer.get_class(self.answer_type).validators()
+
+    def validator_names(self):
+        return [v.__name__ for v in Answer.get_class(self.answer_type).validators()]
+
     # just utility to get number of times this question has been answered
     def total_answers(self):
         return Answer.get_class(self.answer_type).objects.filter(question=self).count()

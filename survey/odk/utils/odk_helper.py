@@ -204,7 +204,7 @@ def _get_or_create_household_member(survey_allocation, survey_tree):
         return HouseholdMember.objects.create(**kwargs)
 
 
-def record_interview_answer(interview, question, answer, loop_id=Answer.NO_LOOP):
+def record_interview_answer(interview, question, answer):
     if not isinstance(answer, NonResponseAnswer):
         answer_class = Answer.get_class(question.answer_type)
         print 'answer type ', answer_class.__name__
@@ -213,7 +213,7 @@ def record_interview_answer(interview, question, answer, loop_id=Answer.NO_LOOP)
         print 'interview is ', interview
         print 'answer text is ', answer
         answer = answer_class.create(
-            interview, question, answer, loop_id=loop_id)
+            interview, question, answer)
         return answer
     else:
         answer.interview = interview
@@ -347,10 +347,7 @@ def save_survey_questions(survey_allocation, xml_blob, media_files):
         for (b_id, q_id), answers in response_dict.items():
             question = Question.objects.get(pk=q_id)
             batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-            loop_id = Answer.NO_LOOP
             for idx, answer in enumerate(answers):
-                if len(answers) > 0:
-                    loop_id = idx
                 if answer is not None:
                     if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
                                                 VideoAnswer.choice_name()]:
@@ -366,7 +363,7 @@ def save_survey_questions(survey_allocation, xml_blob, media_files):
                         )
                         interviews[b_id] = interview
                     created = record_interview_answer(
-                        interview, question, answer, loop_id)
+                        interview, question, answer)
             if b_id not in treated_batches.keys():
                 treated_batches[b_id] = batch
         # create batch completion for question batches

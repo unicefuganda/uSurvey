@@ -8,18 +8,15 @@ class Survey(BaseModel):
     name = models.CharField(max_length=100, blank=False,
                             null=True, unique=True)
     description = models.CharField(max_length=300, blank=True, null=True)
-    sample_size = models.PositiveIntegerField(
-        null=False, blank=False, default=10)
     has_sampling = models.BooleanField(
         default=True, verbose_name='Survey Type')
-    listing_form = models.ForeignKey('ListingTemplate', related_name='surveys')
-    preferred_listing = models.ForeignKey('Survey', related_name='householdlist_users',
-                                          help_text='Select which survey household listing to reuse. Leave empty for fresh listing',
+    # next three are only relevant for listing data. I believe it saves unnecessary extra tables to refer to them here
+    sample_size = models.PositiveIntegerField(null=False, blank=False, default=10)
+    listing_form = models.ForeignKey('ListingTemplate', related_name='survey_settings', null=True)
+    preferred_listing = models.ForeignKey('Survey', related_name='listing_users',
+                                          help_text='Select which survey listing to reuse. '
+                                                    'Leave empty for fresh listing',
                                           null=True, blank=True)
-
-    # min_percent_reg_houses = models.IntegerField(verbose_name='Min % Of Registered Households', default=80, validators=[MinValueValidator(0), MaxValueValidator(100)],
-    # help_text='Enter minimum percentage of total household to be registered
-    # before survey can start on ODK channel')
 
     class Meta:
         app_label = 'survey'
@@ -85,6 +82,17 @@ class Survey(BaseModel):
 
     def disable_batches(self, ea):
         return self.commencement_registry.filter(ea=ea).delete()
+
+
+# class ListingSetting(BaseModel):
+#     survey = models.OneToOneField(Survey, related_name='listing_settings')
+#     listing_form = models.ForeignKey('ListingTemplate', related_name='survey_settings', null=True)
+#     sample_size = models.PositiveIntegerField(
+#         null=False, blank=False, default=10)
+#     preferred_listing = models.ForeignKey(Survey, related_name='householdlist_users',
+#                                           help_text='Select which survey household listing to reuse. '
+#                                                     'Leave empty for fresh listing',
+#                                           null=True, blank=True)
 
 
 class SurveySampleSizeReached(Exception):

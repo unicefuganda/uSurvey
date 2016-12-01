@@ -5,8 +5,8 @@ from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from survey.models import Survey, Location, LocationType, Batch
-from survey.forms.surveys import SurveyForm
+from survey.models import Survey, Location, LocationType, Batch, RandomizationCriterion
+from survey.forms.surveys import SurveyForm, SamplingCriterionForm
 from survey.views.custom_decorators import handle_object_does_not_exist
 from survey.utils.query_helper import get_filterset
 from survey.models import EnumerationArea, LocationType, Location, BatchCommencement, SurveyHouseholdListing
@@ -92,6 +92,33 @@ def new(request):
         ('Surveys', reverse('survey_list_page')),
     ])
     return response or render(request, 'surveys/new.html', context)
+
+@permission_required('auth.can_view_batches')
+def sampling_criteria(request, survey_id):
+    survey = Survey.get(pk=survey_id)
+    if request.method == 'POST':
+        sampling_form = SamplingCriterionForm(survey, data=request.POST)
+        if sampling_form.is_valid():
+            sampling_form.save()
+            messages.success(request, 'Sampling criterion successfully added.')
+            return HttpResponseRedirect('.')
+    sampling_form = SamplingCriterionForm(survey)
+    request.breadcrumbs([
+        ('Surveys', reverse('survey_list_page')),
+    ])
+    context = {'sampling_form': sampling_form, 'button_label': 'Save', 'survey': survey,
+           'class': 'question-form',
+           'cancel_url': reverse('survey_list_page')}
+    return render(request, "surveys/sampling_criterion.html", context)
+
+
+@permission_required('auth.can_view_batches')
+def delete_sampling_criterion(request, criterion_id):
+    randomization_criteria = get_object_or_404(RandomizationCriterion, pk=criterion_id)
+    survey = randomization_criteria.survey
+    randomization_criteria.arguments.all().delete()
+    randomization_criteria.delete()
+    return HttpResponseRedirect(reverse('listing_criteria_page', args=(survey.pk, )))
 
 
 @handle_object_does_not_exist(message="Survey does not exist.")

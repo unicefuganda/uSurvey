@@ -40,7 +40,7 @@ def filter(request):
             question_lib, request.GET['q'], search_fields)
     question_filter_form = QuestionFilterForm(data=request.GET)
     questions = question_filter_form.filter(question_lib).values(
-        'id', 'text', 'answer_type', 'group', 'module').order_by('text')
+        'id', 'text', 'answer_type', 'module').order_by('text')
     json_dump = json.dumps(list(questions), cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, content_type='application/json')
 

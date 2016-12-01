@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm
 import re
 from django.core.exceptions import ValidationError
-from survey.models import BatchQuestion as Question
+from survey.models import Question, BatchQuestion
 from survey.models import QuestionOption, Batch, Answer, QuestionModule, \
     HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
 from django.conf import settings
@@ -68,10 +68,9 @@ def get_question_form(model_class):
         #         raise ValidationError('Misconfigured form')
         #     return prev_question
 
-
         def clean_identifier(self):
             identifier = self.cleaned_data['identifier']
-            if Question.objects.filter(identifier=identifier, qset=self.qset).exists():
+            if Question.objects.filter(identifier=identifier, qset__pk=self.qset.pk).exists():
                 if self.instance and self.instance.identifier == identifier:
                     pass
                 else:
@@ -162,3 +161,6 @@ def get_question_form(model_class):
             return question
 
     return QuestionForm
+
+QuestionForm = get_question_form(Question)
+BatchQuestionForm = get_question_form(BatchQuestion)

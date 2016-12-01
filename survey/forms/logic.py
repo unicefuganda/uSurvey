@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import Q
 from django import forms
+from form_order_mixin import FormOrderMixin
 from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow, \
     Question, TextArgument, NumericalAnswer
 from survey.models import QuestionLoop, FixedLoopCount, PreviousAnswerCount
@@ -162,7 +163,7 @@ class LogicForm(forms.Form):
         self.question.qset.zombie_questions().delete()
 
 
-class LoopingForm(forms.ModelForm):
+class LoopingForm(forms.ModelForm, FormOrderMixin):
     FIXED_COUNT = FixedLoopCount.choice_name()
     PREVIOUS_ANSWER_COUNT = PreviousAnswerCount.choice_name()
     repeat_count = forms.IntegerField(required=False)
@@ -171,7 +172,7 @@ class LoopingForm(forms.ModelForm):
         super(LoopingForm, self).__init__(initial=initial, *args, **kwargs)
         self.fields['loop_starter'].widget = forms.HiddenInput()
         self.fields['loop_starter'].initial = loop_starter.pk
-        self.fields['loop_ender'].label = 'End Loop'
+        self.fields['loop_ender'].label = 'Loop Ends At:'
         self.fields['loop_ender'].queryset = Question.objects.filter(pk__in=[q.pk for
                                                                              q in loop_starter.upcoming_inlines()])
         self.fields['previous_numeric_values'] = forms.ModelChoiceField(queryset=Question.objects.filter(
@@ -189,27 +190,6 @@ class LoopingForm(forms.ModelForm):
         self.fields['previous_numeric_values'].required = False
         self.order_fields(['loop_starter', 'loop_label', 'repeat_logic', 'previous_numeric_values',
                                 'repeat_count', 'loop_ender'])
-
-    def order_fields(self, field_order):
-        """
-        Rearranges the fields according to field_order.
-        field_order is a list of field names specifying the order. Fields not
-        included in the list are appended in the default order for backward
-        compatibility with subclasses not overriding field_order. If field_order
-        is None, all fields are kept in the order defined in the class.
-        Unknown fields in field_order are ignored to allow disabling fields in
-        form subclasses without redefining ordering.
-        """
-        if field_order is None:
-            return
-        fields = OrderedDict()
-        for key in field_order:
-            try:
-                fields[key] = self.fields.pop(key)
-            except KeyError:  # ignore unknown fields
-                pass
-        fields.update(self.fields)  # add remaining fields in original order
-        self.fields = fields
 
     class Meta:
         model = QuestionLoop

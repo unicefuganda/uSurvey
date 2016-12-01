@@ -1,3 +1,4 @@
+import string
 from django import template
 from django.core.urlresolvers import reverse
 from survey.interviewer_configs import MONTHS
@@ -78,7 +79,7 @@ def display_list(list):
 
 @register.filter
 def join_list(list, delimiter):
-    new_list = ['<span class="muted">%s</span>' % str(item) for item in list]
+    new_list = ['<span class="muted">%s</span>' % string.capwords(str(item)) for item in list]
     return mark_safe(delimiter.join(new_list))
 
 
