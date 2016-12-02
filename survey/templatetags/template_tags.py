@@ -316,7 +316,10 @@ def is_relevant_odk(context, question, interviewer):
         connecting_flows = question.connecting_flows.all()
         if null_flows:
             null_flow = null_flows[0]
-            null_condition = ["string-length(%s) &gt; 0" % node_path, ]
+            if hasattr(question, 'loop_ended') is False:
+                null_condition = ["string-length(%s) &gt; 0" % node_path, ]
+            else:
+                null_condition = ["count(%s) &gt; 0" % node_path, ]
             # ['true()', "string-length(%s) &gt; 0" % node_path]
             # null_condition = ['true()', ]
             if len(flow_conditions) > 0:
@@ -329,8 +332,8 @@ def is_relevant_odk(context, question, interviewer):
                 next_q_context.append('true()')
             # if get_loop_aware_path(question) != get_loop_aware_path(next_question):
             #     next_q_context.append('true()')
-            if hasattr(next_question, 'loop_ended'):
-                next_q_context.append('true()')
+            # if hasattr(next_question, 'loop_ended'):
+            #     next_q_context.append('true()')
             context[next_question.pk] = next_q_context
     return mark_safe(relevance_context)
 
