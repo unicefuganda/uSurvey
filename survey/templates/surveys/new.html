@@ -10,4 +10,17 @@
 
 {% block javascripts %}
     <script src="{{STATIC_URL}}js/survey.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            $(function(){
+                 $('#id_preferred_listing').change(function(){
+                    if($(this).val()){
+                         $('#id_listing_form').val('');
+                         $('#id_listing_form-control-group').hide();
+                    }
+                    else{
+                        $('#id_listing_form-control-group').show();
+                    }
+                });
+            });
+        </script>
 {% endblock %}
