@@ -252,17 +252,6 @@ def get_download_url(request, url_name, instance=None):
 
 
 @register.assignment_tag
-def get_question_path(question, loop_boundaries):
-    return get_node_path(question, loop_boundaries)
-
-
-@register.assignment_tag
-def get_non_loop_question_path(question):
-    batch = question.batch
-    return '/survey/b%s/q%s' % (batch.pk, question.pk)
-
-
-@register.assignment_tag
 def get_odk_mem_question(question):
     surname = HouseholdMember._meta.get_field('surname')
     first_name = HouseholdMember._meta.get_field('first_name')
@@ -279,32 +268,34 @@ def get_odk_mem_question(question):
     return template.Template(html.escape(question.text)).render(question_context)
 
 
-def get_node_path(question, loop_boundaries):
-    batch = question.batch
-    boundary = loop_boundaries.get(question.pk, None)
-    if boundary:
-        start_id, end_id = boundary
-        return '/survey/b%s/q%sq%s/q%s' % (batch.pk,
-                                           start_id, end_id,
-                                           question.pk)
-    # should take account with looping question
-    return '/survey/b%s/q%s' % (batch.pk, question.pk)
+@register.assignment_tag
+def get_loop_aware_path(question):
+    loops = question.qset.get_loop_story().get(question.pk, [])
+    tokens = ['q%sq%s' % (loop.loop_starter.pk, loop.loop_ender.pk) for loop in loops]
+    if tokens:
+        return '/%s' % '/'.join(tokens)
+    else:
+        return ''
+
+
+def get_node_path(question):
+    return '/qset%s/q%s' % (get_loop_aware_path(question), question.pk)
 
 
 @register.assignment_tag(takes_context=True)
-def is_relevant_odk(context, question, interviewer, registered_households, loop_boundaries):
-    batch = question.batch
+def is_relevant_odk(context, question, interviewer):
+    batch = question.qset
     if question.pk == batch.start_question.pk:
         default_relevance = 'true()'
     else:
         default_relevance = 'false()'
-    relevance_context = ' (%s) %s' % (
+    relevance_context = ' (%s) ' % (
         ' or '.join(context.get(question.pk, [default_relevance, ])),
-        is_relevant_by_group(context, question, registered_households)
+        # is_relevant_by_group(context, question, registered_households)
     )
     # do not include back to flows to this
     flows = question.flows.exclude(desc=LogicForm.BACK_TO_ACTION)
-    node_path = get_node_path(question, loop_boundaries)
+    node_path = get_node_path(question)
     flow_conditions = []
     if flows:
         for flow in flows:
@@ -320,15 +311,13 @@ def is_relevant_odk(context, question, interviewer, registered_households, loop_
                         next_question.pk, ['false()', ])
                     next_q_context.append(flow_condition)
                     context[next_question.pk] = next_q_context
-
         null_flows = flows.filter(
             validation_test__isnull=True, next_question__isnull=False)
         connecting_flows = question.connecting_flows.all()
         if null_flows:
             null_flow = null_flows[0]
-            null_condition = ['true()', ]
-            if question.flows.filter(desc=LogicForm.BACK_TO_ACTION).exists() is False:
-                null_condition.append("string-length(%s) &gt; 0" % node_path)
+            null_condition = ["string-length(%s) &gt; 0" % node_path, ]
+            # ['true()', "string-length(%s) &gt; 0" % node_path]
             # null_condition = ['true()', ]
             if len(flow_conditions) > 0:
                 null_condition.append('not (%s)' %
@@ -336,19 +325,11 @@ def is_relevant_odk(context, question, interviewer, registered_households, loop_
             next_question = null_flow.next_question
             next_q_context = context.get(next_question.pk, ['false()', ])
             next_q_context.append('(%s)' % ' and '.join(null_condition))
-            if question.group != next_question.group:
+            if hasattr(question, 'group') and question.group != next_question.group:
+                next_q_context.append('true()')
+            if get_loop_aware_path(question) != get_loop_aware_path(next_question):
                 next_q_context.append('true()')
             context[next_question.pk] = next_q_context
-            # if connecting_flows.count() == 0 or (next_question and
-            #                                              question.group != next_question.group):
-            #     prob_next = batch.next_inline(next_question,
-            #                                   exclude_groups=[next_question.group, ])
-            #     if prob_next:
-            #         prob_next_context = context.get(prob_next.pk, [])
-            #         prob_next_context.append('true()')
-            #         else:
-            #             prob_next_context.append("string-length(%s) &gt; 0" % node_path)
-            #         context[prob_next.pk] = prob_next_context
     return mark_safe(relevance_context)
 
 

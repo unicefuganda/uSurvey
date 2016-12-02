@@ -1,5 +1,7 @@
 import os
+import copy
 import string
+from django_rq import job
 from collections import OrderedDict
 from ordered_set import OrderedSet
 from cacheops import cached_as
@@ -24,6 +26,7 @@ ALL_ANSWERS = Answer.answer_types()
 class Question(GenericQuestion):
     objects = InheritanceManager()
     qset = models.ForeignKey('QuestionSet', related_name='questions')
+    mandatory = models.BooleanField(default=True)
 
     class Meta:
         abstract = False
@@ -41,36 +44,6 @@ class Question(GenericQuestion):
     # just utility to get number of times this question has been answered
     def total_answers(self):
         return Answer.get_class(self.answer_type).objects.filter(question=self).count()
-
-    def is_loop_start(self):
-        from survey.forms.logic import LogicForm
-        # actually the more correct way is to
-        return self.connecting_flows.filter(desc=LogicForm.BACK_TO_ACTION).exists()
-        # check if the next is previous
-
-    def is_loop_end(self):
-        from survey.forms.logic import LogicForm
-        # actually the more correct way is
-        return self.flows.filter(desc=LogicForm.BACK_TO_ACTION).exists()
-        # to check if connecting quest is asked after
-
-    @property
-    def loop_ender(self):
-        try:
-            from survey.forms.logic import LogicForm
-            return self.connecting_flows.get(desc=LogicForm.BACK_TO_ACTION).question
-        except QuestionFlow.DoesNotExist:
-            inlines = self.qset.questions_inline()
-
-    @property
-    def looper_flow(self):
-        # if self.is_loop_start() or self.is_loop_end():
-        return self.qset.get_looper_flow(self)
-
-    def loop_boundary(self):
-        return self.qset.loop_back_boundaries().get(self.pk, None)
-
-    # def loop_inlines(self):
 
     def delete(self, using=None):
         '''
@@ -291,24 +264,24 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
     def can_be_deleted(self):
         return True, ''
 
-    def get_looper_flow(self, question):
-        from survey.forms.logic import LogicForm
-        try:
-            return question.connecting_flows.get(desc=LogicForm.BACK_TO_ACTION)
-        except QuestionFlow.DoesNotExist:
-            return first_inline_flow_with_desc(question, LogicForm.BACK_TO_ACTION)
-
-    def loop_starters(self):
-        from survey.forms.logic import LogicForm
-        flows = QuestionFlow.objects.filter(
-            next_question__qset=self, desc=LogicForm.BACK_TO_ACTION)
-        return set([f.next_question for f in flows])
-
-    def loop_enders(self):
-        from survey.forms.logic import LogicForm
-        flows = QuestionFlow.objects.filter(
-            question__qset=self, desc=LogicForm.BACK_TO_ACTION)
-        return set([f.question for f in flows])
+    def get_loop_story(self):
+        '''
+        Basically returns all the loops which a question is involved in. This retains the queston order
+        :return:
+        '''
+        @cached_as(QuestionLoop.objects.filter(loop_starter__qset__id=self.id))
+        def _loop_story():
+            fquestions = self.flow_questions
+            loops = []
+            loop_story = OrderedDict()
+            for q in fquestions:
+                if hasattr(q, 'loop_started'):
+                    loops.append(q.loop_started)
+                loop_story[q.pk] = copy.deepcopy(loops)
+                if hasattr(q, 'loop_ended'):
+                    loops.pop(-1)
+            return loop_story
+        return _loop_story()
 
     def non_response_enabled(self, ea):
         locations = set()
@@ -349,45 +322,6 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
             return inlines
         else:
             return []
-
-    def loop_backs_questions(self):
-        '''
-        :return: loop question structure for this qset (q_start_pk, q_end_pk) = []
-        '''
-        cached_as(QuestionSet.objects.filter(id=self.id))
-
-        def _loop_backs_questions():
-            survey_questions = self.survey_questions
-            loop_starters = self.loop_starters()
-            loop_enders = self.loop_enders()
-            start = None
-            loop_desc = OrderedDict()
-            present_loop = []
-            for q in survey_questions:
-                if q in loop_starters:
-                    start = q
-                    present_loop = []
-                if q in loop_enders:
-                    present_loop.append(q)
-                    loop_desc[(start.pk, q.pk)] = present_loop
-                    start = None
-                if start:
-                    present_loop.append(q)
-            # just transpose
-            return loop_desc
-        return _loop_backs_questions()
-
-    def loop_back_boundaries(self):
-        cached_as(QuestionSet.objects.filter(id=self.id))
-
-        def _loop_back_boundaries():
-            loop_desc = self.loop_backs_questions()
-            quest_map = OrderedDict()
-            for boundary, loop_questions in loop_desc.items():
-                map(lambda q: quest_map.update(
-                    {q.pk: boundary}), loop_questions)
-            return quest_map
-        return _loop_back_boundaries()
 
     def previous_inlines(self, question):
         inlines = self.questions_inline()
@@ -469,6 +403,10 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
     @classmethod
     def new_breadcrumbs(cls, *args, **kwargs):
         return cls.edit_breadcrumbs(**kwargs)
+
+# @job
+# def refresh_loop_story(qset):
+#     for
 
 
 def next_inline_question(question, flows, answer_types=ALL_ANSWERS):
@@ -592,6 +530,12 @@ class QuestionLoop(BaseModel):
     loop_starter = models.OneToOneField(Question, related_name='loop_started')
     repeat_logic = models.CharField(max_length=64, choices=REPEAT_OPTIONS)
     loop_ender = models.OneToOneField(Question, related_name='loop_ended')
+
+    def loop_questions(self):
+        return self.loop_starter.qset.inlines_between(self.loop_starter, self.loop_ender)
+
+
+
 
 
 

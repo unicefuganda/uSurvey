@@ -233,6 +233,7 @@ CACHE_REFRESH_DURATION = 10800
 CACHEOPS = {
     # refresh every 3 hrs
     'survey.point': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.questionloop': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
     'survey.locationtype': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs

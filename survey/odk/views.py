@@ -67,17 +67,12 @@ def get_survey_xform(allocation):
     })
 
 
-def get_household_list_xform(interviewer, survey, house_listing):
-    selectable_households = None
-    # total_households = house_listing.households.count()
-    # if total_households > 0:
-    #     selectable_households = [idx+1 for idx in range(total_households)]
-    return render_to_string("odk/household_listing-repeat.xml", {
+def get_listing_xform(interviewer, survey):
+    return render_to_string("odk/question_set.xml", {
         'interviewer': interviewer,
-        'survey': survey,
+        'qset': survey.listing_form,
         'educational_levels': LEVEL_OF_EDUCATION,
         'messages': MESSAGES,
-        'selectable_households': selectable_households,
     })
 
 
@@ -170,10 +165,8 @@ def download_xform(request, survey_id):
                 if allocation.stage is None:
                     allocation.stage = SurveyAllocation.LISTING
                     allocation.save()
-                survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
-                    interviewer, survey)
-                survey_xform = get_household_list_xform(
-                    interviewer, survey, survey_listing.listing)
+                # starting the list
+                survey_xform = get_listing_xform(interviewer, survey)
             else:
                 survey_xform = get_survey_xform(allocation)
             form_id = '%s' % allocation.pk
@@ -206,8 +199,7 @@ def download_houselist_xform(request):
         survey = allocation.survey
         survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
             interviewer, survey)
-        householdlist_xform = get_household_list_xform(
-            interviewer, survey, survey_listing.listing)
+        householdlist_xform = get_listing_xform(interviewer, survey)
         form_id = 'allocation-%s' % allocation.id
         audit = {
             "xform": form_id
