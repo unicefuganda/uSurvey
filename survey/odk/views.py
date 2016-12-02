@@ -74,6 +74,7 @@ def get_qset_xform(interviewer, allocation):
         'assignment': allocation,
         'educational_levels': LEVEL_OF_EDUCATION,
         'messages': MESSAGES,
+        'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()]),
     })
 
 
