@@ -9,12 +9,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% if title %}
 		{{ title }}
 	{% else %}
-	  {{qset.name}}
-	  {% if qset.desc %} for
-	  	{{ qset.desc }}
-	  {% endif %}
+	  {{qset.name}} - {{ assignment.allocation_ea.name }}
 	{% endif %}
-	- {{ assignment.allocation_ea.name }}
+
 </h:title>
   <model>
   <instance>
