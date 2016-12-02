@@ -135,8 +135,8 @@ class LogicForm(forms.Form):
         next_question = None
         desc = self._make_desc()
         if self.cleaned_data['action'] in [self.ASK_SUBQUESTION, self.SKIP_TO, self.BACK_TO]:
-            next_question = Question.objects.get(
-                pk=self.cleaned_data['next_question'])
+            #import pdb; pdb.set_trace()
+            next_question = Question.get(pk=self.cleaned_data['next_question'])
         if self.cleaned_data['action'] == self.REANSWER:
             next_question = self.question
         flow = QuestionFlow.objects.create(question=self.question,
