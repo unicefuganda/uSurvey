@@ -3,6 +3,9 @@
     <thead>
     <tr>
         <th>
+            Metric
+        </th>
+        <th>
             Eligibility Criteria
         </th>
         <th>
@@ -16,6 +19,9 @@
     <tbody>
     {% for criterion in survey.randomization_criteria.all %}
         <tr>
+            <td >
+                {{ criterion.listing_question.identifier }}
+            </td>
             <td >
                 {{ criterion.validation_test }}
             </td>
