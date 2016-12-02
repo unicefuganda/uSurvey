@@ -97,3 +97,13 @@ class QuestionSetView(object):
         else:
             qset.delete()
         return HttpResponseRedirect('%s_home'%self.model.resolve_tag())
+
+
+def delete(request, qset_id):
+    qset = QuestionSet.get(pk=qset_id)
+    if qset.interviews.exists():
+        messages.error(request,
+                       "%s cannot be deleted because it already has interviews." % qset.verbose_name())
+    else:
+        qset.delete()
+    return HttpResponseRedirect('%s_home'%qset.resolve_tag())

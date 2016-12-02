@@ -58,7 +58,7 @@
                 <a class="btn btn-small" href='{% url "edit_"|add:model.resolve_tag|add:"_page" question_set.id %}'><i class="icon-pencil"></i> Edit</a>
                 {% if not question_set.interviews.exists %}
                 <a class="btn btn-small " data-toggle="modal" href="#delete_questionset_{{question_set.id}}"><i class="icon-trash"></i> Delete</a>
-                {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_"|add:model.resolve_tag %}
+                {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_qset" %}
                 {% endif %}
                 <a class="add_batch btn btn-small" href="{% url 'qset_questions_page' question_set.pk %}">View/Edit Questions</a>
                 {% if question_set.interviews.count %}
