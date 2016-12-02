@@ -80,7 +80,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 						{% for option in question.options.all %}
 						<item>
 							<label>{{ option.text }}</label>
-							<value>{{ option.pk }}</value>
+							<value>{{ option.order }}</value>
 						</item>
 						{% endfor %}
 					</select1>
@@ -90,7 +90,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 							{% for option in question.options.all %}
 							<item>
 								<label>{{ option.text }}</label>
-								<value>{{ option.pk }}</value>
+								<value>{{ option.order }}</value>
 							</item>
 							{% endfor %}
 						</select>
