@@ -14,6 +14,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	  	{{ qset.desc }}
 	  {% endif %}
 	{% endif %}
+	- {{ assignment.allocation_ea.name }}
 </h:title>
   <model>
   <instance>

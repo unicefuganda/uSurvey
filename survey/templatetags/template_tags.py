@@ -320,7 +320,7 @@ def is_relevant_odk(context, question, interviewer):
             # ['true()', "string-length(%s) &gt; 0" % node_path]
             # null_condition = ['true()', ]
             if len(flow_conditions) > 0:
-                null_condition.append('not (%s)' %
+                null_condition.append('not(%s)' %
                                       ' or '.join(flow_conditions))
             next_question = null_flow.next_question
             next_q_context = context.get(next_question.pk, ['false()', ])
