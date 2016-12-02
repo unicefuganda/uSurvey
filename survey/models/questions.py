@@ -271,14 +271,16 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
         '''
         @cached_as(QuestionLoop.objects.filter(loop_starter__qset__id=self.id))
         def _loop_story():
-            fquestions = self.flow_questions
+            inlines = self.questions_inline()
             loops = []
             loop_story = OrderedDict()
-            for q in fquestions:
-                if hasattr(q, 'loop_started'):
-                    loops.append(q.loop_started)
-                loop_story[q.pk] = copy.deepcopy(loops)
-                if hasattr(q, 'loop_ended'):
+            for inline_ques in inlines:
+                if hasattr(inline_ques, 'loop_started'):
+                    loops.append(inline_ques.loop_started)
+                loop_story[inline_ques.pk] = copy.deepcopy(loops)
+                #also include all direct subquestions
+                map(lambda q: loop_story.update({q.pk: copy.deepcopy(loops)}), inline_ques.direct_sub_questions())
+                if hasattr(inline_ques, 'loop_ended'):
                     loops.pop(-1)
             return loop_story
         return _loop_story()
@@ -366,8 +368,7 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
 
     @property
     def flow_questions(self):
-        cached_as(QuestionSet.objects.filter(id=self.id))
-
+        @cached_as(QuestionSet.objects.filter(id=self.id))
         def _flow_questions():
             inline_ques = self.questions_inline()
             questions = OrderedSet(inline_ques)
