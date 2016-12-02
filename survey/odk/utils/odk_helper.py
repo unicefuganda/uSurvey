@@ -17,7 +17,7 @@ from djangohttpdigest.authentication import SimpleHardcodedAuthenticator
 from django.utils.translation import ugettext as _
 from survey.models import Survey, Interviewer, Interview, SurveyAllocation, ODKAccess, QuestionSet, \
     Question, Batch, ODKSubmission, ODKGeoPoint, TextAnswer, Answer, NonResponseAnswer, \
-    VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer, GeopointAnswer,
+    VideoAnswer, AudioAnswer, ImageAnswer, MultiSelectAnswer, MultiChoiceAnswer, DateAnswer, GeopointAnswer
 from survey.odk.utils.log import logger
 from functools import wraps
 from survey.utils.zip import InMemoryZip
@@ -104,9 +104,9 @@ def _get_nodes(search_path, tree=None, xml_string=None):
 #     return only_household_reg(survey_tree) is False
 
 
-def _get_household_members(survey_tree):
-    member_nodes = _get_nodes(MANUAL_HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
-    return HouseholdMember.objects.filter(pk__in=[member_node.text for member_node in member_nodes]).all()
+# def _get_household_members(survey_tree):
+#     member_nodes = _get_nodes(MANUAL_HOUSEHOLD_MEMBER_PATH, tree=survey_tree)
+#     return HouseholdMember.objects.filter(pk__in=[member_node.text for member_node in member_nodes]).all()
 
 
 def _get_member_attrs(survey_tree):
@@ -147,62 +147,62 @@ def _choosed_existing_household(survey_tree):
     return _get_nodes(NEW_OR_OLD_HOUSEHOLD_CHOICE_PATH, tree=survey_tree)[0].text == '1'
 
 
-def _get_selected_household_member(survey_tree):
-    household_id = _get_nodes(HOUSEHOLD_SELECT_PATH, tree=survey_tree)[0].text
-    context = template.Context({'household_id': household_id})
-    hm_path = template.Template(HOUSEHOLD_MEMBER_SELECT_PATH).render(context)
-    member_id = (_get_nodes(hm_path, tree=survey_tree)[0].text).split(
-        HOUSEHOLD_MEMBER_ID_DELIMITER)[1]
-    return HouseholdMember.objects.get(pk=member_id)
-
-
-def _get_or_create_household_member(survey_allocation, survey_tree):
-    interviewer, survey = survey_allocation.interviewer, survey_allocation.survey
-    house_number = _get_household_house_number(survey_tree)
-    survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
-        interviewer, survey)
-    house_listing = survey_listing.listing
-    try:
-        household = Household.objects.get(listing=house_listing,
-                                          house_number=house_number)
-    except Household.DoesNotExist:
-        physical_addr = ''
-        try:
-            physical_addr = _get_household_physical_addr(survey_tree)
-        except IndexError:
-            pass
-        household = Household.objects.create(last_registrar=interviewer,
-                                             listing=house_listing,
-                                             registration_channel=ODKAccess.choice_name(),
-                                             house_number=house_number, physical_address=physical_addr)
-    # now time for member details
-    MALE = '1'
-    IS_HEAD = '1'
-    mem_attrs = _get_member_attrs(survey_tree)
-    kwargs = {}
-    kwargs['surname'] = mem_attrs.get('surname')
-    kwargs['first_name'] = mem_attrs['firstName']
-    kwargs['gender'] = (mem_attrs['sex'] == MALE)
-    date_of_birth = current_val = datetime.now(
-    ) - relativedelta(years=int(mem_attrs['age']))
-    kwargs['date_of_birth'] = date_of_birth
-    #datetime.strptime(mem_attrs['dateOfBirth'], '%Y-%m-%d')
-    kwargs['household'] = household
-    kwargs['registrar'] = interviewer
-    kwargs['registration_channel'] = ODKAccess.choice_name()
-    kwargs['survey_listing'] = survey_listing
-    if not household.get_head() and mem_attrs['isHead'] == IS_HEAD:
-        # kwargs['occupation'] = mem_attrs.get('occupation', '')
-        # kwargs['level_of_education'] = mem_attrs.get('levelOfEducation', '')
-        # resident_since = datetime.strptime(mem_attrs.get('residentSince', '1900-01-01'), '%Y-%m-%d')
-        # kwargs['resident_since']=resident_since
-        head = HouseholdHead.objects.create(**kwargs)
-        if household.head_desc is not head.surname:
-            household.head_desc = head.surname
-            household.save()
-        return head
-    else:
-        return HouseholdMember.objects.create(**kwargs)
+# def _get_selected_household_member(survey_tree):
+#     household_id = _get_nodes(HOUSEHOLD_SELECT_PATH, tree=survey_tree)[0].text
+#     context = template.Context({'household_id': household_id})
+#     hm_path = template.Template(HOUSEHOLD_MEMBER_SELECT_PATH).render(context)
+#     member_id = (_get_nodes(hm_path, tree=survey_tree)[0].text).split(
+#         HOUSEHOLD_MEMBER_ID_DELIMITER)[1]
+#     return HouseholdMember.objects.get(pk=member_id)
+#
+#
+# def _get_or_create_household_member(survey_allocation, survey_tree):
+#     interviewer, survey = survey_allocation.interviewer, survey_allocation.survey
+#     house_number = _get_household_house_number(survey_tree)
+#     survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
+#         interviewer, survey)
+#     house_listing = survey_listing.listing
+#     try:
+#         household = Household.objects.get(listing=house_listing,
+#                                           house_number=house_number)
+#     except Household.DoesNotExist:
+#         physical_addr = ''
+#         try:
+#             physical_addr = _get_household_physical_addr(survey_tree)
+#         except IndexError:
+#             pass
+#         household = Household.objects.create(last_registrar=interviewer,
+#                                              listing=house_listing,
+#                                              registration_channel=ODKAccess.choice_name(),
+#                                              house_number=house_number, physical_address=physical_addr)
+#     # now time for member details
+#     MALE = '1'
+#     IS_HEAD = '1'
+#     mem_attrs = _get_member_attrs(survey_tree)
+#     kwargs = {}
+#     kwargs['surname'] = mem_attrs.get('surname')
+#     kwargs['first_name'] = mem_attrs['firstName']
+#     kwargs['gender'] = (mem_attrs['sex'] == MALE)
+#     date_of_birth = current_val = datetime.now(
+#     ) - relativedelta(years=int(mem_attrs['age']))
+#     kwargs['date_of_birth'] = date_of_birth
+#     #datetime.strptime(mem_attrs['dateOfBirth'], '%Y-%m-%d')
+#     kwargs['household'] = household
+#     kwargs['registrar'] = interviewer
+#     kwargs['registration_channel'] = ODKAccess.choice_name()
+#     kwargs['survey_listing'] = survey_listing
+#     if not household.get_head() and mem_attrs['isHead'] == IS_HEAD:
+#         # kwargs['occupation'] = mem_attrs.get('occupation', '')
+#         # kwargs['level_of_education'] = mem_attrs.get('levelOfEducation', '')
+#         # resident_since = datetime.strptime(mem_attrs.get('residentSince', '1900-01-01'), '%Y-%m-%d')
+#         # kwargs['resident_since']=resident_since
+#         head = HouseholdHead.objects.create(**kwargs)
+#         if household.head_desc is not head.surname:
+#             household.head_desc = head.surname
+#             household.save()
+#         return head
+#     else:
+#         return HouseholdMember.objects.create(**kwargs)
 
 
 def record_interview_answer(interview, question, answer):
@@ -293,127 +293,127 @@ def _get_form_type(survey_tree):
     return int(_get_nodes(FORM_TYPE_PATH, tree=survey_tree)[0].text)
 
 
-def save_household_list(interviewer, survey, survey_tree, survey_listing):
-    house_nodes = _get_nodes(HOUSEHOLD_PATH, tree=survey_tree)
-    if len(house_nodes) < survey.sample_size:
-        raise NotEnoughHouseholds('Not enough households')
-    house_number = 1
-    households = []
-    try:
-        for node in house_nodes:
-            household, _ = Household.objects.get_or_create(
-                house_number=house_number,
-                listing=survey_listing.listing,
-                last_registrar=interviewer,
-                registration_channel=ODKAccess.choice_name(),
-                physical_address=_get_nodes(
-                    './physicalAddress', tree=node)[0].text,
-                head_desc=_get_nodes('./headDesc', tree=node)[0].text,
-                head_sex=_get_nodes('./headSex', tree=node)[0].text,
-            )
-            house_number = house_number + 1
-            households.append(household)
-    except IntegrityError:
-        raise HouseholdNumberAlreadyExists('Household number already exists')
-    return households
+# def save_household_list(interviewer, survey, survey_tree, survey_listing):
+#     house_nodes = _get_nodes(HOUSEHOLD_PATH, tree=survey_tree)
+#     if len(house_nodes) < survey.sample_size:
+#         raise NotEnoughHouseholds('Not enough households')
+#     house_number = 1
+#     households = []
+#     try:
+#         for node in house_nodes:
+#             household, _ = Household.objects.get_or_create(
+#                 house_number=house_number,
+#                 listing=survey_listing.listing,
+#                 last_registrar=interviewer,
+#                 registration_channel=ODKAccess.choice_name(),
+#                 physical_address=_get_nodes(
+#                     './physicalAddress', tree=node)[0].text,
+#                 head_desc=_get_nodes('./headDesc', tree=node)[0].text,
+#                 head_sex=_get_nodes('./headSex', tree=node)[0].text,
+#             )
+#             house_number = house_number + 1
+#             households.append(household)
+#     except IntegrityError:
+#         raise HouseholdNumberAlreadyExists('Household number already exists')
+#     return households
 
 
-def save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing):
-    house_nodes = _get_nodes(HOUSEHOLD_PATH, tree=survey_tree)
-    house_number = 1
-    non_responses = []
-    for node in house_nodes:
-        if _get_nodes('./nr', tree=node)[0].text == COULD_NOT_COMPLETE_SURVEY:
-            nr_msg = _get_nodes('./qnsr', tree=node)[0].text if len(_get_nodes('./qnsr', tree=node)) \
-                else _get_nodes('./qnr', tree=node)[0].text
-            non_responses.append(
-                NonResponseAnswer.objects.create(
-                    household=Household.objects.get(listing=survey_listing.listing,
-                                                    house_number=_get_nodes('./houseNumber', tree=node)[0].text),
-                    survey_listing=survey_listing,
-                    interviewer=interviewer,
-                    value=nr_msg
-                )
-            )
-    return non_responses
+# def save_nonresponse_answers(interviewer, survey, survey_tree, survey_listing):
+#     house_nodes = _get_nodes(HOUSEHOLD_PATH, tree=survey_tree)
+#     house_number = 1
+#     non_responses = []
+#     for node in house_nodes:
+#         if _get_nodes('./nr', tree=node)[0].text == COULD_NOT_COMPLETE_SURVEY:
+#             nr_msg = _get_nodes('./qnsr', tree=node)[0].text if len(_get_nodes('./qnsr', tree=node)) \
+#                 else _get_nodes('./qnr', tree=node)[0].text
+#             non_responses.append(
+#                 NonResponseAnswer.objects.create(
+#                     household=Household.objects.get(listing=survey_listing.listing,
+#                                                     house_number=_get_nodes('./houseNumber', tree=node)[0].text),
+#                     survey_listing=survey_listing,
+#                     interviewer=interviewer,
+#                     value=nr_msg
+#                 )
+#             )
+#     return non_responses
 
-
-@job('odk')
-def save_survey_questions(survey_allocation, xml_blob, media_files):
-    survey_tree = _get_tree_from_blob(xml_blob)
-    interviewer = survey_allocation.interviewer
-    survey = survey_allocation.survey
-    form_id = _get_form_id(survey_tree)
-    member = _get_or_create_household_member(survey_allocation, survey_tree)
-    response_dict = _get_responses(interviewer, survey_tree, survey)
-    treated_batches = {}
-    interviews = {}
-    if response_dict:
-        for (b_id, q_id), answers in response_dict.items():
-            question = Question.objects.get(pk=q_id)
-            batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
-            for idx, answer in enumerate(answers):
-                if answer is not None:
-                    if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
-                                                VideoAnswer.choice_name()]:
-                        answer = media_files.get(answer, None)
-                    interview = interviews.get(b_id, None)
-                    if interview is None:
-                        interview, _ = Interview.objects.get_or_create(
-                            interviewer=interviewer,
-                            householdmember=member,
-                            batch=batch,
-                            interview_channel=interviewer.odk_access[0],
-                            ea=survey_allocation.allocation_ea
-                        )
-                        interviews[b_id] = interview
-                    created = record_interview_answer(
-                        interview, question, answer)
-            if b_id not in treated_batches.keys():
-                treated_batches[b_id] = batch
-        # create batch completion for question batches
-        map(lambda batch: member.batch_completed(
-            batch), treated_batches.values())
-        member.survey_completed()
-        if member.household.has_completed(survey):
-            map(lambda batch: member.household.batch_completed(
-                batch, interviewer), treated_batches.values())
-            member.household.survey_completed(survey, interviewer)
-    household = member.household
-    submission = ODKSubmission.objects.create(interviewer=interviewer,
-                                              survey=survey, form_id=form_id, description=SURVEY_DESC,
-                                              instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
-                                              xml=etree.tostring(survey_tree, pretty_print=True))
-    #    execute.delay(submission.save_attachments, media_files)
-    submission.save_attachments(media_files.values())
-    return submission
+#
+# @job('odk')
+# def save_survey_questions(survey_allocation, xml_blob, media_files):
+#     survey_tree = _get_tree_from_blob(xml_blob)
+#     interviewer = survey_allocation.interviewer
+#     survey = survey_allocation.survey
+#     form_id = _get_form_id(survey_tree)
+#     member = _get_or_create_household_member(survey_allocation, survey_tree)
+#     response_dict = _get_responses(interviewer, survey_tree, survey)
+#     treated_batches = {}
+#     interviews = {}
+#     if response_dict:
+#         for (b_id, q_id), answers in response_dict.items():
+#             question = Question.objects.get(pk=q_id)
+#             batch = treated_batches.get(b_id, Batch.objects.get(pk=b_id))
+#             for idx, answer in enumerate(answers):
+#                 if answer is not None:
+#                     if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
+#                                                 VideoAnswer.choice_name()]:
+#                         answer = media_files.get(answer, None)
+#                     interview = interviews.get(b_id, None)
+#                     if interview is None:
+#                         interview, _ = Interview.objects.get_or_create(
+#                             interviewer=interviewer,
+#                             householdmember=member,
+#                             batch=batch,
+#                             interview_channel=interviewer.odk_access[0],
+#                             ea=survey_allocation.allocation_ea
+#                         )
+#                         interviews[b_id] = interview
+#                     created = record_interview_answer(
+#                         interview, question, answer)
+#             if b_id not in treated_batches.keys():
+#                 treated_batches[b_id] = batch
+#         # create batch completion for question batches
+#         map(lambda batch: member.batch_completed(
+#             batch), treated_batches.values())
+#         member.survey_completed()
+#         if member.household.has_completed(survey):
+#             map(lambda batch: member.household.batch_completed(
+#                 batch, interviewer), treated_batches.values())
+#             member.household.survey_completed(survey, interviewer)
+#     household = member.household
+#     submission = ODKSubmission.objects.create(interviewer=interviewer,
+#                                               survey=survey, form_id=form_id, description=SURVEY_DESC,
+#                                               instance_id=_get_instance_id(survey_tree), household_member=member, household=household,
+#                                               xml=etree.tostring(survey_tree, pretty_print=True))
+#     #    execute.delay(submission.save_attachments, media_files)
+#     submission.save_attachments(media_files.values())
+#     return submission
 
 #@transaction.autocommit
-
-def save_qset(survey_tree, interviewer, ea):
-    house_nodes = _get_nodes(QSET_PATH, tree=survey_tree)
-
-    if len(house_nodes) < survey.sample_size:
-        raise NotEnoughHouseholds('Not enough households')
-    house_number = 1
-    households = []
-    try:
-        for node in house_nodes:
-            household, _ = Household.objects.get_or_create(
-                house_number=house_number,
-                listing=survey_listing.listing,
-                last_registrar=interviewer,
-                registration_channel=ODKAccess.choice_name(),
-                physical_address=_get_nodes(
-                    './physicalAddress', tree=node)[0].text,
-                head_desc=_get_nodes('./headDesc', tree=node)[0].text,
-                head_sex=_get_nodes('./headSex', tree=node)[0].text,
-            )
-            house_number = house_number + 1
-            households.append(household)
-    except IntegrityError:
-        raise HouseholdNumberAlreadyExists('Household number already exists')
-    return households
+#
+# def save_qset(survey_tree, interviewer, ea):
+#     house_nodes = _get_nodes(QSET_PATH, tree=survey_tree)
+#
+#     if len(house_nodes) < survey.sample_size:
+#         raise NotEnoughHouseholds('Not enough households')
+#     house_number = 1
+#     households = []
+#     try:
+#         for node in house_nodes:
+#             household, _ = Household.objects.get_or_create(
+#                 house_number=house_number,
+#                 listing=survey_listing.listing,
+#                 last_registrar=interviewer,
+#                 registration_channel=ODKAccess.choice_name(),
+#                 physical_address=_get_nodes(
+#                     './physicalAddress', tree=node)[0].text,
+#                 head_desc=_get_nodes('./headDesc', tree=node)[0].text,
+#                 head_sex=_get_nodes('./headSex', tree=node)[0].text,
+#             )
+#             house_number = house_number + 1
+#             households.append(household)
+#     except IntegrityError:
+#         raise HouseholdNumberAlreadyExists('Household number already exists')
+#     return households
 
 
 def process_submission(interviewer, xml_file, media_files=[], request=None):
@@ -429,8 +429,8 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     description = ''
     qset  = _get_qset(survey_tree)
     survey_allocation = _get_allocation(survey_tree)
-    if _get_form_type(survey_tree) == SurveyAllocation.LISTING:
-        save_qset(survey_tree, interviewer, survey_allocation.allocation_ea)
+    # if _get_form_type(survey_tree) == SurveyAllocation.LISTING:
+    #     save_qset(survey_tree, interviewer, survey_allocation.allocation_ea)
     # if form_id.startswith('alloc-'):
     #     survey_allocation = _get_allocation(survey_tree)
     #     survey = survey_allocation.survey

@@ -67,7 +67,7 @@ def get_survey_xform(allocation):
     })
 
 
-def get_listing_xform(interviewer, allocation):
+def get_qset_xform(interviewer, allocation):
     return render_to_string("odk/question_set.xml", {
         'interviewer': interviewer,
         'qset': allocation.survey.listing_form,
@@ -77,18 +77,18 @@ def get_listing_xform(interviewer, allocation):
     })
 
 
-def get_on_response_xform(interviewer, survey):
-    batches = interviewer.ea.open_batches(survey)
-    return render_to_string("odk/survey_form-no-repeat.xml", {
-        'interviewer': interviewer,
-        # interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
-        'registered_households': registered_households,
-        'title': '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
-        'survey': survey,
-        'survey_batches': batches,
-        'messages': MESSAGES,
-        'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
-    })
+# def get_on_response_xform(interviewer, survey):
+#     batches = interviewer.ea.open_batches(survey)
+#     return render_to_string("odk/survey_form-no-repeat.xml", {
+#         'interviewer': interviewer,
+#         # interviewer.households.filter(survey=survey, ea=interviewer.ea).all(),
+#         'registered_households': registered_households,
+#         'title': '%s - %s' % (survey, ', '.join([batch.name for batch in batches])),
+#         'survey': survey,
+#         'survey_batches': batches,
+#         'messages': MESSAGES,
+#         'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()])
+#     })
 
 
 @login_required
@@ -167,7 +167,7 @@ def download_xform(request, survey_id):
                     allocation.stage = SurveyAllocation.LISTING
                     allocation.save()
                 # starting the list
-                survey_xform = get_listing_xform(interviewer, allocation)
+                survey_xform = get_qset_xform(interviewer, allocation)
             else:
                 survey_xform = get_survey_xform(allocation)
             form_id = '%s' % allocation.pk
@@ -200,7 +200,7 @@ def download_houselist_xform(request):
         survey = allocation.survey
         survey_listing = SurveyHouseholdListing.get_or_create_survey_listing(
             interviewer, survey)
-        householdlist_xform = get_listing_xform(interviewer, survey)
+        householdlist_xform = get_qset_xform(interviewer, allocation)
         form_id = 'allocation-%s' % allocation.id
         audit = {
             "xform": form_id
