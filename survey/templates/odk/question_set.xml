@@ -22,11 +22,14 @@ xmlns:jr="http://openrosa.org/javarosa">
      </meta>
 	   <type>{{ assignment.stage }}</type> {% comment %} important because survey allocation status may change {% endcomment %}
 	   <assignment>{{ assignment.pk }}</assignment>
-		{% for question in qset.flow_questions %}
+		{% for question in qset.questions_inline %}
 	       {% if question.loop_started %}
 	           <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
 	       {% endif %}
 					<q{{question.pk}} />
+	   				{% for sub_question in question.direct_sub_questions %}
+	                <q{{sub_question.pk}} />
+	   				{% endfor %}
 	       {% if question.loop_ended %}
 	           </q{{question.loop_ended.loop_starter.pk}}q{{question.pk}}>
 	       {% endif %}
