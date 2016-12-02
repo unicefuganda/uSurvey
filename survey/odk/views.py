@@ -67,10 +67,11 @@ def get_survey_xform(allocation):
     })
 
 
-def get_listing_xform(interviewer, survey):
+def get_listing_xform(interviewer, allocation):
     return render_to_string("odk/question_set.xml", {
         'interviewer': interviewer,
-        'qset': survey.listing_form,
+        'qset': allocation.survey.listing_form,
+        'assignment': allocation,
         'educational_levels': LEVEL_OF_EDUCATION,
         'messages': MESSAGES,
     })
@@ -166,7 +167,7 @@ def download_xform(request, survey_id):
                     allocation.stage = SurveyAllocation.LISTING
                     allocation.save()
                 # starting the list
-                survey_xform = get_listing_xform(interviewer, survey)
+                survey_xform = get_listing_xform(interviewer, allocation)
             else:
                 survey_xform = get_survey_xform(allocation)
             form_id = '%s' % allocation.pk
