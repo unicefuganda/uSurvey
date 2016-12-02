@@ -329,6 +329,8 @@ def is_relevant_odk(context, question, interviewer):
                 next_q_context.append('true()')
             # if get_loop_aware_path(question) != get_loop_aware_path(next_question):
             #     next_q_context.append('true()')
+            if hasattr(next_question, 'loop_ended'):
+                next_q_context.append('true()')
             context[next_question.pk] = next_q_context
     return mark_safe(relevance_context)
 
