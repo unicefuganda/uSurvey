@@ -529,7 +529,7 @@ class QuestionLoop(BaseModel):
                        ]
     loop_label = models.CharField(max_length=64)
     loop_starter = models.OneToOneField(Question, related_name='loop_started')
-    repeat_logic = models.CharField(max_length=64, choices=REPEAT_OPTIONS)
+    repeat_logic = models.CharField(max_length=64, choices=REPEAT_OPTIONS, null=True, blank=True)
     loop_ender = models.OneToOneField(Question, related_name='loop_ended')
 
     def loop_questions(self):

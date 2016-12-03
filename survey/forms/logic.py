@@ -135,7 +135,6 @@ class LogicForm(forms.Form):
         next_question = None
         desc = self._make_desc()
         if self.cleaned_data['action'] in [self.ASK_SUBQUESTION, self.SKIP_TO, self.BACK_TO]:
-            #import pdb; pdb.set_trace()
             next_question = Question.get(pk=self.cleaned_data['next_question'])
         if self.cleaned_data['action'] == self.REANSWER:
             next_question = self.question
@@ -197,12 +196,13 @@ class LoopingForm(forms.ModelForm, FormOrderMixin):
 
     def clean(self):
         super(LoopingForm, self).clean()
-        if self.cleaned_data['repeat_logic'] == self.FIXED_COUNT:
+        repeat_logic = self.cleaned_data.get('repeat_logic', '')
+        if repeat_logic == self.FIXED_COUNT:
             try:
                 int(self.cleaned_data.get('repeat_count', ''))
             except ValueError:
                 raise ValidationError('repeat count is required')
-        if self.cleaned_data['repeat_logic'] ==  self.PREVIOUS_ANSWER_COUNT and not self.cleaned_data.get(
+        if repeat_logic == self.PREVIOUS_ANSWER_COUNT and not self.cleaned_data.get(
                 'previous_numeric_values', False):
             raise ValidationError('No previous answer selected')
         # check for overlapping loops between start and end
