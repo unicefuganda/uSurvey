@@ -66,22 +66,23 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% for question in qset.questions_inline %}
 		   {% get_loop_aware_path question  as path %}
 		   {% if question.loop_started %}
-	           <repeat nodeset="/qset{{ path }}" {% if question.loop_started.repeat_logic == question.loop_started.PREVIOUS_QUESTION %}
+		       <group {% if question.loop_started.loop_prompt %}prompt="{{question.loop_started.loop_prompt}}"{% endif %}>
+					<label>{{question.loop_started.loop_label}}</label>
+	           		<repeat nodeset="/qset{{ path }}" {% if question.loop_started.repeat_logic == question.loop_started.PREVIOUS_QUESTION %}
 													{% get_loop_aware_path question.loop_started.previousanswercount.value  as counter_path %}
 													jr:count="/qset{{counter_path}}/q{{question.loop_started.previousanswercount.value.pk}}"
 												{% elif question.loop_started.repeat_logic == question.loop_started.FIXED_REPEATS %}
 													jr:count="{{question.loop_started.fixedloopcount.value}}"
 												{% endif %}>
-				 <group {% if question.loop_started.loop_prompt %}prompt="{{question.loop_started.loop_prompt}}"{% endif %}>
-					<label>{{question.loop_started.loop_label}}</label>
+
 	       {% endif %}
 					{% include "odk/_question_body.xml" with question=question answer_types=answer_types %}
 					 {% for sub_question in question.direct_sub_questions %}
 	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types %}
 	   				{% endfor %}
 				{% if question.loop_ended %}
-				   </group>
-		      </repeat>
+		      		</repeat>
+			 </group>
 	       {% endif %}
 		{% endfor %}
 	</group>

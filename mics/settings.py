@@ -232,20 +232,21 @@ CACHEOPS_REDIS = {
 CACHE_REFRESH_DURATION = 10800
 CACHEOPS = {
     # refresh every 3 hrs
-    'survey.point': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.point': {'ops': 'all',  'timeout': CACHE_REFRESH_DURATION},
     'survey.questionloop': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
+    'survey.questionflow': {'ops': ('fetch', ), 'timeout': CACHE_REFRESH_DURATION},
     # 'survey.question': {'ops': ('fetch', ), 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
-    'survey.locationtype': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.locationtype': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
-    'survey.location': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.location': {'ops': ('get', ), 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
-    'survey.enumerationarea': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.enumerationarea': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs,
     'survey.batch': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs,
     'survey.survey': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
-    'survey.questionset': {'ops': ('all', ), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.questionset': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
 }
 
 # DJANGO-WS CONFIG

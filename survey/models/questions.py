@@ -27,6 +27,8 @@ class Question(GenericQuestion):
     objects = InheritanceManager()
     qset = models.ForeignKey('QuestionSet', related_name='questions')
     mandatory = models.BooleanField(default=True)
+    # contraint_msg = models.CharField(max_length=80, null=True, blank=True,
+    #                                  help_text='This is error message shown to interviewer')
 
     class Meta:
         abstract = False
@@ -317,13 +319,17 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
     def questions_inline(self):
         qflows = QuestionFlow.objects.filter(
             question__qset=self, validation_test__isnull=True)
-        if self.start_question:
-            inlines = inline_questions(self.start_question, qflows)
-            if inlines and inlines[-1] is None:
-                inlines.pop(-1)
-            return inlines
-        else:
-            return []
+
+        @cached_as(qflows)
+        def _questions_inline():
+            if self.start_question:
+                inlines = inline_questions(self.start_question, qflows)
+                if inlines and inlines[-1] is None:
+                    inlines.pop(-1)
+                return inlines
+            else:
+                return []
+        return _questions_inline()
 
     def previous_inlines(self, question):
         inlines = self.questions_inline()
