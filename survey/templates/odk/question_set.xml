@@ -72,7 +72,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 												{% elif question.loop_started.repeat_logic == question.loop_started.FIXED_REPEATS %}
 													jr:count="{{question.loop_started.fixedloopcount.value}}"
 												{% endif %}>
-				 <group prompt="{{question.loop_started.prompt}}">
+				 <group prompt="{{question.loop_started.loop_prompt}}">
 					<label>{{question.loop_started.loop_label}}</label>
 	       {% endif %}
 					{% include "odk/_question_body.xml" with question=question answer_types=answer_types %}
