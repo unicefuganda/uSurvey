@@ -1,7 +1,0 @@
-test:
-  adapter: postgresql
-  encoding: utf8
-  database: app_test
-  username: go
-  password: go
-  host: localhost

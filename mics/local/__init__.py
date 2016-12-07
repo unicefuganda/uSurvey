@@ -1,1 +1,0 @@
-/home/manish/projects/uSurvey/mics/mics/__init__.py
