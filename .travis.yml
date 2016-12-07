@@ -1,0 +1,39 @@
+branches:
+  only:
+  - master
+  - uSurvey
+
+language: python
+
+python:
+  - "2.7"
+
+services:
+  - redis-server
+  - postgresql
+
+
+# command to install dependencies
+install:
+  - pip install -U -r pip-requires.txt
+  - pip install coveralls
+  - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
+
+before_script:
+  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'DROP DATABASE IF EXISTS mics_test;' -U postgres; fi"
+  - psql -c 'create database mics_test;' -U postgres
+  - cp mics/travis-settings.py mics/localsettings.py
+  - cp survey/interviewer_configs.py.example survey/interviewer_configs.py
+  - python manage.py syncdb --noinput
+  - python manage.py makemigrations
+  - python manage.py migrate
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
+# command to run tests
+script:
+  - coverage run manage.py test
+
+after_success:
+  coveralls
+
