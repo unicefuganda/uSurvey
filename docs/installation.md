@@ -1,11 +1,9 @@
-
-
 Prerequisites
-------------- 
+-------------
 
 * Has been tested on Ubuntu and OS X. However it should run on most Linux machines (since there are no distribution specific dependency).
 
-* Minimum of 1GB RAM is recommended for setup.
+* For development server, minimum of 1GB RAM, 1.6GHz 1 CPU core is required for setup (for production sizing requirements see the relevant section in the [Deployment guide](./deployment_guide.md#deployment-considerations "Deployment Guide")).
 
 * Postgres, redis-server should be running
 
@@ -19,24 +17,16 @@ Prerequisites
 Installation Instructions
 -------------------------
 
-* Clone the uSurvey Application from Github 
+* Execute the following commands from your installation directory:
 
         git clone https://github.com/unicefuganda/uSurvey.git
 
-* Go to mics folder in uSurvey 
-
         cd uSurvey/mics
-
-* Copy customized settings in localsettings.py 
 
         cp travis-settings.py localsettings.py
         (adjust localsettings.py for db and test_db setup)
-        
-* Go to survey folder in uSurvey
 
         cd ../survey
-
-* Copy config file interviewer_configs.py
 
         cp interviewer_configs.py.example interviewer_configs.py
 
