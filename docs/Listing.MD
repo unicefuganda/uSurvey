@@ -4,7 +4,7 @@ The Listing be carried out by field staff other than interviewers, as a separate
 Survey has to be simplified to the Interviewer in identifying the household respondents, one who is eligible for this particular survey, based up on these Listing Questions.
 
 
-Survey Listing is available from main menu under Survey Administration >> Listing Form
+Survey Listing is available from main menu under Survey <b>Administration</b> >> <b>Listing Form</b>
 
 Listing is set of Questions can be customized/configurable for any survey by reusing same Listing template, implementing Looping concept and apply logic to the Questions.
 
@@ -24,16 +24,16 @@ The ‘Listing Form Questions Template’ page by default shows list of all Ques
 ###Adding Questions to the Listing Form: 
 In the ‘Listing Form’ page click on the respective Listing Name / on Action item ‘View/Edit Questions’ to navigate to ‘Listing Form Questions Template’ form where one can Add New Questions to the Listing by clicking on ‘Add Question’ Button, this will open a pop form where one can write a Question, by providing ‘Variable Name’, ‘Text’ (Question), ‘Answer Type’ and select/ check ‘Mandatory’ to mark the Question as to answer compulsory.
 
-Export Questions: On click, ‘Export Questions’ button user can download the Listing Questions in “.csv” file format.
+<b>Export Questions</b>: On click, ‘Export Questions’ button user can download the Listing Questions in “.csv” file format.
 
-Select Question: On click, ‘Select Question’ button, User navigates to ‘Select Question from Question
+<b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Question from Question
 Library’ where one can select the Questions from Library into Listing, by sorting out using ‘Search with text’ and ‘Question Type’ methods. 
 
 To select the Question from Library List to Listing, just Click on “Code” or “Text” to move between tables (Library << / >> Listing List)
 
 <b>Edit – Listing Question</b>: On click, Action Item ‘Edit’, User can Edit respective Question, ‘Variable Name’, ‘Text’ (Question), ‘Answer Type’ and select/ check ‘Mandatory’ to mark the Question as to answer compulsory.
 
-Insert Question: On click, Action Item, ‘Insert Question’ by which User can insert a New Question below the respective Question and rest of the thing is similar to ‘Add New Question’.
+<b>Insert Question</b>: On click, Action Item, ‘Insert Question’ by which User can insert a New Question below the respective Question and rest of the thing is similar to ‘Add New Question’.
 
 <b>Manage Loop</b>: On click, Action Item, ‘Manage Loop’ this in terms, applying the Looping concepts in Listing Questions, here one has to define the Looping concept for respective question by providing ‘Loop label’, ‘Repeat Logic’, ‘Loop Ends At, and ‘Loop Prompt’. As follows:
 
