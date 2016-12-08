@@ -1,12 +1,12 @@
 
 ###Explore uSurvey process flow:
 
-![uSurvey Flow](../screenshots/uSurvey_flow.png)
+![uSurvey Flow](./uSurvey_flow.png)
 
 
 ###uSurvey Sitemap:
 
-![uSurvey Menu](../screenshots/uSurvey_LOC.png)
+![uSurvey Menu](./uSurvey_LOC.png)
 
 
 
