@@ -87,3 +87,4 @@ In the ‘Listing Form Questions Template’ page, Questions that has Logic are 
 <b>Update Question Order</b>:  On click, this button user can update the rearranged order of the Question, 
 
 <b>Change order of the Question</b>: To change the order of the Question, just select the Question to drag and drop at the required order, then click on ‘Update Question Order’ button 
+
