@@ -23,12 +23,14 @@ The ‘Listing Form’ page by default shows list of all existing Listings and e
 
 <b>View/Edit Questions – Listing</b>: On click, Action Item ‘View/Edit Questions’, User navigates to ‘Listing Form Questions Template’ page to View or Edit respective Questions in Listing
 
+###Listing Form Questions Template:
+
+![Adding Questions](./Page2v1.png)
+
 The ‘Listing Form Questions Template’ page by default shows list of all Questions in Listing, if/that exists and each of these Question items has Actions to ‘Edit’, ‘Insert Question’, ‘Manage Loop’, ‘Add Logic’, ‘Remove’ and ‘View Options’- for Multiple Choice Type Question.
 
 ###Adding Questions to the Listing Form: 
 In the ‘Listing Form’ page click on the respective Listing Name / on Action item ‘View/Edit Questions’ to navigate to ‘Listing Form Questions Template’ form where one can Add New Questions to the Listing by clicking on ‘Add Question’ Button, this will open a pop form where one can write a Question, by providing ‘Variable Name’, ‘Text’ (Question), ‘Answer Type’ and select/ check ‘Mandatory’ to mark the Question as to answer compulsory.
-
-![Adding Questions](./Page2v1.png)
 
 <b>Export Questions</b>: On click, ‘Export Questions’ button user can download the Listing Questions in “.csv” file format.
 
@@ -41,15 +43,23 @@ To select the Question from Library List to Listing, just Click on “Code” or
 
 <b>Insert Question</b>: On click, Action Item, ‘Insert Question’ by which User can insert a New Question below the respective Question and rest of the thing is similar to ‘Add New Question’.
 
+![Manage Loop](./Page01.png)
+
 <b>Manage Loop</b>: On click, Action Item, ‘Manage Loop’ this in terms, applying the Looping concepts in Listing Questions, here one has to define the Looping concept for respective question by providing ‘Loop label’, ‘Repeat Logic’, ‘Loop Ends At, and ‘Loop Prompt’. As follows:
 
-<b>Loop label</b>: naming the Loop 
+<b>Loop label</b>: naming the Loop
+
+![User Defined](./Page02.png)
 
 <b>Repeat Logic: ‘User Defined’</b> – is chosen, need to define ‘Loop Ends At’, that is this set of Question come into loop, starting from this particular question and has to end loop with any of the consecutive question in the Listing to be chosen here. And ‘Loop Prompt’ – this is a message prompt shown in ODK at the time of capturing survey details about the “user defined” question.
 
 <b>Repeat Logic: ‘Fixed number of repeats’</b>– is chosen, need to define ‘Repeat count’ – any specific no of times loop to be repeated. And ‘Loop Ends At’ – specify that at which, Question this loop should close. 
 
+![Fixed number of repeats](./Page03.png)
+
 <b>Repeat Logic: ‘Response from previous question’</b>– is chosen, need to define ‘Previous numeric values’ – this logic based up on count/ number provided in this previous question and ‘Loop Ends At’ - specify that at which, Question this loop should close.
+
+![Response from previous question](./Page04.png)
 
 <b>Loop Ends At</b>:  specify that at which, Question this loop should close
 
