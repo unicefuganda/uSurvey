@@ -6,6 +6,7 @@ pages:
 - USSD Integration: ussd-integration.md
 - Set up Guide: installation.md
 - Deployment Guide: deployment_guide.md
+- Site Map: site_Map.md
 - Tests: tests.md
 #theme: readthedocs
 theme: cerulean
