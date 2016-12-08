@@ -92,10 +92,6 @@ Now, Survey: ‘The Educational Survey’ with Listing: ‘Public School’ and 
 
 Interviewer conducts the survey in the designated enumeration area, suppose an Interviewer is assigned to a survey know as ‘The Educational' Survey.
 
-
-
-
- 
  
 ###Listing:
 The Listing be carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts.
@@ -143,13 +139,13 @@ To Add a Variable, click on ‘Manage Variables’ button to view list of existi
 
 To Edit existing Group, every corresponding Group name has Actions column with Action items ‘Edit’ and ‘Delete’, select Edit to modify the Group.
    
- ![uSurvey map page](../screenshots/Map_groupZ_selected.png)
+ ![uSurvey map page](./Map_groupZ_selected.png)
 
 ###Creating Groups:
 
 Navigate to <b>Survey Administration</b> >> <b>Groups</b>
 
- ![Create Groups](../screenshots/Add_Groups.png)
+ ![Create Groups](./Add_Groups.png)
  
 The above Groups page is used to manage Groups, i.e. to Create a New Group, Edit existing Group, Delete Groups and Manage Variables.
 
@@ -157,18 +153,18 @@ The above Groups page is used to manage Groups, i.e. to Create a New Group, Edit
 
  click on ‘Manage Variables’ button to view list of existing Variables and options to Add, Edit and Delete Variables
  
- ![Manage Variables](../screenshots/addvariable.png)
+ ![Manage Variables](./addvariable.png)
  
 ###Add Variables:
  
  click on 'Add Variables' button, to navigare below show form. Where one can create new variable by assigning question. Provide 'variable Name' and Question in 'Text' feilds and select 'Answer' type.  
  
- ![Add Variables](../screenshots/Add_Variable.png)
+ ![Add Variables](./Add_Variable.png)
  
  
 ###Edit Group:
  
  To Edit existing Group, every corresponding Group name has Actions column with Action items ‘Edit’ and ‘Delete’, select Edit to modify the Group.
  
- ![Edit Groups](../screenshots/Edit_group.png)
+ ![Edit Groups](./Edit_group.png)
 
