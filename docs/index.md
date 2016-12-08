@@ -54,7 +54,10 @@ User Guides
   * [Components](https://github.com/unicefuganda/uSurvey/blob/uSurvey/docs/deployment_guide.md#components)
   * [Deployment Considerations](https://github.com/unicefuganda/uSurvey/blob/uSurvey/docs/deployment_guide.md#deployment-considerations)
   * [uSurvey Hosting](https://github.com/unicefuganda/uSurvey/blob/uSurvey/docs/deployment_guide.md#usurvey-hosting)
-  
+
+* **Site Map**
+  * [Site Map](./Site_Map.md)
+
 * **Tests**
   * [Testing](https://github.com/unicefuganda/uSurvey/blob/uSurvey/docs/tests.md)
 
