@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class=" js csstransitions" lang="en-US">
+   <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width">
+      <link rel="icon" type="image/png" href="images/favicon.png">
+      <title>{{ PROJECT_TITLE }}</title>
+  
+      <!-- usur styles -->
+      <link rel="stylesheet" href="assets/usur.css">
+   <style>
+   #search {
+
+}
+
+#search input[type="text"] {
+     -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+	background: url(assets/images/search.png) no-repeat 10px 6px #fcfcfc;
+    border: 1px solid #d1d1d1;
+    font: bold 12px Arial,Helvetica,Sans-serif;
+    color: #bebebe;
+    width: 150px;
+    padding: 6px 15px 6px 35px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    -webkit-transition: all 0.7s ease 0s;
+    -moz-transition: all 0.7s ease 0s;
+    -o-transition: all 0.7s ease 0s;
+    transition: all 0.7s ease 0s;
+	
+    }
+
+#search input[type="text"]:focus {
+    width: 200px;
+    }
+   </style>
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+      <link rel="stylesheet" href="{{ STATIC_URL }}{{ STATIC_URL }}toassets/bootstrap.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}{{ STATIC_URL }}toassets/animate.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}{{ STATIC_URL }}toassets/preset.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}{{ STATIC_URL }}toassets/style_002.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}{{ STATIC_URL }}toassets/responsive.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}{{ STATIC_URL }}toassets/fonts.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}{{ STATIC_URL }}toassets/color8.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all">
+      <script type="text/javascript" src="{{ STATIC_URL }}{{ STATIC_URL }}toassets/jquery_005.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}{{ STATIC_URL }}toassets/jquery.js"></script>
+      <style>
+         .headerArea {
+         background: #0099ff;	
+		 border-bottom:13px solid #0073bf;
+         }
+      </style>
+     
+   </head>
+
+   <body class="home page page-id-146 page-template page-template-page_templates page-template-home bgOne ">
+      <!--================= Site Preloader ==================-->
+      <div class="loaderWrap" style="display: none;">
+         <div class="loader-inner sk-folding-cube">
+            <div class="sk-cube1 sk-cube"></div>
+            <div class="sk-cube2 sk-cube"></div>
+            <div class="sk-cube4 sk-cube"></div>
+            <div class="sk-cube3 sk-cube"></div>
+         </div>
+      </div>
+      <!--================= Site Preloader ==================-->
+      <!--================= Box Div Start ==================-->
+      <div class="boxWrapper">
+         <!--================= Box Div Start ==================-->
+         <!-- Header Area -->
+         <header class="headerArea">
+            <div class="logo pull-left">
+               <div class="logoImg">
+                  <a href="#"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
+               </div>
+            </div>
+            <nav class="mainMenu pull-left">
+               <div class="menuButton hidden-lg hidden-md">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+               </div>
+               <ul id="menu-main-menu" class="">
+                   {% if perms.auth.can_view_interviewers %}
+                    <li  class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'main_page' %}">Home</a>
+                  </li>
+                   <li  class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'about_page' %}">About</a>
+                  </li>
+                   <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="#">Survey Administration</a>
+                       <ul class="sub-menu">
+                        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="{% url 'interviewers_page' %}">Interviewers</a></li>
+                        {% if perms.auth.can_enter_data %}
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'listing_template_home' %}">Listing Form</a></li>
+                        {% endif %}
+                        {% if perms.auth.can_view_batches %}
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-404"><a href="{% url 'show_question_library' %}">Question
+                                                Bank</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="{% url 'survey_list_page' %}">Surveys</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-407"><a href="{% url 'question_module_listing_page' %}">Modules</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-406"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="{% url 'interviewers_page' %}">Enumeration Areas/a></li>
+                        {% endif %}
+                        {% if perms.auth.can_enter_data %}
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
+                        {% endif %}
+                       </ul>
+                  </li>
+
+                   {% endif %}
+
+                    {% if perms.auth.can_view_aggregates %}
+                    <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="#">Downloads</a>
+                       <ul class="sub-menu">
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'download_excel' %}">Download
+                                            Data Sheet</a>
+                          </li>
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'interviewer_report_page' %}">Mobile Money
+                                            Sheet</a>
+                          </li>
+                       </ul>
+                   </li>
+                    {% endif %}
+                    {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="#">Downloads</a>
+
+                          <ul class="sub-menu">
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'odk_submission_list' %}">View ODK submissions</a></li>
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'list_indicator_page' %}">Indicators</a></li>
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'survey_completion_rates' %}">Completion
+                                        Rates</a></li>
+                           {% if perms.auth.view_completed_survey %}
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'show_interviewer_completion_summary' %}">Interviewer Completion
+                                        Summary</a></li>
+                            {% endif %}
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'list_weights_page' %}">Location Weights</a></li>
+                           </ul>
+                      </li>
+                   {% endif %}
+                    {% if perms.auth.can_view_users %}
+                        <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="#">Settings</a>
+                                <ul class="sub-menu">
+                                   <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'users_index' %}">Users</a></li>
+
+                                {% comment "Left to set up script" %}
+                                    <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
+                                {% endcomment %}
+                                </ul>
+                            </li>
+                        {% endif %}
+               </ul>
+            </nav>
+             <div>
+               {% if user.is_authenticated %}
+               <ul>
+                  <li><a href="#" style="color:#fff;font-size:13px;margin-bottom:8px; padding-top:5px; padding-left:5px;"><span><i class="fa fa-sign-in" aria-hidden="true"></i>
+                     </span> &nbsp;{{ user.get_full_name }}</a>
+                     <ul class="sub-menu">
+                         {% if user.is_superuser == False %}
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'users_edit' user.id %}">Edit Profile</a>
+                          </li>
+                         {% endif %}
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'password_change' %}">Change Password</a>
+                          </li>
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="{% url 'logout_page' %}">Logout</a>
+                          </li>
+                       </ul>
+                  </li>
+                 </ul>
+                    {% else %}
+                    <ul>
+                      <li><a href="{% url 'login_page' %}" style="color:#fff;font-size:13px;margin-bottom:8px; padding-top:5px; padding-left:5px;"><span><i class="fa fa-sign-in" aria-hidden="true"></i>
+                         </span> &nbsp;Login</a>
+                      </li>
+                    </ul>
+                    {% endif %}
+            </div>
+            <div class="clearfix"></div>
+        </header>
+        <div class="fw-page-builder-content">
+            <div class="container-fluid">
+               <div class="fw-row">
+                  <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;">
+                  </div>
+              <div class="row" style="color:#09F; z-index:1; text-align:center; margin:5px;">
+                  <h3 style="color:#09F;">{% block title %}{% endblock %}</h3></div>
+                  <div class="tp-fullwidth-forcer" style="width: 100%; height: 600px;">
+                  <div class="main-container">
+         <div class="">
+            <div class="main-content-inner">
+               <div class="page-content">
+                  <div class="usur-settings-container">
+                     <div class="usur-settings-box clearfix">
+                       </div>
+                  </div>
+                  <div class="row">
+                     <div class="col-xs-12">
+                        <div class="row">
+                           <div class="col-xs-12">
+                              <div class="clearfix">
+                                 <div class="pull-right tableTools-container"></div>
+                              </div>
+                              <div class="table-header">
+                                 <a href="{% url 'main_page' %}" style="background: 000;">Home</a> &raquo;
+                                {% for breadcrumb in request.breadcrumbs %}
+                                <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
+                                {% endfor %}
+                              </div>
+                              <div>
+                                 <div id="dynamic-table_wrapper" class="dataTables_wrapper form-inline no-footer">
+                                    <div class="row">
+                                       <div class="col-xs-6">
+                                          <div class="dataTables_length" id="dynamic-table_length">
+                                             {% block search %}
+
+                                             {% endblock %}
+                                          </div>
+                                       </div>
+                                       <div class="col-xs-6">
+                                          <div id="" class="dataTables_filter">
+                                              {% block page_actions %}
+
+                                                {% endblock %}
+                                          </div>
+                                       </div>
+                                    </div>
+                                    {% block content %}
+                                     
+                                    {% endblock %} 
+                                </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div id="modal-table" class="modal fade" tabindex="-1">
+                           <div class="modal-dialog">
+                              <div class="modal-content">
+                                 <div class="modal-header no-padding">
+                                    <div class="table-header">
+                                       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                       <span class="white">×</span>
+                                       </button>
+                                       Results for "Latest Registered Domains
+                                    </div>
+                                 </div>
+                                 <div class="modal-body no-padding">
+                                    <table class="table table-striped table-bordered table-hover no-margin-bottom no-border-top">
+                                       <thead>
+                                          <tr>
+                                             <th>Domain</th>
+                                             <th>Price</th>
+                                             <th>Clicks</th>
+                                             <th>
+                                                <i class="usur-icon fa fa-clock-o bigger-110"></i>
+                                                Update
+                                             </th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          <tr>
+                                             <td>
+                                                <a href="#">usur.com</a>
+                                             </td>
+                                             <td>$45</td>
+                                             <td>3,330</td>
+                                             <td>Feb 12</td>
+                                          </tr>
+                                          <tr>
+                                             <td>
+                                                <a href="#">base.com</a>
+                                             </td>
+                                             <td>$35</td>
+                                             <td>2,595</td>
+                                             <td>Feb 18</td>
+                                          </tr>
+                                          <tr>
+                                             <td>
+                                                <a href="#">max.com</a>
+                                             </td>
+                                             <td>$60</td>
+                                             <td>4,400</td>
+                                             <td>Mar 11</td>
+                                          </tr>
+                                          <tr>
+                                             <td>
+                                                <a href="#">best.com</a>
+                                             </td>
+                                             <td>$75</td>
+                                             <td>6,500</td>
+                                             <td>Apr 03</td>
+                                          </tr>
+                                          <tr>
+                                             <td>
+                                                <a href="#">pro.com</a>
+                                             </td>
+                                             <td>$55</td>
+                                             <td>4,250</td>
+                                             <td>Jan 21</td>
+                                          </tr>
+                                       </tbody>
+                                    </table>
+                                 </div>
+                                 <div class="modal-footer no-margin-top">
+                                    <button class="btn btn-sm btn-danger pull-left" data-dismiss="modal">
+                                    <i class="usur-icon fa fa-times"></i>
+                                    Close
+                                    </button>
+                                    <ul class="pagination pull-right no-margin">
+                                       <li class="prev disabled">
+                                          <a href="#">
+                                          <i class="usur-icon fa fa-angle-double-left"></i>
+                                          </a>
+                                       </li>
+                                       <li class="active">
+                                          <a href="#">1</a>
+                                       </li>
+                                       <li>
+                                          <a href="#">2</a>
+                                       </li>
+                                       <li>
+                                          <a href="#">3</a>
+                                       </li>
+                                       <li class="next">
+                                          <a href="#">
+                                          <i class="usur-icon fa fa-angle-double-right"></i>
+                                          </a>
+                                       </li>
+                                    </ul>
+                                 </div>
+                              </div>
+                              <!-- /.modal-content -->
+                           </div>
+                           <!-- /.modal-dialog -->
+                        </div>
+                        <!-- PAGE CONTENT ENDS -->
+                     </div>
+                     <!-- /.col -->
+                  </div>
+                  <!-- /.row -->
+               </div>
+               <!-- /.page-content -->
+            </div>
+         </div>
+         <!-- /.main-content -->
+         <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+         <i class="usur-icon fa fa-angle-double-up icon-only bigger-110"></i>
+         </a>
+      </div></div>
+               </div>
+               <!-- END REVOLUTION SLIDER --> 
+            </div>
+         </div>
+      </div>
+      <div class="secTriangle" style="background-image: url(images/slider3.png); background-reapet: no-reapet; background-position: center center; "></div>
+ 
+      </div>
+      <footer class="footerArea">
+         <section class="copyRight">
+            <div class="container">
+               <div class="row">
+                  <div class="col-lg-12 col-sm-12 col-xs-12 text-center">
+                     <span><img src="images/bottomfooterlogo.jpg" width="219" height="80"></span>
+                     <p style="padding-bottom:10px;">Copyright © 2016 <a href="#">UNICEF</a><span> and UBOS</span> </p>
+                  </div>
+                  <div class="topSocial pull-right">
+                     <ul>
+                        <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
+                        <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
+                        <li><a class="google" href="#"><i class="fa fa-linkedin"></i></a></li>
+                     </ul>
+                  </div>
+               </div>
+            </div>
+            </div>
+         </section>
+      </footer>
+      <!--================= Box Div Start ==================-->
+      </div>
+      <!--================= Box Div Start ==================-->	
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/bootstrap.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
+          <!-- /.main-container -->
+      <!-- basic scripts -->
+      <!--[if !IE]> -->
+    
+      <!-- <![endif]-->
+      <!--[if IE]>
+      <script src="assets/js/jquery-1.11.3.min.js"></script>
+      <![endif]-->
+      <script type="text/javascript">
+         if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
+      </script>
+    
+
+<script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/highcharts.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/exporting.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/underscore.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/question_options.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/chosen/chosen.jquery.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/application.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/numerical-bar-chart.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/multichoice-bar-chart.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/multichoice-stacked-bar-chart.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/simple_indicator_bar_chart.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}/js/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
+{% block javascripts %}
+{% endblock %}
+<script type="text/javascript">
+     $('.datepicker').datepicker({
+     changeMonth: true,
+     changeYear: true,
+     dateFormat: 'dd-mm-yy',
+     yearRange: "-120:+nn"
+     });
+</script>
+	<script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+	<script src="{{ STATIC_URL }}js/main.js"></script>
+</body>
+</html>

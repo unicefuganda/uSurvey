@@ -1,0 +1,1632 @@
+/*
+This is only usurvey
+ */
+
+
+@media (min-width:1368px) and (max-width:1439px){
+    /**************** Slider ***************/
+    .headCaption {
+        font-size: 60px;
+    }
+    .sliderImg{
+        width: 875px;
+    }
+    .sliderImg.two{
+        width: 996px;
+    }
+    .sliderImg.three{
+        width: 797px;
+    }
+    .sliderImg img{
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lft.resFix{
+        left: auto !important;
+        right: 0px !important;
+        top: 68px !important;
+    }
+
+
+}
+@media(min-width:1200px) and (max-width:1440px){
+    .sliderBtn i {
+        background: #fff none repeat scroll 0 0;
+        color: #404040;
+        float: left;
+        font-size: 24px !important;
+        height: 60px;
+        left: -1px;
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+        padding-top: 25px !important;
+        position: relative;
+        text-align: center;
+        top: -1px;
+        width: 60px;
+    }
+    .redCaption {
+        margin-left: -197px !important;
+        padding: 8px 25px !important;
+    }
+    .headCaption {
+        margin-left: -197px !important;
+        padding: 200px 0  !important;
+    }
+    .capItalic {
+        margin-left: -197px !important;
+    }
+    .sliderBtn{
+        margin-left: -197px !important;
+    }
+
+
+}
+
+@media(min-width:1000px) and (max-width:1280px){
+    .redCaption {
+        margin-left: 0 !important;
+        padding: 8px 25px !important;
+    }
+    .headCaption {
+        margin-left: 0 !important;
+        padding: 200px 0  !important;
+    }
+    .capItalic {
+        margin-left: 0 !important;
+    }
+    .sliderBtn{
+        margin-left: 0 !important;
+    }
+
+}
+
+@media (min-width:1440px) and (max-width:2565px){
+    /**************** Preset ***************/
+    .presetArea {
+        top: 220px;
+    }
+    #backto {
+        top: 260px;
+    }
+    /**************** Slider ***************/
+    .headCaption {
+        font-size: 90px;
+    }
+    .sliderImg{
+        width: 875px;
+    }
+    .sliderImg.two{
+        width: 996px;
+    }
+    .sliderImg.three{
+        width: 797px;
+    }
+    .sliderImg img{
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lft.resFix{
+        left: auto !important;
+        right: 0px !important;
+        top: 68px !important;
+    }
+
+}
+@media (min-width: 1280px) and (max-width: 1400px){
+    .presetArea {
+        top: 150px;
+        height: 500px;
+    }
+    .accentColor {
+        padding: 20px 40px 15px 40px;
+    }
+    .accentColor a {
+        margin-bottom: 8px;
+        margin-right: 8px;
+    }
+    .colorChem {
+        top: 205px;
+    }
+    .layoutstyle {
+        padding: 20px 0 28px 40px;
+        top: 297px;
+    }
+    .patterns {
+        top: 415px;
+    }
+}
+@media (min-width: 992px) and (max-width: 1199px){
+    /**************** Header ***************/
+    .mainMenu {
+        width: 50%;
+    }
+    .logo {
+        padding-left: 90px;
+        width: 25%;
+    }
+    .topSocial {
+        padding-right: 90px;
+        width: 25%;
+    }
+    .mainMenu > ul > li > a {
+        padding: 3px 15px;
+    }
+    /**************** Slider Area ***************/
+    .sliderArea{
+        height: 650px !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lft{
+        left: 40px !important;
+        top: 190px !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lft.resFix{
+        left: auto !important;
+        right: -35px !important;
+        top: 158px !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lfr{
+        left: 40px !important;
+        top: 245px !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lfl{
+        left: 40px !important;
+        top: 350px !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lfb{
+        left: 40px !important;
+        top: 445px !important;
+    }
+    .headCaption {
+        font-size: 55px;
+    }
+    .capItalic {
+        width: 510px;
+    }
+    /**************** Feature Area ***************/
+    .featureArea.commonSection{
+        padding-bottom: 78px;
+    }
+    .featureContent {
+        margin-bottom: 40px;
+    }
+    .featureArea:after {
+        left: 10px;
+    }
+    /**************** Service ***************/
+    .serviceContent {
+        margin-bottom: 25px;
+        width: 100%;
+    }
+    /**************** Portfolio Area ***************/
+    .portfolioImg {
+        height: 165px;
+        width: 165px;
+    }
+    .folioHover{
+        width: 230px;
+        height: 230px;
+        margin: -32px 0 0 -32px;
+    }
+    .portfolioImg.folioImgFix_5 {
+        top: -44px;
+    }
+    .portfolioImg.folioImgFix_8 {
+        top: -85px;
+    }
+    .portfolioImg.folioImgFix_6 {
+        top: -44px;
+    }
+    .portfolioImg.folioImgFix_7 {
+        top: -42px;
+    }
+    .portfolioImg.folioImgFix_9 {
+        top: -83px;
+    }
+    .viewBtn {
+        height: 165px;
+        left: 1px;
+        margin-bottom: -128px;
+        position: relative;
+        top: -128px;
+        width: 165px;
+    }
+
+
+    /**************** Fun fact ***************/
+    .singleFacts h1 {
+        font-size: 65px;
+    }
+    /**************** Skill Area ***************/
+    .skillArea.commonSection{
+        padding-bottom: 88px;
+    }
+    .singleSkill {
+        margin-bottom: 30px;
+    }
+    /**************** Blog ***************/
+    .blogArea:after {
+        left: 5px;
+    }
+    .postThumb.first {
+        height: auto;
+    }
+    .postThumb.first img {
+        height: auto;
+    }
+    .postThumb {
+        height: 175px;
+    }
+    .postThumb img {
+        height: 100%;
+    }
+    /**************** Hompage Three ***************/
+    .portfolioDetails {
+        padding: 40px 0 40px;
+    }
+    .folioHover2 a.prePhoto,.folioHover2 a.detailsLink {
+        top: 42%;
+    }
+    /**************** Blog Sidebar ***************/
+    .widget form input {
+        width: 100%;
+    }
+    /************** Blog Single Page ***************/
+    .blogSidebarArea:after {
+        left: 12px;
+    }
+    .postPage .leftPost {
+        padding-left: 0;
+    }
+    .postPage .quote {
+        padding: 0 35px 37px 30px;
+    }
+    .authorInfo {
+        margin-bottom: 40px;
+    }
+    .authorDesc {
+        background: transparent none repeat scroll 0 0;
+        width: 70%;
+        padding-left: 0;
+    }
+    .commentForm form input[type="text"] {
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+    .fullComment {
+        width: 82%;
+    }
+    .commentsSection ol > li > ul > li .commenterImg {
+        margin-left: 80px;
+    }
+    .commentsSection ol > li > ul > li .fullComment {
+        width: 70%;
+    }
+    .commentsSection ol > li > ul > li > ul > li .commenterImg {
+        margin-left: 145px;
+    }
+    .commentsSection ol > li > ul > li > ul > li .fullComment {
+        width: 60%;
+    }
+    /**************** Contact Page ***************/
+    .contactForm form input {
+        width: 49.4%;
+    }
+    /**************** Event Page ***************/
+    .eventDet {
+        padding-bottom: 35px;
+        padding-right: 0;
+        padding-top: 20px;
+        position: relative;
+        width: 100%;
+    }
+    .evMeta p.dat {
+        font-size: 12px;
+        margin-right: 10px;
+        padding-left: 25px;
+    }
+    .evMeta p.van {
+        font-size: 12px;
+    }
+    /**************** Event Single ***************/
+    .eventSinglePost {
+        padding: 30px;
+    }
+    /* Member Page */
+    .memberDetails {
+        border-width: 1px;
+        float: none;
+        margin: 0 auto;
+        width: 580px;
+    }
+    .memberImg {
+        float: none;
+        margin: 0 auto;
+        width: 580px;
+    }
+    /* New Home */
+    .tabNavs li a {
+        padding: 0 21px 10px;
+    }
+    .aboutTabImg > img {
+        left: -35px;
+        position: absolute;
+        top: 0;
+    }
+    .aboutTabImg {
+        height: 240px;
+        width: 285px;
+    }
+    .allFeatureBtn {
+        bottom: 0;
+    }
+    .serviceContent {
+        width: 67%;
+    }
+    .singleService {
+        margin-bottom: 10px;
+    }
+    .serviceContent h4 a {
+        font-size: 20px;
+    }
+    .aboutTabImg {
+        top: -36px;
+    }
+}
+
+
+@media (min-width: 768px) and (max-width: 991px){
+    /**************** Header ***************/
+    .headerArea {
+        height: inherit;
+        position: relative;
+        top: 0;
+        padding-top: 40px;
+    }
+    .logo {
+        float: none !important;
+        padding-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+    .logoImg {
+        display: inline-block;
+        float: none;
+        width: auto;
+    }
+    .logo h2 {
+        display: inline-block;
+        float: none;
+        margin-left: 0;
+        padding-top: 4px;
+    }
+    .mainMenu {
+        float: none !important;
+        text-align: center;
+        width: 100%;
+        margin: 25px 0;
+    }
+    .mainMenu > ul > li {
+        display: block;
+    }
+    .mainMenu > ul > li:first-child > a {
+        padding: 3px 35px;
+    }
+    .mainMenu > ul > li > a{
+        border: none;
+    }
+    .dropMenu {
+        opacity: 1;
+        position: relative;
+        top: 20px;
+        visibility: visible;
+        width: 100%;
+        text-align: center;
+    }
+    .mainMenu > ul > li:hover .dropMenu {
+        top: 20px;
+    }
+    .mainMenu > ul > li:last-child > a {
+        border-right: 0 none;
+        padding: 3px 35px;
+    }
+    .dropMenu > li > a {
+        padding: 14px 0;
+    }
+    .dropSub {
+        left: 0;
+        opacity: 1;
+        position: relative;
+        text-align: center;
+        top: 20px;
+        visibility: visible;
+        width: 100%;
+    }
+    .dropSub li a {
+        padding: 14px 0;
+    }
+    .dropMenu > li:hover .dropSub {
+        top: 20px;
+    }
+    .mainMenu ul{
+        display: none;
+        -webkit-transition: none 0s;
+        -moz-transition: none 0s;
+        -ms-transition: none 0s;
+        -o-transition: none 0s;
+        transition: none 0s;
+    }
+    .topSocial {
+        float: none !important;
+        padding-bottom: 40px;
+        padding-right: 0;
+        padding-top: 0;
+        text-align: center;
+        width: 100%;
+    }
+    .topSocial ul {
+        text-align: center;
+    }
+    /**************** Slider ***************/
+    .sliderArea .tp-caption.lightgrey_divider{
+        width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lft{
+        top: 80px !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lft.resFix{
+        display: none;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lfr{
+        top:130px !important; 
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lfl{
+        top: 255px !important;
+    }
+    .capItalic {
+        padding: 0 160px;
+        line-height: 1.3;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lfb{
+        top: 325px !important;
+    }
+    /**************** Feature ***************/
+    .featureArea.commonSection{
+        padding-bottom: 78px;
+    }
+    .featureContent {
+        margin-bottom: 30px;
+    }
+    /**************** Service ***************/
+    .singleService.first {
+        padding-top: 60px;
+    }
+    .serviceContent {
+        float: none !important;
+        margin-bottom: 30px;
+        padding-top: 15px;
+        text-align: center;
+        width: 100%;
+    }
+    .serviceIcon {
+        margin: 0 auto;
+        float: none !important;
+    }
+    .serviceContent h4 {
+        font-size: 22px;
+    }
+    .serviceContent.pull-left{
+        margin-bottom: 15px;
+    }
+    .serviceIcon.pull-right{
+        margin-bottom: 15px;
+    }
+    .commonSection.serviceArea{
+        padding-bottom: 78px;
+    }
+    /**************** Fun Fact ***************/
+    .singlePortfolio {
+        position: relative;
+        text-align: center;
+        display: table;
+        width: 600px;
+        margin: 0 auto;
+        clear: both;
+    }
+    .singlePortfolio .clearfix{
+        display: none;
+    }
+    .portfolioImg.folioImgFix_1 {
+        left: -42px;
+        margin: 0 auto;
+        right: 0;
+    }
+    .portfolioImg.folioImgFix_2 {
+        left: 42px;
+        right: 0;
+        margin: 0 auto;
+    }
+    .portfolioImg.folioImgFix_3 {
+        left: -42px;
+        right: 0;
+        margin: 0 auto;
+    }
+    .portfolioImg.folioImgFix_4 {
+        left: 42px;
+        right: 0;
+        margin: 0 auto;
+    }
+    .portfolioImg.folioImgFix_5 {
+        left: -42px;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg.folioImgFix_6 {
+        left: 42px;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg.folioImgFix_7 {
+        left: -42px;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg.folioImgFix_9 {
+        display: none;
+    }
+    .portfolioImg.folioImgFix_8 {
+        left: 42px;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg {
+        margin-bottom: 85px !important;
+    }
+    .viewBtn {
+        left: 0px;
+        margin-bottom: -143px;
+        position: relative;
+        top: -143px;
+    }
+    .portfolioArea.commonSection {
+        padding-bottom: 0;
+    }
+    /**************** Fun Fact ***************/
+    .singleFacts h1 {
+        font-size: 45px;
+    }
+    /**************** Skill ***************/
+    .skillArea.commonSection{
+        padding-bottom: 78px;
+    }
+    .singleSkill {
+        margin-bottom: 25px;
+    }
+    /**************** Blog ***************/
+    .postThumb.first img {
+        height: auto;
+    }
+    .postThumb.first {
+        height: inherit;
+    }
+    .postThumb {
+        height: 175px;
+    }
+    .postThumb img{
+        height: 100%;
+    }
+    /**************** Footer Area ***************/
+    .footerContent a {
+        font-size: 65px;
+    }
+    /**************** Homepage two ***************/
+    /* Folio 1 */
+    .folioBtn {
+        margin-bottom: 50px;
+    }
+    .folioBtn li {
+        margin-bottom: 10px;
+    }
+    .folioHover2 a.prePhoto,.folioHover2 a.detailsLink {
+        top: 42%;
+    }
+    /************* Home Page Three *************/
+    .portfolioDetails {
+        padding: 30px 20px 30px;
+    }
+    /*********** 404 page ************/
+    .fourZeroArea p {
+        width: 38%;
+    }
+    .breadCrumArea {
+        padding: 80px 0;
+    }
+    .fourZeroArea {
+        padding: 115px 0;
+    }
+    .hasChild:after{
+        display: block;
+    }
+    /*************** About Page ************/
+    .sinlgeTeam {
+        margin-bottom: 30px;
+    }
+    /* Blog Sidebar */
+    .blogSidbarPost h2 a {
+        font-size: 40px;
+    }
+    .blogCategory li {
+        margin-bottom: 10px;
+    }
+    .sidePostCont {
+        margin-left: 10px;
+        width: 135px;
+    }
+    .sidePostCont p a {
+        line-height: 1.4;
+    }
+    .widget form input {
+        width: 100%;
+    }
+    /************** Blog Single Page ***************/
+    .postPage .leftPost {
+        padding-left: 0;
+    }
+    .postPage .quote {
+        padding: 0 35px 37px 30px;
+    }
+    .authorInfo {
+        margin-bottom: 60px;
+    }
+    .authorDesc {
+        background: transparent none repeat scroll 0 0;
+        width: 70%;
+        padding-left: 0;
+    }
+    .commentForm form input[type="text"] {
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+    .fullComment {
+        width: 78%;
+    }
+    .commentsSection ol > li > ul > li .commenterImg {
+        margin-left: 50px;
+    }
+    .commentsSection ol > li > ul > li .fullComment {
+        width: 68%;
+    }
+    .commentsSection ol > li > ul > li > ul > li .commenterImg {
+        margin-left: 80px;
+    }
+    .commentsSection ol > li > ul > li > ul > li .fullComment {
+        width: 60%;
+    }
+    /************ Contact Page **************/
+    .contactForm form input {
+        width: 354px;
+    }
+    /************* Event Page **************/
+    .eventThumb {
+        height: auto;
+        position: relative;
+        width: 100%;
+    }
+    .singleEvents {
+        background: transparent none repeat scroll 0 0;
+        margin: 0 auto 30px;
+        padding-left: 0;
+    }
+    .evMeta p {
+        margin-bottom: 12px;
+    }
+    .eventDet {
+        padding-bottom: 0;
+        padding-right: 0;
+        padding-top: 25px;
+        position: relative;
+        width: 100%;
+    }
+    /**************** Event Single ***************/
+    .tribe-events-event-meta .column, .tribe-events-event-meta .tribe-events-meta-group
+    .eventSinglePost {
+        padding: 30px 25px;
+    }
+    .blogSidebarArea.singleEventPage::after {
+        left: 5px;
+    }
+    /* Member Page */
+    .memberDetails {
+        border-width: 1px;
+        float: none;
+        margin: 0 auto;
+        width: 580px;
+    }
+    .memberImg {
+        float: none;
+        margin: 0 auto;
+        width: 580px;
+    }
+    .headerFix .topSocial {
+        margin-bottom: 0;
+        padding: 0;
+        position: absolute;
+        top: 21.5px;
+    }
+    .headerFix .logo{
+        width: 180px;
+    }
+    .headerFix.headerArea{
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    .headerFix .menuButton {
+        margin: 0;
+        padding: 0 4px;
+        position: absolute;
+        right: 20px;
+        top: 28px;
+    }
+    .mainMenu > ul > li:last-child{
+        padding-bottom: 5px;
+    }
+    /* New Home */
+    .tabNavs li a {
+        padding: 0 21px 10px;
+    }
+    .aboutTabImg > img {
+        width: 100%;
+        height: auto;
+        top: -20px;
+    }
+    .aboutTabImg {
+        height: 240px;
+        width: 285px;
+    }
+    .allFeatureBtn {
+        bottom: 0;
+    }
+    .mainMenu{
+        margin: 0;
+    }
+
+    .redCaption {
+        position: relative;
+        top: -80px;
+        left: 40px;
+    }
+    .headCaption {
+        position: relative;
+        top: -40px;
+        left: 40px;
+    }
+    .capItalic {
+        padding-left: 50px !important;
+        position: relative;
+        top: -20px;
+    }
+    .sliderBtn {
+        position: relative;
+        top: 0;
+        left: 40px;
+    }
+    .sliderBtn i{
+        position: relative;
+        top: 1px;
+    }
+    .singleCaros img {
+        margin: 35px 0;
+    }
+    .serviceContent.pull-left, 
+    .serviceIcon.pull-right, 
+    .serviceIcon.pull-left,
+    .serviceContent.pull-right {
+        float: none !important;
+    }
+    .sliderArea .tp-caption img {
+        bottom: -191px;
+        position: relative;
+    }
+    .portfolioDetails h3,.postContent h3 {
+        line-height: 32px;
+    }
+    .contactForm .col-lg-6{
+        margin-bottom:20px;
+    }
+    .tribe-events-event-meta .column, .tribe-events-event-meta .tribe-events-meta-group{
+        width: 100%;
+    }
+    .tribe-events-event-meta .tribe-events-meta-group.tribe-events-meta-group-organizer{
+        padding-left: 0;
+        margin-top: 50px
+    }
+    .widgetTitle {
+        font-size: 20px;
+    }
+}
+
+@media (min-width: 320px) and (max-width: 767px){
+    /**************** Header ***************/
+    .headerArea {
+        height: inherit;
+        position: relative;
+        top: 0;
+        padding-top: 40px;
+    }
+    .logo {
+        float: none !important;
+        padding-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+    .logoImg {
+        display: inline-block;
+        float: none;
+        width: auto;
+    }
+    .logo h2 {
+        display: inline-block;
+        float: none;
+        margin-left: 0;
+        padding-top: 4px;
+    }
+    .mainMenu {
+        float: none !important;
+        text-align: center;
+        width: 100%;
+        margin: 25px 0;
+    }
+    .mainMenu > ul > li {
+        display: block;
+    }
+    .mainMenu > ul > li:first-child > a {
+        padding: 3px 35px;
+    }
+    .mainMenu > ul > li > a{
+        border: none;
+    }
+    .dropMenu {
+        opacity: 1;
+        position: relative;
+        top: 20px;
+        visibility: visible;
+        width: 100%;
+        text-align: center;
+    }
+    .mainMenu > ul > li:hover .dropMenu {
+        top: 20px;
+    }
+    .mainMenu > ul > li:last-child > a {
+        border-right: 0 none;
+        padding: 3px 35px;
+    }
+    .dropMenu > li > a {
+        padding: 14px 0;
+    }
+    .dropSub {
+        left: 0;
+        opacity: 1;
+        position: relative;
+        text-align: center;
+        top: 20px;
+        visibility: visible;
+        width: 100%;
+    }
+    .dropSub li a {
+        padding: 14px 0;
+    }
+    .dropMenu > li:hover .dropSub {
+        top: 20px;
+    }
+    .mainMenu ul{
+        display: none;
+        -webkit-transition: none 0s;
+        -moz-transition: none 0s;
+        -ms-transition: none 0s;
+        -o-transition: none 0s;
+        transition: none 0s;
+    }
+    .topSocial {
+        float: none !important;
+        padding-bottom: 40px;
+        padding-right: 0;
+        padding-top: 0;
+        text-align: center;
+        width: 100%;
+    }
+    .topSocial ul {
+        text-align: center;
+    }
+    /**************** Slider ***************/
+    .tp-bullets{
+        display: none !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider{
+        width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lft{
+        top: 80px !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lft.resFix{
+        display: none;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lfr{
+        top:120px !important; 
+    }
+    .headCaption,
+    .headCaption span{
+        font-size: 35px !important;
+    }
+
+    .sliderArea .tp-caption.lightgrey_divider.lfl{
+        top: 200px !important;
+    }
+    .capItalic {
+        line-height: 1.1;
+        padding: 0 25px;
+    }
+    .capItalic br{
+        display: none !important;
+    }
+    .sliderArea .tp-caption.lightgrey_divider.lfb{
+        top: 300px !important;
+    }
+    .sliderArea .rev_slider .tp-parallax-wrap, 
+    .sliderArea .rev_slider .tp-parallax-wrap .tp-loop-wrap, 
+    .sliderArea .rev_slider .tp-parallax-wrap .tp-loop-wrap .tp-mask-wrap{
+        width: 100% !important;
+    }
+    .sliderArea .rev_slider .tp-caption{
+        position: relative;
+        width: 100%;
+        white-space: normal !important;
+        padding-right: 15px !important;
+    }
+    /**************** Testimonial ***************/
+    /*    .commonSection {
+            padding: 74px 0 78px !important;
+        }*/
+    .testiImg {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 15px;
+    }
+    .quotation {
+        padding: 30px 20px 0;
+    }
+    /**************** Feature ***************/
+    .featureArea:after {
+        left: -5px;
+    }
+    .featureImg {
+        margin: 30px auto 0;
+    }
+    /**************** Service ***************/
+    .singleService.first {
+        padding-top: 0;
+    }
+    .serviceContent {
+        float: none !important;
+        margin: 0 auto 20px;
+        padding-top: 15px;
+        text-align: center;
+        width: 100%;
+    }
+    .serviceIcon {
+        float: none !important;
+        margin: 0 auto 25px;
+    }
+    .serviceImg {
+        width: 290px;
+        margin: 0 auto 30px;
+    }
+    /**************** Poftfolio Area ***************/
+    .portfolioArea.home{
+        overflow: hidden;
+    }
+    .singlePortfolio {
+        position: relative;
+        text-align: center;
+        display: table;
+        width: 290px;
+        margin: 0 auto;
+    }
+    .portfolioImg.folioImgFix_1 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    .portfolioImg.folioImgFix_2 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    .portfolioImg.folioImgFix_3 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    .portfolioImg.folioImgFix_4 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    .portfolioImg.folioImgFix_5 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg.folioImgFix_6 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg.folioImgFix_7 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg.folioImgFix_9 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg.folioImgFix_8 {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        top: 0;
+    }
+    .portfolioImg {
+        margin-bottom: 110px !important;
+    }
+    .viewBtn{
+        top: 0;
+        position: relative;
+        overflow: hidden;
+    }
+    /* prettyPhoto styling for small screens */
+    .pp_pic_holder.pp_default { 
+        width: 100%!important; 
+        left: 0!important; 
+        overflow: hidden; 
+    }
+    div.pp_default .pp_content_container .pp_left {
+        padding-left: 0!important; 
+    }
+    div.pp_default .pp_content_container .pp_right { 
+        padding-right: 0!important; 
+    }
+    .pp_content { 
+        width: 100%!important; 
+        height: auto!important; 
+    }
+    .pp_fade { 
+        width: 100%!important; 
+        height: 100%!important; 
+    }
+    a.pp_expand, a.pp_contract, .pp_hoverContainer, .pp_gallery, .pp_top, .pp_bottom { 
+        display: none!important; 
+    }
+    #pp_full_res img { 
+        width: 100%!important; 
+        height: auto!important; 
+    }
+    .pp_details { 
+        background-color: #fff;
+        height: 42px;
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+        padding: 0;
+        width: 100% !important;
+    }
+    a.pp_close { 
+        right: 10px!important; 
+        top: 9px!important; 
+    }
+    /**************** Skill Area ***************/
+    .skillArea.commonSection{
+        padding-bottom: 48px !important;
+    }
+    .singleFacts {
+        float: none;
+        width: 100%;
+        margin-bottom: 30px;
+    }
+    .singleSkill {
+        margin-bottom: 30px;
+    }
+    /**************** Blog Area ***************/
+    .postThumb.first img {
+        height: auto;
+    }
+    .postThumb.first .postDate {
+        height: 174px;
+    }
+    .postDate {
+        height: 175px;
+    }
+    .postThumb {
+        height: 175px;
+    }
+    .postThumb img{
+        height: 100%;
+    }
+    .postThumb.first{
+        height: inherit;
+    }
+    .postThumb.first + .postContent{
+        margin-bottom: 30px;  
+    }
+    .blogArea:after {
+        left: 9px;
+    }
+    /**************** Subscribe ***************/
+    .subsForm form {
+        width: 100%;
+    }
+    .subsForm form input {
+        width: 100%;
+    }
+    /**************** Footer area ***************/
+    .footerContent a {
+        font-size: 30px;
+    }
+    .footerContent h2 {
+        line-height: 1;
+    }
+    /**************** Homepage two ***************/
+    /* Folio 1 */
+    .folioBtn {
+        margin-bottom: 50px;
+    }
+    .folioBtn li {
+        margin-bottom: 10px;
+    }
+    .folioHover2 a.prePhoto,.folioHover2 a.detailsLink {
+        top: 42%;
+    }
+    /**************** Home Three ***************/
+    /* Folio 3 */
+    .portfolioArea.commonSection.home3 {
+        padding-bottom: 48px !important;
+    }
+    .portfolioDetails.last {
+        margin-bottom: 30px;
+    }
+    /**************** 404 Page ***************/
+    .fourZeroArea:after {
+        left: -3px;
+    }
+    .breadCrumArea {
+        padding: 60px 0;
+    }
+    .breadCrumArea h1 {
+        font-size: 40px;
+    }
+    .breadLink li {
+        font-size: 16px;
+    }
+    .breadLink li span {
+        font-size: 12px;
+        padding: 0 15px;
+    }
+    .fourZeroArea h1 {
+        font-size: 140px;
+    }
+    .fourZeroArea {
+        padding: 115px 0;
+    }
+    .fourZeroArea h2 {
+        padding: 40px 40px 20px;
+    }
+    .fourZeroArea p {
+        width: 70%;
+    }
+    .hasChild:after {
+        display: block;
+    }
+    /**************** About Page ***************/
+    .featuresList {
+        margin-bottom: 40px;
+    }
+    .sinlgeTeam {
+        margin: 0 auto 30px;
+        width: 290px;
+    }
+    #teamCarousel .carousel-indicators li {
+        margin: 1px 5px;
+    }
+    #teamCarousel .carousel-indicators {
+        bottom: -30px;
+    }
+    .teamArea:after {
+        left: 9px;
+    }
+    /**************** Blog Sidebar Page ***************/
+    .blogSidbarPost h2 a {
+        font-size: 35px;
+    }
+    .blogCategory li {
+        margin-bottom: 10px;
+    }
+    .leftImg {
+        width: 100%;
+    }
+    .leftPost {
+        width: 100%;
+    }
+    .leftImg img {
+        height: auto;
+        width: 100%;
+    }
+    .postVideo iframe {
+        height: 290px;
+    }
+    .defaultPagi li {
+        margin-bottom: 10px;
+    }
+    .blogSidebarArea .defaultPagi {
+        margin-bottom: 40px;
+    }
+    .blogSidebarArea.commonSection{
+        padding-bottom: 48px !important;
+    }
+    .widget form input {
+        width: 100%;
+    }
+    /**************** Blog Single Page ***************/
+    .postPage .leftPost {
+        padding: 16px 15px 19px;
+    }
+    .authorDesc {
+        width: 100%;
+        padding: 25px;
+        background: transparent none repeat scroll 0 0;
+    }
+    .commentsSection ol > li {
+        display: block;
+    }
+    .fullComment {
+        float: left;
+        margin-top: 15px;
+        width: 100%;
+        margin-left: 0;
+    }
+    .commentsSection ol > li > ul > li {
+        display: block;
+    }
+    .commentsSection ol > li > ul > li .commenterImg {
+        margin-left: 0;
+    }
+    .commentsSection ol > li > ul > li .fullComment {
+        width: 100%;
+    }
+    .commentsSection ol > li > ul > li > ul > li {
+        display: block;
+    }
+    .commentsSection ol > li > ul > li > ul > li .commenterImg {
+        margin-left: 0;
+    }
+    .commentsSection ol > li > ul > li > ul > li .fullComment {
+        width: 100%;
+    }
+    .commentForm h1 {
+        font-size: 40px;
+        padding-bottom: 30px;
+    }
+    .commentForm form input[type="text"] {
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+    .commentForm form input {
+        width: 100%;
+    }
+    .commentForm form button {
+        margin-bottom: 40px;
+    }
+    /**************** Contact Page ***************/
+    .contactForm form input {
+        width: 100%;
+    }
+    .contactForm form input[type="text"] {
+        margin-bottom: 20px;
+        margin-right: 0;
+    }
+    #map {
+        height: 400px;
+    }
+    /**************** Event Page ***************/
+    .eventThumb {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+    .singleEvents {
+        padding-left: 0;
+        background: transparent none repeat scroll 0 0;
+    }
+    .eventDet {
+        padding: 25px 25px 10px;
+    }
+    .evMeta p {
+        margin-bottom: 15px;
+    }
+    .sidePostCont {
+        width: 67%;
+    }
+    /**************** Event Single Page ***************/
+    .tribe-events-event-meta .column, .tribe-events-event-meta .tribe-events-meta-group {
+        padding: 0;
+        width: 100%;
+    }
+    .single-tribe_events #tribe-events-content .tribe-events-event-meta {
+        padding: 38px 10px;
+    }
+    .tribe-events-event-meta .tribe-events-meta-group.tribe-events-meta-group-organizer {
+        margin-top: 50px;
+        padding-left: 0;
+    }
+    .eventSinglePost {
+        padding: 30px 25px;
+    }
+    /**************** Folio Single Page ***************/
+    div#slider, #slider div.sliderInner div.mcSlc {
+        background-size: cover !important;
+    }
+    #slider, #slider div.sliderInner {
+        height: 290px;
+        width: 290px;
+    }
+    #sliderFrame {
+        width: 100%;
+    }
+    .folioItemContent {
+        padding: 30px;
+    }
+    /**************** Member Page ***************/
+    .memberImg {
+        float: left;
+        width: 100%;
+    }
+    .memberDetails {
+        padding: 30px;
+        width: 100%;
+        border-width: 1px;
+    }
+    .teamDetails {
+        padding: 30px;
+    }
+    .headerFix .topSocial{
+        display: none;
+    }
+    .headerFix .logo{
+        width: 180px;
+    }
+    .headerFix.headerArea{
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    .headerFix .menuButton {
+        margin: 0;
+        padding: 0 4px;
+        position: absolute;
+        right: 20px;
+        top: 25px;
+    }
+    .mainMenu > ul > li:last-child{
+        padding-bottom: 5px;
+    }
+    /* New Home Page */
+    .tabsGroupArea{
+        overflow: hidden;
+    }
+    .singleTabContent {
+        margin-top: 30px;
+        margin-bottom: 0;
+    }
+    .tabNavs {
+        display: block;
+    }
+    .tabNavs li {
+        float: none;
+    }
+    .tabNavs li a {
+        border-right: 0;
+    }
+    .aboutTabImg {
+        height: 280px;
+        width: 290px;
+    }
+    .aboutTabImg > img {
+        left: 0;
+        top: 0;
+    }
+    #testiCarousel .quotation::before {
+        left: -3px;
+    }
+    #testiCarousel .quotation::after {
+        right: -4px;
+    }
+
+    .mainMenu{
+        margin: 0 0 7px;
+    }
+    .headerFix .mainMenu{
+        margin: 0;
+    }
+    .sliderImg img{
+        display: none; 
+    }
+    .redCaption {
+        padding: 12px 20px !important;
+        position: relative;
+        top: -130px;
+        left: 15px;
+    }
+    .headCaption {
+        padding: 0 !important;
+        position: relative;
+        top: -87px;
+        left: 15px;
+    }
+    .capItalic {
+        position: relative;
+        top: -20px; 
+        left: 15px;
+    }
+    .sliderBtn{
+        position: relative;
+        top: 80px;
+        left: 15px;
+    }
+    .sliderBtn {
+        padding:  4px 0 !important;
+    }
+    .sliderBtn i {
+        padding: 27px 0 !important;
+        position: relative;
+        top: -3px;
+    }
+    .serviceContent.pull-left,
+    .serviceIcon.pull-right,
+    .serviceIcon.pull-left,
+    .serviceContent.pull-right{
+        float: none !important;
+    }
+    .tabNavs li{
+        width: 100%;
+    }
+    .sliderArea .tp-caption img{
+        display: none !important;
+    }
+    .singleCaros img {
+        margin: 25px 0;
+    }
+    .footerContent h2 {
+        font-size: 35px;
+    }
+    .footerContent p {
+        font-size: 22px;
+        line-height: 30px;
+    }
+    .postContent h3 a{
+        font-size: 20px;
+    }
+    .blogPostContent {
+        padding: 32px 15px 45px;
+    }
+    .fourZeroArea h2 {
+        line-height: 48px;
+    }
+    .eventDet h4 {
+        line-height: 38px;
+    }
+    #tribe-events-footer.tw_event_footer ul li a {
+        padding: 22px 30px;
+    }
+    span.wpcf7-not-valid-tip {
+        top: -20px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 767px){
+    /**************** Homepage two ***************/
+    /* Folio 1 */
+    .folioImg {
+        margin: 0 auto;
+        width: 450px;
+    }
+    .item .blogCotent{
+        width: 450px;
+        margin: 0 auto 30px;
+    }
+    #blogCarousel .carousel-indicators {
+        bottom: -32px;
+    }
+    /* About Page */
+    .aboutArea.commonSection {
+        margin: 0 auto;
+        width: 450px;
+    }
+    /******* Blog Grid *********/
+    .blogGridArea .blogCotent {
+        margin: 0 auto 30px;
+        width: 450px;
+    }
+    /* Blog Sidebar */
+    .postVideo iframe {
+        height: 390px;
+    }
+    .sidePostCont {
+        width: 80%;
+    }
+    /* Folio Page */
+    .folioImg2 {
+        margin: 0 auto;
+        width: 450px;
+    }
+    .portfolioDetails{
+        margin: 0 auto 30px;
+        width: 450px; 
+    }
+    #slider, #slider div.sliderInner {
+        height: 400px;
+        width: 400px;
+        margin: 0 auto;
+    }
+    .folioItem {
+        margin: 0 auto;
+        width: 500px;
+        background: transparent none repeat scroll 0 0;
+    }
+    .folioItemImg {
+        background: transparent none repeat scroll 0 0;
+    }
+    /**************** Member Page ***************/
+    .memberImg {
+        float: none;
+        width: 450px;
+        margin: 0 auto;
+    }
+    .memberDetails {
+        float: none;
+        margin: 0 auto;
+        padding: 30px;
+        width: 450px;
+    }
+
+
+}
+
+@media (min-width:360px) and (max-width:650px){
+    .redCaption {
+        top: -95px;
+    }
+    .sliderBtn {
+        top: 40px;
+    }
+    .headCaption {
+        top: -70px;
+    }
+    .capItalic {
+        padding-right: 50px !important;
+    }
+}
