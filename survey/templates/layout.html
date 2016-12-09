@@ -1,83 +1,25 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <title>
-        {{ PROJECT_TITLE }}
-    </title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style type="text/css">
+{% load repeatedblocks %}
+<!DOCTYPE html>
+<html class=" js csstransitions" lang="en-US">
+   <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width">
+      <link rel="icon" type="{{ STATIC_URL }}image/png" href="images/favicon.png">
+      <title>{% repeated_block title %}uSurvey – Data Matters{% endblock %}</title>
 
-        body {
-    background-image: url("{{ STATIC_URL }}img/uniceflogo.png");
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-}
-        .alert {
-            padding: 0;
-        }
-
-        .alert ul {
-            height: 10px;
-            size: 8px;
-            padding: 4px;
-        }
-        .row-fluid {
-            display: none;
-        }
-    </style>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/Bread.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" type="text/css" media="screen"
-          charset="utf-8">
-    <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
-	<link href="{{ STATIC_URL }}css/instyle.css" rel="stylesheet" type="text/css" />
-    <!-- link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" / -->
-	<link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />
-    <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css" />
-
-    {% block extra_css %}{% endblock %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/background.cycle.js"></script>
-    <link rel="stylesheet/less" type="text/css" href="{{ STATIC_URL }}css/application.less"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui2.css"/>
-    <script src="{{ STATIC_URL }}js/less.js" type="text/javascript" charset="utf-8"></script>
-    {% if perms.auth.can_view_aggregates %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/mprogress.min.css"/>
-    <script src="{{ STATIC_URL }}js/mprogress.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/reconnecting-websocket.min.js"></script>
-    <script>
-        var myHostname = window.location.hostname;
-        var myPort = window.location.port;
-        var scheme = "ws";
-        if(document.location.protocol === "https:") {
-              scheme += "s";
-          }
-        ws_uri = scheme + "://" + myHostname + ':' + myPort + "{{ WEBSOCKET_URL }}";
-    </script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/statusbar.js"></script>
-    {% endif %}
-    <!-- link rel="stylesheet" href="{{ STATIC_URL }}assets/bootstrap.css" -->
-      <link rel="stylesheet" href="assets/font-awesome.css">
-      <!-- text fonts -->
-      <link rel="stylesheet" href="{{ STATIC_URL }}assets/fonts.css">
       <!-- usur styles -->
       <link rel="stylesheet" href="{{ STATIC_URL }}assets/usur.css">
-    <style>
-           form.search {
+   <style>
+   #search {
 
 }
 
-form.search input[type="text"] {
+#search input[type="text"] {
      -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
     border-radius: 20px;
-	background: url(assets/images/search.png) no-repeat 10px 6px #fcfcfc;
+	background: url({{ STATIC_URL }}assets/images/search.png) no-repeat 10px 6px #fcfcfc;
     border: 1px solid #d1d1d1;
     font: bold 12px Arial,Helvetica,Sans-serif;
     color: #bebebe;
@@ -97,238 +39,262 @@ form.search input[type="text"] {
 
     }
 
-form.search input[type="text"]:focus {
+#search input[type="text"]:focus {
     width: 200px;
     }
-    </style>
-</head>
-<body>
-<div id="loader-wrapper">
-			<div id="loader"></div>
+   div.table-header a {
+       color: #0f0;
+       }
+   </style>
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/bootstrap.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/animate.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/preset.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/responsive.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/fonts.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/color8.css" type="text/css" media="all">
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all">
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_005.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery.js"></script>
+      <style>
+         .headerArea {
+         background: #0099ff;
+		 border-bottom:13px solid #0073bf;
+         }
+      </style>
+       {% block extra_head %}
 
-			<div class="loader-section section-left"></div>
-            <div class="loader-section section-right"></div>
+       {% endblock %}
 
-		</div>
-		<div id="contentx">
-<header class="tbanner">
-    <div class="navbar navbar-fixed-top">
-        <div>
-            <div class="container">
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse" id="fold-menu">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-{% if user.is_authenticated %}
-{% else %}
-<a class="logopad" href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}img/uSurvey.png" /></a>
-{% endif%} 
-
-
-<div class="nav-collapse collapse">
-                    <ul class="nav">
-                        {% if perms.auth.can_view_interviewers %}
-                        <li>
-                            <a id="about" class="dropdown-toggle" role="button" href="{% url 'main_page' %}">Home</a>
-                        </li>
-                        <li>
-                            <a id="about" class="dropdown-toggle" role="button" href="{% url 'about_page' %}">About</a>
-                        </li>
-
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-survey-admin-tab" class="dropdown-toggle"
-                                   role="button" href="#">Survey Administration<b class="caret"></b></a>
-                                <ul aria-labelledby="drop-survey-admin-tab" role="menu" class="dropdown-menu">
-                                    <li role="presentation"><a href="{% url 'interviewers_page' %}">Interviewers</a>
-                                    </li>
-                                    {% if perms.auth.can_enter_data %}
-                                    <li role="presentation"><a href="{% url 'listing_template_home' %}">Listing Form</a>
-                                    </li>
-                                    {% endif %}
-
-                                    {% if perms.auth.can_view_batches %}
-                                        <li role="presentation"><a href="{% url 'show_question_library' %}">Question
-                                            Bank</a></li>
-                                        <li role="presentation"><a href="{% url 'survey_list_page' %}">Surveys</a></li>
-                                        <li role="presentation"><a href="{% url 'question_module_listing_page' %}">Modules</a>
-                                        </li>
-                                        <!-- li role="presentation"><a href="{% url 'household_member_groups_page' %}">Groups</a -->
-                                        </li>
-                                        <li role="presentation"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
-
-                                        <!--  li role="presentation"><a href="{% url 'upload_ea' %}">Upload EAs</a></li -->
-                                        <li role="presentation"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
-                                    {% endif %}
-
-                                    {% if perms.auth.can_enter_data %}
-                                    <li role="presentation"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
-                                    {% endif %}
-                                </ul>
-                            </li>
+   </head>
+   <body class="home page page-id-146 page-template page-template-page_templates page-template-home bgOne ">
+      <!--================= Site Preloader ==================-->
+      <div class="loaderWrap" style="display: none;">
+         <div class="loader-inner sk-folding-cube">
+            <div class="sk-cube1 sk-cube"></div>
+            <div class="sk-cube2 sk-cube"></div>
+            <div class="sk-cube4 sk-cube"></div>
+            <div class="sk-cube3 sk-cube"></div>
+         </div>
+      </div>
+      <!--================= Site Preloader ==================-->
+      <!--================= Box Div Start ==================-->
+      <div class="boxWrapper">
+         <!--================= Box Div Start ==================-->
+         <!-- Header Area -->
+         <header class="headerArea">
+            <div class="logo pull-left">
+               <div class="logoImg">
+                  <a href="#"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
+               </div>
+            </div>
+            <nav class="mainMenu pull-left">
+               <div class="menuButton hidden-lg hidden-md">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+               </div>
+                {% if perms.auth.can_view_interviewers %}
+                <ul id="menu-main-menu" class="iz_main_menu"><li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'main_page' %}">Home</a>
+                   </li>
+                   <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="{% url 'about_page' %}">About</a></li>
+                   <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Survey Administration</a>
+                   <ul class="sub-menu">
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-218"><a href="{% url 'interviewers_page' %}">Interviewers</a></li>
+                        {% if perms.auth.can_enter_data %}
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'listing_template_home' %}">Listing Form</a></li>
                         {% endif %}
-
-                        {% if perms.auth.can_view_aggregates %}
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-downloads-tab" class="dropdown-toggle" role="button"
-                                   href="#">Downloads<b class="caret"></b></a>
-                                <ul aria-labelledby="drop-downloads-tab" role="menu" class="dropdown-menu">
-                                    <li role="presentation"><a href="{% url 'download_excel' %}">Download
-                                        Data Sheet</a></li>
-                                    <li role="presentation"><a href="{% url 'interviewer_report_page' %}">Mobile Money
-                                        Sheet</a></li>
-                                </ul>
-                            </li>
+                        {% if perms.auth.can_view_batches %}
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item menu-item-home menu-item-404"><a href="{% url 'show_question_library' %}">Question
+                                                Bank</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="{% url 'survey_list_page' %}">Surveys</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-407"><a href="{% url 'question_module_listing_page' %}">Modules</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-406"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
                         {% endif %}
-
-                        {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-analysis-tab" class="dropdown-toggle" role="button"
-                                   href="#">Analysis<b class="caret"></b></a>
-                                <ul aria-labelledby="drop-analysis-tab" role="menu" class="dropdown-menu">
-                                   <li role="presentation"><a href="{% url 'odk_submission_list' %}">View ODK submissions</a></li>
-                                    <li role="presentation"><a href="{% url 'list_indicator_page' %}">Indicators</a>
-                                    </li>
-                                    <li role="presentation"><a href="{% url 'survey_completion_rates' %}">Completion
-                                        Rates</a></li>
- {% if perms.auth.view_completed_survey %}
-                                    <li role="presentation"><a href="{% url 'show_interviewer_completion_summary' %}">Interviewer Completion
-                                        Summary</a></li>
- {% endif %}
-                                    <li role="presentation"><a href="{% url 'list_weights_page' %}">Location Weights</a>
-                                    </li>
-                                </ul>
-                            </li>
+                        {% if perms.auth.can_enter_data %}
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
                         {% endif %}
-
-                        {% if perms.auth.can_view_users %}
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-settings-tab" class="dropdown-toggle" role="button"
-                                   href="#">Settings<b class="caret"></b></a>
-                                <ul aria-labelledby="drop-settings-tab" role="menu" class="dropdown-menu">
-                                    <li role="presentation"><a href="{% url 'users_index' %}">Users</a></li>
-                                {% comment "Left to set up script" %}
-                                    <li role="presentation"><a href="{% url  'upload_locations' %}">Upload Locations CSV</a></li>
-                                {% endcomment %}
-                                </ul>
-                            </li>
-                        {% endif %}
-                    </ul>
-
-                    <!-- login/profile link on the right side -->
-
-                    {% if user.is_authenticated %}
-                        <ul role="navigation" class="nav pull-right">
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" id="drop-user-settings" class="dropdown-toggle2" role="button"
-                                   href="#">{{ user.get_full_name }} <b class="caret"></b></a>
-                                <ul aria-labelledby="drop-user-settings" role="menu" class="dropdown-menu">
-                                    {% if user.is_superuser == False %}
-                                    <li role="presentation"><a href="{% url 'users_edit' user.id %}" id="edit_user"><i
-                                            class="icon-pencil"></i> Edit Profile</a></li>
-                                    {% endif %}
-                                    <li role="presentation"><a href="{% url 'password_change' %}"><i
-                                            class="icon-pencil"></i> Change Password</a></li>
-                                    <li role="presentation"><a href="{% url 'logout_page' %}"><i class="icon-off"></i>
-                                        Logout</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    {% else %}
-                        <ul role="navigation" class="nav pull-right">
-                            <li>
-                                <a class="dropdown-toggle" role="button" href="{% url 'login_page' %}">LOGIN</a>
-                            </li>
-                        </ul>
+                   </ul>
+                   </li>
+                   {% endif %}
+                    {% if perms.auth.can_view_aggregates %}
+                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="#">Downloads</a>
+                       <ul class="sub-menu">
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'download_excel' %}">Download
+                                            Data Sheet</a>
+                          </li>
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'interviewer_report_page' %}">Mobile Money
+                                            Sheet</a>
+                          </li>
+                       </ul>
+                   </li>
                     {% endif %}
-                </div>
-                <!--/.nav-collapse -->
-            </div>
-        </div>
-    </div>
-</header>
-<div class="breadnavbar">
-    <div class="container">
-<a href="{% url 'main_page' %}" style="background: 000;">Home</a> &raquo;
-{% for breadcrumb in request.breadcrumbs %} 
-<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
-{% endfor %}
-<span class="breadnavbarblue">{% block title %}{% endblock %}</span>
-<div id="status-bar" class="status-bar right">
-    <span id="status-msg">...</span>
-</div>
-</div>
-</div>
-<br />
-<div id="content" class="container">
-    <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    <ul>
-                        {{ message }}
+                   {% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="#">Analysis</a>
+
+                          <ul class="sub-menu">
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'odk_submission_list' %}">View ODK submissions</a></li>
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'list_indicator_page' %}">Indicators</a></li>
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'survey_completion_rates' %}">Completion
+                                        Rates</a></li>
+                           {% if perms.auth.view_completed_survey %}
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'show_interviewer_completion_summary' %}">Interviewer Completion
+                                        Summary</a></li>
+                            {% endif %}
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'list_weights_page' %}">Location Weights</a></li>
+                           </ul>
+                      </li>
+                   {% endif %}
+
+                         <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-251">
+                             {% if user.is_authenticated %}
+                                 <a href="#">{% if user.get_full_name %}{{ user.get_full_name }} {% else %} Account {% endif %}</a>
+                                <ul class="sub-menu">
+                                {% if user.is_superuser == True %}
+                                   <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'users_index' %}">Users</a>
+                                  </li>
+                                 {% else %}
+                                   <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'users_edit' user.id %}">Edit Profile</a>
+                                  </li>
+                                 {% endif %}
+                                   <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'password_change' %}">Change Password</a>
+                                  </li>
+                                   <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'logout_page' %}">Logout</a>
+                                  </li>
+                               </ul>
+                             {% else %}
+                             <a href="{% url 'login_page' %}">Login</a>
+                             {% endif %}
+                       </li>
                     </ul>
-                </div>
-            {% endfor %}
-        {% endif %}
-        {% block page_actions %}
-
-        {% endblock %}
-        {% block content %}
-        {% endblock %}
-    </div>
-<div id="push"></div>
-</div>
-<br class="clear" />
-<br class="clear" />
-<div class="footer">&copy; UNICEF &amp; UBOS 2013 - <script language="JavaScript" type="text/javascript">
-
-var now = new Date();
-
-var dayNames = new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
-
-var monNames = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
-
-document.write(" "+ now.getFullYear());
-
-      </script></div>
-         
-<script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/highcharts.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/exporting.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
-<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/underscore.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/question_options.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/chosen/chosen.jquery.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/application.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/location-widget.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/numerical-bar-chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/multichoice-bar-chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/multichoice-stacked-bar-chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/simple_indicator_bar_chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}/js/jquery-ui.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/household_member_group.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/jquery.formset.js" type="text/javascript" charset="utf-8"></script>
-{% block javascripts %}
-{% endblock %}
-<script type="text/javascript">
-     $('.datepicker').datepicker({
-     changeMonth: true,
-     changeYear: true,
-     dateFormat: 'dd-mm-yy',
-     yearRange: "-120:+nn"
-     });
-</script>
-
+                </nav>
+            <div>
             </div>
+            <div class="clearfix"></div>
+         </header>
+         <div class="fw-page-builder-content">
+            <div class="container-fluid">
+               <div class="fw-row">
+                  <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;">
+                  </div>
+              <div class="row" style="color:#09F; z-index:1; text-align:center; margin:5px;">
+                  <h3 style="color:#09F;">{% block page_title %}{% repeat title %}{% endblock %}</h3></div>
+                  <div class="tp-fullwidth-forcer" style="width: 100%; height: 600px;">
+                  <div class="main-container">
+         <div class="">
+            <div class="main-content-inner">
+               <div class="page-content">
+                  <div class="usur-settings-container">
+                     <div class="usur-settings-box clearfix">
+                       </div>
+                     <!-- /.usur-settings-box -->
+                  </div>
+                  <!-- /.usur-settings-container -->
+                  <!-- /.page-header -->
+                  <div class="row">
+                     <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <!-- /.row -->
+                        <div class="row">
+                           <div class="col-xs-12">
+                              <div class="clearfix">
+                                 <div class="pull-right tableTools-container"></div>
+                              </div>
+                              <div class="table-header">
+                                 <a href="{% url 'main_page' %}">Home</a> &raquo;
+                                {% for breadcrumb in request.breadcrumbs %}
+                                <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
+                                {% endfor %}
+                              </div>
+                              <!-- div.table-responsive -->
+                              <!-- div.dataTables_borderWrap -->
+                              <div>
+                                 <div id="dynamic-table_wrapper" class="dataTables_wrapper form-inline no-footer">
+                                    <div class="row">
+                                       <div class="col-xs-6">
+                                          <div class="dataTables_length" id="dynamic-table_length">
+                                             {% block search %}
+                                             {% endblock %}
+                                          </div>
+                                       </div>
+                                       <div class="col-xs-6">
+                                          <div class="dataTables_filter">
+                                            {% block page_actions %}
 
-	<script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-	<script src="{{ STATIC_URL }}js/main.js"></script>
-</body>
+                                             {% endblock %}
+                                          </div>
+                                       </div>
+                                    </div>
+                                    {% block content %}
+
+                                    {% endblock %}
+
+                              </div>
+                           </div>
+                        </div>
+                        <!-- PAGE CONTENT ENDS -->
+                     </div>
+                     <!-- /.col -->
+                  </div>
+                  <!-- /.row -->
+               </div>
+               <!-- /.page-content -->
+            </div>
+         </div>
+         <!-- /.main-content -->
+         <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+         <i class="usur-icon fa fa-angle-double-up icon-only bigger-110"></i>
+         </a>
+      </div></div>
+               </div>
+               <!-- END REVOLUTION SLIDER -->
+            </div>
+         </div>
+      </div>
+      <div class="secTriangle" style="background-image: url({{ STATIC_URL }}images/slider3.png); background-reapet: no-reapet; background-position: center center; "></div>
+      </section>
+
+      </div>
+      <footer class="footerArea">
+         <section class="copyRight">
+            <div class="container">
+               <div class="row">
+                  <div class="col-lg-12 col-sm-12 col-xs-12 text-center">
+                     <span><img src="{{ STATIC_URL }}images/bottomfooterlogo.jpg" width="219" height="80"></span>
+                     <p style="padding-bottom:10px;">Copyright © 2016 <a href="#">UNICEF</a><span> and UBOS</span> </p>
+                  </div>
+                  <div class="topSocial pull-right">
+                     <ul>
+                        <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
+                        <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
+                        <li><a class="google" href="#"><i class="fa fa-linkedin"></i></a></li>
+                     </ul>
+                  </div>
+               </div>
+            </div>
+            </div>
+         </section>
+      </footer>
+      <!--================= Box Div Start ==================-->
+      </div>
+      <!--================= Box Div Start ==================-->
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/bootstrap.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
+          <!-- /.main-container -->
+      <!-- basic scripts -->
+
+      <script src="{{ STATIC_URL }}assets/jquery-2.js"></script>
+      {% block javascripts %}
+
+      {% endblock %}
+      <script type="text/javascript">
+         if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
+      </script>
+
+   </body>
 </html>

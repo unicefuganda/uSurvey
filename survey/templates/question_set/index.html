@@ -2,36 +2,42 @@
 {% block title %}
   {{ model.verbose_name }}
 {% endblock %}
+{% block page_title %}Listing{% endblock %}
+{% block search %}
+{% include "search_form.html" %}
+{% endblock %}
+{% block page_actions %}
+    <button class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												<a href="#new_question_set" data-toggle="modal"  class="btn btn_primary pull-right padded-bottom" id="add_question_set">Create New {{ model.verbose_name }}</a>
+											</button>
+
+{% endblock %}
 {% block content %}
 {% load pagination_tags %}
 {% autopaginate question_sets 50 %}
 {% load template_tags %}
-<div class="row">
-<div id="" class="dataTables_filter"><button class="btn btn-white btn-warning btn-bold">
-												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-<a href="#new_question_set" data-toggle="modal"  class="btn btn_primary pull-right padded-bottom" id="add_question_set">Create New {{ model.verbose_name }}</a>
-											</button></div>
-{% include "search_form.html" %}
+
 </div>
  <br />
-  <table class="table table-striped table-bordered table-hover table-sort">
+  <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
     <thead>
       <tr>
-        <th>
+        <th class="sorting">
           Name
         </th>
-        <th class="span6">
+        <th class="sorting">
           Description
         </th>
         {% if model.verbose_name == 'Listing Form' %}
-        <th>
+        <th class="sorting">
           No. Of Surveys
         </th>
-        <th>
+        <th class="sorting">
           Total Interviews
         </th>
         {% endif %}
-        <th  style="background-image: None;">
+        <th>
           Actions
         </th>
       </tr>
@@ -54,25 +60,30 @@
           </td>
           {% endif %}
           <td>
-            <div class="btn-group">
-                <a class="btn btn-small" href='{% url "edit_"|add:model.resolve_tag|add:"_page" question_set.id %}'><i class="icon-pencil"></i> Edit</a>
-                {% if not question_set.interviews.exists %}
-                <a class="btn btn-small " data-toggle="modal" href="#delete_questionset_{{question_set.id}}"><i class="icon-trash"></i> Delete</a>
-                {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_qset" %}
-                {% endif %}
-                <a class="add_batch btn btn-small" href="{% url 'qset_questions_page' question_set.pk %}">View/Edit Questions</a>
-                {% if question_set.interviews.count %}
-                <a class="add_batch btn btn-small" href="{% url 'set_questions_index_page' question_set.pk %}">View Data</a>
-                {% endif %}
-                {% if question_set.verbose_name = 'Batch' and question_set.flow_questions %}
-                    <a class="btn btn-small" href="{% url 'batch_show_page' question_set.survey.id question_set.pk %}"><i class="icon-lock"></i> Open/Close</a>
-                {% endif %}
-                {% comment %}
-                {% if question_set.verbose_name == 'Listing Form' %}
-                    <a class="add_batch btn btn-small" href="{% url 'sampling_criteria' question_set.pk %}">Sampling Criteria</a>
-                {% endif %}
-                {% endcomment %}
-
+            <div class="">
+                <div class="inline pos-rel">
+                       <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                       </button>
+                        <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                            <li>
+                                <a href='{% url "edit_"|add:model.resolve_tag|add:"_page" question_set.id %}' class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                            </li>
+                            {% if not question_set.interviews.exists %}
+                            <li><a href="#delete_questionset_{{question_set.id}}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                            {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_qset" %}
+                            {% endif %}
+                            <li>
+                                <a href="{% url 'qset_questions_page' question_set.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-question-circle bigger-120"></i>View/Edit Questions</span></a>
+                            </li>
+                            {% if question_set.interviews.count %}
+                            <li><a href="{% url 'set_questions_index_page' question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-table bigger-120"></i>View Data</span></a></li>
+                            {% endif %}
+                            {% if question_set.verbose_name = 'Batch' and question_set.flow_questions %}
+                            <li><a href="{% url 'batch_show_page' question_set.survey.id question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa-folder-open-o/fa fa-times-circle bigger-120"></i>Open/Close</span></a></li>
+                            {% endif %}
+                        </ul>
+                </div>
             </div>
           </td>
         </tr>

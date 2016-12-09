@@ -3,50 +3,46 @@
 {% block title %}
   Interviewers List
 {% endblock %}
+
+{% block search %}
+{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
+<br />
+{% include "search_form.html" %}
+{% endblock %}
+{% block page_actions %}
+    <button class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												<a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-plus"></i> Add Interviewer</a>
+											</button>
+    <button id="export_question" class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												<a href="{% url 'download_interviewers' %}" class="btn btn_primary pull-right" id="download_interviewers"><i class="icon-plus"></i>Export Interviewers</a>
+											</button>
+
+
+{% endblock %}
 {% block content %}
 {% load pagination_tags %}
 {% autopaginate interviewers 50 %}
-    {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
 <br>
-<div>
-	<form accept-charset="utf-8" action="{% url 'download_interviewers' %}" method="get" id="download_interviewers" class="pull-right">
-                {% csrf_token %}
-                <button class="btn btn_primary" id="export_question">Export Interviewers</button>
-            </form>
-    <a href="{% url 'new_interviewer_page' %}" class="btn btn_primary pull-right" id="add-interviewer"><i class="icon-plus"></i> Add Interviewer</a>
-    {% include "search_form.html" %}
-</div>
-  <br />
 
-    <table class="table table-striped table-bordered table-hover table-sort">
-      <thead>
-        <tr>
-          <th>
-            Name
-          </th>
-          <th>
-            Mobile Numbers
-          </th>
-          <th>
-            ODK ID
-          </th>
-        {% for loc_type in location_filter_types %}
-           <th>
-            {{ loc_type.name }}
-          </th>
-        {% endfor %}
-	 <th>
-          Enumeration Area
-	</th>
-     <th>
-          Allocated Surveys
-	</th>
-     <th style="background-image: None;">
-            Actions
-      </th>
-        </tr>
-      </thead>
-      <tbody>
+<table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
+    <thead>
+        <tr role="row">
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Name</th>
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending">Mobile Numbers</th>
+            <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">ODK ID</th>
+            {% for loc_type in location_filter_types %}
+                <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">
+                    {{ loc_type.name }}
+                </th>
+            {% endfor %}
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Enumeration Area</th>
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Allocated Surveys</th>
+            <th class="hidden-466" tabindex="0" aria-controls="" rowspan="1" colspan="1" aria-label="">Actions</th>
+         </tr>
+    </thead>
+    <tbody>
         {% for interviewer in interviewers %}
           <tr>
             <td>

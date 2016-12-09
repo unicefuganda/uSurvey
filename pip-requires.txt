@@ -33,3 +33,4 @@ phonenumbers
 channels
 asgi_redis
 django-cacheops
+django-macros

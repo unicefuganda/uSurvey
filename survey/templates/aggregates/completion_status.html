@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
 {% block extra_css %}
-
 <style type="text/css">
 	.button {
 		margin-top: -15px;
@@ -17,12 +16,13 @@
 {% block title %}
     Completion Rates
 {% endblock %}
+{% block page_title %} Select Batch and Location to view report{% endblock %}
+{% block search %}
+{% include "aggregates/completion_status_form.html" with a_form=locations_filter filter_button_name='Refresh Status' survey_form=filter filter_id='aggregates-form' method='post' no_button=True %}
+{% endblock %}
+
 {% block content %}
    {% load pagination_tags %}
-  <h4>
-    Select Batch and Location to view report
-  </h4>
-{% include "aggregates/completion_status_form.html" with a_form=locations_filter filter_button_name='Refresh Status' survey_form=filter filter_id='aggregates-form' method='post' no_button=True %}
 
   {% if completion_rates %}
     {% autopaginate completion_rates.attributes 50 %}

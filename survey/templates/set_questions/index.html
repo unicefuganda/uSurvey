@@ -10,27 +10,31 @@
 {% block title %}
     {{ batch.name.capitalize }} Questions
 {% endblock %}
+{% block search %}
+ {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
+<br />
+{% include "search_form.html" %}
+{% endblock %}
+{% block page_actions %}
 
+        <button class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												<a href="{% url 'export_questions_in_qset' batch.id %}" class="btn btn_primary pull-right padded-bottom">Export Questions</a>
+											</button>
+{% if batch.interviews.count == 0 %}
+    <button class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												<a href="{% url 'new_qset_question_page' batch.id %}" data-toggle="modal"  class="btn btn_primary pull-right padded-bottom">Add Question</a>
+											</button>
+    <button class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												<a href="{% url 'qset_assign_questions_page' batch.id %}" data-toggle="modal"  class="btn btn_primary pull-right padded-bottom">Select Question</a>
+											</button>
+{% endif %}
+{% endblock %}
 {% block content %}
     {% load template_tags %}
 
-    {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
-
-    <div>
-        <input type="hidden" value="{{ batch.id }}" id="batch_id">
-        {% include "search_form.html" %}
-        <div class="question-button pull-right">
-            <form accept-charset="utf-8" action="{% url 'export_questions_in_qset' batch.id %}" method="post" id="export_questions_form">
-                {% csrf_token %}
-                <button class="btn btn_primary" id="export_question">Export Questions</button>
-            </form>
-            {% if batch.interviews.count == 0 %}
-                <a href="{% url 'new_qset_question_page' batch.id %}" class="btn btn_primary" id="add_question">Add Question</a>
-                <a href="{% url 'qset_assign_questions_page' batch.id %}" class="btn btn_primary" id="select_question">Select Question</a>
-            {% endif %}
-        </div>
-
-    </div>
     {% if batch %}
         <form method="post" accept-charset="utf-8" action="{% url 'qset_update_question_order_page' batch.id %}">
         {% csrf_token %}
@@ -57,7 +61,7 @@
     {% for question in questions %}
         <tr>
             <td>
-                {% if question.loop_started %}<span style="color: green;">&raquo;</span>{% endif %}{% if question.loop_ended %}<span style="color: red;">&laquo;</span>{% endif %}{{ question.identifier }}
+                {% if question.loop_started %}<i class="usur-icon fa fa-object-ungroup bigger-120"></i>{% endif %}{% if question.loop_ended %}<i class="fa fa-times-circle"></i> {% endif %}{{ question.identifier }}
             </td>
             <td class="span8">
                 {% if question.conditional_flows %}
@@ -102,27 +106,39 @@
                 {{ question.answer_type.upper }}
             </td>
             <td>
-                <div class="btn-group">
-                    {% if  batch and batch.interviews.count == 0 %}
-                        <a class="btn btn-small" href="{% url 'qset_edit_question_page' question.pk %}" id="edit_question"><i
-                                class="icon-pencil"></i> Edit</a>
-                        <a href="{% url 'insert_qset_question_page' question.pk %}" class="btn btn-small"><i
-                                class="icon-plus"></i>Insert Question</a>
-                        <a href="{% url 'loop_qset_question_page' question.pk %}" class="btn btn-small"><i
-                                class="icon-plus"></i>Manage Loop</a>
-                        <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="btn btn-small"><i
-                                class="icon-plus"></i> Add Logic</a>
-                        <a class="btn btn-small" href="#remove_question_{{ question.pk }}" data-toggle="modal"
-                           id="remove_question"><i class="icon-trash"></i> Remove</a>
-                    {% endif %}
-                    {% if question.options.all %}
-                        <a class="btn btn-small" href="#view_options_{{ question.id }}" data-toggle="modal"><i
-                                class="icon-list"></i>View options{% if question.conditional_flows %}/Logic{% endif %}</a>
-                    {% elif question.conditional_flows %}
-                        <a class="btn btn-small" href="#view_logic_{{ question.id }}" data-toggle="modal"><i
-                                class="icon-list"></i>View Logic</a>
-                    {% endif %}
+             <div class="">
+                <div class="inline pos-rel">
+                       <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                       </button>
+                        <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                             {% if  batch and batch.interviews.count == 0 %}
+                            <li>
+                                <a href="{% url 'qset_edit_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                            </li>
+                            <li>
+                                <a href="{% url 'insert_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Insert Question</span></a>
+                            </li>
+                            <li>
+                                <a href="{% url 'loop_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-plus-square bigger-120"></i>Start Loop</span></a>
+                            </li>
+                            <li>
+                                <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-code bigger-120"></i>Add Logic</span></a>
+                            </li>
+                            <li><a href="#remove_question_{{ question.pk }}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-language bigger-120"></i>Delete</span></a></li>
+                            {% include "base/delete_modal.html" with object_name=question.name id=question.id name=question.verbose_name url=question.id|get_url_with_ids:"delete_question" %}
+                            {% endif %}
+                            {% if question.options.all %}
+                            <li>
+                                <a href="#view_options_{{ question.id }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-question-circle bigger-120"></i>View options{% if question.conditional_flows %}/Logic{% endif %}</span></a>
+                            </li>
+                            {% elif question.conditional_flows %}
+                            <li><a href="#view_logic_{{ question.id }}" data-toggle="modal" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-question-circle bigger-120"></i>View Logic</span></a></li>
+                            {% endif %}
+                        </ul>
                 </div>
+            </div>
+
 
                 {% if question.options.all %}
                     <div class="modal fade hide" id="view_options_{{ question.id }}" tabindex="-1" role="dialog"

@@ -1,6 +1,169 @@
 {% extends "layout.html" %}
-{% block extra_css %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.css" />
+{% block extra_head %}
+    <!-- link rel="stylesheet" href="{{ STATIC_URL }}leaflet/leaflet.css" / -->
+    <style>
+        #container {
+            height: 500px;
+            min-width: 310px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .loading {
+            margin-top: 10em;
+            text-align: center;
+            color: gray;
+        }
+
+		body {
+			font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+			font-size:12px;
+
+		}
+
+		select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+    border-radius: 4px;
+    color: #555555;
+    display: inline-block;
+    font-size: 14px;
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: 10px;
+    padding: 4px 6px;
+    vertical-align: middle;
+}
+input, textarea, .uneditable-input {
+    width: 206px;
+}
+textarea {
+    height: auto;
+}
+.leaflet-left .leaflet-control {
+    margin-left: 10px;
+}
+.leaflet-top .leaflet-control {
+    margin-top: 10px;
+}
+select, input[type="file"] {
+    height: 30px;
+    line-height: 30px;
+}
+.leaflet-popup-pane, .leaflet-control {
+    cursor: auto;
+}
+.leaflet-control {
+    clear: both;
+    float: left;
+}
+select {
+    background-color: #ffffff;
+    border: 1px solid #0099ff;
+    width: 220px;
+}
+select, input[type="file"] {
+    height: 30px;
+    line-height: 30px;
+}
+   /*
+   .leaflet-bottom .leaflet-control {
+    margin-bottom: 276px;
+    margin-right: 191px;
+}*/
+   .leaflet-bottom {
+    bottom: 0;
+}
+.leaflet-right {
+    right: 0;
+}
+.leaflet-top, .leaflet-bottom {
+    pointer-events: none;
+    position: absolute;
+    z-index: 1000;
+}
+.leaflet-container {
+    font: 12px/1.5 "Helvetica Neue",Arial,Helvetica,sans-serif;
+}
+.leaflet-container {
+    cursor: grab;
+}
+
+
+.leaflet-right .leaflet-control {
+    margin-right: 10px;
+}
+.leaflet-bottom .leaflet-control {
+background: #e3e3e3 none repeat scroll 0 0;
+    border: 1px solid #0099ff;
+    color: #000;
+    font-family: trebuchet ms;
+    font-size: 12px;
+    margin-bottom: 105px;
+    margin-right: 125px;
+}
+
+}
+.leaflet-right .leaflet-control {
+    float: right;
+}
+.leaflet-control2 {
+    float: right;
+}
+.info {
+    background: rgba(255, 255, 255, 0.8) none repeat scroll 0 0;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font: 16px Arial,Helvetica,sans-serif;
+    height: 150px;
+    padding: 10px;
+    width:138px;
+}
+.legend {
+    color: #555;
+    line-height: 18px;
+}
+.leaflet-popup-pane, .leaflet-control {
+    cursor: auto;
+}
+.leaflet-control {
+   /* clear: both;
+    float: left;*/
+	margin-left:256px;
+	margin-top:50px;
+}
+.leaflet-control {
+    pointer-events: auto;
+    position: relative;
+    z-index: 7;
+}
+
+.info h1 {
+    color: #777;
+    font: 20px Arial,Helvetica,sans-serif !important;
+    margin: 0 0 5px;
+}
+h1 {
+    font-size: 38.5px;
+}
+h1, h2, h3 {
+    line-height: 40px;
+}
+h1, h2, h3, h4, h5, h6 {
+    color: inherit;
+    font-family: inherit;
+    font-weight: bold;
+    line-height: 20px;
+    margin: 10px 0;
+    text-rendering: optimizelegibility;
+}
+.legend i {
+    float: left;
+    height: 18px;
+    line-height: 1.5em;
+    margin-right: 8px;
+    opacity: 0.7;
+    width: 15px;
+}
+    </style>
 {% endblock %}
 {% block title %}
   Survey Map

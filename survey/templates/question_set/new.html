@@ -1,9 +1,18 @@
 {% extends "form.html"%}
 
+{% block search %}
+
+{% endblock %}
+{% block page_actions %}
+{% endblock %}
+
 {% block title %}
   {% if question_set_form.instance.pk %}  {{ question_set_form.instance.name }} {% else %} {{ model.verbose_name }} {% endif %}
 {% endblock %}
 
+{% block page_title %}
+  {% if question_set_form.instance.pk %}  Edit {{ question_set_form.instance.name }} {% else %} New {{ model.verbose_name }} {% endif %}
+{% endblock %}
 {% block display_form_fields %}
 	{% include "naked_form.html" with a_form=question_set_form %}
 {% endblock %}

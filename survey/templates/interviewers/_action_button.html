@@ -1,12 +1,20 @@
 {% load template_tags %}
-<div class="btn-group">
-  <a href="{% url 'edit_interviewer_page'  interviewer.id %}" class="btn btn-small" ><i class="icon-pencil"></i> Edit</a>
-  {% if interviewer.has_access %}
-    <a href="#block_interviewer_{{interviewer.id}}" class="btn btn-small" data-toggle="modal" id="block_interviewer"><i class="icon-lock"></i> Block</a>
-  {% else %}
-    <a href="#unblock_interviewer_{{interviewer.id}}" class="btn btn-small" data-toggle="modal" id="unblock_interviewer"><i class="icon-lock"></i> Unblock</a>
-  {% endif %}
+<div class="">
+    <div class="inline pos-rel">
+           <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+               <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+           </button>
+            <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                <li>
+                    <a href="{% url 'edit_interviewer_page'  interviewer.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                </li>
+                {% if interviewer.has_access %}
+                <li><a href="#unblock_interviewer_{{interviewer.id}}" id="unblock_interviewer" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-language bigger-120"></i>UnBlock</span></a></li>
+                {% else %}
+                <li><a href="#block_interviewer_{{interviewer.id}}" id="block_interviewer" data-toggle="modal" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-exclamation-triangle bigger-120"></i>Block</span></a></li>
+                {% endif %}
+            </ul>
+    </div>
 </div>
-
     {% include "base/block_modal.html" with object_name=interviewer.name id=interviewer.id name="Interviewer" url=interviewer.id|get_url_with_ids:"block_interviewer_page" %}
     {% include "base/unblock_modal.html" with object_name=interviewer.name id=interviewer.id name="Interviewer" url=interviewer.id|get_url_with_ids:"unblock_interviewer_page" %}

@@ -1,7 +1,16 @@
 {% extends 'layout.html' %}
 {% block title %} Simple Indicator {% endblock %}
-{% block content %}
+{% block page_title %}Simple Indicator{% endblock %}
+{% block search %}
 {% include "horizontal_filter_form.html" with a_form=locations_filter filter_button_name='Show results' filter_id='location_filter' method='post' %}
+<br />
+{% include "search_form.html" %}
+{% endblock %}
+{% block page_actions %}
+
+{% endblock %}
+{% block content %}
+
 
 <br>
 
@@ -19,7 +28,7 @@
       window.simple_indicator_bar_chart['length'] = window.simple_indicator_bar_chart['series'][0]['data'].length
   </script>
 
-  <table class="table table-striped table-bordered table-hover">
+  <table class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
     <thead>
       <tr>
         {% for header in tabulated_data.0.keys %}
