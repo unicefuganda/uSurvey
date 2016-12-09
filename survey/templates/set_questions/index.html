@@ -125,8 +125,8 @@
                             <li>
                                 <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-code bigger-120"></i>Add Logic</span></a>
                             </li>
-                            <li><a href="#remove_question_{{ question.pk }}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-language bigger-120"></i>Delete</span></a></li>
-                            {% include "base/delete_modal.html" with object_name=question.name id=question.id name=question.verbose_name url=question.id|get_url_with_ids:"delete_question" %}
+                            <li><a href="#remove_question_{{ question.pk }}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                            {% include "base/delete_modal.html" with object_name=question.name id=question.id name=question.verbose_name url=question.id|get_url_with_ids:"delete_qset_question_logic_page" %}
                             {% endif %}
                             {% if question.options.all %}
                             <li>
