@@ -6,24 +6,23 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
-from survey.models.householdgroups import HouseholdMemberGroup, GroupCondition
+from survey.models import RespondentGroup, ParameterTemplate, GroupCondition
 from survey.forms.group_condition import GroupConditionForm
-from survey.forms.household_member_group import HouseholdMemberGroupForm
+from survey.forms.respondent_group import GroupForm
 from survey.utils.views_helper import contains_key
 
 
 @permission_required('auth.can_view_household_groups')
 def conditions(request):
     conditions = GroupCondition.objects.all().order_by('condition')
-    return render(request, 'household_member_groups/conditions/index.html',
+    return render(request, 'respondent_groups/conditions/index.html',
                   {'conditions': conditions, 'add_condition_url': 'new_group_condition', 'request': request})
 
 
 @permission_required('auth.can_view_interviewers')
 def index(request):
-    groups = HouseholdMemberGroup.objects.all().order_by(
-        'order').exclude(name='REGISTRATION GROUP')
-    return render(request, 'household_member_groups/index.html', {'groups': groups, 'request': request})
+    groups = RespondentGroup.objects.all()
+    return render(request, 'respondent_groups/index.html', {'groups': groups, 'request': request})
 
 
 def _get_conditions_hash():
@@ -53,7 +52,7 @@ def add_condition(request):
                'request': request,
                'condition_form': condition_form}
 
-    return response or render(request, 'household_member_groups/conditions/new.html', context)
+    return response or render(request, 'respondent_groups/conditions/new.html', context)
 
 
 def has_valid_condition(data):
@@ -77,7 +76,7 @@ def _process_condition_form(request, condition_form):
 
 
 def _process_groupform(request, group_form, action, redirect_url):
-    if group_form.is_valid() and has_valid_condition(request.POST):
+    if group_form.is_valid():
         group_form.save()
         messages.success(request, 'Group successfully %s.' % action)
         return HttpResponseRedirect(redirect_url)
@@ -91,31 +90,31 @@ def _process_groupform(request, group_form, action, redirect_url):
 def add_group(request):
     params = request.POST
     response = None
-    group_form = HouseholdMemberGroupForm(
-        initial={'order': HouseholdMemberGroup.max_order() + 1})
+    group_form = GroupForm()
 
     if request.method == 'POST':
-        group_form = HouseholdMemberGroupForm(params)
+        group_form = GroupForm(params)
         response = _process_groupform(
-            request, group_form, action='added', redirect_url='/groups/')
+            request, group_form, action='added', redirect_url=reverse('respondent_groups_page'))
     context = {'groups_form': group_form,
                'conditions': GroupCondition.objects.all(),
                'title': "New Group",
                'button_label': 'Create',
                'id': 'add_group_form',
-               'action': "/groups/new/",
-               'cancel_url': '/groups/',
+               'action': reverse('new_respondent_groups_page'),
+               'cancel_url': reverse('respondent_groups_page'),
                'condition_form': GroupConditionForm(),
+               'parameter_questions': ParameterTemplate.objects.all(),
                'condition_title': "New Eligibility Criteria"}
     request.breadcrumbs([
-        ('Member Groups', reverse('household_member_groups_page')),
+        ('Member Groups', reverse('respondent_groups_page')),
     ])
-    return response or render(request, 'household_member_groups/new.html', context)
+    return response or render(request, 'respondent_groups/new.html', context)
 
 
 @permission_required('auth.can_view_household_groups')
 def details(request, group_id):
-    group = HouseholdMemberGroup.objects.get(id=group_id)
+    group = RespondentGroup.objects.get(id=group_id)
     conditions = GroupCondition.objects.filter(groups__id=group_id)
     if not conditions.exists():
         messages.error(request, "No conditions in this group.")
@@ -131,7 +130,7 @@ def add_group_condition(request, group_id):
         condition_form = GroupConditionForm(data=request.POST)
         if condition_form.is_valid():
             try:
-                group = HouseholdMemberGroup.objects.get(id=group_id)
+                group = RespondentGroup.objects.get(id=group_id)
                 condition = condition_form.save()
                 condition.groups.add(group)
                 condition.save()
@@ -148,39 +147,38 @@ def add_group_condition(request, group_id):
                'action': '/groups/%s/conditions/new/' % group_id,
                'request': request,
                'condition_form': condition_form}
-    return render(request, 'household_member_groups/conditions/new.html', context)
+    return render(request, 'respondent_groups/conditions/new.html', context)
 
 
 @permission_required('auth.can_view_household_groups')
 def edit_group(request, group_id):
-    params = request.POST
     response = None
-    group = HouseholdMemberGroup.objects.get(id=group_id)
-    group_form = HouseholdMemberGroupForm(instance=group,
-                                          initial={'conditions': [gp.id for gp in group.conditions.all()]})
+    group = RespondentGroup.objects.get(id=group_id)
+    group_form = GroupForm(instance=group)
     if request.method == 'POST':
-        group_form = HouseholdMemberGroupForm(params, instance=group)
-        redirect_url = "/groups/%s/" % group_id
+        group_form = GroupForm(request.POST, instance=group)
+        redirect_url = reverse('respondent_groups_edit', args=(group_id,))
         performed_action = 'edited'
         response = _process_groupform(
             request, group_form, performed_action, redirect_url)
     context = {'groups_form': group_form,
-               'conditions': GroupCondition.objects.all(),
                'title': "Edit Group",
                'button_label': 'Save',
                'id': 'add_group_form',
-               'action': "/groups/%s/edit/" % group_id,
+               'action': reverse('respondent_groups_edit', args=(group_id,)),
+               'cancel_url': reverse('respondent_groups_page'),
                'condition_form': GroupConditionForm(),
-               'condition_title': "New Criteria"}
+               'parameter_questions': ParameterTemplate.objects.all(),
+               'condition_title': "New Eligibility Criteria"}
     request.breadcrumbs([
-        ('Member Groups', reverse('household_member_groups_page')),
+        ('Member Groups', reverse('respondent_groups_page')),
     ])
-    return response or render(request, 'household_member_groups/new.html', context)
+    return response or render(request, 'respondent_groups/new.html', context)
 
 
 @permission_required('auth.can_view_household_groups')
 def delete_group(request, group_id):
-    member_group = HouseholdMemberGroup.objects.get(id=group_id)
+    member_group = RespondentGroup.objects.get(id=group_id)
     member_group.remove_related_questions()
     member_group.delete()
     messages.success(request, "Group successfully deleted.")

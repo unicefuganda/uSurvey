@@ -8,23 +8,27 @@
     </style>
 {% endblock %}
 {% block title %}
-    Questions Library
+    {{ model_class.verbose_name }}
 {% endblock %}
 {% block search %}
  {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question_filter_form' %}
 <br />
+<br />
 {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
-
+        {% with 'export_'|add:model_class.resolve_tag as export_template_url %}
         <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="{% url 'export_template_questions' %}" class="btn btn_primary pull-right padded-bottom">Export Questions</a>
+												<a href="{% url export_template_url %}" class="btn btn_primary pull-right padded-bottom">Export Questions</a>
 											</button>
+        {% endwith %}
+        {% with 'new_'|add:model_class.resolve_tag as new_template_url %}
         <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="{% url 'new_question_template' %}" class="btn btn_primary pull-right padded-bottom">Create New Question</a>
+												<a href="{% url new_template_url %}" class="btn btn_primary pull-right padded-bottom">Create New Question</a>
 											</button>
+        {% endwith %}
 {% endblock %}
 
 {% block content %}
@@ -44,9 +48,11 @@
         <th class="sorting">
             Type
         </th>
+        {% if 'module' in model_class.field_names %}
         <th class="sorting">
-            Group
+            Module
         </th>
+        {% endif %}
         <th>
             Actions
         </th>
@@ -62,9 +68,11 @@
             <td>
                 {{ question.answer_type.upper }}
             </td>
+            {% if 'module' in model_class.field_names %}
             <td>
-                {{ question.group.name }}
+                {{ question.module.name }}
             </td>
+            {% endif %}
             <td>
                 <div class="">
                     <div class="inline pos-rel">
@@ -72,9 +80,11 @@
                            <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
                        </button>
                         <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                            {% with 'edit_'|add:model_class.resolve_tag as edit_url %}
                             <li>
-                                <a href="{% url 'edit_question_template_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                                <a href="{% url edit_url question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
                             </li>
+                            {% endwith %}
                             <li><a href="#delete_question_{{ question.pk }}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
                             {% if question.options.all %}
                             <li>
@@ -96,23 +106,6 @@
                                 </div>
                                 <div class="modal-body">
                                     {% include 'questions/_view_question_options.html' %}
-                                    <a href="#" class="btn btn-primary pull-right"
-                                       id="close_view_options_{{ question.id }}" data-dismiss="modal">Close</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="modal fade hide" id="view_logic_{{ question.id }}" tabindex="-1" role="dialog"
-                         aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal"
-                                            aria-hidden="true">&times;</button>
-                                    <h4 class="modal-title">{{ question.text }}</h4>
-                                </div>
-                                <div class="modal-body">
                                     <a href="#" class="btn btn-primary pull-right"
                                        id="close_view_options_{{ question.id }}" data-dismiss="modal">Close</a>
                                 </div>

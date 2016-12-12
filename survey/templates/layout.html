@@ -105,16 +105,17 @@
                     <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-218"><a href="{% url 'interviewers_page' %}">Interviewers</a></li>
                         {% if perms.auth.can_enter_data %}
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'listing_template_home' %}">Listing Form</a></li>
-                        {% endif %}
-                        {% if perms.auth.can_view_batches %}
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item menu-item-home menu-item-404"><a href="{% url 'show_question_library' %}">Question
                                                 Bank</a></li>
+                       {% endif %}
+                       {% if perms.auth.can_view_batches %}
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="{% url 'survey_list_page' %}">Surveys</a></li>
+                       {% endif %}
+                       {% if perms.auth.can_enter_data %}
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-407"><a href="{% url 'question_module_listing_page' %}">Modules</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-407"><a href="{% url 'respondent_groups_page' %}">Groups</a></li>
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-406"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="{% url 'enumeration_area_home' %}">Enumeration Areas</a></li>
-                        {% endif %}
-                        {% if perms.auth.can_enter_data %}
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
                         {% endif %}
                    </ul>
@@ -282,13 +283,12 @@
       </div>
       <!--================= Box Div Start ==================-->
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/bootstrap.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
           <!-- /.main-container -->
       <!-- basic scripts -->
 
-      <script src="{{ STATIC_URL }}assets/jquery-2.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
       {% block javascripts %}
 
       {% endblock %}

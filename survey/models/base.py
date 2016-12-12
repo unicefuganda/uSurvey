@@ -30,4 +30,7 @@ class BaseModel(TimeStampedModel):
     def resolve_tag(cls):
         return cls._meta.verbose_name.replace(' ', '_')
 
+    @classmethod
+    def field_names(cls):
+        return cls._meta.get_all_field_names()
 

@@ -1,11 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
-from survey.models import RandomizationCriterion, CriterionTestArgument, QuestionOption
-from survey.models import Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer
+from survey.models import RandomizationCriterion, CriterionTestArgument, QuestionOption, ListingTemplate
+from survey.models import Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, Interview
 from survey.forms.widgets import InlineRadioSelect
 from survey.forms.form_order_mixin import FormOrderMixin
-from survey.models import Survey, BatchCommencement, SurveyHouseholdListing
+from survey.models import Survey, BatchCommencement, SurveyHouseholdListing, AnswerAccessDefinition, USSDAccess
 
 
 class SurveyForm(ModelForm):
@@ -30,7 +30,9 @@ class SurveyForm(ModelForm):
                 'disabled'] = 'disabled'
         else:
             preferred_listings = [('', '------ None, Create new -------'), ]
-            survey_listings = SurveyHouseholdListing.objects.all()
+            listing_forms = ListingTemplate.objects.values('pk', flat=True)
+            survey_listings = Interview.objects.all(pk__in=listing_forms).only('qset',
+                                                                               'survey').distinct('qset', 'survey')
             preferred_listings.extend(
                 set([(l.survey.pk, l.survey.name) for l in survey_listings]))
             self.fields['preferred_listing'].choices = preferred_listings
@@ -70,7 +72,7 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
         self.fields['survey'].initial = survey.pk
         self.fields['survey'].widget = forms.HiddenInput()
         self.fields['listing_question'].queryset = survey.listing_form.questions.filter(answer_type__in=[
-            NumericalAnswer.choice_name(), MultiChoiceAnswer.choice_name(), TextAnswer.choice_name()])
+            defin.answer_type for defin in AnswerAccessDefinition.objects.filter(channel=USSDAccess.choice_name())])
         self.order_fields(['listing_question', 'validation_test', 'options', 'value', 'min', 'max', 'survey'])
         if self.data.get('listing_question', []):
             options = QuestionOption.objects.filter(question__pk=self.data['listing_question'])

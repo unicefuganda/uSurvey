@@ -1,7 +1,7 @@
 {% extends "form.html" %}
 
 {% block title %}
-  New Question Template
+  {% if questionform.instance.pk %} Edit {% else %} New {% endif %}{{ model_class.verbose_name }}
 {% endblock %}
 {% block pre_form_content %}
 <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
@@ -33,7 +33,9 @@
 {% endblock %}
 
 {% block javascripts %}
+    <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}/js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/question_options.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
     channel_map = {
         {% for answer_type, channels in questionform.answer_map.items %}

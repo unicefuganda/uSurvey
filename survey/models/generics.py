@@ -1,5 +1,5 @@
 __author__ = 'anthony <>'
-
+from model_utils.managers import InheritanceManager
 from django.db import models
 from survey.models.base import BaseModel
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
@@ -19,4 +19,27 @@ class GenericQuestion(BaseModel):
 
     class Meta:
         abstract = True
+
+    def validators(self):
+        return Answer.get_class(self.answer_type).validators()
+
+    def validator_names(self):
+        return [v.__name__ for v in Answer.get_class(self.answer_type).validators()]
+
+
+class TemplateQuestion(GenericQuestion):
+    objects = InheritanceManager()
+
+    class Meta:
+        abstract = False
+
+
+class TemplateOption(BaseModel):
+    question = models.ForeignKey(TemplateQuestion, null=True, related_name="options")
+    text = models.CharField(max_length=150, blank=False, null=False)
+    order = models.PositiveIntegerField()
+
+    @property
+    def to_text(self):
+        return "%d: %s" % (self.order, self.text)
 

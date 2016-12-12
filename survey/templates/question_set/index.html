@@ -1,8 +1,11 @@
 {% extends "layout.html" %}
 {% block title %}
+  {% if model.verbose_name == 'Batch' %}
+        {{ survey }} Batches
+  {% else %}
   {{ model.verbose_name }}
+  {% endif %}
 {% endblock %}
-{% block page_title %}Listing{% endblock %}
 {% block search %}
 {% include "search_form.html" %}
 {% endblock %}

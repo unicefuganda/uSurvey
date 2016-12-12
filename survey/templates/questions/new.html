@@ -65,6 +65,7 @@
 
 {% block javascripts %}
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/question_options.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
             channel_map = {
                 {% for answer_type, channels in questionform.answer_map.items %}

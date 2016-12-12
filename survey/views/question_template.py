@@ -4,11 +4,11 @@ from collections import OrderedDict
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.contrib.auth.decorators import permission_required
 from survey.forms.filters import QuestionFilterForm
-from survey.models import QuestionTemplate
-from survey.forms.question_template import QuestionTemplateForm
+from survey.models import QuestionTemplate, ParameterTemplate, TemplateQuestion
+from survey.forms.question_template import get_question_templates_form
 from survey.services.export_questions import get_question_template_as_dump
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
@@ -16,18 +16,22 @@ from django.conf import settings
 
 
 @permission_required('auth.can_view_batches')
-def index(request):
+def index(request, model_class=QuestionTemplate):
     '''
         show all library questions
     '''
     question_filter_form = QuestionFilterForm(data=request.GET or None)
-    questions = question_filter_form.filter(QuestionTemplate.objects.all())
-    search_fields = ['identifier', 'group__name', 'text', ]
+    questions = question_filter_form.filter(model_class.objects.all())
+    search_fields = ['identifier', 'text', ]
     if request.GET.has_key('q'):
         questions = get_filterset(questions, request.GET['q'], search_fields)
     context = {'questions': questions, 'request': request,
-               'placeholder': 'identifier, group name, text',
-               'question_filter_form': question_filter_form}
+               'placeholder': 'identifier, text',
+               'question_filter_form': question_filter_form, 'model_class': model_class}
+    if model_class == ParameterTemplate:
+        request.breadcrumbs([
+            ('Groups', reverse('respondent_groups_page')),
+        ])
     return render(request, 'question_templates/index.html', context)
 
 
@@ -45,19 +49,21 @@ def filter(request):
     return HttpResponse(json_dump, content_type='application/json')
 
 
-def _process_question_form(request, response, instance=None):
+def _process_question_form(request, response, model_class, instance=None):
+    QuestionTemplateForm = get_question_templates_form(model_class)
     question_form = QuestionTemplateForm(data=request.POST, instance=instance)
     action_str = 'edit' if instance else 'add'
     if question_form.is_valid():
         question_form.save()
         messages.success(request, 'Question successfully %sed.' % action_str)
-        response = HttpResponseRedirect(reverse('show_question_library'))
+        response = HttpResponseRedirect(reverse('show_%s' % model_class.resolve_tag()))
     else:
         messages.error(request, 'Question was not %sed.' % action_str)
     return response, question_form
 
 
-def _render_question_view(request, instance=None):
+def _render_question_view(request, model_class, instance=None):
+    QuestionTemplateForm = get_question_templates_form(model_class)
     question_form = QuestionTemplateForm(instance=instance)
     button_label = 'Create'
     options = None
@@ -68,16 +74,17 @@ def _render_question_view(request, instance=None):
         # options = [option.text for option in options] if options else None
     if request.method == 'POST':
         response, question_form = _process_question_form(
-            request, response, instance)
+            request, response, model_class, instance)
     request.breadcrumbs([
-        ('Question Library', reverse('show_question_library')),
+        (model_class.verbose_name(), reverse('show_%s' % model_class.resolve_tag())),
     ])
     context = {'button_label': button_label,
                'id': 'add-question-form',
                'request': request,
                'class': 'question-form',
-               'cancel_url': reverse('show_question_library'),
-               'questionform': question_form}
+               'cancel_url': reverse('show_%s' % model_class.resolve_tag()),
+               'questionform': question_form,
+               'model_class': model_class}
 
     if options:
         #options = map(lambda option: re.sub("[%s]" % settings.USSD_IGNORED_CHARACTERS, '', option), options)
@@ -87,11 +94,11 @@ def _render_question_view(request, instance=None):
 
 
 @permission_required('auth.can_view_batches')
-def add(request):
+def add(request, model_class=QuestionTemplate):
     '''
         create all library questions
     '''
-    response, context = _render_question_view(request)
+    response, context = _render_question_view(request, model_class)
     return response or render(request, 'question_templates/new.html', context)
 
 
@@ -100,8 +107,11 @@ def edit(request, question_id):
     '''
         Modify library question
     '''
-    question = get_object_or_404(QuestionTemplate, pk=question_id)
-    response, context = _render_question_view(request, instance=question)
+    try:
+        question = TemplateQuestion.get(pk=question_id)
+    except TemplateQuestion.DoesNotExist:
+        return HttpResponseNotFound()
+    response, context = _render_question_view(request, model_class=question.__class__, instance=question)
     return response or render(request, 'question_templates/new.html', context)
 
 
@@ -111,18 +121,22 @@ def delete(request, question_id):
         Delete library question
     '''
     try:
-        question = get_object_or_404(QuestionTemplate, pk=question_id)
+        try:
+            question = TemplateQuestion.get(pk=question_id)
+            model_class = question.__class__
+        except TemplateQuestion.DoesNotExist:
+            return HttpResponseNotFound()
         identifier = question.identifier
         question.delete()
         messages.success(request, 'Question Deleted question %s.' % identifier)
     except Exception:
         messages.error(request, 'Unable to delete question %s.' % identifier)
-    return HttpResponseRedirect(reverse('show_question_library'))
+    return HttpResponseRedirect(reverse('show_%s' % model_class.resolve_tag()))
 
 
-def export_questions(request):
-    filename = 'library_questions'
-    questions = QuestionTemplate.objects.all()
+def export_questions(request, model_class=QuestionTemplate):
+    filename = '%ss' % model_class.verbose_name()
+    questions = model_class.objects.all()
     formatted_responses = get_question_template_as_dump(questions)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename

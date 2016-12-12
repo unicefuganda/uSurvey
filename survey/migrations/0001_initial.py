@@ -58,7 +58,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
                 ('value', models.FileField(null=True, upload_to=b'/home/anthony/workspace/uSurvey/answerFiles')),
             ],
             options={
@@ -105,13 +104,25 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='CriterionTestArgument',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('position', models.PositiveIntegerField()),
+                ('param', models.CharField(max_length=100)),
+            ],
+            options={
+                'get_latest_by': 'position',
+            },
+        ),
+        migrations.CreateModel(
             name='DateAnswer',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
                 ('value', models.DateField(null=True)),
             ],
             options={
@@ -132,6 +143,18 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='FixedLoopCount',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('value', models.PositiveIntegerField()),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
             name='Formula',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -146,7 +169,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
             ],
             options={
                 'abstract': False,
@@ -162,6 +184,19 @@ class Migration(migrations.Migration):
                 ('attribute', models.CharField(default=b'AGE', max_length=20, choices=[(b'GENDER', b'GENDER'), (b'AGE', b'AGE'), (b'GENERAL', b'ROLE')])),
                 ('condition', models.CharField(default=b'EQUALS', max_length=20, choices=[(b'GREATER_THAN', b'GREATER_THAN'), (b'LESS_THAN', b'LESS_THAN'), (b'EQUALS', b'EQUALS')])),
             ],
+        ),
+        migrations.CreateModel(
+            name='GroupTestArgument',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('position', models.PositiveIntegerField()),
+                ('param', models.CharField(max_length=100)),
+            ],
+            options={
+                'get_latest_by': 'position',
+            },
         ),
         migrations.CreateModel(
             name='Household',
@@ -264,7 +299,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
                 ('value', models.FileField(null=True, upload_to=b'/home/anthony/workspace/uSurvey/answerFiles')),
             ],
             options={
@@ -351,13 +385,25 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='ListingSample',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('interview', models.ForeignKey(related_name='listing_samples', to='survey.Interview')),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
             name='Location',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
-                ('name', models.CharField(max_length=50)),
-                ('code', models.CharField(max_length=100, null=True, blank=True)),
+                ('name', models.CharField(max_length=200)),
+                ('code', models.CharField(max_length=200, null=True, blank=True)),
                 ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
@@ -417,7 +463,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
                 ('interview', models.ForeignKey(related_name='multichoiceanswer', to='survey.Interview')),
             ],
             options={
@@ -431,7 +476,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
                 ('interview', models.ForeignKey(related_name='multiselectanswer', to='survey.Interview')),
             ],
             options={
@@ -459,7 +503,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
                 ('value', models.PositiveIntegerField(null=True)),
                 ('interview', models.ForeignKey(related_name='numericalanswer', to='survey.Interview')),
             ],
@@ -494,6 +537,17 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='PreviousAnswerCount',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
             name='Question',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -502,6 +556,7 @@ class Migration(migrations.Migration):
                 ('identifier', models.CharField(max_length=100, null=True, verbose_name=b'Variable Name')),
                 ('text', models.CharField(max_length=150)),
                 ('answer_type', models.CharField(max_length=100, choices=[('Numerical Answer', 'Numerical Answer'), ('Text Answer', 'Text Answer'), ('Multi Choice Answer', 'Multi Choice Answer'), ('Multi Select Answer', 'Multi Select Answer'), ('Date Answer', 'Date Answer'), ('Audio Answer', 'Audio Answer'), ('Video Answer', 'Video Answer'), ('Image Answer', 'Image Answer'), ('Geopoint Answer', 'Geopoint Answer')])),
+                ('mandatory', models.BooleanField(default=True)),
             ],
             options={
                 'abstract': False,
@@ -519,6 +574,20 @@ class Migration(migrations.Migration):
                 ('desc', models.CharField(max_length=200, null=True, blank=True)),
                 ('next_question_type', models.CharField(max_length=100)),
             ],
+        ),
+        migrations.CreateModel(
+            name='QuestionLoop',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('loop_label', models.CharField(max_length=64)),
+                ('repeat_logic', models.CharField(blank=True, max_length=64, null=True, choices=[(b'', b'User Defined'), (b'fixedloopcount', b'Fixed number of Repeats'), (b'previousanswercount', b'Response from previous question')])),
+                ('loop_prompt', models.CharField(max_length=50, null=True, blank=True)),
+            ],
+            options={
+                'abstract': False,
+            },
         ),
         migrations.CreateModel(
             name='QuestionModule',
@@ -557,15 +626,21 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='QuestionTemplate',
+            name='QuestionSetChannel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
-                ('identifier', models.CharField(max_length=100, null=True, verbose_name=b'Variable Name')),
-                ('text', models.CharField(max_length=150)),
-                ('answer_type', models.CharField(max_length=100, choices=[('Numerical Answer', 'Numerical Answer'), ('Text Answer', 'Text Answer'), ('Multi Choice Answer', 'Multi Choice Answer'), ('Multi Select Answer', 'Multi Select Answer'), ('Date Answer', 'Date Answer'), ('Audio Answer', 'Audio Answer'), ('Video Answer', 'Video Answer'), ('Image Answer', 'Image Answer'), ('Geopoint Answer', 'Geopoint Answer')])),
-                ('module', models.ForeignKey(related_name='question_templates', to='survey.QuestionModule')),
+                ('channel', models.CharField(max_length=100, choices=[('Ussd Access', 'Ussd Access'), ('Odk Access', 'Odk Access'), ('Web Access', 'Web Access')])),
+            ],
+        ),
+        migrations.CreateModel(
+            name='RandomizationCriterion',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('validation_test', models.CharField(blank=True, max_length=200, null=True, choices=[(b'starts_with', b'starts_with'), (b'ends_with', b'ends_with'), (b'equals', b'equals'), (b'between', b'between'), (b'less_than', b'less_than'), (b'greater_than', b'greater_than'), (b'contains', b'contains')])),
             ],
         ),
         migrations.CreateModel(
@@ -581,6 +656,29 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='RespondentGroup',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('name', models.CharField(max_length=50)),
+                ('description', models.TextField()),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='RespondentGroupCondition',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('validation_test', models.CharField(blank=True, max_length=200, null=True, choices=[(b'starts_with', b'starts_with'), (b'ends_with', b'ends_with'), (b'equals', b'equals'), (b'between', b'between'), (b'less_than', b'less_than'), (b'greater_than', b'greater_than'), (b'contains', b'contains')])),
+                ('respondent_group', models.ForeignKey(related_name='conditions', to='survey.RespondentGroup')),
+            ],
+        ),
+        migrations.CreateModel(
             name='Survey',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -588,9 +686,9 @@ class Migration(migrations.Migration):
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('name', models.CharField(max_length=100, unique=True, null=True)),
                 ('description', models.CharField(max_length=300, null=True, blank=True)),
-                ('sample_size', models.PositiveIntegerField(default=10)),
                 ('has_sampling', models.BooleanField(default=True, verbose_name=b'Survey Type')),
-                ('preferred_listing', models.ForeignKey(related_name='householdlist_users', blank=True, to='survey.Survey', help_text=b'Select which survey household listing to reuse. Leave empty for fresh listing', null=True)),
+                ('sample_size', models.PositiveIntegerField(default=10)),
+                ('preferred_listing', models.ForeignKey(related_name='listing_users', blank=True, to='survey.Survey', help_text=b'Select which survey listing to reuse. Leave empty for fresh listing', null=True)),
             ],
             options={
                 'ordering': ['name'],
@@ -628,7 +726,20 @@ class Migration(migrations.Migration):
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('text', models.CharField(max_length=150)),
                 ('order', models.PositiveIntegerField()),
-                ('question', models.ForeignKey(related_name='options', to='survey.QuestionTemplate', null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='TemplateQuestion',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
+                ('identifier', models.CharField(max_length=100, null=True, verbose_name=b'Variable Name')),
+                ('text', models.CharField(max_length=150)),
+                ('answer_type', models.CharField(max_length=100, choices=[('Numerical Answer', 'Numerical Answer'), ('Text Answer', 'Text Answer'), ('Multi Choice Answer', 'Multi Choice Answer'), ('Multi Select Answer', 'Multi Select Answer'), ('Date Answer', 'Date Answer'), ('Audio Answer', 'Audio Answer'), ('Video Answer', 'Video Answer'), ('Image Answer', 'Image Answer'), ('Geopoint Answer', 'Geopoint Answer')])),
             ],
             options={
                 'abstract': False,
@@ -653,7 +764,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
                 ('value', models.CharField(max_length=100)),
                 ('interview', models.ForeignKey(related_name='textanswer', to='survey.Interview')),
             ],
@@ -693,7 +803,6 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(default=django.utils.timezone.now, verbose_name='created', editable=False, blank=True)),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(default=django.utils.timezone.now, verbose_name='modified', editable=False, blank=True)),
                 ('question_type', models.CharField(max_length=100)),
-                ('loop_id', models.IntegerField(null=True, blank=True)),
                 ('value', models.FileField(null=True, upload_to=b'/home/anthony/workspace/uSurvey/answerFiles')),
                 ('interview', models.ForeignKey(related_name='videoanswer', to='survey.Interview')),
             ],
@@ -706,7 +815,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('questionset_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.QuestionSet')),
                 ('order', models.PositiveIntegerField(null=True)),
-                ('survey', models.ForeignKey(related_name='batches', to='survey.Survey', null=True)),
             ],
             bases=('survey.questionset',),
         ),
@@ -714,7 +822,7 @@ class Migration(migrations.Migration):
             name='BatchQuestion',
             fields=[
                 ('question_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.Question')),
-                ('group', models.ForeignKey(related_name='questions', to='survey.HouseholdMemberGroup')),
+                ('group', models.ForeignKey(related_name='questions', blank=True, to='survey.RespondentGroup', null=True)),
                 ('module', models.ForeignKey(related_name='questions', default=b'', to='survey.QuestionModule')),
             ],
             options={
@@ -786,6 +894,28 @@ class Migration(migrations.Migration):
             bases=('survey.point',),
         ),
         migrations.CreateModel(
+            name='ParameterTemplate',
+            fields=[
+                ('templatequestion_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TemplateQuestion')),
+            ],
+            bases=('survey.templatequestion',),
+        ),
+        migrations.CreateModel(
+            name='QuestionTemplate',
+            fields=[
+                ('templatequestion_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TemplateQuestion')),
+                ('module', models.ForeignKey(related_name='question_templates', blank=True, to='survey.QuestionModule', null=True)),
+            ],
+            bases=('survey.templatequestion',),
+        ),
+        migrations.CreateModel(
+            name='SurveyParameterList',
+            fields=[
+                ('questionset_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.QuestionSet')),
+            ],
+            bases=('survey.questionset',),
+        ),
+        migrations.CreateModel(
             name='TextArgument',
             fields=[
                 ('testargument_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='survey.TestArgument')),
@@ -824,9 +954,29 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(related_name='testargument', to='survey.QuestionFlow'),
         ),
         migrations.AddField(
+            model_name='templateoption',
+            name='question',
+            field=models.ForeignKey(related_name='options', to='survey.TemplateQuestion', null=True),
+        ),
+        migrations.AddField(
             model_name='randomselection',
             name='survey',
             field=models.ForeignKey(related_name='random_selections', to='survey.Survey'),
+        ),
+        migrations.AddField(
+            model_name='randomizationcriterion',
+            name='listing_question',
+            field=models.ForeignKey(related_name='criteria', to='survey.Question'),
+        ),
+        migrations.AddField(
+            model_name='randomizationcriterion',
+            name='survey',
+            field=models.ForeignKey(related_name='randomization_criteria', to='survey.Survey'),
+        ),
+        migrations.AddField(
+            model_name='questionsetchannel',
+            name='qset',
+            field=models.ForeignKey(related_name='access_channels', to='survey.QuestionSet'),
         ),
         migrations.AddField(
             model_name='questionset',
@@ -837,6 +987,16 @@ class Migration(migrations.Migration):
             model_name='questionoption',
             name='question',
             field=models.ForeignKey(related_name='options', to='survey.Question', null=True),
+        ),
+        migrations.AddField(
+            model_name='questionloop',
+            name='loop_ender',
+            field=models.OneToOneField(related_name='loop_ended', to='survey.Question'),
+        ),
+        migrations.AddField(
+            model_name='questionloop',
+            name='loop_starter',
+            field=models.OneToOneField(related_name='loop_started', to='survey.Question'),
         ),
         migrations.AddField(
             model_name='questionflow',
@@ -852,6 +1012,16 @@ class Migration(migrations.Migration):
             model_name='question',
             name='qset',
             field=models.ForeignKey(related_name='questions', to='survey.QuestionSet'),
+        ),
+        migrations.AddField(
+            model_name='previousanswercount',
+            name='loop',
+            field=models.OneToOneField(related_name='previousanswercount', to='survey.QuestionLoop'),
+        ),
+        migrations.AddField(
+            model_name='previousanswercount',
+            name='value',
+            field=models.ForeignKey(related_name='loop_count_identifier', to='survey.Question'),
         ),
         migrations.AddField(
             model_name='odksubmission',
@@ -919,6 +1089,11 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(related_name='locations', to='survey.LocationType'),
         ),
         migrations.AddField(
+            model_name='listingsample',
+            name='survey',
+            field=models.ForeignKey(related_name='listing_samples', to='survey.Survey'),
+        ),
+        migrations.AddField(
             model_name='intervieweraccess',
             name='interviewer',
             field=models.ForeignKey(related_name='intervieweraccess', to='survey.Interviewer'),
@@ -950,8 +1125,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='interview',
-            name='survey',
-            field=models.ForeignKey(related_name='interviews', to='survey.Survey'),
+            name='question_set',
+            field=models.ForeignKey(related_name='interviews', to='survey.QuestionSet'),
         ),
         migrations.AddField(
             model_name='indicator',
@@ -1044,6 +1219,11 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(related_name='households', to='survey.HouseholdListing'),
         ),
         migrations.AddField(
+            model_name='grouptestargument',
+            name='group_condition',
+            field=models.ForeignKey(to='survey.RespondentGroupCondition'),
+        ),
+        migrations.AddField(
             model_name='groupcondition',
             name='groups',
             field=models.ManyToManyField(related_name='conditions', to='survey.HouseholdMemberGroup'),
@@ -1094,6 +1274,11 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(related_name='numerator_options', to='survey.QuestionOption'),
         ),
         migrations.AddField(
+            model_name='fixedloopcount',
+            name='loop',
+            field=models.OneToOneField(related_name='fixedloopcount', to='survey.QuestionLoop'),
+        ),
+        migrations.AddField(
             model_name='enumerationarea',
             name='locations',
             field=models.ManyToManyField(related_name='enumeration_areas', to='survey.Location'),
@@ -1107,6 +1292,11 @@ class Migration(migrations.Migration):
             model_name='dateanswer',
             name='question',
             field=models.ForeignKey(related_name='dateanswer', on_delete=django.db.models.deletion.PROTECT, to='survey.Question', null=True),
+        ),
+        migrations.AddField(
+            model_name='criteriontestargument',
+            name='test_condition',
+            field=models.ForeignKey(related_name='arguments', to='survey.RandomizationCriterion'),
         ),
         migrations.AddField(
             model_name='batchlocationstatus',
@@ -1141,6 +1331,15 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name='answeraccessdefinition',
             unique_together=set([('answer_type', 'channel')]),
+        ),
+        migrations.AddField(
+            model_name='survey',
+            name='listing_form',
+            field=models.ForeignKey(related_name='survey_settings', to='survey.ListingTemplate', null=True),
+        ),
+        migrations.AlterUniqueTogether(
+            name='questionsetchannel',
+            unique_together=set([('qset', 'channel')]),
         ),
         migrations.AlterUniqueTogether(
             name='question',
@@ -1191,7 +1390,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='batchchannel',
             name='batch',
-            field=models.ForeignKey(related_name='access_channels', to='survey.Batch'),
+            field=models.ForeignKey(related_name='baccess_channels', to='survey.Batch'),
+        ),
+        migrations.AddField(
+            model_name='batch',
+            name='survey',
+            field=models.ForeignKey(related_name='batches', to='survey.Survey', null=True),
         ),
         migrations.AlterUniqueTogether(
             name='batchchannel',

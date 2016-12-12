@@ -1,0 +1,68 @@
+{% extends "page_with_table.html" %}
+{% load template_tags %}
+{% load pagination_tags %}
+{% autopaginate groups 50 %}
+{% block title %}
+  Group List
+{% endblock %}
+{% block search %}
+{% include "search_form.html" %}
+{% endblock %}
+{% block page_actions %}
+        <button class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												<a href="{% url 'new_respondent_groups_page' %}" class="btn btn_primary pull-right padded-bottom">Add Group</a>
+											</button>
+        <button class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-eye bigger-120 orange"></i>
+												<a href="{% url 'show_parameter_template' %}" class="btn btn_primary pull-right padded-bottom" >Available Parameters</a>
+											</button>
+
+{% endblock %}
+
+    {% block table_head %}
+      <tr>
+        <th class="sorting">
+          Group name
+        </th>
+        <th class="sorting">
+          Description
+        </th>
+        <th  style="background-image: None;">
+          Actions
+        </th>
+      </tr>
+    {% endblock %}
+    {% block table_body %}
+    {% for group in groups %}
+        <tr>
+          <td>
+            <a href="{% url 'respondent_groups_details' group.id %}">{{ group.name }}</a>
+          </td>
+          <td>
+            {{ group.description }}
+          </td>
+          <td>
+            <div class="">
+                <div class="inline pos-rel">
+                       <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                       </button>
+                        <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                            <li>
+                                <a href="{% url 'respondent_groups_edit' group.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                            </li>
+                            {% if not group.has_interviews %}
+                            <li>
+                                <a href="#delete_group_{{ group.id }}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                </div>
+            </div>
+          {% include "base/delete_modal.html" with object_name=group.name id=group.id name="Group" url=group.id|get_url_with_ids:"respondent_groups_delete" %}
+          </td>
+        </tr>
+      {% endfor %}
+    {% endblock %}
+

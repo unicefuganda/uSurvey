@@ -1,16 +1,21 @@
-{% extends "layout.html" %}
+{% extends "page_with_table.html" %}
+{% load template_tags %}
+{% load pagination_tags %}
+{% autopaginate surveys 50 %}
 {% block title %}
   Survey List
 {% endblock %}
-{% block content %}
-{% load pagination_tags %}
-{% autopaginate surveys 50 %}
-{% load template_tags %}
-<a href="#new_survey" data-toggle="modal" class="btn btn_primary pull-right padded-bottom" id="add_survey">Create New Survey</a>
+{% block search %}
 {% include "search_form.html" %}
- <br />
-  <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
-    <thead>
+{% endblock %}
+{% block page_actions %}
+        <button class="btn btn-white btn-warning btn-bold">
+												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												<a href="#new_survey" class="btn btn_primary pull-right padded-bottom" id="add_survey">Create New Survey</a>
+											</button>
+
+{% endblock %}
+    {% block table_head %}
       <tr>
         <th class="sorting">
           Name
@@ -31,9 +36,9 @@
           Actions
         </th>
       </tr>
-    </thead>
-    <tbody>
-      {% for survey in surveys %}
+    {% endblock %}
+    {% block table_body %}
+    {% for survey in surveys %}
         <tr>
           <td>
             <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
@@ -76,8 +81,8 @@
           </td>
         </tr>
       {% endfor %}
-    </tbody>
-  </table>
+    {% endblock %}
+    {% block post_table %}
     <div class="modal fade hide" id="new_survey" tabindex="-1" role="dialog"  aria-hidden="true">
         <div class="modal-dialog">k
             <div class="modal-content">
@@ -91,9 +96,7 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-
-  {% paginate %}
-{% endblock %}
+    {% endblock %}
 
 
 {% block javascripts %}

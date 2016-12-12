@@ -3,34 +3,34 @@ __author__ = 'anthony <>'
 from django.db import models
 from model_utils.managers import InheritanceManager
 from survey.models.base import BaseModel
+from survey.models.generics import TemplateQuestion
 from survey.models.questions import Question, QuestionSet
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
 
 
-class MetricsForm(QuestionSet):
+class ParameterTemplate(TemplateQuestion):
 
     class Meta:
         app_label = 'survey'
 
-
-class SurveyMetric(Question):
-    metric_form = models.ForeignKey(MetricsForm, related_name='metric_form_questions')
-
-    class Meta:
-        app_label = 'survey'
+    def __unicode__(self):
+        return self.identifier
 
 
 class RespondentGroup(BaseModel):
     name = models.CharField(max_length=50)
     description = models.TextField()
-    metric_form = models.ForeignKey(MetricsForm, related_name='respondent_group')
+
+    def has_interviews(self):
+        from survey.models import Interview
+        return self.questions.exists() and Interview.objects.filter(qset__pk=self.questions.first().qset.pk).exists()
 
 
 class RespondentGroupCondition(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
                         for validator in Answer.validators()]
-    respondent_group = models.ForeignKey(RespondentGroup, related_name='conditions')
-    personal_info = models.ForeignKey(SurveyMetric, related_name='conditions')
+    respondent_group = models.ForeignKey(RespondentGroup, related_name='group_conditions')
+    test_question = models.ForeignKey(ParameterTemplate, related_name='group_condition')
     validation_test = models.CharField(
         max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)
 
@@ -57,7 +57,7 @@ class RespondentGroupCondition(BaseModel):
 
 
 class GroupTestArgument(BaseModel):
-    group_condition = models.ForeignKey(RespondentGroupCondition)
+    group_condition = models.ForeignKey(RespondentGroupCondition, related_name='arguments')
     position = models.PositiveIntegerField()
     param = models.CharField(max_length=100)
 
@@ -69,3 +69,7 @@ class GroupTestArgument(BaseModel):
         get_latest_by = 'position'
 
 
+class SurveyParameterList(QuestionSet): # basically used to tag survey grouping questions
+
+    class Meta:
+        app_label = 'survey'

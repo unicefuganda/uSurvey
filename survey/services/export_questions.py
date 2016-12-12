@@ -33,14 +33,13 @@ class ExportQuestionsService:
 
 
 def get_question_template_as_dump(questions):
-    HEADERS = "Question Code,Question Text,Answer Type,Options,Group,Module"
+    HEADERS = "Question Code,Question Text,Answer Type,Options"
     _formatted_responses = [HEADERS, ]
     map(lambda question:
-        _formatted_responses.append('%s,%s,%s,%s,%s,%s' %
+        _formatted_responses.append('%s,%s,%s,%s' %
                                     (question.identifier, question.text.replace('\r\n', ' '), question.answer_type.upper(),
                                      '|'.join(
-                                         [opt.to_text for opt in question.options.all()]),
-                                     question.group.name, question.module.name)
+                                         [opt.to_text for opt in question.options.all()]))
                                     ), questions)
     return _formatted_responses
 
