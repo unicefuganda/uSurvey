@@ -12,7 +12,7 @@
 {% block page_actions %}
     <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="{% url 'new_enumeration_area_page' %}" class="btn btn_primary pull-right" id="add-module"><i class="icon-plus"></i> Add Enumeration Area</a>
+												<a href="{% url 'new_enumeration_area_page' %}" class="" id="add-module"><i class="icon-plus"></i> Add Enumeration Area</a>
 											</button>
 
 {% endblock %}
@@ -22,7 +22,8 @@
 {% load template_tags %}
     <br class="clear"/>
     <br/>
-    <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
+    <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info"> -->
+    <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
 		<thead>
         <tr role="row">
             <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Name</th>
@@ -93,6 +94,11 @@
 {% endblock %}
 
 {% block javascripts %}
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
 	    <!--$("#a-ea-list").hide();-->
 	    <!-- -->
@@ -114,7 +120,9 @@
 	        <!--});-->
 	    <!--});-->
 	    
-	
+	$(document).ready(function() {
+    $('#datatables').DataTable();
+} );
 	    
 	    {% for location_type in location_filter_types %}
 	    $('#id_{{ location_type }}').on('change', function () {
