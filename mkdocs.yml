@@ -8,5 +8,6 @@ pages:
 - Deployment Guide: deployment_guide.md
 - Site Map: Site_Map.md
 - Tests: tests.md
+- Listing: Listing.md
 #theme: readthedocs
 theme: cerulean
