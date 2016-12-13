@@ -66,7 +66,7 @@ Survey Type:  Sampled
 Sample size: 5
 Preferred Listing: None
 Listing Form: Public School
-Select Groups: "Single Moms, Single Fathers,	Single member earning family"
+Select Groups: "Single Moms, Single Fathers,Single member earning family"
 
 ###Batches: 
 Batches are set of Questions categorized for Survey convenience, let us create few Batches for our current Survey convenient. 
@@ -157,7 +157,7 @@ The above Groups page is used to manage Groups, i.e. to Create a New Group, Edit
  
 ###Add Variables:
  
- click on 'Add Variables' button, to navigare below show form. Where one can create new variable by assigning question. Provide 'variable Name' and Question in 'Text' feilds and select 'Answer' type.  
+ click on 'Add Variables' button, to navigate below show form. Where one can create new variable by assigning question. Provide 'variable Name' and Question in 'Text' feilds and select 'Answer' type.  
  
  ![Add Variables](./Add_Variable.png)
  
