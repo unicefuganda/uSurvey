@@ -8,7 +8,7 @@ Source code for this project is available on github [here]()
 
 User Guides
 -----------
-*  **Introduction** 
+* **Introduction** 
   * [Overview](./index.md)
   * [Features](./index.md#features)
   * [Getting Started](./index.md#what-to-do-next)
