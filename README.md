@@ -79,4 +79,4 @@ Testing
         python manage.py test
 
 
-[![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg)](https://travis-ci.org/unicefuganda/uSurvey)
+[![Build Status](https://travis-ci.org/unicefuganda/uSurvey.svg?branch=uSurvey)](https://travis-ci.org/unicefuganda/uSurvey)
