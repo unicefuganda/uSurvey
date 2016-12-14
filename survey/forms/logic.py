@@ -206,8 +206,8 @@ class LoopingForm(forms.ModelForm, FormOrderMixin):
                 'previous_numeric_values', False):
             raise ValidationError('No previous answer selected')
         # check for overlapping loops between start and end
-        start_question = self.cleaned_data['loop_starter']
-        end_question = self.cleaned_data['loop_ender']
+        # start_question = self.cleaned_data['loop_starter']
+        # end_question = self.cleaned_data['loop_ender']
         # QuestionFlow.objects.filter(Q(question__in=start_question.qset.inlines_between(start_question, end_question))|
         #                             Q(next_question__in=start_question.qset.inlines_between(start_question,
         #                                                                                     end_question)),
