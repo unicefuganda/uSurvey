@@ -1,9 +1,9 @@
 ###Listing: 
-The Listing be carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts.
-Survey has to be simplified to the Interviewer in identifying the household respondents, one who is eligible for this particular survey, based up on these Listing Questions.
+The Listing is generally carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts.
+Such that Survey has to be simplified to the Interviewers in identifying the Household respondents, one who is eligible for this particular survey, based up on these Listing Questions.
 
 
-Survey Listing is available from main menu under Survey <b>Administration</b> >> <b>Listing Form</b>
+Survey Listing is available from main menu under <b>Survey Administration</b> >> <b>Listing Form</b>
 
 ![Listing](./Page3_v1.png)
 
@@ -15,6 +15,8 @@ To create a new Listing, click on the ‘Create New Listing Form’ button, this
 ![Listing Form](./Page1v1.png)
 
 The ‘Listing Form’ page by default shows list of all existing Listings and each of these Listing items has Actions to ‘Edit’, ‘Delete’ and ‘View/Edit Questions’.
+
+<b>Description about Actions</b>
 
 <b>Edit – Listing</b>: On click, Action Item ‘Edit’, User can Edit only the name of the Listing, Description and selection of Access channels (OBK, USSD)
 
@@ -31,12 +33,7 @@ The ‘Listing Form Questions Template’ page by default shows list of all Ques
 ###Adding Questions to the Listing Form: 
 In the ‘Listing Form’ page click on the respective Listing Name / on Action item ‘View/Edit Questions’ to navigate to ‘Listing Form Questions Template’ form where one can Add New Questions to the Listing by clicking on ‘Add Question’ Button, this will open a pop form where one can write a Question, by providing ‘Variable Name’, ‘Text’ (Question), ‘Answer Type’ and select/ check ‘Mandatory’ to mark the Question as to answer compulsory.
 
-<b>Export Questions</b>: On click, ‘Export Questions’ button user can download the Listing Questions in “.csv” file format.
-
-<b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Question from Question
-Library’ where one can select the Questions from Library into Listing, by sorting out using ‘Search with text’ and ‘Question Type’ methods. 
-
-To select the Question from Library List to Listing, just Click on “Code” or “Text” to move between tables (Library << / >> Listing List)
+<b>Description about Actions</b>
 
 <b>Edit – Listing Question</b>: On click, Action Item ‘Edit’, User can Edit respective Question, ‘Variable Name’, ‘Text’ (Question), ‘Answer Type’ and select/ check ‘Mandatory’ to mark the Question as to answer compulsory.
 
@@ -83,6 +80,15 @@ In the ‘Listing Form Questions Template’ page, Questions that has Logic are 
 
 <b>View Options</b>: On click, Action Item, show the Options of Multiple Choice Type Question.
 
+<b>More Functions</b>:
+
 <b>Update Question Order</b>:  On click, this button user can update the rearranged order of the Question, 
 
 <b>Change order of the Question</b>: To change the order of the Question, just select the Question to drag and drop at the required order, then click on ‘Update Question Order’ button 
+
+<b>Export Questions</b>: On click, ‘Export Questions’ button user can download the Listing Questions in “.csv” file format.
+
+<b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Question from Question
+Library’ where one can select the Questions from Library into Listing, by sorting out using ‘Search with text’ and ‘Question Type’ methods. 
+
+To select the Question from Library List to Listing, just Click on “Code” or “Text” to move between tables (Library << / >> Listing List)
