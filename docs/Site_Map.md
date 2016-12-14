@@ -12,18 +12,8 @@
 
 ###Sitemap:
 -----------
-* **uSurvey Home** 
-  * [Dashboard](http://usurvey.unicefuganda.org/home/)
-  * [Design]()
-  * [Administration]()
-  * [Collect]()
-  * [Monitor]()
-  * [Analyse]()
-  * [Download]()
-  * [Settings]()
-
 * **Dashboard**
-   
+
 * **Design** 
    * [Survey](http://usurvey.unicefuganda.org/surveys/)
    * [Listing](./Listing.md)
