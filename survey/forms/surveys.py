@@ -30,12 +30,16 @@ class SurveyForm(ModelForm):
                 'disabled'] = 'disabled'
         else:
             preferred_listings = [('', '------ None, Create new -------'), ]
-            listing_forms = ListingTemplate.objects.values('pk', flat=True)
-            survey_listings = Interview.objects.all(pk__in=listing_forms).only('qset',
+            try:
+                listing_forms = ListingTemplate.objects.values_list('pk', flat=True).order_by('id')
+                survey_listings = Interview.objects.filter(pk__in=listing_forms).only('qset',
                                                                                'survey').distinct('qset', 'survey')
-            preferred_listings.extend(
-                set([(l.survey.pk, l.survey.name) for l in survey_listings]))
-            self.fields['preferred_listing'].choices = preferred_listings
+                preferred_listings.extend(
+                    set([(l.survey.pk, l.survey.name) for l in survey_listings]))
+                self.fields['preferred_listing'].choices = preferred_listings
+            except Exception, err:
+                print Exception, err
+            
 
     def clean(self):
         cleaned_data = self.cleaned_data

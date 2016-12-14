@@ -11,7 +11,7 @@
 {% block page_actions %}
         <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="#new_survey" class="btn btn_primary pull-right padded-bottom" id="add_survey">Create New Survey</a>
+												<a href="#new_survey" data-toggle="modal" id="add_survey">Create New Survey</a>
 											</button>
 
 {% endblock %}
@@ -83,7 +83,7 @@
       {% endfor %}
     {% endblock %}
     {% block post_table %}
-    <div class="modal fade hide" id="new_survey" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="modal fade " id="new_survey" tabindex="-1" role="dialog"  aria-hidden="true">
         <div class="modal-dialog">k
             <div class="modal-content">
               <div class="modal-header">

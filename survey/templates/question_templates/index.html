@@ -20,13 +20,13 @@
         {% with 'export_'|add:model_class.resolve_tag as export_template_url %}
         <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="{% url export_template_url %}" class="btn btn_primary pull-right padded-bottom">Export Questions</a>
+												<a href="{% url export_template_url %}" class="">Export Questions</a>
 											</button>
         {% endwith %}
         {% with 'new_'|add:model_class.resolve_tag as new_template_url %}
         <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="{% url new_template_url %}" class="btn btn_primary pull-right padded-bottom">Create New Question</a>
+												<a href="{% url new_template_url %}" class="">Create New Question</a>
 											</button>
         {% endwith %}
 {% endblock %}
