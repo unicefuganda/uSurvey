@@ -13,6 +13,7 @@ class InterviewerForm(ModelForm):
     date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT, ],
                                     widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                   'class': 'datepicker'}, format=settings.DATE_FORMAT))
+    ea = forms.ModelMultipleChoiceField(queryset=EnumerationArea.objects.none())
 
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
@@ -22,7 +23,8 @@ class InterviewerForm(ModelForm):
             try:
                 self.fields['survey'].initial = SurveyAllocation.objects.filter(interviewer=self.instance,
                                                                                 status__in=[SurveyAllocation.PENDING,
-                                                                                            SurveyAllocation.COMPLETED])[0].survey.pk
+                                                                                            SurveyAllocation.COMPLETED]
+                                                                                ).order_by('status')[0].survey.pk
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas
@@ -30,7 +32,7 @@ class InterviewerForm(ModelForm):
     class Meta:
         model = Interviewer
         fields = ['name',  'date_of_birth', 'gender',
-                  'level_of_education', 'language',  'ea']
+                  'level_of_education', 'language',  ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
             'gender': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
@@ -38,21 +40,22 @@ class InterviewerForm(ModelForm):
         }
 
     def clean_survey(self):
-        ea = self.data.get('ea', '')
-        if not ea:
+        eas = self.data.get('ea', '')
+        if not eas:
             raise ValidationError('No Enumeration Area selected')
         survey = self.cleaned_data['survey']
         if survey:
             # check if this has already been allocated to someone else
             allocs = SurveyAllocation.objects.filter(survey=survey, status__in=[SurveyAllocation.PENDING,
-                                                                                SurveyAllocation.COMPLETED],
-                                                     interviewer__ea=ea,
-                                                     allocation_ea=ea)
+                                                                                SurveyAllocation.COMPLETED,],
+                                                     interviewer__ea__in=eas,
+                                                     allocation_ea__in=eas)
             if self.instance and self.instance.pk:
                 allocs = allocs.exclude(interviewer=self.instance)
             if allocs.exists():
                 raise ValidationError(
-                    'Survey already active in %s for Interviewer %s' % (ea, allocs[0].interviewer))
+                    'Survey already active for %s interviewers. Starting from %s for Interviewer %s' %
+                    (allocs[0].allocation_ea, allocs[0].interviewer))
         return survey
 
     # def clean(self):
@@ -65,15 +68,18 @@ class InterviewerForm(ModelForm):
     def save(self, commit=True, **kwargs):
         interviewer = super(InterviewerForm, self).save(
             commit=commit, **kwargs)
+        eas = self.cleaned_data['ea']
+        interviewer.ea = eas[0]
         if commit:
             survey = self.cleaned_data['survey']
             if survey:
-                ea = self.cleaned_data['ea']
                 interviewer.assignments.update(
-                    status=SurveyAllocation.DEALLOCATED)
-                SurveyAllocation.objects.create(survey=survey,
-                                                interviewer=interviewer,
-                                                allocation_ea=ea)
+                    status=SurveyAllocation.DEALLOCATED, survey=survey)     # I want to track every change in allocation
+                for ea in eas:
+                    SurveyAllocation.objects.create(survey=survey,
+                                                    interviewer=interviewer,
+                                                    allocation_ea=ea)
+            interviewer.save()
         return interviewer
 
 

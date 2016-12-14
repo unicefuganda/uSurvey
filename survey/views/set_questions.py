@@ -255,8 +255,11 @@ def _process_question_form(request, batch, response, question_form):
             messages.success(
                 request, 'Question successfully %sed. to library' % action_str)
         messages.success(request, 'Question successfully %sed.' % action_str)
-        response = HttpResponseRedirect(
-            reverse('qset_questions_page', args=(batch.pk, )))
+        if request.POST.has_key('add_more_button'):
+            redirect_age = ''
+        else:
+            redirect_age = reverse('qset_questions_page', args=(batch.pk, ))
+        response = HttpResponseRedirect(redirect_age)
     else:
         messages.error(request, 'Question was not %sed.' % action_str)
 #         options = dict(request.POST).get('options', None)
@@ -391,6 +394,13 @@ def update_orders(request, qset_id):
                                 redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
 def remove(request, batch_id, question_id):
     return _remove(request, batch_id, question_id)
+
+
+@permission_required('auth.can_view_batches')
+def remove_loop(request,  question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    get_object_or_404(QuestionLoop, loop_starter=question).delete()
+    return HttpResponseRedirect(reverse('qset_questions_page',  args=(question.batch.pk, )))
 
 
 def _kill_zombies(zombies):

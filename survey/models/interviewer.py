@@ -39,8 +39,8 @@ class Interviewer(BaseModel):
                                           blank=False, default='Primary',
                                           verbose_name="Highest level of education completed")
     is_blocked = models.BooleanField(default=False)
-    ea = models.ForeignKey('EnumerationArea', null=True,
-                           related_name="interviewers", verbose_name='Enumeration Area')
+    ea = models.ForeignKey('EnumerationArea', null=True,        # shall use this to track the interviewer present ea
+                           related_name="interviewers", verbose_name='Enumeration Area', blank=True)  # reporting mostly
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
                                 blank=False, default='English', verbose_name="Preferred language of communication")
     weights = models.FloatField(default=0, blank=False)

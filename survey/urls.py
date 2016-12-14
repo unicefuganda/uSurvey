@@ -164,6 +164,8 @@ urlpatterns = patterns('',
                            'survey.views.questions.remove', name='remove_question_page'),
                        url(r'^qset/batches/(?P<batch_id>\d+)/questions/(?P<question_id>\d+)/remove/$',
                            'survey.views.set_questions.remove', name='remove_qset_question_page'),
+                       url(r'^qset/batches/questions/(?P<question_id>\d+)/remove_loop/$',
+                           'survey.views.set_questions.remove_loop', name='remove_question_loop_page'),
                        ##########
                        url(r'^batches/$', 'survey.views.batch.list_batches'),
                        url(r'^groups/(?P<group_id>\d+)/$', 'survey.views.respondent_group.details',

@@ -120,7 +120,7 @@
                                 <a href="{% url 'insert_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Insert Question</span></a>
                             </li>
                             <li>
-                                <a href="{% url 'loop_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-plus-square bigger-120"></i>Start Loop</span></a>
+                                <a href="{% url 'loop_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-plus-square bigger-120"></i>Start/Edit Loop</span></a>
                             </li>
                             <li>
                                 <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-code bigger-120"></i>Add Logic</span></a>
@@ -134,6 +134,10 @@
                             </li>
                             {% elif question.conditional_flows %}
                             <li><a href="#view_logic_{{ question.id }}" data-toggle="modal" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-question-circle bigger-120"></i>View Logic</span></a></li>
+                            {% endif %}
+                            {% if question.loop_started %}
+                            <li><a href="#remove_question_loop_{{ question.pk }}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Remove Loop</span></a></li>
+                            {% include "base/remove_modal.html" with object_name=question.text id="remove_question_loop_"|add:question.pk name=question.id|add:" Loop" url=question.id|get_url_with_ids:"remove_question_loop_page" %}
                             {% endif %}
                         </ul>
                 </div>
