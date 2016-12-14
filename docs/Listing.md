@@ -82,11 +82,11 @@ In the ‘Listing Form Questions Template’ page, Questions that has Logic are 
 
 <b>More Functions</b>:
 
-<b>Update Question Order</b>:  On click, this button user can update the rearranged order of the Question, 
+<b>Update Question Order</b>:  On click, user can update the rearranged order of the Questions. 
 
-<b>Change order of the Question</b>: To change the order of the Question, just select the Question to drag and drop at the required order, then click on ‘Update Question Order’ button 
+<b>Change order of the Question</b>: To change the order of the Question, just select the Question to drag and drop at the required order, then click on ‘Update Question Order’ button
 
-<b>Export Questions</b>: On click, ‘Export Questions’ button user can download the Listing Questions in “.csv” file format.
+<b>Export Questions</b>: On click, ‘Export Questions’ button, user can download the Listing Questions in “.csv” file format.
 
 <b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Question from Question
 Library’ where one can select the Questions from Library into Listing, by sorting out using ‘Search with text’ and ‘Question Type’ methods. 
