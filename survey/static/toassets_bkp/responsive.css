@@ -859,14 +859,13 @@ This is only usurvey
         height: inherit;
         position: relative;
         top: 0;
-       /* padding-top: 40px;*/
+        padding-top: 40px;
     }
-
     .logo {
         float: none !important;
         padding-left: 0;
         width: 100%;
-       /* text-align: center;*/
+        text-align: center;
     }
     .logoImg {
         display: inline-block;
@@ -937,7 +936,7 @@ This is only usurvey
     }
     .topSocial {
         float: none !important;
-      /*  padding-bottom: 40px;*/
+        padding-bottom: 40px;
         padding-right: 0;
         padding-top: 0;
         text-align: center;
@@ -1422,8 +1421,8 @@ This is only usurvey
         width: 180px;
     }
     .headerFix.headerArea{
-       /* padding-top: 20px;
-        padding-bottom: 20px;*/
+        padding-top: 20px;
+        padding-bottom: 20px;
     }
     .headerFix .menuButton {
         margin: 0;

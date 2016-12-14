@@ -1,0 +1,51 @@
+/**************** Color #00abef ****************/
+.mainMenu > ul > li.active > a,.mainMenu > ul > li > a:focus,.mainMenu > ul > li:hover > a,
+.logo h2 a:hover,.mainMenu > ul > li > a:focus,.postContent h3 a:hover,.postDate a:hover,
+.fourZeroArea h1,.featuresList li:before,.teamDetails h5,.blogAuthor a,.blogCategory li i,
+.widget ul li a:after,.widget ul li a:hover,.blogSidbarPost h2 a:hover,.sidePostCont a:hover,
+.blogCategory li a:hover,.postPage .quotation:before,.authorDesc h6,.commentMeta a,
+.hasChild:hover:after,.hasChild.active:after,.testimonialFirstHome .quotation:before,
+.calendarWidget table tr td.active,.evMeta p i,.featureContent h3 a:hover,.serviceContent h4 a:hover,
+.mainMenu > ul > li > a:hover,.metaRight i,.metaLeft a:hover,.metaLeft i,div.pp_default .pp_close,
+.folioHover a.detailsLink:hover,.mixurBtn ul li:hover,.footerContent a,.copyRight p a:hover,
+.dropSub li a:focus, .dropSub li a:hover,.folioHover2 a.detailsLink:hover,.breadLink li:hover a,
+.potCategory a,.portfolioDetails h3 a:hover,.folioHover2 a.detailsLink2:hover,a:focus,
+.sub-menu > li > a:focus, .sub-menu > li > a:hover, .mainMenu > ul > li.current-menu-item > a, .mainMenu > ul > li.current-menu-parent > a, 
+ .sub-menu > li.current-menu-item > a, .sub-menu > li.current-menu-parent > a, .sub-menu > li:hover > a, 
+ .mainMenu ul li ul.sub-menu li ul.sub-menu li a:focus, .mainMenu ul li ul.sub-menu li ul.sub-menu li a:hover, 
+ .folioHoverH a.detailsLink:hover, #testicarousels1 .quotation::before, #testicarousels1 .quotation::after, 
+ .widget ul li::after, .postPage .quotation::before, .singleBlogPostcontent blockquote p::before, 
+ .memberMeta li i, .teamDetails h3 a:hover, .widget_calendar table tr td a, .eventDet h4 a:hover, .event_meat_ul li i, 
+ .event_meat_ul li a, .single-feature2 i{
+    color: #e1f500;
+}
+/**************** Background ****************/
+.redCaption,.serviceIcon,.folioBtn li:hover,.singleFacts p:before,.folioHover a.prePhoto,
+.folioHover2 a.prePhoto2,.defaultButton:hover,.defaultPagi li a:hover,.widget form button,
+.widget.tags a.active, .widget.tags a:hover,.commentForm form button:hover,.slick-prev.slick-arrow:hover,.slick-next.slick-arrow:hover,
+.calendarButton a,.contactForm form button:hover,.switch a,.switch,.menuButton.active span, .menuButton:hover span,
+.defaultPagi li.active a,.myAccordion .panel-title a,.myAccordion .panel-title a.collapsed:hover,
+.folioBtn li.active,.folioHover2 a.prePhoto,.postDate,.folioSubTittle,.viewBtn,.subsForm form button,
+.sliderBtn:hover i, .folioHoverH a.prePhoto, .tab-content .allFeatureBtn, .loaderWrap, 
+.defaultPagi li a:hover, .page-numbers li span:hover, .defaultPagi li.active a, .page-numbers li:hover a, .page-numbers li span.current, 
+.widget form.search-form::after, .widget .tagcloud a.active, .widget .tagcloud a:hover, #tribe-events-footer.tw_event_footer ul li a:hover, .top_btn,  
+.pricingTable2 .top_btn:hover, .fearuedTable2 .pricingTable2 .top_btn, .top_carousels .carousel-control:hover, .single-feature2 a:hover{
+    background: #00abef;
+}
+/***************** Border Color *****************/
+.defaultButton:hover,.commentForm form button:hover,.contactForm form button:hover, #tribe-events-footer.tw_event_footer ul li a:hover, .top_btn,  
+.pricingTable2 .top_btn:hover, .fearuedTable2 .pricingTable2 .top_btn, .fearuedTable2 .pricingTable2, .single-feature2 a:hover, 
+.top_carousels .carousel-indicators li.active{
+    border-color: #00abef;
+}
+/* New Home */
+.singleTabContent h2,.tabNavs li a span,
+.testimonialFirstHome .quotation:after {
+    color: #00abef;
+}
+.tabNavs li.active {
+    border-color: #00abef;
+}
+.allFeatureBtn{
+    background: #00abef;
+}

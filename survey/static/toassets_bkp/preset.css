@@ -48,6 +48,7 @@ ul,ol{
     margin: 0;
     padding: 0;
     list-style: none;
+    z-index:98938434;
 }
 a, a:hover,a:focus{
     display: inline-block;
@@ -88,8 +89,7 @@ a{
 }
 /************** Commmon Content Style ********************/
 .commonSection{
-  /*  padding: 116px 0 118px;*/
-  padding:20px 0 20px;
+    padding: 116px 0 118px;
     position: relative;
     background: rgba(0, 0, 0, 0);
 }
