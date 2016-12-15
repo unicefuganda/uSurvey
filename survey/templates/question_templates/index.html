@@ -18,16 +18,24 @@
 {% endblock %}
 {% block page_actions %}
         {% with 'export_'|add:model_class.resolve_tag as export_template_url %}
-        <button class="btn btn-white btn-warning btn-bold">
+        <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="{% url export_template_url %}" class="">Export Questions</a>
-											</button>
+											</button> -->
+
+        <a class="btn btn-white btn-warning btn-bold" href="{% url export_template_url %}" >
+                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+                         Export Questions</a>
         {% endwith %}
         {% with 'new_'|add:model_class.resolve_tag as new_template_url %}
-        <button class="btn btn-white btn-warning btn-bold">
+        <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="{% url new_template_url %}" class="">Create New Question</a>
-											</button>
+											</button> -->
+
+        <a class="btn btn-white btn-warning btn-bold" href="{% url new_template_url %}" >
+                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+                         Create New Question</a>
         {% endwith %}
 {% endblock %}
 

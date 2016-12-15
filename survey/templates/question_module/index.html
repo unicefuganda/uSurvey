@@ -5,10 +5,14 @@
 {% endblock %}
 {% block page_actions %}
 
-        <button class="btn btn-white btn-warning btn-bold">
+        <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="{% url 'new_question_module_page' %}" class="">Add Module</a>
-											</button>
+											</button> -->
+
+      <a class="btn btn-white btn-warning btn-bold" href="{% url 'new_question_module_page' %}" >
+                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+                         Add Module</a>
 {% endblock %}
 
 {% block content %}

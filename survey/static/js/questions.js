@@ -19,8 +19,6 @@ $(function(){
         'answer_type':'required'
       }
       });
-     
-
            
 });
 
