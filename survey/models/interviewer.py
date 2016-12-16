@@ -193,18 +193,25 @@ class SurveyAllocation(BaseModel):
         return self.survey.name
 
     @classmethod
-    def get_allocation(cls, interviewer):
+    def get_allocation(cls, interviewer, count=0):
+        """
+        This function is just retained for compatibility sake. Shall be removed in time. Be wary about using it
+        :param interviewer:
+        :param count:
+        :return:
+        """
         try:
             allocation = cls.get_allocation_details(interviewer)
             if allocation:
-                return allocation.survey
+                return allocation[count].survey
         except cls.DoesNotExist:
             return None
 
     @classmethod
     def get_allocation_details(cls, interviewer):
         try:
-            return cls.objects.get(interviewer=interviewer, allocation_ea=interviewer.ea, status=cls.PENDING)
+            return cls.objects.filter(interviewer=interviewer, allocation_ea=interviewer.ea,
+                                      status=cls.PENDING).order_by('created')
         except cls.DoesNotExist:
             return None
 
