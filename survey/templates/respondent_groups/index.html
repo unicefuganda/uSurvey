@@ -9,14 +9,21 @@
 {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
-        <button class="btn btn-white btn-warning btn-bold">
+
+        <a class="btn btn-white btn-warning btn-bold" href="{% url 'new_respondent_groups_page' %}" >
+                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+                         Add Group</a>
+        <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="{% url 'new_respondent_groups_page' %}" class="">Add Group</a>
-											</button>
-        <button class="btn btn-white btn-warning btn-bold">
+											</button> -->
+        <a class="btn btn-white btn-warning btn-bold" href="{% url 'show_parameter_template' %}" >
+                        <i class="ace-icon fa fa-eye bigger-120 orange"></i>
+                         Available Parameters</a>
+        <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-eye bigger-120 orange"></i>
 												<a href="{% url 'show_parameter_template' %}" class="" >Available Parameters</a>
-											</button>
+											</button> -->
 
 {% endblock %}
 

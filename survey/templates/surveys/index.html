@@ -9,9 +9,9 @@
 {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
-        <button class="btn btn-white btn-warning btn-bold">
-												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="#new_survey" data-toggle="modal" id="add_survey">Create New Survey</a>
+        <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_survey"  id="add_survey">
+          <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+												Create New Survey 
 											</button>
 
 {% endblock %}
@@ -83,12 +83,12 @@
       {% endfor %}
     {% endblock %}
     {% block post_table %}
-    <div class="modal fade " id="new_survey" tabindex="-1" role="dialog"  aria-hidden="true">
-        <div class="modal-dialog">k
+    <div class="modal fade" id="new_survey" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
-              <div class="modal-header">
+              <div class="modal-header" style="background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;" >
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">New Survey</h4>
+                <h4 class="modal-title" style="color: #fff">New Survey</h4>
               </div>
               <div class="modal-body">
                 {% include "surveys/new_survey.html" with title="" action="/surveys/new/" button_label="Save"%}
