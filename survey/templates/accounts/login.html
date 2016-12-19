@@ -1,29 +1,75 @@
-{% extends "layout.html" %}
-{% block title %}
-  Login
-{% endblock %}
 
-{% block content %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+     <!-- Google font -->
+    <link href="{{ STATIC_URL }}loginassest/css.css" rel="stylesheet" type="text/css">
+    <!-- Css -->
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/bootstrap.css">
+       <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}loginassest/style.css">
+    <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      
+    <![endif]-->
+    <title>Login - uSurvey </title>
+
+</head>
+<body id="page-top" class="home">
+
+<!-- PAGE WRAP -->
+<div id="page-wrap">
 
 
-<script type="text/javascript">// <![CDATA[
-var image_array = new Array();
-    <!--image_array[0] = "{{ STATIC_URL }}img/L1.jpg";-->
-    image_array[0] = "{{ STATIC_URL }}img/L2.jpg";
-    image_array[1] = "{{ STATIC_URL }}img/L3.jpg";
-    image_array[2] = "{{ STATIC_URL }}img/L4.jpg";
+    <!-- HEADER -->
+    <header id="header" class="header">
+        <div class="container">
 
-    var rand_path = image_array[Math.floor(Math.random() * image_array.length)];
+            <!-- LOGO -->
+            <div class="logo"><a href="#"><img src="{{ STATIC_URL }}loginassest/Logo_Main.png" alt=""></a></div>
+            <!-- END / LOGO -->
 
-    $(document).ready(function() {
-        $('body').css('background', 'url('+rand_path+')');
-        $('body').css('background-repeat', 'no-repeat');
-        $('body').css('background-size', 'cover');
-    });
-// ]]></script>
-   {% if form.errors %}
-<br><br>
+            <!-- NAVIGATION -->
+            <nav class="navigation">
+
+                <div class="open-menu">
+                   
+                </div>
+
+                <!-- MENU -->
+          
+                <!-- END / MENU -->
+
+                <!-- LIST ACCOUNT INFO -->
+                <ul class="list-account-info">
+
+
+                    <li class="list-item account">
+                        <!-- <div class="account-info item-click">
+                            <img src="{{ STATIC_URL }}loginassest/userafterlogin.jpg" alt="">
+                        </div> -->
+                        <div class="toggle-account toggle-list">
+                            <ul class="list-account">
+                                <li><a href="#"><i><img src="{{ STATIC_URL }}loginassest/settings.png" width="16" height="16"></i> Settings</a></li>
+                                <li><a href="#"><i><img src="{{ STATIC_URL }}loginassest/logout.png" width="16" height="16"></i> Sign Out</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+
+                </ul>
+                <!-- END / LIST ACCOUNT INFO -->
+
+            </nav>
+            <!-- END / NAVIGATION -->
+
+        </div>
+    </header>
+    <!-- END / HEADER -->
+
+    <!-- LOGIN -->
+    {% if form.errors %}
+
       <div class="alert alert-error">
         <label class="error">Your username and password didn't match. Please try again.</label>
       </div>
@@ -33,43 +79,77 @@ var image_array = new Array();
 
   {% endif %}
 
-<style>
-.forright {
-    position: relative;
-    top: 20px;
-	right:30;
-} 
+    <section id="login-content" class="login-content">
+        <div class="awe-parallax bg-login-content"></div>
+      <div class="awe-overlay"></div>
+        <div class="container">
+            <div class="row" style="padding-bottom: 60px">
 
-.forleft {
-    position: absolute;
-    top: 250px;
-    left: 30;
-	width: 400px;
-    FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
-    font-size: 15px;
-    color:#FFFFFF;
-    text-decoration:none;
-	font-weight:bold;
-    
-}
-</style>
-
-<div class="forleft"></div>
-  <div class="forright"><form class="login-form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
-      <span>Type your username and password to login</span>
-      <hr>
-    {% csrf_token %}
-      <label class="control-label" for="username">{{ form.username.label_tag }}</label>
-
-        {{ form.username }}
-      <label class="control-label" for="inputPassword">{{ form.password.label_tag }}</label>
-        {{ form.password }}
-        <button type="submit" class="btnforallxlarge" >Login</button>
-    {% if next %}
+                <!-- FORM -->
+                <div class="col-xs-12 col-lg-4 pull-right">
+                {% csrf_token %}
+                   <div class="form-login">
+                        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+                            <h2 class="text-uppercase">uSurvey</h2>
+                            {% csrf_token %} <div>
+                            <div class="form-email">
+                                 <label for="username" style="color: #fff">{{ form.username.label_tag }}</label>
+                                 {{ form.username }}
+                                 </div>
+                            </div>
+                            <div class="form-password">
+                               <label  for="inputPassword" style="color: #fff">{{ form.password.label_tag }}</label>
+                              {{ form.password }}
+                            </div>
+                            <div class="form-check">
+                                <input id="check" type="checkbox">
+                                <label for="check">
+                                <i class="icon md-check-2"></i>
+                                Remember me</label>
+                                <a href="#">Forget password?</a>
+                            </div>
+                            <div class="form-submit-1">
+                                <input value="Sign In" class="mc-btn btn-style-1" type="submit">
+                                 {% if next %}
         <input type="hidden" name="next" value="{{ next }}" />
     {% else %}
         <input type="hidden" name="next" value="{% url 'home_page' %}" />
     {% endif %}
-  </form></div>
+                            </div>
+                         
+                        </form>
+                    </div>
+                </div>
+                <!-- END / FORM -->
+    
+                <div class="image">
+                    <img src="{{ STATIC_URL }}loginassest/img-thumb.png" alt="">
+                </div>
+    
+            </div>
+        </div>
+    </section>
+    <!-- END / LOGIN -->
+    <!-- FOOTER -->
+    <footer id="footer" class="footer">
+        
+        <div class="second-footer">
+            <div class="container">
+                <div class="contact">
+                   
+                    
+                    <div class="address">
+                 
+                    </div>
+                </div>
+                <p class="copyright">Copyright © 2017 uSurvey. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- END / FOOTER -->
+<div class="overlayForm"></div></div>
+<!-- END / PAGE WRAP -->
 
-{% endblock %}
+<!-- Load jQuery -->
+
+</body></html>
