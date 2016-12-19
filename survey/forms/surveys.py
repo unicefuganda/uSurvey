@@ -18,9 +18,10 @@ class SurveyForm(ModelForm):
         fields = ['name', 'description', 'has_sampling',
                   'sample_size', 'preferred_listing', 'listing_form']
         widgets = {
-            'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
+            'description': forms.Textarea(attrs={"rows": 4, "cols": 30}),
             'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')),
-                                              attrs={'class': 'has_sampling'}),
+                                              attrs={'class': 'has_sampling'}),            
+            
         }
 
     def __init__(self, *args, **kwargs):
