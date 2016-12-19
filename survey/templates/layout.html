@@ -58,6 +58,9 @@
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/fonts.css" type="text/css" media="all">
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/color8.css" type="text/css" media="all">
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all">
+       <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+       <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css"/>
+       <link href="{{ STATIC_URL }}chosen/chosen.css" rel="stylesheet" type="text/css"/>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_005.js"></script>
        <!-- <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery.js"></script> -->
        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -123,8 +126,7 @@
                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Administration</a>
                    <ul class="sub-menu">
                     <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-218"><a href="{% url 'interviewers_page' %}">Interviewers</a></li>
-                    <!-- <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="#">HouseHolds</a></li> -->
-                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="#">OPEN/CLOSE</a></li>
+                    <!-- li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="#">OPEN/CLOSE</a></li -->
                         <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-406"><a href="{% url 'bulk_sms' %}">Notifications</a>
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
                             
@@ -323,7 +325,9 @@
       <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
       <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}chosen/chosen.jquery.js"></script>
+      <!-- script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script -->
+
           <!-- /.main-container -->
       <!-- basic scripts -->
 
@@ -332,6 +336,14 @@
       {% block javascripts %}
 
       {% endblock %}
+      <script type="text/javascript">
+             $('.datepicker').datepicker({
+             changeMonth: true,
+             changeYear: true,
+             dateFormat: 'dd-mm-yy',
+             yearRange: "-120:+nn"
+             });
+        </script>
       <script type="text/javascript">
          if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
       </script>

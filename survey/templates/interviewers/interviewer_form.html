@@ -4,7 +4,7 @@
 {{ title }}
 {% endblock %}
 {% block search %}
-{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
+{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
 <br />
 {% endblock %}
 
@@ -41,6 +41,7 @@
 {% endblock %}
 
 {% block javascripts %}
+	 <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/investigator.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
@@ -55,19 +56,6 @@
         })
     </script>
   <script type="text/javascript">
-  <!--$('#id_ea').on('change', function () {-->
-  		<!--var ea_id = $('#id_ea');-->
-        <!--url = "{% url 'open_surveys_in_ea_area' %}";-->
-        <!--params = {"ea_id" : ea_id.val() }-->
-        <!--$.getJSON(url, params, function (data) {-->
-                <!--$('#id_survey option').hide();-->
-	 			<!--$('#id_survey option[value=""]').show();-->
-	  		    <!--$.each(data, function () {-->
-	             <!--$('#id_survey option[value='+this.id+']').show();-->
-	          <!--});-->
-	      <!--});-->
-
-  <!--});-->
 
   	{% for location_type in location_filter_types %}
 	$('#id_{{ location_type }}').on('change', function () {
