@@ -3,6 +3,10 @@
 {% block title %}
 {{ title }}
 {% endblock %}
+{% block search %}
+{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
+<br />
+{% endblock %}
 
 {% block extra_css %}
 <style type="text/css">
@@ -19,17 +23,21 @@
 
 </style>
 {% endblock %}
-{% block pre_form_content %}
-{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True%}
-<br class="break" />
-{% endblock %}
 {% block display_form_fields %}
+<div>
+	<br />
+	<br />
   {% include "naked_form.html" with a_form=form %}
+</div>
+<br />
+<div>
   <legend>ODK Access</legend>
   {% include "horizontal_naked_form.html" with a_form=odk_access_form %}
-<br class="break" />
+<br />
+</div>
+<div>
   {% include "horizontal-formset.html" with formset=ussd_access_form legend='USSD Access' class='ussd_form' %}
-
+</div>
 {% endblock %}
 
 {% block javascripts %}
