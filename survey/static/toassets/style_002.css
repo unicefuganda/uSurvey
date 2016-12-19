@@ -24,15 +24,16 @@ Speacially design for uSurvey
 .logo{
   /*  padding-left: 100px;
     width: 20%;*/
-	padding-left: 167px;
+	/*padding-left: 50px;*/
 }
 .logoImg{
     float: left;
     width: 100%;
 }
 .logoImg img{
-/*    height: 33px;*/
+    height: 60px;
     width: auto;
+    margin-left: 50px;
 }
 .logo h2{
     float: left;
@@ -61,7 +62,7 @@ Speacially design for uSurvey
     font-weight: 700;
 }
 .mainMenu{
-    width: 70%;
+    width: 80%;
 }
 .mainMenu > ul{
     text-align: center;
