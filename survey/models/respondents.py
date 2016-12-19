@@ -1,5 +1,4 @@
 __author__ = 'anthony <>'
-
 from django.db import models
 from model_utils.managers import InheritanceManager
 from survey.models.base import BaseModel

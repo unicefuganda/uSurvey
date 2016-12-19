@@ -473,6 +473,9 @@ def get_survey(interviewer):
 
 
 def get_survey_allocation(interviewer):
+    '''Just helper function to put additional layer of abstraction to allocation retrival
+    @param: interviewer. Interviewer to which to get survey allocation
+    '''
     return SurveyAllocation.get_allocation_details(interviewer)
 
 

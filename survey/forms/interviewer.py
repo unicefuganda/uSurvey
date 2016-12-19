@@ -49,13 +49,13 @@ class InterviewerForm(ModelForm):
             allocs = SurveyAllocation.objects.filter(survey=survey, status__in=[SurveyAllocation.PENDING,
                                                                                 SurveyAllocation.COMPLETED,],
                                                      interviewer__ea__in=eas,
-                                                     allocation_ea__in=eas)
-            if self.instance and self.instance.pk:
-                allocs = allocs.exclude(interviewer=self.instance)
+                                                     allocation_ea__in=eas).exclude(interviewer=self.instance)
+            # if self.instance and self.instance.pk:
+            #     allocs = allocs.exclude(interviewer=self.instance)
             if allocs.exists():
                 raise ValidationError(
-                    'Survey already active for %s interviewers. Starting from %s for Interviewer %s' %
-                    (allocs[0].allocation_ea, allocs[0].interviewer))
+                    'Survey already active for %s interviewers. Starting from %s for \
+                    Interviewer %s' % (allocs[0].allocation_ea, allocs[0].interviewer))
         return survey
 
     # def clean(self):
@@ -73,8 +73,8 @@ class InterviewerForm(ModelForm):
         if commit:
             survey = self.cleaned_data['survey']
             if survey:
-                interviewer.assignments.update(
-                    status=SurveyAllocation.DEALLOCATED, survey=survey)     # I want to track every change in allocation
+                interviewer.assignments.update(      # I want to track every change in allocation
+                    status=SurveyAllocation.DEALLOCATED, survey=survey)
                 for ea in eas:
                     SurveyAllocation.objects.create(survey=survey,
                                                     interviewer=interviewer,

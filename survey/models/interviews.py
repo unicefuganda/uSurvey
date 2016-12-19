@@ -27,52 +27,15 @@ def update_model_obj_serial(model_obj, serial_name, filter_criteria):
     model_obj.save()
 
 
-class InterviewAddress(BaseModel):
-    ''' This one corresponds to the physical facility of where the interview is being conducted
-
-    '''
-    survey = models.ForeignKey(Survey, related_name='interview_addresses', db_index=True)
-    ea = models.ForeignKey(
-        'EnumerationArea', related_name='interview_addresses', db_index=True)
-    structure_number = models.PositiveIntegerField(null=True)
-    address_description = models.TextField(null=True, blank=True)
-    interview_location = models.ForeignKey('ODKGeoPoint', related_name='interview_addresses',
-                                           null=True, blank=True)   # This is experimental presently
-
-    def start_new_station(self):
-        # you have gotten to the physical facility. now start the visit
-        station = InterviewStation.objects.create(address=self)
-        update_model_obj_serial.delay(station, 'station_number', {'ea': self.ea, 'survey': self.survey})
-        return station
-
-    def save(self, *args, **kwargs):
-        _ = super(InterviewAddress, self).save(*args, **kwargs)
-        if self.structure_number is None:   # I'll set it for you if you don't want to
-            update_model_obj_serial.delay(self, 'structure_number', {'ea': self.ea, 'survey': self.survey})
-        return _
-
-
-class InterviewStation(BaseModel):
-    '''
-        This corresponds to the station within the physical facility where each respondent group is being interviewed
-    '''
-    address = models.ForeignKey(InterviewAddress, related_name='interviews')
-    station_number = models.PositiveIntegerField(null=True)
-
-    # def start_interview(self):
-    #     return Interview.objects.create(interview_station=self, survey=self.address.survey,
-    #                                     ea=self.address.ea)
-
-
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name="interviews")
+    survey = models.ForeignKey('Survey', related_name='interviews')
     question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)    # repeated here for easy reporting
     ea = models.ForeignKey(
         'EnumerationArea', related_name='interviews', db_index=True)    # repeated here for easy reporting
     interview_channel = models.ForeignKey(
         InterviewerAccess, related_name='interviews')
-    interview_station = models.ForeignKey(InterviewStation, related_name='interviews')
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
     last_question = models.ForeignKey(
         "Question", related_name='ongoing', null=True, blank=True)
@@ -88,15 +51,14 @@ class Interview(BaseModel):
         return self.last_question is not None
 
     def get_anwser(self, question, capwords=True):
-        if self.householdmember.belongs_to(question.group):
-            answer_class = Answer.get_class(question.answer_type)
-            answers = answer_class.objects.filter(
-                interview=self, question=question)
-            if answers.exists():
-                reply = unicode(answers[0].to_text())
-                if capwords:
-                    reply = string.capwords(reply)
-                return reply
+        answer_class = Answer.get_class(question.answer_type)
+        answers = answer_class.objects.filter(
+            interview=self, question=question)
+        if answers.exists():
+            reply = unicode(answers[0].to_text())
+            if capwords:
+                reply = string.capwords(reply)
+            return reply
         return ''
 
     def respond(self, reply=None, channel=ODKAccess.choice_name()):

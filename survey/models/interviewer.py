@@ -210,7 +210,7 @@ class SurveyAllocation(BaseModel):
     @classmethod
     def get_allocation_details(cls, interviewer):
         try:
-            return cls.objects.filter(interviewer=interviewer, allocation_ea=interviewer.ea,
+            return cls.objects.filter(interviewer=interviewer,
                                       status=cls.PENDING).order_by('created')
         except cls.DoesNotExist:
             return None

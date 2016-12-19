@@ -9,7 +9,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% if title %}
 		{{ title }}
 	{% else %}
-	  {{qset.name}} - {{ assignment.allocation_ea.name }}
+	  {{qset.name}}
 	{% endif %}
 
 </h:title>
@@ -20,8 +20,8 @@ xmlns:jr="http://openrosa.org/javarosa">
        <instanceID />
        <instanceName />
      </meta>
-	   <type>{{ assignment.stage }}</type> {% comment %} important because survey allocation status may change {% endcomment %}
-	   <assignment>{{ assignment.pk }}</assignment>
+	   <type>{{ stage }}</type> {% comment %} basically tells if it's listing or survey data. status may change {% endcomment %}
+	   <enumerationArea />
 		{% for question in qset.questions_inline %}
 	       {% if question.loop_started %}
 	           <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
@@ -38,10 +38,11 @@ xmlns:jr="http://openrosa.org/javarosa">
   </instance>
 
   <!-- bindings -->
-  <bind nodeset="/survey/meta/instanceID" type="string" 
+  <bind nodeset="/qset/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
-  <bind nodeset="/survey/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat('{{ qset.name}}', '')" />
+  <bind nodeset="/qset/meta/instanceName" type="string" 
+           readonly="true()" calculate="concat('{{ qset.name}}', '/qset/enumerationArea')" />
+  <bind nodeset="/qset/enumerationArea" type="select1" required="true()" />		   
 	{% for question in qset.flow_questions  %}
 		{% is_relevant_odk question interviewer as relevance_context %}
 	    {% get_loop_aware_path question  as path %}
@@ -55,11 +56,24 @@ xmlns:jr="http://openrosa.org/javarosa">
 				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
 				required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
 				relevant="true() and {{ relevance_context }}"/>
+			{% comment %}{% if question.loop_ended %}
+				<bind nodeset="/qset{{ path }}/loop_id" type="string" 
+           readonly="true()" calculate="count(/qset{{ path }}/q{{question.pk}})" />
+	       {% endif %}{% endcomment %}
 	{% endfor %}
 
   </model>
 </h:head>
 <h:body>
+    <select ref="/qset/enumerationArea">
+		<label>Select EnumerationArea</label>
+		{% for assignment in assignments %}
+		<item>
+			<label>{{assignment.allocation_ea.name}}</label>
+			<value>{{ assignment.allocation_ea.pk }}</value>
+		</item>
+		{% endfor %}
+	</select>
 	<group>
 		<label>{{ qset.name }}</label>
 		<hint>{{ qset.description }}</hint>

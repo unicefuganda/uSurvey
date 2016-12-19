@@ -532,6 +532,8 @@ class QuestionLoop(BaseModel):
     repeat_logic = models.CharField(max_length=64, choices=REPEAT_OPTIONS, null=True, blank=True)
     loop_ender = models.OneToOneField(Question, related_name='loop_ended')
     loop_prompt = models.CharField(max_length=50, null=True, blank=True)
+    loop_counter_name= models.CharField(max_length=50, null=True, blank=True, help_text='Provide a value for this field \
+                                        if you want to save the loop counter into a variable')
 
     def loop_questions(self):
         return self.loop_starter.qset.inlines_between(self.loop_starter, self.loop_ender)

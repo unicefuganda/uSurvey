@@ -3,21 +3,21 @@
     {% load template_tags %}
     {% if survey.has_sampling and allocation.stage != '2' %}
     <xform>
-        {% get_download_url request 'download_odk_householdlist_form'  as household_download_url %}
-        <formID>{{ allocation.pk }}</formID>
-        <name>Household List Form - {{ allocation.survey.name }} - {{ allocation.allocation_ea.name }}</name>
+        {% get_download_url request 'download_odk_listing_form'  as listing_download_url %}
+        <formID>{{ survey.pk }}</formID>
+        <name>{{ survey.name }} - {{ survey.listing_form.name }}</name>
         <majorMinorVersion/>
         <version/>
         <hash />
-        <descriptionText> {{ allocation.survey.description }}</descriptionText>
-        <downloadUrl> {{ household_download_url }} </downloadUrl>
+        <descriptionText> {{ survey.description }}</descriptionText>
+        <downloadUrl> {{ listing_download_url }} </downloadUrl>
         <manifestUrl></manifestUrl>
     </xform>
   {% else %}
      {% get_download_url request 'download_odk_survey_form' survey as download_url %}
       <xform>
-        <formID>{{ allocation.pk }}</formID>
-        <name>{{ survey.name }} - {{ allocation.allocation_ea.name }}</name>
+        <formID>{{ survey.pk }}</formID>
+        <name>{{ survey.name }}</name>
         <majorMinorVersion/>
         <version/>
         <hash />
