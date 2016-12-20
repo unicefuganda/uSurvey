@@ -119,11 +119,11 @@ display: inline-block;
 .mainMenu > ul > li.current-menu-parent > a{
     color: #de3c2f;
 }
-.sub-menu{
+/*.sub-menu{
     position: absolute;
     width: 200px;
     padding: 35px 0;
-    background: #404040;
+    background: #0099ff none repeat scroll 0 0;
     top: 157px;
     left: 0;
     right: 0;
@@ -137,7 +137,22 @@ display: inline-block;
     opacity: 0;
     text-align: left;
     z-index:987463;
-}
+}*/
+.sub-menu {
+    background: #0099ff none repeat scroll 0 0;
+    left: 0;
+    margin: 0 auto;
+    opacity: 0;
+    padding: 15px 0;
+    position: absolute;
+    right: 0;
+    text-align: left;
+    top: 157px;
+    transition: all 700ms ease-in-out 0s;
+    visibility: hidden;
+    width: 200px;
+    z-index:987463;
+    }
 .mainMenu > ul > li:hover .sub-menu{
     top: 57px;
     visibility: visible;
@@ -154,7 +169,7 @@ display: inline-block;
     text-transform: uppercase;
     display: block;
     color: #fff;
-    border-bottom: 1px solid #4a4a4a;
+    border-bottom: 1px solid #d0dbe2;
     padding: 14px 0 14px 5px;
 }
 .sub-menu > li:first-child > a{
