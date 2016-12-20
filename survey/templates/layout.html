@@ -107,7 +107,7 @@
                   <span></span>
                </div>
                 {% if perms.auth.can_view_interviewers %}
-                <ul id="menu-main-menu" class="iz_main_menu"><li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'main_page' %}">Home</a>
+                <ul id="menu-main-menu" class="iz_main_menu"><li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'main_page' %}">DashBoard</a>
                    </li>
                    <!-- <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="{% url 'about_page' %}">About</a></li> -->
                    <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Design</a>
@@ -127,9 +127,10 @@
                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Administration</a>
                    <ul class="sub-menu">
                     <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-218"><a href="{% url 'interviewers_page' %}">Interviewers</a></li>
-                    <!-- li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="#">OPEN/CLOSE</a></li -->
-                        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-406"><a href="{% url 'bulk_sms' %}">Notifications</a>
-                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
+                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="#">HOUSEHOLDS</a></li>
+                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-405"><a href="#">OPEN/CLOSE</a></li>
+                        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-406"><a href="{% url 'bulk_sms' %}">Notifications</a></li>
+                            
 
                        {% endif %}
 
@@ -139,10 +140,12 @@
 
                    </ul>
                    </li>
-                   <!-- li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Collect</a>
+                   <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Collect</a>
                    <ul class="sub-menu">
+                   <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-403"><a href="{% url 'simulator_page' %}">Data Entry</a></li>
+
                    </ul>
-                   </li -->
+                   </li>
 
 
                    <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Monitor</a>
@@ -153,7 +156,7 @@
                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'show_interviewer_completion_summary' %}"> Completion
                                         Summary</a></li>
                             {% endif %}
-                       <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'odk_submission_list' %}">View ODK submissions</a></li>
+                       <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'odk_submission_list' %}">ODK submissions</a></li>
 
                    </ul>
                    </li>
@@ -196,6 +199,7 @@
                                   </li>
                                   </li>
                             <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="{% url 'enumeration_area_home' %}">Locations</a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="#">Setup</a></li>
                                  {% else %}
                                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'users_edit' user.id %}">Edit Profile</a>
                                   </li>
