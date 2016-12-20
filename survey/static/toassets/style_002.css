@@ -33,7 +33,7 @@ Speacially design for uSurvey
 .logoImg img{
     height: 60px;
     width: auto;
-    margin-left: 50px;
+    margin-left: 20px;
 }
 .logo h2{
     float: left;
@@ -66,6 +66,7 @@ Speacially design for uSurvey
 }
 .mainMenu > ul{
     text-align: center;
+    /*padding-right: 60px;*/
 
 	/*margin-left: 285px;*/
 	
