@@ -68,7 +68,7 @@
                             </li>
                             {% if not survey.interviews.exists %}
                             <li>
-                                <a href="#delete_survey_{{survey.id}}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                                <a href="{% url 'delete_survey' survey.id%}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
                             </li>
                             {% endif %}
                             {% if survey.has_sampling and not survey.listing_samples.exists %}
