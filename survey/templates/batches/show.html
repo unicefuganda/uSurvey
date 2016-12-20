@@ -2,34 +2,33 @@
 {% block title %}
   {{ batch.name }}
 {% endblock %}
-{% block content %}
-	<div class='filter-options'>
-			<h5>Filter By Status</h5>
-		    <ul id="horizontal-filter">
-		        <li>
-			    <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}" class="btn btn_primary">All</a>
-		        </li>
-		        <li>
-		            <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=open" class="btn btn_primary">Open</a>
-		        </li>
-		        <li>
-		            <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=closed" class="btn btn_primary">Closed</a>
-		        </li>
-		    </ul>
-	</div>
-	<div class="bulk-actions">
-		
+{% block search %}
+<div class='filter-options'>
+  <span><strong>Filter By Status:&nbsp;</strong></span>
+  <span>
+  <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}" class="btn btn-white btn-warning btn-bold" >All</a>
+  <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=open" class="btn btn-white btn-warning btn-bold" >Open</a>
+  <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=closed" class="btn btn-white btn-warning btn-bold" >Closed</a>
+  </span>
+</div>
+{% endblock %}
+{% block page_actions %}
 		<form action="{% url 'batch_all_locs' batch.pk %}" method="POST" accept-charset="utf-8" id="open-for-location-form">
-			
+
               {% csrf_token %}
               {% if open_locations.count > 0 %}
-              	<input type="submit" name="action" value="Close All" class="btn right">
+              	<input type="submit" name="action" class="btn btn-white btn-warning btn-bold" value="Close All" class="btn right" />
               {% endif %}
               {% if locations.count > open_locations.count %}
-              	<input type="submit" name="action" value="Open All" class="btn right">
+              	<input type="submit" name="action" value="Open All" class="btn btn-white btn-warning btn-bold" />
               {% endif %}
         </form>
-	</div>
+
+
+
+{% endblock %}
+{% block content %}
+
   <table class="table table-striped table-bordered table-hover table-sort">
     <thead>
       <tr>
@@ -83,5 +82,6 @@
   </table>
 {% endblock %}
 {% block javascripts %}
+         <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
 {% endblock %}
