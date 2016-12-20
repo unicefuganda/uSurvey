@@ -16,20 +16,28 @@
 {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
-
-        <button class="btn btn-white btn-warning btn-bold">
+        <a class="btn btn-white btn-warning btn-bold" href="{% url 'export_questions_in_qset' batch.id %}">
+                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+                         Export Questions</a>
+        <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="{% url 'export_questions_in_qset' batch.id %}" class="btn btn_primary pull-right padded-bottom">Export Questions</a>
-											</button>
+												<a href="{% url 'export_questions_in_qset' batch.id %}" >Export Questions</a>
+											</button> -->
 {% if batch.interviews.count == 0 %}
-    <button class="btn btn-white btn-warning btn-bold">
+    <a class="btn btn-white btn-warning btn-bold" href="{% url 'new_qset_question_page' batch.id %}" data-toggle="modal">
+                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+                         Add Question</a>
+    <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="{% url 'new_qset_question_page' batch.id %}" data-toggle="modal"  class="btn btn_primary pull-right padded-bottom">Add Question</a>
-											</button>
-    <button class="btn btn-white btn-warning btn-bold">
+												<a href="{% url 'new_qset_question_page' batch.id %}" data-toggle="modal"  >Add Question</a>
+											</button> -->
+    <a class="btn btn-white btn-warning btn-bold" href="{% url 'qset_assign_questions_page' batch.id %}" data-toggle="modal">
+                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+                         Select Question</a>                                            
+    <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="{% url 'qset_assign_questions_page' batch.id %}" data-toggle="modal"  class="btn btn_primary pull-right padded-bottom">Select Question</a>
-											</button>
+												<a href="{% url 'qset_assign_questions_page' batch.id %}" data-toggle="modal"  >Select Question</a>
+											</button> -->
 {% endif %}
 {% endblock %}
 {% block content %}
@@ -39,7 +47,7 @@
         <form method="post" accept-charset="utf-8" action="{% url 'qset_update_question_order_page' batch.id %}">
         {% csrf_token %}
     {% endif %}
-
+<br>
 <table class="table table-striped table-bordered table-hover clear" id="questions_table">
     <thead>
     <tr>
