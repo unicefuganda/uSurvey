@@ -97,7 +97,7 @@
          <header class="headerArea">
             <div class="logo pull-left">
                <div class="logoImg">
-                  <a href="#"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
+                  <a href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
                </div>
             </div>
             <nav class="mainMenu pull-left">
@@ -107,7 +107,7 @@
                   <span></span>
                </div>
                 {% if perms.auth.can_view_interviewers %}
-                <ul id="menu-main-menu" class="iz_main_menu"><li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'main_page' %}">DashBoard</a>
+                <ul id="menu-main-menu" class="iz_main_menu"><li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}">DashBoard</a>
                    </li>
                    <!-- <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="{% url 'about_page' %}">About</a></li> -->
                    <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Design</a>
