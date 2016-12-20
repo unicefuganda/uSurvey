@@ -19,7 +19,8 @@ from .question_set import QuestionSetView
 @login_required
 @permission_required('auth.can_view_batches')
 def index(request, survey_id=None):
-    survey = Survey.get(pk=survey_id)
+    if survey_id:
+        survey = Survey.get(pk=survey_id)
     request.breadcrumbs(Batch.index_breadcrumbs(survey=survey))
     if survey_id is None:
         batches = Batch.objects.all()
@@ -117,8 +118,8 @@ def edit(request, batch_id):
     qset_view.questionSetForm = BatchForm
     request.breadcrumbs(Batch.edit_breadcrumbs(survey=survey))
     response = qset_view.edit(request, batch, initial={'survey': survey.pk})
-    if response.status_code == 302 and response.url == '%s_home' % Batch.resolve_tag():
-        response.url = reverse('batch_index_page', args=(survey.pk, ))
+    if response.status_code == 302:
+        response = HttpResponseRedirect(reverse('batch_index_page', args=(survey.pk, )))
     return response
 
 

@@ -71,6 +71,7 @@ def get_qset_xform(interviewer, allocations):
     return render_to_string("odk/question_set.xml", {
         'interviewer': interviewer,
         'qset': allocations[0].survey.listing_form,
+        'stage': allocations[0].stage,
         'assignments': allocations,
         'educational_levels': LEVEL_OF_EDUCATION,
         'messages': MESSAGES,

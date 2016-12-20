@@ -1,5 +1,4 @@
 $(function(){
-
 	 reload_questions_lib();
     $('#id_groups').on('change', function () {
     	reload_questions_lib();
@@ -20,7 +19,6 @@ $(function(){
         toggleStatus($this, ['open-for-location-form', 'close-for-location-form'], data);
         toggle_($this, nonResponseSwitch);
     });
-
     $('.switch-activate-non-response').on('switch-change', function (e, data) {
         toggleStatus($(this), ['activate-non_response-for-location-form', 'deactivate-non_response-for-location-form'], data)
     });
