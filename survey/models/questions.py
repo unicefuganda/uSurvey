@@ -314,7 +314,7 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
         qflows = QuestionFlow.objects.filter(
             question__qset=self, validation_test__isnull=True)
 
-        @cached_as(qflows)
+        @cached_as(self.questions.all())
         def _questions_inline():
             if self.start_question:
                 inlines = inline_questions(self.start_question, qflows)
