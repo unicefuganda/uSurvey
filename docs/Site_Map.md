@@ -6,7 +6,7 @@
 
 ###Overview:
 
-![uSurvey Menu](./uSurvey_LOC.png)
+![uSurvey Menu](./uSurvey_LOC.jpg)
 
 
 
@@ -30,7 +30,7 @@
   * [Notification](http://usurvey.unicefuganda.org/bulk_sms)
 
 * **Collect**
-   * [Collect](#)
+   * [Data Entry](#)
 
 * **Monitor**
    * [Completion Rate](http://usurvehttp://usurvey.unicefuganda.org/surveys/interviewers_completion/y.unicefuganda.org/surveys/completion/)
