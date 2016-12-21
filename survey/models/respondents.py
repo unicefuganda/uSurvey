@@ -4,6 +4,7 @@ from model_utils.managers import InheritanceManager
 from survey.models.base import BaseModel
 from survey.models.generics import TemplateQuestion
 from survey.models.questions import Question, QuestionSet
+from survey.models.question_templates import QuestionTemplate
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
 
 
@@ -23,7 +24,10 @@ class RespondentGroup(BaseModel):
     def has_interviews(self):
         from survey.models import Interview
         return self.questions.exists() and Interview.objects.filter(qset__pk=self.questions.first().qset.pk).exists()
-
+    def remove_related_questions(self):
+        self.question_templates.all().delete()
+    def __unicode__(self):
+        return self.name
 
 class RespondentGroupCondition(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
