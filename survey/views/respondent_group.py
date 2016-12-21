@@ -9,6 +9,9 @@ from django.core.urlresolvers import reverse
 from survey.models import RespondentGroup, ParameterTemplate, GroupCondition
 from survey.forms.group_condition import GroupConditionForm
 from survey.forms.respondent_group import GroupForm
+from survey.forms.question_module_form import QuestionModuleForm
+from survey.models.question_templates import QuestionTemplate
+from survey.models import QuestionModule, Question
 from survey.utils.views_helper import contains_key
 
 
@@ -151,7 +154,7 @@ def add_group_condition(request, group_id):
 
 
 @permission_required('auth.can_view_household_groups')
-def edit_group(request, group_id):
+def edit_group(request, group_id):    
     response = None
     group = RespondentGroup.objects.get(id=group_id)
     group_form = GroupForm(instance=group)
@@ -178,12 +181,23 @@ def edit_group(request, group_id):
 
 @permission_required('auth.can_view_household_groups')
 def delete_group(request, group_id):
-    member_group = RespondentGroup.objects.get(id=group_id)
-    member_group.remove_related_questions()
-    member_group.delete()
-    messages.success(request, "Group successfully deleted.")
+    print "sudheer"
+    try:
+        member_group = RespondentGroup.objects.get(id=group_id)
+        print member_group, "membergroup"
+        #member_group.remove_related_questions()
+        member_group.delete()
+        messages.success(request, "Group successfully deleted.")
+    except Exception,err:
+        print err
+        messages.success(request, "Group does not exist.")
     return HttpResponseRedirect("/groups/")
-
+    # member_group = RespondentGroup.objects.get(id=group_id)
+    # if RespondentGroup.objects.filter(name=member_group).exists():
+    #     messages.error(request, "Respondent Group cannot be deleted.")
+    # else:
+    #     member_group.delete()
+    # return HttpResponseRedirect('/groups/')
 
 @permission_required('auth.can_view_household_groups')
 def delete_condition(request, condition_id):

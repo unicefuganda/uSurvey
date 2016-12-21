@@ -83,7 +83,7 @@
 							 <li>
                                 <a href="{% url 'edit_enumeration_area_page' ea.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
                             </li>
-                            <li><a href="#delete_enumeration_area_{{ ea.pk }}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                            <li><a href="{% url 'delete_enumeration_area' ea.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
                         </ul>
                     </div>
                 </div>

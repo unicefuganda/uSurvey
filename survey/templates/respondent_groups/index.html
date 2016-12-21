@@ -62,7 +62,7 @@
                             </li>
                             {% if not group.has_interviews %}
                             <li>
-                                <a href="#delete_group_{{ group.id }}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                                <a href="{% url 'respondent_groups_delete' group.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
                             </li>
                             {% endif %}
                         </ul>
