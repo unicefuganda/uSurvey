@@ -33,7 +33,7 @@
 											</button> -->
     <a class="btn btn-white btn-warning btn-bold" href="{% url 'qset_assign_questions_page' batch.id %}" data-toggle="modal">
                         <i class="ace-icon fa fa-plus bigger-120 orange"></i>
-                         Select Question</a>                                            
+                         Select Question</a>
     <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="{% url 'qset_assign_questions_page' batch.id %}" data-toggle="modal"  >Select Question</a>
@@ -133,7 +133,7 @@
                             <li>
                                 <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="blue"><i class="usur-icon fa fa-code bigger-120"></i>Add Logic</span></a>
                             </li>
-                            <li><a href="#remove_question_{{ question.pk }}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                            <li><a href="{% url 'delete_qset_question_logic_page' question.pk %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
                             {% include "base/delete_modal.html" with object_name=question.name id=question.id name=question.verbose_name url=question.id|get_url_with_ids:"delete_qset_question_logic_page" %}
                             {% endif %}
                             {% if question.options.all %}
@@ -214,4 +214,3 @@
     {% endif %}
     <script src="{{ STATIC_URL }}js/questions.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
-

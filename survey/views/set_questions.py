@@ -202,7 +202,9 @@ def remove_loop(request, loop_id):
 
 @permission_required('auth.can_view_batches')
 def delete_logic(request, flow_id):
-    flow = QuestionFlow.objects.get(id=flow_id)
+    question = Question.get(id=flow_id)
+    print "questions",question,flow_id
+    flow = QuestionFlow.objects.get(question=question)
     batch = flow.question.qset
     flow.delete()
     _kill_zombies(batch.zombie_questions())

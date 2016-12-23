@@ -180,8 +180,7 @@ def edit_group(request, group_id):
 
 
 @permission_required('auth.can_view_household_groups')
-def delete_group(request, group_id):
-    print "sudheer"
+def delete_group(request, group_id):    
     try:
         member_group = RespondentGroup.objects.get(id=group_id)
         print member_group, "membergroup"

@@ -17,7 +17,7 @@
 
     <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set">
           <i class="ace-icon fa fa-plus bigger-120 orange"></i>
-                        Create New {{ model.verbose_name }} 
+                        Create New {{ model.verbose_name }}
                       </button>
 
 {% endblock %}
@@ -78,9 +78,19 @@
                                 <a href='{% url "edit_"|add:model.resolve_tag|add:"_page" question_set.id %}' class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
                             </li>
                             {% if not question_set.interviews.exists %}
-                            <li><a href="#" data-target="#delete_question_set_{{question_set.id}}" data-toggle="modal"><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
-                            {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name="question_set" url=question_set.id|get_url_with_ids:"delete_qset" %}
-                            {% endif %}
+
+                            {% if model.verbose_name == 'Batch' %}
+                            <li><a href="{% url 'delete_qset' question_set.id survey.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+
+                     {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|add_string:survey.id|get_url_with_ids:"delete_qset" %}
+                {% else %}
+
+                <li><a href="{% url 'delete_qset_listingform' question_set.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+
+                    {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_qset_listingform" %}
+
+                {% endif %}
+                {% endif %}
                             <li>
                                 <a href="{% url 'qset_questions_page' question_set.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-question-circle bigger-120"></i>View/Edit Questions</span></a>
                             </li>
@@ -122,4 +132,6 @@
 
 {% block javascripts %}
     <script src="{{STATIC_URL}}js/survey.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

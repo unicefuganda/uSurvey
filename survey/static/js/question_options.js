@@ -13,12 +13,13 @@ jQuery(function($){
     }
 
     function addQuestionOption($element){
+        alert(template);
         $element.after(template);
         assignOptionNumbers();
     }
 
     $("#id_answer_type").on('change', function(){
-    	if($(this).val() == 'Multi Choice Answer' || $(this).val() == 'Multi Select Answer'){
+        if($(this).val() == 'Multi Choice Answer' || $(this).val() == 'Multi Select Answer'){
             addQuestionOption($(this).parents("div.control-group"));
         }else{
             $form.find("div.question-option").remove();

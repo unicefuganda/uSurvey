@@ -99,11 +99,21 @@ class QuestionSetView(object):
         return HttpResponseRedirect('%s_home'%self.model.resolve_tag())
 
 
-def delete(request, qset_id):
-    qset = QuestionSet.get(pk=qset_id)
+def delete(request, question_id,batch_id):
+    qset = QuestionSet.get(pk=question_id)
+    print batch_id,"contextname"
     if qset.interviews.exists():
         messages.error(request,
                        "%s cannot be deleted because it already has interviews." % qset.verbose_name())
     else:
         qset.delete()
-    return HttpResponseRedirect('%s_home'%qset.resolve_tag())
+    return HttpResponseRedirect('/surveys/%s/batches/'%batch_id)
+
+def delete_qset_listingform(request, question_id):
+    qset = QuestionSet.get(pk=question_id)
+    if qset.interviews.exists():
+        messages.error(request,
+                       "%s cannot be deleted because it already has interviews." % qset.verbose_name())
+    else:
+        qset.delete()
+    return HttpResponseRedirect('/listing_form/')
