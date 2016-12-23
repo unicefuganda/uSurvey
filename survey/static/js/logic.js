@@ -57,7 +57,6 @@ function show_or_hide_next_question(action_value) {
         next_question_field.hide();
         next_question_field.attr('disabled', 'disabled')
     }
-    next_question_field.hide();
     $(' .chzn-select').trigger("liszt:updated");
 }
 
@@ -108,7 +107,7 @@ function fill_questions_or_subquestions_in_next_question_field(action_value){
     var show_sub_questions = ['ASK_SUBQUESTION'];
     var show_back_to_questions = ['BACK_TO'];
     var question_id = $('#id_question').val();
-    var batch_id = $('#id_batch').val()
+    var batch_id = $('#id_batch').val();
     var questions_url = "";
     if(show_questions.indexOf(action_value) != -1)
     {
@@ -125,7 +124,8 @@ function fill_questions_or_subquestions_in_next_question_field(action_value){
         questions_url = '/questions/' + question_id +'/prev_questions_json/'
         $('#add_subquestion').hide();
     }
-    replace_next_question_with_right_data(questions_url);
+    if(questions_url)
+        replace_next_question_with_right_data(questions_url);
 }
 
 function isHTML(str) {
