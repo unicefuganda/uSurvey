@@ -36,6 +36,12 @@ def space_replace(value, search_string):
 
 
 @register.filter
+def replace_space(value, replace_string):
+    return value.replace(' ', replace_string)
+
+
+
+@register.filter
 def is_location_selected(locations_data, location):
     if locations_data.has_location_selected(location):
         return "selected='selected'"

@@ -78,8 +78,8 @@
                                 <a href='{% url "edit_"|add:model.resolve_tag|add:"_page" question_set.id %}' class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
                             </li>
                             {% if not question_set.interviews.exists %}
-                            <li><a href="#delete_questionset_{{question_set.id}}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
-                            {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_qset" %}
+                            <li><a href="#" data-target="#delete_question_set_{{question_set.id}}" data-toggle="modal"><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                            {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name="question_set" url=question_set.id|get_url_with_ids:"delete_qset" %}
                             {% endif %}
                             <li>
                                 <a href="{% url 'qset_questions_page' question_set.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-question-circle bigger-120"></i>View/Edit Questions</span></a>

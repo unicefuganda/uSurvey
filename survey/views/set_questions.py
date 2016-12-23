@@ -187,7 +187,6 @@ def manage_loop(request, question_id):
     breadcrumbs = Question.edit_breadcrumbs(qset=batch)
     if breadcrumbs:
         request.breadcrumbs(breadcrumbs)
-    # import pdb;pdb.set_trace()
     context = {'loop_form': looping_form, 'button_label': 'Save', 'question': question,
                'cancel_url': reverse('%s_home' % batch.resolve_tag())}
     return render(request, "set_questions/loop.html", context)
