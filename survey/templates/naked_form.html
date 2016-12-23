@@ -1,53 +1,13 @@
-<style type="text/css">
-  
-
-</style>
-
 {% load template_tags %}
 {% for field in a_form.visible_fields %}
-<!-- <style type="text/css">label{
+<style type="text/css">label{
 	margin-top: -7px;
 	}
-  .input-groupd>input{
-
-      width: 100%;
-  border: 2px solid gray;
-  background: none;
-  position: relative;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  padding: 8px 12px;
-  outline: 0;
-  }
-  .tip, .help {
-    color: #09F;
-    /*#font-size: 10px;*/
-}
-    </style> -->
-    <style type="text/css">
-.tip, .help {
-    color: #09F;
-    margin-left: 140px;
-    /*#font-size: 10px;*/
-}
-  </style>
-   <!--  <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
-
-  <div class="form-group {{field.widget.attrs.class}}" id="{{field.auto_id}}-control-group">
-
-<label class="col-md-4 control-label {{field.field.widget.attrs.class}}" for="{{field.auto_id}}">{{field.label}}</label>
-<div class="col-md-8 "> {{field}}</div>
-
-
-    <!-- <label class="control-label {{field.field.widget.attrs.class}}" for="{{field.auto_id}}">
-     
-    {{field.label}}</label>
-    <span>{{field}}</span> -->
-   <!--  <div class="controls {{ field|is_radio }} input-groupd">
-<div class="element-input"><label class="title"></label><div class="item-cont"> {{field}}<span class="icon-place"></span></div></div> -->
-
-     <div>
+    </style>
+  <div class="control-group">
+    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
+    <div class="controls {{ field|is_radio }}">
+      {{field}}
         &nbsp;&nbsp;<span id="{{field.auto_id}}_tip" class="help tip">{{ field.help_text }}</span>
         {% if field.errors %}
         <label class="error" >
@@ -63,4 +23,3 @@
 {% for hidden in a_form.hidden_fields %}
   {{ hidden }}
 {% endfor %}
-

@@ -16,6 +16,7 @@
   {% endif %}
     <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
 {% endblock%}
+
 {% block display_form_fields %}
 <div class="control-group">
         <label class="control-label" for="text_counter"></label>
@@ -64,11 +65,8 @@
     {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ STATIC_URL }}js/jquery.validate.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
-    <script src="{{STATIC_URL}}js/question_options.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
-
             channel_map = {
                 {% for answer_type, channels in questionform.answer_map.items %}
                     '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
