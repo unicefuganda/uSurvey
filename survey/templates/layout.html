@@ -234,6 +234,16 @@
                   </div>
                   <div class="tp-fullwidth-forcer" style="width: 100%; height: 600px;">
                   <div class="main-container">
+                      <div>
+                              {% if messages %}
+                                <br /><br />
+                                {% for message in messages %}
+                                   <ul class="alert alert-{{ message.tags }}"  style="text-align: center;">
+                                        {{ message }}
+                                    </ul>
+                                {% endfor %}
+                            {% endif %}
+                      </div>
          <div class="">
             <div class="main-content-inner">
                <div class="page-content">
