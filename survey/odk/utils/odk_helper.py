@@ -10,6 +10,7 @@ from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.shortcuts import render
 from django import template
+from survey.templatetags.template_tags import get_node_path
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from djangohttpdigest.digest import Digestor, parse_authorization_header

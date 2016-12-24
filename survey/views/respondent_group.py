@@ -78,11 +78,11 @@ def _process_condition_form(request, condition_form):
     return HttpResponseRedirect(redirect_url)
 
 
-def _process_groupform(request, group_form, action, redirect_url):
+def _process_groupform(request, group_form, action):
     if group_form.is_valid():
-        group_form.save()
+        group = group_form.save()
         messages.success(request, 'Group successfully %s.' % action)
-        return HttpResponseRedirect(redirect_url)
+        return HttpResponseRedirect(reverse('respondent_groups_edit', args=(group.id,)))
     else:
         errors = group_form.non_field_errors()
         if errors:
@@ -98,7 +98,7 @@ def add_group(request):
     if request.method == 'POST':
         group_form = GroupForm(params)
         response = _process_groupform(
-            request, group_form, action='added', redirect_url=reverse('respondent_groups_page'))
+            request, group_form, action='added')
     context = {'groups_form': group_form,
                'conditions': GroupCondition.objects.all(),
                'title': "New Group",
@@ -160,10 +160,8 @@ def edit_group(request, group_id):
     group_form = GroupForm(instance=group)
     if request.method == 'POST':
         group_form = GroupForm(request.POST, instance=group)
-        redirect_url = reverse('respondent_groups_edit', args=(group_id,))
         performed_action = 'edited'
-        response = _process_groupform(
-            request, group_form, performed_action, redirect_url)
+        response = _process_groupform(request, group_form, performed_action)
     context = {'groups_form': group_form,
                'title': "Edit Group",
                'button_label': 'Save',

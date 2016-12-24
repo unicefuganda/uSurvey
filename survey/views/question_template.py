@@ -56,7 +56,11 @@ def _process_question_form(request, response, model_class, instance=None):
     if question_form.is_valid():
         question_form.save()
         messages.success(request, 'Question successfully %sed.' % action_str)
-        response = HttpResponseRedirect(reverse('show_%s' % model_class.resolve_tag()))
+        if request.POST.has_key('add_more_button'):
+            redirect_age = ''
+        else:
+            redirect_age = reverse('show_%s' % model_class.resolve_tag())
+        response = HttpResponseRedirect(redirect_age)
     else:
         messages.error(request, 'Question was not %sed.' % action_str)
     return response, question_form

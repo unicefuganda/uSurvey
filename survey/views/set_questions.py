@@ -33,10 +33,6 @@ def _max_number_of_question_per_page(number_sent_in_request):
         int(max_question_per_page_supplied), MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
     return max(given_max_per_page, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE)
 
-
-QuestionForm = get_question_form(Question)
-
-
 @permission_required('auth.can_view_batches')
 def index(request, qset_id):
     # now I'm gonna call question set a batch of questions. If there's time, I'll rename them properly
@@ -60,7 +56,6 @@ def index(request, qset_id):
     else:
         question_filter_form = QuestionFilterForm(qset=batch)
     #question_library =  question_filter_form.filter(QuestionTemplate.objects.all())
-    question_form = QuestionForm(batch)
     breadcrumbs = Question.index_breadcrumbs(qset=batch)
     if breadcrumbs:
         request.breadcrumbs(breadcrumbs)
@@ -79,6 +74,7 @@ def new_subquestion(request, batch_id):
 def _save_subquestion(request, batch_id, instance=None):
     # possible subquestions are questions not bound to any interviewer yet
     batch = QuestionSet.get(pk=batch_id)
+    QuestionForm = get_question_form(batch.question_model())
     questionform = QuestionForm(batch, instance=instance)
     if request.method == 'POST':
         questionform = QuestionForm(
@@ -150,6 +146,7 @@ def delete(request, question_id, batch_id=None):
 def add_logic(request, qset_id, question_id):
     question = Question.get(id=question_id)
     batch = QuestionSet.get(id=qset_id)
+    QuestionForm = get_question_form(batch.question_model())
     response = None
     logic_form = LogicForm(question)
     question_rules_for_batch = {}
@@ -273,6 +270,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
     button_label = 'Create'
     options = None
     response = None
+    QuestionForm = get_question_form(batch.question_model())
     if instance:
         button_label = 'Save'
         options = instance.options.all().order_by('order')

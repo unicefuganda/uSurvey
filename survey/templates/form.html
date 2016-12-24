@@ -1,4 +1,8 @@
 {% extends "layout.html" %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ STATIC_URL }}formoid/formoid-solid-blue.css"/>
+<script type="text/javascript" src="{{ STATIC_URL }}formoid/formoid-solid-blue.js"></script>
+{% endblock %}
 <br>
 {% block content %}
 {%  block non_form_errors %}
@@ -11,7 +15,7 @@
 {% endblock %}
 
 
-<form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
+<form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}" >
   {% csrf_token %}
 
   {% block display_form_fields %}{% endblock %}

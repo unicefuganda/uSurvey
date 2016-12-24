@@ -10,7 +10,7 @@ from survey.models.surveys import Survey
 from survey.models.base import BaseModel
 from survey.utils.views_helper import get_descendants
 from survey.models.questions import QuestionFlow, QuestionSet
-from survey.models.batch_questions import BatchQuestion as Question
+from survey.models.batch_questions import BatchQuestion
 from survey.forms.logic import LogicForm
 from survey.models.access_channels import InterviewerAccess
 # from survey.models.enumeration_area import EnumerationArea
@@ -24,6 +24,10 @@ class Batch(QuestionSet):
     survey = models.ForeignKey(Survey, null=True, related_name="batches")
     BATCH_IS_OPEN_MESSAGE = "Batch cannot be deleted because it is open in %s."
     BATCH_HAS_ANSWERS_MESSAGE = "Batch cannot be deleted because it has responses."
+
+    @classmethod
+    def question_model(cls):
+        return BatchQuestion
 
     class Meta:
         app_label = 'survey'

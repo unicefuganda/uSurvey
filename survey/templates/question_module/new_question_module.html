@@ -1,6 +1,4 @@
-<h3>
-  {% block title %} {{ title }} {% endblock %}
-</h3>
+
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
   {% csrf_token %}
   {% include "naked_form.html" with a_form=question_module_form %}

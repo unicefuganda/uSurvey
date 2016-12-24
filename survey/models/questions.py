@@ -251,6 +251,10 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
     start_question = models.OneToOneField(
         Question, related_name='starter_%(class)s', null=True, blank=True, on_delete=models.SET_NULL)
 
+    @classmethod
+    def question_model(cls):
+        return Question
+
     class Meta:
         app_label = 'survey'
 

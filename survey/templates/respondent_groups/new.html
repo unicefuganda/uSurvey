@@ -23,7 +23,6 @@
 {% block javascripts %}
         <script type="text/javascript">
             $(function(){
-
                  if(!$('#id_value').val()) {
                      $('#id_value-control-group').hide();
                      $('#id_value').prop('disabled', true);
@@ -76,7 +75,7 @@
                              $('#id_max').prop('disabled', false);
                             break;
                         case('equals'):
-                            if(question_options[$('#id_test_question').val()]){
+                            if(Object.keys(question_options[$('#id_test_question').val()]).length > 0){
                                 $('#id_options-control-group').show();
                                 $('#id_options').prop('disabled', false);
                                 $('#id_value-control-group').hide();

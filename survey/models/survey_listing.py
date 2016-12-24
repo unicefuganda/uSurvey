@@ -81,13 +81,13 @@ class ListingSample(BaseModel):
 
     @classmethod
     def generate_random_samples(cls, from_survey, to_survey, ea):
-        ''' Used to generate random samples from listing conducted by from_survey to be used by to_survey
+        """ Used to generate random samples from listing conducted by from_survey to be used by to_survey
         to do: optimize this method queries
         :param from_survey: Survey from which listing was done
         :param to_survey: Survey for whom the random sample is being generated.
         :param ea: the EA where the survey was conducted
         :return: None
-        '''
+        """
         if to_survey.has_sampling is False or from_survey.has_sampling is False:
             raise ValueError('Either source or destination survey does not support sampling')
         valid_interviews = from_survey.interviews.filter(ea=ea, # the listed interviews in the ea
