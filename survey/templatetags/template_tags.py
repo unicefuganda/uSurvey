@@ -37,6 +37,11 @@ def space_replace(value, search_string):
 
 @register.filter
 def replace_space(value, replace_string):
+    """Basically the inverse of space replace
+    :param value:
+    :param replace_string:
+    :return:
+    """
     return value.replace(' ', replace_string)
 
 

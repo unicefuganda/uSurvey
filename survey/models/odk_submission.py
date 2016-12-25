@@ -1,3 +1,5 @@
+import os
+import mimetypes
 from django.conf import settings
 from django.db import models
 from survey.models.base import BaseModel

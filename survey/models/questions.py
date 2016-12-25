@@ -188,6 +188,18 @@ class QuestionFlow(BaseModel):
             self.next_question_type = self.next_question.type_name()
         return super(QuestionFlow, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        qset = self.question.qset
+        outcome = super(QuestionFlow, self).delete(*args, **kwargs)
+        _kill_zombies(qset.zombie_questions())          # this is basically for home cleaning to remove any dangling
+                                                        # to remove any dangling question
+        return outcome
+
+
+def _kill_zombies(zombies):
+    for z in zombies:
+        z.delete()
+
 
 class TestArgument(BaseModel):
     object = InheritanceManager()

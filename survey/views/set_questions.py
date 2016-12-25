@@ -199,12 +199,10 @@ def remove_loop(request, loop_id):
 
 @permission_required('auth.can_view_batches')
 def delete_logic(request, flow_id):
-    question = Question.get(id=flow_id)
-    print "questions",question,flow_id
-    flow = QuestionFlow.objects.get(question=question)
+    flow = QuestionFlow.get(id=flow_id)
     batch = flow.question.qset
     flow.delete()
-    _kill_zombies(batch.zombie_questions())
+    # _kill_zombies(batch.zombie_questions())
     messages.success(request, "Logic successfully deleted.")
     return HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
 
@@ -391,8 +389,8 @@ def update_orders(request, qset_id):
 @permission_required('auth.can_view_batches')
 @not_allowed_when_batch_is_open(message=REMOVE_QUESTION_FROM_OPEN_BATCH_ERROR_MESSAGE,
                                 redirect_url_name="batch_questions_page", url_kwargs_keys=['batch_id'])
-def remove(request, batch_id, question_id):
-    return _remove(request, batch_id, question_id)
+def remove(request, question_id):
+    return _remove(request, question_id)
 
 
 @permission_required('auth.can_view_batches')
@@ -401,21 +399,22 @@ def remove_loop(request,  question_id):
     get_object_or_404(QuestionLoop, loop_starter=question).delete()
     return HttpResponseRedirect(reverse('qset_questions_page',  args=(question.batch.pk, )))
 
+#
+# def _kill_zombies(zombies):
+#     for z in zombies:
+#         z.delete()
 
-def _kill_zombies(zombies):
-    for z in zombies:
-        z.delete()
 
-
-def _remove(request, batch_id, question_id):
+def _remove(request, question_id):
     question = Question.get(pk=question_id)
+    batch_id = question.qset.id
     batch = QuestionSet.get(pk=batch_id)
     redirect_url = reverse('qset_questions_page', args=(batch_id, ))
     if question.total_answers() > 0:
         messages.error(
             request, "Cannot delete question that has been answered at least once.")
     else:
-        _kill_zombies(batch.zombie_questions())
+        # _kill_zombies(batch.zombie_questions())
         if question:
             success_message = "Question successfully deleted."
             # % ("Sub question" if question.subquestion else "Question"))
