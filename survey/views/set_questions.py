@@ -394,10 +394,11 @@ def remove(request, question_id):
 
 
 @permission_required('auth.can_view_batches')
-def remove_loop(request,  question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    get_object_or_404(QuestionLoop, loop_starter=question).delete()
-    return HttpResponseRedirect(reverse('qset_questions_page',  args=(question.batch.pk, )))
+def remove_loop(request,  loop_id):
+    loop = get_object_or_404(QuestionLoop, id=loop_id)
+    batch = loop.loop_starter.qset
+    loop.delete()
+    return HttpResponseRedirect(reverse('qset_questions_page',  args=(batch.pk, )))
 
 
 def _kill_zombies(zombies):
