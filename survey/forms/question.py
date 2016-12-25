@@ -47,7 +47,7 @@ def get_question_form(model_class):
             model = model_class
             exclude = []
             widgets = {
-                'text': forms.Textarea(attrs={"rows": 4, "cols": 100, "maxlength": "150"}),
+                'text': forms.Textarea(attrs={"rows": 5, "cols": 30, "maxlength": "150"}),
             }
 
         def clean_options(self):

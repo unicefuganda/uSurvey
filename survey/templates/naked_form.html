@@ -1,9 +1,20 @@
 {% load template_tags %}
 {% for field in a_form.visible_fields %}
-<style type="text/css">label{
-	margin-top: -7px;
-	}
-    </style>
+
+  <!-- div class="element-input">
+      <label class="title" for="{{field.auto_id}}">{{field.label}}</label>
+      <div class="item-cont">
+          {{field}}
+          <span class="icon-place"></span>&nbsp;&nbsp;<span id="{{field.auto_id}}_tip" class="help tip">{{ field.help_text }}</span>
+          {% if field.errors %}
+            <label class="error" >
+                {% for error in field.errors %}
+                    {{ error}}
+                {% endfor %}
+             </label>
+        {% endif %}
+      </div>
+  </div -->
   <div id="{{field.auto_id}}-control-group" class="control-group">
     <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
     <div class="controls {{ field|is_radio }}">
@@ -18,6 +29,7 @@
         {% endif %}
     </div>
   </div>
+<br />
 {% endfor %}
 
 {% for hidden in a_form.hidden_fields %}

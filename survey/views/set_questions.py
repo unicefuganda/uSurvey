@@ -202,7 +202,7 @@ def delete_logic(request, flow_id):
     flow = QuestionFlow.get(id=flow_id)
     batch = flow.question.qset
     flow.delete()
-    # _kill_zombies(batch.zombie_questions())
+    _kill_zombies(batch.zombie_questions())
     messages.success(request, "Logic successfully deleted.")
     return HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
 
@@ -399,10 +399,10 @@ def remove_loop(request,  question_id):
     get_object_or_404(QuestionLoop, loop_starter=question).delete()
     return HttpResponseRedirect(reverse('qset_questions_page',  args=(question.batch.pk, )))
 
-#
-# def _kill_zombies(zombies):
-#     for z in zombies:
-#         z.delete()
+
+def _kill_zombies(zombies):
+    for z in zombies:
+        z.delete()
 
 
 def _remove(request, question_id):
@@ -414,7 +414,7 @@ def _remove(request, question_id):
         messages.error(
             request, "Cannot delete question that has been answered at least once.")
     else:
-        # _kill_zombies(batch.zombie_questions())
+        _kill_zombies(batch.zombie_questions())
         if question:
             success_message = "Question successfully deleted."
             # % ("Sub question" if question.subquestion else "Question"))
