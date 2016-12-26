@@ -327,13 +327,14 @@ def is_relevant_odk(context, question, interviewer):
         connecting_flows = question.connecting_flows.all()
         if null_flows:
             null_flow = null_flows[0]
-            if hasattr(question, 'loop_ended') is False:
-                null_condition = ["string-length(%s) &gt; 0" % node_path, ]
-            else:
+            if hasattr(question, 'loop_ended') or question.connecting_flows.exclude(desc=LogicForm.ASK_SUBQUESTION
+                                                                                    ).exists():
                 null_condition = ["count(%s) &gt; 0" % node_path, ]
+            else:
+                null_condition = ["string-length(%s) &gt; 0" % node_path, ]
             # ['true()', "string-length(%s) &gt; 0" % node_path]
             # null_condition = ['true()', ]
-            if len(flow_conditions) > 0:
+            if len(flow_conditions) > 0 and hasattr(question, 'loop_ended') is False:
                 null_condition.append('not(%s)' %
                                       ' or '.join(flow_conditions))
             next_question = null_flow.next_question
