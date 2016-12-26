@@ -76,7 +76,7 @@
                              $('#id_max').prop('disabled', false);
                             break;
                         case('equals'):
-                            if(question_options[$('#id_listing_question').val()]){
+                            if(Object.keys(question_options[$('#id_listing_question').val()]).length > 0){
                                 $('#id_options-control-group').show();
                                 $('#id_options').prop('disabled', false);
                                 $('#id_value-control-group').hide();
