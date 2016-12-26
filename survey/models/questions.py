@@ -5,6 +5,7 @@ from django_rq import job
 from collections import OrderedDict
 from ordered_set import OrderedSet
 from cacheops import cached_as
+from cacheops import invalidate_obj
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
@@ -281,7 +282,8 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
         Basically returns all the loops which a question is involved in. This retains the queston order
         :return:
         '''
-        @cached_as(QuestionLoop.objects.filter(loop_starter__qset__id=self.id))
+        @cached_as(QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
+                   Question.objects.filter(qset__id=self.id))
         def _loop_story():
             inlines = self.questions_inline()
             loops = []
@@ -330,7 +332,11 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
         qflows = QuestionFlow.objects.filter(
             question__qset=self, validation_test__isnull=True)
 
-        @cached_as(self.questions.all())
+        @cached_as(QuestionSet.objects.get(id=self.id),
+                   Question.objects.filter(qset__id=self.id),
+                   QuestionFlow.objects.filter(question__qset__id=self.id),
+                   QuestionFlow.objects.filter(next_question__qset__id=self.id),
+                   QuestionLoop.objects.filter(loop_starter__qset__id=self.id))
         def _questions_inline():
             if self.start_question:
                 inlines = inline_questions(self.start_question, qflows)

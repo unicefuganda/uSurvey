@@ -250,7 +250,8 @@ def _process_question_form(request, batch, response, question_form):
                 TemplateOption.objects.bulk_create(topts)
             messages.success(
                 request, 'Question successfully %sed. to library' % action_str)
-        messages.success(request, 'Question successfully %sed.' % action_str)
+        #messages.success(request, 'Question successfully Saved.' % action_str)
+        messages.success(request, 'Question successfully Saved.')
         if request.POST.has_key('add_more_button'):
             redirect_age = ''
         else:

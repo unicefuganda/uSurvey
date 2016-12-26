@@ -1,6 +1,7 @@
 import string
 from django_extensions.db.models import TimeStampedModel
 from model_utils.managers import InheritanceManager
+from cacheops import invalidate_obj
 
 
 class BaseModel(TimeStampedModel):
@@ -33,4 +34,9 @@ class BaseModel(TimeStampedModel):
     @classmethod
     def field_names(cls):
         return cls._meta.get_all_field_names()
+
+    def save(self, *args, **kwargs):
+        instance = super(BaseModel, self).save(*args, **kwargs)
+        invalidate_obj(self)            # to fix any cache issues relating to edit obj. seems not to be working
+        return instance
 
