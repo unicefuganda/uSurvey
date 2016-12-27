@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
+{% load template_tags %}
 {% block title %}
     {{ interviewer.name|capfirst }}'s Details
 {% endblock %}
 {% block content %}
-{% load template_tags %}
-   <table width="70%" border="0" cellspacing="0" align="center" cellpadding="0">
+
+   <table class="table table-hover">
   <tr>
     <td align="right" valign="top">Name</td>
     <td align="left" valign="top" class="showdetails">{{ interviewer.name|capfirst }}</td>
@@ -77,7 +78,10 @@
                     class="icon-chevron-left icon-white"></i> Back</a>
         {% endif %}
         {% include 'interviewers/_action_button.html' with button_size="" interviewer=interviewer %}
-{% endblock %}
+
 </td>
   </tr>
 </table>
+<br />
+<br />
+{% endblock %}

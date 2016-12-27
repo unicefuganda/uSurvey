@@ -247,7 +247,6 @@ class QuestionView(object):
         if instance:
             button_label = 'Save'
             options = instance.options.all().order_by('order')
-            # import pdb; pdb.set_trace()
             # options = [option.text.strip() for option in options] if options else None
 
         if request.method == 'POST':

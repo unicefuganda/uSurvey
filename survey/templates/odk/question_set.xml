@@ -21,7 +21,7 @@ xmlns:jr="http://openrosa.org/javarosa">
        <instanceName />
      </meta>
 	   <type>{{ stage }}</type> {% comment %} basically tells if it's listing or survey data. status may change {% endcomment %}
-	   <enumerationArea />
+	   <surveyAllocation />
 		{% for question in qset.questions_inline %}
 	       {% if question.loop_started %}
 	           <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
@@ -41,8 +41,8 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/qset/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/qset/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat('{{ qset.name}}', '/qset/enumerationArea')" />
-  <bind nodeset="/qset/enumerationArea" type="select1" required="true()" />		   
+           readonly="true()" calculate="concat('{{ qset.name}}', '/qset/surveyAllocation')" />
+  <bind nodeset="/qset/surveyAllocation" type="select1" required="true()" />
 	{% for question in qset.flow_questions  %}
 		{% is_relevant_odk question interviewer as relevance_context %}
 	    {% get_loop_aware_path question  as path %}
@@ -65,12 +65,12 @@ xmlns:jr="http://openrosa.org/javarosa">
   </model>
 </h:head>
 <h:body>
-    <select ref="/qset/enumerationArea">
+    <select ref="/qset/surveyAllocation">
 		<label>Select EnumerationArea</label>
 		{% for assignment in assignments %}
 		<item>
 			<label>{{assignment.allocation_ea.name}}</label>
-			<value>{{ assignment.allocation_ea.pk }}</value>
+			<value>{{ assignment.pk }}</value>
 		</item>
 		{% endfor %}
 	</select>

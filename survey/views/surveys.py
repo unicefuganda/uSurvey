@@ -118,6 +118,7 @@ def delete_sampling_criterion(request, criterion_id):
     survey = randomization_criteria.survey
     randomization_criteria.arguments.all().delete()
     randomization_criteria.delete()
+    messages.success('sampling criterion successfully deleted')
     return HttpResponseRedirect(reverse('listing_criteria_page', args=(survey.pk, )))
 
 
@@ -131,14 +132,14 @@ def edit(request, survey_id):
         if survey_form.is_valid():
             Survey.save_sample_size(survey_form)
             messages.success(request, 'Survey successfully edited.')
-            return HttpResponseRedirect('/surveys/')
+            return HttpResponseRedirect(reverse('survey_list_page'))
 
     context = {'survey_form': survey_form,
                'title': "Edit Survey",
                'button_label': 'Save',
                'id': 'edit-survey-form',
-               'cancel_url': '/surveys/',
-               'action': '/surveys/%s/edit/' % survey_id
+               'cancel_url': reverse('survey_list_page'),
+               'action': reverse('edit_survey_page', args=(survey_id))
                }
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
@@ -154,4 +155,4 @@ def delete(request, survey_id):
         messages.error(request, "Survey cannot be deleted.")
     else:
         survey.delete()
-    return HttpResponseRedirect('/surveys/')
+    return HttpResponseRedirect(reverse('survey_list_page'))

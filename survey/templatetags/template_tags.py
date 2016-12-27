@@ -227,7 +227,6 @@ def trim(value):
 
 @register.filter
 def household_completed_percent(interviewer):
-    #    import pdb;pdb.set_trace()
     households = interviewer.households.all()
     total = households.count()
     completed = len([hld for hld in households.all(
