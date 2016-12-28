@@ -1,191 +1,59 @@
-<!-- script language="JavaScript" type="text/javascript">
-$(document).ready(function() {
-    $('table.batch_assignments').DataTable( {
-        "scrollY":        "200px",
-        "scrollCollapse": true,
-        "paging":         false
-    } );
-} );
-</script -->
 {% extends 'form.html' %}
 {% block title %}
     Select Questions for {{ batch.survey.name.capitalize }} - {{ batch.name.capitalize }}
 {% endblock %}
 {% block extra_css %}
 	<link rel="stylesheet" href="{{ STATIC_URL }}js/redips_drag/style.css" />
-	<style type="text/css">
-/*.table {
-	font-family:Arial, Helvetica, sans-serif;
-	color:#666;
-	font-size:12px;
-	text-shadow: 1px 1px 0px #fff;
-	background:#eaebec;
-	margin:20px;
-	border:#ccc 1px solid;
-
-	-moz-border-radius:3px;
-	-webkit-border-radius:3px;
-	border-radius:3px;
-
-	-moz-box-shadow: 0 1px 2px #d1d1d1;
-	-webkit-box-shadow: 0 1px 2px #d1d1d1;
-	box-shadow: 0 1px 2px #d1d1d1;
-}*/
-
-div.batch_assignment {
-		<!--height: 10%;-->
-		<!--max-height: 50%;-->
-		overflow:  auto;
-		width: 49%;
-		margin-left: 1%;
-
-}
-
-
- div.batch_assignment {
-	height: 400px;
-	overflow-y: auto;
-}
-
-
-.search {
-	margin-top: -1px;
-}
-
-th.question, td.question {
-	width: 85%;
-	text-align: left;
-	padding-left: 15px;
-	font-size: 12px;
-}
-
-th.code, td.code {
-	width: 15%;
-	text-align: left;
-	padding-left: 10px;
-	font-size: 12px;
-}
-
-thead {
-	<!--display: block;-->
-}
-
-#lib_questions_table_body, #batch_questions_body {
-	overflow-y: scroll;
-    max-height:100px;
-	<!--display: block;-->
-}
-
-table a:active, a:link, a:visited, table a:hover
- {
-	text-decoration:none;
-}
-
-table th {
-	padding:8px;
-	border-top:1px solid #eee;
-	border-right:1px solid  #e0e0e0;
-	border-bottom:1px solid #e0e0e0;
-	font-weight: bold;
-    color: #09F;
-    text-transform: uppercase;
-    font-size: 12px;
-
-}
-
-table tr:first-child th:first-child{
-	-moz-border-radius-topleft:3px;
-	-webkit-border-top-left-radius:3px;
-	border-top-left-radius:3px;
-}
-table tr:first-child th:last-child{
-	-moz-border-radius-topright:3px;
-	-webkit-border-top-right-radius:3px;
-	border-top-right-radius:3px;
-
-}
-table tr td:first-child{
-	border-left: 0;
-}
-.tabletrtd {
-	padding:10px;
-	border-top: 1px solid #ffffff;
-	border-bottom:1px solid #e0e0e0;
-	border-left: 1px solid #e0e0e0;
-	background: #fafafa;
-	background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
-	background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
-}
-table tr.even td{
-	background: #f6f6f6;
-	background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#f6f6f6));
-	background: -moz-linear-gradient(top,  #f8f8f8,  #f6f6f6);
-}
-table tr:last-child td{
-	border-bottom:0;
-}
-table tr:last-child td:first-child{
-	-moz-border-radius-bottomleft:3px;
-	-webkit-border-bottom-left-radius:3px;
-	border-bottom-left-radius:3px;
-}
-table tr:last-child td:last-child{
-	-moz-border-radius-bottomright:3px;
-	-webkit-border-bottom-right-radius:3px;
-	border-bottom-right-radius:3px;
-}
-table tr:hover td{
-	background: #ffffff;
-	background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#ffffff));
-	background: -moz-linear-gradient(top,  #ffffff,  #ffffff);
-}
-
-
-
-		#batch_questions {
-			margin-top: -17px;
-		}
-	.forleft
-		{
-		position: relative;
-		top:17px;
-		left:35;
-		}
-	.tip {
-		padding: 0;
-		text-align: center;
-		font-size: 11px;
-	}
-	table tr td a {
-		display:block;
-		height:100%;
-		width:100%;
-		}
-
-	</style>
 {% endblock %}
 {% block pre_form_content %}
-	<div class="filter-form right">
+<div class="row" style="margin-right: -15px;
+    margin-left: -15px;background: none">
+<div class="col-md-12">
+<div class="filter-form right">
 		{% include "horizontal_naked_form.html" with a_form=question_filter_form %}
     </div>
     <div class="forleft">
     	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
     </div>
-       <div id="batch_assignment" class="clear">
-		<ul>
+ </div>
+
+ <div class="col-md-12">
+
+ 	<ul>
 			<li class="help tip">
 				Click on code or text to move between tables
 			</li>
 		</ul>
-<div class="batch_assignment" style="float: left;">
+<div class="row" style="margin-right: -15px;
+    margin-left: -15px;background: none;border-bottom: none;">
+	<div class="col-md-6">
+<table class="table" style="
+    margin-bottom: 0px !important;">
+<thead id="lib_questions_table_head">
+<tr >
+	<th colspan="2" class="text-center" style="background: #f2f2f2 linear-gradient(to bottom, #f8f8f8 0px, #fff 100%) repeat-x scroll 0 0;
+    /*color: #707070;*/
+    font-weight: 400;
+    border-left-color: #ddd;
+   color: #09F;
+    font-family: "Open Sans",sans-serif;
+    font-size: 13px;">LIBRARY QUESTIONS</th>
 
-					<table id="lib_questions_table" >
+</tr>
+
+</thead>
+ </table>
+
+
+<div class="batch_assignment" >
+
+					<table id="lib_questions_table" class="table table-hover" >
 						<thead id="lib_questions_table_head">
-        <tr>
-			<th  colspan="2"  id="lib_title">LIBRARY QUESTIONS</th>
-		</tr>
-		<tr><th align="center" class="code">CODE</th><th align="left" class="question">TEXT</th></tr></thead>
-						 <tbody id="lib_questions_table_body">
+       <tr><th align="center" class="code" >CODE</th>
+
+<th align="left" class="question" >TEXT</th></tr>
+		</thead>
+						 <tbody id="lib_questions_table_body" class="lib_questions_table_body1">
 						{% for question in library_questions %}
 							<tr id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move" class="ms-selectable">
 								<td class="tabletrtd code"><a href="#">
@@ -205,28 +73,63 @@ table tr:hover td{
 
 {% endblock %}
 {% block display_form_fields %}
-		   		<div class="batch_assignment" style="float: right;">
-						<table id="batch_questions"  width="100%">
-							<br>
-							<thead id="batch_questions_head">
-        <tr>
-           <th  colspan="2">BATCH QUESTIONS</th>
-		</tr>
-		<tr>
-            <th align="center" class="code">CODE</th><th align="left"  class="question">TEXT</th>
+	</div>
 
-        </tr></thead>
-							<tbody id="batch_questions_body"></tbody>
+
+
+	<div class="col-md-6">
+
+
+	<table class="table" style="
+    margin-bottom: 0px !important;">
+<thead id="lib_questions_table_head">
+<tr >
+	<th colspan="2" class="text-center" style="background: #f2f2f2 linear-gradient(to bottom, #f8f8f8 0px, #fff 100%) repeat-x scroll 0 0;
+    /*color: #707070;*/
+    color: #09F;
+    font-weight: 400;
+    border-left-color: #ddd;
+   
+    font-family: "Open Sans",sans-serif;
+    font-size: 13px;">BATCH QUESTIONS</th>
+
+</tr>
+<tr><th align="center" class="code">CODE</th>
+
+<th align="left" class="question">TEXT</th></tr>
+</thead>
+ </table>
+	
+
+
+
+		   		<div class="batch_assignment"  >
+						<table id="batch_questions" class="table table-hover"  width="100%">
+							
+							<thead id="batch_questions_head">
+        
+	</thead>
+							<tbody id="batch_questions_body" class="lib_questions_table_body1"></tbody>
 						</table>
 					</div>
 
 				<input type="hidden" value="{{ batch.id }}" id="batch_id">
-		   	<br class="clear" />
+		  
 
-{% endblock %}
+
+	</div>
+
+</div>
+
+ </div>
+
+	<div class="col-md-12">
+	{% endblock %}
 {% block non_form_content %}
 	</div>
 {% endblock %}
+</div>
+	       
 {% block javascripts %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/batch.js"></script>
 {% comment %}
@@ -300,4 +203,6 @@ $(window).resize(function() {
     });
 }).resize(); // Trigger resize handler
 </script>
+<link href="{{ STATIC_URL }}toassets/instyle.css" rel="stylesheet" type="text/css">
 {% endblock %}
+
