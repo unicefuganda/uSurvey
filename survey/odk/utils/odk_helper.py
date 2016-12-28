@@ -26,6 +26,7 @@ from django.contrib.sites.models import Site
 from dateutils import relativedelta
 from django.db.utils import IntegrityError
 from django_rq import job
+from survey.templatetags.template_tags import get_xform_relative_path
 
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'
@@ -297,8 +298,18 @@ def _get_form_type(survey_tree):
 
 def save_questions(qset, survey_allocation, survey_tree):
     questions = qset.flow_questions
-    for question in questions:
-        question_nodes = _get_nodes(QUESTION_PATH_TEMPLATE, survey_tree)
+    submission_summary = []
+    for question in qset.inline_questions():
+        data = {}
+        if hasattr(inline_ques, 'loop_started'):
+            loop_summary = []
+            question_base_nodes = _get_nodes(get_xform_relative_path(question), survey_tree)
+            for base_node in question_base_nodes:
+                answer_node = _get_nodes('./q%s'%question.pk, survey_tree)
+                if answer_node:
+                    data[question.pk] = answer_node[0].text
+        # if hasattr(inline_ques, 'loop_ended'):
+
 
 
 def process_submission(interviewer, xml_file, media_files=[], request=None):
@@ -314,6 +325,10 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     description = ''
     qset  = _get_qset(survey_tree)
     survey_allocation = _get_allocation(survey_tree)
+    # first things first. save the submission incase all else background task fails... enables recover
+    ODKSubmission.objects.create(interviewer=interviewer, survey=survey_allocation.survey,
+                                 question_set=qset, ea=survey_allocation.allocation_ea, form_id=form_id,
+                                 xml=xml_blob, instance_id=instance_id)
     save_questions(qset, survey_allocation, survey_tree)
     if _get_form_type(survey_tree) in ['None', str(SurveyAllocation.LISTING)]:
         pass

@@ -62,8 +62,7 @@ class LocationsFilterForm(Form):
                 self.fields[location_type.name] = forms.ModelChoiceField(
                     queryset=locations)  # forms.ChoiceField(choices=choices)
                 self.fields[location_type.name].required = False
-                self.fields[location_type.name].widget.attrs[
-                    'class'] = 'location_filter ea_filters chzn-select'
+                self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filters chzn-select'
                 # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
         if last_selected_pk:
             self.last_location_selected = Location.objects.get(

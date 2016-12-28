@@ -60,14 +60,35 @@ function show_or_hide_next_question(action_value) {
     $(' .chzn-select').trigger("liszt:updated");
 }
 
+var id_text_delim = ":    ";
+
 function append_to_next_question_dropdown(data) {
     counter=0;
+    $('#id_next_question').append('<option value="">Question-Code'+id_text_delim+'Text</option>');
     $.each(data, function () {
-        $('#id_next_question').append("<option value=" + data[counter]['id'] + ">" + data[counter]['identifier'] + " -- "+ data[counter]['text'] + "</option>");
+        $('#id_next_question').append('<option value="' + data[counter]['id'] + '">' + data[counter]['identifier'] + id_text_delim + data[counter]['text'] + "</option>");
         counter++;
     });
-     $(' .chzn-select').trigger("liszt:updated");
+//     $(' .chzn-select').trigger("liszt:updated");
+     $('#id_next_question').select2({
+        templateResult: next_question_format,
+        theme: "classic",
+    });
 }
+
+function next_question_format(state) {
+    if(state.id){    // to do: handle this more elegantly
+        var question_code = state.text.split(id_text_delim)[0];
+        var question_text = state.text.split(id_text_delim)[1];
+    }
+    else{
+        var question_code = '<strong class="opt-header">'+state.text.split(id_text_delim)[0]+'</strong>';
+        var question_text = '<strong class="opt-header">'+state.text.split(id_text_delim)[1]+'</strong>';
+    }
+    return $('<div class="opt-item"><span class="opt-id" style="display: inline-block; padding-right: 2%; width: 20%;">' + question_code +
+    '</span><span class="opt-text" style="display: inline-block;">'+ question_text + '</span></div>');
+}
+
 
 function append_to_drop_down_options(url)
 {
@@ -182,7 +203,7 @@ jQuery(function($){
 
         post.done(function(data){
             if(data){
-                 $('#id_next_question').append("<option value=" + data['id'] + ">" + data['identifier'] + " -- "+ data['text'] + "</option>");
+                 $('#id_next_question').append("<option value=" + data['id'] + ">" + data['identifier'] + id_text_delim + data['text'] + "</option>");
                 $('#close_modal').click();
             } else{
                 append_error_to_text(data);

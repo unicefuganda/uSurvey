@@ -2,6 +2,16 @@
 
 {% load template_tags %}
 
+{% block extra_head %}
+<link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
+<script src="{{STATIC_URL}}js/select2.full.js"></script>
+<style type="text/css">
+    #id_next_question {
+        width: 50%;
+    }
+</style>
+{% endblock %}
+
 {% block title %}
     Add Logic
 {% endblock %}

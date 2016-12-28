@@ -66,7 +66,7 @@ class LogicForm(forms.Form):
                                for q in batch.zombie_questions()])
         self.fields['next_question'] = forms.ChoiceField(label='', choices=next_q_choices, widget=forms.Select,
                                                          required=False)
-        self.fields['next_question'].widget.attrs['class'] = 'chzn-select'
+        #self.fields['next_question'].widget.attrs['class'] = 'chzn-select'
         self.fields['action'].choices = self.ACTIONS.items()
 
         action_sent = data.get('action', None) if data else None
@@ -105,6 +105,14 @@ class LogicForm(forms.Form):
         # return '%s-%s' % (self.cleaned_data['condition'],
         # self.ACTIONS[self.cleaned_data['action']])
         return self.ACTIONS[self.cleaned_data['action']]
+
+    def clean_next_question(self):
+        if self.cleaned_data['action'] in [self.ASK_SUBQUESTION, self.SKIP_TO, self.BACK_TO]:
+            try:
+                int(self.cleaned_data.get('next_question', ''))
+            except:
+                raise ValidationError('Next question is required for Skip or Sub questions')
+        return self.cleaned_data.get('next_question', '')
 
     def clean(self):
         field_name = ""

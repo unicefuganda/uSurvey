@@ -6,6 +6,8 @@ from survey.models.base import BaseModel
 from survey.models.interviewer import Interviewer
 from survey.models.surveys import Survey
 from survey.models.interviews import  Interview
+from survey.models.enumeration_area import EnumerationArea
+from survey.models.questions import QuestionSet
 
 
 class ODKFileDownload(BaseModel):
@@ -16,7 +18,8 @@ class ODKSubmission(BaseModel):
     interviewer = models.ForeignKey(
         Interviewer, related_name="odk_submissions")
     survey = models.ForeignKey(Survey, related_name="odk_submissions")
-    interview = models.ForeignKey(Interview, related_name='odk_submissions')
+    ea = models.ForeignKey(EnumerationArea, related_name="odk_submissions")
+    question_set = models.ForeignKey(QuestionSet, related_name='odk_submissions')
     form_id = models.CharField(max_length=256)
     description = models.CharField(max_length=256, null=True, blank=True)
     instance_id = models.CharField(max_length=256)

@@ -348,22 +348,26 @@
       <script src="{{ STATIC_URL }}js/jquery.dataTables.js"></script>
       <script src="{{ STATIC_URL }}js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}chosen/chosen.jquery.js"></script>
       <script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
-    <script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
       {% block javascripts %}
 
       {% endblock %}
       <script type="text/javascript">
+          $(function(){
+             (function($) { $(".chzn-select").chosen(); })(jQuery);
              $('.datepicker').datepicker({
              changeMonth: true,
              changeYear: true,
              dateFormat: 'dd-mm-yy',
              yearRange: "-120:+nn"
              });
+             });
+
         </script>
       <script type="text/javascript">
          if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
