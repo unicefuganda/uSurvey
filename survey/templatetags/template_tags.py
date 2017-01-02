@@ -316,7 +316,7 @@ def is_relevant_odk(context, question, interviewer):
             if flow.validation_test:
                 text_params = [t.param for t in flow.text_arguments]
                 answer_class = Answer.get_class(question.answer_type)
-                flow_condition = answer_class.print_odk_validation(
+                flow_condition = answer_class.print_odk_validation(     # get appropriate flow condition
                     node_path, flow.validation_test, *text_params)
                 flow_conditions.append(flow_condition)
                 if flow.next_question:
@@ -327,11 +327,12 @@ def is_relevant_odk(context, question, interviewer):
                     context[next_question.pk] = next_q_context
         null_flows = flows.filter(
             validation_test__isnull=True, next_question__isnull=False)
-        connecting_flows = question.connecting_flows.all()
         if null_flows:
             null_flow = null_flows[0]
-            if hasattr(question, 'loop_ended') or question.connecting_flows.exclude(desc=LogicForm.ASK_SUBQUESTION
-                                                                                    ).exists():
+            # check if next question if we are moving to a less looped question
+            # essentially same as checking if next question is outside current questions loop
+            loop_story = question.qset.get_loop_story()
+            if len(loop_story.get(question.pk, [])) > len(loop_story.get(null_flow.next_question.pk, [])):
                 null_condition = ["count(%s) &gt; 0" % node_path, ]
             else:
                 null_condition = ["string-length(%s) &gt; 0" % node_path, ]

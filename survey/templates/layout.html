@@ -77,6 +77,9 @@
        <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
 
+       {% block extra_head %}
+
+       {% endblock %}
 
       <style>
          .headerArea {
@@ -84,9 +87,20 @@
 		 border-bottom:13px solid #0073bf;
          }
       </style>
-       {% block extra_head %}
-
-       {% endblock %}
+      <style>
+         li.select2-results__option {
+                -moz-user-select: none;
+                background-color: #fefefe;
+                border-bottom: 1px solid #d5d5d5;
+                padding: 6px;
+            }
+          li.select2-results__option:nth(odd) {
+               background-color: #f3f3f3;
+            }
+        li.select2-results__option:nth-child(even) {
+               background-color: #d3e7f5
+            }
+      </style>
 
    </head>
    <body class="home page page-id-146 page-template page-template-page_templates page-template-home bgOne ">

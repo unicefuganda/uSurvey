@@ -41,7 +41,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/qset/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/qset/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat('{{ qset.name}}', '/qset/surveyAllocation')" />
+           readonly="true()" calculate="concat('{{ qset.name}}', /qset/surveyAllocation)" />
   <bind nodeset="/qset/surveyAllocation" type="select1" required="true()" />
 	{% for question in qset.flow_questions  %}
 		{% is_relevant_odk question interviewer as relevance_context %}

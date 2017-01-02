@@ -171,14 +171,14 @@ def download_xform(request, survey_id):
             return response
         except:
             raise
-    return OpenRosaResponseNotFound()
+    return OpenRosaResponseNotFound('No survey found')
 
 
 @http_digest_interviewer_auth
 def download_listing_xform(request):
     interviewer = request.user
     assignments = get_survey_allocation(interviewer)
-    response = OpenRosaResponseNotFound()
+    response = OpenRosaResponseNotFound('No survey allocated')
     if assignments.count():
         survey = assignments[0].survey       # all assignemnts are of same survey
         downloads = []
