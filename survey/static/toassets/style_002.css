@@ -162,15 +162,16 @@ display: inline-block;
 .sub-menu > li{
     display: block;
     position: relative;
-    padding: 0 30px;
+    /*padding: 0 30px;*/
+    padding: 0 5px;
 }
 .sub-menu > li > a{
     font-size: 13px;
     font-weight: 400;
     text-transform: uppercase;
     display: block;
-    color: #fff;
-    border-bottom: 1px solid #d0dbe2;
+    color: #fff;    
+    border-bottom: 1px solid #77c8fe;
     padding: 14px 0 14px 5px;
 }
 .sub-menu > li:first-child > a{
@@ -3256,3 +3257,17 @@ form.commentForm{
     color: #fff;
 }
 
+.showdetails {
+color: #0066FF;
+text-decoration: none;
+height: 30px;
+width: 50%;
+text-align: center;
+padding-left: 20px;
+padding-right: 20px;
+}
+.centerTable tr td{
+    
+    margin:0px auto;
+    width: 50%;
+}

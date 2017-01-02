@@ -23,8 +23,8 @@
 												<a href="{% url export_template_url %}" class="">Export Questions</a>
 											</button> -->
 
-        <a class="btn btn-white btn-warning btn-bold" href="{% url export_template_url %}" >
-                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+        <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url export_template_url %}" >
+                        <i class="ace-icon fa fa-external-link bigger-120"></i>
                          Export Questions</a>
         {% endwith %}
         {% with 'new_'|add:model_class.resolve_tag as new_template_url %}
@@ -33,8 +33,8 @@
 												<a href="{% url new_template_url %}" class="">Create New Question</a>
 											</button> -->
 
-        <a class="btn btn-white btn-warning btn-bold" href="{% url new_template_url %}" >
-                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+        <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url new_template_url %}" >
+                        <i class="ace-icon fa fa-plus bigger-120"></i>
                          Create New Question</a>
         {% endwith %}
 {% endblock %}
@@ -94,7 +94,7 @@
                             </li>
                             {% endwith %}
                             
-                            <li><a href="{% url 'delete_question_template_page' question.pk %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                            <li><a href="{% url 'delete_question_template_page' question.pk %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
                             {% if question.options.all %}
                             <li>
                                 <a href="#view_options_{{ question.id }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>View Options</span></a>

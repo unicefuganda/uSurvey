@@ -68,16 +68,7 @@
     <!-- END / HEADER -->
 
     <!-- LOGIN -->
-    {% if form.errors %}
-
-      <div class="alert alert-error">
-        <label class="error">Your username and password didn't match. Please try again.</label>
-      </div>
-  {% endif %}
-
-  {% if not form.errors %}
-
-  {% endif %}
+    
 
     <section id="login-content" class="login-content">
         <div class="awe-parallax bg-login-content"></div>
@@ -89,6 +80,17 @@
                 <div class="col-xs-12 col-lg-4 pull-right">
                 {% csrf_token %}
                    <div class="form-login">
+
+                   {% if form.errors %}
+
+      
+        <label class="error" style="color:yellow">Your username and password didn't match. Please try again.</label>
+      
+  {% endif %}
+
+  {% if not form.errors %}
+
+  {% endif %}                   
                         <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
                             <h2 class="text-uppercase">uSurvey</h2>
                             {% csrf_token %} <div>

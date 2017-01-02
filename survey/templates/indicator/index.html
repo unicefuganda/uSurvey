@@ -8,10 +8,13 @@
 {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
-    <button class="btn btn-white btn-warning btn-bold">
+    <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="{% url 'new_indicator_page' %}" class="">Add Indicator</a>
-											</button>
+											</button> -->
+  <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'new_indicator_page' %}" >
+                        <i class="ace-icon fa fa-plus bigger-120"></i>
+                         Add Indicator</a>
 {% endblock %}
 {% load template_tags %}
 {% block content %}
@@ -43,12 +46,39 @@
                 <td>{{ indicator.description }}</td>
                 <td>{{ indicator.module.name }}</td>
                 <td>{{ indicator.measure }}</td>
-                <td>
-                <div class="btn-group">
-                    <a href="{% url 'edit_indicator_page'  indicator.id %}" class="btn btn-small" id="edit-indicator_{{ indicator.id }}"><i class="icon-pencil"></i> Edit</a>
-                    <a href="#delete_indicator_{{indicator.id}}" class="btn btn-small" data-toggle="modal" id="delete-indicator_{{indicator.id}}"><i class="icon-trash"></i> Delete</a>
-                    <a href="{% url 'add_formula_page' indicator.id %}" class="btn btn-small" id="add-formula-indicator_{{ indicator.id }}"><i class="icon-wrench"></i> Formula</a>
-                    <a href="{% url 'simple_indicator_chart_page' indicator.id %}" class="btn btn-small" id="analyse-indicator_{{ indicator.id }}"><i class="icon-eye-open"></i> Analysis</a>
+                <td>                                
+                <div class="">
+                <div class="inline pos-rel">
+                <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                       </button>
+                        <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                <li>
+                                <a href="{% url 'edit_indicator_page'  indicator.id %}" class="tooltip-info" data-rel="tooltip" data-toggle="modal" id="edit-indicator_{{ indicator.id }}" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                            </li>
+                    <!-- <li>
+                    <a href="{% url 'edit_indicator_page'  indicator.id %}" class="btn btn-small" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title="" id="edit-indicator_{{ indicator.id }}"><i class="icon-pencil"></i> Edit</a></li>-->
+                    <!-- <li>
+                    <a href="#delete_indicator_{{indicator.id}}" class="btn btn-small" data-toggle="modal" id="delete-indicator_{{indicator.id}}"><i class="icon-trash"></i> Delete</a></li>
+                    <li> -->
+
+                     <li>
+                                <a href="#delete_indicator_{{indicator.id}}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" id="edit-indicator_{{ indicator.id }}" title="" data-original-title="Edit"><span class="red"><i class="usur-icon fa fa-trash"></i>Delete</span></a>
+                            </li>
+
+<!-- 
+                    <a href="{% url 'add_formula_page' indicator.id %}" class="btn btn-small" id="add-formula-indicator_{{ indicator.id }}"><i class="icon-wrench"></i> Formula</a></li>
+                    <li> -->
+                    <li>
+                                <a href="{% url 'add_formula_page' indicator.id %}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" id="add-formula-indicator_{{ indicator.id }}" title="" data-original-title="Edit"><span class="black"><i class="usur-icon fa fa-braille"></i>Formula</span></a>
+                            </li>
+                    <!-- <a href="{% url 'simple_indicator_chart_page' indicator.id %}" class="btn btn-small" id="analyse-indicator_{{ indicator.id }}"><i class="icon-eye-open"></i> Analysis</a></li> -->
+
+                    <li>
+                                <a href="{% url 'simple_indicator_chart_page' indicator.id %}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" id="analyse-indicator_{{ indicator.id }}" title="" data-original-title="Edit"><span class="green"><i class="usur-icon fa fa-pie-chart"></i>Analysis</span></a>
+                            </li>
+                            </ul>
+                    </div>
                 </div>
                 {% include "base/delete_modal.html" with object_name=indicator.name id=indicator.id name="Indicator" url=indicator.id|get_url_with_ids:"delete_indicator_page" %}
                 </td>

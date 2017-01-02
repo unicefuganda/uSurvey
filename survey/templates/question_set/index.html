@@ -16,7 +16,7 @@
 											</button> -->
 
     <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set">
-          <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+          <i class="ace-icon fa fa-plus bigger-120"></i>
                         Create New {{ model.verbose_name }}
                       </button>
 
@@ -80,12 +80,12 @@
                             {% if not question_set.interviews.exists %}
 
                             {% if model.verbose_name == 'Batch' %}
-                            <li><a href="{% url 'delete_qset' question_set.id survey.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                            <li><a href="{% url 'delete_qset' question_set.id survey.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
 
                      {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|add_string:survey.id|get_url_with_ids:"delete_qset" %}
                 {% else %}
 
-                <li><a href="{% url 'delete_qset_listingform' question_set.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                <li><a href="{% url 'delete_qset_listingform' question_set.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
 
                     {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_qset_listingform" %}
 
@@ -98,7 +98,7 @@
                             <li><a href="{% url 'set_questions_index_page' question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-table bigger-120"></i>View Data</span></a></li>
                             {% endif %}
                             {% if question_set.verbose_name = 'Batch' and question_set.flow_questions %}
-                            <li><a href="{% url 'batch_show_page' question_set.survey.id question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa-folder-open-o/fa fa-times-circle bigger-120"></i>Open/Close</span></a></li>
+                            <li><a href="{% url 'batch_show_page' question_set.survey.id question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-folder-open-o/fa fa-times-circle bigger-120"></i>Open/Close</span></a></li>
                             {% endif %}
                         </ul>
                 </div>

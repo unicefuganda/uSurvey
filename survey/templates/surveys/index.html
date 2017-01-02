@@ -9,10 +9,10 @@
 {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
-        <a class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_survey"  id="add_survey">
-          <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+        <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_survey"  id="add_survey">
+          <i class="ace-icon fa fa-plus bigger-120"></i>
 												Create New Survey 
-											</a>
+											</button>
 
 {% endblock %}
     {% block table_head %}
@@ -68,13 +68,13 @@
                             </li>
                             {% if not survey.interviews.exists %}
                             <li>
-                                <a href="{% url 'delete_survey' survey.id%}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                                <a href="{% url 'delete_survey' survey.id%}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
                             </li>
                             {% endif %}
                             {% if survey.has_sampling and not survey.listing_samples.exists %}
                             <li><a href="{% url 'listing_criteria_page' survey.pk %}" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>Samping Criteria</span></a></li>
                             {% endif %}
-                            <li><a href="{% url 'batch_index_page' survey.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-eye bigger-120"></i>View Batches</span></a></li>
+                            <li><a href="{% url 'batch_index_page' survey.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>View Batches</span></a></li>
                         </ul>
                 </div>
             </div>

@@ -10,15 +10,15 @@
 {% endblock %}
 {% block page_actions %}
 
-        <a class="btn btn-white btn-warning btn-bold" href="{% url 'new_respondent_groups_page' %}" >
-                        <i class="ace-icon fa fa-plus bigger-120 orange"></i>
+        <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'new_respondent_groups_page' %}" >
+                        <i class="ace-icon fa fa-plus bigger-120"></i>
                          Add Group</a>
         <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="{% url 'new_respondent_groups_page' %}" class="">Add Group</a>
 											</button> -->
-        <a class="btn btn-white btn-warning btn-bold" href="{% url 'show_parameter_template' %}" >
-                        <i class="ace-icon fa fa-eye bigger-120 orange"></i>
+        <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'show_parameter_template' %}" >
+                        <i class="ace-icon fa fa-eye bigger-120"></i>
                          Available Parameters</a>
         <!-- <button class="btn btn-white btn-warning btn-bold">
 												<i class="ace-icon fa fa-eye bigger-120 orange"></i>
@@ -62,7 +62,7 @@
                             </li>
                             {% if not group.has_interviews %}
                             <li>
-                                <a href="{% url 'respondent_groups_delete' group.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                                <a href="{% url 'respondent_groups_delete' group.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
                             </li>
                             {% endif %}
                         </ul>

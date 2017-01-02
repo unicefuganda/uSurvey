@@ -5,77 +5,77 @@
 {% endblock %}
 {% block content %}
 
-   <table class="table table-hover">
+   <table class="table centerTable">
   <tr>
-    <td align="right" valign="top">Name</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.name|capfirst }}</td>
+    <td style="text-align:right" valign="top" >Name</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.name|capfirst }}</td>
   </tr>
 {% for access in interviewer.ussd_access %}
   <tr>
-    <td align="right" valign="top">Mobile Number</td>
-    <td align="left" valign="top" class="showdetails">{{ access.user_identifier }}</td>
+    <td style="text-align:right" valign="top">Mobile Number</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ access.user_identifier }}</td>
   </tr>
 {% endfor %}
 {% for access in interviewer.odk_access %}
   <tr>
-    <td align="right" valign="top">ODK ID</td>
-    <td align="left" valign="top" class="showdetails">{{ access.user_identifier }}</td>
+    <td style="text-align:right" valign="top">ODK ID</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ access.user_identifier }}</td>
   </tr>
   <tr>
-    <td align="right" valign="top">ODK Token</td>
-    <td align="left" valign="top" class="showdetails">{{ access.odk_token }}</td>
+    <td style="text-align:right" valign="top">ODK Token</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ access.odk_token }}</td>
   </tr>
 {% endfor %}
   <tr>
-    <td align="right" valign="top">Date Of Birth</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.date_of_birth |format_date }}</td>
+    <td style="text-align:right" valign="top">Date Of Birth</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.date_of_birth |format_date }}</td>
   </tr>
   <tr>
-    <td align="right" valign="top">Sex</td>
-    <td align="left" valign="top" class="showdetails">{% if interviewer.gender %}
+    <td style="text-align:right" valign="top">Sex</td>
+    <td style="text-align:left" valign="top" class="showdetails">{% if interviewer.gender %}
                 Male
             {% else %}
                 Female
             {% endif %}</td>
   </tr>
   <tr>
-    <td align="right" valign="top">Highest Level of Education</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.level_of_education }}</td>
+    <td style="text-align:right" valign="top">Highest Level of Education</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.level_of_education }}</td>
   </tr>
   <tr>
-    <td align="right" valign="top">Preferred Language of Communication</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.language }}</td>
+    <td style="text-align:right" valign="top">Preferred Language of Communication</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.language }}</td>
   </tr>
 {% for loc in interviewer.ea.parent_locations %}
   <tr>
-    <td align="right" valign="top">{{ loc.type.name}}</td>
-    <td align="left" valign="top" class="showdetails">{{ loc.name}}</td>
+    <td style="text-align:right" valign="top">{{ loc.type.name}}</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ loc.name}}</td>
   </tr>
 {% endfor %}
   <tr>
-    <td align="right" valign="top">Enumeration Area</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.ea }}</td>
+    <td style="text-align:right" valign="top">Enumeration Area</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.ea }}</td>
   </tr>
   <tr>
-    <td align="right" valign="top">Allocated Surveys</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.allocated_surveys | display_list }}</td>
+    <td style="text-align:right" valign="top">Allocated Surveys</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.allocated_surveys | display_list }}</td>
   </tr>
   <tr>
-    <td align="right" valign="top">Total Households</td>
-    <td align="left" valign="top" class="showdetails">{{ interviewer.ea.total_households }}</td>
+    <td style="text-align:right" valign="top">Total Households</td>
+    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.ea.total_households }}</td>
   </tr>
        <tr>
-    <td align="right" valign="top">&nbsp;</td>
-    <td align="left" valign="top">&nbsp;</td>
+    <td style="text-align:right" valign="top">&nbsp;</td>
+    <td style="text-align:left" valign="top">&nbsp;</td>
   </tr>
   <tr>
-    <td align="right" valign="top">&nbsp;</td>
-    <td align="left" valign="top">
+    <td style="text-align:right" valign="top">&nbsp;</td>
+    <td style="text-align:left" valign="top">
         {% if cancel_url %}
             <a href="{{ cancel_url }}" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
         {% else %}
             <a href="javascript:window.history.back()" class="btn btn-inverse"><i
-                    class="icon-chevron-left icon-white"></i> Back</a>
+                    class="icon-chevron-left icon-white" style="background-color: #307ecc"></i> Back</a>
         {% endif %}
         {% include 'interviewers/_action_button.html' with button_size="" interviewer=interviewer %}
 
