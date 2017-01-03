@@ -72,21 +72,28 @@ function append_to_next_question_dropdown(data) {
 //     $(' .chzn-select').trigger("liszt:updated");
      $('#id_next_question').select2({
         templateResult: next_question_format,
+        templateSelection: next_question_select_format,
         theme: "classic",
     });
 }
 
 function next_question_format(state) {
+    var identifier_terminus = state.text.indexOf(id_text_delim);
     if(state.id){    // to do: handle this more elegantly
-        var question_code = state.text.split(id_text_delim)[0];
-        var question_text = state.text.split(id_text_delim)[1];
+        var question_code = state.text.substring(0, identifier_terminus);
+        var question_text = state.text.substring(identifier_terminus + 1);
     }
     else{
-        var question_code = '<strong class="opt-header">'+state.text.split(id_text_delim)[0]+'</strong>';
-        var question_text = '<strong class="opt-header">'+state.text.split(id_text_delim)[1]+'</strong>';
+        var question_code = '<strong class="opt-header">'+state.text.substring(0, identifier_terminus)+'</strong>';
+        var question_text = '<strong class="opt-header">'+state.text.substring(identifier_terminus + 1)+'</strong>';
     }
-    return $('<div class="opt-item"><span class="opt-id" style="display: inline-block; padding-right: 2%; width: 23%; word-wrap:break-word;">' + question_code +
+    return $('<div class="opt-item"><span class="opt-id" style="display: inline-block; padding-right: 2%; width: 25%; word-wrap:break-word;">' + question_code +
     '</span><span class="opt-text" style="display: inline-block; word-wrap:break-word;">'+ question_text + '</span></div>');
+}
+
+function next_question_select_format(state) {
+    if(state.id) return next_question_format(state);
+    else return $('<div align="center"><span><strong> Choose Question </strong></span></div>');
 }
 
 

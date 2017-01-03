@@ -22,6 +22,11 @@ xmlns:jr="http://openrosa.org/javarosa">
      </meta>
 	   <type>{{ stage }}</type> {% comment %} basically tells if it's listing or survey data. status may change {% endcomment %}
 	   <surveyAllocation />
+	   <groupQuestion>
+		   {% for question in group_questions %}
+		   		<p{{question.pk}} />
+		   {% endfor %}
+	   </groupQuestion>
 		{% for question in qset.questions_inline %}
 	       {% if question.loop_started %}
 	           <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
