@@ -92,8 +92,15 @@ function next_question_format(state) {
 }
 
 function next_question_select_format(state) {
-    if(state.id) return next_question_format(state);
-    else return $('<div align="center"><span><strong> Choose Question </strong></span></div>');
+    if(state.id){
+        var identifier_terminus = state.text.indexOf(id_text_delim);
+         var text = '<span style="color: #3875d7">' + state.text.substring(identifier_terminus + 1)+ '</span>';
+    }
+    else{
+        var text =  '<strong>Choose Question</strong>';
+     }
+
+    return $('<div align="center">' + text + '</div>');
 }
 
 
