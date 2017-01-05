@@ -16,6 +16,7 @@
 {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
+<div class="col-lg-12" style="margin-top: -18px;">
         <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'export_questions_in_qset' batch.id %}">
                         <i class="ace-icon fa fa-external-link bigger-120"></i>
                          Export Questions</a>
@@ -26,6 +27,7 @@
     <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'qset_assign_questions_page' batch.id %}" data-toggle="modal">
                         <i class="ace-icon fa fa-check-square-o bigger-120"></i>
                          Select Question</a>
+                         </div>
 {% endif %}
 {% endblock %}
 {% block content %}
@@ -113,7 +115,7 @@
                                 <a href="{% url 'qset_edit_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
                             </li>
                             <li>
-                                <a href="{% url 'insert_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="orange"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Insert Question</span></a>
+                                <a href="{% url 'insert_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="green"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Insert Question</span></a>
                             </li>
                             <li>
                                 <a href="{% url 'loop_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="green"><i class="usur-icon fa fa-plus-square bigger-120"></i>Start/Edit Loop</span></a>

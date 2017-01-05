@@ -4922,9 +4922,9 @@ a.thumbnail.active {
   color: #333;
 }
 .alert {
-  padding: 15px;
+  /*padding: 15px;
   margin-bottom: 20px;
-  border: 1px solid transparent;
+  border: 1px solid transparent;*/
   border-radius: 4px;
 }
 .alert h4 {
@@ -4953,9 +4953,10 @@ a.thumbnail.active {
   color: inherit;
 }
 .alert-success {
-  color: #3c763d;
-  background-color: #dff0d8;
-  border-color: #d6e9c6;
+  color: #328502;
+  font-size: 14px;
+ /* background-color: #dff0d8;
+  border-color: #d6e9c6;*/
 }
 .alert-success hr {
   border-top-color: #c9e2b3;

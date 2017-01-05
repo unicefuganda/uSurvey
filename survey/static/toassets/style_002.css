@@ -118,7 +118,7 @@ display: inline-block;
 .mainMenu > ul > li:hover > a, 
 .mainMenu > ul > li.current-menu-item > a, 
 .mainMenu > ul > li.current-menu-parent > a{
-    color: #de3c2f;
+    color: #fff000;
 }
 /*.sub-menu{
     position: absolute;
@@ -144,14 +144,14 @@ display: inline-block;
     left: 0;
     margin: 0 auto;
     opacity: 0;
-    padding: 15px 0;
+    padding: 10px 0;
     position: absolute;
     right: 0;
     text-align: left;
     top: 157px;
     transition: all 700ms ease-in-out 0s;
     visibility: hidden;
-    width: 200px;
+    width: 170px;
     z-index:987463;
     }
 .mainMenu > ul > li:hover .sub-menu{
@@ -185,7 +185,7 @@ display: inline-block;
 .sub-menu > li:hover > a, 
 .sub-menu > li.current-menu-item > a, 
 .sub-menu > li.current-menu-parent > a{
-    color: #de3c2f;
+    color: #fff000;
 }
 .mainMenu ul li ul.sub-menu li ul.sub-menu, .dropSub{
     background: #fff;

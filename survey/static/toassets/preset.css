@@ -54,9 +54,9 @@ a, a:hover,a:focus{
     outline: none;
     text-decoration: none;
 }
-a:focus{
+/*a:focus{
     color: #de3c2f;
-}
+}*/
 a{
     -webkit-transition: all 700ms ease;
     -moz-transition: all 700ms ease;

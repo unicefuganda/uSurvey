@@ -24,7 +24,7 @@
     border: 1px solid #d1d1d1;
     font: bold 12px Arial,Helvetica,Sans-serif;
     color: #bebebe;
-    width: 150px;
+    /*width: 150px;*/
     padding: 6px 15px 6px 35px;
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
@@ -36,19 +36,20 @@
     -webkit-transition: all 0.7s ease 0s;
     -moz-transition: all 0.7s ease 0s;
     -o-transition: all 0.7s ease 0s;
-    transition: all 0.7s ease 0s;
+    /*transition: all 0.7s ease 0s;*/
 
     }
 
 #search input[type="text"]:focus {
     width: 200px;
+    border :1px solid #0073bf;
     }
    div.table-header a {
        color: #0f0;
        }
 
  span.help {
-        font-size: 10px !important;
+        font-size: 15px !important;
         color: #09f;
   }
 
@@ -65,7 +66,7 @@
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css" media="all" />
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/responsive.css" type="text/css" media="all" />
       <!-- <link rel="stylesheet" href="{{ STATIC_URL }}toassets/fonts.css" type="text/css" media="all" /> -->
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/color8.css" type="text/css" media="all" />
+      <!-- <link rel="stylesheet" href="{{ STATIC_URL }}toassets/color8.css" type="text/css" media="all" /> -->
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all"  />
        <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet" type="text/css"/>
        <link href="{{ STATIC_URL }}chosen/chosen.css" rel="stylesheet" type="text/css"/>
@@ -115,7 +116,7 @@
       </div>
       <!--================= Site Preloader ==================-->
       <!--================= Box Div Start ==================-->
-      <div class="boxWrapper">
+      <div class="">
          <!--================= Box Div Start ==================-->
          <!-- Header Area -->
          <header class="headerArea">
@@ -259,7 +260,7 @@
                   <div class="main-container">
                       <div>
                               {% if messages %}
-                                <br /><br />
+                                <!-- <br /><br /> -->
                                 {% for message in messages %}
                                    <ul class="alert alert-{{ message.tags }}"  style="text-align: center;">
                                         {{ message }}
@@ -359,11 +360,11 @@
       <!--================= Box Div Start ==================-->
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/bootstrap.js"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}chosen/chosen.jquery.js"></script>
+      <script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}js/jquery.dataTables.js"></script>
       <script src="{{ STATIC_URL }}js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
-    <script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}chosen/chosen.jquery.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>          
       <script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>

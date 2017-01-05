@@ -21,7 +21,7 @@
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css" media="all">
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/responsive.css" type="text/css" media="all">
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/fonts.css" type="text/css" media="all">
-      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/color8.css" type="text/css" media="all">
+      <!-- <link rel="stylesheet" href="{{ STATIC_URL }}toassets/color8.css" type="text/css" media="all"> -->
       <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" />
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all">
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_005.js"></script>
@@ -83,8 +83,13 @@
                      </li>
                   </ul>
                   </li>
-                  <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="#">About</a></li>                  
+                  <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="#">About</a></li> 
+
+                   {% if user.is_authenticated %}
+                   <li id="menu-item-181" class="ulogin menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="{% url 'home_page' %}">SURVEY</a></li>         
+{% else %}
                    <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="{% url 'login_page' %}">login</a></li>
+                   {% endif%}
                </ul>
             </nav>
             <!-- This is the menu with submenu item lists(For Inner Page menu items)<ul id="menu-main-menu" class="iz_main_menu"><li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="#">Home</a>
