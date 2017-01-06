@@ -95,7 +95,7 @@ def new(request):
 
 @permission_required('auth.can_view_batches')
 def sampling_criteria(request, survey_id):
-    survey = Survey.get(pk=survey_id)
+    survey = get_object_or_404(Survey, pk=survey_id)
     if request.method == 'POST':
         sampling_form = SamplingCriterionForm(survey, data=request.POST)
         if sampling_form.is_valid():
@@ -118,33 +118,37 @@ def delete_sampling_criterion(request, criterion_id):
     survey = randomization_criteria.survey
     randomization_criteria.arguments.all().delete()
     randomization_criteria.delete()
-    messages.success('sampling criterion successfully deleted')
+    messages.success(request, 'sampling criterion successfully deleted')
     return HttpResponseRedirect(reverse('listing_criteria_page', args=(survey.pk, )))
 
 
 @handle_object_does_not_exist(message="Survey does not exist.")
 @permission_required('auth.can_view_batches')
 def edit(request, survey_id):
-    survey = Survey.objects.get(id=survey_id)
-    survey_form = SurveyForm(instance=survey)
-    if request.method == 'POST':
-        survey_form = SurveyForm(instance=survey, data=request.POST)
-        if survey_form.is_valid():
-            Survey.save_sample_size(survey_form)
-            messages.success(request, 'Survey successfully edited.')
-            return HttpResponseRedirect(reverse('survey_list_page'))
+    try:
+        survey = Survey.objects.get(id=survey_id)
+        survey_form = SurveyForm(instance=survey)
+        if request.method == 'POST':
+            survey_form = SurveyForm(instance=survey, data=request.POST)
+            if survey_form.is_valid():
+                Survey.save_sample_size(survey_form)
+                messages.success(request, 'Survey successfully edited.')
+                return HttpResponseRedirect(reverse('survey_list_page'))
 
-    context = {'survey_form': survey_form,
-               'title': "Edit Survey",
-               'button_label': 'Save',
-               'id': 'edit-survey-form',
-               'cancel_url': reverse('survey_list_page'),
-               'action': reverse('edit_survey_page', args=(survey_id))
-               }
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-    ])
-    return render(request, 'surveys/new.html', context)
+        context = {'survey_form': survey_form,
+                   'title': "Edit Survey",
+                   'button_label': 'Save',
+                   'id': 'edit-survey-form',
+                   'cancel_url': reverse('survey_list_page'),
+                   'action': reverse('edit_survey_page', args=(survey_id))
+                   }
+        request.breadcrumbs([
+            ('Surveys', reverse('survey_list_page')),
+        ])
+        return render(request, 'surveys/new.html', context)
+    except Survey.DoesNotExist:
+        messages.error(request, 'survey does not exists')
+        return HttpResponseRedirect(reverse('survey_list_page'))
 
 
 @handle_object_does_not_exist(message="Survey does not exist.")

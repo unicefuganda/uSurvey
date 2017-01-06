@@ -2,15 +2,16 @@ from django import forms
 from django.forms import ModelForm
 import re
 from django.core.exceptions import ValidationError
+from django.conf import settings
 from survey.models import Question, BatchQuestion
 from survey.models import QuestionOption, Batch, Answer, QuestionModule, \
     HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
-from django.conf import settings
+from survey.forms.form_order_mixin import FormOrderMixin
 
 
 def get_question_form(model_class):
 
-    class QuestionForm(ModelForm):
+    class QuestionForm(ModelForm, FormOrderMixin):
         # prev_question = forms.CharField(
         #     max_length=50, widget=forms.HiddenInput(), required=False)
         options = forms.CharField(
@@ -42,6 +43,7 @@ def get_question_form(model_class):
                 self.answer_map[defi.answer_type].append(defi.channel)
 
             self.parent_question = parent_question
+            self.order_fields(['module', 'group', 'identifier', 'text', 'answer_type', 'mandatory'])
 
         class Meta:
             model = model_class

@@ -99,7 +99,7 @@ class QuestionSetView(object):
         return HttpResponseRedirect('%s_home'%self.model.resolve_tag())
 
 
-def delete(request, question_id,batch_id):
+def delete(request, question_id, batch_id):
     qset = QuestionSet.get(pk=question_id)
     print batch_id,"contextname"
     if qset.interviews.exists():
