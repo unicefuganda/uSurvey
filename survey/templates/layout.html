@@ -25,6 +25,8 @@
     font: bold 12px Arial,Helvetica,Sans-serif;
     color: #bebebe;
     /*width: 150px;*/
+    margin-top:10px;
+    margin-left:-312px;
     padding: 6px 15px 6px 35px;
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
@@ -49,7 +51,7 @@
        }
 
  span.help {
-        font-size: 15px !important;
+        font-size: 13px !important;
         color: #09f;
   }
 
@@ -74,7 +76,6 @@
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_005.js"></script>
        <!-- <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery.js"></script> -->
        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-      <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/be7019ee387/integration/bootstrap/2/dataTables.bootstrap.css" />
        <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
@@ -296,8 +297,8 @@
                               <div>
                                  <div id="dynamic-table_wrapper" class="dataTables_wrapper form-inline no-footer">
                                     <div class="row">
-                                       <div class="col-xs-6">
-                                          <div class="dataTables_length" id="dynamic-table_length">
+                                       <div class="">
+                                          <div class="dataTables_length txt_cen"  id="dynamic-table_length">
                                              {% block search %}
                                              {% endblock %}
                                           </div>
