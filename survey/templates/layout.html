@@ -79,6 +79,8 @@
        <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
+        <link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
+        <script src="{{STATIC_URL}}js/select2.full.js"></script>
 
        {% block extra_head %}
 
@@ -371,21 +373,28 @@
       <script src="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
-      {% block javascripts %}
 
-      {% endblock %}
+	<!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+	<script src="harvesthq-chosen-12a7a11/chosen/chosen.jquery.js"></script -->
+	<script>
+	    jQuery(function($) {
+			$(".chzn-select").chosen();
+		});
+	</script>
       <script type="text/javascript">
-          $(function(){
-             (function($) { $(".chzn-select").chosen(); })(jQuery);
-             $('.datepicker').datepicker({
+        jQuery(function($) {
+            $(".datepicker").datepicker({
              changeMonth: true,
              changeYear: true,
              dateFormat: 'dd-mm-yy',
              yearRange: "-120:+nn"
-             });
-             });
+           });
+		});
 
         </script>
+      {% block javascripts %}
+
+      {% endblock %}
       <script type="text/javascript">
          if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
       </script>

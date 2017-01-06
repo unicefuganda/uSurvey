@@ -33,7 +33,7 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate interviewers 50 %}
+{% autopaginate interviewers max_display_per_page %}
 <br>
 <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
 <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
@@ -109,9 +109,7 @@
 	  		<!--$(' .chzn-select').trigger("liszt:updated");  -->
 	      <!--});-->
 	  <!--});-->
-    $(document).ready(function() {
-    $('#datatables').DataTable();
-} );
+
 	<!--{% endfor %}-->
     $('.ea_filter').on('change', function () {
     	{% for location_type in location_filter_types %}

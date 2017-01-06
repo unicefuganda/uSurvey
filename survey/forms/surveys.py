@@ -20,7 +20,7 @@ class SurveyForm(ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={"rows": 2, "cols": 50}),
             'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')),
-                                              attrs={'class': 'has_sampling'}),            
+                                              attrs={'class': 'has_sampling'}),
             
         }
 
@@ -40,6 +40,7 @@ class SurveyForm(ModelForm):
                 self.fields['preferred_listing'].choices = preferred_listings
             except Exception, err:
                 print Exception, err
+        # self.fields['listing_form'].widget.attrs['class'] = 'chzn-select'
             
 
     def clean(self):
