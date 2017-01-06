@@ -235,12 +235,12 @@ def _process_question_form(request, batch, response, question_form):
     action_str = 'edit' if instance else 'add'
     if question_form.is_valid():
         question = question_form.save(**request.POST)
+        module = getattr(question, 'module', None)
         if request.POST.has_key('add_to_lib_button'):
             qt = QuestionTemplate.objects.create(identifier=question.identifier,
-                                                 group=question.group,
                                                  text=question.text,
                                                  answer_type=question.answer_type,
-                                                 module=question.module)
+                                                 module=module)
             options = question.options.all()
             if options:
                 topts = []
@@ -358,12 +358,11 @@ def update_orders(request, qset_id):
     if len(new_orders) > 0:
         # wipe off present inline flows
         inlines = batch.questions_inline()
-        start_question = inlines.pop(0)
+        start_question = inlines[0]
         question = start_question
-        for next_question in inlines:
-            QuestionFlow.objects.filter(
-                question=question, next_question=next_question).delete()
-            question = next_question
+        while len(inlines) > 0:
+            question = inlines.pop(0)
+            QuestionFlow.objects.filter(question=question).delete()
         order_details = []
         map(lambda order: order_details.append(order.split('-')), new_orders)
         order_details = sorted(

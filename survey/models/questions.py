@@ -101,6 +101,7 @@ class Question(GenericQuestion):
     def save(self, *args, **kwargs):
         if self.answer_type not in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
             self.options.all().delete()
+        invalidate_obj(self.qset)       # to fix update of flow_question update
         return super(Question, self).save(*args, **kwargs)
 
     @classmethod

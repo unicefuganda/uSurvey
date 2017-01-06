@@ -40,6 +40,7 @@ class SurveyForm(ModelForm):
                 self.fields['preferred_listing'].choices = preferred_listings
             except Exception, err:
                 print Exception, err
+        self.fields['listing_form'].required = False
         # self.fields['listing_form'].widget.attrs['class'] = 'chzn-select'
             
 
