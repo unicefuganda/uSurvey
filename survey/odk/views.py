@@ -21,10 +21,10 @@ from django.conf import settings
 from django.template import RequestContext, loader, Context
 from survey.odk.utils.log import audit_log, Actions, logger
 from survey.odk.utils.odk_helper import get_survey_allocation, process_submission, disposition_ext_and_date, \
-    get_zipped_dir, HouseholdNumberAlreadyExists, \
+    get_zipped_dir,  \
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, OpenRosaRequestConflict, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
-    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughHouseholds
+    BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughData
 from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, \
     HouseholdListing, SurveyAllocation, ODKFileDownload
 from django.utils.translation import ugettext as _
@@ -241,23 +241,14 @@ def submission(request):
         response.status_code = 201
         response['Location'] = request.build_absolute_uri(request.path)
         return response
-    except NotEnoughHouseholds:
-        desc = 'Not enough households'
+    except NotEnoughData:
+        desc = u'Not enough data'
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
                   _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
                       "interviewer": interviewer.name,
                       "desc": desc
                   }, {'desc': desc}, request, logging.WARNING)
-        return OpenRosaRequestForbidden(u"Not Enough Households")
-    except HouseholdNumberAlreadyExists:
-        desc = 'House number already exists'
-        audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
-                  _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
-                      "interviewer": interviewer.name,
-                      "desc": desc
-                  }, {'desc': desc}, request, logging.WARNING)
-        # return OpenRosaRequestConflict(u'Household Number Already exists')
-        return OpenRosaResponseNotAllowed(u'Household Number Already exists')
+        return OpenRosaRequestForbidden(desc)
     except Exception, ex:
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
                   _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {

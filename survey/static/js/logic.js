@@ -69,8 +69,17 @@ function append_to_next_question_dropdown(data) {
         $('#id_next_question').append('<option value="' + data[counter]['id'] + '">' + data[counter]['identifier'] + id_text_delim + data[counter]['text'] + "</option>");
         counter++;
     });
+    change_to_select2($('#id_next_question'));
 //     $(' .chzn-select').trigger("liszt:updated");
-     $('#id_next_question').select2({
+//     $('#id_next_question').select2({
+//        templateResult: next_question_format,
+//        templateSelection: next_question_select_format,
+//        theme: "classic",
+//    });
+}
+
+function change_to_select2(obj) {
+     obj.select2({
         templateResult: next_question_format,
         templateSelection: next_question_select_format,
         theme: "classic",

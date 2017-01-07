@@ -32,6 +32,7 @@ class RandomizationCriterion(BaseModel):
     listing_question = models.ForeignKey(Question, related_name='criteria')
     validation_test = models.CharField(
         max_length=200, null=True, blank=True, choices=VALIDATION_TESTS)
+    naming_convention = models.CharField(max_length=100)
 
     class Meta:
         app_label = 'survey'

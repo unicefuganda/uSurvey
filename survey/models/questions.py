@@ -83,6 +83,9 @@ class Question(GenericQuestion):
     def upcoming_inlines(self):
         return self.qset.upcoming_inlines(self)
 
+    def upcoming_question(self):
+        return self.qset.next_inline()
+
     def direct_sub_questions(self):
         from survey.forms.logic import LogicForm
         sub_flows = self.flows.filter(
@@ -96,7 +99,7 @@ class Question(GenericQuestion):
         return self.connecting_flows.filter(validation_test__isnull=False)
 
     def __unicode__(self):
-        return "%s - %s: (%s)" % (self.identifier, self.text, self.answer_type.upper())
+        return " - ".join([self.identifier, self.text])
 
     def save(self, *args, **kwargs):
         if self.answer_type not in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
@@ -279,11 +282,12 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
         return True, ''
 
     def get_loop_story(self):
-        '''
+        """
         Basically returns all the loops which a question is involved in. This retains the queston order
         :return:
-        '''
-        @cached_as(QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
+        """
+        @cached_as(QuestionSet.objects.get(id=self.id),
+                    QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
                    Question.objects.filter(qset__id=self.id))
         def _loop_story():
             inlines = self.questions_inline()
@@ -317,9 +321,13 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
                                                                                                   flat=True))
 
     def next_inline(self, question, channel=ODKAccess.choice_name()):
-        qflows = QuestionFlow.objects.filter(question__qset=self, validation_test__isnull=True)
-        if qflows.exists():
-            return next_inline_question(question, qflows, AnswerAccessDefinition.answer_types(channel))
+        @cached_as(QuestionSet.objects.get(id=self.id), QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
+                   Question.objects.filter(qset__id=self.id))
+        def _next_inline():
+            qflows = QuestionFlow.objects.filter(question__qset=self, validation_test__isnull=True)
+            if qflows.exists():
+                return next_inline_question(question, qflows, AnswerAccessDefinition.answer_types(channel))
+        return _next_inline()
 
     def last_question_inline(self):
         qflows = QuestionFlow.objects.filter(

@@ -15,6 +15,8 @@ class ODKFileDownload(BaseModel):
 
 
 class ODKSubmission(BaseModel):
+    STARTED = 1
+    COMPLETED = 2
     interviewer = models.ForeignKey(
         Interviewer, related_name="odk_submissions")
     survey = models.ForeignKey(Survey, related_name="odk_submissions")
@@ -24,6 +26,7 @@ class ODKSubmission(BaseModel):
     description = models.CharField(max_length=256, null=True, blank=True)
     instance_id = models.CharField(max_length=256)
     xml = models.TextField()
+    status = models.IntegerField(choices=[( STARTED, 'Started'), (COMPLETED, 'Completed')], default=STARTED)
 
     class Meta:
         app_label = 'survey'

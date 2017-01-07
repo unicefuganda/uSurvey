@@ -22,14 +22,18 @@ xmlns:jr="http://openrosa.org/javarosa">
      </meta>
 	   <type>{{ stage }}</type> {% comment %} basically tells if it's listing or survey data. status may change {% endcomment %}
 	   <surveyAllocation />
+	   <qset{{ qset.pk }}>
+	   {% comment %}
 	   <groupQuestion>
 		   {% for question in group_questions %}
 		   		<p{{question.pk}} />
 		   {% endfor %}
 	   </groupQuestion>
+	   {% endcomment %}
 		{% for question in qset.questions_inline %}
 	       {% if question.loop_started %}
 	           <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
+	   			<id />
 	       {% endif %}
 					<q{{question.pk}} />
 	   				{% for sub_question in question.direct_sub_questions %}
@@ -39,6 +43,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	           </q{{question.loop_ended.loop_starter.pk}}q{{question.pk}}>
 	       {% endif %}
 		{% endfor %}
+	   </qset{{ qset.pk }}>
    </qset>
   </instance>
 
@@ -52,18 +57,21 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% is_relevant_odk question interviewer as relevance_context %}
 	    {% get_loop_aware_path question  as path %}
 	       {% if question.loop_started %}
-	           <bind nodeset="/qset{{ path }}"
+	           <bind nodeset="/qset/qset{{qset.pk}}{{ path }}"
 				required="true()"
 				relevant="true() and {{ relevance_context }}"/>
+				<bind nodeset="/qset/qset{{qset.pk}}{{ path }}/id"
+				required="true()"
+				relevant="true() and {{ relevance_context }}" readonly="true()" calculate="position(..)"/>
 	       {% endif %}
 
-			<bind nodeset="/qset{{ path }}/q{{question.pk}}"
+			<bind nodeset="/qset/qset{{qset.pk}}{{ path }}/q{{question.pk}}"
 				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
 				required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
 				relevant="true() and {{ relevance_context }}"/>
 			{% comment %}{% if question.loop_ended %}
-				<bind nodeset="/qset{{ path }}/loop_id" type="string" 
-           readonly="true()" calculate="count(/qset{{ path }}/q{{question.pk}})" />
+				<bind nodeset="/qset/qset{{qset.pk}}{{ path }}/loop_id" type="string" 
+           readonly="true()" calculate="count(/qset/qset{{qset.pk}}{{ path }}/q{{question.pk}})" />
 	       {% endif %}{% endcomment %}
 	{% endfor %}
 
@@ -87,9 +95,9 @@ xmlns:jr="http://openrosa.org/javarosa">
 		   {% if question.loop_started %}
 		       <group {% if question.loop_started.loop_prompt %}prompt="{{question.loop_started.loop_prompt}}"{% endif %}>
 					<label>{{question.loop_started.loop_label}}</label>
-	           		<repeat nodeset="/qset{{ path }}" {% if question.loop_started.repeat_logic == question.loop_started.PREVIOUS_QUESTION %}
+	           		<repeat nodeset="/qset/qset{{qset.pk}}{{ path }}" {% if question.loop_started.repeat_logic == question.loop_started.PREVIOUS_QUESTION %}
 													{% get_loop_aware_path question.loop_started.previousanswercount.value  as counter_path %}
-													jr:count="/qset{{counter_path}}/q{{question.loop_started.previousanswercount.value.pk}}"
+													jr:count="/qset/qset{{qset.pk}}{{counter_path}}/q{{question.loop_started.previousanswercount.value.pk}}"
 												{% elif question.loop_started.repeat_logic == question.loop_started.FIXED_REPEATS %}
 													jr:count="{{question.loop_started.fixedloopcount.value}}"
 												{% endif %}>

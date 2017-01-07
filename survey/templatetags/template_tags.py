@@ -289,7 +289,7 @@ def get_loop_aware_path(question):
 
 
 def get_xform_relative_path(question):
-    return '/qset%s' % get_loop_aware_path(question)
+    return '/qset/qset%s%s' % (question.qset.pk, get_loop_aware_path(question))
 
 
 def get_node_path(question):

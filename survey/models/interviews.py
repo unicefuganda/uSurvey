@@ -144,9 +144,9 @@ class Answer(BaseModel):
                                  on_delete=models.PROTECT, db_index=True)
 
     @classmethod
-    def create(cls, interview, question, answer, loop_id=None):
+    def create(cls, interview, question, answer):
         return cls.objects.create(question=question, value=answer, question_type=question.__class__.type_name(),
-                                  interview=interview, loop_id=loop_id)
+                                  interview=interview)
 
     @classmethod
     def supported_answers(cls):

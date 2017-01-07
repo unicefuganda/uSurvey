@@ -3,6 +3,15 @@
 {% block title %}
     Loop Start
 {% endblock %}
+{% block extra_head %}
+<link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
+<script src="{{STATIC_URL}}js/select2.full.js"></script>
+<style type="text/css">
+    #id_previous_numeric_values {
+        width: 50%;
+    }
+</style>
+{% endblock %}
 {% block pre_form_content %}
      <h4> Loop Starts From: {{question.text}} <h4>
          <br />
@@ -76,5 +85,11 @@
                     }
                 });
             });
+        </script>
+        <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            id_text_delim = '-';
+            change_to_select2( $('#id_previous_numeric_values'));
+            change_to_select2( $('#id_loop_ender'));
         </script>
 {% endblock %}
