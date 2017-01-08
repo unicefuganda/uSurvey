@@ -185,6 +185,7 @@ class LoopingForm(forms.ModelForm, FormOrderMixin):
         self.fields['previous_numeric_values'] = forms.ModelChoiceField(queryset=Question.objects.filter(
             pk__in=[q.pk for q in loop_starter.previous_inlines() if q.answer_type == NumericalAnswer.choice_name()]
         ))
+        self.fields['previous_numeric_values'].empty_label = 'Code - Question'
         if self.instance:
             prev_question_count = getattr(self.instance, PreviousAnswerCount.choice_name(), None)
             fixed_count = getattr(self.instance, FixedLoopCount.choice_name(), None)

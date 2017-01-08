@@ -32,7 +32,7 @@ function show_or_hide_attribute_fields(attribute_value){
 
     hide_between_value_fields();
 
-    if ($('#id_condition').val().toUpperCase() != 'BETWEEN'){
+    if ($('#id_condition').val() && $('#id_condition').val().toUpperCase() != 'BETWEEN'){
         hide_between_value_fields()
         if(attribute_value == 'value'){
             value_field.show();

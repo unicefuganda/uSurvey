@@ -80,6 +80,8 @@ def new(request):
             Survey.save_sample_size(survey_form)
             messages.success(request, 'Survey successfully added.')
             response = HttpResponseRedirect('/surveys/')
+        elif survey_form.errors.get('__all__'):
+                messages.error(request, survey_form.errors['__all__'])
 
     context = {'survey_form': survey_form,
                'title': "New Survey",
@@ -93,6 +95,7 @@ def new(request):
     ])
     return response or render(request, 'surveys/new.html', context)
 
+
 @permission_required('auth.can_view_batches')
 def sampling_criteria(request, survey_id):
     survey = get_object_or_404(Survey, pk=survey_id)
@@ -102,7 +105,10 @@ def sampling_criteria(request, survey_id):
             sampling_form.save()
             messages.success(request, 'Sampling criterion successfully added.')
             return HttpResponseRedirect('.')
-    sampling_form = SamplingCriterionForm(survey)
+        elif sampling_form.errors.get('__all__'):
+            messages.error(request, sampling_form.errors['__all__'])
+    else:
+        sampling_form = SamplingCriterionForm(survey)
     request.breadcrumbs([
         ('Surveys', reverse('survey_list_page')),
     ])
@@ -134,7 +140,8 @@ def edit(request, survey_id):
                 Survey.save_sample_size(survey_form)
                 messages.success(request, 'Survey successfully edited.')
                 return HttpResponseRedirect(reverse('survey_list_page'))
-
+            elif survey_form.errors.get('__all__'):
+                    messages.error(request, survey_form.errors['__all__'])
         context = {'survey_form': survey_form,
                    'title': "Edit Survey",
                    'button_label': 'Save',

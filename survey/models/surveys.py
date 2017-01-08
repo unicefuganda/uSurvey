@@ -17,6 +17,8 @@ class Survey(BaseModel):
                                           help_text='Select which survey listing to reuse. '
                                                     'Leave empty for fresh listing',
                                           null=True, blank=True)
+    random_sample_label = models.CharField(max_length=100, null=True, blank=True)
+
 
     class Meta:
         app_label = 'survey'

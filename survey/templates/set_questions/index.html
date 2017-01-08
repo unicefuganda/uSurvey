@@ -137,7 +137,7 @@
                             {% elif question.conditional_flows %}
                             <li><a href="#view_logic_{{ question.id }}" data-toggle="modal" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-question-circle bigger-120"></i>View Logic</span></a></li>
                             {% endif %}
-                            {% if question.loop_started  %}
+                            {% if question.loop_started  and batch.interviews.count == 0 %}
                             <li><a href="{% url 'remove_question_loop_page' question.loop_started.id %}" data-toggle="modal" {% comment %} data-target="#remove_loop_{{ question.loop_started.id }}"{% endcomment %}><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Remove Loop</span></a>
                             {% include "base/remove_modal.html" with object_name=question.text id=question.loop_started.id name="Loop" url=question.loop_started.id|get_url_with_ids:"remove_question_loop_page" %}
                             </li>

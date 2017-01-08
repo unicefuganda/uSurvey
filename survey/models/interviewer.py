@@ -222,6 +222,11 @@ class SurveyAllocation(BaseModel):
         '''
         return self.status == self.PENDING and self.interviewer.ea == self.allocation_ea
 
+    def sample_size_reached(self):
+        from survey.models import Interview
+        return Interview.objects.filter(interviewer=self.interviewer, survey=self.survey,
+                                        ea=self.allocation_ea).count() >= self.survey.sample_size
+
     def batches_enabled(self):
         if self.is_valid():
             if self.survey.has_sampling:

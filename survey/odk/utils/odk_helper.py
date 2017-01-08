@@ -85,7 +85,8 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     answers_node = _get_answer_node(survey_tree, qset)
     answers = []
     survey = survey_allocation.survey
-    map(lambda node: answers.extend(get_answers(node, qset, question_map)), answers_node.getchildren())
+    map(lambda node: answers.extend(get_answers(_get_nodes('./questions', node)[0], qset, question_map)),
+        answers_node.getchildren())
     if survey.has_sampling and survey.sample_size > len(answers):
         raise NotEnoughData()
     save_answers(qset, access_channel, question_map, answers, survey_allocation)

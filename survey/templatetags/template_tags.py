@@ -1,6 +1,8 @@
 import string
+import re
 from django import template
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
@@ -235,6 +237,12 @@ def household_completed_percent(interviewer):
         return "%s%%" % str(completed * 100 / total)
 
 
+@register.assignment_tag
+def can_start_survey(survey_allocations):
+    completed = filter(lambda allocation: allocation.sample_size_reached(), survey_allocations)
+    return (1.0 * len(completed))/len(survey_allocations) >= getattr(settings, 'EAS_PERCENT_TO_START_SURVEY', 0.5)
+
+
 @register.filter
 def open_survey_in_current_loc(interviewer):
     return len(Survey.currently_open_surveys(interviewer.location))
@@ -254,12 +262,39 @@ def total_household_members(interviewer):
 
 
 @register.assignment_tag
+def is_relevant_sample(ea_id, assignments):
+    ea_assignmts = assignments.filter(allocation_ea__id=ea_id)
+    return ' or '.join(["selected(/qset/surveyAllocation, '%s')" % a.pk for a in ea_assignmts ])
+
+
+@register.assignment_tag
 def get_download_url(request, url_name, instance=None):
     if instance is None:
         return request.build_absolute_uri(reverse(url_name))
     else:
         return request.build_absolute_uri(reverse(url_name, args=(instance.pk, )))
 
+
+@register.assignment_tag
+def get_sample_data_display(sample):
+    survey = sample.survey
+    naming_label = survey.random_sample_label
+    interview = sample.interview
+    # get the exact answer type
+    pattern = '.*{{(.+)}}.*'
+    identifiers = re.match(pattern, naming_label).groups()
+    questions = survey.listing_form.questions.filter(identifier__in=identifiers)
+    context = {}
+    for question in questions:
+        answer_class = Answer.get_class(question.answer_type)
+        try:
+            answer = answer_class.get(interview=interview, question=question)
+            context[question.identifier] = answer.value
+        except answer_class.DoesNotExist:
+            import pdb; pdb.set_trace()
+            pass
+    question_context = template.Context(context)
+    return template.Template(html.escape(naming_label)).render(question_context)
 
 @register.assignment_tag
 def get_odk_mem_question(question):
@@ -289,7 +324,7 @@ def get_loop_aware_path(question):
 
 
 def get_xform_relative_path(question):
-    return '/qset/qset%s%s' % (question.qset.pk, get_loop_aware_path(question))
+    return '/qset/qset%s/questions%s' % (question.qset.pk, get_loop_aware_path(question))
 
 
 def get_node_path(question):

@@ -34,8 +34,8 @@ class Interview(BaseModel):
     question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)    # repeated here for easy reporting
     ea = models.ForeignKey(
         'EnumerationArea', related_name='interviews', db_index=True)    # repeated here for easy reporting
-    interview_channel = models.ForeignKey(
-        InterviewerAccess, related_name='interviews')
+    interview_reference = models.ForeignKey('Interview', related_name='follow_up_interviews', null=True, blank=True)
+    interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
     last_question = models.ForeignKey(
         "Question", related_name='ongoing', null=True, blank=True)
@@ -189,7 +189,7 @@ class Answer(BaseModel):
 
     @classmethod
     def equals(cls, answer, value):
-        return answer == value
+        return str(answer).lower() == str(value).lower()
 
     @classmethod
     def odk_equals(cls, node_path, value):

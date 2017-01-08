@@ -100,6 +100,11 @@
                 });
             });
         </script>
+        <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            id_text_delim = '-';
+            change_to_select2( $('#id_listing_question'));
+        </script>
 {% endblock %}
 
 {% block non_form_content %}

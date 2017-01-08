@@ -1,3 +1,4 @@
+import re
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
@@ -8,20 +9,15 @@ from survey.forms.form_order_mixin import FormOrderMixin
 from survey.models import Survey, BatchCommencement, SurveyHouseholdListing, AnswerAccessDefinition, USSDAccess
 
 
-class SurveyForm(ModelForm):
-    # survey_listing = forms.CharField(choices=[(survey.pk, survey.name) for survey in Survey.objects.all()],
-    #                                  help_text='Select survey household listing to reuse. Leave empty for fresh listing',
-    #                                  required=False)
+class SurveyForm(ModelForm, FormOrderMixin):
 
     class Meta:
         model = Survey
-        fields = ['name', 'description', 'has_sampling',
-                  'sample_size', 'preferred_listing', 'listing_form']
+        exclude = []
         widgets = {
             'description': forms.Textarea(attrs={"rows": 2, "cols": 50}),
             'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')),
                                               attrs={'class': 'has_sampling'}),
-            
         }
 
     def __init__(self, *args, **kwargs):
@@ -41,18 +37,34 @@ class SurveyForm(ModelForm):
             except Exception, err:
                 print Exception, err
         self.fields['listing_form'].required = False
-        # self.fields['listing_form'].widget.attrs['class'] = 'chzn-select'
-            
+        self.order_fields(['name', 'description', 'has_sampling', 'sample_size',
+                           'preferred_listing', 'listing_form', 'sample_naming_convention'])
+
+
+    def clean_random_sample_label(self):
+        """Make sure this field makes reference to listing form entry in {{}} brackets
+        :return:
+        """
+        pattern = '.*{{(.+)}}.*'
+        match = re.match(pattern, self.data.get('random_sample_label', ''))
+        if match is None:
+            raise ValidationError('You need to include one listing response identifier in double curly brackets'
+                                  ' e.g {{house_number}}')
+        requested_identifiers = match.groups()
+        listing_form = self.cleaned_data['listing_form']
+        if listing_form.questions.filter(identifier__in=requested_identifiers).exists():
+            return self.cleaned_data['random_sample_label']
+        raise ValidationError('%s is not in %s' % (', '.join(requested_identifiers), listing_form.name))
+
 
     def clean(self):
         cleaned_data = self.cleaned_data
-
         has_sampling = cleaned_data.get('has_sampling', None)
-
         if has_sampling and not cleaned_data.get('sample_size', None):
             raise ValidationError(
                 'Sample size must be specified if has sampling is selected.')
-
+        if self.data.get('listing_form', None):
+            self.cleaned_data['random_sample_label'] = self.clean_random_sample_label()
         return cleaned_data
 
     def clean_name(self):
@@ -80,6 +92,7 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
         self.fields['survey'].widget = forms.HiddenInput()
         self.fields['listing_question'].queryset = survey.listing_form.questions.filter(answer_type__in=[
             defin.answer_type for defin in AnswerAccessDefinition.objects.filter(channel=USSDAccess.choice_name())])
+        self.fields['listing_question'].empty_label = 'Code - Question'
         self.order_fields(['listing_question', 'validation_test', 'options', 'value', 'min', 'max', 'survey'])
         if self.data.get('listing_question', []):
             options = QuestionOption.objects.filter(question__pk=self.data['listing_question'])
@@ -94,9 +107,11 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
     #
     #     return self.cleaned_data['options']
 
+
     def clean(self):
-        validation_test = self.cleaned_data['validation_test']
-        listing_question = self.cleaned_data['listing_question']
+        super(SamplingCriterionForm, self).clean()
+        validation_test = self.cleaned_data.get('validation_test', None)
+        listing_question = self.cleaned_data.get('listing_question', None)
         answer_class = Answer.get_class(listing_question.answer_type)
         method = getattr(answer_class, validation_test, None)
         if method is None:
@@ -106,7 +121,7 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
                 raise ValidationError('min and max values required for between condition')
         elif self.cleaned_data.get('value', False) is False:
             raise ValidationError('Value is required for %s' % validation_test)
-        if listing_question.answer_type == MultiChoiceAnswer.choice_name():
+        if listing_question and listing_question.answer_type == MultiChoiceAnswer.choice_name():
             if self.cleaned_data.get('options', False) is False:
                 raise ValidationError('No option selected for %s' % listing_question.identifier)
             self.cleaned_data['value'] = self.cleaned_data['options']
@@ -114,11 +129,12 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
 
     def save(self, *args, **kwargs):
         criterion = super(SamplingCriterionForm, self).save(*args, **kwargs)
+        criterion.arguments.all().delete()      # recreate the arguments
         if criterion.validation_test == 'between':
             criterion.arguments.create(position=0, param=self.cleaned_data['min'])
             criterion.arguments.create(position=1, param=self.cleaned_data['max'])
         else:
-            criterion.arguments.create(position=0, param=self.cleaned_data['value'])
+            criterion.arguments.create(position=0, param=self.cleaned_data.get('value', ''))
         return criterion
 
 

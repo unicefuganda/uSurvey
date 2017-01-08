@@ -27,6 +27,7 @@ from survey.odk.utils.odk_helper import get_survey_allocation, process_submissio
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughData
 from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, \
     HouseholdListing, SurveyAllocation, ODKFileDownload
+from survey.models import ListingSample
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 from survey.utils.query_helper import get_filterset
@@ -67,15 +68,15 @@ def get_survey_xform(allocation):
     })
 
 
-def get_qset_xform(interviewer, allocations):
+def get_qset_xform(interviewer, allocations, qset, ea_samples={}):
     return render_to_string("odk/question_set.xml", {
         'interviewer': interviewer,
-        'qset': allocations[0].survey.listing_form,
+        'qset': qset,
         'stage': allocations[0].stage,
         'assignments': allocations,
-        'educational_levels': LEVEL_OF_EDUCATION,
         'messages': MESSAGES,
         'answer_types': dict([(cls.__name__.lower(), cls.choice_name()) for cls in Answer.supported_answers()]),
+        'ea_samples': ea_samples,
     })
 
 
@@ -97,12 +98,9 @@ def download_submission_attachment(request, submission_id):
 @permission_required('auth.can_view_aggregates')
 def submission_list(request):
     odk_submissions = ODKSubmission.objects.all().order_by('-created')
-    search_fields = ['interviewer__name', 'interviewer__ea__name', 'survey__name',
-                     'household_member__household__house_number', 'household_member__surname',
-                     'household_member__first_name', 'form_id', 'instance_id']
+    search_fields = ['interviewer__name', 'interviewer__ea__name', 'survey__name', 'form_id', 'instance_id']
     if request.GET.has_key('q'):
-        odk_submissions = get_filterset(
-            odk_submissions, request.GET['q'], search_fields)
+        odk_submissions = get_filterset(odk_submissions, request.GET['q'], search_fields)
     return render(request, 'odk/submission_list.html', {'submissions': odk_submissions,
                                                         'placeholder': 'interviewer, house, member, survey',
                                                         'request': request})
@@ -111,8 +109,8 @@ def submission_list(request):
 @http_digest_interviewer_auth
 @require_GET
 def form_list(request):
-    ''' This is where ODK Collect gets its download list.
-    '''
+    """ This is where ODK Collect gets its download list.
+    """
     interviewer = request.user
     #get_object_or_404(Interviewer, mobile_number=username, odk_token=token)
     # to do - Make fetching households more e
@@ -126,12 +124,16 @@ def form_list(request):
         audit = {}
         audit_log(Actions.USER_FORMLIST_REQUESTED, request.user, interviewer,
                   _("Requested forms list. for alloc: %s:%s" % (survey, interviewer)), audit, request)
+        open_batches = set()
+        for assignment in assignments:
+            open_batches.update(assignment.allocation_ea.open_batches(survey))
         content = render_to_string("odk/xformsList.xml", {
             'assignments': assignments,
             'survey': survey,
             'interviewer': interviewer,
             'request': request,
-            'Const': SurveyAllocation
+            'Const': SurveyAllocation,
+            'open_batches': open_batches
         })
         response = BaseOpenRosaResponse(content)
         response.status_code = 200
@@ -141,43 +143,35 @@ def form_list(request):
 
 
 @http_digest_interviewer_auth
-def download_xform(request, survey_id):
+def download_xform(request, batch_id):
     interviewer = request.user
-    survey = get_object_or_404(Survey, pk=survey_id)
-    allocation = get_survey_allocation(interviewer)
-    if allocation:
-        try:
-            if survey.has_sampling and allocation.stage in [None, SurveyAllocation.LISTING]:
-                if allocation.stage is None:
-                    allocation.stage = SurveyAllocation.LISTING
-                    allocation.save()
-                # starting the list
-                survey_xform = get_qset_xform(interviewer, allocation)
-            else:
-                survey_xform = get_survey_xform(allocation)
-            form_id = '%s' % allocation.pk
-
-            audit = {
-                "xform": form_id
-            }
-            audit_log(Actions.FORM_XML_DOWNLOADED, request.user, interviewer,
-                      _("'%(interviewer)s' Downloaded XML for form '%(id_string)s'.") % {
-                          "interviewer": interviewer.name,
-                          "id_string": form_id
-                      }, audit, request)
-            response = response_with_mimetype_and_name('xml', 'survey-%s' % allocation.pk,
-                                                       show_date=False, full_mime='text/xml')
-            response.content = survey_xform
-            return response
-        except:
-            raise
-    return OpenRosaResponseNotFound('No survey found')
+    batch = get_object_or_404(Batch, pk=batch_id)
+    survey = batch.survey
+    ea_samples = {}
+    assignments = get_survey_allocation(interviewer)
+    if assignments and survey.has_sampling:
+        assignments.update(stage=SurveyAllocation.SURVEY)
+        for assignment in assignments:
+            ea = assignment.allocation_ea
+            listing_survey = survey.preferred_listing or survey
+            try:
+                ListingSample.generate_random_samples(listing_survey, survey, ea)
+            except ListingSample.SamplesAlreadyGenerated:
+                pass
+            ea_samples[ea.pk] = ListingSample.samples(survey, ea)
+    return _get_qset_response(request, interviewer, assignments, batch, ea_samples=ea_samples)
 
 
 @http_digest_interviewer_auth
 def download_listing_xform(request):
     interviewer = request.user
     assignments = get_survey_allocation(interviewer)
+    qset = assignments[0].survey.listing_form
+    response = OpenRosaResponseNotFound('No survey allocated')
+    return _get_qset_response(request, interviewer, assignments, qset)
+
+
+def _get_qset_response(request, interviewer, assignments, qset, ea_samples={}):
     response = OpenRosaResponseNotFound('No survey allocated')
     if assignments.count():
         survey = assignments[0].survey       # all assignemnts are of same survey
@@ -187,7 +181,7 @@ def download_listing_xform(request):
         assignments
         )
         ODKFileDownload.objects.bulk_create(downloads)
-        listing_xform = get_qset_xform(interviewer, assignments)
+        qset_xform = get_qset_xform(interviewer, assignments, qset, ea_samples=ea_samples)
         form_id = 'allocation-%s-%s' % (survey.id, interviewer.id)
         audit = {
             "xform": form_id
@@ -197,9 +191,9 @@ def download_listing_xform(request):
                       "interviewer": interviewer.name,
                       "id_string": form_id
                   }, audit, request)
-        response = response_with_mimetype_and_name('xml', 'listing-form-%s' % survey.pk,
+        response = response_with_mimetype_and_name('xml', '-'.join([qset.verbose_name(), str(survey.pk)]),
                                                    show_date=False, full_mime='text/xml')
-        response.content = listing_xform
+        response.content = qset_xform
     return response
 
 

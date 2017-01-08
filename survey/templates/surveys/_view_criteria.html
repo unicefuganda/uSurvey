@@ -20,13 +20,13 @@
     {% for criterion in survey.randomization_criteria.all %}
         <tr>
             <td >
-                {{ criterion.listing_question.identifier }}
+                {{ criterion.listing_question.identifier|default:"" }}
             </td>
             <td >
-                {{ criterion.validation_test }}
+                {{ criterion.validation_test|default:"" }}
             </td>
             <td>
-                {{ criterion.test_arguments|join_list:"and" }}
+                {{ criterion.test_arguments|join_list:"and"|default:"" }}
 
             </td>
             <td>
