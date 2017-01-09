@@ -46,12 +46,12 @@ class SurveyForm(ModelForm, FormOrderMixin):
         """Make sure this field makes reference to listing form entry in {{}} brackets
         :return:
         """
-        pattern = '.*{{(.+)}}.*'
-        match = re.match(pattern, self.data.get('random_sample_label', ''))
-        if match is None:
+        pattern = '{{ *([0-9a-zA-Z_]+) *}}'
+        label = self.data.get('random_sample_label', '')
+        requested_identifiers = re.findall(pattern, label)
+        if not requested_identifiers:
             raise ValidationError('You need to include one listing response identifier in double curly brackets'
                                   ' e.g {{house_number}}')
-        requested_identifiers = match.groups()
         listing_form = self.cleaned_data['listing_form']
         if listing_form.questions.filter(identifier__in=requested_identifiers).exists():
             return self.cleaned_data['random_sample_label']

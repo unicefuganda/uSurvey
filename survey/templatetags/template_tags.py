@@ -281,8 +281,8 @@ def get_sample_data_display(sample):
     naming_label = survey.random_sample_label
     interview = sample.interview
     # get the exact answer type
-    pattern = '.*{{(.+)}}.*'
-    identifiers = re.match(pattern, naming_label).groups()
+    pattern = '{{ *([0-9a-zA-Z_]+) *}}'
+    identifiers = re.findall(pattern, naming_label)
     questions = survey.listing_form.questions.filter(identifier__in=identifiers)
     context = {}
     for question in questions:
