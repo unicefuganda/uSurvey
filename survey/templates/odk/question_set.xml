@@ -25,6 +25,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	   <qset{{ qset.pk }}>
 	   {% if ea_samples %}
 	     <sampleData>
+			 <selectedSample />
 		   {% for ea_id, samples in ea_samples.items %}
 				<iq{{ ea_id }} />
 			{% endfor %}
@@ -62,6 +63,8 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/qset/meta/instanceName" type="string" 
            readonly="true()" calculate="concat('{{ qset.name}}', /qset/surveyAllocation)" />
   <bind nodeset="/qset/surveyAllocation" type="select1" required="true()" />
+	<bind nodeset="/qset/qset{{qset.pk}}/sampleData/selectedSample" type="string" readonly="true()"
+			calculate="concat({% for ea_id in ea_samples %}/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }},'-',{% endfor %}'')"/>
 	{% for ea_id, samples in ea_samples.items %}
 		{% is_relevant_sample ea_id assignments as  relevant_sample_context %}
 		<bind nodeset="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}" type="select1" required="true()"  relevant="{{ relevant_sample_context }}"/>

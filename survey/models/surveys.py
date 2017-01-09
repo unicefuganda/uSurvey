@@ -18,6 +18,7 @@ class Survey(BaseModel):
                                                     'Leave empty for fresh listing',
                                           null=True, blank=True)
     random_sample_label = models.CharField(max_length=100, null=True, blank=True)
+    # random_sample_description = models.TextField()
 
 
     class Meta:

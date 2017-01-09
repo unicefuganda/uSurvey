@@ -82,14 +82,21 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     :return:
     """
     survey_tree = _get_tree_from_blob(xml)
-    answers_node = _get_answer_node(survey_tree, qset)
-    answers = []
-    survey = survey_allocation.survey
-    map(lambda node: answers.extend(get_answers(_get_nodes('./questions', node)[0], qset, question_map)),
-        answers_node.getchildren())
-    if survey.has_sampling and survey.sample_size > len(answers):
-        raise NotEnoughData()
-    save_answers(qset, access_channel, question_map, answers, survey_allocation)
+    answers_nodes = _get_answer_nodes(survey_tree, qset)
+    for answers_node in answers_nodes:
+        answers = []
+        survey = survey_allocation.survey
+        question_answers_node = _get_nodes('./questions', answers_node)[0]
+        reference_interview = None          # typically used if
+        if _get_nodes('./sampleData/selectedSample', answers_node):
+            # the following looks ugly but ./sampleData/selectedSample is calculated in xform by a concat of
+            # sampleData/iq{{ ea_id }} values with -. See question_set.xml binding for ./sampleData/selectedSample
+            # if for some reason more than one interview value is reflected, choose the first one
+            reference_interview = _get_nodes('./sampleData/selectedSample', answers_node)[0].split('-')[0]
+        map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
+        if survey.has_sampling and survey.sample_size > len(answers):
+            raise NotEnoughData()
+        save_answers(qset, access_channel, question_map, answers, survey_allocation, reference_interview)
     submission.status = ODKSubmission.COMPLETED
     submission.save()
 
@@ -114,7 +121,7 @@ def get_answers(node, qset, question_map):
     return answers
 
 
-def save_answers(qset, access_channel, question_map, answers, survey_allocation):
+def save_answers(qset, access_channel, question_map, answers, survey_allocation, reference_interview=None):
     survey = survey_allocation.survey
     ea = survey_allocation.allocation_ea
     interviewer = access_channel.interviewer
@@ -124,7 +131,8 @@ def save_answers(qset, access_channel, question_map, answers, survey_allocation)
                                              ea=ea,
                                              interviewer=interviewer,
                                              interview_channel=access_channel,
-                                             closure_date=timezone.now())
+                                             closure_date=timezone.now(),
+                                             interview_reference_id=reference_interview)
         map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
 
     def _save_answer(interview, q_id, answer):
@@ -147,9 +155,9 @@ def _update_loop_answers(inline_record, loop_answers):
     return loop_answers
 
 
-def _get_answer_node(tree, qset):
+def _get_answer_nodes(tree, qset):
     answer_path = template.Template(ANSWER_NODE_PATH).render(template.Context({'qset_id': qset.pk}))
-    return _get_nodes(answer_path, tree)[0]
+    return _get_nodes(answer_path, tree)
 
 
 def _get_instance_id(survey_tree):
