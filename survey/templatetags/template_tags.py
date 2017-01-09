@@ -291,7 +291,6 @@ def get_sample_data_display(sample):
             answer = answer_class.get(interview=interview, question=question)
             context[question.identifier] = answer.value
         except answer_class.DoesNotExist:
-            import pdb; pdb.set_trace()
             pass
     question_context = template.Context(context)
     return template.Template(html.escape(naming_label)).render(question_context)
