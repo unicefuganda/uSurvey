@@ -107,16 +107,18 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% if ea_samples %}
 		<group>
 			{% for ea_id, samples in ea_samples.items %}
-				<select ref="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}">
-					<label>Select Sample</label>
-					{% for sample in samples %}
-					{% get_sample_data_display sample as  sample_label %}
-					<item>
-						<label>{{ sample_label }}</label>
-						<value>{{ sample.interview.pk }}</value>
-					</item>
-					{% endfor %}
-				</select>
+			   {% if samples %}
+					<select ref="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}">
+						<label>Select Sample</label>
+						{% for sample in samples %}
+						{% get_sample_data_display sample as  sample_label %}
+						<item>
+							<label>{{ sample_label }}</label>
+							<value>{{ sample.interview.pk }}</value>
+						</item>
+						{% endfor %}
+					</select>
+				{% endif %}
 			{% endfor %}
 		</group>
 	{% endif %}
