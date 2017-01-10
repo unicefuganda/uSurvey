@@ -4955,6 +4955,7 @@ a.thumbnail.active {
 .alert-success {
   color: #328502;
   font-size: 14px;
+  padding-bottom: 2px;
  /* background-color: #dff0d8;
   border-color: #d6e9c6;*/
 }

@@ -46,7 +46,7 @@ p{
 }
 ul,ol{
     margin: 0;
-    padding: 0;
+    padding: 1px;
     list-style: none;
 }
 a, a:hover,a:focus{

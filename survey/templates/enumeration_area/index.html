@@ -27,7 +27,7 @@
     <br class="clear"/>
     <br/>
     <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info"> -->
-    <table id="ea" class="table table-striped table-bordered table-hover table-sort ">
+    <table id="ea" class="table table-striped table-bordered table-hover dataTable table-sort ">
 		<thead>
         <tr role="row">
             <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Name</th>
@@ -125,7 +125,7 @@
 	    <!--});-->
 	    
 	$(document).ready(function() {
-    $('#datatables').DataTable();
+    $('#ea').DataTable();
 } );
 	    
 	    {% for location_type in location_filter_types %}
