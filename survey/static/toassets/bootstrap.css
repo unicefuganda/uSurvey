@@ -3091,7 +3091,9 @@ fieldset[disabled] .btn-default.active {
 }
 .btn-primary {
   color: #fff;
-  background-color: #337ab7;
+  /*background-color: #337ab7;*/
+  margin-bottom: 10px;
+  background: rgba(0, 0, 0, 0) linear-gradient(#00498e, #0099dc) repeat scroll 0 0 !important;
   border-color: #2e6da4;
 }
 .btn-primary:hover,
