@@ -24,10 +24,13 @@ class RespondentGroup(BaseModel):
     def has_interviews(self):
         from survey.models import Interview
         return self.questions.exists() and Interview.objects.filter(qset__pk=self.questions.first().qset.pk).exists()
+
     def remove_related_questions(self):
         self.question_templates.all().delete()
+
     def __unicode__(self):
         return self.name
+
 
 class RespondentGroupCondition(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
@@ -72,7 +75,12 @@ class GroupTestArgument(BaseModel):
         get_latest_by = 'position'
 
 
-class SurveyParameterList(QuestionSet): # basically used to tag survey grouping questions
+class SurveyParameterList(QuestionSet):             # basically used to tag survey grouping questions
+    batch = models.ForeignKey('BatchQuestion', related_name='parameter_list')
 
     class Meta:
         app_label = 'survey'
+
+
+# class SurveyParameter(Question):        # this essentially shall be made from copying from survey paramaters.
+#     pass                            # It is required to

@@ -12,52 +12,56 @@
       <link rel="stylesheet" href="{{ STATIC_URL }}assets/usur.css" />
      <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
    <style>
-   #search {
+        .search {
+          width: 100%;
+          position: relative
+        }
 
-}
+        .searchTerm {
+          float: left;
+          width: 100%;
+          border: 3px solid #0099ff;
+          padding: 5px;
+          height: 20px;
+          border-radius: 5px;
+          outline: none;
+          color: #0099ff;
+        }
 
-#search input[type="text"] {
-     -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    border-radius: 20px;
-	background: url({{ STATIC_URL }}assets/images/search.png) no-repeat 10px 6px #fcfcfc;
-    border: 1px solid #d1d1d1;
-    font: bold 12px Arial,Helvetica,Sans-serif;
-    color: #bebebe;
-    /*width: 150px;*/
-    margin-top:10px;
-    margin-left:-5px;
-    padding: 6px 15px 6px 35px;
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    border-radius: 20px;
-    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
-    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
-    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
-    -webkit-transition: all 0.7s ease 0s;
-    -moz-transition: all 0.7s ease 0s;
-    -o-transition: all 0.7s ease 0s;
-    /*transition: all 0.7s ease 0s;*/
+        .searchTerm:focus{
+          color: #0099ff;
+        }
 
-    }
+        .searchButton {
+          position: absolute;
+          right: -50px;
+          width: 40px;
+          height: 36px;
+          border: 1px solid #0099ff;
+          background: #0099ff;
+          text-align: center;
+          color: #fff;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 20px;
+        }
 
-#search input[type="text"]:focus {
-    width: 200px;
-    border :1px solid #0073bf;
-    }
-   div.table-header a {
-       color: #0f0;
-       }
+        /*Resize the wrap to see the search bar change!*/
+        .wrap{
+          width: 30%;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+         span.help {
+                font-size: 13px !important;
+                color: #09f;
+          }
 
- span.help {
-        font-size: 13px !important;
-        color: #09f;
-  }
-
- .modal-header {
-       background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;
-  }
+         .modal-header {
+               background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;
+          }
 
    </style>
       <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />

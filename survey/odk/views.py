@@ -152,13 +152,14 @@ def download_xform(request, batch_id):
     if assignments and survey.has_sampling:
         assignments.update(stage=SurveyAllocation.SURVEY)
         for assignment in assignments:
-            ea = assignment.allocation_ea
-            listing_survey = survey.preferred_listing or survey
-            try:
-                ListingSample.generate_random_samples(listing_survey, survey, ea)
-            except ListingSample.SamplesAlreadyGenerated:
-                pass
-            ea_samples[ea.pk] = ListingSample.samples(survey, ea)
+            if assignment.sample_size_reached():            # only randomize eas that has reached sample size
+                ea = assignment.allocation_ea
+                listing_survey = survey.preferred_listing or survey
+                try:
+                    ListingSample.generate_random_samples(listing_survey, survey, ea)
+                except ListingSample.SamplesAlreadyGenerated:
+                    pass
+                ea_samples[ea.pk] = ListingSample.samples(survey, ea)
     return _get_qset_response(request, interviewer, assignments, batch, ea_samples=ea_samples)
 
 
