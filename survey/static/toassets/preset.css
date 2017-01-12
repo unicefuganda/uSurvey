@@ -93,10 +93,10 @@ a{
     position: relative;
     background: rgba(0, 0, 0, 0);
 }
-img{
-    /*width: 100%;*/
+/*img{
+    width: 100%;
     height: auto;
-}
+}*/
 .sectionTitles{
     position: relative;
     width: 100%;

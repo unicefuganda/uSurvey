@@ -14,7 +14,7 @@
 												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
 												<a href="#new_question_set" data-toggle="modal"  class="" id="add_question_set">Create New {{ model.verbose_name }}</a>
 											</button> -->
-<div class="col-lg-12" style="margin-top: -18px;">
+<div class="col-lg-12" style="margin-top: -18px;margin-left: 21px;">
     <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set">
           <i class="ace-icon fa fa-plus bigger-120"></i>
                         Create New {{ model.verbose_name }}
@@ -24,7 +24,7 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% autopaginate question_sets 50 %}
+{% autopaginate question_sets 10 %}
 {% load template_tags %}
 
 </div>

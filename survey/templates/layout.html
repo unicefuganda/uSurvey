@@ -26,7 +26,7 @@
     color: #bebebe;
     /*width: 150px;*/
     margin-top:10px;
-    margin-left:-312px;
+    margin-left:-5px;
     padding: 6px 15px 6px 35px;
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
@@ -245,7 +245,7 @@
                   <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;">
                   </div>
                    <br />
-                  <div class="row col-xs-4 col-lg-4" style="color:#09F; z-index:1; margin:5px;">
+                  <div class="row col-xs-4 col-lg-4" style="color:#09F; z-index:1;">
                       <h5 style="color:#09F; font-weight:none;">
                                 <a href="{% url 'home_page' %}">Home</a> &raquo;
                                     {% for breadcrumb in request.breadcrumbs %}
@@ -301,7 +301,7 @@
                                  <div id="dynamic-table_wrapper" class="dataTables_wrapper form-inline no-footer">
                                     <div class="row">
                                        <div class="">
-                                          <div class="dataTables_length txt_cen"  id="dynamic-table_length">
+                                          <div class="dataTables_length "  id="dynamic-table_length">
                                              {% block search %}
                                              {% endblock %}
                                           </div>
@@ -345,17 +345,17 @@
             <div class="container">
                <div class="row">
                   <div class="col-lg-12 col-sm-12 col-xs-12 text-center">
-                     <span><img src="{{ STATIC_URL }}images/bottomfooterlogo.jpg" width="219" height="80"></span>
+                     <!-- <span><img src="{{ STATIC_URL }}images/bottomfooterlogo.jpg" width="219" height="80"></span> -->
                      <p style="padding-bottom:10px;">Copyright © 2016 <a href="#">UNICEF</a><span> and UBOS</span> </p>
                   </div>
-                  <div class="topSocial pull-right">
+                  <!-- <div class="topSocial pull-right">
                      <ul>
                         <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
                         <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
                         <li><a class="google" href="#"><i class="fa fa-linkedin"></i></a></li>
                      </ul>
                   </div>
-               </div>
+               </div> -->
             </div>
             </div>
          </section>
