@@ -1,7 +1,7 @@
 <div class="wrap">
    <div class="search">
       <form action="" method="get" accept-charset="utf-8" id="{{ id }}" class="search {{ class }}">
-          <input type="text" class="searchTerm" value="{{q}}" id="{{ id }}_val" placeholder="{% if placeholder %}{{placeholder}}{% else %}Search...{% endif %}" />
+          <input name="q" type="text" class="searchTerm" value="{{q}}" id="{{ id }}_val" placeholder="{% if placeholder %}{{placeholder}}{% else %}Search...{% endif %}" />
           <button type="submit" class="searchButton">
             <i class="fa fa-search"></i>
          </button>
