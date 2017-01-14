@@ -32,26 +32,28 @@ xmlns:jr="http://openrosa.org/javarosa">
 		</sampleData>
 	   {% endif %}
 			<questions>
-			   {% comment %} Would come back to this
-			   <groupQuestion>
-				   {% for question in group_questions %}
-						<p{{question.pk}} />
-				   {% endfor %}
-			   </groupQuestion>
-			   {% endcomment %}
-				{% for question in qset.questions_inline %}
-				   {% if question.loop_started %}
-					   <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
-						<id />
+			   <groupQuestions>
+				   {% if qset.parameter_list %}
+					   {% for question in qset.parameter_list.questions.all %}
+							<p{{question.pk}} />
+					   {% endfor %}
 				   {% endif %}
-							<q{{question.pk}} />
-							{% for sub_question in question.direct_sub_questions %}
-							<q{{sub_question.pk}} />
-							{% endfor %}
-				   {% if question.loop_ended %}
-					   </q{{question.loop_ended.loop_starter.pk}}q{{question.pk}}>
-				   {% endif %}
-				{% endfor %}
+			   </groupQuestions>
+				<surveyQuestions>
+					{% for question in qset.questions_inline %}
+					   {% if question.loop_started %}
+						   <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
+							<id />
+					   {% endif %}
+								<q{{question.pk}} />
+								{% for sub_question in question.direct_sub_questions %}
+								<q{{sub_question.pk}} />
+								{% endfor %}
+					   {% if question.loop_ended %}
+						   </q{{question.loop_ended.loop_starter.pk}}q{{question.pk}}>
+					   {% endif %}
+					{% endfor %}
+				</surveyQuestions>
 			</questions>
 	   </qset{{ qset.pk }}>
    </qset>
@@ -61,34 +63,35 @@ xmlns:jr="http://openrosa.org/javarosa">
   <bind nodeset="/qset/meta/instanceID" type="string" 
            readonly="true()" calculate="concat('uuid:',uuid())" />
   <bind nodeset="/qset/meta/instanceName" type="string" 
-           readonly="true()" calculate="concat('{{ qset.name}}', /qset/surveyAllocation)" />
+           readonly="true()" calculate="concat('{{ qset.name}}', /qset/surveyAllocation{% if ea_samples %}, '-', /qset/qset{{qset.pk}}/sampleData/selectedSample{% endif %})" />
   <bind nodeset="/qset/surveyAllocation" type="select1" required="true()" />
-	<bind nodeset="/qset/qset{{qset.pk}}/sampleData/selectedSample" type="string" readonly="true()"
-			calculate="concat({% for ea_id in ea_samples %}/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }},'-',{% endfor %}'')"/>
-	{% for ea_id, samples in ea_samples.items %}
-		{% is_relevant_sample ea_id assignments as  relevant_sample_context %}
-		<bind nodeset="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}" type="select1" required="true()"  relevant="{{ relevant_sample_context }}"/>
-	{% endfor %}
-
+	{% if ea_samples %}
+		<bind nodeset="/qset/qset{{qset.pk}}/sampleData/selectedSample" type="string" readonly="true()"
+				calculate="concat({% for ea_id in ea_samples %}/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }},'-',{% endfor %}'')"/>
+		{% for ea_id, samples in ea_samples.items %}
+			{% is_relevant_sample ea_id assignments as  relevant_sample_context %}
+			<bind nodeset="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}" type="select1" required="true()"  relevant="{{ relevant_sample_context }}"/>
+		{% endfor %}
+	{% endif %}
 	{% for question in qset.flow_questions  %}
 		{% is_relevant_odk question interviewer as relevance_context %}
 	    {% get_loop_aware_path question  as path %}
 	       {% if question.loop_started %}
-	           <bind nodeset="/qset/qset{{qset.pk}}/questions{{ path }}"
+	           <bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}"
 				required="true()"
 				relevant="true() and {{ relevance_context }}"/>
-				<bind nodeset="/qset/qset{{qset.pk}}/questions{{ path }}/id"
+				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/id"
 				required="true()"
 				relevant="true() and {{ relevance_context }}" readonly="true()" calculate="position(..)"/>
 	       {% endif %}
 
-			<bind nodeset="/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}}"
+			<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"
 				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
 				required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
 				relevant="true() and {{ relevance_context }}"/>
 			{% comment %}{% if question.loop_ended %}
-				<bind nodeset="/qset/qset{{qset.pk}}/questions{{ path }}/loop_id" type="string" 
-           readonly="true()" calculate="count(/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}})" />
+				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/loop_id" type="string" 
+           readonly="true()" calculate="count(/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}})" />
 	       {% endif %}{% endcomment %}
 	{% endfor %}
 
@@ -122,6 +125,13 @@ xmlns:jr="http://openrosa.org/javarosa">
 			{% endfor %}
 		</group>
 	{% endif %}
+	{% if qset.parameter_list %}
+		<group>
+			{% for question in qset.parameter_list.questions.all %}
+				{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:question.pk %}
+			{% endfor %}
+		</group>
+	{% endif %}
 	<group>
 		<label>{{ qset.name }}</label>
 		<hint>{{ qset.description }}</hint>
@@ -130,7 +140,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		   {% if question.loop_started %}
 		       <group {% if question.loop_started.loop_prompt %}prompt="{{question.loop_started.loop_prompt}}"{% endif %}>
 					<label>{{question.loop_started.loop_label}}</label>
-	           		<repeat nodeset="/qset/qset{{qset.pk}}/questions{{ path }}" {% if question.loop_started.repeat_logic == question.loop_started.PREVIOUS_QUESTION %}
+	           		<repeat nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}" {% if question.loop_started.repeat_logic == question.loop_started.PREVIOUS_QUESTION %}
 													{% get_loop_aware_path question.loop_started.previousanswercount.value  as counter_path %}
 													jr:count="/qset/qset{{qset.pk}}/questions{{counter_path}}/q{{question.loop_started.previousanswercount.value.pk}}"
 												{% elif question.loop_started.repeat_logic == question.loop_started.FIXED_REPEATS %}
@@ -138,10 +148,10 @@ xmlns:jr="http://openrosa.org/javarosa">
 												{% endif %}>
 
 	       {% endif %}
-					{% include "odk/_question_body.xml" with question=question answer_types=answer_types %}
+					{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:question.pk %}
 					 {% for sub_question in question.direct_sub_questions %}
-	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types %}
-	   				{% endfor %}
+	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:question.pk %}
+					{% endfor %}
 				{% if question.loop_ended %}
 		      		</repeat>
 			 </group>

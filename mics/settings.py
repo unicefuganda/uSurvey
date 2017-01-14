@@ -240,6 +240,7 @@ CACHEOPS = {
     'survey.numericalanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     'survey.textanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     'survey.multichoiceanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
+    'survey.odkgeopoint': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs
     'survey.locationtype': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     # refresh every 3 hrs

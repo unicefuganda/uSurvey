@@ -1,4 +1,5 @@
 import ast
+import os
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
@@ -7,16 +8,19 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.utils.decorators import method_decorator
 from django.forms import ValidationError
+from survey.services.export_interviewers import ExportInterviewersService
 from survey.models import Survey, Location, LocationType, QuestionSet, ListingTemplate, Batch, \
-    Question, QuestionTemplate, QuestionOption, QuestionFlow
+    Question, QuestionTemplate, QuestionOption, QuestionFlow, Answer
 from survey.forms.surveys import SurveyForm
 from survey.views.custom_decorators import handle_object_does_not_exist
 from survey.utils.query_helper import get_filterset
 from survey.models import EnumerationArea, LocationType, Location, BatchCommencement, SurveyHouseholdListing
+from survey.models import Interview
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 from survey.forms.question_set import get_question_set_form
 from survey.forms.question import get_question_form
 from survey.forms.filters import QuestionFilterForm
+from survey.odk.utils.odk_helper import get_zipped_dir
 from django.conf import settings
 
 model = QuestionSet
@@ -117,3 +121,45 @@ def delete_qset_listingform(request, question_id):
     else:
         qset.delete()
     return HttpResponseRedirect('/listing_form/')
+
+
+def view_data(request, qset_id):
+    try:
+        qset = QuestionSet.get(pk=qset_id)
+        request.breadcrumbs(qset.edit_breadcrumbs(qset=qset))
+        params = request.GET
+        locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
+        if locations_filter.is_valid():
+            interviews = Interview.objects.filter(ea__in=locations_filter.get_enumerations(),
+                                                  question_set=qset).order_by('created')
+        context = {'qset': qset, 'interviews': interviews, 'locations_filter': locations_filter,
+                   'location_filter_types': LocationType.in_between()}
+        return render(request, 'question_set/view_data.html', context)
+    except QuestionSet.DoesNotExist:
+        return HttpResponseNotFound()
+
+
+@permission_required('auth.can_view_aggregates')
+def download_attachment(request, question_id, interview_id):
+    question = get_object_or_404(Question, pk=question_id)
+    interview = get_object_or_404(Interview, pk=interview_id)
+    answer_class = Answer.get_class(question.answer_type)
+    filename = '%s-%s.zip' % (question.identifier, question_id)
+    attachment_dir = os.path.join(
+        settings.SUBMISSION_UPLOAD_BASE, str(answer_class.get(interview=interview, question=question).value),
+        'attachments')
+    response = HttpResponse(content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+    response.write(get_zipped_dir(attachment_dir))
+    return response
+
+
+def download_data(request, qset_id):
+    qset = QuestionSet.get(pk=qset_id)
+    filename = 'all_interviewers'
+    formatted_responses = ExportInterviewersService(
+        settings.INTERVIEWER_EXPORT_HEADERS).formatted_responses()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
+    response.write("\r\n".join(formatted_responses))
+    return response

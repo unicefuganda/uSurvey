@@ -35,7 +35,7 @@ class ODKSubmission(BaseModel):
         return self.attachments.count() > 0
 
     def save_attachments(self, media_files):
-        for f in media_files:
+        for f in media_files.values():
             content_type = f.content_type if hasattr(f, 'content_type') else ''
             attach, created = Attachment.objects.get_or_create(submission=self,
                                                                media_file=f,

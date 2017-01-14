@@ -1,5 +1,5 @@
                 {% if question.answer_type == answer_types.multichoiceanswer %}
-					<select1 ref="/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}}">
+					<select1 ref="{{qref}}">
 						<label>{{question.text}}</label>
 						{% for option in question.options.all %}
 						<item>
@@ -9,7 +9,7 @@
 						{% endfor %}
 					</select1>
 					{% elif question.answer_type == answer_types.multiselectanswer %}
-						<select ref="/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}}">
+						<select ref="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}">
 							<label>{{question.text}}</label>
 							{% for option in question.options.all %}
 							<item>
@@ -19,23 +19,23 @@
 							{% endfor %}
 						</select>
 					{% elif question.answer_type == answer_types.imageanswer %}
-						<upload ref="/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
+						<upload ref="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"   appearance="annotate" mediatype="image/*">
 							<label>{{question.text}}</label>
 						</upload>
 					{% elif question.answer_type == answer_types.audioanswer %}
-						<upload ref="/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}}"   mediatype="audio/*">
+						<upload ref="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"   mediatype="audio/*">
 							<label>{{question.text}}</label>
 						</upload>
 					{% elif question.answer_type == answer_types.videoanswer %}
-						<upload ref="/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}}" mediatype="video/*">
+						<upload ref="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}" mediatype="video/*">
 							<label>{{question.text}}</label>
 						</upload>
 					{% elif question.answer_type == answer_types.dateanswer %}
-					<input ref="/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}}" appearance="no-calendar">
+					<input ref="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}" appearance="no-calendar">
 						<label>{{question.text}}</label>
 					</input>
 					{% else %}
-					<input ref="/qset/qset{{qset.pk}}/questions{{ path }}/q{{question.pk}}">
+					<input ref="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}">
 						<label>{{question.text}}</label>
 					</input>
 					{% endif %}

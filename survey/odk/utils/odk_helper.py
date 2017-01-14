@@ -72,7 +72,7 @@ def _get_nodes(search_path, tree=None, xml_string=None):
 
 
 @job('odk', connection=get_connection())
-def process_answers(xml, qset, access_channel, question_map, survey_allocation, submission):
+def process_answers(xml, qset, access_channel, question_map, survey_allocation, submission, media_files):
     """Process answers for this answers_node. It's supposed to handle for all question answers in this xform.
     :param answers_node:
     :param qset:
@@ -84,21 +84,33 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
     survey_tree = _get_tree_from_blob(xml)
     answers_nodes = _get_answer_nodes(survey_tree, qset)
     for answers_node in answers_nodes:
-        answers = []
+        # answers = []
+        survey_parameters = []
         survey = survey_allocation.survey
-        question_answers_node = _get_nodes('./questions', answers_node)[0]
+        question_answers_node = _get_nodes('./questions/surveyQuestions', answers_node)[0]
         reference_interview = None          # typically used if
         if _get_nodes('./sampleData/selectedSample', answers_node):
             # the following looks ugly but ./sampleData/selectedSample is calculated in xform by a concat of
             # sampleData/iq{{ ea_id }} values with -. See question_set.xml binding for ./sampleData/selectedSample
             # if for some reason more than one interview value is reflected, choose the first one
             reference_interview = _get_nodes('./sampleData/selectedSample', answers_node)[0].text.split('-')[0]
-        map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
+        # map(lambda node: answers.extend(get_answers(node, qset, question_map)), question_answers_node.getchildren())
+        # map(lambda node: survey_parameters.extend(get_answers(node, qset, question_map)),
+        #     survey_parameters_node.getchildren())
+        answers = get_answers(question_answers_node, qset, question_map)
+        survey_parameters = None
+        if qset.parameter_list:
+            survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
+            # survey paramaters does not have any single repeat
+            survey_parameters = get_answers(survey_parameters_node, qset, question_map)[0]
         if survey.has_sampling and survey.sample_size > len(answers):
             raise NotEnoughData()
-        save_answers(qset, access_channel, question_map, answers, survey_allocation, reference_interview)
+        save_answers(qset, access_channel, question_map, answers, survey_allocation,
+                     survey_parameters=survey_parameters, reference_interview=reference_interview,
+                     media_files=media_files)
     submission.status = ODKSubmission.COMPLETED
     submission.save()
+    submission.save_attachments(media_files.values())
 
 
 def get_answers(node, qset, question_map):
@@ -121,7 +133,8 @@ def get_answers(node, qset, question_map):
     return answers
 
 
-def save_answers(qset, access_channel, question_map, answers, survey_allocation, reference_interview=None):
+def save_answers(qset, access_channel, question_map, answers, survey_allocation, survey_parameters=None,
+                 reference_interview=None, media_files=None):
     survey = survey_allocation.survey
     ea = survey_allocation.allocation_ea
     interviewer = access_channel.interviewer
@@ -134,11 +147,16 @@ def save_answers(qset, access_channel, question_map, answers, survey_allocation,
                                              closure_date=timezone.now(),
                                              interview_reference_id=reference_interview)
         map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
+        if survey_parameters:
+            map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())
 
     def _save_answer(interview, q_id, answer):
         question = question_map.get(q_id, None)
         if question:
             answer_class = Answer.get_class(question.answer_type)
+            if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
+                                        VideoAnswer.choice_name()]:
+                answer = media_files.get(answer, None)
             answer_class.create(interview, question, answer)
     map(_save_record, answers)
 
@@ -182,7 +200,7 @@ def _get_form_type(survey_tree):
     return int(_get_nodes(FORM_TYPE_PATH, tree=survey_tree)[0].text)
 
 
-def process_submission(interviewer, xml_file, media_files=[], request=None):
+def process_submission(interviewer, xml_file, media_files={}, request=None):
     """extracts and saves the collected data from associated xform.
     """
     media_files = dict([(os.path.basename(f.name), f) for f in media_files])
@@ -199,8 +217,9 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
                                               xml=xml_blob, instance_id=instance_id)
     question_map = dict([(str(q.pk), q) for q in qset.flow_questions])
     access_channel = ODKAccess.objects.get(interviewer=interviewer)
+    media_files = dict([(os.path.basename(f.name), f) for f in media_files])
     # process_answers.delay(xml_blob, qset, interviewer, question_map, survey_allocation, submission)
-    process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission)
+    process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
 
 

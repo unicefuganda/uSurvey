@@ -1,5 +1,6 @@
 import string
 import re
+from cacheops import cached_as
 from django import template
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -8,6 +9,7 @@ from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
 from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
     GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember
+from survey.models import VideoAnswer, AudioAnswer, ImageAnswer
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
@@ -238,6 +240,21 @@ def household_completed_percent(interviewer):
 
 
 @register.assignment_tag
+def get_answer(question, interview):
+    @cached_as(question, interview)
+    def _get_answer():
+        answer_class = Answer.get_class(question.answer_type)
+        try:
+            if answer_class in [VideoAnswer, AudioAnswer, ImageAnswer]:
+                return mark_safe('<a href="{% url download_qset_attachment %s %s %}">Download</a>' % (question.pk,
+                                                                                                      interview.pk))
+            else:
+                return answer_class.get(interview=interview, question=question).value
+        except answer_class.DoesNotExist:
+            return ''
+    return _get_answer()
+
+@register.assignment_tag
 def can_start_survey(survey_allocations):
     completed = filter(lambda allocation: allocation.sample_size_reached(), survey_allocations)
     return (1.0 * len(completed))/len(survey_allocations) >= getattr(settings, 'EAS_PERCENT_TO_START_SURVEY', 0.5)
@@ -323,7 +340,7 @@ def get_loop_aware_path(question):
 
 
 def get_xform_relative_path(question):
-    return '/qset/qset%s/questions%s' % (question.qset.pk, get_loop_aware_path(question))
+    return '/qset/qset%s/questions/surveyQuestions%s' % (question.qset.pk, get_loop_aware_path(question))
 
 
 def get_node_path(question):

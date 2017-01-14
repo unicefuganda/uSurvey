@@ -265,8 +265,8 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
     objects = InheritanceManager()
     name = models.CharField(max_length=100, blank=False, null=True, db_index=True)
     description = models.CharField(max_length=300, blank=True, null=True)
-    start_question = models.OneToOneField(
-        Question, related_name='starter_%(class)s', null=True, blank=True, on_delete=models.SET_NULL)
+    start_question = models.OneToOneField(Question, related_name='starter_%(class)s',
+                                          null=True, blank=True, on_delete=models.SET_NULL)
 
     @classmethod
     def question_model(cls):
