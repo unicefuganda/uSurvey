@@ -21,7 +21,7 @@ class GroupForm(forms.ModelForm, FormOrderMixin):
                            'min', 'max'])
         if self.data.get('test_question', []):
             options = TemplateOption.objects.filter(question__pk=self.data['test_question'])
-            self.fields['options'].choices = [(opt.text, opt.text) for opt in options]
+            self.fields['options'].choices = [(opt.order, opt.text) for opt in options]
 
     class Meta:
         exclude = []

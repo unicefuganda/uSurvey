@@ -35,7 +35,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 				{% if qset.parameter_list %}
 				   <groupQuestions>
 					   {% for question in qset.parameter_list.questions.all %}
-							<p{{question.pk}} />
+							<q{{question.pk}} />
 					   {% endfor %}
 				   </groupQuestions>
 				   {% endif %}
@@ -43,7 +43,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 					{% for question in qset.questions_inline %}
 					   {% if question.loop_started %}
 						   <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
-							<id />
+							<id{{ question.loop_started.pk }} />
 					   {% endif %}
 								<q{{question.pk}} />
 								{% for sub_question in question.direct_sub_questions %}
@@ -73,6 +73,14 @@ xmlns:jr="http://openrosa.org/javarosa">
 			<bind nodeset="/qset/qset{{qset.pk}}/sampleData/iq{{ ea_id }}" type="select1" required="true()"  relevant="{{ relevant_sample_context }}"/>
 		{% endfor %}
 	{% endif %}
+	{% if qset.parameter_list %}
+		{% for question in qset.parameter_list.questions.all %}
+			<bind nodeset="/qset/qset{{qset.pk}}/questions/groupQuestions/q{{question.pk}}"
+				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
+				required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
+				relevant="true()" />
+		{% endfor %}
+	{% endif %}
 	{% for question in qset.flow_questions  %}
 		{% is_relevant_odk question interviewer as relevance_context %}
 	    {% get_loop_aware_path question  as path %}
@@ -80,7 +88,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	           <bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}"
 				required="true()"
 				relevant="true() and {{ relevance_context }}"/>
-				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/id"
+				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/id{{ question.loop_started.id }}"
 				required="true()"
 				relevant="true() and {{ relevance_context }}" readonly="true()" calculate="position(..)"/>
 	       {% endif %}

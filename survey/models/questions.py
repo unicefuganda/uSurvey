@@ -351,6 +351,7 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
                 inlines = inline_questions(self.start_question, qflows)
                 if inlines and inlines[-1] is None:
                     inlines.pop(-1)
+                inlines = [Question.get(pk=q.pk) for q in inlines] # this is to convert question to correct type
                 return inlines
             else:
                 return []

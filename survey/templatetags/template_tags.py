@@ -1,5 +1,6 @@
 import string
 import re
+from collections import OrderedDict
 from cacheops import cached_as
 from django import template
 from django.core.urlresolvers import reverse
@@ -9,7 +10,7 @@ from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
 from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
     GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember
-from survey.models import VideoAnswer, AudioAnswer, ImageAnswer
+from survey.models import VideoAnswer, AudioAnswer, ImageAnswer, QuestionSet
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
@@ -168,8 +169,8 @@ def modulo(num, val):
 
 
 @register.filter
-def repeat_string(string, times):
-    return string * (times - 1)
+def repeat_string(s, times):
+    return s * (times - 1)
 
 
 @register.filter
@@ -359,10 +360,12 @@ def is_relevant_odk(context, question, interviewer):
         default_relevance = 'true()'
     else:
         default_relevance = 'false()'
-    relevance_context = ' (%s) ' % (
+    relevance_context = ' (%s)' % (
         ' or '.join(context.get(question.pk, [default_relevance, ])),
-        # is_relevant_by_group(context, question, registered_households)
     )
+    if hasattr(question, 'group'):
+        relevance_context = '%s %s' % (relevance_context, is_relevant_by_group(context, question))
+
     # do not include back to flows to this
     flows = question.flows.exclude(desc=LogicForm.BACK_TO_ACTION)
     node_path = get_node_path(question)
@@ -400,7 +403,8 @@ def is_relevant_odk(context, question, interviewer):
             next_question = null_flow.next_question
             next_q_context = context.get(next_question.pk, ['false()', ])
             next_q_context.append('(%s)' % ' and '.join(null_condition))
-            if hasattr(question, 'group') and question.group != next_question.group:
+            if hasattr(question, 'group') and (hasattr(next_question, 'group') is False or
+                                                       question.group != next_question.group):
                 next_q_context.append('true()')
             # if get_loop_aware_path(question) != get_loop_aware_path(next_question):
             #     next_q_context.append('true()')
@@ -410,37 +414,25 @@ def is_relevant_odk(context, question, interviewer):
     return mark_safe(relevance_context)
 
 
-def is_relevant_by_group(context, question, registered_households):
-    question_group = question.group
-    relevant_existing = []
-    relevant_new = []
-    attributes = {
-        'AGE': '/survey/household/householdMember/age',
-        'GENDER': '/survey/household/householdMember/sex',
-                  'GENERAL': '/survey/household/householdMember/isHead'
-    }
-    for condition in question_group.get_all_conditions():
-        relevant_new.append(condition.odk_matches(attributes))
+def get_group_question_path(qset, group_question):
+    return '/qset/qset%s/questions/groupQuestions/q%s' % (qset.id, group_question.id)
 
-    # for household in registered_households:
-    #     for member in household.members.all():
-    #         if member.belongs_to(question_group):
-    #             relevant_existing.append(" /survey/registeredHousehold/selectedMember = '%s_%s' " % (member.household.pk, member.pk))
-    #         else:
-    #         #get next inline question... This is another flow leading to the next inline question in case current is not applicable
-    #             connecting_flows = question.connecting_flows.filter(validation_test__isnull=True)
-    #             if connecting_flows:
-    #                 f_question = connecting_flows[0].question
-    #                 next_question = f_question.batch.next_inline(f_question, groups=member.groups,
-    #                                                                         channel=ODKAccess.choice_name())
-    #                 if next_question:
-    #                     node_path = '/survey/b%s/q%s' % (f_question.batch.pk, f_question.pk)
-    #                     next_q_context = context.get(next_question.pk, ['false()', ])
-    #                     next_q_context.append("string-length(%s) &gt; 0" % node_path)
-    #                     context[next_question.pk] = next_q_context
-    relevance_builder = ['false()', ]
-    if relevant_new:
-        relevance_builder.append('(%s)' % ' and '.join(relevant_new))
-    if relevant_existing:
-        relevance_builder.append('(%s)' % ' or '.join(relevant_existing))
-    return ' and (%s)' % ' or '.join(relevance_builder)
+
+def is_relevant_by_group(context, question):
+    question_group = question.group
+    qset = question.qset
+
+    @cached_as(question_group, qset)
+    def _is_relevant_by_group(qset):
+        qset = QuestionSet.get(pk=qset.pk)
+        relevant_new = []
+        for condition in question_group.group_conditions.all():
+            test_question = qset.parameter_list.questions.get(identifier=condition.test_question.identifier)
+            answer_class = Answer.get_class(condition.test_question.answer_type)
+            relevant_new.append(answer_class.print_odk_validation(get_group_question_path(qset, test_question),
+                                                                  condition.validation_test,  *condition.test_params))
+        relevance_builder = ['false()', ]
+        if relevant_new:
+            relevance_builder.append('(%s)' % ' and '.join(relevant_new))
+        return ' and (%s)' % ' or '.join(relevance_builder)
+    return _is_relevant_by_group(qset)

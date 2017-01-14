@@ -43,13 +43,13 @@ def index(request, qset_id):
     if request.method == 'GET':
         question_filter_form = QuestionFilterForm(
             data=request.GET, qset=batch)
-        batch_questions = batch.questions.all()
         search_fields = ['identifier',  'text', ]
+        qset_questions = batch.questions.all()      # basically using this make use of db filters
         if request.GET.has_key('q'):
-            questions = get_filterset(
-                batch_questions, request.GET['q'], search_fields)
-        relevant_questions = question_filter_form.filter(batch_questions)
-        questions = [q for q in questions if q in relevant_questions]
+            questions = get_filterset(qset_questions, request.GET['q'], search_fields)
+        relevant_questions = question_filter_form.filter(qset_questions)
+        relevant_ids = [q.id for q in relevant_questions]
+        questions = [q for q in questions if q.id in relevant_ids]
         # now maintain same inline other exclusing questions in
         max_per_page = _max_number_of_question_per_page(
             request.GET.get('number_of_questions_per_page', 0))

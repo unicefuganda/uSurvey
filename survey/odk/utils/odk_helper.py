@@ -30,7 +30,6 @@ from django.contrib.sites.models import Site
 from dateutils import relativedelta
 from django.db.utils import IntegrityError
 from django_rq import job, get_connection
-from survey.templatetags.template_tags import get_xform_relative_path, get_node_path
 
 
 OPEN_ROSA_VERSION_HEADER = 'X-OpenRosa-Version'

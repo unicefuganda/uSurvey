@@ -2,8 +2,8 @@ __author__ = 'anthony <>'
 from django.db import models
 from model_utils.managers import InheritanceManager
 from survey.models.base import BaseModel
-from survey.models.generics import TemplateQuestion
-from survey.models.questions import Question, QuestionSet
+from survey.models.generics import TemplateQuestion, TemplateOption
+from survey.models.questions import Question, QuestionSet, QuestionOption
 from survey.models.question_templates import QuestionTemplate
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
 
@@ -45,7 +45,7 @@ class RespondentGroupCondition(BaseModel):
 
     @property
     def test_params(self):
-        return [t.param for t in self.text_arguments]
+        return [t.param for t in self.test_arguments]
 
     def params_display(self):
         params = []
@@ -97,14 +97,19 @@ class SurveyParameterList(QuestionSet):             # basically used to tag surv
         groups = RespondentGroup.objects.filter(questions__qset=batch)
         template_questions = []
         question_ids = []
+        options = []
         # loop through groups to get required template parameters
         for group in groups:
             map(lambda condition: question_ids.append(condition.test_question.id), group.group_conditions.all())
         parameters = ParameterTemplate.objects.filter(id__in=question_ids).order_by('identifier')
         for param in parameters:
-            template_questions.append(Question(**{'identifier': param.identifier, 'text': param.text,
-                                                'answer_type': param.answer_type, 'qset': param_list}))
-        Question.objects.bulk_create(template_questions)
+            # going this route because param questions typically would be small
+            question = Question(**{'identifier': param.identifier, 'text': param.text,
+                                   'answer_type': param.answer_type, 'qset': param_list})
+            question.save()
+            if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiChoiceAnswer]:
+                for option in param.options.all():
+                    QuestionOption.objects.create(order=option.order, text=option.text, question=question)
         return param_list
 
 

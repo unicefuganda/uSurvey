@@ -46,7 +46,7 @@
                  }
                  var question_options = {
                     {% for question in parameter_questions %}
-                        '{{ question.pk }}' : { {% for opt in question.options.all %}'{{ opt.text }}': '{{ opt.text }}',{% endfor %} },
+                        '{{ question.pk }}' : { {% for opt in question.options.all %}'{{ opt.order }}': '{{ opt.text }}',{% endfor %} },
                     {% endfor %}
                  }
                  $('#id_test_question').change(function(){
