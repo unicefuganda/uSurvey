@@ -76,7 +76,7 @@ class GroupTestArgument(BaseModel):
 
 
 class SurveyParameterList(QuestionSet):             # basically used to tag survey grouping questions
-    batch = models.OneToOneField('BatchQuestion', related_name='parameter_list')
+    batch = models.OneToOneField('Batch', related_name='parameter_list')
 
     class Meta:
         app_label = 'survey'
@@ -94,7 +94,7 @@ class SurveyParameterList(QuestionSet):             # basically used to tag surv
         param_list, _ = cls.objects.get_or_create(batch=batch)
         param_list.questions.all().delete()
         # now create a new
-        groups = RespondentGroup.objects.filter(questions__batch=batch)
+        groups = RespondentGroup.objects.filter(questions__qset=batch)
         template_questions = []
         question_ids = []
         # loop through groups to get required template parameters
@@ -102,7 +102,7 @@ class SurveyParameterList(QuestionSet):             # basically used to tag surv
             map(lambda condition: question_ids.append(condition.test_question.id), group.group_conditions.all())
         parameters = ParameterTemplate.objects.filter(id__in=question_ids).order_by('identifier')
         for param in parameters:
-            template_questions.append(Question({'identifier': param.identifier, 'text': param.text,
+            template_questions.append(Question(**{'identifier': param.identifier, 'text': param.text,
                                                 'answer_type': param.answer_type, 'qset': param_list}))
         Question.objects.bulk_create(template_questions)
         return param_list

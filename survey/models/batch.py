@@ -115,6 +115,12 @@ class Batch(QuestionSet):
         self.open_locations.filter(
             location=location).update(non_response=False)
 
+    def save(self, *args, **kwargs):
+        super(Batch, self).save(*args, **kwargs)
+        if self.pk:
+            from survey.models import SurveyParameterList
+            SurveyParameterList.update_parameter_list(self)
+
 
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")

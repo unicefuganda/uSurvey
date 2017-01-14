@@ -128,7 +128,8 @@ xmlns:jr="http://openrosa.org/javarosa">
 	{% if qset.parameter_list %}
 		<group>
 			{% for question in qset.parameter_list.questions.all %}
-				{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:question.pk %}
+				{% concat_strings '/qset/qset' qset.pk '/questions/groupQuestions' path '/q' question.pk as ref %}
+				{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref=ref %}
 			{% endfor %}
 		</group>
 	{% endif %}
@@ -148,9 +149,11 @@ xmlns:jr="http://openrosa.org/javarosa">
 												{% endif %}>
 
 	       {% endif %}
-					{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:question.pk %}
+					{% concat_strings '/qset/qset' qset.pk '/questions/surveyQuestions' path '/q' question.pk as ref %}
+					{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref=ref %}
 					 {% for sub_question in question.direct_sub_questions %}
-	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:sub_question.pk %}
+						{% concat_strings '/qset/qset' qset.pk '/questions/surveyQuestions' path '/q' sub_question.pk as ref %}
+	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types qref=ref %}
 					{% endfor %}
 				{% if question.loop_ended %}
 		      		</repeat>

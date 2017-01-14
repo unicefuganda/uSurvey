@@ -151,6 +151,11 @@ def add_string(int_1, int_2):
     return "%s, %s" % (str(int_1), str(int_2))
 
 
+@register.assignment_tag
+def concat_strings(*args):
+    return ''.join([str(arg) for arg in args])
+
+
 @register.filter
 def condition_text(key):
     value = CONDITIONS.get(key, "")
