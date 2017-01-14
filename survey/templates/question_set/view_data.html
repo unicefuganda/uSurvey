@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% load template_tags %}
+{% block title %}
+  {{ qset.name }} Data
+{% endblock %}
+
+{% block search %}
+{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
+{% include "search_form.html" %}
+{% endblock %}
+{% block page_actions %}
+<div class="col-lg-12" style="margin-top: -18px;margin-left: 21px;">
+                         <a style="padding-left: 4px;padding-right: 3px;" id="export_question" class="btn btn-white btn-warning btn-bold" href="{% url 'download_qset_data' qset.id %}" id="download_qset_data">
+                        <i class="ace-icon fa fa-external-link bigger-120 "></i>
+                         Export Data</a>
+		</div>
+{% endblock %}
+{% block content %}
+{% load pagination_tags %}
+{% autopaginate interviews 100 %}
+<br>
+<table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
+<!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
+ -->
+ <thead>
+        <tr role="row">
+            {% for loc_type in location_filter_types %}
+                <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">
+                    {{ loc_type.name }}
+                </th>
+            {% endfor %}
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Enumeration Area</th>
+            {% for question in qset.flow_questions %}
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">{{ question.identifier|upper }}</th>
+            {% endfor %}
+         </tr>
+    </thead>
+    <tbody>
+        {% for interview in interviews %}
+          <tr>
+            {% for loc in interview.ea.parent_locations %}
+              <td>
+                {{ loc.name }}
+              </td>
+            {% endfor %}
+           <td>
+            {{ interview.ea.name}}
+          </td>
+            {% for question in qset.flow_questions %}
+              {% get_answer question interview as answer %}
+                <td>
+                    {{ answer }}
+                </td>
+           {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+{% paginate %}
+{% endblock %}
+
+{% block javascripts %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+
+    $('.ea_filter').on('change', function () {
+    	{% for location_type in location_filter_types %}
+    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
+    	{% endfor %}
+    	url = "{% url 'enumeration_area_filter' %}";
+        params = {
+        		{% for location_type in location_filter_types %}
+        			{{ location_type }} : {{ location_type }}_selected,
+ 	    		{% endfor %}
+        }
+        $.getJSON(url, params, function (data) {
+        	$('#id_enumeration_area option').hide();
+        	$('#id_enumeration_area' +' option[value=""]').show();
+            $.each(data, function () {
+            	$('#id_enumeration_area' +' option[value='+this.id+']').show();
+            });
+        });
+    });
+
+  $(document).ready(function() {
+    $('#datatables').DataTable();
+} );
+  </script>
+{% endblock %}
