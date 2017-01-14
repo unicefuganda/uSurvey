@@ -32,13 +32,13 @@ xmlns:jr="http://openrosa.org/javarosa">
 		</sampleData>
 	   {% endif %}
 			<questions>
-			   <groupQuestions>
-				   {% if qset.parameter_list %}
+				{% if qset.parameter_list %}
+				   <groupQuestions>
 					   {% for question in qset.parameter_list.questions.all %}
 							<p{{question.pk}} />
 					   {% endfor %}
+				   </groupQuestions>
 				   {% endif %}
-			   </groupQuestions>
 				<surveyQuestions>
 					{% for question in qset.questions_inline %}
 					   {% if question.loop_started %}
@@ -150,7 +150,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 	       {% endif %}
 					{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:question.pk %}
 					 {% for sub_question in question.direct_sub_questions %}
-	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:question.pk %}
+	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types qref='/qset/qset'|add:qset.pk|add:'/questions/surveyQuestions'|add:path|add:'/q'|add:sub_question.pk %}
 					{% endfor %}
 				{% if question.loop_ended %}
 		      		</repeat>

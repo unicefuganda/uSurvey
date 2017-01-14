@@ -67,29 +67,4 @@
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
-  <script type="text/javascript">
-
-    $('.ea_filter').on('change', function () {
-    	{% for location_type in location_filter_types %}
-    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
-    	{% endfor %}
-    	url = "{% url 'enumeration_area_filter' %}";
-        params = {
-        		{% for location_type in location_filter_types %}
-        			{{ location_type }} : {{ location_type }}_selected,
- 	    		{% endfor %}
-        }
-        $.getJSON(url, params, function (data) {
-        	$('#id_enumeration_area option').hide();
-        	$('#id_enumeration_area' +' option[value=""]').show();
-            $.each(data, function () {
-            	$('#id_enumeration_area' +' option[value='+this.id+']').show();
-            });
-        });
-    });
-
-  $(document).ready(function() {
-    $('#datatables').DataTable();
-} );
-  </script>
 {% endblock %}

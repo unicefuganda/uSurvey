@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllow
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.utils.decorators import method_decorator
 from django.forms import ValidationError
 from survey.services.export_interviewers import ExportInterviewersService
@@ -122,7 +122,7 @@ def delete_qset_listingform(request, question_id):
         qset.delete()
     return HttpResponseRedirect('/listing_form/')
 
-
+@permission_required('auth.can_view_aggregates')
 def view_data(request, qset_id):
     try:
         qset = QuestionSet.get(pk=qset_id)
