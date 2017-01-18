@@ -195,7 +195,7 @@
     </tbody>
 </table>
 {% paginate %}
-{% if batch %}
+{% if batch and batch.interviews.count == 0 %}
     <button type="submit" class="btn btn-primary pull-right" name="save_button">Update Question Order</button>
     </form>
 {% endif %}
