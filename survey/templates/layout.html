@@ -13,48 +13,53 @@
      <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
    <style>
        .search {
-          width: 100%;
+          width: 300px;
           position: relative
         }
+   div.table-header a {
+       color: #0f0;
+       }
 
         .searchTerm {
-          float: left;
-          width: 177px;
-          border: 3px solid #0099ff;
-          padding: 5px;
-          height: 20px;
-          border-radius: 5px;
-          outline: none;
-          color: #0099ff;
-        }
+  float: left;
+  width: 177px;
+  border: 3px solid #0099ff;
+  padding-left: 5px;
+  padding-bottom: 2px;
+  height: 25px;
+  border-radius: 5px;
+  outline: none;
+  color: #0099ff;
+}
 
         .searchTerm:focus{
           color: #0099ff;
         }
 
         .searchButton {
-          position: absolute;
-          right: 182px;
+          /*position: absolute;*/
+          position: relative;          
+          right: 11px;
           width: 40px;
-          height: 36px;
+          height: 25px;
           border: 1px solid #0099ff;
           background: #0099ff;
           text-align: center;
           color: #fff;
           border-radius: 5px;
           cursor: pointer;
-          font-size: 20px;
+          /*font-size: 20px;*/
         }
 
         /*Resize the wrap to see the search bar change!*/
-        .wrap{
+        /*.wrap{
           width: 30%;
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
         }
-
+*/
 
          span.help {
                 font-size: 13px !important;

@@ -87,7 +87,13 @@
     <script src="{{STATIC_URL}}js/survey.js" type="text/javascript" charset="utf-8"></script>    
             <script type="text/javascript">            
             $(document).ready(function() {
-    $('#datatables').DataTable();
+    $('#datatables').DataTable(
+{
+   'aoColumnDefs': [{
+        'bSortable': false,
+        'aTargets': [-1] /* 1st one, start by the right */
+    }]
+});
 } );
         </script>
 {% endblock %}

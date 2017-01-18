@@ -126,8 +126,14 @@
 	        <!--});-->
 	    <!--});-->
 	    
-	$(document).ready(function() {
-    $('#ea').DataTable();
+	$(document).ready(function() {    
+     $('#ea').DataTable(
+{
+   'aoColumnDefs': [{
+        'bSortable': false,
+        'aTargets': [-1] /* 1st one, start by the right */
+    }]
+});
 } );
 	    
 	    {% for location_type in location_filter_types %}

@@ -131,7 +131,13 @@
     });
     
   $(document).ready(function() {
-    $('#datatables').DataTable();
+     $('#datatables').DataTable(
+{
+   'aoColumnDefs': [{
+        'bSortable': false,
+        'aTargets': [-1] /* 1st one, start by the right */
+    }]
+});   
 } );
   </script>
 {% endblock %}
