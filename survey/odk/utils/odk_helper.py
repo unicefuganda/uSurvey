@@ -98,7 +98,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
         #     survey_parameters_node.getchildren())
         answers = get_answers(question_answers_node, qset, question_map)
         survey_parameters = None
-        if qset.parameter_list:
+        if hasattr(qset, 'parameter_list'):
             survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
             # survey paramaters does not have any single repeat
             survey_parameters = get_answers(survey_parameters_node, qset, question_map)[0]
