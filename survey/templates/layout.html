@@ -23,7 +23,7 @@
         .searchTerm {
   float: left;
   width: 177px;
-  border: 3px solid #0099ff;
+  border: 3px solid #0099ff !important;
   padding-left: 5px;
   padding-bottom: 2px;
   height: 25px;
@@ -221,20 +221,30 @@
                     {% endif %}
 
 
-                         <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-251">
-                             {% if user.is_authenticated %}
-                                 <a href="#">{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
-                                <ul class="sub-menu">
-                                {% if user.is_superuser == True %}
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="#">settings</a>
+<ul class="sub-menu">
+{% if user.is_superuser == True %}
                                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'users_index' %}">Users</a>
                                   </li>
-                                  </li>
-                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="{% url 'enumeration_area_home' %}">Locations</a></li>
-                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="#">Setup</a></li>
+
+                                  <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="{% url 'enumeration_area_home' %}">Locations</a></li>
+
+                                  <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-402"><a href="#">Setup</a></li>
                                  {% else %}
                                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'users_edit' user.id %}">Edit Profile</a>
                                   </li>
-                                 {% endif %}
+                                 {% endif %}                                 
+</ul>
+</li>
+
+                         <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-251">
+                             {% if user.is_authenticated %}
+                                 <a href="#" style="margin-left: 75px;">{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
+                                <ul class="sub-menu">
+                                
+                                  </li>
+                            
+                            
                                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'password_change' %}">Change Password</a>
                                   </li>
                                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'logout_page' %}">Logout</a>
