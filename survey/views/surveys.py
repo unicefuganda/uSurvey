@@ -147,7 +147,7 @@ def edit(request, survey_id):
                    'button_label': 'Save',
                    'id': 'edit-survey-form',
                    'cancel_url': reverse('survey_list_page'),
-                   'action': reverse('edit_survey_page', args=(survey_id))
+                   'action': reverse('edit_survey_page', args=(survey_id, ))
                    }
         request.breadcrumbs([
             ('Surveys', reverse('survey_list_page')),
