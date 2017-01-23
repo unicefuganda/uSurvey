@@ -122,6 +122,7 @@ def delete_qset_listingform(request, question_id):
         qset.delete()
     return HttpResponseRedirect('/listing_form/')
 
+
 @permission_required('auth.can_view_aggregates')
 def view_data(request, qset_id):
     try:

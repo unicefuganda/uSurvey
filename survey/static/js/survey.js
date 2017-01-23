@@ -26,6 +26,7 @@
          $l_div_to_toggle.show();
          $preferred_listing.removeAttr('disabled');
          $listing_form.removeAttr('disabled');
+         $('#id_random_sample_label-control-group').show();
      }
      else {
          $div_to_toggle.hide();
@@ -34,6 +35,7 @@
          $l_div_to_toggle.hide();
          $listing_form.val("");
          $listing_form.attr('disabled', 'disabled');
+         $('#id_random_sample_label-control-group').hide();
      }
 
  }
