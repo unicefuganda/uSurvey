@@ -102,6 +102,11 @@
                             {% if question_set.verbose_name = 'Batch' and question_set.flow_questions %}
                             <li><a href="{% url 'batch_show_page' question_set.survey.id question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-folder-open-o/fa fa-times-circle bigger-120"></i>Open/Close</span></a></li>
                             {% endif %}
+                            {% if model.verbose_name == 'Listing Form' %}
+                            <li>
+                                <a href="{% url 'clone_qset_page' question_set.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Clone</span></a>
+                            </li>
+                            {% endif %}
                         </ul>
                 </div>
             </div>

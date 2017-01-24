@@ -105,7 +105,6 @@ class QuestionSetView(object):
 
 def delete(request, question_id, batch_id):
     qset = QuestionSet.get(pk=question_id)
-    print batch_id,"contextname"
     if qset.interviews.exists():
         messages.error(request,
                        "%s cannot be deleted because it already has interviews." % qset.verbose_name())
@@ -138,6 +137,13 @@ def view_data(request, qset_id):
         return render(request, 'question_set/view_data.html', context)
     except QuestionSet.DoesNotExist:
         return HttpResponseNotFound()
+
+
+def clone_qset(request, qset_id):
+    qset = QuestionSet.get(pk=qset_id)
+    qset.deep_clone()
+    messages.info(request, 'Successfully cloned %s' % qset.name)
+    return HttpResponseRedirect(reverse('%s_home'% qset.resolve_tag()))
 
 
 @permission_required('auth.can_view_aggregates')

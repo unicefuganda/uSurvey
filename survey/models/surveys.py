@@ -87,16 +87,15 @@ class Survey(CloneableMixin, BaseModel):
     def disable_batches(self, ea):
         return self.commencement_registry.filter(ea=ea).delete()
 
-
-# class ListingSetting(BaseModel):
-#     survey = models.OneToOneField(Survey, related_name='listing_settings')
-#     listing_form = models.ForeignKey('ListingTemplate', related_name='survey_settings', null=True)
-#     sample_size = models.PositiveIntegerField(
-#         null=False, blank=False, default=10)
-#     preferred_listing = models.ForeignKey(Survey, related_name='householdlist_users',
-#                                           help_text='Select which survey household listing to reuse. '
-#                                                     'Leave empty for fresh listing',
-#                                           null=True, blank=True)
+    def deep_clone(self):
+        from survey.models import Batch
+        from survey.models import Question, QuestionFlow
+        # first clone this survey
+        survey = self.clone(attrs={'name': '%s-copy' % self.name})
+        # not create survey batches for this one
+        for batch in Batch.objects.filter(survey__id=self.id):
+            batch.deep_clone(survey=survey)
+        return survey
 
 
 class SurveySampleSizeReached(Exception):

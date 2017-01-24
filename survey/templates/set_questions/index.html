@@ -56,6 +56,11 @@
         <th>
             Type
         </th>
+        {% if batch.verbose_name == 'Batch' %}
+        <th>
+            Group
+        </th>
+        {% endif %}
         <th>
             Actions
         </th>
@@ -111,6 +116,11 @@
             <td>
                 {{ question.answer_type.upper }}
             </td>
+            {% if batch.verbose_name == 'Batch' %}
+            <td>
+                {{ question.group }}
+            </td>
+            {% endif %}
             <td>
              <div class="">
                 <div class="inline pos-rel">

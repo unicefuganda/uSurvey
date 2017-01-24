@@ -5,7 +5,8 @@ from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from survey.models import Survey, Location, LocationType, Batch, RandomizationCriterion, Interview, QuestionFlow
+from survey.models import Survey, Location, LocationType, Batch, RandomizationCriterion, \
+    Interview, QuestionFlow, Question
 from survey.forms.surveys import SurveyForm, SamplingCriterionForm
 from survey.views.custom_decorators import handle_object_does_not_exist
 from survey.utils.query_helper import get_filterset
@@ -172,29 +173,7 @@ def delete(request, survey_id):
 @permission_required('auth.can_view_batches')
 def clone_survey(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
-    # first clone this survey
-    survey = survey.clone(attrs={'name': '%s-copy' % survey.name})
-    # not create survey batches for this one
-    for batch in Batch.objects.filter(survey__id=survey_id):
-        old_batch = batch
-        start_question = batch.start_question
-        batch = batch.clone(attrs={'survey': survey, 'start_question': None})
-        if start_question:
-            start_question = start_question.clone(attrs={'qset': batch})
-            batch.start_question = start_question
-            batch.save()
-            # now clone all flows for this batch.
-            for flow in QuestionFlow.objects.filter(question__qset=old_batch):
-                # except for the first question, every other is a next question
-                next_question = flow.next_question
-                if next_question and next_question.qset.pk == old_batch.pk:
-                    next_question = next_question.clone(attrs={'qset': batch})
-                    print 'ne batch coming up'
-                    flow.next_question = next_question
-                flow.save()
-            # question_start is never a next question
-            start_flow = QuestionFlow.objects.get(question__qset=old_batch)
-            start_flow.question = start_question
+    survey.deep_clone()
     messages.info(request, 'Successfully cloned %s' % survey.name)
     return HttpResponseRedirect(reverse('survey_list_page'))
 

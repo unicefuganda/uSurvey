@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from survey.models import Question, BatchQuestion, QuestionSet
 from survey.models import QuestionOption, Batch, Answer, QuestionModule, \
-    HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
+    MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
 from survey.forms.form_order_mixin import FormOrderMixin
 
 

@@ -4,7 +4,8 @@ import string
 from django_rq import job
 from collections import OrderedDict
 from ordered_set import OrderedSet
-from cacheops import cached_as, cached
+from cacheops import cached_as
+from cacheops import invalidate_obj, invalidate_all
 from django_cloneable import CloneableMixin
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -104,6 +105,7 @@ class Question(CloneableMixin, GenericQuestion):
     def save(self, *args, **kwargs):
         if self.answer_type not in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
             self.options.all().delete()
+        invalidate_obj(self.qset)       # to fix update of flow_question update
         return super(Question, self).save(*args, **kwargs)
 
     @classmethod
@@ -205,7 +207,7 @@ class QuestionFlow(CloneableMixin, BaseModel):
 #         z.delete()
 
 
-class TestArgument(BaseModel):
+class TestArgument(CloneableMixin, BaseModel):
     object = InheritanceManager()
     flow = models.ForeignKey(QuestionFlow, related_name='%(class)s')
     position = models.PositiveIntegerField()
@@ -280,14 +282,13 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     def can_be_deleted(self):
         return True, ''
 
-    @cached
     def get_loop_story(self):
         """
         Basically returns all the loops which a question is involved in. This retains the queston order
         :return:
         """
         @cached_as(QuestionSet.objects.get(id=self.id),
-                   QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
+                    QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
                    Question.objects.filter(qset__id=self.id))
         def _loop_story():
             inlines = self.questions_inline()
@@ -320,8 +321,9 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
         return set(AnswerAccessDefinition.objects.filter(channel__in=access_channels).values_list('answer_type',
                                                                                                   flat=True))
 
-    @cached
     def next_inline(self, question, channel=ODKAccess.choice_name()):
+        @cached_as(QuestionSet.objects.get(id=self.id), QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
+                   Question.objects.filter(qset__id=self.id))
         def _next_inline():
             qflows = QuestionFlow.objects.filter(question__qset=self, validation_test__isnull=True)
             if qflows.exists():
@@ -336,10 +338,15 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
         else:
             return self.start_question
 
-    @cached
     def questions_inline(self):
         qflows = QuestionFlow.objects.filter(
             question__qset=self, validation_test__isnull=True)
+
+        @cached_as(QuestionSet.objects.get(id=self.id),
+                   Question.objects.filter(qset__id=self.id),
+                   QuestionFlow.objects.filter(question__qset__id=self.id),
+                   QuestionFlow.objects.filter(next_question__qset__id=self.id),
+                   QuestionLoop.objects.filter(loop_starter__qset__id=self.id))
         def _questions_inline():
             if self.start_question:
                 inlines = inline_questions(self.start_question, qflows)
@@ -431,6 +438,56 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     def new_breadcrumbs(cls, *args, **kwargs):
         return cls.edit_breadcrumbs(**kwargs)
 
+    def deep_clone(self, **attrs):
+        batch = QuestionSet.get(pk=self.pk)
+        old_batch = batch
+        start_question = batch.start_question
+        attrs.update({'start_question': None, 'name': '%s-copy' % batch.name})
+        batch = batch.clone(attrs=attrs)
+        flows = QuestionFlow.objects.filter(question__qset=old_batch)
+        if start_question:
+            start_question_id = start_question.id
+            if flows.exists():
+                # now clone all flows for this batch.
+                treated = {}
+                flows = QuestionFlow.objects.filter(question__qset__id=old_batch.id)
+                for flow in flows:
+                    # except for the first question, every other is a next question
+                    question = flow.question
+                    old_question_id = question.id
+                    question = treated.get(question.identifier, None)
+                    if question is None:
+                        question = Question.get(pk=flow.question.pk).clone(attrs={'qset': batch})
+                        treated[question.identifier] = question
+                        if old_question_id == start_question_id:
+                            batch.start_question = question
+                            # just take this opportunity to update the access channels once
+                            for channel in old_batch.access_channels.all():
+                                channel.clone(attrs={'qset': batch})
+                            batch.save()
+                    next_question = flow.next_question
+                    if next_question:
+                        next_question = treated.get(next_question.identifier, None)
+                        if next_question is None:
+                            next_question = Question.get(pk=flow.next_question.pk).clone(attrs={'qset': batch})
+                            treated[next_question.identifier] = next_question
+                    # first clone all flow parameters
+                    args = flow.text_arguments
+                    flow = flow.clone(attrs={'next_question': next_question, 'question': question})
+                    for arg in args:
+                        arg = arg.clone()
+                        arg.flow = flow
+                        arg.save()
+                    flow.save()
+            else:
+                batch.start_question = start_question.clone(attrs={'qset': batch})
+                batch.save()
+        batch.update_flow()
+        old_batch.update_flow()
+        return batch
+
+    def update_flow(self):
+        invalidate_all()
 # @job
 # def refresh_loop_story(qset):
 #     for
@@ -495,7 +552,7 @@ def inline_flows(question, flows):
     return flows
 
 
-class QuestionSetChannel(BaseModel):
+class QuestionSetChannel(CloneableMixin, BaseModel):
     ACCESS_CHANNELS = [(name, name)
                        for name in InterviewerAccess.access_channels()]
     qset = models.ForeignKey(QuestionSet, related_name='access_channels')
@@ -563,7 +620,6 @@ class QuestionLoop(BaseModel):
 
     def loop_questions(self):
         return self.loop_starter.qset.inlines_between(self.loop_starter, self.loop_ender)
-
 
 
 
