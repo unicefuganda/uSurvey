@@ -34,3 +34,4 @@ channels
 asgi_redis
 django-cacheops
 django-macros
+django-cloneable
