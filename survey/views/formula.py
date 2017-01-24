@@ -64,7 +64,7 @@ def new(request, indicator_id):
     except Indicator.DoesNotExist:
         error_message = "The indicator requested does not exist."
         messages.error(request, error_message)
-        return HttpResponseRedirect("/indicators/")
+        return HttpResponseRedirect('list_indicator_page')
 
 
 @permission_required('auth.can_view_batches')

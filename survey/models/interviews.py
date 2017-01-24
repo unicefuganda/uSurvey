@@ -184,12 +184,24 @@ class Answer(BaseModel):
             return False
 
     @classmethod
+    def fetch_contains(cls, answer_key, txt, qs=None):
+        if qs:
+            qs = cls.objects
+        return qs.filter(**{'%s__icontains' % answer_key: txt})
+
+    @classmethod
     def odk_contains(cls, node_path, value):
         return "regex(%s, '.*(%s).*')" % (node_path, value)
 
     @classmethod
     def equals(cls, answer, value):
         return str(answer).lower() == str(value).lower()
+
+    @classmethod
+    def fetch_equals(cls, answer_key, value, qs=None):
+        if qs:
+            qs = cls.objects
+        return qs.filter(**{'%s__iexact' % answer_key: str(value)})
 
     @classmethod
     def odk_equals(cls, node_path, value):
@@ -202,6 +214,12 @@ class Answer(BaseModel):
         return answer.startswith(txt)
 
     @classmethod
+    def fetch_starts_with(cls, answer_key, txt, qs=None):
+        if qs:
+            qs = cls.objects
+        return qs.filter(**{'%s__istarts_with' % answer_key: str(txt)})
+
+    @classmethod
     def odk_starts_with(cls, node_path, value):
         return "regex(%s, '^(%s).*')" % (node_path, value)
 
@@ -212,12 +230,24 @@ class Answer(BaseModel):
         return answer.endswith(txt)
 
     @classmethod
+    def fetch_ends_with(cls, answer_key, txt, qs=None):
+        if qs:
+            qs = cls.objects
+        return qs.filter(**{'%s__iends_with' % answer_key: str(txt)})
+
+    @classmethod
     def odk_ends_with(cls, node_path, value):
         return "regex(%s, '.*(%s)$')" % (node_path, value)
 
     @classmethod
     def greater_than(cls, answer, value):
         return answer > value
+
+    @classmethod
+    def fetch_greater_than(cls, answer_key, value, qs=None):
+        if qs:
+            qs = cls.objects
+        return qs.filter(**{'%s__gt' % answer_key: value})
 
     @classmethod
     def odk_greater_than(cls, node_path, value):
@@ -228,12 +258,24 @@ class Answer(BaseModel):
         return answer < value
 
     @classmethod
+    def fetch_less_than(cls, answer_key, value, qs=None):
+        if qs:
+            qs = cls.objects
+        return qs.filter(**{'%s__lt' % answer_key: value})
+
+    @classmethod
     def odk_less_than(cls, node_path, value):
         return "%s &lt; '%s'" % (node_path, value)
 
     @classmethod
     def between(cls, answer, lowerlmt, upperlmt):
         return upperlmt > answer >= lowerlmt
+
+    @classmethod
+    def fetch_less_than(cls, answer_key, lowerlmt, upperlmt, qs=None):
+        if qs:
+            qs = cls.objects
+        return qs.filter(**{'%s__lt' % answer_key: upperlmt, '%s__gte' % answer_key: lowerlmt})
 
     @classmethod
     def odk_between(cls, node_path, lowerlmt, upperlmt):

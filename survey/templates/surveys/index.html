@@ -77,6 +77,9 @@
                             <li><a href="{% url 'listing_criteria_page' survey.pk %}" class="tooltip-success" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>Samping Criteria</span></a></li>
                             {% endif %}
                             <li><a href="{% url 'batch_index_page' survey.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>View Batches</span></a></li>
+                            <li>
+                                <a href="{% url 'clone_survey_page' survey.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Clone</span></a>
+                            </li>
                         </ul>
                 </div>
             </div>

@@ -1,7 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
-from survey.models import Formula, HouseholdMemberGroup
+from survey.models import Formula
+from survey.models import RespondentGroup
 
 
 class FormulaForm(ModelForm):
@@ -19,16 +20,14 @@ class FormulaForm(ModelForm):
 
         question_choices = []
         if indicator.batch:
-            for question in indicator.batch.survey_questions:
+            for question in indicator.batch.flow_questions:
                 if question.module == indicator.module:
                     question_choices.append((question.id, question.text))
-
-            groups = HouseholdMemberGroup.objects.all()
+            groups = RespondentGroup.objects.all()
             self.fields['numerator'].choices = question_choices
             self.fields['denominator'].choices = question_choices
             self.fields['count'].choices = question_choices
-            self.fields['groups'].choices = [
-                (group.id, group.name) for group in groups]
+            self.fields['groups'].choices = [(group.id, group.name) for group in groups]
 
         if indicator:
             self.delete_fields_based_on(indicator)

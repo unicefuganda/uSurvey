@@ -16,7 +16,7 @@ def new(request):
         if indicator_form.is_valid():
             indicator_form.save()
             messages.success(request, "Indicator successfully created.")
-            return HttpResponseRedirect("/indicators/")
+            return HttpResponseRedirect(reverse('list_indicator_page'))
         messages.error(request, "Indicator was not created.")
     request.breadcrumbs([
         ('Indicators', reverse('list_indicator_page')),

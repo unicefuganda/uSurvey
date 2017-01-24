@@ -4,8 +4,8 @@ import string
 from django_rq import job
 from collections import OrderedDict
 from ordered_set import OrderedSet
-from cacheops import cached_as
-from cacheops import invalidate_obj
+from cacheops import cached_as, cached
+from django_cloneable import CloneableMixin
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
@@ -24,7 +24,7 @@ from survey.models.access_channels import ODKAccess
 ALL_ANSWERS = Answer.answer_types()
 
 
-class Question(GenericQuestion):
+class Question(CloneableMixin, GenericQuestion):
     objects = InheritanceManager()
     qset = models.ForeignKey('QuestionSet', related_name='questions')
     mandatory = models.BooleanField(default=True)
@@ -104,7 +104,6 @@ class Question(GenericQuestion):
     def save(self, *args, **kwargs):
         if self.answer_type not in [MultiChoiceAnswer.choice_name(), MultiSelectAnswer.choice_name()]:
             self.options.all().delete()
-        invalidate_obj(self.qset)       # to fix update of flow_question update
         return super(Question, self).save(*args, **kwargs)
 
     @classmethod
@@ -146,7 +145,7 @@ class Question(GenericQuestion):
         return data
 
 
-class QuestionFlow(BaseModel):
+class QuestionFlow(CloneableMixin, BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
                         for validator in Answer.validators()]
     question = models.ForeignKey(Question, related_name='flows')
@@ -261,7 +260,7 @@ class QuestionOption(BaseModel):
         return self.text
 
 
-class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
+class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, respondent personal
     objects = InheritanceManager()
     name = models.CharField(max_length=100, blank=False, null=True, db_index=True)
     description = models.CharField(max_length=300, blank=True, null=True)
@@ -281,13 +280,14 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
     def can_be_deleted(self):
         return True, ''
 
+    @cached
     def get_loop_story(self):
         """
         Basically returns all the loops which a question is involved in. This retains the queston order
         :return:
         """
         @cached_as(QuestionSet.objects.get(id=self.id),
-                    QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
+                   QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
                    Question.objects.filter(qset__id=self.id))
         def _loop_story():
             inlines = self.questions_inline()
@@ -320,9 +320,8 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
         return set(AnswerAccessDefinition.objects.filter(channel__in=access_channels).values_list('answer_type',
                                                                                                   flat=True))
 
+    @cached
     def next_inline(self, question, channel=ODKAccess.choice_name()):
-        @cached_as(QuestionSet.objects.get(id=self.id), QuestionLoop.objects.filter(loop_starter__qset__id=self.id),
-                   Question.objects.filter(qset__id=self.id))
         def _next_inline():
             qflows = QuestionFlow.objects.filter(question__qset=self, validation_test__isnull=True)
             if qflows.exists():
@@ -337,15 +336,10 @@ class QuestionSet(BaseModel):   # can be qset, listing, respondent personal
         else:
             return self.start_question
 
+    @cached
     def questions_inline(self):
         qflows = QuestionFlow.objects.filter(
             question__qset=self, validation_test__isnull=True)
-
-        @cached_as(QuestionSet.objects.get(id=self.id),
-                   Question.objects.filter(qset__id=self.id),
-                   QuestionFlow.objects.filter(question__qset__id=self.id),
-                   QuestionFlow.objects.filter(next_question__qset__id=self.id),
-                   QuestionLoop.objects.filter(loop_starter__qset__id=self.id))
         def _questions_inline():
             if self.start_question:
                 inlines = inline_questions(self.start_question, qflows)

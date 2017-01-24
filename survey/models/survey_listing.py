@@ -55,6 +55,11 @@ class RandomizationCriterion(BaseModel):
             raise ValueError('unsupported validator defined on listing question')
         return method(value, *list(self.test_arguments))
 
+    def qs_passes_test(self, value_key, queryset):
+        answer_class = Answer.get_class(self.listing_question.answer_type)
+        method = getattr(answer_class, 'fetch_%s' % self.validation_test, None)
+        return method(value_key, *list(self.test_arguments), qs=queryset)
+
     @property
     def test_arguments(self):
         return CriterionTestArgument.objects.filter(test_condition=self).values_list('param',
@@ -103,20 +108,23 @@ class ListingSample(BaseModel):
                                                          question_set=from_survey.listing_form).values_list('id',
                                                                                                             flat=True)
         valid_interviews = set(valid_interviews)
+        qs = None
         # now get the interviews that meet the randomization criteria
         for criterion in to_survey.randomization_criteria.all():  # need to optimize this
             answer_type = criterion.listing_question.answer_type
             if answer_type == MultiChoiceAnswer.choice_name():
-                db_args = ('interview__id', 'value__text')
+                value_key = 'value__text'
             else:
-                db_args = ('interview__id', 'value')
+                value_key = 'value'
             answer_class = Answer.get_class(answer_type)
-            data_sets = answer_class.objects.filter(question=criterion.listing_question,
-                                                    interview__pk__in=valid_interviews).only(*db_args).values_list(
-                *db_args)
-            for interview_id, value in data_sets:
-                if criterion.passes_test(value) is False:  # simply remove the entries which does not pass the test
-                    valid_interviews.remove(interview_id)
+            kwargs = {
+                'question': criterion.listing_question
+            }
+            if qs:
+                kwargs['interview__id__in'] = qs
+            qs = criterion.passes_test(value_key,
+                                       answer_class.objects.filter(**kwargs).only('interview').values_list('interview',
+                                                                                                           flat=True))
         valid_interviews = list(valid_interviews)
         random.shuffle(valid_interviews)
         random_samples = valid_interviews[:to_survey.sample_size]

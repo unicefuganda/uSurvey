@@ -1,10 +1,11 @@
 from django.db import models
+from django_cloneable import CloneableMixin
 from survey.models.base import BaseModel
 from django.core.validators import MinValueValidator, MaxValueValidator
 from survey.models.locations import Location, LocationType
 
 
-class Survey(BaseModel):
+class Survey(CloneableMixin, BaseModel):
     name = models.CharField(max_length=100, blank=False,
                             null=True, unique=True)
     description = models.CharField(max_length=300, blank=True, null=True)

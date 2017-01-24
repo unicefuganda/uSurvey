@@ -3,13 +3,12 @@ from django.db.models import Sum
 from survey.models.base import BaseModel
 from survey.models.interviewer import Interviewer
 from survey.models.questions import Question, QuestionOption
+from survey.models.respondents import RespondentGroup
 
 
 class Formula(BaseModel):
-    numerator = models.ForeignKey(
-        Question, null=True, related_name="as_numerator")
-    groups = models.ForeignKey(
-        "HouseholdMemberGroup", null=True, blank=True, related_name="as_group")
+    numerator = models.ForeignKey(Question, null=True, related_name="as_numerator")
+    groups = models.ForeignKey(RespondentGroup, null=True, blank=True, related_name="as_group")
     denominator = models.ForeignKey(
         Question, null=True, blank=True, related_name="as_denominator")
     numerator_options = models.ManyToManyField(

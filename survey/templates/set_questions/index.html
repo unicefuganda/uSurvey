@@ -43,7 +43,6 @@
 {% autopaginate questions max_display_per_page %}
 <!-- <table class="table table-striped table-bordered table-hover clear" id="questions_table"> -->
 {% load pagination_tags %}
-{% autopaginate questions 10 %}
 <table id="questions_table" class="table table-striped table-bordered table-hover dataTable no-footer">
     <thead>
     <tr>
@@ -194,7 +193,6 @@
     {% endfor %}
     </tbody>
 </table>
-{% paginate %}
 {% if batch and batch.interviews.count == 0 %}
     <button type="submit" class="btn btn-primary pull-right" name="save_button">Update Question Order</button>
     </form>
