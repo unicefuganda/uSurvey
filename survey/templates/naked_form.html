@@ -15,10 +15,20 @@
         {% endif %}
       </div>
   </div -->
-  <div id="{{field.auto_id}}-control-group" class="control-group">
-    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
-      <br /><br />
+  <style type="text/css">
+    #id_gender{
+      display: inline-block;
+      vertical-align: middle;
+    }
+    #id_access_channels{
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+  <div id="{{field.auto_id}}-control-group" class="control-group" style="margin-top: 15px;">
+      <!-- <br /><br /> -->
     <div class="controls {{ field|is_radio }}">
+    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
       {{field}}
         &nbsp;&nbsp;<span id="{{field.auto_id}}_tip" class="help tip">{{ field.help_text }}</span>
         {% if field.errors %}
@@ -30,7 +40,7 @@
         {% endif %}
     </div>
   </div>
-<br />
+
 {% endfor %}
 
 {% for hidden in a_form.hidden_fields %}

@@ -72,9 +72,9 @@
                <ul id="menu-main-menu" class="">
                   <li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-120"><a href="#">Home</a>
                   </li>
-                  <li id="menu-item-182" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Features</a>
+                  <li id="menu-item-182" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Discover</a>
                   </li>
-                  <li id="menu-item-251" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-251"><a href="#">success stories</a>
+                  <li id="menu-item-251" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-251"><a href="#">Contact</a>
                   </li>
                   <ul class="sub-menu">
                      <li id="menu-item-289" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-289"><a href="#">Member</a></li>
@@ -83,12 +83,12 @@
                      </li>
                   </ul>
                   </li>
-                  <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="#">About</a></li> 
+                  <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="#" style="border-right: none !important;">About</a></li> 
 
                    {% if user.is_authenticated %}
-                   <li id="menu-item-181" class="ulogin menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="{% url 'home_page' %}">SURVEY</a></li>         
+                   <li id="menu-item-181" class="ulogin menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right"><a href="{% url 'home_page' %}">SURVEY</a></li>         
 {% else %}
-                   <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181"><a href="{% url 'login_page' %}">login</a></li>
+                   <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right" ><a href="{% url 'login_page' %}">login</a></li>
                    {% endif%}
                </ul>
             </nav>
@@ -238,7 +238,7 @@
             <div class="container">
             
             <div class="heading main centered">
-              <h2 class="lg-title" style="color:#002956; font-family:'Baloo Bhaina',cursive;">Features</h2><b class="head-sep"><u></u></b><b class="head-sep"><u></u></b><b class="head-sep"><u></u></b>
+              <h2 class="lg-title" style="color:#002956; font-family:'Baloo Bhaina',cursive;">Discover</h2><b class="head-sep"><u></u></b><b class="head-sep"><u></u></b><b class="head-sep"><u></u></b>
               <p>Let's Create Unlimited Websites With this Fancy Huge HTML 
 Template, With Endless possibilities and very easy Customization, What 
 else do you need to create all your websites, it is completely complete 

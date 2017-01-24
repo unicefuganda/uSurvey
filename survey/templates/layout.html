@@ -13,8 +13,10 @@
      <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
    <style>
        .search {
-          width: 300px;
-          position: relative
+          /*width: 300px;*/
+         /* position: relative*/
+         float: right;
+         margin-right: -7px;
         }
    div.table-header a {
        color: #0f0;
@@ -23,7 +25,7 @@
         .searchTerm {
   float: left;
   width: 177px;
-  border: 3px solid #0099ff !important;
+  border: 2px solid #0099ff !important;
   padding-left: 5px;
   padding-bottom: 2px;
   height: 25px;
@@ -40,7 +42,7 @@
           /*position: absolute;*/
           position: relative;          
           right: 11px;
-          width: 40px;
+          /*width: 32px;*/
           height: 25px;
           border: 1px solid #0099ff;
           background: #0099ff;
@@ -52,14 +54,14 @@
         }
 
         /*Resize the wrap to see the search bar change!*/
-        /*.wrap{
+       /* .wrap{
           width: 30%;
           position: absolute;
-          top: 50%;
-          left: 50%;
+          top: 36%;
+          left: 16%;
           transform: translate(-50%, -50%);
-        }
-*/
+        }*/
+
 
          span.help {
                 font-size: 13px !important;
@@ -225,7 +227,7 @@
                     {% endif %}
 
 
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="#">settings</a>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="#" style="border-right: none !important;">settings</a>
 <ul class="sub-menu">
 {% if user.is_superuser == True %}
                                    <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'users_index' %}">Users</a>
@@ -244,7 +246,7 @@
                          <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-251">
 
                              {% if user.is_authenticated %}
-                                <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                                <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto" style="margin-left: 75px;">
                                    <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
                                </button>
                                 <ul id="nav-mydd" class="sub-menu dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">

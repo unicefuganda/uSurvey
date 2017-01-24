@@ -88,7 +88,7 @@ class USSDAccessForm(ModelForm):
                                       max_length=settings.MOBILE_NUM_MAX_LENGTH,
                                       min_length=settings.MOBILE_NUM_MIN_LENGTH,
                                       widget=forms.TextInput(attrs={'placeholder': 'Format: 771234567',
-                                                                    'style': "width:172px;",
+                                                                    'style': "width:172px; margin-top:5px;",
                                                                     'maxlength': settings.MOBILE_NUM_MAX_LENGTH,
                                                                     'minlength': settings.MOBILE_NUM_MIN_LENGTH}))
 
