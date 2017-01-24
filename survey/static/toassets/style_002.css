@@ -1181,7 +1181,7 @@ div.pp_default .pp_close{
     color: #48e1fd;
 }
 .copyRight p a:hover{
-    color: #de3c2f;
+    /*color: #de3c2f;*/
 }
 #backto{
     width: 40px;

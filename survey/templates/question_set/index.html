@@ -7,7 +7,7 @@
   {% endif %}
 {% endblock %}
 {% block search %}
-{% include "search_form.html" %}
+
 {% endblock %}
 {% block page_actions %}
   <!--   <button class="btn btn-white btn-warning btn-bold">
@@ -24,6 +24,7 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
+{% include "search_form.html" %}
 {% autopaginate question_sets 10 %}
 {% load template_tags %}
 

@@ -4,7 +4,7 @@
     Question Module Lists
 {% endblock %}
 {% block search %}
-{% include "search_form.html" %}
+
 {% endblock %}
 {% block page_actions %}
 
@@ -21,6 +21,7 @@
 
 {% block content %}
 {% load pagination_tags %}
+{% include "search_form.html" %}
 {% autopaginate question_modules 10 %}
 <br>
     <table id="datatables" class="table table-striped table-bordered table-hover dataTable no-footer">
