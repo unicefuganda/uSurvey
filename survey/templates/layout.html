@@ -12,11 +12,10 @@
       <link rel="stylesheet" href="{{ STATIC_URL }}assets/usur.css" />
      <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
    <style>
-       .search {
-          /*width: 300px;*/
-         /* position: relative*/
+       .search {         
          float: right;
-         margin-right: -7px;
+         margin-right: -7px;                  
+        margin-top: 14px; 
         }
    div.table-header a {
        color: #0f0;
@@ -246,9 +245,10 @@
                          <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-251">
 
                              {% if user.is_authenticated %}
-                                <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto" style="margin-left: 75px;">
-                                   <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
-                               </button>
+                                <span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="margin-left: 75px;  background:  none !important; border: none !important;">
+                                   <!-- <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i> -->
+                                   <img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;">                                   
+                               </span> 
                                 <ul id="nav-mydd" class="sub-menu dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
                                     <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120">
                                     <a href="#">{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
@@ -291,7 +291,7 @@
                          {% endblock %}
                       </div>
                   </div>
-                  <div class="tp-fullwidth-forcer" style="width: 100%; height: 600px;">
+                  <div class="tp-fullwidth-forcer" style="width: 100%; min-height:auto; height: 500px;">
                   <div class="main-container">
                       <div>
                       <br /><br />

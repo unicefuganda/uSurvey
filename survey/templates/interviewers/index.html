@@ -6,7 +6,7 @@
 
 {% block search %}
 {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
-{% include "search_form.html" %}
+
 {% endblock %}
 {% block page_actions %}
 <!-- <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="{% url 'new_interviewer_page' %}"  id="add-interviewer">
@@ -33,6 +33,7 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
+{% include "search_form.html" %}
 {% autopaginate interviewers 10 %}
 <br>
 <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">

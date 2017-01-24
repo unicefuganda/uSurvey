@@ -14,7 +14,7 @@
  {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question_filter_form' %}
 <br />
 <br />
-{% include "search_form.html" %}
+
 {% endblock %}
 {% block page_actions %}
         {% with 'export_'|add:model_class.resolve_tag as export_template_url %}
@@ -42,6 +42,7 @@
 
 {% block content %}
     {% load pagination_tags %}
+    {% include "search_form.html" %}
     {% autopaginate questions 10 %}
     {% load template_tags %}
 <br>
