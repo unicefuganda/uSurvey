@@ -89,7 +89,7 @@ class QuestionSetView(object):
             qset_form = self.questionSetForm(instance=qset, **form_extra)
         context = {'request': request, 'model': self.model, 'listing_model': ListingTemplate,
                    'id': 'edit-question-set-form', 'placeholder': 'name, description', 'question_set_form': qset_form,
-                   'action': ''}
+                   'action': '', 'cancel_url': reverse('%s_home'%self.model.resolve_tag())}
         context.update(extra_context)
         return render(request, template_name, context)
 

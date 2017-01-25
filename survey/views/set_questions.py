@@ -148,6 +148,7 @@ def add_logic(request, qset_id, question_id):
     batch = QuestionSet.get(id=qset_id)
     QuestionForm = get_question_form(batch.question_model())
     response = None
+    cancel_url = '../'
     logic_form = LogicForm(question)
     question_rules_for_batch = {}
 #     question_rules_for_batch[question] = question.rules_for_batch(batch)
@@ -160,12 +161,13 @@ def add_logic(request, qset_id, question_id):
     breadcrumbs = Question.edit_breadcrumbs(qset=batch)
     if breadcrumbs:
         request.breadcrumbs(breadcrumbs)
+        cancel_url = breadcrumbs[-1][1]
     context = {'logic_form': logic_form, 'button_label': 'Save', 'question': question,
                'rules_for_batch': question_rules_for_batch,
                'questionform': QuestionForm(batch, parent_question=question),
                'modal_action': reverse('add_qset_subquestion_page', args=(batch.pk, )),
                'class': 'question-form', 'batch_id': qset_id, 'batch': batch,
-               'cancel_url': reverse('%s_home' % batch.resolve_tag())}
+               'cancel_url': cancel_url}
     return response or render(request, "set_questions/logic.html", context)
 
 
@@ -173,6 +175,7 @@ def manage_loop(request, question_id):
     question = Question.get(id=question_id)
     batch = QuestionSet.get(pk=question.qset.pk)
     response = None
+    cancel_url = '../'
     existing_loop = getattr(question, 'loop_started', None)
     looping_form = LoopingForm(question, instance=existing_loop)
     if request.method == "POST":
@@ -182,10 +185,12 @@ def manage_loop(request, question_id):
             messages.success(request, 'Loop Logic successfully added.')
             return HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
     breadcrumbs = Question.edit_breadcrumbs(qset=batch)
+
     if breadcrumbs:
         request.breadcrumbs(breadcrumbs)
+        cancel_url = breadcrumbs[-1][1]
     context = {'loop_form': looping_form, 'button_label': 'Save', 'question': question,
-               'cancel_url': reverse('%s_home' % batch.resolve_tag())}
+               'cancel_url': cancel_url}
     return render(request, "set_questions/loop.html", context)
 
 

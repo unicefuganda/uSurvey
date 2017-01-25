@@ -61,6 +61,11 @@
             Group
         </th>
         {% endif %}
+        {% if batch.verbose_name == 'Batch' %}
+            <td>
+                Module
+            </td>
+        {% endif %}
         <th>
             Actions
         </th>
@@ -119,6 +124,9 @@
             {% if batch.verbose_name == 'Batch' %}
             <td>
                 {{ question.group }}
+            </td>
+            <td>
+                {{ question.module.name }}
             </td>
             {% endif %}
             <td>

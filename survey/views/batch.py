@@ -116,8 +116,12 @@ def edit(request, batch_id):
     survey = batch.survey
     qset_view = QuestionSetView(model_class=Batch)
     qset_view.questionSetForm = BatchForm
-    request.breadcrumbs(Batch.edit_breadcrumbs(survey=survey))
-    response = qset_view.edit(request, batch, initial={'survey': survey.pk})
+    breadcrumbs = Batch.edit_breadcrumbs(survey=survey)
+    cancel_url = '../'
+    if breadcrumbs:
+        request.breadcrumbs(breadcrumbs)
+        cancel_url = breadcrumbs[-1][1]
+    response = qset_view.edit(request, batch, extra_context={'cancel_url': cancel_url}, initial={'survey': survey.pk})
     if response.status_code == 302:
         response = HttpResponseRedirect(reverse('batch_index_page', args=(survey.pk, )))
     return response
