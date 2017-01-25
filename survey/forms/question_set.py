@@ -53,7 +53,7 @@ class BatchForm(get_question_set_form(Batch)):
         fields = ['name', 'description', 'survey', ]
 
         widgets = {
-            'description': forms.Textarea(attrs={"rows": 4, "cols": 50}),
+            'description': forms.Textarea(attrs={"rows": 4, "cols": 40}),
             'survey': forms.HiddenInput(),
         }
 
