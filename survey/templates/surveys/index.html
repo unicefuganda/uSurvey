@@ -43,7 +43,8 @@
     {% for survey in surveys %}
         <tr>
           <td>
-            <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
+            <a href="{% url 'batch_index_page' survey.id %}">{% if survey.interviews.exists %}<span class="label label-sm label-inverse arrowed-in"><strong>{{ survey.name }}</strong></span>{% else %}
+{{ survey.name }}{% endif %}</a>
           </td>
           <td>
             {{ survey.description }}

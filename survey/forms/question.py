@@ -73,6 +73,9 @@ def get_question_form(model_class):
 
         def clean_identifier(self):
             identifier = self.cleaned_data['identifier']
+            pattern = '^[a-zA-Z][0-9a-zA-Z_]+$'
+            if re.match(pattern, identifier) is None:
+                raise ValidationError('Identifier must start with a letter, and must contain alphanumeric values or _')
             if Question.objects.filter(identifier=identifier, qset__pk=self.qset.pk).exists():
                 if self.instance and self.instance.identifier == identifier:
                     pass

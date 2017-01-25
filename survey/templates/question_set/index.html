@@ -56,7 +56,8 @@
       {% for question_set in question_sets %}
         <tr>
           <td>
-             <a href="{% url 'qset_questions_page' question_set.id %}">{{ question_set.name }}</a>
+             <a href="{% url 'qset_questions_page' question_set.id %}">{% if question_set.interviews.exists %}<span class="label label-sm label-inverse arrowed-in"><strong>{{ question_set.name }}</strong></span>{% else %}
+{{ question_set.name }}{% endif %}</a>
           </td>
           <td>
             {{ question_set.description }}

@@ -41,7 +41,6 @@ class SurveyForm(ModelForm, FormOrderMixin):
         self.order_fields(['name', 'description', 'has_sampling', 'sample_size',
                            'preferred_listing', 'listing_form', 'sample_naming_convention'])
 
-
     def clean_random_sample_label(self):
         """Make sure this field makes reference to listing form entry in {{}} brackets
         :return:
@@ -56,7 +55,6 @@ class SurveyForm(ModelForm, FormOrderMixin):
         if listing_form.questions.filter(identifier__in=requested_identifiers).exists():
             return self.cleaned_data['random_sample_label']
         raise ValidationError('%s is not in %s' % (', '.join(requested_identifiers), listing_form.name))
-
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -107,7 +105,6 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
     #     listing_question = self.cleaned_data['listing_question']
     #
     #     return self.cleaned_data['options']
-
 
     def clean(self):
         super(SamplingCriterionForm, self).clean()

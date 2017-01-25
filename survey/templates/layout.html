@@ -95,6 +95,7 @@
        <link href="{{ STATIC_URL }}css/formset-extra.css" rel="stylesheet" type="text/css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.css"/>
        <link rel="stylesheet" href="{{ STATIC_URL }}multi-select/multi-select.css"/>
+       <link rel="stylesheet" href="{{ STATIC_URL }}css/interview-status.css"/>
         <link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
         <script src="{{STATIC_URL}}js/select2.full.js"></script>
 
@@ -341,9 +342,11 @@
 
                                        </div>
                                     </div>
-                                     {% block content_search %}
+                                     <div id="content-search">
+                                         {% block content_search %}
 
-                                     {% endblock %}
+                                         {% endblock %}
+                                     </div>
                                     {% block content %}
 
 
