@@ -109,7 +109,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
                      media_files=media_files)
     submission.status = ODKSubmission.COMPLETED
     submission.save()
-    submission.save_attachments(media_files.values())
+    submission.save_attachments(media_files)
 
 
 def get_answers(node, qset, question_map):
@@ -199,7 +199,7 @@ def _get_form_type(survey_tree):
     return int(_get_nodes(FORM_TYPE_PATH, tree=survey_tree)[0].text)
 
 
-def process_submission(interviewer, xml_file, media_files={}, request=None):
+def process_submission(interviewer, xml_file, media_files=[], request=None):
     """extracts and saves the collected data from associated xform.
     """
     media_files = dict([(os.path.basename(f.name), f) for f in media_files])
@@ -216,7 +216,6 @@ def process_submission(interviewer, xml_file, media_files={}, request=None):
                                               xml=xml_blob, instance_id=instance_id)
     question_map = dict([(str(q.pk), q) for q in qset.flow_questions])
     access_channel = ODKAccess.objects.get(interviewer=interviewer)
-    media_files = dict([(os.path.basename(f.name), f) for f in media_files])
     # process_answers.delay(xml_blob, qset, interviewer, question_map, survey_allocation, submission)
     process_answers(xml_blob, qset, access_channel, question_map, survey_allocation, submission, media_files)
     return submission
