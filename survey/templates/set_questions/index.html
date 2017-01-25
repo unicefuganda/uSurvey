@@ -77,7 +77,7 @@
             <td>
                 {% if question.loop_started %}
                 <span class="green">
-                <i class="usur-icon fa fa-hourglass-start bigger-120"></i></span>{% endif %}{% if question.loop_ended %}<span class="red"><i class="fa fa-hourglass-end"></i></span> {% endif %}{{ question.identifier }}
+                <i class="usur-icon fa fa-hourglass-start bigger-120"></i></span> &nbsp;{% endif %}{% if question.loop_ended %}<span class="red"><i class="fa fa-hourglass-end"></i></span> &nbsp;{% endif %}{{ question.identifier }}
             </td>
             <td class="span8">
                 {% if question.conditional_flows %}
