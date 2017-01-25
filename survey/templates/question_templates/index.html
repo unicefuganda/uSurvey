@@ -16,6 +16,9 @@
 <br />
 
 {% endblock %}
+{% block content_search %}
+{% include "search_form.html" %}
+{% endblock %}
 {% block page_actions %}
         {% with 'export_'|add:model_class.resolve_tag as export_template_url %}
         <!-- <button class="btn btn-white btn-warning btn-bold">
@@ -42,7 +45,7 @@
 
 {% block content %}
     {% load pagination_tags %}
-    {% include "search_form.html" %}
+
     {% autopaginate questions 10 %}
     {% load template_tags %}
 <br>
