@@ -57,7 +57,7 @@
     <button id="button" type="submit" class="btn btn-primary submit" name="add_to_lib_button" data-disabled-text="{{ loading_text }}">Save and Update Library</button>
 
     {% if cancel_url %}
-      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel">Cancel</a>
+      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px; padding-left: 5px; padding-bottom: 1px;">Cancel</a>      
     {% else %}
       <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
     {% endif %}
