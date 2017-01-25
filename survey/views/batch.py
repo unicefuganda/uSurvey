@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from survey.interviewer_configs import *
-from survey.models import HouseholdMemberGroup, QuestionModule
+from survey.models import QuestionModule, QuestionLoop
 from survey.models import Survey, Location, LocationType
 from survey.models import Survey, Batch, QuestionTemplate, QuestionFlow, QuestionOption
 from survey.models import BatchQuestion as Question
@@ -142,69 +142,6 @@ def delete(request, batch_id):
 
 
 @permission_required('auth.can_view_batches')
-def assign(request, batch_id):
-    batch = Batch.objects.get(id=batch_id)
-    if batch.is_open():
-        error_message = "Questions cannot be assigned to open batch: %s." % batch.name.capitalize()
-        messages.error(request, error_message)
-        return HttpResponseRedirect("/batches/%s/questions/" % batch_id)
-    batch_questions_form = BatchQuestionsForm(batch=batch)
-    batch = Batch.objects.get(id=batch_id)
-    groups = HouseholdMemberGroup.objects.all()
-    groups.exists()
-    modules = QuestionModule.objects.all()
-    modules.exists()
-    if request.method == 'POST':
-        data = dict(request.POST)
-        last_question = batch.last_question_inline()
-        lib_questions = QuestionTemplate.objects.filter(
-            identifier__in=data.get('identifier', ''))
-        # print 'data: ', data, 'lib questions: ', lib_questions
-        if lib_questions:
-            for lib_question in lib_questions:
-                question = Question.objects.create(identifier=lib_question.identifier,
-                                                   text=lib_question.text,
-                                                   answer_type=lib_question.answer_type,
-                                                   #group=lib_question.group,
-                                                   module=lib_question.module,
-                                                   qset=batch,
-                                                   )
-                # assign the options
-                for option in lib_question.options.all():
-                    QuestionOption.objects.create(
-                        question=question, text=option.text, order=option.order)
-                if last_question:
-                    QuestionFlow.objects.create(
-                        question=last_question, next_question=question)
-                else:
-                    batch.start_question = question
-                    batch.save()
-                last_question = question
-#         batch_questions_form = BatchQuestionsForm(batch=batch, data=request.POST, instance=batch)
-        success_message = "Questions successfully assigned to batch: %s." % batch.name.capitalize()
-        messages.success(request, success_message)
-        return HttpResponseRedirect(reverse("batch_questions_page",  args=(batch_id, )))
-    all_modules = QuestionModule.objects.all()
-    used_identifiers = [
-        question.identifier for question in batch.questions.all()]
-    library_questions = QuestionTemplate.objects.exclude(
-        identifier__in=used_identifiers).order_by('identifier')
-    question_filter_form = QuestionFilterForm()
-#     library_questions =  question_filter_form.filter(library_questions)
-    request.breadcrumbs([
-        ('Surveys', reverse('survey_list_page')),
-        (batch.survey.name, reverse('batch_index_page', args=(batch.survey.pk, ))),
-        (batch.name, reverse('batch_questions_page', args=(batch.pk, ))),
-    ])
-    context = {'batch_questions_form': unicode(batch_questions_form), 'batch': batch,
-               'button_label': 'Save', 'id': 'assign-question-to-batch-form', 'groups': groups,
-               'library_questions': library_questions, 'question_filter_form': question_filter_form,
-               'modules': all_modules}
-    return render(request, 'batches/assign.html',
-                  context)
-
-
-@permission_required('auth.can_view_batches')
 def update_orders(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     new_orders = request.POST.getlist('order_information', None)
@@ -232,7 +169,8 @@ def update_orders(request, batch_id):
                 question_id = next_question_id
             batch.start_question = start_question
             batch.save()
-
+        # now remove any loop associated with this batch
+        QuestionLoop.objects.filter(loop_starter__qset__id=batch_id).delete()
         success_message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
         messages.success(request, success_message)
     else:
