@@ -140,8 +140,8 @@ info.update = function (props) {
     if(property)
        property = property.toUpperCase();
     if(props.rate >-2){
-        rate = props.rate >-1 ? props.rate + '%' : 'Survey not opened.';
-        this._div.innerHTML += property +': '+ rate;
+        rate = props.rate >-1 ? props.rate: 'Survey not opened.';
+        this._div.innerHTML += +property +': '+ rate + ' INTERVIEWS';
     }
     else{
         this._div.innerHTML = property;
@@ -161,7 +161,7 @@ legend.onAdd = function (map) {
         div.innerHTML +=
             '<i style="background:' + getColorFor(grades[i] + 1) + '"></i> ';
         if(typeof  grades[i] != 'undefined' && typeof  grades[i +1] != 'undefined'){
-            div.innerHTML += grades[i] +" &mdash; "+ (grades[i + 1]) + "% <br/>"
+            div.innerHTML += grades[i] +" &mdash; "+ (grades[i + 1]) + "<br/>"
         }
     }
     return div;
@@ -198,7 +198,13 @@ function highlightDistrict(event){
 }
 
 function zoomDistrict(event){
-    map.fitBounds(event.target.getBounds())
+    map.fitBounds(event.target.getBounds());
+    var layer = event.target;
+    var district = layer.feature.properties['{{loc_field}}'];
+    if(!district)
+         district = layer.feature.properties['{{alt_loc_field}}'];
+    alert('District: ' + district);
+
 }
 
 function resetDistrictHighlight(event){

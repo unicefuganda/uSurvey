@@ -131,6 +131,13 @@ class Interview(BaseModel):
     def members_with_open_batches(self):
         pass
 
+    @classmethod
+    def interviews_in(cls, location, survey=None):
+        kwargs = {'ea__locations__in': location.get_leafnodes(True)}
+        if survey:
+            kwargs['survey'] = survey
+        return Interview.objects.filter(**kwargs)
+
     class Meta:
         app_label = 'survey'
 

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <xforms xmlns="http://openrosa.org/xforms/xformsList">
     {% load template_tags %}
-    {% can_start_survey assignments as can_start %}
+    {% can_start_survey interviewer as can_start %}
     {% if can_start  %}
       {% for batch in open_batches %}
         {% get_download_url request 'download_odk_batch_form' batch as download_url %}

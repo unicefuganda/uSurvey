@@ -6,7 +6,9 @@
 
 {% block search %}
 {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
-{% include "search_form.html" %}
+{% endblock %}
+{% block content_search %}
+    {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
 <div class="col-lg-12" style="margin-top: -18px;margin-left: 21px;">

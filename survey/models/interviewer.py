@@ -101,55 +101,55 @@ class Interviewer(BaseModel):
     def get_odk_access(self, identifier):
         return ODKAccess.objects.get(interviewer=self, user_identifier=identifier)
 
-    def present_households(self, survey=None):
-        if survey is None:
-            return Household.objects.filter(listing__ea=self.ea)
-        else:
-            return Household.objects.filter(listing__ea=self.ea, listing__survey_houselistings__survey=survey)
-
-    def generate_survey_households(self, survey):
-        survey_households = self.present_households(survey)
-        if survey.has_sampling:
-            selections = RandomSelection.objects.filter(
-                survey=survey, household__listing__ea=self.ea).distinct()
-            households = [s.household for s in selections]
-            if survey.sample_size > selections.count():
-                # random select households as per sample size
-                # first shuffle registered households and select up to sample
-                # number
-                sample_size = survey.sample_size - selections.count()
-                if households:
-                    survey_households = survey_households.exclude(
-                        pk__in=[h.pk for h in households])
-                # to do bulk create
-                survey_households = list(survey_households)
-                random.shuffle(survey_households)
-                survey_households = survey_households[:sample_size]
-                random_selections = []
-                for household in survey_households:
-                    random_selections.append(RandomSelection(
-                        household=household, survey=survey))
-                RandomSelection.objects.bulk_create(random_selections)
-                survey_households.extend(households)
-            else:
-                # import pdb; pdb.set_trace()
-                survey_households = households
-            msg = '\n'.join(['Survey: %s' % survey, 'Households: %s' %
-                             ','.join([str(h) for h in survey_households])])
-            for access in self.ussd_access:
-                send_sms(access.user_identifier, msg)
-        else:
-            survey_households = list(survey_households)
-        return sorted(survey_households, key=lambda household: household.house_number)
-
-    def survey_households(self, survey):
-        if survey.has_sampling:
-            selections = RandomSelection.objects.filter(
-                survey=survey, household__listing__ea=self.ea).distinct()
-            households = [s.household for s in selections]
-        else:
-            households = self.present_households(survey)
-        return sorted(households, key=lambda household: household.house_number)
+    # def present_households(self, survey=None):
+    #     if survey is None:
+    #         return Household.objects.filter(listing__ea=self.ea)
+    #     else:
+    #         return Household.objects.filter(listing__ea=self.ea, listing__survey_houselistings__survey=survey)
+    #
+    # def generate_survey_households(self, survey):
+    #     survey_households = self.present_households(survey)
+    #     if survey.has_sampling:
+    #         selections = RandomSelection.objects.filter(
+    #             survey=survey, household__listing__ea=self.ea).distinct()
+    #         households = [s.household for s in selections]
+    #         if survey.sample_size > selections.count():
+    #             # random select households as per sample size
+    #             # first shuffle registered households and select up to sample
+    #             # number
+    #             sample_size = survey.sample_size - selections.count()
+    #             if households:
+    #                 survey_households = survey_households.exclude(
+    #                     pk__in=[h.pk for h in households])
+    #             # to do bulk create
+    #             survey_households = list(survey_households)
+    #             random.shuffle(survey_households)
+    #             survey_households = survey_households[:sample_size]
+    #             random_selections = []
+    #             for household in survey_households:
+    #                 random_selections.append(RandomSelection(
+    #                     household=household, survey=survey))
+    #             RandomSelection.objects.bulk_create(random_selections)
+    #             survey_households.extend(households)
+    #         else:
+    #             # import pdb; pdb.set_trace()
+    #             survey_households = households
+    #         msg = '\n'.join(['Survey: %s' % survey, 'Households: %s' %
+    #                          ','.join([str(h) for h in survey_households])])
+    #         for access in self.ussd_access:
+    #             send_sms(access.user_identifier, msg)
+    #     else:
+    #         survey_households = list(survey_households)
+    #     return sorted(survey_households, key=lambda household: household.house_number)
+    #
+    # def survey_households(self, survey):
+    #     if survey.has_sampling:
+    #         selections = RandomSelection.objects.filter(
+    #             survey=survey, household__listing__ea=self.ea).distinct()
+    #         households = [s.household for s in selections]
+    #     else:
+    #         households = self.present_households(survey)
+    #     return sorted(households, key=lambda household: household.house_number)
 
     def has_survey(self):
         return self.assignments.filter(status=SurveyAllocation.PENDING).count() > 0
@@ -214,6 +214,15 @@ class SurveyAllocation(BaseModel):
                                       status=cls.PENDING).order_by('created')
         except cls.DoesNotExist:
             return None
+
+    def min_eas_is_covered(self, loc):
+        pass
+
+    @classmethod
+    def can_start_batch(cls, interviewer):
+        survey_allocations = interviewer.assignments.all()
+        completed = filter(lambda allocation: allocation.sample_size_reached(), survey_allocations)
+        return (1.0 * len(completed))/len(survey_allocations) >= getattr(settings, 'EAS_PERCENT_TO_START_SURVEY', 0.5)
 
     def is_valid(self):
         '''

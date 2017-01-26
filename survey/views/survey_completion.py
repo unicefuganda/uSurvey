@@ -8,7 +8,7 @@ from django.shortcuts import render, get_object_or_404
 from survey.models import Location, LocationType
 from survey.forms.enumeration_area import LocationsFilterForm as LocFilterForm
 from survey.forms.filters import LocationFilterForm
-from survey.models import Survey, Interviewer, SurveyAllocation, Household, Batch, EnumerationArea
+from survey.models import Survey, Interviewer, SurveyAllocation, Household, Batch, EnumerationArea, Interview
 from survey.services.completion_rates_calculator import BatchLocationCompletionRates, \
     BatchHighLevelLocationsCompletionRates, BatchSurveyCompletionRates
 from survey.views.location_widget import LocationWidget
@@ -137,11 +137,15 @@ def show(request):
 def completion_json(request, survey_id):
     @cached_as(Survey.objects.filter(id=survey_id))
     def get_result_json():
-        # print "Getting data from DB"
+        """Basically get all the response count for this survey on the largest admin unit
+        :return:
+        """
         survey = Survey.objects.get(id=survey_id)
         location_type = LocationType.largest_unit()
-        completion_rates = BatchSurveyCompletionRates(
-            location_type).get_completion_formatted_for_json(survey)
+        completion_rates = {}
+        #basically get interviews count
+        for location in location_type.locations.all():
+            completion_rates[location.name.upper()] = Interview.interviews_in(location, survey).count()
         return json.dumps(completion_rates, cls=DjangoJSONEncoder)
     json_dump = get_result_json()
     return HttpResponse(json_dump, content_type='application/json')

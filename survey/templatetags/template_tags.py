@@ -9,7 +9,7 @@ from survey.interviewer_configs import MONTHS
 from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
 from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
-    GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember
+    GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember, SurveyAllocation
 from survey.models import VideoAnswer, AudioAnswer, ImageAnswer, QuestionSet
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
@@ -260,10 +260,10 @@ def get_answer(question, interview):
             return ''
     return _get_answer()
 
+
 @register.assignment_tag
-def can_start_survey(survey_allocations):
-    completed = filter(lambda allocation: allocation.sample_size_reached(), survey_allocations)
-    return (1.0 * len(completed))/len(survey_allocations) >= getattr(settings, 'EAS_PERCENT_TO_START_SURVEY', 0.5)
+def can_start_survey(interviewer):
+    return SurveyAllocation.can_start_batch(interviewer)
 
 
 @register.filter
