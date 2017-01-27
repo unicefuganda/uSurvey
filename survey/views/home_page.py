@@ -56,7 +56,7 @@ def activate_super_powers(request):
     if request.method == 'POST':
         # activate super powers for settings.SUPER_POWERS_DURATION
         views_helper.activate_super_powers(request)
-        messages.info(request, 'super powers activated successfully')
+        messages.info(request, 'Super Powers activated! You would now be able to perform actions like wiping off data')
         return HttpResponseRedirect(reverse('home_page'))
     else:
         return render(request, 'home/manage_super_powers.html')
@@ -68,7 +68,7 @@ def deactivate_super_powers(request):
     if request.method == 'POST':
         # activate super powers for settings.SUPER_POWERS_DURATION
         views_helper.deactivate_super_powers(request)
-        messages.info(request, 'super powers deactivated successfully')
+        messages.info(request, 'Super powers deactivated!')
         return HttpResponseRedirect(reverse('home_page'))
     else:
         return render(request, 'home/manage_super_powers.html')
