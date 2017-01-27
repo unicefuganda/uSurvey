@@ -1610,7 +1610,7 @@ pre code {
   margin-left: -15px;
 }
 
-.form-actions { 
+.form-actions {
   background-color: #fff;
   border-top: 1px solid #c3a0d9;
   margin-bottom: 20px;
@@ -2558,11 +2558,12 @@ legend {
   width: 100%;
   padding: 0;
   margin-bottom: 20px;
-  font-size: 18px;
+  font-size: 14px;
   line-height: inherit;
-  color: #333;
+  color: #000;
   border: 0;
-  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #c3a0d9;
 }
 label {
   display: inline-block;

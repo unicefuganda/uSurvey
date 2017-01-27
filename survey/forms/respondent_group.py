@@ -26,6 +26,10 @@ class GroupForm(forms.ModelForm, FormOrderMixin):
     class Meta:
         exclude = []
         model = RespondentGroup
+        fields = ['name', 'description', ]
+        widgets = {
+        'description': forms.Textarea(attrs={"rows": 3, "cols": 30}),
+        }
     #
     # def validate_options(self):
     #     listing_question = self.cleaned_data['listing_question']
