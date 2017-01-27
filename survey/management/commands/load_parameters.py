@@ -32,7 +32,7 @@ class Command(BaseCommand):
         can_receive_email, _ = Permission.objects.get_or_create(
             codename='can_receive_email', name='Can Receive Email', content_type=content_type)
         can_have_super_powers, _ = Permission.objects.get_or_create(
-            codename='can_receive_email', name='Can Have Super Powers', content_type=content_type)
+            codename='can_have_super_powers', name='Can Have Super Powers', content_type=content_type)
 
         self.stdout.write('Permissions created.')
         self.stdout.write('Creating some groups...')
