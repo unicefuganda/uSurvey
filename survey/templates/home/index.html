@@ -4,20 +4,41 @@
 	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 
     <style>
-        .leaflet-container {
+        <!--.leaflet-container {
             background-color:rgba(255,0,0,0.0);
-        }
-        #survey_map {
+        }-->
+        .leaflet-container {
+    margin-bottom: 10px;
+    margin-left: 384px;
+     overflow: hidden;
+}
+
+.dataTables_wrapper .row:first-child {
+    display: none;
+  }
+
+
+
+        <!--#survey_map {
             height: 500px;
             width:600px;
             border:1px solid #063;
-        }
+        }-->
+        #survey_map {
+    border: 1px solid #c5c5c6;
+    box-shadow: 5px 5px 5px #dbddde;
+    height: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 600px;
+}
+
         .rop {
          text-align:center;
          }
          .leaflet-container {
             margin-left: 384px;
-            margin-top: 77px;
+            /*margin-top: 77px;*/
             overflow: hidden;
 
         }
@@ -132,7 +153,7 @@ info.onAdd = function (map) {
   return this._div;
 };
 info.update = function (props) {
-  this._div.innerHTML = '<h3>Completion rates:</h3>';
+  this._div.innerHTML = '<h5>Completion rates:</h5>';
   if(typeof props != 'undefined'){
     var property = props['{{loc_field}}'];
     if(property === undefined)

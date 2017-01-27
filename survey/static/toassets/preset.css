@@ -19,12 +19,19 @@ body.single-post{
     position: relative;
     overflow: hidden;
 }
-h1,h2,h3,h4,h5,h6{
+/*h1,h2,h3,h4,h5,h6{
     margin: 0;
     padding: 0;
-    /*line-height: .8;*/
+    line-height: .8;
     font-weight: 700;
     color: #404040;
+}*/
+h1, h2, h3, h4, h5, h6 {
+    color: #0b488d;
+    font-family: trebuchet ms,Open Sans;
+    font-weight: bolder;
+    margin: 0;
+    padding: 0;
 }
 .top_heading{
     margin: 0;
@@ -36,12 +43,20 @@ h1,h2,h3,h4,h5,h6{
 .top_heading span{
     font-weight: 300;
 }
-p{
-    /*color: #fff;*/
+/*p{
+    color: #fff;
     font-size: 16px;
     font-weight: 300;    
     line-height: 1.625;
     font-weight: 300;
+    margin: 0;
+}*/
+
+p {
+    /*color: #0e8edd;*/
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.625;
     margin: 0;
 }
 ul,ol{
@@ -53,6 +68,15 @@ a, a:hover,a:focus{
     display: inline-block;
     outline: none;
     text-decoration: none;
+}
+
+.info {
+    background: rgba(255, 255, 255, 0.8) none repeat scroll 0 0;
+    border: 1px solid #4695fb;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font: bold 14px/16px Trebuchet MS;
+    padding: 6px 8px;
 }
 /*a:focus{
     color: #de3c2f;

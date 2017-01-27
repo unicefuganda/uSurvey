@@ -7,9 +7,7 @@
         div.row-fluid {
             display: none;
         }
-        /*.search{
-            margin-bottom: -7px; !important
-        }*/
+        
     </style>
 {% endblock %}
 {% block title %}
@@ -17,6 +15,12 @@
 {% endblock %}
 {% block search %}
  {% include "horizontal_filter_form.html" with a_form=question_filter_form no_button=True filter_id='question-filter-form' %}
+ <style>
+ .search{
+            margin-top: -10px !important;
+        }
+ </style> 
+ {% include "search_form.html" %}
 {% endblock %}
 {% block page_actions %}
 <div class="col-lg-12" style="margin-top: -18px;margin-left: 21px;">
@@ -35,7 +39,7 @@
 {% endblock %}
 {% block content %}
     {% load template_tags %}
-{% include "search_form.html" %}
+
     {% if batch %}
         <form method="post" accept-charset="utf-8" action="{% url 'qset_update_question_order_page' batch.id %}">
         {% csrf_token %}

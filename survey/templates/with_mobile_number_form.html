@@ -1,8 +1,15 @@
 {% load template_tags %}
+<style type="text/css">
+  .form-horizontal .control-label {
+    padding-top: 7px !important;
+    margin-bottom: 0;
+    text-align: right;
+}
+</style>
 {% for field in form.visible_fields %}
   <div class="control-group">
-    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
-    <div class="controls {{ field|is_radio }}">
+    <label class="control-label col-md-4" for="{{field.auto_id}}">{{field.label}}</label>
+    <div class="controls {{ field|is_radio }} col-md-8">
       {% if field.label_tag|is_mobile_number %}
        <div class="ccode">
            <span class="add-on">{{ country_phone_code }}</span>
