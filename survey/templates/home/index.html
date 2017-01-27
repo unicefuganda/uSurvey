@@ -186,7 +186,7 @@ info.update = function (props) {
        property = property.toUpperCase();
     if(props.rate >-2){
         rate = props.rate >-1 ? props.rate: 'Survey not opened.';
-        this._div.innerHTML += +property +': '+ rate + ' INTERVIEWS';
+        this._div.innerHTML += property +': '+ rate + ' INTERVIEWS';
     }
     else{
         this._div.innerHTML = property;
