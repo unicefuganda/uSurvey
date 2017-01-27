@@ -70,14 +70,14 @@ a, a:hover,a:focus{
     text-decoration: none;
 }
 
-.info {
+/*.info {
     background: rgba(255, 255, 255, 0.8) none repeat scroll 0 0;
     border: 1px solid #4695fb;
     border-radius: 5px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     font: bold 14px/16px Trebuchet MS;
     padding: 6px 8px;
-}
+}*/
 /*a:focus{
     color: #de3c2f;
 }*/
