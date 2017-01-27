@@ -7,9 +7,8 @@
         div.row-fluid {
             display: none;
         }
-        /*.search{
-            margin-bottom: -7px; !important
-        }*/
+
+
     </style>
 {% endblock %}
 {% block title %}
@@ -75,9 +74,10 @@
     {% for question in questions %}
         <tr>
             <td>
-                {% if question.loop_started %}
-                <span class="green">
-                <i class="usur-icon fa fa-hourglass-start bigger-120"></i></span> &nbsp;{% endif %}{% if question.loop_ended %}<span class="red"><i class="fa fa-hourglass-end"></i></span> &nbsp;{% endif %}{{ question.identifier }}
+                {% for loop in question.loop_story %}
+                    <img src="{{ STATIC_URL }}images/icon_bar3.png" width="6px;" height="100%;" class="loop_indicator" style="float: left;">
+                {% endfor %}
+                <span class="identifier" style="margin-left: 2px;">{{ question.identifier }}</span>
             </td>
             <td class="span8">
                 {% if question.conditional_flows %}

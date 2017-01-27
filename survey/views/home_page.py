@@ -6,6 +6,10 @@ from survey.forms.aboutus_form import AboutUsForm
 from survey.models import Survey, AboutUs
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from survey.utils import views_helper
+
+
 
 @login_required
 def home(request):
@@ -44,3 +48,32 @@ def edit(request):
             messages.success(request, message)
             return HttpResponseRedirect("/about/")
     return render(request, 'home/edit.html', {'about_form': about_form})
+
+
+@login_required
+@permission_required('can_have_super_powers')
+def activate_super_powers(request):
+    if request.method == 'POST':
+        # activate super powers for settings.SUPER_POWERS_DURATION
+        views_helper.activate_super_powers(request)
+        messages.info(request, 'super powers activated successfully')
+        return HttpResponseRedirect(reverse('home_page'))
+    else:
+        return render(request, 'home/manage_super_powers.html')
+
+
+@login_required
+@permission_required('can_have_super_powers')
+def deactivate_super_powers(request):
+    if request.method == 'POST':
+        # activate super powers for settings.SUPER_POWERS_DURATION
+        views_helper.deactivate_super_powers(request)
+        messages.info(request, 'super powers deactivated successfully')
+        return HttpResponseRedirect(reverse('home_page'))
+    else:
+        return render(request, 'home/manage_super_powers.html')
+
+
+
+
+

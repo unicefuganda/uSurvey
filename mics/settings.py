@@ -386,6 +386,10 @@ RQ_QUEUES = {
     }
 }
 
+# super powers duration in seconds
+SUPER_POWERS_DURATION= 90
+SUPER_POWERS_KEY = 'auth:super_powers'
+
 
 
 

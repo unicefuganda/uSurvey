@@ -1,3 +1,8 @@
+from django.conf import settings
+from cacheops import cache
+from cacheops import CacheMiss
+from django.utils import timezone
+
 
 def contains_key(params, key):
     return params.has_key(key) and params[key].isdigit()
@@ -52,3 +57,22 @@ def prepend_to_keys(params, text):
     for key, value in params.items():
         new_params[text + key] = value
     return new_params
+
+
+def activate_super_powers(request):
+    cache.set('%s:%s' % (request.user.pk, settings.SUPER_POWERS_KEY), data={'started': timezone.now()},
+              timeout=settings.SUPER_POWERS_DURATION)
+
+
+def deactivate_super_powers(request):
+    try:
+        return cache.delete('%s:%s' % (request.user.pk, settings.SUPER_POWERS_KEY))
+    except:
+        return 0
+
+
+def has_super_powers(request):
+    try:
+        return cache.get('%s:%s' % (request.user.pk, settings.SUPER_POWERS_KEY))
+    except CacheMiss:
+        return False

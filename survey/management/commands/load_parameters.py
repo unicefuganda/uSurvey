@@ -31,6 +31,8 @@ class Command(BaseCommand):
             codename='can_view_users', name='Can view Users', content_type=content_type)
         can_receive_email, _ = Permission.objects.get_or_create(
             codename='can_receive_email', name='Can Receive Email', content_type=content_type)
+        can_have_super_powers, _ = Permission.objects.get_or_create(
+            codename='can_receive_email', name='Can Have Super Powers', content_type=content_type)
 
         self.stdout.write('Permissions created.')
         self.stdout.write('Creating some groups...')
@@ -44,6 +46,7 @@ class Command(BaseCommand):
         group.permissions.add(can_view_locations)
         group.permissions.add(can_view_users)
         group.permissions.add(can_receive_email)
+        group.permissions.add(can_have_super_powers)
         group, _ = Group.objects.get_or_create(name='Supervisor')
         group.permissions.add(can_enter_data)
         group.permissions.add(can_view_aggregates)

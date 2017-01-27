@@ -146,6 +146,10 @@ class Question(CloneableMixin, GenericQuestion):
                               question_options}
         return data
 
+    @property
+    def loop_story(self):
+        return self.qset.get_loop_story()[self.id]
+
 
 class QuestionFlow(CloneableMixin, BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)

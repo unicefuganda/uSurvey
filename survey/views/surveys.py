@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from survey.models import Survey, Location, LocationType, Batch, RandomizationCriterion, \
     Interview, QuestionFlow, Question
 from survey.forms.surveys import SurveyForm, SamplingCriterionForm
@@ -175,6 +175,18 @@ def clone_survey(request, survey_id):
     survey = Survey.objects.get(id=survey_id)
     survey.deep_clone()
     messages.info(request, 'Successfully cloned %s' % survey.name)
+    return HttpResponseRedirect(reverse('survey_list_page'))
+
+
+@login_required
+@permission_required('can_have_super_powers')
+def wipe_survey_data(request, survey_id):
+    from survey.models import Interview
+    from survey.utils import views_helper
+    if views_helper.has_super_powers(request):
+        survey = Survey.get(pk=survey_id)
+        Interview.objects.filter(survey=survey)
+        messages.info(request, 'Data has been cleared for %s' % survey.name)
     return HttpResponseRedirect(reverse('survey_list_page'))
 
 
