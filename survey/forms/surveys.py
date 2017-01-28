@@ -26,17 +26,15 @@ class SurveyForm(ModelForm, FormOrderMixin):
         if kwargs.get('instance', None) and kwargs['instance'].has_sampling is False:
             self.fields['preferred_listing'].widget.attrs[
                 'disabled'] = 'disabled'
-        else:
-            preferred_listings = [('', '------ None, Create new -------'), ]
-            try:
-                listing_forms = ListingTemplate.objects.values_list('pk', flat=True).order_by('id')
-                survey_listings = Interview.objects.filter(pk__in=listing_forms).only('qset',
-                                                                               'survey').distinct('qset', 'survey')
-                preferred_listings.extend(
-                    set([(l.survey.pk, l.survey.name) for l in survey_listings]))
-                self.fields['preferred_listing'].choices = preferred_listings
-            except Exception, err:
-                print Exception, err
+        preferred_listings = [('', '------ None, Create new -------'), ]
+        try:
+            listing_forms = ListingTemplate.objects.values_list('pk', flat=True).order_by('id')
+            survey_listings = Interview.objects.filter(pk__in=listing_forms).only('survey').distinct('survey')
+            preferred_listings.extend(
+                set([(l.survey.pk, l.survey.name) for l in survey_listings]))
+            self.fields['preferred_listing'].choices = preferred_listings
+        except Exception, err:
+            print Exception, err
         self.fields['listing_form'].required = False
         self.order_fields(['name', 'description', 'has_sampling', 'sample_size',
                            'preferred_listing', 'listing_form', 'sample_naming_convention'])
@@ -45,16 +43,17 @@ class SurveyForm(ModelForm, FormOrderMixin):
         """Make sure this field makes reference to listing form entry in {{}} brackets
         :return:
         """
-        pattern = '{{ *([0-9a-zA-Z_]+) *}}'
-        label = self.data.get('random_sample_label', '')
-        requested_identifiers = re.findall(pattern, label)
-        if not requested_identifiers:
-            raise ValidationError('You need to include one listing response identifier in double curly brackets'
-                                  ' e.g {{house_number}}')
-        listing_form = self.cleaned_data['listing_form']
-        if listing_form.questions.filter(identifier__in=requested_identifiers).exists():
-            return self.cleaned_data['random_sample_label']
-        raise ValidationError('%s is not in %s' % (', '.join(requested_identifiers), listing_form.name))
+        if self.cleaned_data['has_sampling'] and not self.data.get('preferred_listing', None):
+            pattern = '{{ *([0-9a-zA-Z_]+) *}}'
+            label = self.data.get('random_sample_label', '')
+            requested_identifiers = re.findall(pattern, label)
+            if not requested_identifiers:
+                raise ValidationError('You need to include one listing response identifier in double curly brackets'
+                                      ' e.g {{house_number}}')
+            listing_form = self.cleaned_data['listing_form']
+            if listing_form.questions.filter(identifier__in=requested_identifiers).exists():
+                return self.cleaned_data['random_sample_label']
+            raise ValidationError('%s is not in %s' % (', '.join(requested_identifiers), listing_form.name))
 
     def clean(self):
         cleaned_data = self.cleaned_data

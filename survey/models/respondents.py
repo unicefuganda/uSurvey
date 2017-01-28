@@ -23,7 +23,8 @@ class RespondentGroup(BaseModel):
 
     def has_interviews(self):
         from survey.models import Interview
-        return self.questions.exists() and Interview.objects.filter(qset__pk=self.questions.first().qset.pk).exists()
+        return self.questions.exists() and \
+               Interview.objects.filter(question_set__pk=self.questions.first().qset.pk).exists()
 
     def remove_related_questions(self):
         self.question_templates.all().delete()

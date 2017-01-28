@@ -7,7 +7,8 @@ from survey.models.base import BaseModel
 
 
 class BatchQuestion(Question):
-    group = models.ForeignKey(RespondentGroup, related_name='questions', null=True, blank=True)
+    group = models.ForeignKey(RespondentGroup, related_name='questions', null=True, blank=True,
+                              on_delete=models.SET_NULL)
     module = models.ForeignKey(
-        "QuestionModule", related_name="questions", default='')
+        "QuestionModule", related_name="questions", default='', on_delete=models.SET_NULL, null=True, blank=True)
 

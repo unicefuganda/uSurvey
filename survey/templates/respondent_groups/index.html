@@ -29,7 +29,7 @@
 
     {% block table_head %}
     {% load pagination_tags %}
-    {% autopaginate groups 1 %}
+    {% autopaginate groups 10 %}
     <br>
       <tr>
         <th class="sorting">
@@ -47,7 +47,7 @@
     {% for group in groups %}
         <tr>
           <td>
-            <a href="{% url 'respondent_groups_details' group.id %}">{{ group.name }}</a>
+            <a href="{% url 'respondent_groups_edit' group.id %}">{{ group.name }}</a>
           </td>
           <td>
             {{ group.description }}

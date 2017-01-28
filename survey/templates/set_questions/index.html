@@ -102,8 +102,10 @@
                                             <a href="#" data-toggle="modal" data-target="#delete_logic_{{flow.id}}"
                                                id="delete_subquestion_{{flow.id}}">Delete</a>
                                             &nbsp;&nbsp;
+                                               {% if flow.next_question in question.direct_sub_questions %}
                                                <a href="{% url 'qset_edit_question_page' flow.next_question.id %}"
-                                                  id="edit_subquestion_{{ flow.id }}">Edit</a>&nbsp;&nbsp;
+                                                  id="edit_subquestion_{{ flow.id }}">Edit Subquestion</a>&nbsp;&nbsp;
+                                                {% endif %}
                                             <!-- disabled this for now -->
                                             <!-- a href="{% url 'add_question_logic_page' batch.pk  flow.next_question.pk %}" class="add-logic">Add Logic</a -->
                                             {% include "base/delete_modal.html" with object_name=flow.desc|add:" "|add:flow.next_question.text id=flow.id name='Logic' url=flow.id|get_url_with_ids:"delete_qset_question_logic_page" %}
