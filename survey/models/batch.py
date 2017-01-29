@@ -121,6 +121,15 @@ class Batch(QuestionSet):
             from survey.models import SurveyParameterList
             SurveyParameterList.update_parameter_list(self)
 
+    @property
+    def all_questions(self):
+        """This is might be different from the flow questions because it might have group paramater questions if present
+        :return:
+        """
+        questions = OrderedSet(self.parameter_list.questions.all())
+        map(lambda q: questions.add(q), self.flow_questions)
+        return questions
+
 
 class BatchLocationStatus(BaseModel):
     batch = models.ForeignKey(Batch, null=True, related_name="open_locations")

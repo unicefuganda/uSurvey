@@ -36,6 +36,21 @@ class Question(CloneableMixin, GenericQuestion):
         abstract = False
         unique_together = [('identifier', 'qset'), ]
 
+    @classmethod
+    def get(cls, **kwargs):
+        from survey.models import BatchQuestion
+        try:    # this is just a quick fix till I find out why Question.get doesnt seem to find BatchQuestions
+            return BatchQuestion.objects.get(**kwargs)
+        except BatchQuestion.DoesNotExist:
+            return super(Question, cls).get(**kwargs)
+
+    @property
+    def e_qset(self):
+        """This one basically means exact question set. Should retrieve batch, Listing template, etc
+        :return:
+        """
+        return QuestionSet.get(pk=self.qset.pk)
+
     def answers(self):
         return Answer.get_class(self.answer_type).objects.filter(question=self)
 

@@ -40,7 +40,7 @@ function show_or_hide_attribute_fields(attribute_value){
         }
 
     }
-    if ($('#id_condition').val().toUpperCase() == 'BETWEEN'){
+    if ($('#id_condition').val() && $('#id_condition').val().toUpperCase() == 'BETWEEN'){
         show_between_value_fields()
     }
 }

@@ -34,7 +34,10 @@
               Description
             </th>
              <th>
-              Module
+              Survey
+            </th>
+            <th>
+              Batch
             </th>
              <th>
               Measure
@@ -49,8 +52,9 @@
             <tr>
                 <td>{{ indicator.name }}</td>
                 <td>{{ indicator.description }}</td>
-                <td>{{ indicator.module.name }}</td>
-                <td>{{ indicator.measure }}</td>
+                <td>{{ indicator.parameter.e_qset.survey.name }}</td>
+                <td>{{ indicator.parameter.qset.name }}</td>
+                <td>{{ indicator.parameter.identifier }}</td>
                 <td>                                
                 <div class="">
                 <div class="inline pos-rel">
@@ -101,14 +105,16 @@
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
             <script type="text/javascript">            
             $(document).ready(function() {
-     $('#datatables').DataTable(
-{
-   'aoColumnDefs': [{
-        'bSortable': false,
-        'aTargets': [-1] /* 1st one, start by the right */
-    }]
-});
-} );
+                 $('#datatables').DataTable(
+                    {
+                       'aoColumnDefs': [{
+                            'bSortable': false,
+                            'aTargets': [-1] /* 1st one, start by the right */
+                        }]
+                    });
+            } );
+
+
         </script>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}

@@ -197,6 +197,27 @@ def list_batches(request):
     return render(request, 'layout.html')
 
 
+@permission_required('auth.can_view_batches')
+def list_all_questions(request):
+    batch_id = request.GET.get('id', None)
+    batch = Batch.get(pk=batch_id)
+    #if request.is_ajax():
+    json_dump = json.dumps([{'id': q.id, 'identifier': q.identifier} for q in batch.all_questions],
+                           cls=DjangoJSONEncoder)
+    return HttpResponse(json_dump, content_type='application/json')
+    return HttpResponseRedirect(reverse('batch_index_page', args=(batch.survey.pk, )))
+
+
+@permission_required('auth.can_view_batches')
+def list_batch_questions(request):
+    batch_id = request.GET.get('id', None)
+    batch = Batch.get(pk=batch_id)
+    #if request.is_ajax():
+    json_dump = json.dumps([{'id': q.id, 'identifier': q.identifier} for q in batch.flow_questions],
+                           cls=DjangoJSONEncoder)
+    return HttpResponse(json_dump, content_type='application/json')
+    return HttpResponseRedirect(reverse('batch_index_page', args=(batch.survey.pk, )))
+
 def activate_non_response(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     location = Location.objects.get(

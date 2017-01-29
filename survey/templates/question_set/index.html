@@ -39,14 +39,9 @@
         <th class="sorting">
           Description
         </th>
-        {% if model.verbose_name == 'Listing Form' %}
-        <th class="sorting">
-          No. Of Surveys
-        </th>
         <th class="sorting">
           Total Interviews
         </th>
-        {% endif %}
         <th>
           Actions
         </th>
@@ -62,14 +57,9 @@
           <td>
             {{ question_set.description }}
           </td>
-          {% if model.verbose_name == 'Listing Form' %}
-          <td>
-              {{ question_set.surveys.count }}
-          </td>
           <td>
               {{ question_set.interviews.count}}
           </td>
-          {% endif %}
           <td>
             <div class="">
                 <div class="inline pos-rel">

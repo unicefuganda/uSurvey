@@ -3,18 +3,16 @@ from django.db import models
 from survey.models.question_module import QuestionModule
 from survey.models.interviews import MultiChoiceAnswer, Answer
 from survey.models.surveys import Survey
-from survey.models.questions import Question
+from survey.models import Batch
+from survey.models import BatchQuestion
+from survey.models import Question
 
 
 class Indicator(BaseModel):
     name = models.CharField(max_length=255, null=False)
-    target_group = models.ForeignKey('Group', related_name='indicators', null=True, blank=True)
-    module = models.ForeignKey(QuestionModule, null=False, related_name='indicator')
+    # module = models.ForeignKey(QuestionModule, null=False, related_name='indicator')
     description = models.TextField(null=True)
-    # disabling this in preference to show indicator
-    # measure = models.CharField(max_length=255, null=False, choices=MEASURE_CHOICES, default=MEASURE_CHOICES[0][1])
-    batch = models.ForeignKey("Batch", null=True, related_name='indicators')
-
+    parameter = models.ForeignKey(BatchQuestion, related_name='indicators')
 
     def is_percentage_indicator(self):
         percentage_measure = [Indicator.MEASURE_CHOICES[
@@ -37,3 +35,45 @@ class Indicator(BaseModel):
     #         return self.compute_multichoice_question_for_interviewers(interviewers)
     #     else:
     #         return self.compute_numerical_question_for_interviewers(interviewers)
+
+
+class IndicatorCriteria(BaseModel):
+    VALIDATION_TESTS = [(validator.__name__, validator.__name__)
+                        for validator in Answer.validators()]
+    indicator = models.ForeignKey(Indicator, related_name='indicator_criteria')
+    test_question = models.ForeignKey(Question, related_name='indicator_criteria') # batch & parameter_list questions
+    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS)
+
+    class Meta:
+        app_label = 'survey'
+
+    @property
+    def test_params(self):
+        return [t.param for t in self.test_arguments]
+
+    def params_display(self):
+        params = []
+        for arg in self.text_arguments:
+            if self.question.answer_type == MultiChoiceAnswer.choice_name():
+                params.append(self.question.options.get(order=arg.param).text)
+            else:
+                params.append(arg.param)
+
+        return params
+
+    @property
+    def test_arguments(self):
+        return IndicatorCriteria.objects.filter(group_condition=self).order_by('position')
+
+
+class IndicatorCriteriaTestArgument(BaseModel):
+    criteria = models.ForeignKey(IndicatorCriteria, related_name='arguments')
+    position = models.PositiveIntegerField()
+    param = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.param
+
+    class Meta:
+        app_label = 'survey'
+        get_latest_by = 'position'
