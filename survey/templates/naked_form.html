@@ -28,7 +28,7 @@
   <div id="{{field.auto_id}}-control-group" class="control-group" style="margin-top: 15px;">
       <!-- <br /><br /> -->
     <div class="controls {{ field|is_radio }}">
-    <label class="control-label col-md-4" for="{{field.auto_id}}">{{field.label}}</label>
+    <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
       {{field}}
         <div id="{{field.auto_id}}_tip" class="help tip" style="color: #307ecc; margin-top: 5px; margin-left: 55px;">{{ field.help_text }}</div>
         {% if field.errors %}

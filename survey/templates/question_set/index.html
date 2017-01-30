@@ -25,7 +25,6 @@
 {% block content %}
 {% load pagination_tags %}
 {% include "search_form.html" %}
-{% autopaginate question_sets 10 %}
 {% load template_tags %}
 
 </div>
@@ -123,7 +122,7 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-
+{% autopaginate question_sets 10 %}
   {% paginate %}
 {% endblock %}
 

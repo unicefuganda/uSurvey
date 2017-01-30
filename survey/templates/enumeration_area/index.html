@@ -29,7 +29,6 @@
         }
  </style>
 {% include "search_form.html" %}
-{% autopaginate enumeration_areas 10 %}
     
     <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info"> -->
     <table id="ea" class="table table-striped table-bordered table-hover dataTable table-sort ">
@@ -98,7 +97,8 @@
             {% include "base/delete_modal.html" with object_name=ea.name id=ea.id name="Enumeration_Area" url=ea.id|get_url_with_ids:"delete_enumeration_area" %}
         {% endfor %}
         </tbody>
-    </table>
+    </table>        
+{% autopaginate enumeration_areas 10 %}
 {% paginate %}
 {% endblock %}
 
