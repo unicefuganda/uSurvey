@@ -1,6 +1,13 @@
 <script type="text/template" id="{{ id }}">
+<style type="text/css">
+    .form-horizontal .control-label {
+    padding-top: 7px !important;
+    margin-bottom: 0;
+    text-align: right;
+}
+</style>
     <div class="control-group options question-option">
-        <label class="control-label">{{ option_label }} <span class="number"></span></label>
+        <label class="control-label col-md-4">{{ option_label }} <span class="number"></span></label>
         <div class="controls">
             <input type="text" maxlength="100" name={{ name }}>
             <a href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>
