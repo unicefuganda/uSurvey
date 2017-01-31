@@ -12,7 +12,7 @@ class EnumerationArea(BaseModel):
                             blank=True, null=True, unique=True)
     # total_households = models.PositiveIntegerField(null=True, blank=True)
     locations = models.ManyToManyField(
-        Location, related_name="enumeration_areas")
+        Location, related_name="enumeration_areas", db_index=True)
 
     def __unicode__(self):
         return self.name
