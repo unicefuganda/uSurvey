@@ -15,7 +15,7 @@ class SurveyForm(ModelForm, FormOrderMixin):
         model = Survey
         exclude = []
         widgets = {
-            'description': forms.Textarea(attrs={"rows": 2, "cols": 40}),
+            'description': forms.Textarea(attrs={"rows": 3, "cols": 40}),
             'random_sample_label': forms.Textarea(attrs={"rows": 2, "cols": 40}),
             'has_sampling': InlineRadioSelect(choices=((True, 'Sampled'), (False, 'Census')),
                                               attrs={'class': 'has_sampling'}),
