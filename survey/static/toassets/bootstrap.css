@@ -1433,16 +1433,31 @@ ol ol {
   padding-right: 5px;
   padding-left: 5px;
 }
-dl {
+/*dl {
   margin-top: 0;
   margin-bottom: 20px;
+}*/
+
+dl {
+  background: #f3f3f3 none repeat scroll 0 0;
+    border: 1px solid #c7c7c7;
+    border-radius: 5px;
+    padding: 10px;
+    width: 300px;
+    margin: 0 auto;
 }
+
+
 dt,
 dd {
   line-height: 1.42857143;
 }
-dt {
+/*dt {
   font-weight: bold;
+}*/
+dt {
+    color: #29a300;
+    font-weight: bold;
 }
 dd {
   margin-left: 0;
