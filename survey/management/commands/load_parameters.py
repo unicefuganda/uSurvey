@@ -2,7 +2,7 @@ __author__ = 'anthony'
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User, Permission, Group
 from django.contrib.contenttypes.models import ContentType
-from survey.models import AnswerAccessDefinition, NumericalAnswer, TextAnswer, \
+from survey.models import AnswerAccessDefinition, AutoResponse, NumericalAnswer, TextAnswer, \
     MultiChoiceAnswer, MultiSelectAnswer, ImageAnswer, GeopointAnswer, DateAnswer, AudioAnswer, VideoAnswer, \
     USSDAccess, ODKAccess, WebAccess
 
@@ -66,6 +66,8 @@ class Command(BaseCommand):
         self.stdout.write('Creating answer definition... ')
         # ussd definition
         AnswerAccessDefinition.objects.get_or_create(channel=USSDAccess.choice_name(),
+                                                     answer_type=AutoResponse.choice_name())
+        AnswerAccessDefinition.objects.get_or_create(channel=USSDAccess.choice_name(),
                                                      answer_type=NumericalAnswer.choice_name())
         AnswerAccessDefinition.objects.get_or_create(channel=USSDAccess.choice_name(),
                                                      answer_type=TextAnswer.choice_name())
@@ -73,6 +75,8 @@ class Command(BaseCommand):
                                                      answer_type=MultiChoiceAnswer.choice_name())
 
         # ODK definition
+        AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
+                                                     answer_type=AutoResponse.choice_name())
         AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),
                                                      answer_type=NumericalAnswer.choice_name())
         AnswerAccessDefinition.objects.get_or_create(channel=ODKAccess.choice_name(),

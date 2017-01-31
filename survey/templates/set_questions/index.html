@@ -147,34 +147,37 @@
                            <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
                        </button>
                         <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-                             {% if  batch and batch.interviews.count == 0 %}
-                            <li>
-                                <a href="{% url 'qset_edit_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
-                            </li>
-                            <li>
-                                <a href="{% url 'insert_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="green"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Insert Question</span></a>
-                            </li>
+                            {% if 'auto' in question.answer_type.lower %}
                             <li>
                                 <a href="{% url 'loop_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="green"><i class="usur-icon fa fa-plus-square bigger-120"></i>Start/Edit Loop</span></a>
                             </li>
-                            <li>
-                                <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="black"><i class="usur-icon fa fa-code bigger-120"></i>Add Logic</span></a>
-                            </li>
-                            <li><a href="{% url 'remove_qset_question_page' question.pk %}" data-toggle="modal" {% comment %} data-target="#delete_question_{{question.id}}"{% endcomment %} id="delete_quest_{{question.id}}"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
-                            {% include "base/delete_modal.html" with object_name=question.name id=question.id name="Question" url=question.id|get_url_with_ids:"remove_qset_question_page" %}
-                            </li>
-                            {% endif %}
-                            {% if question.options.all %}
-                            <li>
-                                <a href="#view_options_{{ question.id }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-question-circle bigger-120"></i>View options{% if question.conditional_flows %}/Logic{% endif %}</span></a>
-                            </li>
-                            {% elif question.conditional_flows %}
-                            <li><a href="#view_logic_{{ question.id }}" data-toggle="modal" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-question-circle bigger-120"></i>View Logic</span></a></li>
-                            {% endif %}
-                            {% if question.loop_started  and batch.interviews.count == 0 %}
-                            <li><a href="{% url 'remove_question_loop_page' question.loop_started.id %}" data-toggle="modal" {% comment %} data-target="#remove_loop_{{ question.loop_started.id }}"{% endcomment %}><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Remove Loop</span></a>
-                            {% include "base/remove_modal.html" with object_name=question.text id=question.loop_started.id name="Loop" url=question.loop_started.id|get_url_with_ids:"remove_question_loop_page" %}
-                            </li>
+                            {% else %}
+                                 {% if  batch and batch.interviews.count == 0 %}
+                                <li>
+                                    <a href="{% url 'qset_edit_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit</span></a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'insert_qset_question_page' question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="green"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Insert Question</span></a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'add_qset_question_logic_page' batch.pk question.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Insert"><span class="black"><i class="usur-icon fa fa-code bigger-120"></i>Add Logic</span></a>
+                                </li>
+                                <li><a href="{% url 'remove_qset_question_page' question.pk %}" data-toggle="modal" {% comment %} data-target="#delete_question_{{question.id}}"{% endcomment %} id="delete_quest_{{question.id}}"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                                {% include "base/delete_modal.html" with object_name=question.name id=question.id name="Question" url=question.id|get_url_with_ids:"remove_qset_question_page" %}
+                                </li>
+                                {% endif %}
+                                {% if question.options.all %}
+                                <li>
+                                    <a href="#view_options_{{ question.id }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-question-circle bigger-120"></i>View options{% if question.conditional_flows %}/Logic{% endif %}</span></a>
+                                </li>
+                                {% elif question.conditional_flows %}
+                                <li><a href="#view_logic_{{ question.id }}" data-toggle="modal" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-question-circle bigger-120"></i>View Logic</span></a></li>
+                                {% endif %}
+                                {% if question.loop_started  and batch.interviews.count == 0 %}
+                                <li><a href="{% url 'remove_question_loop_page' question.loop_started.id %}" data-toggle="modal" {% comment %} data-target="#remove_loop_{{ question.loop_started.id }}"{% endcomment %}><span class="green"><i class="usur-icon fa fa-trash bigger-120"></i>Remove Loop</span></a>
+                                {% include "base/remove_modal.html" with object_name=question.text id=question.loop_started.id name="Loop" url=question.loop_started.id|get_url_with_ids:"remove_question_loop_page" %}
+                                </li>
+                                {% endif %}
                             {% endif %}
                         </ul>
                 </div>

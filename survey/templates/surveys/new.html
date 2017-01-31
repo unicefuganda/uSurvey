@@ -3,6 +3,10 @@
 {% block title %}
   New Survey
 {% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
+<script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
+{% endblock %}
 
 {% block display_form_fields %}
 	{% include "naked_form.html" with a_form=survey_form %}
@@ -23,6 +27,44 @@
                         $('#id_random_sample_label-control-group').show();
                     }
                 });
+                var random_label = document.querySelector("#id_random_sample_label");
+                var aucomplete = null;
+                $('#id_listing_form').change(function(){
+                        $.get( "{% url 'qset_identifiers' %}?id=" + $('#id_listing_form').val(), function( list ) {
+
+                            $(random_label).val('');
+                            if(aucomplete){             // need to find a better way to remove this
+                               aucomplete.filter = null;
+                               aucomplete.replace = null;
+                               aucomplete.list = [];
+                               aucomplete = null;
+                            }
+
+                            aucomplete = get_autocomplete(list);
+                        });
+                });
+
+                $(random_label).on('keydown', function() {
+                     if (this.value.length > 1 && aucomplete == null) {
+                          $.get( "{% url 'qset_identifiers' %}?id=" + $('#id_listing_form').val(), function( list ) {
+                            aucomplete = get_autocomplete(list);
+                        });
+                     }
+                });
+
+                get_autocomplete = function(list) {
+                        return new Awesomplete(random_label, {
+                                                list: list,
+                                                    filter: function(text, input) {
+                                                        return Awesomplete.FILTER_CONTAINS(text, input.match(/[^{{]*$/)[0]);
+                                                    },
+
+                                                    replace: function(text) {
+                                                        var before = this.input.value.match(/^.*{{\s*|/)[0];
+                                                        this.input.value = before +text + "}} ";
+                                                    }
+                                            });
+                }
             });
         </script>
 {% endblock %}

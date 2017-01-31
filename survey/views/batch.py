@@ -212,10 +212,10 @@ def list_all_questions(request):
 def list_batch_questions(request):
     batch_id = request.GET.get('id', None)
     batch = Batch.get(pk=batch_id)
-    #if request.is_ajax():
-    json_dump = json.dumps([{'id': q.id, 'identifier': q.identifier} for q in batch.flow_questions],
-                           cls=DjangoJSONEncoder)
-    return HttpResponse(json_dump, content_type='application/json')
+    if request.is_ajax():
+        json_dump = json.dumps([{'id': q.id, 'identifier': q.identifier} for q in batch.flow_questions],
+                               cls=DjangoJSONEncoder)
+        return HttpResponse(json_dump, content_type='application/json')
     return HttpResponseRedirect(reverse('batch_index_page', args=(batch.survey.pk, )))
 
 def activate_non_response(request, batch_id):

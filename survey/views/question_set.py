@@ -1,8 +1,10 @@
 import ast
 import os
+import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
@@ -137,6 +139,13 @@ def view_data(request, qset_id):
         return render(request, 'question_set/view_data.html', context)
     except QuestionSet.DoesNotExist:
         return HttpResponseNotFound()
+
+
+@login_required
+def identifiers(request):
+    id = request.GET.get('id', None)
+    json_dump = json.dumps(list(Question.objects.filter(qset__id=id).values_list('identifier', flat=True)))
+    return HttpResponse(json_dump, content_type='application/json')
 
 
 def clone_qset(request, qset_id):

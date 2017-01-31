@@ -88,19 +88,20 @@ xmlns:jr="http://openrosa.org/javarosa">
 	           <bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}"
 				required="true()"
 				relevant="true() and {{ relevance_context }}"/>
-				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/id{{ question.loop_started.id }}"
+				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"
 				required="true()"
 				relevant="true() and {{ relevance_context }}" readonly="true()" calculate="position(..)"/>
-	       {% endif %}
+	       {% else %}
 
-			<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"
-				type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
-				required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
-				relevant="true() and {{ relevance_context }}"/>
-			{% comment %}{% if question.loop_ended %}
-				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/loop_id" type="string" 
-           readonly="true()" calculate="count(/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}})" />
-	       {% endif %}{% endcomment %}
+				<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}}"
+					type="{% if question.answer_type == answer_types.numericalanswer %}int{% elif question.answer_type == answer_types.multichoiceanswer %}select1{% elif question.answer_type == answer_types.multiselectanswer %}select{% elif question.answer_type == answer_types.dateanswer %}date{% elif question.answer_type == answer_types.audioanswer or answer_type == answer_types.imageanswer or answer_type == answer_types.videoanswer %}binary{% elif question.answer_type == answer_types.geopointanswer %}geopoint{% else %}string{% endif %}"
+					required="{% if question.mandatory %}true(){% else %}false(){% endif %}"
+					relevant="true() and {{ relevance_context }}"/>
+				{% comment %}{% if question.loop_ended %}
+					<bind nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/loop_id" type="string"
+			   readonly="true()" calculate="count(/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}/q{{question.pk}})" />
+			   {% endif %}{% endcomment %}
+	      {% endif %}
 	{% endfor %}
 
   </model>
@@ -148,7 +149,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		   {% get_loop_aware_path question  as path %}
 		   {% if question.loop_started %}
 		       <group {% if question.loop_started.loop_prompt %}prompt="{{question.loop_started.loop_prompt}}"{% endif %}>
-					<label>{{question.loop_started.loop_label}}</label>
+					<label>{{question.text}}</label>
 	           		<repeat nodeset="/qset/qset{{qset.pk}}/questions/surveyQuestions{{ path }}" {% if question.loop_started.repeat_logic == question.loop_started.PREVIOUS_QUESTION %}
 													{% get_loop_aware_path question.loop_started.previousanswercount.value  as counter_path %}
 													jr:count="/qset/qset{{qset.pk}}/questions{{counter_path}}/q{{question.loop_started.previousanswercount.value.pk}}"
@@ -156,13 +157,14 @@ xmlns:jr="http://openrosa.org/javarosa">
 													jr:count="{{question.loop_started.fixedloopcount.value}}"
 												{% endif %}>
 
-	       {% endif %}
+	       {% else %}
 					{% concat_strings '/qset/qset' qset.pk '/questions/surveyQuestions' path '/q' question.pk as ref %}
 					{% include "odk/_question_body.xml" with question=question answer_types=answer_types qref=ref %}
 					 {% for sub_question in question.direct_sub_questions %}
 						{% concat_strings '/qset/qset' qset.pk '/questions/surveyQuestions' path '/q' sub_question.pk as ref %}
 	                	{% include "odk/_question_body.xml" with question=sub_question answer_types=answer_types qref=ref %}
 					{% endfor %}
+		   {% endif %}
 				{% if question.loop_ended %}
 		      		</repeat>
 			 </group>

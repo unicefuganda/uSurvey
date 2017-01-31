@@ -1,5 +1,5 @@
 from survey.models.interviewer import Interviewer, SurveyAllocation
-from survey.models.interviews import NumericalAnswer, Interview, TextAnswer, MultiChoiceAnswer, \
+from survey.models.interviews import AutoResponse, NumericalAnswer, Interview, TextAnswer, MultiChoiceAnswer, \
     MultiSelectAnswer, Answer, ODKGeoPoint, DateAnswer, VideoAnswer, \
     ImageAnswer, AudioAnswer, GeopointAnswer, NonResponseAnswer
 from survey.models.backend import Backend

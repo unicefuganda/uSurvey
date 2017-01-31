@@ -31,7 +31,7 @@ class Interview(BaseModel):
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name="interviews")
     survey = models.ForeignKey('Survey', related_name='interviews')
-    question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)    # repeated here for easy reporting
+    question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)
     ea = models.ForeignKey(
         'EnumerationArea', related_name='interviews', db_index=True)    # repeated here for easy reporting
     interview_reference = models.ForeignKey('Interview', related_name='follow_up_interviews', null=True, blank=True)
@@ -314,6 +314,14 @@ class Answer(BaseModel):
         app_label = 'survey'
         abstract = True
         get_latest_by = 'created'
+
+
+class AutoResponse(Answer):
+    """Shall be used to capture responses auto generated
+    """
+    class Meta:
+        app_label = 'survey'
+        abstract = False
 
 
 class NumericalAnswer(Answer):
