@@ -46,6 +46,9 @@ class Survey(CloneableMixin, BaseModel):
                 return True
         return False
 
+    def eas_covered(self):
+        return self.interviews.distinct('ea').count()
+
     def is_open(self):
         return any([batch.is_open() for batch in self.batches.all()])
 

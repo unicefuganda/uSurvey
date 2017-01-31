@@ -26,7 +26,7 @@ class SurveyForm(ModelForm, FormOrderMixin):
         if kwargs.get('instance', None) and kwargs['instance'].has_sampling is False:
             self.fields['preferred_listing'].widget.attrs[
                 'disabled'] = 'disabled'
-        preferred_listings = [('', '------ None, Create new -------'), ]
+        preferred_listings = [('', '------ Create new -------'), ]
         try:
             listing_forms = ListingTemplate.objects.values_list('pk', flat=True).order_by('id')
             survey_listings = Interview.objects.filter(pk__in=listing_forms).only('survey').distinct('survey')
