@@ -313,7 +313,12 @@
                               {% if messages %}
                                 <!-- <br /><br /> -->
                                 {% for message in messages %}
-                                   <ul class="alert alert-{{ message.tags }}"  style="text-align: center;">
+                                   <ul class="alert alert-{{ message.tags }}"  style="background: #def0d8 none repeat scroll 0 0;
+    border: 1px solid #cfdaca;
+    margin-top: 7px;
+    padding: 8px;
+    text-align: center;">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
                                         {{ message }}
                                     </ul>
                                 {% endfor %}

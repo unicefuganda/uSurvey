@@ -1,10 +1,17 @@
 {% load template_tags %}
+<style type="text/css">
+	.offset3{
+		text-align: center;
+    margin-top: 10px;
+    padding : 2px;
+	}
+</style>
 <div class="btn-group">
-    <a href="{% url 'users_edit'  the_user.id %}" class="btn btn-small" ><i class="icon-pencil"></i> Edit</a>
+    <a href="{% url 'users_edit'  the_user.id %}" class="btn btn-white btn-warning btn-bold" style="margin-right: 10px; border-radius:5px">Edit</a>
     {% if the_user.is_active %}
-        <a href="#deactivate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Deactivate</a>
+        <a href="#deactivate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-white btn-warning btn-bold" style="border-radius:5px">Deactivate</a>
     {% else %}
-        <a href="#re-activate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Activate</a>
+        <a href="#re-activate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-white btn-warning btn-bold" style=" border-radius:5px"> Activate</a>
     {% endif %}
 
 </div>
