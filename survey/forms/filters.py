@@ -162,7 +162,7 @@ class BatchOpenStatusFilterForm(forms.Form):
         status = None
         try:
             if self.is_valid():
-                status = int(self.cleaned_data['status'])
+                status = int(self.cleaned_data.get('status') or 0)
         except forms.ValidationError:
             pass
         prime_location_type = LocationType.largest_unit()
@@ -174,3 +174,23 @@ class BatchOpenStatusFilterForm(forms.Form):
         elif status and status == self.CLOSED:
             return locations.exclude(id__in=batch_location_ids)
         return locations
+
+
+class UsersFilterForm(forms.Form):
+    ACTIVE = 1
+    DEACTIVATED = 2
+    status = forms.ChoiceField(
+        label='Status', widget=forms.Select(), choices=[(0, '-- All Status --'), (ACTIVE, 'Active'),
+                                                        (DEACTIVATED, 'Deactivated')], required=False)
+
+    def get_users(self):
+        from django.contrib.auth.models import User
+        status = None
+        try:
+            if self.is_valid():
+                status = int(self.cleaned_data.get('status') or 0)
+        except forms.ValidationError:
+            pass
+        if status:
+            return User.objects.filter(is_active=(status==self.ACTIVE)).exclude(is_superuser=True).order_by('first_name')
+        return User.objects.exclude(is_superuser=True).order_by('first_name')

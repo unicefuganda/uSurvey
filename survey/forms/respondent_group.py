@@ -12,8 +12,10 @@ class GroupForm(forms.ModelForm, FormOrderMixin):
     value = forms.CharField(required=False)
     options = forms.ChoiceField(choices=[], required=False)
     validation_test = forms.ChoiceField(choices=[('', '--------------------')] +
-                                                RespondentGroupCondition.VALIDATION_TESTS, required=False)
-    test_question = forms.ModelChoiceField(queryset=ParameterTemplate.objects.all(), required=False)
+                                                RespondentGroupCondition.VALIDATION_TESTS, required=False,
+                                        label='Operator')
+    test_question = forms.ModelChoiceField(queryset=ParameterTemplate.objects.all(), required=False,
+                                           label='Parameter')
 
     def __init__(self, *args, **kwargs):
         super(GroupForm, self).__init__(*args, **kwargs)

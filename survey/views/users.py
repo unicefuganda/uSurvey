@@ -13,6 +13,7 @@ from survey.views.custom_decorators import permission_required_for_perm_or_curre
 from survey.utils.query_helper import get_filterset
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from survey.forms.filters import UsersFilterForm
 
 
 def _add_error_messages(userform, request, action_str='registered'):
@@ -64,6 +65,8 @@ def check_user_attribute(**kwargs):
 
 @permission_required('auth.can_view_users')
 def index(request):
+    users_filter_form = UsersFilterForm(request.GET)
+    userlist = users_filter_form.get_users()
     if request.GET.has_key('mobile_number'):
         return check_mobile_number(request.GET['mobile_number'])
 
@@ -72,17 +75,12 @@ def index(request):
             username=request.GET['username'])
     if request.GET.has_key('email'):
         return check_user_attribute(email=request.GET['email'])
-    userlist = User.objects.exclude(is_superuser=True).order_by('first_name')
     search_fields = ['first_name', 'last_name', 'groups__name']
     if request.GET.has_key('q'):
         userlist = get_filterset(userlist, request.GET['q'], search_fields)
-
-    if request.GET.has_key('status'):
-        userlist = userlist.filter(is_active=(
-            True if request.GET['status'].lower() == 'active' else False))
-
     return render(request, 'users/index.html', {'users': userlist,
-                                                'request': request})
+                                                'request': request,
+                                                'users_filter_form': users_filter_form})
 
 
 @permission_required_for_perm_or_current_user('auth.can_view_users')

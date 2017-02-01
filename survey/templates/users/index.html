@@ -2,6 +2,9 @@
 {% block title %}
   Users List
 {% endblock %}
+{% block search %}
+{% include "horizontal_filter_form.html" with a_form=users_filter_form no_button=True filter_id='users_filter_form' %}
+{% endblock %}
 {% block page_actions %}
 <ul id="horizontal-filter">
 		        <li>
@@ -16,18 +19,6 @@
 {% load pagination_tags %}
 {% autopaginate users 30 %}
 {% load template_tags %}
-	<div class="filter-option">
-			<p><b>Filter By Status</b></p>
-            <br>
-		    <ul id="horizontal-filter">
-		        <li>
-					<a href="{% url 'users_index' %}" class="btn btn-white btn-warning btn-bold" style="padding: 3px 12px;">All</a>
-		            <a href="{% url 'users_index' %}?status=active" class="btn btn-white btn-warning btn-bold" style="padding: 3px 12px;">Active</a>
-		            <a href="{% url 'users_index' %}?status=deactivated" class="btn btn-white btn-warning btn-bold" style="padding: 3px 12px;">Deactivated</a>
-                </li>
-		    </ul>
-	</div>
-    <br>
         <!-- <table class="table table-striped table-bordered table-hover table-sort"> -->
         <table id="" class="table table-striped table-bordered table-hover dataTable no-footer table-sort" role="grid" aria-describedby="dynamic-table_info">
             <thead>
