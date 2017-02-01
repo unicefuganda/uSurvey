@@ -18,7 +18,10 @@ class Survey(CloneableMixin, BaseModel):
                                           help_text='Select which survey listing to reuse. '
                                                     'Leave empty for fresh listing',
                                           null=True, blank=True)
-    random_sample_label = models.TextField(null=True, blank=True, verbose_name='Randomly selected data label')
+    random_sample_label = models.TextField(null=True, blank=True,
+                                           verbose_name='Randomly selected data label',
+                                           help_text='Include double curly brackets to automatically insert '
+                                                     'identifiers from the listing form e.g {{structure_address}}')
     # random_sample_description = models.TextField()
 
 

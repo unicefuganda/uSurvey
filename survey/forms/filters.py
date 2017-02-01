@@ -1,5 +1,6 @@
 from django import forms
-from survey.models import RespondentGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, Location
+from survey.models import RespondentGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, Location, \
+    LocationType
 from django.contrib.auth.handlers.modwsgi import groups_for_user
 MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
 DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 20
@@ -7,7 +8,7 @@ DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 20
 
 class QuestionFilterForm(forms.Form):
     question_types = forms.ChoiceField(
-        label='Question Type', widget=forms.Select(), choices=[], required=False)
+        label='Answer Type', widget=forms.Select(), choices=[], required=False)
 
     def __init__(self, data=None, initial=None, read_only=[], qset=None):  # ttype can be batch, listing question, etc
         super(QuestionFilterForm, self).__init__(data=data, initial=initial)
@@ -144,3 +145,32 @@ class SurveyBatchFilterForm(forms.Form):
         if self.data.get('survey'):
             survey = Survey.objects.get(id=self.data['survey'])
             self.fields['batch'].queryset = survey.batches.all()
+
+
+class BatchOpenStatusFilterForm(forms.Form):
+    OPEN = 1
+    CLOSED = 2
+    status = forms.ChoiceField(
+        label='Status', widget=forms.Select(), choices=[(0, '-- All Status --'), (OPEN, 'Open'),
+                                                        (CLOSED, 'Closed')], required=False)
+
+    def __init__(self, batch, *args, **kwargs):
+        super(BatchOpenStatusFilterForm, self).__init__(*args, **kwargs)
+        self.batch = batch
+
+    def get_locations(self):
+        status = None
+        try:
+            if self.is_valid():
+                status = int(self.cleaned_data['status'])
+        except forms.ValidationError:
+            pass
+        prime_location_type = LocationType.largest_unit()
+        locations = Location.objects.filter(
+            type=prime_location_type).order_by('name')
+        batch_location_ids = self.batch.open_locations.values_list('location_id', flat=True)
+        if status and status == self.OPEN:
+            return locations.filter(id__in=batch_location_ids)
+        elif status and status == self.CLOSED:
+            return locations.exclude(id__in=batch_location_ids)
+        return locations

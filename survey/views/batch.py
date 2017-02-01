@@ -12,7 +12,7 @@ from survey.models import Survey, Batch, QuestionTemplate, QuestionFlow, Questio
 from survey.models import BatchQuestion as Question
 from survey.forms.batch import BatchQuestionsForm
 from survey.forms.question_set import BatchForm
-from survey.forms.filters import QuestionFilterForm
+from survey.forms.filters import QuestionFilterForm, BatchOpenStatusFilterForm
 from .question_set import QuestionSetView
 
 
@@ -45,21 +45,15 @@ def batches(request, survey_id):
 @permission_required('auth.can_view_batches')
 def show(request, survey_id, batch_id):
     batch = Batch.objects.get(id=batch_id)
-    prime_location_type = LocationType.largest_unit()
-    locations = Location.objects.filter(
-        type=prime_location_type).order_by('name')
-    batch_location_ids = batch.open_locations.values_list(
-        'location_id', flat=True)
-    if request.GET.has_key('status'):
-        if request.GET['status'] == 'open':
-            locations = locations.filter(id__in=batch_location_ids)
-        else:
-            locations = locations.exclude(id__in=batch_location_ids)
+    open_status_filter = BatchOpenStatusFilterForm(batch, request.GET)
+    batch_location_ids = batch.open_locations.values_list('location_id', flat=True)
+    locations = open_status_filter.get_locations()
     request.breadcrumbs(Batch.edit_breadcrumbs(survey=batch.survey))
     open_locations = locations.filter(id__in=batch_location_ids)
     context = {'batch': batch,
                'locations': locations,
                'open_locations': open_locations,
+               'open_status_filter': open_status_filter,
                'non_response_active_locations': batch.get_non_response_active_locations()}
     return render(request, 'batches/show.html', context)
 

@@ -28,7 +28,7 @@
 <div class="col-lg-12" style="margin-top: -18px;margin-left: 21px;">
         <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url export_template_url %}" >
                         <i class="ace-icon fa fa-external-link bigger-120"></i>
-                         Export Questions</a>
+                         Export {% if 'Parameter' in model_class.verbose_name %}Parameter{% else %}Question{% endif %}s</a>
         {% endwith %}
         {% with 'new_'|add:model_class.resolve_tag as new_template_url %}
         <!-- <button class="btn btn-white btn-warning btn-bold">
@@ -38,7 +38,7 @@
 
         <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url new_template_url %}" >
                         <i class="ace-icon fa fa-plus bigger-120"></i>
-                         Create New Question</a>
+                         Create New {% if 'Parameter' in model_class.verbose_name %}Parameter{% else %}Question{% endif %}</a>
                          </div>
         {% endwith %}
 {% endblock %}
@@ -52,7 +52,7 @@
     <thead>
     <tr>
         <th class="sorting">
-            Code
+            {% if 'Parameter' in model_class.verbose_name %}Parameter{% else %}Code{% endif %}
         </th>
         <th class="span8 sorting">
             Question

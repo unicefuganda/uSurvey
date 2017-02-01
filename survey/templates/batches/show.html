@@ -4,13 +4,7 @@
 {% endblock %}
 {% block search %}
 <div class='filter-options'>
-  <span><strong>Filter By Status:&nbsp;</strong></span>
-  <span>
-  <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}" class="btn btn-white btn-warning btn-bold" >All</a>
-  <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=open" class="btn btn-white btn-warning btn-bold" >Open</a>
-  <a href="{% url 'batch_show_page' batch.survey.pk batch.pk %}?status=closed" class="btn btn-white btn-warning btn-bold" >Closed</a>
-  </span>
-</div>
+  {% include "horizontal_filter_form.html" with a_form=open_status_filter no_button=True filter_id='open_status_filter' %}
 {% endblock %}
 {% block page_actions %}
 		<form action="{% url 'batch_all_locs' batch.pk %}" method="POST" accept-charset="utf-8" id="open-for-location-form">
