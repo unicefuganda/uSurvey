@@ -383,7 +383,8 @@ def update_orders(request, qset_id):
                 question_id = next_question_id
             batch.start_question = start_question
             batch.save()
-
+        # better to clear all loops tied to this qset for now
+        QuestionLoop.objects.filter(loop_starter__qset__pk=batch.pk).delete()
         success_message = "Question orders successfully updated for batch: %s." % batch.name.capitalize()
         messages.success(request, success_message)
     else:

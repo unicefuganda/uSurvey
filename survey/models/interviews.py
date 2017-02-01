@@ -323,6 +323,10 @@ class AutoResponse(Answer):
         app_label = 'survey'
         abstract = False
 
+    @classmethod
+    def choice_name(cls):
+        return 'Auto Generated'
+
 
 class NumericalAnswer(Answer):
     value = models.PositiveIntegerField(null=True)
