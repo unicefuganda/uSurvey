@@ -112,7 +112,7 @@ def add_indicator_formular(request, indicator_id):
 @permission_required('auth.can_view_batches')
 def simple_indicator(request, indicator_id):
     hierarchy_limit = 2
-    selected_location = Location.objects.get(type=LocationType.largest_unit())
+    selected_location = Location.objects.get(parent__isnull=True)
     report_location_type = LocationType.largest_unit()
     params = request.GET or request.POST
     locations_filter = LocationsFilterForm(data=params)
