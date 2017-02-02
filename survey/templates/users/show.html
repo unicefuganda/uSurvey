@@ -6,49 +6,67 @@
 <h3 class="offset3">
     {{ the_user.get_full_name|capfirst }}'s Details
 </h3>
-<dl class="details offset1">
-  <dt>
+<table class="table centerTable">
+<tbody>
+<tr>
+  <td style="text-align:right" valign="top"> 
     Username
-  </dt>
-  <dd>
+  </td>
+  <td style="text-align:left" valign="top" class="showdetails">
     {{ the_user.username }}
-  </dd>
-  <dt>
+  </td>
+  </tr>
+
+  <tr>
+  <td style="text-align:right" valign="top">
     First name
-  </dt>
-  <dd>
+  </td>
+ <td style="text-align:left" valign="top" class="showdetails">
     {{ the_user.first_name}}
-  </dd>
-  <dt>
+  </td>
+  </tr>
+
+  <tr>
+  <td style="text-align:right" valign="top">
     Last name
-  </dt>
-  <dd>
+  </td>
+  <td style="text-align:left" valign="top" class="showdetails">
     {{ the_user.last_name }}
-  </dd>
-  <dt>
+  </td>
+  </tr>
+
+  <tr>
+  <td style="text-align:right" valign="top">
     Mobile number
-  </dt>
-  <dd>
+  </td>
+  <td style="text-align:left" valign="top" class="showdetails">
       {{ the_user.userprofile.mobile_number }}
-  </dd>
-  <dt>
+  </td>
+  </tr>
+  <tr>
+  <td style="text-align:right" valign="top">
     Email
-  </dt>
-  <dd>
+  </td>
+  <td style="text-align:left" valign="top" class="showdetails">
     {{ the_user.email }}
-  </dd>
-  <dt>
+  </td>
+  </tr>
+  <tr>
+  <td style="text-align:right" valign="top">
     Groups
-  </dt>
-  <dd>
+  </td>
+  <td style="text-align:left" valign="top" class="showdetails">
    {% for group in the_user.groups.all %}
     {{ group }}{% if not forloop.last %}, {% endif %}
    {% endfor %}
-  </dd>
-</dl>
+  </td>
+  </tr>
+  </tbody>
+  </table>
+
 <div class="offset3">
     {% if cancel_url %}
-        <a href="{{cancel_url}}" class="btn btn-white btn-warning btn-bold"><i class="icon-chevron-left icon-white"></i> Back</a>
+        <a href="{{cancel_url}}" class="btn btn-primary btn-bold" style="margin-bottom: 1px;padding: 2px;"><i class="icon-chevron-left icon-white"></i> Back</a>
     {% else %}
         <a href="javascript:window.history.back()" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
     {% endif %}
