@@ -4,9 +4,12 @@
     <br />    
 {% endblock %}
 {% block submit_button %}
+<style type="text/css">
+	.dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 200px!important;}
+</style>
 <td valign="middle" class="downbutton">
-    <input type="submit" name="action" value="Email Spreadsheet" class="btn btn-primary" id="email_excel" style="    border-left: 0px solid #0577e0 !important;" />
-     <input type="submit" name="action"  value="Download Spreadsheet" class="btn btn-primary" id="download_excel" style="border-left: 0px solid #0577e0 !important;" />
+    <input type="submit" name="action" value="Email Spreadsheet" class="btn btn-primary" id="email_excel" style="    border-left: 0px solid #0577e0 !important;     padding: 4px;" />
+     <input type="submit" name="action"  value="Download Spreadsheet" class="btn btn-primary" id="download_excel" style="border-left: 0px solid #0577e0 !important;     padding: 4px;" />
 </td>
 {% endblock %}
 

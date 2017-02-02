@@ -9,12 +9,14 @@ from survey.forms.form_order_mixin import FormOrderMixin
 from survey.models import Survey, BatchCommencement, SurveyHouseholdListing, AnswerAccessDefinition, USSDAccess
 
 
-class SurveyForm(ModelForm, FormOrderMixin):
+class SurveyForm(ModelForm, FormOrderMixin):    
 
     class Meta:
         model = Survey
         exclude = []
         widgets = {
+            'name' : forms.TextInput(attrs={'size': 40, 'title': 'Your name','style': 'height: 2em;'}),
+            # 'name' : forms.TextInput(attrs={"rows": 3, "cols": 40}),            
             'description': forms.Textarea(attrs={"rows": 3, "cols": 40}),
             'random_sample_label': forms.Textarea(attrs={"rows": 4, "cols": 40,
                                                          'placeholder':

@@ -3,13 +3,12 @@
 </h3>
 <style type="text/css">
   #id_name{
-   width: 339px !important;
-   -web-kit-widht:339px !important;
-   -moz-width:339px !important;
+   margin-left: -2px !important;
   }
   #id_sample_size{
         height: 25px !important;
-  }  
+  }
+  .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}  
 </style>
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
   {% csrf_token %}

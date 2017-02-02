@@ -2580,6 +2580,7 @@ legend {
   border: 0;
   padding-bottom: 5px;
   border-bottom: 1px solid #c3a0d9;
+  margin-top: 20px;
 }
 label {
   display: inline-block;

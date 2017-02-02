@@ -28,7 +28,8 @@ def get_question_set_form(model_class):
             fields = ['name', 'description', ]
 
             widgets = {
-                'description': forms.Textarea(attrs={"rows": 4, "cols": 30}),
+                'name' : forms.TextInput(attrs={'size': 40, 'title': 'Your name','style': 'height: 2em;'}),
+                'description': forms.Textarea(attrs={"rows": 3, "cols": 40}),
             }
 
         def clean_name(self):

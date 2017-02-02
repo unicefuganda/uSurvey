@@ -31,7 +31,7 @@ class GroupForm(forms.ModelForm, FormOrderMixin):
         model = RespondentGroup
         fields = ['name', 'description', ]
         widgets = {
-        'description': forms.Textarea(attrs={"rows": 3, "cols": 30}),
+        'description': forms.Textarea(attrs={"rows": 3, "cols": 34}),
         }
     #
     # def validate_options(self):
