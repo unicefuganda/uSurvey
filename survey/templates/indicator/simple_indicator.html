@@ -29,14 +29,16 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
+
             {% for location_name, values in reports.items %}
+            <tr>
                 <th>{{ location_name }}</th>
                 {% for val in values %}
                     <td>{{ val }}</td>
                 {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
+
     </tbody>
 </table>
 {% endblock %}
