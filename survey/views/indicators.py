@@ -113,7 +113,6 @@ def add_indicator_formular(request, indicator_id):
 def simple_indicator(request, indicator_id):
     hierarchy_limit = 2
     selected_location = Location.objects.get(parent__isnull=True)
-    report_location_type = LocationType.largest_unit()
     params = request.GET or request.POST
     locations_filter = LocationsFilterForm(data=params)
     indicator_metric_form = IndicatorMetricFilterForm(params)
@@ -128,13 +127,12 @@ def simple_indicator(request, indicator_id):
     if locations_filter.last_location_selected:
         selected_location = locations_filter.last_location_selected
         # hence set the location where the report is based. i.e the child current selected location.
-        report_location_type = LocationType.objects.get(parent=selected_location)
     context = {'request': request,
                'reports': _get_data_series(selected_location, indicator, metric),
                'indicator': indicator,
                'locations_filter': locations_filter,
                'options': indicator.parameter.options.order_by('order'),
-               'report_location_type': report_location_type,
+               'selected_location': selected_location,
                'indicator_metric_form': indicator_metric_form,
                'metric': 'Count' if metric == Indicator.COUNT else 'Percentage'
                }
