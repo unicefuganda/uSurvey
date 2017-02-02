@@ -68,6 +68,11 @@ class IndicatorCriteria(BaseModel):
     def test_arguments(self):
         return IndicatorCriteriaTestArgument.objects.filter(criteria=self).order_by('position')
 
+    def qs_passes_test(self, value_key, queryset):
+        answer_class = Answer.get_class(self.test_question.answer_type)
+        method = getattr(answer_class, 'fetch_%s' % self.validation_test, None)
+        return method(value_key, *list(self.test_arguments), qs=queryset)
+
 
 class IndicatorCriteriaTestArgument(BaseModel):
     criteria = models.ForeignKey(IndicatorCriteria, related_name='arguments')

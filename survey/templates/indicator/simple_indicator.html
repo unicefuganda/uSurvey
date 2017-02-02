@@ -19,10 +19,10 @@
 
 <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
-<table id="datatable">
+<table id="datatable"  class="table table-striped table-bordered table-hover table-sort ">
     <thead>
         <tr>
-            <th>{{report_location_type}}</th>
+            <th>{{report_location_type.name}}</th>
             {% for option in options %}
             <th>{{option}}</th>
             {% endfor %}
@@ -30,8 +30,8 @@
     </thead>
     <tbody>
         <tr>
-            {% for location, values in reports.items %}
-                <th>{{ location.name }}</th>
+            {% for location_name, values in reports.items %}
+                <th>{{ location_name }}</th>
                 {% for val in values %}
                     <td>{{ val }}</td>
                 {% endfor %}
@@ -52,12 +52,12 @@ $(function () {
             type: 'column'
         },
         title: {
-            text: '<b>{{ indicator.name }}</b> Result per {{ locations_filter.last_location_selected.type.name.capitalize }}'
+            text: '<b>{{ indicator.name }}</b> Result per {{ report_location_type.name.capitalize }}'
         },
         yAxis: {
             allowDecimals: false,
             title: {
-                text: 'Units'
+                text: '{{metric}}'
             }
         },
         tooltip: {

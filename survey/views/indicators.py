@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
-from survey.models import LocationType, Location
+from survey.models import LocationType, Location, MultiChoiceAnswer, Interview
 from survey.forms.indicator import IndicatorForm, IndicatorCriteriaForm
 from survey.forms.filters import IndicatorFilterForm, IndicatorMetricFilterForm
 from survey.models import Indicator, Survey, Answer
@@ -59,7 +59,7 @@ def index(request):
 @permission_required('auth.can_view_batches')
 def delete(request, indicator_id):
     indicator = Indicator.objects.get(id=indicator_id)
-    Formula.objects.filter(indicator=indicator).delete()
+    indicator.indicator_criteria.all().delete()
     indicator.delete()
     messages.success(request, 'Indicator successfully deleted.')
     return HttpResponseRedirect('/indicators/')
@@ -130,12 +130,13 @@ def simple_indicator(request, indicator_id):
         # hence set the location where the report is based. i.e the child current selected location.
         report_location_type = LocationType.objects.get(parent=selected_location)
     context = {'request': request,
-               'data_series': _get_data_series(selected_location, indicator, metric),
+               'reports': _get_data_series(selected_location, indicator, metric),
                'indicator': indicator,
                'locations_filter': locations_filter,
                'options': indicator.parameter.options.order_by('order'),
                'report_location_type': report_location_type,
-               'indicator_metric_form': indicator_metric_form
+               'indicator_metric_form': indicator_metric_form,
+               'metric': 'Count' if metric == Indicator.COUNT else 'Percentage'
                }
     return render(request, 'indicator/simple_indicator.html', context)
 
@@ -156,6 +157,31 @@ def _get_data_series(location_parent, indicator, metric):
         if loc_total > 0 and metric == Indicator.PERCENTAGE:
             factor = float(100)/ loc_total
         tabulated_data[child_location.name] = [loc_answers.filter(value__pk=option.pk).count()*factor
-                                                   for option in options]
-    import pdb; pdb.set_trace()
+                                               for option in options]
     return tabulated_data
+
+
+def _applicable_interviews(location_parent, indicator, metric):
+    # the listed interviews in the ea
+    valid_interviews = Interview.objects.filter(ea__loctions__in=location_parent.get_leafnodes(include_self=True),
+                                                question_set__pk=indicator.parameter.qset.id,
+                                                survey=indicator.parameter.qset.survey,
+                                                ).values_list('id', flat=True)
+    valid_interviews = set(valid_interviews)
+    qs = None
+    # now get the interviews that meet the randomization criteria
+    for criterion in indicator.indicator_criteria.all():  # need to optimize this
+        answer_type = criterion.test_question.answer_type
+        if answer_type == MultiChoiceAnswer.choice_name():
+            value_key = 'value__text'
+        else:
+            value_key = 'value'
+        answer_class = Answer.get_class(answer_type)
+        kwargs = {
+            'question': criterion.listing_question
+        }
+        if qs:
+            kwargs['interview__id__in'] = qs
+        qs = criterion.passes_test(value_key,
+                                   answer_class.objects.filter(**kwargs).only('interview').values_list('interview',
+                                                                                                       flat=True))
