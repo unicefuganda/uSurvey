@@ -145,11 +145,16 @@ def _get_data_series(location_parent, indicator, metric):
     options = indicator.parameter.options.order_by('order')
     answer_class = Answer.get_class(indicator.parameter.answer_type)
     first_level_locations = location_parent.get_children().order_by('name')
+    kwargs = {}
+    if indicator.indicator_criteria.count():
+        kwargs['interview__in'] = _applicable_interviews(location_parent, indicator)
     for child_location in first_level_locations:
         location_names.append(child_location.name)
-        loc_answers = answer_class.objects.filter(question__id=indicator.parameter.id,
-                                                  interview__ea__locations__in=
-                                                  child_location.get_leafnodes(include_self=True))
+        kwargs.update({
+            'question__id': indicator.parameter.id,
+            'interview__ea__locations__in': child_location.get_leafnodes(include_self=True)
+        })
+        loc_answers = answer_class.objects.filter(**kwargs)
         loc_total = loc_answers.count()
         factor = 1
         if loc_total > 0 and metric == Indicator.PERCENTAGE:
@@ -159,14 +164,12 @@ def _get_data_series(location_parent, indicator, metric):
     return tabulated_data
 
 
-def _applicable_interviews(location_parent, indicator, metric):
+def _applicable_interviews(location_parent, indicator):
     # the listed interviews in the ea
-    valid_interviews = Interview.objects.filter(ea__loctions__in=location_parent.get_leafnodes(include_self=True),
+    valid_interviews = Interview.objects.filter(ea__locations__in=location_parent.get_leafnodes(include_self=True),
                                                 question_set__pk=indicator.parameter.qset.id,
-                                                survey=indicator.parameter.qset.survey,
+                                                survey=indicator.parameter.e_qset.survey,
                                                 ).values_list('id', flat=True)
-    valid_interviews = set(valid_interviews)
-    qs = None
     # now get the interviews that meet the randomization criteria
     for criterion in indicator.indicator_criteria.all():  # need to optimize this
         answer_type = criterion.test_question.answer_type
@@ -176,10 +179,10 @@ def _applicable_interviews(location_parent, indicator, metric):
             value_key = 'value'
         answer_class = Answer.get_class(answer_type)
         kwargs = {
-            'question': criterion.listing_question
+            'question': criterion.test_question,
+            'interview__id__in': valid_interviews
         }
-        if qs:
-            kwargs['interview__id__in'] = qs
-        qs = criterion.passes_test(value_key,
-                                   answer_class.objects.filter(**kwargs).only('interview').values_list('interview',
-                                                                                                       flat=True))
+        valid_interviews = criterion.qs_passes_test(value_key, answer_class.objects.filter(**kwargs).
+                                                    only('interview__id').values_list('interview__id', flat=True))
+    # return all the interviews that meet the criteria
+    return valid_interviews

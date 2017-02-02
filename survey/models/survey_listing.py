@@ -107,7 +107,7 @@ class ListingSample(BaseModel):
         valid_interviews = from_survey.interviews.filter(ea=ea,     # the listed interviews in the ea
                                                          question_set=from_survey.listing_form).values_list('id',
                                                                                                             flat=True)
-        valid_interviews = set(valid_interviews)
+        #valid_interviews = set(valid_interviews)
         qs = None
         # now get the interviews that meet the randomization criteria
         for criterion in to_survey.randomization_criteria.all():  # need to optimize this
@@ -118,13 +118,13 @@ class ListingSample(BaseModel):
                 value_key = 'value'
             answer_class = Answer.get_class(answer_type)
             kwargs = {
-                'question': criterion.listing_question
+                'question': criterion.listing_question,
+                'interview__id__in': valid_interviews,
             }
-            if qs:
-                kwargs['interview__id__in'] = qs
-            qs = criterion.passes_test(value_key,
-                                       answer_class.objects.filter(**kwargs).only('interview').values_list('interview',
-                                                                                                           flat=True))
+            #if qs:
+            # kwargs['interview__id__in'] = valid_interviews
+            valid_interviews = criterion.qs_passes_test(value_key, answer_class.objects.filter(**kwargs).
+                                                        only('interview__id').values_list('interview__id', flat=True))
         valid_interviews = list(valid_interviews)
         random.shuffle(valid_interviews)
         random_samples = valid_interviews[:to_survey.sample_size]
