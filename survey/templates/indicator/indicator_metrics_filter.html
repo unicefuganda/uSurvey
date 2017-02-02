@@ -2,7 +2,7 @@
 {% block postfilter %}
     <table class="{{ class }} horizontal-filter">
         <tr id="control-group">
-            {% for field in indicator_metric_form.visible_fields %}
+            {% for field in b_form.visible_fields %}
                 <td valign="top">
                   <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label>
                    <span class="horiselect">{{field}}</span>
@@ -12,7 +12,7 @@
 </table>
 <script type="text/javascript">
 $(function(){
-    {% for field in indicator_metric_form.visible_fields %}
+    {% for field in b_form.visible_fields %}
         $('#{{ field.auto_id }}').on('change', function () {
             $('#{{ filter_id }}').submit();
         });

@@ -2,7 +2,7 @@
 {% block title %} Simple Indicator {% endblock %}
 {% block page_title %}Simple Indicator{% endblock %}
 {% block search %}
-{% include "indicator_metrics_filter_form.html" with a_form=locations_filter filter_button_name='Show results' filter_id='location_filter' method='post' %}
+{% include "indicator/indicator_metrics_filter.html" with a_form=locations_filter b_form=indicator_metric_form filter_button_name='Show results' filter_id='location_filter' method='post' %}
 <br />
 {% include "search_form.html" %}
 {% endblock %}
@@ -30,11 +30,11 @@
     </thead>
     <tbody>
         <tr>
-            {% for location, values in reports.items() %}
+            {% for location, values in reports.items %}
                 <th>{{ location.name }}</th>
                 {% for val in values %}
                     <td>{{ val }}</td>
-                {% enfor %}
+                {% endfor %}
             {% endfor %}
         </tr>
     </tbody>
@@ -42,6 +42,7 @@
 {% endblock %}
 
 {% block javascripts %}
+<script type="text/javascript">
 $(function () {
     Highcharts.chart('container', {
         data: {
@@ -67,4 +68,5 @@ $(function () {
         }
     });
 });
-{% endif %}
+</script>
+{% endblock %}

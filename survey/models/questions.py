@@ -264,7 +264,7 @@ class DateArgument(TestArgument):
         app_label = 'survey'
 
 
-class QuestionOption(BaseModel):
+class QuestionOption(CloneableMixin, BaseModel):
     question = models.ForeignKey(Question, null=True, related_name="options")
     text = models.CharField(max_length=150, blank=False, null=False)
     order = models.PositiveIntegerField()
@@ -477,6 +477,9 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                     question = treated.get(question.identifier, None)
                     if question is None:
                         question = Question.get(pk=flow.question.pk).clone(attrs={'qset': batch})
+                        for option in flow.question.options.all():
+                            # to do, appearantly clone question_opt not workng
+                            QuestionOption.objects.create(question=question, order=option.order, text=option.text)
                         treated[question.identifier] = question
                         if old_question_id == start_question_id:
                             batch.start_question = question
@@ -490,6 +493,10 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                         if next_question is None:
                             next_question = Question.get(pk=flow.next_question.pk).clone(attrs={'qset': batch})
                             treated[next_question.identifier] = next_question
+                            for option in flow.next_question.options.all():
+                                # to do, appearantly clone question_opt not workng
+                                QuestionOption.objects.create(question=next_question, order=option.order,
+                                                              text=option.text)
                     # first clone all flow parameters
                     args = flow.text_arguments
                     flow = flow.clone(attrs={'next_question': next_question, 'question': question})

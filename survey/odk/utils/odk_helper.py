@@ -102,11 +102,15 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
             survey_parameters_node = _get_nodes('./questions/groupQuestions', answers_node)[0]
             # survey paramaters does not have any single repeat
             survey_parameters = get_answers(survey_parameters_node, qset, question_map)[0]
-        if survey.has_sampling and survey.sample_size > len(answers):
+        if survey_allocation.stage in [None, SurveyAllocation.LISTING] and \
+                survey.has_sampling and survey.sample_size > len(answers):
             raise NotEnoughData()
         save_answers(qset, access_channel, question_map, answers, survey_allocation,
                      survey_parameters=survey_parameters, reference_interview=reference_interview,
                      media_files=media_files)
+        if survey.has_sampling:
+            survey_allocation.stage = SurveyAllocation.SURVEY
+            survey_allocation.save()
     submission.status = ODKSubmission.COMPLETED
     submission.save()
     submission.save_attachments(media_files)

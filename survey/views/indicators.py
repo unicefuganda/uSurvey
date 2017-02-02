@@ -8,7 +8,6 @@ from survey.models import LocationType, Location
 from survey.forms.indicator import IndicatorForm, IndicatorCriteriaForm
 from survey.forms.filters import IndicatorFilterForm, IndicatorMetricFilterForm
 from survey.models import Indicator, Survey, Answer
-from survey.services.simple_indicator_service import SimpleIndicatorService
 from survey.forms.enumeration_area import LocationsFilterForm
 
 
@@ -113,19 +112,16 @@ def add_indicator_formular(request, indicator_id):
 @permission_required('auth.can_view_batches')
 def simple_indicator(request, indicator_id):
     hierarchy_limit = 2
-    selected_location = None
+    selected_location = Location.objects.get(type=LocationType.largest_unit())
     report_location_type = LocationType.largest_unit()
     params = request.GET or request.POST
     locations_filter = LocationsFilterForm(data=params)
     indicator_metric_form = IndicatorMetricFilterForm(params)
-    metric = int(indicator_metric_form.data['metric'])
+    metric = int(indicator_metric_form.data.get('metric', Indicator.COUNT))
     first_level_location_analyzed = Location.objects.filter(
         type__name__iexact="country")[0]
     indicator = Indicator.objects.get(id=indicator_id)
     formula = indicator.indicator_criteria.all()
-    if not formula:
-        messages.error(request, "No formula was found in this indicator")
-        return HttpResponseRedirect(reverse("list_indicator_page"))
     request.breadcrumbs([
         ('Indicator List', reverse('list_indicator_page')),
     ])
@@ -133,18 +129,15 @@ def simple_indicator(request, indicator_id):
         selected_location = locations_filter.last_location_selected
         # hence set the location where the report is based. i.e the child current selected location.
         report_location_type = LocationType.objects.get(parent=selected_location)
-    indicator_service = SimpleIndicatorService(formula, first_level_location_analyzed)
-    data_series, locations = indicator_service.get_location_names_and_data_series()
     context = {'request': request,
                'data_series': _get_data_series(selected_location, indicator, metric),
-               'location_names': locations,
                'indicator': indicator,
                'locations_filter': locations_filter,
-               'options': indicator.parameter.options.all(),
+               'options': indicator.parameter.options.order_by('order'),
                'report_location_type': report_location_type,
                'indicator_metric_form': indicator_metric_form
                }
-    return render(request, 'formula/simple_indicator.html', context)
+    return render(request, 'indicator/simple_indicator.html', context)
 
 
 def _get_data_series(location_parent, indicator, metric):
@@ -158,9 +151,11 @@ def _get_data_series(location_parent, indicator, metric):
         loc_answers = answer_class.objects.filter(question__id=indicator.parameter.id,
                                                   interview__ea__locations__in=
                                                   child_location.get_leafnodes(include_self=True))
+        loc_total = loc_answers.count()
         factor = 1
-        if metric == Indicator.PERCENTAGE:
-            factor = float(100)/loc_answers.count()
+        if loc_total > 0 and metric == Indicator.PERCENTAGE:
+            factor = float(100)/ loc_total
         tabulated_data[child_location.name] = [loc_answers.filter(value__pk=option.pk).count()*factor
-                                               for option in options]
+                                                   for option in options]
+    import pdb; pdb.set_trace()
     return tabulated_data

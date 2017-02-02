@@ -27,7 +27,9 @@ class IndicatorForm(ModelForm, FormOrderMixin):
         self.fields['name'].label = 'Indicator'
         self.fields['parameter'].queryset = BatchQuestion.objects.filter(answer_type__in=
                                                                          [MultiChoiceAnswer.choice_name(),
-                                                                          NumericalAnswer.choice_name()])
+                                                                          # NumericalAnswer.choice_name()
+                                                                          # shall support only multichoice for now
+                                                                          ])
         self.order_fields(['name', 'description', 'survey', 'batch', 'parameter'])
 
     def clean(self):
