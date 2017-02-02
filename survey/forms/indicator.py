@@ -46,20 +46,25 @@ class IndicatorForm(ModelForm, FormOrderMixin):
         exclude = []
 
 
-class IndicatorCriteriaForm(ModelForm):
+class IndicatorCriteriaForm(ModelForm, FormOrderMixin):
     min = forms.IntegerField(required=False)
     max = forms.IntegerField(required=False)
     value = forms.CharField(required=False)
     options = forms.ChoiceField(choices=[], required=False)
+    CHOICES = [('', '--------------------')]
+    CHOICES.extend(IndicatorCriteria.VALIDATION_TESTS)
+    validation_test = forms.ChoiceField(choices=CHOICES, required=False,
+                                        label='Operator')
 
     def __init__(self, indicator, *args, **kwargs):
         super(IndicatorCriteriaForm, self).__init__(*args, **kwargs)
         self.indicator = indicator
-        self.order_fields(['name', 'description',  'test_question', 'validation_test', 'options', 'value',
+        self.order_fields(['name', 'description', 'test_question', 'validation_test', 'options', 'value',
                            'min', 'max'])
         self.fields['test_question'].queryset = Question.objects.filter(pk__in=[q.pk
                                                                                 for q in
-                                                                                indicator.parameter.qset.all_questions])
+                                                                                indicator.parameter.e_qset.all_questions
+                                                                                ])
         if self.data.get('test_question', []):
             options = QuestionOption.objects.filter(question__pk=self.data['test_question'])
             self.fields['options'].choices = [(opt.order, opt.text) for opt in options]

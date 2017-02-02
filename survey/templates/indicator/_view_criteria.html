@@ -1,0 +1,40 @@
+{% load template_tags %}
+<table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
+    <thead>
+    <tr>
+        <th class="sorting">
+            Parameter
+        </th>
+        <th class="sorting">
+            Operator
+        </th>
+        <th class="sorting">
+            Value
+        </th>
+         <th>
+            Delete
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for condition in conditions %}
+        <tr>
+            <td >
+                {{ condition.test_question.identifier }}
+            </td>
+            <td >
+                {{ condition.validation_test }}
+            </td>
+            <td>
+                {{ condition.test_arguments|join_list:" and " }}
+
+            </td>
+            <td>
+                <a href="#delete_criterion_{{condition.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"  id="delete-icon-{{condition.id}}"></i></span></a>
+            </td>
+            {% include "base/delete_modal.html" with object_name="" id=condition.id name="Condition" url=condition.id|get_url_with_ids:"delete_condition_page" %}
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>

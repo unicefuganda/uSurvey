@@ -19,7 +19,8 @@ def home(request):
                                                'twitter_url': settings.TWITTER_URL,
                                                'shape_file_uri': settings.SHAPE_FILE_URI,
                                                'loc_field': settings.SHAPE_FILE_LOC_FIELD,
-                                               'alt_loc_field': settings.SHAPE_FILE_LOC_ALT_FIELD})
+                                               'alt_loc_field': settings.SHAPE_FILE_LOC_ALT_FIELD,
+                                               'map_center': settings.MAP_CENTER})
 
 
 def index(request):

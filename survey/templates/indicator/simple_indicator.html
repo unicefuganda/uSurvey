@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+{% block title %} Simple Indicator {% endblock %}
+{% block page_title %}Simple Indicator{% endblock %}
+{% block search %}
+{% include "indicator_metrics_filter_form.html" with a_form=locations_filter filter_button_name='Show results' filter_id='location_filter' method='post' %}
+<br />
+{% include "search_form.html" %}
+{% endblock %}
+{% block extra_head %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+{% endblock %}
+
+{% block page_actions %}
+
+{% endblock %}
+{% block content %}
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<table id="datatable">
+    <thead>
+        <tr>
+            <th>{{report_location_type}}</th>
+            {% for option in options %}
+            <th>{{option}}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            {% for location, values in reports.items() %}
+                <th>{{ location.name }}</th>
+                {% for val in values %}
+                    <td>{{ val }}</td>
+                {% enfor %}
+            {% endfor %}
+        </tr>
+    </tbody>
+</table>
+{% endblock %}
+
+{% block javascripts %}
+$(function () {
+    Highcharts.chart('container', {
+        data: {
+            table: 'datatable'
+        },
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: '<b>{{ indicator.name }}</b> Result per {{ locations_filter.last_location_selected.type.name.capitalize }}'
+        },
+        yAxis: {
+            allowDecimals: false,
+            title: {
+                text: 'Units'
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    this.point.y + ' ' + this.point.name.toLowerCase();
+            }
+        }
+    });
+});
+{% endif %}

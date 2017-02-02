@@ -9,6 +9,8 @@ from survey.models import Question
 
 
 class Indicator(BaseModel):
+    PERCENTAGE = 1
+    COUNT = 2
     name = models.CharField(max_length=255, null=False)
     # module = models.ForeignKey(QuestionModule, null=False, related_name='indicator')
     description = models.TextField(null=True)
@@ -41,8 +43,9 @@ class IndicatorCriteria(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
                         for validator in Answer.validators()]
     indicator = models.ForeignKey(Indicator, related_name='indicator_criteria')
-    test_question = models.ForeignKey(Question, related_name='indicator_criteria') # batch & parameter_list questions
-    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS)
+    # batch & parameter_list questions
+    test_question = models.ForeignKey(Question, related_name='indicator_criteria', verbose_name='parameter')
+    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS, verbose_name='operator')
 
     class Meta:
         app_label = 'survey'
@@ -63,7 +66,7 @@ class IndicatorCriteria(BaseModel):
 
     @property
     def test_arguments(self):
-        return IndicatorCriteria.objects.filter(group_condition=self).order_by('position')
+        return IndicatorCriteriaTestArgument.objects.filter(criteria=self).order_by('position')
 
 
 class IndicatorCriteriaTestArgument(BaseModel):

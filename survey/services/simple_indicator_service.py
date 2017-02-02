@@ -11,6 +11,20 @@ class SimpleIndicatorService(object):
     def hierarchical_count(self):
         return self.hierarchical_count_for(self.location_parent)
 
+    def hierarchical_result_for(self, location_parent, survey):
+        locations = location_parent.get_children().order_by('name')[:10]
+        answers = self.multichoiceanswer.all()
+        return self._format_answer(locations, answers, survey)
+
+    def _format_answer(self, locations, answers, survey):
+        question_options = self.options.all()
+        data = OrderedDict()
+        for location in locations:
+            households = Household.all_households_in(location, survey)
+            data[location] = {option.text: answers.filter(value=option, interview__householdmember__household__in=households).count() for option in
+                              question_options}
+        return data
+
     def hierarchical_count_for(self, location_parent):
         return self.count.hierarchical_result_for(location_parent, self.survey)
 

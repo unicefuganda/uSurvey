@@ -141,7 +141,11 @@ def completion_json(request, survey_id):
         :return:
         """
         survey = Survey.objects.get(id=survey_id)
-        location_type = LocationType.largest_unit()
+        country = LocationType.objects.get(parent__isnull=True)
+        if hasattr(settings, 'MAP_ADMIN_LEVEL'):
+            location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
+        else:
+            location_type = LocationType.largest_unit()
         completion_rates = {}
         #basically get interviews count
         for location in location_type.locations.all():

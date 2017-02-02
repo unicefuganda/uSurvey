@@ -24,7 +24,7 @@ class Command(BaseCommand):
         can_view_com_surveys, _ = Permission.objects.get_or_create(
             codename='view_completed_survey', name='Can view Completed Surveys', content_type=content_type)
         can_view_households, _ = Permission.objects.get_or_create(
-            codename='can_view_households', name='Can view Households', content_type=content_type)
+            codename='can_view_househs', name='Can view Households', content_type=content_type)
         can_view_locations, _ = Permission.objects.get_or_create(
             codename='can_view_locations', name='Can view Locations', content_type=content_type)
         can_view_users, _ = Permission.objects.get_or_create(

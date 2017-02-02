@@ -319,6 +319,8 @@ class Answer(BaseModel):
 class AutoResponse(Answer):
     """Shall be used to capture responses auto generated
     """
+    value = models.PositiveIntegerField(null=True)
+
     class Meta:
         app_label = 'survey'
         abstract = False

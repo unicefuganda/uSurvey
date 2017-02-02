@@ -11,8 +11,9 @@ class GroupForm(forms.ModelForm, FormOrderMixin):
     max = forms.IntegerField(required=False)
     value = forms.CharField(required=False)
     options = forms.ChoiceField(choices=[], required=False)
-    validation_test = forms.ChoiceField(choices=[('', '--------------------')] +
-                                                RespondentGroupCondition.VALIDATION_TESTS, required=False,
+    CHOICES = [('', '--------------------')]
+    CHOICES.extend(RespondentGroupCondition.VALIDATION_TESTS)
+    validation_test = forms.ChoiceField(choices=CHOICES, required=False,
                                         label='Operator')
     test_question = forms.ModelChoiceField(queryset=ParameterTemplate.objects.all(), required=False,
                                            label='Parameter')

@@ -1,6 +1,6 @@
 from django import forms
 from survey.models import RespondentGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, Location, \
-    LocationType
+    LocationType, Indicator
 from django.contrib.auth.handlers.modwsgi import groups_for_user
 MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
 DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 20
@@ -194,3 +194,8 @@ class UsersFilterForm(forms.Form):
         if status:
             return User.objects.filter(is_active=(status==self.ACTIVE)).exclude(is_superuser=True).order_by('first_name')
         return User.objects.exclude(is_superuser=True).order_by('first_name')
+
+
+class IndicatorMetricFilterForm(forms.Form):
+    metric = forms.ChoiceField(choices=[(Indicator.COUNT, 'Count'), (Indicator.PERCENTAGE, 'Percentage')],
+                                initial=Indicator.COUNT)
