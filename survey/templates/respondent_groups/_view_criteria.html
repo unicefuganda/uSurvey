@@ -30,9 +30,10 @@
 
             </td>
             <td>
-                <a href="#delete_criterion_{{condition.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"  id="delete-icon-{{condition.id}}"></i></span></a>
+                <!-- <a href="#delete_criterion_{{condition.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"  id="delete-icon-{{condition.id}}"></i></span></a> -->
+                <a href="#delete_condition_{{condition.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-trash bigger-120"  id="delete-icon-{{condition.id}}"></i></span></a>
             </td>
-            {% include "base/delete_modal.html" with object_name="" id=condition.id name="Condition" url=condition.id|get_url_with_ids:"delete_condition_page" %}
+            {% include "respondent_groups/conditions/delete_condition_modal.html" with object_name="" id=condition.id name="Condition" url=condition.id|get_url_with_ids:"delete_condition_page" %}
         </tr>
     {% endfor %}
 

@@ -7,11 +7,11 @@
 	}
 </style>
 <div class="btn-group">
-    <a href="{% url 'users_edit'  the_user.id %}" class="btn btn-white btn-warning btn-bold" style="margin-right: 10px; border-radius:5px">Edit</a>
+    <a href="{% url 'users_edit'  the_user.id %}" class="btn btn-white btn-warning btn-bold" style="margin-right: 10px; border-radius:5px;font-size: 12px;font-weight: bold;padding:5px; ">Edit</a>
     {% if the_user.is_active %}
-        <a href="#deactivate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-white btn-warning btn-bold" style="border-radius:5px">Deactivate</a>
+        <a href="#deactivate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-white btn-warning btn-bold" style="border-radius:5px;font-size: 12px;font-weight: bold;">Deactivate</a>
     {% else %}
-        <a href="#re-activate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-white btn-warning btn-bold" style=" border-radius:5px"> Activate</a>
+        <a href="#re-activate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-white btn-warning btn-bold" style=" border-radius:5px;font-size: 12px;font-weight: bold;"> Activate</a>
     {% endif %}
 
 </div>

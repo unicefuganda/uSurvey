@@ -7,10 +7,10 @@
 {% endblock %}
 {% block page_actions %}
 <ul id="horizontal-filter">
-		        <li>
-					<a style="padding: 3px 5px" href="{% url 'new_user_page' %}" class="btn btn-white btn-warning btn-bold pull-right" id="add-user"><i class="ace-icon fa fa-plus bigger-120"></i> Add User</a>
-		        </li>
-		    </ul>
+                <li>
+                    <a style="padding: 3px 5px" href="{% url 'new_user_page' %}" class="btn btn-white btn-warning btn-bold pull-right" id="add-user"><i class="ace-icon fa fa-plus bigger-120"></i> Add User</a>
+                </li>
+            </ul>
 {% endblock %}
 {% block content_search %}
 {% include "search_form.html" %}
@@ -55,13 +55,24 @@
                     </td>
                     <td>
                         <div class="btn-group">
-                            <a href="{% url 'users_edit' user.pk %}" class="btn btn-small edit"><i class="icon-pencil"></i> Edit</a>
-                            <a href="{% url 'users_show_details' user.pk %}" class="btn btn-small"><i class="icon-list"></i> Details</a>
+                        <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                           <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
+                       </button>                      
+                       <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                       <li>
+                            <a href="{% url 'users_edit' user.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i> Edit</span></a>
+                            </li>
+                            <li>
+                            <a href="{% url 'users_show_details' user.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Details"><span class="green"><i class="usur-icon fa fa-info-circle bigger-120"></i> Details</span></a>
+                            </li>
+                            <li>
                             {% if user.is_active %}
-                                <a href="#deactivate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Deactivate</a>
+                                <a href="#deactivate_user_{{ user.pk }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="DeActivate"><span class="red"><i class="usur-icon fa fa-low-vision bigger-120"></i> DeActivate</span></a>
                             {% else %}
                                 <a href="#re-activate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Activate</a>
                             {% endif %}
+                            </li>
+                            </ul>
                         </div>
                     </td>
                 </tr>
@@ -72,4 +83,3 @@
         </table>
     {% paginate %}
 {% endblock %}
-

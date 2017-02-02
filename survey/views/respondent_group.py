@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
-from survey.models import RespondentGroup, ParameterTemplate, GroupCondition
+from survey.models import RespondentGroup, ParameterTemplate, GroupCondition,RespondentGroupCondition
 from survey.forms.group_condition import GroupConditionForm
 from survey.forms.respondent_group import GroupForm
 from survey.forms.question_module_form import QuestionModuleForm
@@ -198,6 +198,13 @@ def delete_group(request, group_id):
 
 @permission_required('auth.can_view_household_groups')
 def delete_condition(request, condition_id):
-    GroupCondition.objects.get(id=condition_id).delete()
-    messages.success(request, "Criteria successfully deleted.")
-    return HttpResponseRedirect("/conditions/")
+  group_id=""
+  try:
+    respondent_group_condition = RespondentGroupCondition.objects.filter(id=condition_id).values_list("respondent_group__id")
+    group_id=respondent_group_condition[0][0]
+    RespondentGroupCondition.objects.get(id=condition_id).delete()
+  except Exception,err:
+    print err
+  messages.success(request, "Criteria successfully deleted.")
+  # return HttpResponseRedirect("/conditions/")
+  return HttpResponseRedirect("/groups/new/")
