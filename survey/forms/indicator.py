@@ -75,7 +75,7 @@ class IndicatorCriteriaForm(ModelForm, FormOrderMixin):
         model = IndicatorCriteria
         exclude = ['indicator', ]
         widgets = {
-        'description': forms.Textarea(attrs={"rows": 3, "cols": 30}),
+        'description': forms.Textarea(attrs={"rows": 2, "cols": 100}),
         }
 
     def clean(self):

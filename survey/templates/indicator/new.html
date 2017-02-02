@@ -6,6 +6,14 @@
     {% include "naked_form.html" with a_form=indicator_form %}
 {% endblock %}
 {% block javascripts %}
+<style type="text/css">
+    #id_description{
+        width: 250px !important;
+        height: 50px !important
+    }
+
+    .dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 245px!important;}
+</style>
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
    $(document).ready(function() {

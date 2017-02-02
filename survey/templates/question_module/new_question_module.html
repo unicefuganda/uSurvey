@@ -1,4 +1,9 @@
-
+<style type="text/css">
+	#id_name{
+		width: 280px;
+		margin-left: -2px;
+	}
+</style>
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
   {% csrf_token %}
   {% include "naked_form.html" with a_form=question_module_form %}

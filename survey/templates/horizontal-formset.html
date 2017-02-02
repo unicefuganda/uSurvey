@@ -1,5 +1,13 @@
 {% load template_tags %}
-
+<style type="text/css">
+	.dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {
+    margin-bottom: 0 !important;
+    margin-left: 4px !important;
+    padding: 4px !important;
+    margin-right: 4px !important;
+    width: 240px !important;
+}
+</style>
 <fieldset>
                 <legend>{{ legend }}</legend>
                 {{ formset.management_form }}
