@@ -8,15 +8,18 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from survey.utils import views_helper
+from survey.forms.filters import MapFilterForm
 
 
 
 @login_required
 def home(request):
+    map_filter = MapFilterForm(request.GET)
     return render(request, 'home/index.html', {'surveys': Survey.objects.all().order_by('name'),
                                                'title': settings.PROJECT_TITLE,
                                                'twitter_token': settings.TWITTER_TOKEN,
                                                'twitter_url': settings.TWITTER_URL,
+                                               'map_filter': map_filter,
                                                'shape_file_uri': settings.SHAPE_FILE_URI,
                                                'loc_field': settings.SHAPE_FILE_LOC_FIELD,
                                                'alt_loc_field': settings.SHAPE_FILE_LOC_ALT_FIELD,

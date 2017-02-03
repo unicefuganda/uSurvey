@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block extra_head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 
     <style>
         <!--.leaflet-container {
@@ -80,14 +80,7 @@
 <div id="home_display">
     <div id="survey_map" >
     </div>
-    <form id="completion_form" class="hide">
-    <select id="surveys" >
-        <option value="">Choose a survey</option>
-        {% for survey in surveys %}
-            <option value="{{ survey.id }}">{{ survey.name }}</option>
-        {%  endfor %}
-    </select>
-    </form>
+        {% include "horizontal_filter_form.html" with a_form=map_filter no_button=True filter_id='map_filter' %}
 </div>
 {% endblock%}
 
@@ -99,35 +92,62 @@
     legend = L.control({position: 'bottomright'}),
     geojson;
   osmAttrib='© uSurvey';
+  var mapData = null;
 
 $(function(){
-    $("#surveys").on('change', function(){
-        getCompletionFor($(this).val())
-
+    $(".map-filter").on('change', function(){
+        getCompletionFor();
     });
+    $('#id_survey').on('change', function(){
+        updateIndicators();
+    });
+    $('#id_indicator').on('change', function(){
+        updateParameters();
+    });
+    //getCompletionFor();
     loadInitialMap();
 });
 
-function getCompletionFor(survey_id){
-    $.getJSON("/survey/"+ survey_id +"/completion/json/", function (rate_data) {
-        $.getJSON("{{shape_file_uri}}", function (data) {
-          $.each(data, function(element){
-             data.features.map(function(feature){
-              var property = feature.properties['{{loc_field}}'];
-              if(property === undefined)
-                property = feature.properties['{{alt_loc_field}}'];
-              if(property)
-                property = property.toUpperCase();
-              feature.properties.rate = rate_data[property]
-            })
-          });
-       geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
+function updateIndicators() {
+    var url = '{% url "survey_indicators" %}?survey=' + $("#id_survey").val();
+    $.get(url, function( datas ) {
+       $('#id_indicator').find("option:gt(0)").remove();
+       $.each(datas, function (i, data) {
+            $('#id_indicator').append('<option value="' + data['id'] + '">' + data['name'] + "</option>");
+        });
+    });
+}
+
+function updateParameters() {
+    $.get( '{% url "survey_parameters" %}?indicator=' + $("#id_indicator").val(), function( datas ) {
+       $('#id_parameter').find("option:gt(0)").remove();
+       $.each(datas, function (i, data) {
+            $('#id_parameter').append('<option value="' + data['id'] + '">' + data['name'] + "</option>");
+        });
+    });
+}
+
+function getCompletionFor(){
+    var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val()+'&indicator='+$("#id_indicator").val()+'&parameter='+$("#id_parameter").val()+'&metric='+$("#id_metric").val();
+    $.getJSON(survey_url, function (rate_data) {
+      alert(JSON.stringify(rate_data));
+      $.each(mapData, function(element){
+         mapData.features.map(function(feature){
+          var property = feature.properties['{{loc_field}}'];
+          if(property === undefined)
+            property = feature.properties['{{alt_loc_field}}'];
+          if(property)
+            property = property.toUpperCase();
+          feature.properties.rate = rate_data[property]
+        })
       });
+       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
     });
 }
 
 function loadInitialMap(){
     $.getJSON("{{shape_file_uri}}", function (data) {
+          mapData = data;
           $.each(data, function(element){
              data.features.map(function(feature){
               var property = feature.properties['{{loc_field}}'];
@@ -165,9 +185,9 @@ function style(feature) {
 
 function onEachFeature(feature, layer) {
     layer.on({
-      mouseover: highlightDistrict,
-      click: zoomDistrict,
-      mouseout: resetDistrictHighlight
+      mouseover: highlightAdminLevel,
+      click: zoomAdminLevel,
+      mouseout: resetAdminLevelHighlight
   });
 }
 
@@ -177,7 +197,13 @@ info.onAdd = function (map) {
   return this._div;
 };
 info.update = function (props) {
-  this._div.innerHTML = '<h5>Completion rates:</h5>';
+  this._div.innerHTML = '';
+  if($('#id_indicator').val()) {
+    this._div.innerHTML += "<h5> "+ $("#id_indicator option:selected").text() + '</h5><br />';
+   }
+   this._div.innerHTML += $("#id_metric option:selected").text()+ '&nbsp;';
+  if($('#id_parameter').val())
+     this._div.innerHTML += ':&nbsp;Respondents saying: ' + $('#id_parameter').val();
   if(typeof props != 'undefined'){
     var property = props['{{loc_field}}'];
     if(property === undefined)
@@ -186,7 +212,7 @@ info.update = function (props) {
        property = property.toUpperCase();
     if(props.rate >-2){
         rate = props.rate >-1 ? props.rate: 'Survey not opened.';
-        this._div.innerHTML += property +': '+ rate + ' INTERVIEWS';
+        this._div.innerHTML += property +': '+ rate;
     }
     else{
         this._div.innerHTML = property;
@@ -216,7 +242,7 @@ var survey_selector = L.control({position: 'topleft'});
 
     survey_selector.onAdd = function(map){
         var selector_div = L.DomUtil.create('div', 'survey');
-        var surveysHtml = $('#completion_form');
+        var surveysHtml = $('#map_filter');
         $(selector_div).html(surveysHtml.html());
         $(surveysHtml).removeAttr('class', 'hide')
         $(surveysHtml).remove()
@@ -227,7 +253,7 @@ legend.addTo(map);
 info.addTo(map);
 survey_selector.addTo(map)
 
-function highlightDistrict(event){
+function highlightAdminLevel(event){
     var layer = event.target
     layer.setStyle({
         weight: 3,
@@ -242,17 +268,17 @@ function highlightDistrict(event){
     info.update(layer.feature.properties)
 }
 
-function zoomDistrict(event){
+function zoomAdminLevel(event){
     map.fitBounds(event.target.getBounds());
     var layer = event.target;
-    var district = layer.feature.properties['{{loc_field}}'];
-    if(!district)
-         district = layer.feature.properties['{{alt_loc_field}}'];
-    alert('District: ' + district);
+    var adminLevel = layer.feature.properties['{{loc_field}}'];
+    if(!adminLevel)
+         adminLevel = layer.feature.properties['{{alt_loc_field}}'];
+    alert('AdminLevel: ' + adminLevel);
 
 }
 
-function resetDistrictHighlight(event){
+function resetAdminLevelHighlight(event){
     geojson.resetStyle(event.target)
 }
 

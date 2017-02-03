@@ -128,7 +128,7 @@ def simple_indicator(request, indicator_id):
         selected_location = locations_filter.last_location_selected
         # hence set the location where the report is based. i.e the child current selected location.
     context = {'request': request,
-               'reports': _get_data_series(selected_location, indicator, metric),
+               'reports': indicator.get_data(selected_location.get_children().order_by('name'), metric, _presenter),
                'indicator': indicator,
                'locations_filter': locations_filter,
                'options': indicator.parameter.options.order_by('order'),
@@ -139,50 +139,6 @@ def simple_indicator(request, indicator_id):
     return render(request, 'indicator/simple_indicator.html', context)
 
 
-def _get_data_series(location_parent, indicator, metric):
-    tabulated_data = SortedDict()
-    location_names = []
-    options = indicator.parameter.options.order_by('order')
-    answer_class = Answer.get_class(indicator.parameter.answer_type)
-    first_level_locations = location_parent.get_children().order_by('name')
-    kwargs = {}
-    if indicator.indicator_criteria.count():
-        kwargs['interview__in'] = _applicable_interviews(location_parent, indicator)
-    for child_location in first_level_locations:
-        location_names.append(child_location.name)
-        kwargs.update({
-            'question__id': indicator.parameter.id,
-            'interview__ea__locations__in': child_location.get_leafnodes(include_self=True)
-        })
-        loc_answers = answer_class.objects.filter(**kwargs)
-        loc_total = loc_answers.count()
-        factor = 1
-        if loc_total > 0 and metric == Indicator.PERCENTAGE:
-            factor = float(100)/ loc_total
-        tabulated_data[child_location.name] = [loc_answers.filter(value__pk=option.pk).count()*factor
+def _presenter(tabulated_data, child_location, loc_answers, options, factor):
+    tabulated_data[child_location.name] = [loc_answers.filter(value__pk=option.pk).count()*factor
                                                for option in options]
-    return tabulated_data
-
-
-def _applicable_interviews(location_parent, indicator):
-    # the listed interviews in the ea
-    valid_interviews = Interview.objects.filter(ea__locations__in=location_parent.get_leafnodes(include_self=True),
-                                                question_set__pk=indicator.parameter.qset.id,
-                                                survey=indicator.parameter.e_qset.survey,
-                                                ).values_list('id', flat=True)
-    # now get the interviews that meet the randomization criteria
-    for criterion in indicator.indicator_criteria.all():  # need to optimize this
-        answer_type = criterion.test_question.answer_type
-        if answer_type == MultiChoiceAnswer.choice_name():
-            value_key = 'value__text'
-        else:
-            value_key = 'value'
-        answer_class = Answer.get_class(answer_type)
-        kwargs = {
-            'question': criterion.test_question,
-            'interview__id__in': valid_interviews
-        }
-        valid_interviews = criterion.qs_passes_test(value_key, answer_class.objects.filter(**kwargs).
-                                                    only('interview__id').values_list('interview__id', flat=True))
-    # return all the interviews that meet the criteria
-    return valid_interviews
