@@ -206,8 +206,8 @@ class MapFilterForm(forms.Form):
                                     widget=forms.Select(attrs={'class': 'map-filter'}))
     indicator = forms.ModelChoiceField(Indicator.objects.none(), required=False, empty_label='Choose Indicator',
                                        widget=forms.Select(attrs={'class': 'map-filter'}))
-    parameter = forms.ModelChoiceField(queryset=BatchQuestion.objects.none(), empty_label='Choose Paramater',
-                                       widget=forms.Select(attrs={'class': 'map-filter'}))
+    # parameter = forms.ModelChoiceField(queryset=BatchQuestion.objects.none(), empty_label='Choose Paramater',
+    #                                    widget=forms.Select(attrs={'class': 'map-filter'}))
     metric = forms.ChoiceField(choices=[(Indicator.PERCENTAGE, 'Percentage'), (Indicator.COUNT, 'Count')],
                                initial=Indicator.PERCENTAGE, required=False,
                                widget=forms.Select(attrs={'class': 'map-filter'}))

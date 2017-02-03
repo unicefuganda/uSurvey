@@ -53,12 +53,12 @@ class RandomizationCriterion(BaseModel):
         method = getattr(answer_class, self.validation_test, None)
         if method is None:
             raise ValueError('unsupported validator defined on listing question')
-        return method(value, *list(self.test_arguments))
+        return method(value, *self.test_params)
 
     def qs_passes_test(self, value_key, queryset):
         answer_class = Answer.get_class(self.listing_question.answer_type)
         method = getattr(answer_class, 'fetch_%s' % self.validation_test, None)
-        return method(value_key, *list(self.test_arguments), qs=queryset)
+        return method(value_key, *test_params, qs=queryset)
 
     @property
     def test_arguments(self):

@@ -136,7 +136,7 @@ class IndicatorCriteria(BaseModel):
     def qs_passes_test(self, value_key, queryset):
         answer_class = Answer.get_class(self.test_question.answer_type)
         method = getattr(answer_class, 'fetch_%s' % self.validation_test, None)
-        return method(value_key, *list(self.test_arguments), qs=queryset)
+        return method(value_key, *self.test_params, qs=queryset)
 
 
 class IndicatorCriteriaTestArgument(BaseModel):
