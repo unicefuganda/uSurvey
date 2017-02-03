@@ -96,7 +96,7 @@ function next_question_format(state) {
         var question_code = '<strong class="opt-header">'+state.text.substring(0, identifier_terminus)+'</strong>';
         var question_text = '<strong class="opt-header">'+state.text.substring(identifier_terminus + 1)+'</strong>';
     }
-    return $('<div class="opt-item"><span class="opt-id" style="display: inline-block; padding-right: 2%; width: 25%; word-wrap:break-word;">' + question_code +
+    return $('<div class="opt-item"><span class="opt-id" style="display: inline-block; padding-right: 2%; width: 40%; word-wrap:break-word;">' + question_code +
     '</span><span class="opt-text" style="display: inline-block; word-wrap:break-word;">'+ question_text + '</span></div>');
 }
 

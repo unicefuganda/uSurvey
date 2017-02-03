@@ -17,7 +17,7 @@ padding-left: 10px;
 .ufeedtxttittle
 {
 
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 20px;
 font-weight:bold;
 color:#373737;
@@ -31,7 +31,7 @@ padding-bottom: 10px;
 .udiscover
 {
 
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 40px;
 font-weight:bold;
 color:#373737;
@@ -42,7 +42,7 @@ padding-right: 20px;
 .umedia
 {
 
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 40px;
 font-weight:bold;
 color:#E6E6E6;
@@ -62,7 +62,7 @@ padding-top:2px;
 .uhtxt
 {
 
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 13px;
 color:#2C2C2C;
 text-decoration:none;
@@ -72,7 +72,7 @@ padding-top:5px;
 .uhimgs
 {
 
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 16px;
 font-weight:bold;
 color:#373737;
@@ -83,7 +83,7 @@ text-decoration:none;
 .horititle
 {
 
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 12px;
 font-weight:bold;
 color:#000000;
@@ -96,13 +96,13 @@ text-decoration:none;
 	height:35px;
 	font-size:13px; 
 	border:1px solid #F7F7F7;
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 }
 
 .utopnav
 {
 
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 17px;
 font-weight:bold;
 color:#8F8F8F;
@@ -111,7 +111,7 @@ padding-right: 20px;
 }
 .ulogin
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 17px;
 font-weight:bold;
 color:#D65106;
@@ -120,7 +120,7 @@ text-decoration:none;
 }
 .ulogin a:link
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 17px;
 font-weight:bold;
 color:#D65106;
@@ -130,7 +130,7 @@ text-decoration:none;
 
 ulogin a:hover
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 17px;
 font-weight:bold;
 color:#FF0000;
@@ -140,7 +140,7 @@ text-decoration:none;
 
 .ulogin a:visited
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 17px;
 font-weight:bold;
 color:#D65106;
@@ -156,7 +156,7 @@ z-index: 10000;
 }
 .dashcount
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size:25px;
 color:#FFFFFF;
 text-decoration:none;
@@ -299,7 +299,7 @@ opacity: 0.9;
 
 .confirmpg3
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size:12px;
 color:#666666;
 text-decoration:none;
@@ -315,7 +315,7 @@ text-decoration:none;
 
 .goodmorning
 {
-    FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+    FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 12px;
 font-weight:bold;
 color:#FFFFFF;
@@ -324,7 +324,7 @@ text-decoration:none;
 }
 .confirmpg
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 15px;
 font-weight:bold;
 color:#666666;
@@ -402,7 +402,7 @@ border:solid 1px; color:#003B59;
 }
 .navx
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 12px;
 font-weight:bold;
 color:#666666;
@@ -411,7 +411,7 @@ padding-left:10px;
 
 .navx a:link
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 12px;
 font-weight:bold;
 color:#666666;
@@ -420,7 +420,7 @@ text-decoration:none;
 
 .navx a:hover
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 12px;
 font-weight:bold;
 color:#666666;
@@ -431,7 +431,7 @@ text-decoration:underline;
 
 .navx a:visited
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 12px;
 font-weight:bold;
 color:#666666;
@@ -515,7 +515,7 @@ font-family:Arial,  Helvetica, sans-serif; font-size:18px; color:#666666;
 }
 .BrokerContent
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 13px;
 font-weight:bold;
 color:#666666;
@@ -524,7 +524,7 @@ text-decoration:none;
 
 .BrokerContentRed
 {
-FONT-FAMILY: Trebuchet MS, Myriad Pro, Arial;
+FONT-FAMILY: Open Sans,Trebuchet  MS, Myriad Pro, Arial;
 font-size: 13px;
 font-weight:bold;
 color:#FF0000;
@@ -582,7 +582,7 @@ height:80px; font-family:verdana; font-size:11px; border: solid 1px #666666;widt
 .binfo {
 
 
-	font-family: "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	font-family: "Open Sans,Trebuchet  MS", Verdana, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	color: #333333;
 	background-color: #FDE0DF;
