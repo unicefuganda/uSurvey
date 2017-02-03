@@ -64,12 +64,16 @@
   </tbody>
   </table>
 
-<div class="offset3">
-    {% if cancel_url %}
-        <a href="{{cancel_url}}" class="btn btn-primary btn-bold" style="margin-bottom: 1px;padding: 2px;"><i class="icon-chevron-left icon-white"></i> Back</a>
+<style type="text/css">
+      .btn1 {  -webkit-border-radius: 0;  -moz-border-radius: 0;  border-radius: 0px;  font-family: Arial;  color: #ffffff;  font-size: 12px;  background: #3498db;  padding: 5px 10px 5px 10px;  text-decoration: none;}
+    .btn1:hover {  background: #3cb0fd;  text-decoration: none; color: #000;}
+</style>
+<div>
+    <!-- {% if cancel_url %}
+        <a href="{{cancel_url}}" class="btn1 btn1:hover" style="font-size: 12px;font-weight: bold;"> Back</a>
     {% else %}
-        <a href="javascript:window.history.back()" class="btn btn-inverse"><i class="icon-chevron-left icon-white"></i> Back</a>
-    {% endif %}
+        <a href="javascript:window.history.back()" class="btn btn-inverse"> Back</a>
+    {% endif %} -->
     {% include 'users/_action_button.html' with button_size="" the_user=the_user %}
 </div>
 {% endblock %}

@@ -5,14 +5,21 @@
     margin-top: 10px;
     padding : 2px;
 	}
+    .btn1 {  -webkit-border-radius: 0;  -moz-border-radius: 0;  border-radius: 0px;  font-family: Arial;  color: #ffffff;  font-size: 12px;  background: #3498db;  padding: 5px 10px 5px 10px;  text-decoration: none;}
+    .btn1:hover {  background: #3cb0fd;  text-decoration: none; color: #000;}
 </style>
-<div class="btn-group">
-    <a href="{% url 'users_edit'  the_user.id %}" class="btn btn-white btn-warning btn-bold" style="margin-right: 10px; border-radius:5px;font-size: 12px;font-weight: bold;padding:5px; ">Edit</a>
+<div class="btn-group" style="margin-left: 550px;">
+    <a href="{% url 'users_edit'  the_user.id %}" class="btn1 btn1:hover" style="font-size: 12px;font-weight: bold;padding:5px; ">Edit</a>
     {% if the_user.is_active %}
-        <a href="#deactivate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-white btn-warning btn-bold" style="border-radius:5px;font-size: 12px;font-weight: bold;">Deactivate</a>
+        <a href="#deactivate_user_{{ the_user.pk }}" data-toggle="modal" class="btn1 btn1:hover" style="font-size: 12px;font-weight: bold;">Deactivate</a>
     {% else %}
-        <a href="#re-activate_user_{{ the_user.pk }}" data-toggle="modal" class="btn btn-white btn-warning btn-bold" style=" border-radius:5px;font-size: 12px;font-weight: bold;"> Activate</a>
+        <a href="#re-activate_user_{{ the_user.pk }}" data-toggle="modal" class="btn1 btn1:hover" style="font-size: 12px;font-weight: bold;"> Activate</a>
     {% endif %}
+    {% if cancel_url %}
+        <a href="{{cancel_url}}" class="btn1 btn1:hover" style="font-size: 12px;font-weight: bold;"> Back</a>
+    {% else %}
+        <a href="javascript:window.history.back()" class="btn btn-inverse"> Back</a>
+        {% endif %}
 
 </div>
 {% include "base/delete_modal.html" with object_name=the_user.username id=the_user.pk name="User" url=the_user.pk|get_url_with_ids:"deactivate_user" action_str="deactivate"%}
