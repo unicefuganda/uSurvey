@@ -53,7 +53,7 @@ class LocationsFilterForm(Form):
                         last_selected_pk = data.get(
                             location_type.name, None) or parent_selection
                         kw['parent__pk'] = parent_selection
-                    locations = Location.objects.filter(**kw).order_by('name')
+                    locations = Location.objects.filter(**kw).only('id', 'name').order_by('name')
                 else:
                     self.data[location_type.name] = ''
                     locations = Location.objects.none()

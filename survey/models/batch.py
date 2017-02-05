@@ -1,6 +1,6 @@
 from ordered_set import OrderedSet
 from collections import OrderedDict
-from cacheops import cached_as
+from cacheops import cached_as, invalidate_obj
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
@@ -85,9 +85,11 @@ class Batch(QuestionSet):
         return Survey.objects.filter(batch__id__in=batch_ids)
 
     def open_for_location(self, location):
+        invalidate_obj(location)
         return self.open_locations.get_or_create(batch=self, location=location)
 
     def close_for_location(self, location):
+        invalidate_obj(location)
         self.open_locations.filter(batch=self, location=location).delete()
 
     def is_closed_for(self, location):
@@ -109,9 +111,11 @@ class Batch(QuestionSet):
         return self.flow_questions
 
     def activate_non_response_for(self, location):
+        invalidate_obj(location)
         self.open_locations.filter(location=location).update(non_response=True)
 
     def deactivate_non_response_for(self, location):
+        invalidate_obj(location)
         self.open_locations.filter(
             location=location).update(non_response=False)
 

@@ -211,6 +211,9 @@ class QuestionFlow(CloneableMixin, BaseModel):
         self.question_type = self.question.type_name()
         if self.next_question:
             self.next_question_type = self.next_question.type_name()
+        invalidate_obj(self.question)
+        if self.next_question:
+            invalidate_obj(self.next_question)
         return super(QuestionFlow, self).save(*args, **kwargs)
 
 #     def delete(self, *args, **kwargs):
@@ -508,12 +511,8 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
             else:
                 batch.start_question = start_question.clone(attrs={'qset': batch})
                 batch.save()
-        batch.update_flow()
-        old_batch.update_flow()
         return batch
 
-    def update_flow(self):
-        invalidate_all()
 # @job
 # def refresh_loop_story(qset):
 #     for
@@ -643,6 +642,11 @@ class QuestionLoop(BaseModel):
 
     def loop_questions(self):
         return self.loop_starter.qset.inlines_between(self.loop_starter, self.loop_ender)
+
+    def save(self, *args, **kwargs):
+        invalidate_obj(self.loop_starter)
+        invalidate_obj(self.loop_ender)
+        return super(QuestionLoop, self).save(*args, **kwargs)
 
 
 

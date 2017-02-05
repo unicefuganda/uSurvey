@@ -1,7 +1,6 @@
 from django import forms
 from django.forms import ModelForm
 import re
-from cacheops import invalidate_obj, invalidate_all
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from survey.models import Question, BatchQuestion, QuestionSet
@@ -163,7 +162,6 @@ def get_question_form(model_class):
                 else:
                     question.save()
                 # self.qset.questions_inline.invalidate()
-                invalidate_all()
             if self.options_supplied(commit):
                 self.save_question_options(question)
             return question

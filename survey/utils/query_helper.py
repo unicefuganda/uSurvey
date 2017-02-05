@@ -45,3 +45,19 @@ def get_filterset(objectset, query_string, search_fields):
         query = _get_query(query_string, search_fields)
         return objectset.filter(query).distinct()
     return objectset.distinct()
+
+
+import pandas as pd
+from django.db import connection
+
+
+def to_df(queryset):
+    try:
+        query, params = queryset.query.sql_with_params()
+    except queryset.model.DoesNoteExist:
+        # Occurs when Django tries to create an expression for a
+        # query which will certainly be empty
+        # e.g. Book.objects.filter(author__in=[])
+        return pd.DataFrame()
+    return pd.io.sql.read_sql_query(query, connection, params=params)
+

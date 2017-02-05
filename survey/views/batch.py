@@ -212,6 +212,7 @@ def list_batch_questions(request):
         return HttpResponse(json_dump, content_type='application/json')
     return HttpResponseRedirect(reverse('batch_index_page', args=(batch.survey.pk, )))
 
+
 def activate_non_response(request, batch_id):
     batch = Batch.objects.get(id=batch_id)
     location = Location.objects.get(
