@@ -51,7 +51,7 @@
               {% for option in options %}
                 data.push({
                   x: [{% for loc_name in location_names %}"{{loc_name}}",{% endfor %}],
-                  y: [{% for loc_stats in loc_values %}{{loc_stats|current:forloop.counter0}},{% endfor %}],
+                  y: [{% for loc_stats in loc_values %}{{loc_stats|current:forloop.parentloop.counter0}},{% endfor %}],
                   name: "{{option}}",
                   type: 'bar'
                 });
