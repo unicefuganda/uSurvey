@@ -28,11 +28,21 @@ register = template.Library()
 
 
 @register.filter
+def current(value, arg):
+    try:
+        return value[int(arg)]
+    except:
+        return None
+
+
+@register.filter
 def next(value, arg):
     try:
         return value[int(arg) + 1]
     except:
         return None
+
+
 
 
 @register.filter

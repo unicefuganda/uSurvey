@@ -5,6 +5,10 @@ from model_utils.managers import InheritanceManager
 
 class BaseModel(TimeStampedModel):
 
+    @classmethod
+    def has_name(cls):
+        return hasattr(cls, 'name')
+
     class Meta:
         app_label = 'survey'
         abstract = True

@@ -46,7 +46,7 @@ def get_filterset(objectset, query_string, search_fields):
         return objectset.filter(query).distinct()
     return objectset.distinct()
 
-
+'''
 import pandas as pd
 from django.db import connection
 
@@ -61,3 +61,4 @@ def to_df(queryset):
         return pd.DataFrame()
     return pd.io.sql.read_sql_query(query, connection, params=params)
 
+'''

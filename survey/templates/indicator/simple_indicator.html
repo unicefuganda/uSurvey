@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% load template_tags %}
 {% block title %} Simple Indicator {% endblock %}
 {% block page_title %}Simple Indicator{% endblock %}
 {% block search %}
@@ -7,9 +8,7 @@
 {% include "search_form.html" %}
 {% endblock %}
 {% block extra_head %}
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/data.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 {% endblock %}
 
 {% block page_actions %}
@@ -44,31 +43,34 @@
 {% endblock %}
 
 {% block javascripts %}
+
 <script type="text/javascript">
-$(function () {
-    Highcharts.chart('container', {
-        data: {
-            table: 'datatable'
-        },
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: '<b>{{ indicator.name }}</b><br /><span>Result for {{ selected_location.name.capitalize }} {{ selected_location.type.name.capitalize }}</span>'
-        },
-        yAxis: {
-            allowDecimals: false,
-            title: {
-                text: '{{metric}}'
-            }
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.name + '</b><br/>' +
-                    this.point.y + ' ' + this.point.name.toLowerCase();
-            }
-        }
-    });
-});
+       var data = [];
+       {% with location_names=reports.keys %}
+            {% with loc_values=reports.values %}
+              {% for option in options %}
+                data.push({
+                  x: [{% for loc_name in location_names %}"{{loc_name}}",{% endfor %}],
+                  y: [{% for loc_stats in loc_values %}{{loc_stats|current:forloop.counter0}},{% endfor %}],
+                  name: "{{option}}",
+                  type: 'bar'
+                });
+              {% endfor %}
+            {% endwith %}
+       {% endwith %}
+    var layout = {barmode: 'group',
+                    title: '<b>{{ indicator.name }}</b><br /><span>Result for {{ selected_location.name.capitalize }} {{ selected_location.type.name.capitalize }}</span>',
+                    xaxis: {
+                            rangemode: 'nonnegative',
+                            autorange: true
+                          },
+                          yaxis: {
+                            rangemode: 'nonnegative',
+                            autorange: true,
+                            title: '{{metric}}',
+                          }
+                        };
+
+    Plotly.newPlot('container', data, layout);
 </script>
 {% endblock %}
