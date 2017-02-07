@@ -69,7 +69,8 @@
                             {% if user.is_active %}
                                 <a href="#deactivate_user_{{ user.pk }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="DeActivate"><span class="red"><i class="usur-icon fa fa-low-vision bigger-120"></i> DeActivate</span></a>
                             {% else %}
-                                <a href="#re-activate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Activate</a>
+                                <!-- <a href="#re-activate_user_{{ user.pk }}" data-toggle="modal" class="btn btn-small"><i class="icon-lock"></i> Activate</a> -->
+                                <a href="#re-activate_user_{{ user.pk }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Activate"><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>Activate</span></a>
                             {% endif %}
                             </li>
                             </ul>

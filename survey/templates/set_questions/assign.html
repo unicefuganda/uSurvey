@@ -28,14 +28,15 @@
     margin-left: -15px;background: none;border-bottom: none;">
 	<div class="col-md-6">
 <table class="table" style="
-    margin-bottom: 0px !important;">
+    margin-bottom: 0px !important; margin-top: 0px !important">
 <thead id="lib_questions_table_head">
 <tr >
-	<th colspan="2" class="text-center" style="background: #f2f2f2 linear-gradient(to bottom, #f8f8f8 0px, #fff 100%) repeat-x scroll 0 0;
+	<th colspan="2" class="text-center" style="
     /*color: #707070;*/
+    background: #307ecc !important;
     font-weight: 400;
     border-left-color: #ddd;
-   color: #09F;
+   color: #fff;
     font-family: "Open Sans",sans-serif;
     font-size: 13px;">LIBRARY QUESTIONS</th>
 
@@ -47,11 +48,11 @@
 
 <div class="batch_assignment" >
 
-					<table id="lib_questions_table" class="table table-hover" >
+					<table id="lib_questions_table" class="table table-hover" style="margin-top: 0px !important" >
 						<thead id="lib_questions_table_head">
-       <tr><th align="center" class="code" >CODE</th>
+       <tr><th align="center" class="code" style="background: #307ecc !important;">CODE</th>
 
-<th align="left" class="question" >TEXT</th></tr>
+<th align="left" class="question" style="background: #307ecc !important;">TEXT</th></tr>
 		</thead>
 						 <tbody id="lib_questions_table_body" class="lib_questions_table_body1">
 						{% for question in library_questions %}
@@ -81,12 +82,12 @@
 
 
 	<table class="table" style="
-    margin-bottom: 0px !important;">
+    margin-bottom: 0px !important; margin-top: 0px !important">
 <thead id="lib_questions_table_head">
 <tr >
-	<th colspan="2" class="text-center" style="background: #f2f2f2 linear-gradient(to bottom, #f8f8f8 0px, #fff 100%) repeat-x scroll 0 0;
-    /*color: #707070;*/
-    color: #09F;
+	<th colspan="2" class="text-center" style="
+    background: #307ecc !important;
+    color: #fff;
     font-weight: 400;
     border-left-color: #ddd;
    
@@ -94,9 +95,9 @@
     font-size: 13px;">BATCH QUESTIONS</th>
 
 </tr>
-<tr><th align="center" class="code">CODE</th>
+<tr><th align="center" class="code" style="background: #307ecc !important; color: #fff !important">CODE</th>
 
-<th align="left" class="question">TEXT</th></tr>
+<th align="left" class="question" style="background: #307ecc !important; color: #fff !important">TEXT</th></tr>
 </thead>
  </table>
 	
@@ -123,7 +124,7 @@
 
  </div>
 
-	<div class="col-md-12">
+	<div class="col-md-12 text-center">
 	{% endblock %}
 {% block non_form_content %}
 	</div>
