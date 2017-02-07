@@ -682,7 +682,7 @@ border: 1px solid;
     margin-top: 20px;
     margin-bottom: 20px;
     background-color: #fff !important; 
-    border-top: 1px solid #e5e5e5;
+    /*border-top: 1px solid #e5e5e5;*/
 }
 .searchbox2
 {	
@@ -826,7 +826,7 @@ th.code, td.code {
   width: 25%;
   text-align: left;
   border-right: 1px solid #e0e0e0;
-  background-color: #fff;
+  background-color:rgba(109, 108, 108, 0.09);
   padding-left: 10px;
   font-size: 12px;
    word-break: break-all;

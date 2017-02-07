@@ -11,7 +11,7 @@ class GroupForm(forms.ModelForm, FormOrderMixin):
     max = forms.IntegerField(required=False)
     value = forms.CharField(required=False)
     options = forms.ChoiceField(choices=[], required=False)
-    CHOICES = [('', '--------------------')]
+    CHOICES = [('', '----------Create Operator----------')]
     CHOICES.extend(RespondentGroupCondition.VALIDATION_TESTS)
     validation_test = forms.ChoiceField(choices=CHOICES, required=False,
                                         label='Operator')

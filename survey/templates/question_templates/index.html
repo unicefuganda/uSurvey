@@ -98,7 +98,11 @@
                             </li>
                             {% endwith %}
                             
-                            <li><a href="{% url 'delete_question_template_page' question.pk %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                            <!-- <li><a href="{% url 'delete_question_template_page' question.pk %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li> -->
+
+                            <li>
+                                <a href="#delete_question_{{question.pk}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                            </li>
                             {% if question.options.all %}
                             <li>
                                 <a href="#view_options_{{ question.id }}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>View Options</span></a>
