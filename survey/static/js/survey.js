@@ -19,8 +19,8 @@
  function show_or_hide_sampled_survey_field(show) {
      var $preferred_listing = $('#id_preferred_listing');
      var $listing_form = $('#id_listing_form');
-     $("#id_listing_form").append($('<option value="val"/>').text('--Select Listing Form--'));
-    $("#id_listing_form").val("val");
+     /*$("#id_listing_form").append($('<option value="val"/>').text('--Select Listing Form--'));
+    $("#id_listing_form").val("val");*/
      var $div_to_toggle = $preferred_listing.closest('div').parent('div');
      var $l_div_to_toggle = $listing_form.closest('div').parent('div');
      if(show) {
