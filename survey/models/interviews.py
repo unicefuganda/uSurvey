@@ -580,8 +580,8 @@ class GeopointAnswer(Answer):
     def create(cls, interview, question, answer):
         if isinstance(answer, basestring):
             answer = answer.split(' ')
-            answer = ODKGeoPoint(latitude=answer[0], longitude=answer[
-                                 1], altitude=[2], precision=answer[3])
+            answer = ODKGeoPoint.objects.create(latitude=answer[0], longitude=answer[1],
+                                                altitude=answer[2], precision=answer[3])
         return super(GeopointAnswer, cls).create(interview, question, answer)
 
     class Meta:
