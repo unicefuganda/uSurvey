@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib.auth import logout
 from survey.forms.aboutus_form import AboutUsForm
 from survey.models import Survey, AboutUs
 from django.contrib.auth.decorators import login_required
@@ -57,25 +58,21 @@ def edit(request):
 @login_required
 @permission_required('can_have_super_powers')
 def activate_super_powers(request):
-    if request.method == 'POST':
-        # activate super powers for settings.SUPER_POWERS_DURATION
-        views_helper.activate_super_powers(request)
+    if views_helper.activate_super_powers(request): # activate super powers for settings.SUPER_POWERS_DURATION
         messages.info(request, 'Super Powers activated! You would now be able to perform actions like wiping off data')
         return HttpResponseRedirect(reverse('home_page'))
     else:
-        return render(request, 'home/manage_super_powers.html')
+        logout(request)
+        messages.warning(request, 'You need you validate your credentials before activating power mode')
+        return HttpResponseRedirect('.')        # login again and come back here!
 
 
 @login_required
 @permission_required('can_have_super_powers')
 def deactivate_super_powers(request):
-    if request.method == 'POST':
-        # activate super powers for settings.SUPER_POWERS_DURATION
-        views_helper.deactivate_super_powers(request)
-        messages.info(request, 'Super powers deactivated!')
-        return HttpResponseRedirect(reverse('home_page'))
-    else:
-        return render(request, 'home/manage_super_powers.html')
+    views_helper.deactivate_super_powers(request)
+    messages.info(request, 'Super powers deactivated!')
+    return HttpResponseRedirect(reverse('home_page'))
 
 
 

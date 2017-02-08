@@ -59,9 +59,21 @@ def prepend_to_keys(params, text):
     return new_params
 
 
+PENDING_VALIDATION = 1
+VALIDATED = 2
+
+
 def activate_super_powers(request):
-    cache.set('%s:%s' % (request.user.pk, settings.SUPER_POWERS_KEY), data={'started': timezone.now()},
-              timeout=settings.SUPER_POWERS_DURATION)
+    if get_super_powers_details(request) is None:
+        cache.set('%s:%s' % (request.user.pk, settings.SUPER_POWERS_KEY), data={'started': timezone.now(),
+                                                                                'status': PENDING_VALIDATION},
+                  timeout=settings.SUPER_POWERS_DURATION)
+        return False
+    else:
+        cache.set('%s:%s' % (request.user.pk, settings.SUPER_POWERS_KEY), data={'started': timezone.now(),
+                                                                                'status': VALIDATED},
+                  timeout=settings.SUPER_POWERS_DURATION)
+        return True
 
 
 def deactivate_super_powers(request):
@@ -76,3 +88,10 @@ def has_super_powers(request):
         return cache.get('%s:%s' % (request.user.pk, settings.SUPER_POWERS_KEY))
     except CacheMiss:
         return False
+
+
+def get_super_powers_details(request):
+    try:
+        return cache.get('%s:%s' % (request.user.pk, settings.SUPER_POWERS_KEY)).get('status', None)
+    except CacheMiss:
+        return None

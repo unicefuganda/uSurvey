@@ -232,6 +232,7 @@ def insert(request, prev_quest_id):
     prev_question = Question.get(pk=prev_quest_id)
     batch = QuestionSet.get(pk=prev_question.qset.pk)
     response, context = _render_question_view(request, batch, prev_question=prev_question)
+    context['prev_question'] = prev_question
     return response or render(request, 'set_questions/new.html', context)
 
 
@@ -290,6 +291,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
                'request': request,
                'class': 'question-form',
                'batch': batch,
+               'prev_question': prev_question,
                # 'prev_question': prev_question,
                'cancel_url': reverse('qset_questions_page', args=(batch.pk, )),
                'questionform': question_form}

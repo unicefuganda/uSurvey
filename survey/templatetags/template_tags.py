@@ -212,6 +212,13 @@ def show_condition(flow):
     return ""
 
 
+@register.assignment_tag
+def get_login_message(request):
+    if request.GET.get('next').endswith(reverse('activate_super_powers_page')):
+        from django.contrib import messages
+        messages.warning(request, 'You need to re-login to activate power mode')
+
+
 @register.filter
 def access_channels(answer_type):
     channels = AnswerAccessDefinition.objects.filter(

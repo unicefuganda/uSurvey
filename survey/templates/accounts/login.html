@@ -1,4 +1,4 @@
-
+{% load template_tags %}
 <!DOCTYPE html>
 <html lang="en"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -68,10 +68,24 @@
     <!-- END / HEADER -->
 
     <!-- LOGIN -->
-    
 
+              {% if messages %}
+                <!-- <br /><br /> -->
+                {% for message in messages %}
+                   <ul class="alert alert-{{ message.tags }}"  style="background: #def0d8 none repeat scroll 0 0;
+border: 1px solid #cfdaca;
+margin-top: 7px;
+padding: 8px;
+text-align: center;">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        {{ message }}
+                    </ul>
+                {% endfor %}
+            {% endif %}
     <section id="login-content" class="login-content">
-        <div class="awe-parallax bg-login-content"></div>
+
+        <div class="awe-parallax bg-login-content">
+        </div>
       <div class="awe-overlay"></div>
         <div class="container">
             <div class="row" style="padding-bottom: 60px">

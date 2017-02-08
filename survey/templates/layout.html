@@ -263,10 +263,10 @@
                                   </li>
                                     {% if perms.auth.can_have_super_powers %}
                                         {% if has_powers %}
-                                        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'deactivate_super_powers_page' %}">Deactivate Powers</a>
+                                        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'deactivate_super_powers_page' %}">Deactivate Power Mode</a>
                                       </li>
                                         {% else %}
-                                       <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'activate_super_powers_page' %}">Activate Powers</a>
+                                       <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'activate_super_powers_page' %}">Activate Power Mode</a>
                                       </li>
                                         {% endif %}
                                   {% endif %}
@@ -319,7 +319,7 @@
     margin-top: 7px;
     padding: 8px;
     text-align: center;">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
                                         {{ message }}
                                     </ul>
                                 {% endfor %}

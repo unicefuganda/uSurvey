@@ -16,8 +16,8 @@
   {% if parent_question %}
      <h4> to question: {{parent_question.text}} </h4>
   {% endif %}
-  {% if questionform.prev_question %}
-     <h4> <span>Preceding question:</span> {{questionform.prev_question.text}} </h4>
+  {% if prev_question %}
+     <h4> <span>Preceding question:</span> {{prev_question.text}} </h4>
   {% endif %}
     <p>Please note that the following special characters will be removed on USSD [* ! # ' ; &]</p>
 {% endblock%}
@@ -98,7 +98,18 @@ var options = $('#id_group option');
     var arr = options.map(function(_, o) {
         return {
             t: $(o).text(),
-            v: o.value
+            vvar textcomplete = new Awesomplete('#id_text', {
+                                    list: [],
+                                        filter: function(text, input) {
+                                            return Awesomplete.FILTER_CONTAINS(text, input.match(/[^({{)]*$/)[0]);
+                                        },
+
+                                        replace: function(text) {
+                                            var before = this.input.value.match(/^.*{{\s*|/)[0];
+                                            this.input.value = before +text + "}} ";
+                                        }
+                                });
+            : o.value
         };
     }).get();
     arr.sort(function(o1, o2) {
