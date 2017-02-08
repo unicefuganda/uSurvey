@@ -17,9 +17,11 @@
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
    $(document).ready(function() {
+   $("#id_survey").append($('<option value="val"/>').text('--Select Survey--'));
+   $("#id_survey").val("val");
+   $("#id_parameter").find('option').remove();
+    $("#id_parameter").append($('<option />').text('--Select Parameter--'));
      $("#id_batch").change(function(){
-        $("#id_parameter").find('option').remove();
-        $("#id_parameter").append($('<option />').text('--Select Parameter--'));
         var url = '{% url "list_batch_questions" %}' + '?id='+ $("#id_batch").val();
         $.getJSON(url, function (data) {
             $.each(data, function () {

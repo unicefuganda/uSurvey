@@ -22,3 +22,16 @@
         {% endif %}
   </div>
 </form>
+<script type="text/javascript">
+  $(document).ready(function(){
+
+        $("#id_listing_form option[value='']").text("--Select Listing Form--");
+        $("select#id_listing_form").val("");
+$("#id_preferred_listing_tip").hide();
+        $('#id_preferred_listing').mousedown(function() {
+
+           $("#id_preferred_listing_tip").show();
+
+        })
+      })
+</script>

@@ -1,13 +1,13 @@
 ;
 jQuery(function($){
     var batch = $("#id_batch");
-
+    var parameter = $("#id_parameter");
     $("#id_filter_survey").on('change', updateBatchSelectField);
     $('#id_survey').on('change', updateBatchSelectField);
 
     function updateBatchSelectField () {
        batch.find('option').remove();
-        batch.append($('<option />').val('').text('Select Batch'));
+        batch.append($('<option />').val('').text('--Select Batch--'));
         populate_choices.call(this);
     }
 

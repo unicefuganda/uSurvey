@@ -29,14 +29,22 @@
     height: 25px !important;
     margin-left: -1px !important;
   }
-  .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}  
+  .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 261px!important;}
+  .form-actions {
+    background-color: #fff;
+    border-top: 1px solid #c3a0d9;
+    margin-bottom: 0px !important; 
+    margin-top: 0px !important; 
+    padding: 8px 20px 20px !important;
+    /* text-align: center; */
+}  
 </style>
-<div class="control-group">
+<!-- <div class="control-group">
         <label class="control-label" for="text_counter"></label>
         <div class="controls">
             <span id="text-counter"></span>
         </div>
-  </div>
+  </div> -->
 {% include "naked_form.html" with a_form=questionform %}
 {% if options %}
   {% for option in options %}
@@ -80,13 +88,64 @@
 {% block javascripts %}
     <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+      
+      $(document).ready(function(){
+
+        $("#id_answer_type option[value='']").text("--Select AnswerType--");
+        $("select#id_answer_type").val("");
+var options = $('#id_group option');
+    var arr = options.map(function(_, o) {
+        return {
+            t: $(o).text(),
+            v: o.value
+        };
+    }).get();
+    arr.sort(function(o1, o2) {
+        return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+    });
+    options.each(function(i, o) {
+        console.log(i);
+        o.value = arr[i].v;
+        $(o).text(arr[i].t);
+    });
+        $("#id_module option[value='']").text("--Select Module--");
+
+        var options = $('#id_module option');
+    var arr = options.map(function(_, o) {
+        return {
+            t: $(o).text(),
+            v: o.value
+        };
+    }).get();
+    arr.sort(function(o1, o2) {
+        return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+    });
+    options.each(function(i, o) {
+        console.log(i);
+        o.value = arr[i].v;
+        $(o).text(arr[i].t);
+    });
+        $("select#id_module").val("");
+        $("#id_group option[value='']").text("--Select Group--");
+        $("select#id_group").val("");
+      })
+    </script>
         <script type="text/javascript">
             channel_map = {
                 {% for answer_type, channels in questionform.answer_map.items %}
                     '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
                 {% endfor %}
             };
-            $('#id_answer_type').change(function(){
+
+
+   /* $("#id_answer_type:first").append($('<option value="val"/>').text('--Select AnswerType--'));*/
+    /*$("#id_answer_type").val("val");
+    $("#id_module").append($('<option value="val"/>').text('--Select Module--'));
+    $("#id_module").val("val");
+    $("#id_group").append($('<option value="val"/>').text('--Select Group--'));
+    $("#id_group").val("val");*/
+                $('#id_answer_type').change(function(){
                 help_text = channel_map[$('#id_answer_type').val()].join(' and ');
                // alert($('#id_answer_type_tip').val());
                $('#id_answer_type_tip').text(help_text);
