@@ -25,9 +25,7 @@
       vertical-align: middle;
     }
     #text-counter{
-    position: relative !important;
-    top: 200px !important;
-    left: 435px !important;
+    margin-left: 10px !important;
   }
   </style>
   <div id="{{field.auto_id}}-control-group" class="control-group" style="margin-top: 15px;">
@@ -47,7 +45,11 @@
   </div>
 
 {% endfor %}
-
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('.controls textarea ').after($('<span id="text-counter"></span>'));
+  })
+</script>
 {% for hidden in a_form.hidden_fields %}
   {{ hidden }}
 {% endfor %}
