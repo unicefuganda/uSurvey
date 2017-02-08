@@ -144,7 +144,24 @@ def view_data(request, qset_id):
 @login_required
 def identifiers(request):
     id = request.GET.get('id', None)
-    json_dump = json.dumps(list(Question.objects.filter(qset__id=id).values_list('identifier', flat=True)))
+    last_question_id = request.GET.get('q_id', None)
+    if last_question_id is None:
+        json_dump = json.dumps(list(Question.objects.filter(qset__id=id).values_list('identifier', flat=True)))
+    else:
+        # return questions before last question
+        qset = QuestionSet.get(pk=id)
+        identifiers = set()
+        for question in qset.flow_questions:
+            if int(question.id) == int(last_question_id):
+                break
+            identifiers.add(question.identifier)
+        try:
+            qset = Batch.get(pk=qset.pk)
+            if hasattr(qset, 'parameter_list'):
+                identifiers.union(qset.parameter_list.questions.values_list('identifier', flat=True))
+        except Batch.DoesNotExist:
+            pass
+        json_dump = json.dumps(list(identifiers))
     return HttpResponse(json_dump, content_type='application/json')
 
 

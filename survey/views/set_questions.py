@@ -289,6 +289,7 @@ def _render_question_view(request, batch, instance=None, prev_question=None):
                'id': 'add-question-form',
                'request': request,
                'class': 'question-form',
+               'batch': batch,
                # 'prev_question': prev_question,
                'cancel_url': reverse('qset_questions_page', args=(batch.pk, )),
                'questionform': question_form}

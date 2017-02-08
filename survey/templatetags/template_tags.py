@@ -10,7 +10,7 @@ from survey.models.helper_constants import CONDITIONS
 from survey.utils.views_helper import get_ancestors
 from survey.models import Survey, Question, Batch, Interviewer, MultiChoiceAnswer, \
     GroupCondition, Answer, AnswerAccessDefinition, ODKAccess, HouseholdMember, SurveyAllocation
-from survey.models import VideoAnswer, AudioAnswer, ImageAnswer, QuestionSet
+from survey.models import VideoAnswer, AudioAnswer, ImageAnswer, QuestionSet, SurveyParameterList
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
@@ -334,6 +334,8 @@ def get_sample_data_display(sample):
     question_context = template.Context(context)
     return template.Template(html.escape(naming_label)).render(question_context)
 
+
+
 @register.assignment_tag
 def get_odk_mem_question(question):
     surname = HouseholdMember._meta.get_field('surname')
@@ -432,6 +434,30 @@ def is_relevant_odk(context, question, interviewer):
 
 def get_group_question_path(qset, group_question):
     return '/qset/qset%s/questions/groupQuestions/q%s' % (qset.id, group_question.id)
+
+
+def get_name_references(qset):
+    @cached_as(QuestionSet.objects.filter(pk=qset.pk))
+    def _get_name_references(qset):
+        name_references = {}
+        for question in qset.questions.all():
+            name_references[question.identifier] = mark_safe('<output value="%s"/>' % get_node_path(question))
+        try:
+            qset = Batch.get(pk=qset.pk)
+            if hasattr(qset, 'parameter_list'):
+                for question in qset.parameter_list.questions.all():
+                    name_references[question.identifier] = \
+                        mark_safe('<output value="%s"/>' % get_group_question_path(qset, question))
+        except Batch.DoesNotExist:
+            pass
+        return name_references
+    return template.Context(_get_name_references(qset))
+
+
+@register.assignment_tag
+def get_question_text(question):
+    question_context = get_name_references(question.qset)
+    return template.Template(html.escape(question.text)).render(question_context)
 
 
 def is_relevant_by_group(context, question):

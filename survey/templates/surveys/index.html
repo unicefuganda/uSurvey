@@ -148,9 +148,14 @@
 } );
         </script>
     <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
-      <script type="text/javascript">
-            $(function(){
-                init_fields("{% url 'qset_identifiers' %}");
-            });
-        </script>
+          <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+                $(function(){
+                    init_fields();
+                    $('#id_random_sample_label').on('keyup', function(){
+                       make_suggestions('#id_random_sample_label', "{% url 'qset_identifiers' %}?id=" + $('#id_listing_form').val());
+                       this.focus();
+                    });
+                });
+            </script>
 {% endblock %}

@@ -56,7 +56,8 @@ class SurveyForm(ModelForm, FormOrderMixin):
                 raise ValidationError('You need to include one listing response identifier in double curly brackets'
                                       ' e.g {{house_number}}')
             listing_form = self.cleaned_data['listing_form']
-            if listing_form.questions.filter(identifier__in=requested_identifiers).exists():
+            if listing_form.questions.filter(identifier__in=requested_identifiers).count() == \
+                    len(set(requested_identifiers)):
                 return self.cleaned_data['random_sample_label']
             raise ValidationError('%s is not in %s' % (', '.join(requested_identifiers), listing_form.name))
 

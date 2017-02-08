@@ -41,13 +41,15 @@
  }
 
 
- function init_fields(fetch_qset_ids_url) {
+ function init_fields() {
     //this depends on awesomplete js
      toggle_random_label = function() {
         if($('#id_listing_form').val())
             $('#id_random_sample_label-control-group').show();
-        else
+        else {
             $('#id_random_sample_label-control-group').hide();
+            $('#id_random_sample_label').val('');
+         }
     };
      $('#id_preferred_listing').change(function(){
         if($(this).val()){
@@ -59,46 +61,10 @@
         }
     });
     toggle_random_label();
-    var random_label = document.querySelector("#id_random_sample_label");
-    var aucomplete = null;
     $('#id_listing_form').change(function(){
             toggle_random_label();
-            $.get( fetch_qset_ids_url+ "?id=" + $('#id_listing_form').val(), function( list ) {
-
-                $(random_label).val('');
-                if(aucomplete){             // need to find a better way to remove this
-                   aucomplete.filter = null;
-                   aucomplete.replace = null;
-                   aucomplete.list = [];
-                   aucomplete = null;
-                }
-
-                aucomplete = get_autocomplete(list);
-            });
+            $('#id_random_sample_label').val('');
     });
-
-    $(random_label).on('keydown', function() {
-         if (this.value.length > 1 && aucomplete == null) {
-              $.get( fetch_qset_ids_url+ "?id=" + $('#id_listing_form').val(), function( list ) {
-                aucomplete = get_autocomplete(list);
-            });
-         }
-    });
-
-    get_autocomplete = function(list) {
-            return new Awesomplete(random_label, {
-                                    list: list,
-                                        filter: function(text, input) {
-                                            return Awesomplete.FILTER_CONTAINS(text, input.match(/[^{{]*$/)[0]);
-                                        },
-
-                                        replace: function(text) {
-                                            var before = this.input.value.match(/^.*{{\s*|/)[0];
-                                            this.input.value = before +text + "}} ";
-                                        }
-                                });
-    }
-
  }
 
  jQuery(function($){

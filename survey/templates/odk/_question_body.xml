@@ -1,6 +1,8 @@
+{% load template_tags %}
+		{% get_question_text question as question_text %}
                 {% if question.answer_type == answer_types.multichoiceanswer %}
 					<select1 ref="{{qref}}">
-						<label>{{question.text}}</label>
+						<label>{{question_text}}</label>
 						{% for option in question.options.all %}
 						<item>
 							<label>{{ option.text }}</label>
@@ -10,7 +12,7 @@
 					</select1>
 					{% elif question.answer_type == answer_types.multiselectanswer %}
 						<select ref="{{qref}}">
-							<label>{{question.text}}</label>
+							<label>{{question_text}}</label>
 							{% for option in question.options.all %}
 							<item>
 								<label>{{ option.text }}</label>
@@ -20,22 +22,22 @@
 						</select>
 					{% elif question.answer_type == answer_types.imageanswer %}
 						<upload ref="{{qref}}"   appearance="annotate" mediatype="image/*">
-							<label>{{question.text}}</label>
+							<label>{{question_text}}</label>
 						</upload>
 					{% elif question.answer_type == answer_types.audioanswer %}
 						<upload ref="{{qref}}"   mediatype="audio/*">
-							<label>{{question.text}}</label>
+							<label>{{question_text}}</label>
 						</upload>
 					{% elif question.answer_type == answer_types.videoanswer %}
 						<upload ref="{{qref}}" mediatype="video/*">
-							<label>{{question.text}}</label>
+							<label>{{question_text}}</label>
 						</upload>
 					{% elif question.answer_type == answer_types.dateanswer %}
 					<input ref="{{qref}}" appearance="no-calendar">
-						<label>{{question.text}}</label>
+						<label>{{question_text}}</label>
 					</input>
 					{% else %}
 					<input ref="{{qref}}">
-						<label>{{question.text}}</label>
+						<label>{{question_text}}</label>
 					</input>
 					{% endif %}

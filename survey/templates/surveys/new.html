@@ -14,9 +14,14 @@
 
 {% block javascripts %}
     <script src="{{STATIC_URL}}js/survey.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
             $(function(){
-                init_fields("{% url 'qset_identifiers' %}");
+                init_fields();
+                $('#id_random_sample_label').on('keyup', function(){
+                   make_suggestions('#id_random_sample_label', "{% url 'qset_identifiers' %}?id=" + $('#id_listing_form').val());
+                   this.focus();
+                });
             });
         </script>
 {% endblock %}

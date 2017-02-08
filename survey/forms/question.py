@@ -83,6 +83,29 @@ def get_question_form(model_class):
                         'Identifier already in use for this %s' % model_class.type_name())
             return self.cleaned_data['identifier']
 
+        def clean_text(self):
+            """Make sure any field referenced here belongs to same batch. Field refs are denoted by {{.+}} brackets
+            :return:
+            """
+            pattern = '{{ *([0-9a-zA-Z_]+) *}}'
+            label = self.data.get('text', '')
+            requested_identifiers = re.findall(pattern, label)
+            if requested_identifiers:
+                ids = self.qset.questions.filter(identifier__in=requested_identifiers).values_list('identifier',
+                                                                                                        flat=True)
+                ids = list(ids)
+                try:
+                    qset = Batch.get(pk=self.qset.pk)
+                    if hasattr(qset, 'parameter_list'):
+                        ids += list(qset.parameter_list.questions.filter(identifier__in=requested_identifiers).
+                                    values_list('identifier', flat=True))
+                except Batch.DoesNotExist:
+                    pass
+                if len(set(ids)) != len(set(requested_identifiers)):
+                    raise ValidationError('%s is not in %s' %
+                                          (', '.join(set(requested_identifiers).difference(ids)), self.qset.name))
+            return self.cleaned_data['text']
+
         def clean(self):
             answer_type = self.cleaned_data.get('answer_type', None)
             options = self.cleaned_data.get('options', None)

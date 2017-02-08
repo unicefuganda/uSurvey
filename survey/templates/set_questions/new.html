@@ -7,6 +7,11 @@
     New Question
   {% endif %}
 {% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
+<script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
+{% endblock %}
+
 {% block pre_form_content %}
   {% if parent_question %}
      <h4> to question: {{parent_question.text}} </h4>
@@ -73,6 +78,7 @@
     {% endblock %}
 
 {% block javascripts %}
+    <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
             channel_map = {
@@ -84,6 +90,12 @@
                 help_text = channel_map[$('#id_answer_type').val()].join(' and ');
                // alert($('#id_answer_type_tip').val());
                $('#id_answer_type_tip').text(help_text);
+            });
+            $(function(){
+                $('#id_text').on('keyup', function(){
+                   make_suggestions('#id_text', "{% url 'qset_identifiers' %}?id={{batch.pk}}{% if questionform.instance.id %}&q_id={{questionform.instance.id}}{% endif %}");
+                   this.focus();
+                });
             });
         </script>
 {% endblock %}
