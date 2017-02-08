@@ -51,6 +51,8 @@
                         '{{ question.pk }}' : { {% for opt in question.options.all %}'{{ opt.order }}': '{{ opt.text }}',{% endfor %} },
                     {% endfor %}
                  }
+                 $("#id_test_question").append($('<option value="val"/>').text('--Select Parameter--'));
+                 $("#id_test_question").val("val");
                  $('#id_test_question').change(function(){
                     $('#id_validation_test option:gt(0)').remove();
                     $.each(validate_options[$('#id_test_question').val()], function(key, value) {

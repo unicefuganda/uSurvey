@@ -72,6 +72,12 @@
 
 	    });
   	{% endfor %}
+  	$("#id_level_of_education").append($('<option value="val"/>').text('--Select Level Of Education--'));
+    $("#id_level_of_education").val("val");
+    $("#id_language").append($('<option value="val"/>').text('--Select Preferred Language--'));
+    $("#id_language").val("val");
+  	$("#id_survey").append($('<option value="val"/>').text('--Select Survey--'));
+    $("#id_survey").val("val");
     $('.ea_filters').on('change', function () {
     	{% for location_type in location_filter_types %}
     	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();

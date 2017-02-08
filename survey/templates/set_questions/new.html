@@ -80,7 +80,14 @@
                     '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
                 {% endfor %}
             };
-            $('#id_answer_type').change(function(){
+
+    $("#id_answer_type").append($('<option value="val"/>').text('--Select AnswerType--'));
+    $("#id_answer_type").val("val");
+    $("#id_module").append($('<option value="val"/>').text('--Select Module--'));
+    $("#id_module").val("val");
+    $("#id_group").append($('<option value="val"/>').text('--Select Group--'));
+    $("#id_group").val("val");
+                $('#id_answer_type').change(function(){
                 help_text = channel_map[$('#id_answer_type').val()].join(' and ');
                // alert($('#id_answer_type_tip').val());
                $('#id_answer_type_tip').text(help_text);
