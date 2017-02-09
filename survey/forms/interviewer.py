@@ -29,7 +29,10 @@ class InterviewerForm(ModelForm):
                                                                                 ).order_by('status')[0].survey.pk
             except IndexError:
                 pass
-        self.fields['ea'].queryset = EnumerationArea.objects.all() #eas
+        if self.data.get('ea'):
+            self.fields['ea'].queryset = EnumerationArea.objects.all()
+        else:
+            self.fields['ea'].queryset = eas
 
     class Meta:
         model = Interviewer
