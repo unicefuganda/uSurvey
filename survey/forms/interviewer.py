@@ -13,7 +13,9 @@ class InterviewerForm(ModelForm):
     date_of_birth = forms.DateField(label="Date of birth", required=True, input_formats=[settings.DATE_FORMAT, ],
                                     widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                   'class': 'datepicker'}, format=settings.DATE_FORMAT))
-    ea = forms.ModelMultipleChoiceField(queryset=EnumerationArea.objects.none())
+    ea = forms.ModelMultipleChoiceField(queryset=EnumerationArea.objects.none(),
+                                        widget=forms.SelectMultiple(attrs={'class': 'multi-select ea_filter',
+                                                                           'id': 'test-s'}))
 
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
@@ -36,7 +38,6 @@ class InterviewerForm(ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Name'}),
             'gender': forms.RadioSelect(choices=((True, 'Male'), (False, 'Female'))),
-            'ea': forms.Select(attrs={'class': 'chzn-select ea_filter'}),
         }
 
     def clean_survey(self):

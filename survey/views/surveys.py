@@ -185,7 +185,7 @@ def wipe_survey_data(request, survey_id):
     from survey.utils import views_helper
     if views_helper.has_super_powers(request):
         survey = Survey.get(pk=survey_id)
-        Interview.objects.filter(survey=survey)
+        Interview.objects.filter(survey=survey).delete()
         messages.info(request, 'Data has been cleared for %s' % survey.name)
     return HttpResponseRedirect(reverse('survey_list_page'))
 
