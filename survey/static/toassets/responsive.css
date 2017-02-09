@@ -928,12 +928,13 @@ This is only usurvey
         top: 20px;
     }
     .mainMenu ul{
-        display: none;
+        /*display: none;
         -webkit-transition: none 0s;
         -moz-transition: none 0s;
         -ms-transition: none 0s;
         -o-transition: none 0s;
-        transition: none 0s;
+        transition: none 0s;*/
+        transition: none 0s ease 0s ;        
     }
     .topSocial {
         float: none !important;
