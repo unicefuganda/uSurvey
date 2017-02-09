@@ -150,7 +150,7 @@ display: inline-block;
     top: 157px;
     transition: all 700ms ease-in-out 0s;
     visibility: hidden;
-    width: 170px;
+    width: 185px;
     z-index:987463;
     }
 .mainMenu > ul > li:hover .sub-menu{
