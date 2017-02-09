@@ -88,80 +88,14 @@
 {% block javascripts %}
     <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
     <script src="{{STATIC_URL}}js/questions.js" type="text/javascript" charset="utf-8"></script>
-    <script type="text/javascript">
-      
-      $(document).ready(function(){
 
-        $("#id_answer_type option[value='']").text("--Select AnswerType--");
-        $("select#id_answer_type").val("");
-var options = $('#id_group option');
-    var arr = options.map(function(_, o) {
-        return {
-            t: $(o).text(),
-            vvar textcomplete = new Awesomplete('#id_text', {
-                                    list: [],
-                                        filter: function(text, input) {
-                                            return Awesomplete.FILTER_CONTAINS(text, input.match(/[^({{)]*$/)[0]);
-                                        },
-
-                                        replace: function(text) {
-                                            var before = this.input.value.match(/^.*{{\s*|/)[0];
-                                            this.input.value = before +text + "}} ";
-                                        }
-                                });
-            : o.value
-        };
-    }).get();
-    arr.sort(function(o1, o2) {
-        return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
-    });
-    options.each(function(i, o) {
-        console.log(i);
-        o.value = arr[i].v;
-        $(o).text(arr[i].t);
-    });
-        $("#id_module option[value='']").text("--Select Module--");
-
-        var options = $('#id_module option');
-    var arr = options.map(function(_, o) {
-        return {
-            t: $(o).text(),
-            v: o.value
-        };
-    }).get();
-    arr.sort(function(o1, o2) {
-        return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
-    });
-    options.each(function(i, o) {
-        console.log(i);
-        o.value = arr[i].v;
-        $(o).text(arr[i].t);
-    });
-        $("select#id_module").val("");
-        $("#id_group option[value='']").text("--Select Group--");
-        $("select#id_group").val("");
-      })
-    </script>
         <script type="text/javascript">
             channel_map = {
                 {% for answer_type, channels in questionform.answer_map.items %}
                     '{{answer_type}}' : [{% for channel in channels %}'{{channel}}',{% endfor %}],
                 {% endfor %}
             };
-
-
-   /* $("#id_answer_type:first").append($('<option value="val"/>').text('--Select AnswerType--'));*/
-    /*$("#id_answer_type").val("val");
-    $("#id_module").append($('<option value="val"/>').text('--Select Module--'));
-    $("#id_module").val("val");
-    $("#id_group").append($('<option value="val"/>').text('--Select Group--'));
-    $("#id_group").val("val");*/
-                $('#id_answer_type').change(function(){
-                help_text = channel_map[$('#id_answer_type').val()].join(' and ');
-               // alert($('#id_answer_type_tip').val());
-               $('#id_answer_type_tip').text(help_text);
-            });
-            $(function(){
+         $(function(){
                 $('#id_text').on('keyup', function(){
                    make_suggestions('#id_text', "{% url 'qset_identifiers' %}?id={{batch.pk}}{% if questionform.instance.id %}&q_id={{questionform.instance.id}}{% endif %}");
                    this.focus();

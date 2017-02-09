@@ -155,12 +155,12 @@ def identifiers(request):
             if int(question.id) == int(last_question_id):
                 break
             identifiers.add(question.identifier)
-        try:
-            qset = Batch.get(pk=qset.pk)
-            if hasattr(qset, 'parameter_list'):
-                identifiers.union(qset.parameter_list.questions.values_list('identifier', flat=True))
-        except Batch.DoesNotExist:
-            pass
+        # try:
+        #     qset = Batch.get(pk=qset.pk)
+        #     if hasattr(qset, 'parameter_list'):
+        #         identifiers.union(qset.parameter_list.questions.values_list('identifier', flat=True))
+        # except Batch.DoesNotExist:
+        #     pass
         json_dump = json.dumps(list(identifiers))
     return HttpResponse(json_dump, content_type='application/json')
 

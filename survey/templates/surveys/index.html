@@ -10,6 +10,37 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
 <script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
+<style type="text/css">
+    .status {
+        width: 15px !important;
+        background-image: None !important;
+    }
+#red_circle {
+   width: 10px;
+   height: 10px;
+   background: #d12a09;
+   -moz-border-radius: 70px;
+   -webkit-border-radius: 70px;
+   border-radius: 70px;
+  }
+#green_circle {
+   width: 10px;
+   height: 10px;
+   background: #009948;
+   -moz-border-radius: 70px;
+   -webkit-border-radius: 70px;
+   border-radius: 70px;
+}
+#amber_circle {
+   width: 10px;
+   height: 10px;
+   background: #ffcc00;
+   -moz-border-radius: 70px;
+   -webkit-border-radius: 70px;
+   border-radius: 70px;
+}
+
+</style>
 {% endblock %}
 
 {% block page_actions %}
@@ -25,6 +56,9 @@
     {% block table_head %}
     <br>
       <tr>
+        <th class="status">
+          Status
+        </th>
         <th class="sorting">
           Name
         </th>
@@ -36,9 +70,6 @@
         </th>
         <th class="sorting">
           Sample Size
-        </th>
-        <th class="sorting">
-            Status
         </th>
         <th class="sorting">
             Total Interviews
@@ -55,9 +86,11 @@
     {% has_super_powers request as has_powers %}
     {% for survey in surveys %}
         <tr>
+         <td>
+              {% if survey.is_open %}<div id="green_circle"></div>{% elif survey.interviews.count %}<div id="red_circle"></div>{% else %}<div id="amber_circle"></div>{% endif %}
+          </td>
           <td>
-            <a href="{% url 'batch_index_page' survey.id %}">{% if survey.interviews.exists %}<span class="label label-sm label-inverse arrowed-in"><strong>{{ survey.name }}</strong></span>{% else %}
-{{ survey.name }}{% endif %}</a>
+            <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
           </td>
           <td>
             {{ survey.description }}
@@ -67,9 +100,6 @@
           </td>
           <td>
               {% if survey.has_sampling %}{{ survey.sample_size }}{% else %}N/A{% endif %}
-          </td>
-            <td>
-              {% if survey.interviews.count %}Started {% else %} Not Started {% endif %}
           </td>
           <td>
               {{ survey.interviews.count}}

@@ -1,5 +1,5 @@
 import re
-# import pandas as pd
+import pandas as pd
 from django.db import connection
 from django.db.models import Q
 

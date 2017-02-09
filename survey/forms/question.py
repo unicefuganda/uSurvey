@@ -30,7 +30,8 @@ def get_question_form(model_class):
             # depending on type of ussd/odk access of qset restrict the answer
             # type
             self.fields['answer_type'].choices = [choice for choice in self.fields['answer_type'].choices
-                                                  if choice[0] in qset.answer_types or choice[0] == '']
+                                                  if choice[0] in qset.answer_types]
+            self.fields['answer_type'].choices.insert(0, ('', 'Select Answer Type'))
             if instance:
                 self.help_text = ' and '.join(
                     AnswerAccessDefinition.access_channels(instance.answer_type))
@@ -41,6 +42,10 @@ def get_question_form(model_class):
                 self.answer_map[defi.answer_type] = self.answer_map.get(
                     defi.answer_type, [])
                 self.answer_map[defi.answer_type].append(defi.channel)
+            if self.fields.has_key('module'):
+                self.fields['module'].empty_label = 'Select Module'
+            if self.fields.has_key('group'):
+                self.fields['group'].empty_label = 'Select Group'
 
             self.parent_question = parent_question
             self.order_fields(['module', 'group', 'identifier', 'text', 'answer_type', 'mandatory'])
@@ -94,13 +99,13 @@ def get_question_form(model_class):
                 ids = self.qset.questions.filter(identifier__in=requested_identifiers).values_list('identifier',
                                                                                                         flat=True)
                 ids = list(ids)
-                try:
-                    qset = Batch.get(pk=self.qset.pk)
-                    if hasattr(qset, 'parameter_list'):
-                        ids += list(qset.parameter_list.questions.filter(identifier__in=requested_identifiers).
-                                    values_list('identifier', flat=True))
-                except Batch.DoesNotExist:
-                    pass
+                # try:
+                #     qset = Batch.get(pk=self.qset.pk)
+                #     if hasattr(qset, 'parameter_list'):
+                #         ids += list(qset.parameter_list.questions.filter(identifier__in=requested_identifiers).
+                #                     values_list('identifier', flat=True))
+                # except Batch.DoesNotExist:
+                #     pass
                 if len(set(ids)) != len(set(requested_identifiers)):
                     raise ValidationError('%s is not in %s' %
                                           (', '.join(set(requested_identifiers).difference(ids)), self.qset.name))

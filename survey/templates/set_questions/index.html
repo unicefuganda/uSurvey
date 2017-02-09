@@ -81,11 +81,11 @@
             <td>
                 {% for loop in question.loop_story %}
                    {% if loop.loop_starter.pk == question.pk %}
-                      <img src="{{ STATIC_URL }}images/icon_bar2_2.png" width="6px;" height="100%;" class="loop_indicator" style="float: left;" />
+                      <img src="{{ STATIC_URL }}images/icon_bar24.png" width="6px;" height="100%;" class="loop_indicator" style="float: left;" />
                    {% elif loop.loop_ender.pk == question.pk %}
                       <img src="{{ STATIC_URL }}images/icon_bar_red.png" width="6px;" height="100%;" class="loop_indicator" style="float: left;" />
                    {% else %}
-                    <img src="{{ STATIC_URL }}images/icon_bar2_22.png" width="6px;" height="100%;" class="loop_indicator" style="float: left;" />
+                    <img src="{{ STATIC_URL }}images/icon_bar2.png" width="6px;" height="100%;" class="loop_indicator" style="float: left;" />
                    {% endif %}
                 {% endfor %}
                 <span class="identifier" style="margin-left: 2px;">{{ question.identifier }}</span>

@@ -164,6 +164,13 @@ def json_summary(request):
     indicator_id = request.GET.get('indicator')
     option_id = request.GET.get('parameter')
     metric = request.GET.get('metric', None)
+    try:
+        indicator_id = int(indicator_id)
+        option_id = int(option_id)
+    except ValueError:
+        indicator_id = None
+        option_id = None
+        metric = None
     if not (indicator_id and option_id):
         return completion_json(request, survey_id)
 
