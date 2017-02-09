@@ -27,6 +27,10 @@ class InterviewerForm(ModelForm):
                                                                                 status__in=[SurveyAllocation.PENDING,
                                                                                             SurveyAllocation.COMPLETED]
                                                                                 ).order_by('status')[0].survey.pk
+                self.fields['ea'].initial = EnumerationArea.objects.filter(survey_allocations__survey=
+                                                                           self.fields['survey'].initial,
+                                                                           survey_allocations__interviewer=
+                                                                           self.instance)
             except IndexError:
                 pass
         if self.data.get('ea'):
