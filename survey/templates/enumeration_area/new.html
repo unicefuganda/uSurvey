@@ -30,12 +30,14 @@
 	 	    		{% endfor %}
 	        }
 	        $.getJSON(url, params, function (data) {
-	        	$('#ms-ea-locations .ms-elem-selectable').hide();
-	            $('#ea-locations option').hide();
-	            $.each(data, function () {
-	                $('#ea-locations option[value='+this.id+']').show();
-	                $('#'+this.id+'-selectable').show();
-	            });
+	        	$('#ea-locations').empty();
+        		$(data).each(function () {
+					$("<option />", {
+						val: this.id,
+						text: this.name
+					}).appendTo($('#ea-locations'));
+				});
+				$('#ea-locations').multiSelect("destroy").multiSelect();
 	        });
 	    });
 

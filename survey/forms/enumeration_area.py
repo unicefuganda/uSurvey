@@ -12,7 +12,10 @@ class EnumerationAreaForm(ModelForm):
         super(EnumerationAreaForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder = ['name', ]
         locations = locations or LocationsFilterForm().get_locations()
-        self.fields['locations'].queryset = locations
+        if self.data.get('locations'):
+            self.fields['locations'].queryset = locations
+        else:
+            self.fields['locations'].queryset = Location.objects.none()
         self.fields.keyOrder.append('locations')
 
     class Meta:
