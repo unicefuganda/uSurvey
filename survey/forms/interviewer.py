@@ -15,7 +15,7 @@ class InterviewerForm(ModelForm):
                                                                   'class': 'datepicker'}, format=settings.DATE_FORMAT))
     ea = forms.ModelMultipleChoiceField(queryset=EnumerationArea.objects.none(),
                                         widget=forms.SelectMultiple(attrs={'class': 'multi-select ea_filter',
-                                                                           'id': 'test-s'}))
+                                                                           }))
 
     def __init__(self, eas, data=None, *args, **kwargs):
         super(InterviewerForm, self).__init__(data=data, *args, **kwargs)
@@ -29,7 +29,7 @@ class InterviewerForm(ModelForm):
                                                                                 ).order_by('status')[0].survey.pk
             except IndexError:
                 pass
-        self.fields['ea'].queryset = eas
+        self.fields['ea'].queryset = EnumerationArea.objects.all() #eas
 
     class Meta:
         model = Interviewer

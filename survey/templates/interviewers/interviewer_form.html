@@ -69,7 +69,6 @@
 	            });
         		$(' .chzn-select').trigger("liszt:updated");
 	        });
-
 	    });
   	{% endfor %}
   	$("#id_level_of_education").append($('<option value="val"/>').text('--Select Level Of Education--'));
@@ -82,21 +81,24 @@
     	{% for location_type in location_filter_types %}
     	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
     	{% endfor %}
-    	url = "{% url 'enumeration_area_filter' %}";
+    	var url = "{% url 'enumeration_area_filter' %}";
         params = {
         		{% for location_type in location_filter_types %}
         			{{ location_type }} : {{ location_type }}_selected,
  	    		{% endfor %}
         }
         $.getJSON(url, params, function (data) {
-            $('#id_ea').find('option').remove().end()
-	        	.append('<option value="">-------</option>');
-        		$.each(data, function () {
-        			$('#id_ea').append('<option value='+this.id+'>'+this.name+'</option>');
-	            });
-            $(' .chzn-select').trigger("liszt:updated");
-        });
+        		$('#id_ea').empty();
+        		$(data).each(function () {
+					$("<option />", {
+						val: this.id,
+						text: this.name
+					}).appendTo($('#id_ea'));
+				});
+				$('#id_ea').multiSelect("destroy").multiSelect();
+	        });
     });
+
   </script>
 
   <script type="text/javascript">
