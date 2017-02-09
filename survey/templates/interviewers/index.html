@@ -71,7 +71,26 @@
 	      </td>
         {% endfor %}
 	   <td>
-		{{ interviewer.ea.name}}
+        <a href="#ea_{{interviewer.pk}}" data-toggle="modal" class="add_batch">view ({{interviewer.assignments.count}})</a>
+                	  <div class="modal fade" id="ea_{{interviewer.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
+					    <div class="modal-dialog">
+					        <div class="modal-content">
+					          <div class="modal-header">
+					            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					            <h4 class="modal-title">{{interviewer.name}} Locations</h4>
+					          </div>
+					          <div class="modal-body">
+					            <table id="ea_{{interviewer.pk}}" class="table centerTable ea_locations">
+		                			{% for assignment in interviewer.assignments.all %}
+			                			<tr>
+			                				<td>{{ assignment.allocation_ea.name }}<td>
+			                			</tr>
+			                		{% endfor %}
+			                	</table>
+					          </div>
+					        </div><!-- /.modal-content -->
+					    </div><!-- /.modal-dialog -->
+					</div><!-- /.modal -->
 	  </td>
          <td>
 		{{ interviewer.allocated_surveys | display_list }}
