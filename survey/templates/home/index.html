@@ -130,7 +130,6 @@ function updateParameters() {
 function getCompletionFor(){
     var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val()+'&indicator='+$("#id_indicator").val()+'&parameter='+$("#id_parameter").val()+'&metric='+$("#id_metric").val();
     $.getJSON(survey_url, function (rate_data) {
-      //alert(JSON.stringify(rate_data));
       $.each(mapData, function(element){
          mapData.features.map(function(feature){
           var property = feature.properties['{{loc_field}}'];

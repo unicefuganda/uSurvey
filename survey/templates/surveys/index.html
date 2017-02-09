@@ -57,7 +57,6 @@
     <br>
       <tr>
         <th class="status">
-          Status
         </th>
         <th class="sorting">
           Name
@@ -87,7 +86,7 @@
     {% for survey in surveys %}
         <tr>
          <td>
-              {% if survey.is_open %}<div id="green_circle"></div>{% elif survey.interviews.count %}<div id="red_circle"></div>{% else %}<div id="amber_circle"></div>{% endif %}
+              {% if survey.is_open %}<div id="green_circle" title="Started"></div>{% elif survey.interviews.count %}<div id="red_circle" title="Closed"></div>{% else %}<div id="amber_circle" title="Not Started"></div>{% endif %}
           </td>
           <td>
             <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
