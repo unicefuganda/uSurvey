@@ -82,6 +82,9 @@
        #nav-mydd a {
          background: inherit !important;
        }
+       #xyz-breadcrumbs {
+        z-index: 2;
+       }
 
    </style>
       <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
@@ -299,8 +302,8 @@
                   </div>
                    <br />
                   <!--<div class="row col-xs-4 col-lg-4" style="color:#09F; z-index:1;">-->
-                  <div class="row col-xs-12 col-md-8">
-                      <h5 style="color:#09F; font-weight:none;">
+                  <div class="row col-xs-12 col-md-8" id="xyz-breadcrumbs">
+                      <h5 style="color:#09F; font-weight:none; max-width: 50%;">
                                 <a href="{% url 'home_page' %}">Home</a> &raquo;
                                     {% for breadcrumb in request.breadcrumbs %}
                                     <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a> &raquo;
@@ -308,7 +311,7 @@
                           </h5>
                   </div>
                   <div>
-                      <div class="dataTables_filter">
+                      <div class="dataTables_filter" id="xyz-page-actions">
                         {% block page_actions %}
 
                          {% endblock %}
