@@ -27,11 +27,13 @@
  .search{
             margin-top: 1px !important;
         }
+        
  </style>
 {% include "search_form.html" %}
 
 {% autopaginate enumeration_areas 100 %}
     <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info"> -->
+    <div style="overflow-x: auto; overflow-y: auto; width: 100%;">
     <table id="ea" class="table table-striped table-bordered table-hover dataTable table-sort ">
 		<thead>
         <tr role="row">
@@ -99,6 +101,7 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
 {% paginate %}
 {% endblock %}
 
