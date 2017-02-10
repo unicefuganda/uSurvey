@@ -102,6 +102,16 @@ class Question(CloneableMixin, GenericQuestion):
     def upcoming_question(self):
         return self.qset.next_inline()
 
+    def upcoming_flow_questions(self):
+        questions = OrderedSet()
+        started = False
+        for q in self.qset.flow_questions:
+            if q.pk == self.pk:
+                started = True
+            if started:
+                questions.append(q)
+        return questions
+
     def direct_sub_questions(self):
         from survey.forms.logic import LogicForm
         sub_flows = self.flows.filter(
@@ -212,6 +222,7 @@ class QuestionFlow(CloneableMixin, BaseModel):
         if self.next_question:
             self.next_question_type = self.next_question.type_name()
         invalidate_obj(self.question)
+        invalidate_obj(QuestionSet.get(pk=self.question.qset.pk))
         if self.next_question:
             invalidate_obj(self.next_question)
         return super(QuestionFlow, self).save(*args, **kwargs)
@@ -326,6 +337,15 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
                     loops.pop(-1)
             return loop_story
         return _loop_story()
+
+    @property
+    def has_loop(self):
+        return QuestionLoop.objects.filter(loop_starter__qset__pk=self.pk).exists()
+
+    @property
+    def has_skip(self):
+        from survey.forms.logic import LogicForm
+        return QuestionFlow.objects.filter(question__qset__pk=self.pk, desc=LogicForm.SKIP_TO).exists()
 
     def non_response_enabled(self, ea):
         locations = set()

@@ -43,6 +43,7 @@
     {% if batch %}
         <form method="post" accept-charset="utf-8" action="{% url 'qset_update_question_order_page' batch.id %}">
         {% csrf_token %}
+
     {% endif %}
 
 {% autopaginate questions max_display_per_page %}
@@ -233,7 +234,26 @@
     </tbody>
 </table>
 {% if batch and batch.interviews.count == 0 %}
-    <button type="submit" class="btn btn-primary pull-right" name="save_button">Update Question Order</button>
+    <button type="submit" href="#batch_{{batch.pk}}" data-toggle="modal" class="btn btn-primary pull-right" name="save_button" {% if batch.has_loop or batch.has_skip %}onclick="return false;"{% endif %}>Update Question Order</button>
+      {% if batch.has_loop or batch.has_skip %}
+            <div class="modal fade" id="batch_{{batch.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Confirmation Required</h4>
+                      </div>
+                      <div class="modal-body">
+                        <p>Looks like your questions has a {% if batch.has_loop %}Loop{% else %}Skip Logic{% endif %} attached. Updating the order would delete this.</p>
+                         <p> Would you like to continue?</p>
+                          <div class="form-actions">
+                            <button type="submit" class="btn btn-primary submit btnforall" name="save_button"  data-disabled-text="{{ loading_text }}">Yes</button>
+                           </div>
+                      </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+       {% endif %}
     </form>
 {% endif %}
 

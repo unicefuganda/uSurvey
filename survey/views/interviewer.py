@@ -34,7 +34,8 @@ def _create_or_edit(request, action_text, interviewer=None):
     extra = 1
     title = 'New Interviewer'
     odk_instance = None
-    data = request.GET
+    # loc_data = request.GET if request.method == 'GET' else request.POST
+    data = request.GET if request.method == 'GET' else request.POST
     if request.POST and request.POST.get('ea'):
         ea = get_object_or_404(EnumerationArea, pk=request.POST['ea'])
         data = dict([(loc.type.name, loc.pk) for loc in ea.parent_locations()])

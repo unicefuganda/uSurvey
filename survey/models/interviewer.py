@@ -53,6 +53,10 @@ class Interviewer(BaseModel):
         return self.name
 
     @property
+    def unfinished_assignments(self):
+        return self.assignments.filter(status=SurveyAllocation.PENDING)
+
+    @property
     def age(self):
         return relativedelta(datetime.utcnow().date(), self.date_of_birth).years
 

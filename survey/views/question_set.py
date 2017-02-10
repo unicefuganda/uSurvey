@@ -112,7 +112,8 @@ def delete(request, question_id, batch_id):
                        "%s cannot be deleted because it already has interviews." % qset.verbose_name())
     else:
         qset.delete()
-    return HttpResponseRedirect('/surveys/%s/batches/'%batch_id)
+    return HttpResponseRedirect(reverse('batch_index_page', args=(qset.survey.id,)))
+
 
 def delete_qset_listingform(request, question_id):
     qset = QuestionSet.get(pk=question_id)
@@ -121,9 +122,10 @@ def delete_qset_listingform(request, question_id):
                        "%s cannot be deleted because it already has interviews." % qset.verbose_name())
     else:
         qset.delete()
-    return HttpResponseRedirect('/listing_form/')
+    return HttpResponseRedirect(reverse('%s_home' % qset.resolve_tag()))
 
 
+@login_required
 @permission_required('auth.can_view_aggregates')
 def view_data(request, qset_id):
     try:

@@ -149,6 +149,7 @@ class Answer(BaseModel):
     interview = models.ForeignKey(Interview, related_name='%(class)s', db_index=True)
     question = models.ForeignKey("Question", null=True, related_name="%(class)s",
                                  on_delete=models.PROTECT, db_index=True)
+    identifier = models.CharField(max_length=200)    # basically calculated field for reporting
     as_text = models.CharField(max_length=200)      # basically calculated field for reporting
     as_value = models.CharField(max_length=200)     # basically calculated field for reporting
 
@@ -162,7 +163,8 @@ class Answer(BaseModel):
         except:
             pass
         return cls.objects.create(question=question, value=answer, question_type=question.__class__.type_name(),
-                                  interview=interview, as_text=as_text, as_value=as_value)
+                                  interview=interview, identifier=question.identifier,
+                                  as_text=as_text, as_value=as_value)
 
     @classmethod
     def supported_answers(cls):
@@ -353,7 +355,9 @@ class NumericalAnswer(Answer):
             text_value = str(value).zfill(9)     # zero fill to 1billion
         except Exception:
             raise
-        return super(NumericalAnswer, cls).create(interview, question, answer, as_text=text_value, as_value=text_value)
+        return super(NumericalAnswer, cls).create(interview, question, answer,
+                                                  identifier=question.identifier,
+                                                  as_text=text_value, as_value=text_value)
 
     @classmethod
     def greater_than(cls, answer, value):
@@ -435,8 +439,8 @@ class MultiChoiceAnswer(Answer):
             answer = question.options.get(order=answer)
         except:
             pass
-        return super(MultiChoiceAnswer, cls).create(interview, question, answer, as_text=answer.text,
-                                                    as_value=answer.order)
+        return super(MultiChoiceAnswer, cls).create(interview, question, answer, identifier=question.identifier,
+                                                    as_text=answer.text, as_value=answer.order)
 
     class Meta:
         app_label = 'survey'
@@ -477,7 +481,8 @@ class MultiSelectAnswer(Answer):
         else:
             selected = answer
         ans = cls.objects.create(question=question, question_type=question.__class__.type_name(),
-                                 interview=interview, as_text=raw_answer, as_value=raw_answer)
+                                 interview=interview, identifier=question.identifier,
+                                 as_text=raw_answer, as_value=raw_answer)
         for opt in selected:
             ans.value.add(opt)
         return ans
@@ -519,7 +524,8 @@ class DateAnswer(Answer):
         raw_answer = answer
         if isinstance(answer, basestring):
             answer = extract_date(answer, fuzzy=True)
-        return super(DateAnswer, cls).create(interview, question, answer, as_text=raw_answer, as_value=raw_answer)
+        return super(DateAnswer, cls).create(interview, question, answer, identifier=question.identifier,
+                                             as_text=raw_answer, as_value=raw_answer)
 
     class Meta:
         app_label = 'survey'
@@ -595,7 +601,8 @@ class GeopointAnswer(Answer):
             answer = answer.split(' ')
             answer = ODKGeoPoint.objects.create(latitude=answer[0], longitude=answer[1],
                                                 altitude=answer[2], precision=answer[3])
-        return super(GeopointAnswer, cls).create(interview, question, answer, as_text=raw_answer, as_value=raw_answer)
+        return super(GeopointAnswer, cls).create(interview, question, answer, identifier=question.identifier,
+                                                 as_text=raw_answer, as_value=raw_answer)
 
     class Meta:
         app_label = 'survey'

@@ -14,6 +14,7 @@ from survey.forms.batch import BatchQuestionsForm
 from survey.forms.question_set import BatchForm
 from survey.forms.filters import QuestionFilterForm, BatchOpenStatusFilterForm
 from .question_set import QuestionSetView
+from survey.utils.query_helper import get_filterset
 
 
 @login_required
@@ -48,6 +49,9 @@ def show(request, survey_id, batch_id):
     open_status_filter = BatchOpenStatusFilterForm(batch, request.GET)
     batch_location_ids = batch.open_locations.values_list('location_id', flat=True)
     locations = open_status_filter.get_locations()
+    search_fields = ['name', ]
+    if request.GET.has_key('q'):
+        locations = get_filterset(locations, request.GET['q'], search_fields)
     request.breadcrumbs(Batch.edit_breadcrumbs(survey=batch.survey))
     open_locations = locations.filter(id__in=batch_location_ids)
     context = {'batch': batch,
@@ -103,6 +107,7 @@ def new(request, survey_id):
     if response.status_code == 302:
         response = HttpResponseRedirect(reverse('batch_index_page', args=(survey.pk, )))
     return response
+
 
 @permission_required('auth.can_view_batches')
 def edit(request, batch_id):

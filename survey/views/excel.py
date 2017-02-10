@@ -109,8 +109,7 @@ def download(request):
         if survey_batch_filter_form.is_valid():
             batch = survey_batch_filter_form.cleaned_data['batch']
             survey = survey_batch_filter_form.cleaned_data['survey']
-            multi_option = survey_batch_filter_form.cleaned_data[
-                'multi_option']
+            multi_option = survey_batch_filter_form.cleaned_data['multi_option']
             restricted_to = None
             if last_selected_loc:
                 restricted_to = [last_selected_loc, ]
@@ -128,10 +127,12 @@ def download(request):
                                                           multi_display=multi_option)
                 file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
                                       last_selected_loc else '', batch.name if batch else survey.name)
-                generate_result_link.delay(
-                    request.user, download_service, file_name)
-                messages.warning(
-                    request, "Download is in progress. Download link would be available to you shortly")
+                reports_df = download_service.generate_interview_reports()
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="%s.csv"' % download['filename']
+                reports_df.to_csv(response, columns=reports_df.columns[1:])   #exclude interview id
+                messages.info(request, "Download successfully downloaded")
+                return response
     loc_types = LocationType.in_between()
     return render(request, 'aggregates/download_excel.html',
                   {

@@ -180,8 +180,8 @@ class LoopingForm(forms.ModelForm, FormOrderMixin):
         self.fields['loop_starter'].widget = forms.HiddenInput()
         self.fields['loop_starter'].initial = loop_starter.pk
         self.fields['loop_ender'].label = 'Loop Ends At:'
-        self.fields['loop_ender'].queryset = Question.objects.filter(pk__in=[q.pk for
-                                                                             q in loop_starter.upcoming_inlines()])
+        empty = [('', '---------')]
+        self.fields['loop_ender'].choices = empty +[(q.pk, str(q)) for q in loop_starter.upcoming_flow_questions()]
         self.fields['previous_numeric_values'] = forms.ModelChoiceField(queryset=Question.objects.filter(
             pk__in=[q.pk for q in loop_starter.previous_inlines() if q.answer_type == NumericalAnswer.choice_name()]
         ))

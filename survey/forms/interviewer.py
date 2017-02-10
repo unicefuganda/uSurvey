@@ -33,10 +33,7 @@ class InterviewerForm(ModelForm):
                                                                            self.instance)
             except IndexError:
                 pass
-        if self.data.get('ea'):
-            self.fields['ea'].queryset = EnumerationArea.objects.all()
-        else:
-            self.fields['ea'].queryset = eas
+        self.fields['ea'].queryset = eas
 
     class Meta:
         model = Interviewer

@@ -24,8 +24,7 @@ def uploadtask(composer):
 @permission_required('auth.can_view_batches')
 def new(request):
     locations_filter = LocationsFilterForm(data=request.GET)
-    enumeration_area_form = EnumerationAreaForm(
-        locations=locations_filter.get_locations())
+    enumeration_area_form = EnumerationAreaForm(locations=locations_filter.get_locations())
     if request.method == 'POST':
         enumeration_area_form = EnumerationAreaForm(data=request.POST)
         if enumeration_area_form.is_valid():
@@ -110,7 +109,7 @@ def edit(request, ea_id):
     locations_filter = LocationsFilterForm(data=request.GET)
     ea = get_object_or_404(EnumerationArea, pk=ea_id)
     enumeration_area_form = EnumerationAreaForm(
-        instance=ea, locations=locations_filter.get_locations())
+        instance=ea, locations=ea.locations.all())
     if request.method == 'POST':
         enumeration_area_form = EnumerationAreaForm(
             data=request.POST, instance=ea)
