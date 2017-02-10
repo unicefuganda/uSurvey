@@ -356,7 +356,6 @@ class NumericalAnswer(Answer):
         except Exception:
             raise
         return super(NumericalAnswer, cls).create(interview, question, answer,
-                                                  identifier=question.identifier,
                                                   as_text=text_value, as_value=text_value)
 
     @classmethod
@@ -439,7 +438,7 @@ class MultiChoiceAnswer(Answer):
             answer = question.options.get(order=answer)
         except:
             pass
-        return super(MultiChoiceAnswer, cls).create(interview, question, answer, identifier=question.identifier,
+        return super(MultiChoiceAnswer, cls).create(interview, question, answer,
                                                     as_text=answer.text, as_value=answer.order)
 
     class Meta:
@@ -524,7 +523,7 @@ class DateAnswer(Answer):
         raw_answer = answer
         if isinstance(answer, basestring):
             answer = extract_date(answer, fuzzy=True)
-        return super(DateAnswer, cls).create(interview, question, answer, identifier=question.identifier,
+        return super(DateAnswer, cls).create(interview, question, answer,
                                              as_text=raw_answer, as_value=raw_answer)
 
     class Meta:
@@ -601,7 +600,7 @@ class GeopointAnswer(Answer):
             answer = answer.split(' ')
             answer = ODKGeoPoint.objects.create(latitude=answer[0], longitude=answer[1],
                                                 altitude=answer[2], precision=answer[3])
-        return super(GeopointAnswer, cls).create(interview, question, answer, identifier=question.identifier,
+        return super(GeopointAnswer, cls).create(interview, question, answer,
                                                  as_text=raw_answer, as_value=raw_answer)
 
     class Meta:
