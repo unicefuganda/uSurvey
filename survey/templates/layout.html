@@ -3,6 +3,12 @@
 <!DOCTYPE html>
 <html class=" js csstransitions" lang="en-US">
    <head>
+   <style type="text/css">
+     .modal-body{
+      padding-top: 0px !important;
+      padding-bottom: 40px !important;
+     }
+   </style>
       <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width" />
@@ -292,7 +298,8 @@
                   <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;">
                   </div>
                    <br />
-                  <div class="row col-xs-4 col-lg-4" style="color:#09F; z-index:1;">
+                  <!--<div class="row col-xs-4 col-lg-4" style="color:#09F; z-index:1;">-->
+                  <div class="row col-xs-12 col-md-8">
                       <h5 style="color:#09F; font-weight:none;">
                                 <a href="{% url 'home_page' %}">Home</a> &raquo;
                                     {% for breadcrumb in request.breadcrumbs %}

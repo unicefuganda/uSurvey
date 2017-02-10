@@ -262,7 +262,7 @@ display: inline-block;
 }
 .menuButton.active span,
 .menuButton:hover span {
-    background: #de3c2f;
+    /*background: #de3c2f;*/
 }
 .headerFix{
   position: fixed !important;

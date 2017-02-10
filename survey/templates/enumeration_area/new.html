@@ -38,10 +38,6 @@
 	            });
 	        });
 	    });
-
-
-
-
   	{% for location_type in location_filter_types %}
 	$('#id_{{ location_type }}').on('change', function () {
 	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
@@ -54,7 +50,6 @@
 	            });
         		$(' .chzn-select').trigger("liszt:updated");
 	        });
-
 	    });
   	{% endfor %}
     </script>
