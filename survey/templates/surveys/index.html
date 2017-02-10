@@ -20,10 +20,16 @@
         content: None !important;
     }
 #red_circle  {
-    background: #d12a09 none repeat scroll 0 0;
+    /*background: #d12a09 none repeat scroll 0 0;
     border-radius: 70px;
     height: 10px;
     margin-top: 5px;
+    width: 10px;*/
+    background: #a3a3a3 none repeat scroll 0 0;
+    border: 1px solid #000;
+    margin-top: 5px;
+    border-radius: 70px;
+    height: 10px;
     width: 10px;
 }
 #green_circle {
@@ -88,7 +94,7 @@
     {% for survey in surveys %}
         <tr>
          <td>
-              {% if survey.is_open %}<div id="green_circle" title="Started"></div>{% elif survey.interviews.count %}<div id="red_circle" title="Closed"></div>{% else %}<div id="amber_circle" title="Not Started"></div>{% endif %}
+              {% if survey.is_open %}<div id="green_circle" title="Started"></div>{% elif survey.interviews.count %}<div id="amber_circle" title="Closed"></div>{% else %}<div id="red_circle" title="Not Started"></div>{% endif %}
           </td>
           <td>
             <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>
@@ -133,12 +139,18 @@
                             {% endif %}
                             <li><a href="{% url 'batch_index_page' survey.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>View Batches</span></a></li>
                             <li>
-                                <a href="{% url 'clone_survey_page' survey.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Clone</span></a>
+
+<!-- <a href="#clone_module_{{survey.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-clone bigger-120"></i>clone</span></a> -->
+
+<a href="#clone_survey_{{survey.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Delete"><span class="blue"><i class="usur-icon fa fa-clone bigger-120"></i>clone</span></a>
+                                <!-- <a href="{% url 'clone_survey_page' survey.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Clone</span></a> -->
                             </li>
                         </ul>
                 </div>
             </div>
           {% include "base/delete_modal.html" with object_name=survey.name id=survey.id name="Survey" url=survey.id|get_url_with_ids:"delete_survey" %}
+
+          {% include "base/clone_modal.html" with object_name=survey.name id=survey.id name="Survey" url=survey.id|get_url_with_ids:"clone_survey_page" %}
           </td>
         </tr>
       {% endfor %}

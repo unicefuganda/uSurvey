@@ -10,7 +10,7 @@
         <span class="alert_confirm">Confirm:</span> Are you sure you want to {{ action_str|default:'delete' }} <strong><em>{{ object_name }}</em></strong>?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         <a class="btn btn-primary" href="{{ url }}" id="{{ action_str|default:'delete' }}-{{name.lower}}-{{id}}">Yes</a>
       </div>
     </div>
