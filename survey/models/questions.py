@@ -315,6 +315,7 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     def can_be_deleted(self):
         return True, ''
 
+    @property
     def all_questions(self):
         return self.flow_questions
 
