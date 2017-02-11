@@ -33,6 +33,7 @@
                 </th>
             {% endfor %}
             <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Enumeration Area</th>
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Interviewer</th>
             {% for question in qset.flow_questions %}
             <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">{{ question.identifier|upper }}</th>
             {% endfor %}
@@ -48,6 +49,9 @@
             {% endfor %}
            <td>
             {{ interview.ea.name}}
+          </td>
+           <td>
+            {{ interview.interviewer.name}}
           </td>
             {% for question in qset.flow_questions %}
               {% get_answer question interview as answer %}
