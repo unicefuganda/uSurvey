@@ -88,15 +88,19 @@ class ResultsDownloadService(object):
         # not get pivot table of interview_id, identifier and question value
         answers_report_df = answers_df.pivot(index='id', columns='identifier', values=value)
         reports_df = interviews_df.join(answers_report_df, on='id', how='outer')
-        header_names = ['Interview_id', 'Created', ]
+        header_names = ['Created', ]
         location_names = list(LocationType.objects.get(parent__isnull=True).get_descendants(include_self=False))
         header_names.extend(location_names)
-        header_names.append('EA')
+        header_names.extend(['EA', 'Interview_id', ])
+        report_columns = header_names + [q.identifier for q in self.batch.all_questions
+                                         if q.identifier in reports_df.columns]
         header_names.extend(list(reports_df.columns)[len(header_names):])
         reports_df.columns = header_names
         other_sort_fields = [identifier for identifier in self.batch.auto_fields.values_list('identifier', flat=True)
                              if identifier in header_names]
         reports_df.sort_values(['Created', ] + location_names + other_sort_fields)
+        reports_df = reports_df[report_columns]
+        # reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
         return reports_df
 
     def generate_interview_reports(self):

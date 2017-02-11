@@ -222,5 +222,5 @@ def download_data(request, qset_id, survey_id):
     reports_df = download_service.generate_interview_reports()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
-    reports_df.to_csv(response, columns=reports_df.columns[1:])   #exclude interview id
+    reports_df.to_csv(response) #, date_format='%Y-%m-%d %H:%M:%S')   #exclude interview id
     return response
