@@ -58,7 +58,7 @@ class ResultsDownloadService(object):
         self.multi_display = int(multi_display)
 
     def get_interview_answers(self):
-        interview_list_args = ['created', 'ea__locations__name', 'ea__name', 'interviewer', 'id', ]
+        interview_list_args = ['created', 'ea__locations__name', 'ea__name', 'interviewer__name', 'id', ]
         parent_loc = 'ea__locations'
         for i in range(LocationType.objects.count() - 2):
             parent_loc = '%s__parent' % parent_loc
@@ -91,7 +91,7 @@ class ResultsDownloadService(object):
         header_names = ['Created', ]
         location_names = list(LocationType.objects.get(parent__isnull=True).get_descendants(include_self=False))
         header_names.extend(location_names)
-        header_names.extend(['EA', 'interviewer', 'Interview_id', ])
+        header_names.extend(['EA', 'interviewer__name', 'Interview_id', ])
         report_columns = header_names + [q.identifier for q in self.batch.all_questions
                                          if q.identifier in reports_df.columns]
         header_names.extend(list(reports_df.columns)[len(header_names):])
@@ -100,7 +100,7 @@ class ResultsDownloadService(object):
                              if identifier in header_names]
         reports_df.sort_values(['Created', ] + location_names + other_sort_fields)
         reports_df = reports_df[report_columns]
-        # reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
+        reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
         return reports_df
 
     def generate_interview_reports(self):
