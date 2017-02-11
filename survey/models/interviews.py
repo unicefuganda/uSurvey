@@ -30,7 +30,7 @@ def update_model_obj_serial(model_obj, serial_name, filter_criteria):
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name="interviews")
-    survey = models.ForeignKey('Survey', related_name='interviews')
+    survey = models.ForeignKey('Survey', related_name='interviews',null=True, blank=True)
     question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)
     ea = models.ForeignKey(
         'EnumerationArea', related_name='interviews', db_index=True)    # repeated here for easy reporting

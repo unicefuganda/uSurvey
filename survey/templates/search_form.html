@@ -1,4 +1,4 @@
-<form action="" method="get" accept-charset="utf-8" id="{{ id }}">
+<!-- <form action="" method="get" accept-charset="utf-8" id="{{ id }}">
 <div class="wrap">
    <div class="search">
       <input name="q" type="text" class="searchTerm" value="{{q}}" id="{{ id }}_val" placeholder="{% if placeholder %}{{placeholder}}{% else %}Search...{% endif %}" >
@@ -7,4 +7,109 @@
      </button>
    </div>
 </div>
+</form> -->
+
+<style type="text/css">
+	body {
+ background-color: #f1f1f1;
+ font-family: Helvetica,Arial,Verdana;
+
+}
+h1 {
+ color: green;
+ text-align: center;
+}
+.redfamily {
+ color: red; 
+}
+.search-box,.close-icon,.search-wrapper {
+ position: relative;
+ /*padding: 10px;*/
+}
+/*.search-wrapper {
+ width: 500px;
+ margin: auto;
+ margin-top: 50px;
+}*/
+/*.search-box {
+ width: 80%;
+ border: 1px solid #ccc;
+  outline: 0;
+  border-radius: 15px;
+}*/
+.search-box:focus {
+ box-shadow: 0 0 15px 5px #b0e0ee;
+ border: 2px solid #bebede;
+}
+.close-icon {
+ border:1px solid transparent;
+ background-color: transparent;
+ display: inline-block;
+ vertical-align: middle;
+  outline: 0;
+  cursor: pointer;
+}
+/*.close-icon:after {
+ content: "X";
+ display: block;
+ width: 15px;
+ height: 15px;
+ position: absolute;
+ background-color: #FA9595;
+ z-index:1;
+ right: 35px;
+ top: -3;
+ bottom: 0;
+ margin: auto;
+ padding: 2px;
+ border-radius: 50%;
+ text-align: center;
+ color: white;
+ font-weight: normal;
+ font-size: 12px;
+ box-shadow: 0 0 2px #E50F0F;
+ cursor: pointer;
+}*/
+.dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {    
+	margin-bottom: 0 !important;    
+	margin-left: 4px !important;    
+	margin-right: 4px !important;    
+	margin-top: 0 !important;    
+	padding: 3px !important;
+}
+
+.searchButton {
+    /* position: absolute; */
+    position: relative;
+    right: 28px !important;
+    /* width: 32px; */
+    height: 25px;
+    border: 1px solid #0099ff;
+    background: #0099ff;
+    text-align: center;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    /* font-size: 20px; */
+}	
+.close-icon::after {    background-color: #fa9595;    border-radius: 50%;    bottom: 0;    box-shadow: 0 0 2px #e50f0f;    color: white;    content: "X";    cursor: pointer;    display: block;    font-size: 12px;    font-weight: normal;    height: 15px;    margin: auto;    padding: 2px;    position: absolute;    right: 28px;    text-align: center;    top: -3px;    width: 15px;    z-index: 1;}
+.search-box:not(:valid) ~ .close-icon {
+ display: none;
+}
+</style>
+<div class="wrap">
+<div class="search">
+<form action="" method="get" accept-charset="utf-8" id="{{ id }}">
+   <div class="search-wrapper">
+      <input name="q" required type="text" class="search-box searchTerm" value="{{q}}" id="{{ id }}_val" placeholder="{% if placeholder %}{{placeholder}}{% else %}Search...{% endif %}" >
+      <button type="reset" class="close-icon">
+     </button>
+   <button type="submit" class="searchButton">
+        <i class="fa fa-search"></i>
+     </button>            
+   </div>
+
+      
+</div>
 </form>
+</div>
