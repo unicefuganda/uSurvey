@@ -194,9 +194,9 @@ def _get_qset(survey_tree):
     return QuestionSet.get(pk=pk)
 
 
-def _get_allocation(survey_tree):
-    pk = _get_nodes(FORM_ASSIGNMENT_PATH, tree=survey_tree)[0].text
-    return SurveyAllocation.objects.get(pk=pk)
+def _get_allocation(interviewer, survey_tree):
+    ea_name = _get_nodes(FORM_ASSIGNMENT_PATH, tree=survey_tree)[0].text
+    return interviewer.unfinished_assignments.get(allocation_ea__name=ea_name)
 
 
 def _get_form_type(survey_tree):
@@ -213,7 +213,7 @@ def process_submission(interviewer, xml_file, media_files=[], request=None):
     instance_id = _get_instance_id(survey_tree)
     description = ''
     qset = _get_qset(survey_tree)
-    survey_allocation = _get_allocation(survey_tree)
+    survey_allocation = _get_allocation(interviewer, survey_tree)
     # first things first. save the submission incase all else background task fails... enables recover
     submission = ODKSubmission.objects.create(interviewer=interviewer, survey=survey_allocation.survey,
                                               question_set=qset, ea=survey_allocation.allocation_ea, form_id=form_id,

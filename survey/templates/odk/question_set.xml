@@ -112,7 +112,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 		{% for assignment in assignments %}
 		<item>
 			<label>{{assignment.allocation_ea.name}}</label>
-			<value>{{ assignment.pk }}</value>
+			<value>{{ assignment.allocation_ea.name }}</value>
 		</item>
 		{% endfor %}
 	</select>
