@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from django.utils.decorators import method_decorator
 from django.forms import ValidationError
+from django.conf import settings
 from survey.services.export_interviewers import ExportInterviewersService
 from survey.models import Survey, Location, LocationType, QuestionSet, ListingTemplate, Batch, \
     Question, QuestionTemplate, QuestionOption, QuestionFlow, Answer
@@ -23,7 +24,7 @@ from survey.forms.question_set import get_question_set_form
 from survey.forms.question import get_question_form
 from survey.forms.filters import QuestionFilterForm
 from survey.odk.utils.odk_helper import get_zipped_dir
-from django.conf import settings
+from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 
 model = QuestionSet
 QuestionsForm = get_question_form(Question)
@@ -191,10 +192,17 @@ def download_attachment(request, question_id, interview_id):
 
 def download_data(request, qset_id):
     qset = QuestionSet.get(pk=qset_id)
-    filename = 'all_interviewers'
-    formatted_responses = ExportInterviewersService(
-        settings.INTERVIEWER_EXPORT_HEADERS).formatted_responses()
+    locations_filter = LocationsFilterForm(data=request.GET)
+    last_selected_loc = locations_filter.last_location_selected
+    restricted_to = None
+    if last_selected_loc:
+        restricted_to = [last_selected_loc, ]
+    download_service = ResultsDownloadService(batch=qset, restrict_to=restricted_to)
+    file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
+                          last_selected_loc else '', qset.name)
+    reports_df = download_service.generate_interview_reports()
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % filename
-    response.write("\r\n".join(formatted_responses))
+    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
+    reports_df.to_csv(response, columns=reports_df.columns[1:])   #exclude interview id
+    messages.info(request, "Download successfully downloaded")
     return response

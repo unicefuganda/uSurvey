@@ -68,15 +68,9 @@ class Survey(CloneableMixin, BaseModel):
                 data.append(row)
         return data
 
-    @property
-    def registered_households(self):
-        from survey.models.households import Household
-        return Household.objects.filter(listing__survey_houselistings__survey=self).distinct()
-    # def batches_enabled(self, interviewer):
-    #     if self.has_sampling:
-    #         if interviewer.present_households(self).count() < self.sample_size:
-    #             return False
-    #     return True
+    def total_interviews(self, qset):
+        from survey.models import Interview
+        return Interview.objects.filter(survey=self, question_set__pk=qset.pk).count()
 
     def bulk_enable_batches(self, eas):
         register = []

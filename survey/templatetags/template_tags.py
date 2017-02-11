@@ -388,7 +388,7 @@ def is_relevant_odk(context, question, interviewer):
     relevance_context = ' (%s)' % (
         ' or '.join(context.get(question.pk, [default_relevance, ])),
     )
-    if hasattr(question, 'group'):
+    if hasattr(question, 'group') and question.group:
         relevance_context = '%s %s' % (relevance_context, is_relevant_by_group(context, question))
 
     # do not include back to flows to this

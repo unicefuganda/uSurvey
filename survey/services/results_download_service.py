@@ -1,3 +1,4 @@
+from copy import deepcopy
 import pandas as pd
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -77,10 +78,12 @@ class ResultsDownloadService(object):
             answers_filter_args['interview__in'] = self.interviews
         else:
             interview_queryset = Interview.objects
-        interview_queryset= interview_queryset.filter(**interview_filter_args).values_list(*interview_query_args)
+        interview_queryset = interview_queryset.filter(**interview_filter_args).values_list(*interview_query_args)
         answers_queryset = Answer.objects.filter(**answers_filter_args).values_list(*answer_query_args)
         interviews_df = to_df(interview_queryset, date_cols=['created'])
         answers_df = to_df(answers_queryset)
+        answers_df.columns = [u'id', u'identifier', u'as_text']
+        #import pdb; pdb.set_trace()
         # not get pivot table of interview_id, identifier and question value
         answers_report_df = answers_df.pivot(index='id', columns='identifier', values=value)
         reports_df = interviews_df.join(answers_report_df, on='id', how='outer')
@@ -88,10 +91,12 @@ class ResultsDownloadService(object):
         location_names = list(LocationType.objects.get(parent__isnull=True).get_descendants(include_self=False))
         header_names.extend(location_names)
         header_names.append('EA')
+        report_headers = deepcopy(header_names)       # report header holds the order as per question flow in batch
+        report_headers.extend([q.identifier for q in self.batch.all_questions if q.identifier in reports_df.columns])
         header_names.extend(list(reports_df.columns)[len(header_names):])
         reports_df.columns = header_names
-        reports_df = reports_df.groupby(['Created', ]+location_names)
-        return reports_df
+        reports_group = reports_df.groupby(['Created', ]+location_names)
+        return reports_df[report_headers]
 
     def generate_interview_reports(self):
         return self.get_interview_answers()
