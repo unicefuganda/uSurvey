@@ -132,7 +132,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -142,7 +142,7 @@ MIDDLEWARE_CLASSES = (
     'breadcrumbs.middleware.BreadcrumbsMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 ROOT_URLCONF = 'mics.urls'
 
@@ -156,7 +156,7 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'survey', 'templates'),
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sessions',
@@ -179,7 +179,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-)
+]
 
 CHANNEL_LAYERS = {
     "default": {
@@ -401,3 +401,8 @@ try:
     from localsettings import *
 except ImportError:
     pass
+
+if DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware', ] + MIDDLEWARE_CLASSES
+    INTERNAL_IPS = ['127.0.0.1', ]

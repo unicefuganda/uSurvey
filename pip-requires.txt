@@ -37,3 +37,4 @@ django-macros
 django-cloneable
 numpy
 pandas
+django-debug-toolbar
