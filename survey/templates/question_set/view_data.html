@@ -13,7 +13,7 @@
 {% endblock %}
 {% block page_actions %}
 <div class="col-lg-12" style="margin-top: -18px;margin-left: 21px;">
-                         <a style="padding-left: 4px;padding-right: 3px;" id="export_question" class="btn btn-white btn-warning btn-bold" href="{% url 'download_qset_data' qset.id %}" id="download_qset_data">
+                         <a style="padding-left: 4px;padding-right: 3px;" id="export_question" class="btn btn-white btn-warning btn-bold" href="{% url 'download_qset_data' qset.id survey.id %}" id="download_qset_data">
                         <i class="ace-icon fa fa-external-link bigger-120 "></i>
                          Export Data</a>
 		</div>

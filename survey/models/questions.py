@@ -13,7 +13,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from mptt.models import MPTTModel, TreeForeignKey
 from model_utils.managers import InheritanceManager
-from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer
+from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, AutoResponse
 from survey.models.householdgroups import HouseholdMemberGroup
 from survey.models.access_channels import USSDAccess, InterviewerAccess
 from survey.models.base import BaseModel
@@ -314,6 +314,10 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
 
     def can_be_deleted(self):
         return True, ''
+
+    @property
+    def auto_fields(self):
+        return self.questions.filter(answer_type=AutoResponse.choice_name())
 
     @property
     def all_questions(self):

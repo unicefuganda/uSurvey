@@ -49,6 +49,7 @@ class ResultsDownloadService(object):
 
     def __init__(self, survey=None, batch=None, restrict_to=None, interviews=None, multi_display=AS_TEXT):
         self.batch = batch
+        self.survey = survey
         self.locations = []
         if restrict_to:
             map(lambda loc: self.locations.extend(
@@ -72,6 +73,8 @@ class ResultsDownloadService(object):
             value = 'as_value'
         answer_query_args.append(value)
         answers_filter_args = {'question__qset__pk': self.batch.pk}
+        if self.survey:
+            answers_filter_args['interview__survey'] = self.survey
         if self.interviews:
             interview_queryset = self.interviews
             answers_filter_args['interview__in'] = self.interviews
@@ -81,6 +84,7 @@ class ResultsDownloadService(object):
         answers_queryset = Answer.objects.filter(**answers_filter_args).values_list(*answer_query_args)
         interviews_df = to_df(interview_queryset, date_cols=['created'])
         answers_df = to_df(answers_queryset)
+        answers_df.columns = ['id', 'identifier', value]
         # not get pivot table of interview_id, identifier and question value
         answers_report_df = answers_df.pivot(index='id', columns='identifier', values=value)
         reports_df = interviews_df.join(answers_report_df, on='id', how='outer')
@@ -90,7 +94,9 @@ class ResultsDownloadService(object):
         header_names.append('EA')
         header_names.extend(list(reports_df.columns)[len(header_names):])
         reports_df.columns = header_names
-        reports_df = reports_df.groupby(['Created', ]+location_names)
+        other_sort_fields = [identifier for identifier in self.batch.auto_fields.values_list('identifier', flat=True)
+                             if identifier in header_names]
+        reports_df.sort_values(['Created', ] + location_names + other_sort_fields)
         return reports_df
 
     def generate_interview_reports(self):

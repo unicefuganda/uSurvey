@@ -128,21 +128,39 @@ def delete_qset_listingform(request, question_id):
 
 @login_required
 @permission_required('auth.can_view_aggregates')
-def view_data(request, qset_id):
+def view_data(request, qset_id, survey_id):
     try:
         qset = QuestionSet.get(pk=qset_id)
+        survey = Survey.get(id=survey_id)
         request.breadcrumbs(qset.edit_breadcrumbs(qset=qset))
         params = request.GET
         locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
         if locations_filter.is_valid():
             interviews = Interview.objects.filter(ea__in=locations_filter.get_enumerations(),
                                                   question_set=qset).order_by('created')
-        context = {'qset': qset, 'interviews': interviews, 'locations_filter': locations_filter,
+        context = {'qset': qset, 'survey': survey, 'interviews': interviews, 'locations_filter': locations_filter,
                    'location_filter_types': LocationType.in_between()}
         return render(request, 'question_set/view_data.html', context)
     except QuestionSet.DoesNotExist:
         return HttpResponseNotFound()
 
+
+
+@login_required
+@permission_required('auth.can_view_aggregates')
+def listing_entries(request, qset_id):
+    try:
+        listing_qset = ListingTemplate.get(pk=qset_id)
+        surveys = listing_qset.survey_settings.all()
+        request.breadcrumbs(listing_qset.edit_breadcrumbs(qset=listing_qset))
+        params = request.GET
+        search_fields = ['name', ]
+        if request.GET.has_key('q'):
+            surveys = get_filterset(surveys, request.GET['q'], search_fields)
+        context = {'question_set': listing_qset, 'surveys': surveys, }
+        return render(request, 'question_set/listing_entries.html', context)
+    except ListingTemplate.DoesNotExist:
+        return HttpResponseNotFound()
 
 @login_required
 def identifiers(request):
@@ -190,19 +208,19 @@ def download_attachment(request, question_id, interview_id):
     return response
 
 
-def download_data(request, qset_id):
+def download_data(request, qset_id, survey_id):
     qset = QuestionSet.get(pk=qset_id)
+    survey = Survey.get(pk=survey_id)
     locations_filter = LocationsFilterForm(data=request.GET)
     last_selected_loc = locations_filter.last_location_selected
     restricted_to = None
     if last_selected_loc:
         restricted_to = [last_selected_loc, ]
-    download_service = ResultsDownloadService(batch=qset, restrict_to=restricted_to)
+    download_service = ResultsDownloadService(batch=qset, survey=survey, restrict_to=restricted_to)
     file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
                           last_selected_loc else '', qset.name)
     reports_df = download_service.generate_interview_reports()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
     reports_df.to_csv(response, columns=reports_df.columns[1:])   #exclude interview id
-    messages.info(request, "Download successfully downloaded")
     return response

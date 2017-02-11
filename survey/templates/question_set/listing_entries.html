@@ -5,20 +5,10 @@
 {% block search %}
 
 {% endblock %}
-{% block page_actions %}
-    <div class="col-lg-12" style="margin-top: -18px;margin-left: 21px;">
-    <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set">
-          <i class="ace-icon fa fa-plus bigger-120"></i>
-                        Create New {{ model.verbose_name }}
-                      </button>
-                      </div>
 
-{% endblock %}
 {% block content %}
 {% load pagination_tags %}
-{% block content_search %}
 {% include "search_form.html" %}
-{% endblock %}
 {% load template_tags %}
 
 </div>
@@ -32,6 +22,9 @@
         <th class="sorting">
           Total Responses
         </th>
+        <th class="sorting">
+          EAs Covered
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -39,10 +32,13 @@
       {% for survey in surveys %}
         <tr>
           <td>
-             <a href="{% url 'view_data_home' question_set.pk %}">{{ survey.name }}</a>
+             <a href="{% url 'view_data_home' question_set.pk survey.pk %}">{{ survey.name }}</a>
           </td>
           <td>
-            {{ survey.total_interview.batch }}
+            {{ survey.interviews.count }}
+          </td>
+          <td>
+            {{ survey.eas_covered }}
           </td>
         </tr>
       {% endfor %}
