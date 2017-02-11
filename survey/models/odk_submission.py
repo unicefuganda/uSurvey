@@ -20,8 +20,8 @@ class ODKSubmission(BaseModel):
     interviewer = models.ForeignKey(
         Interviewer, related_name="odk_submissions")
     survey = models.ForeignKey(Survey, related_name="odk_submissions")
-    ea = models.ForeignKey(EnumerationArea, related_name="odk_submissions")
-    question_set = models.ForeignKey(QuestionSet, related_name='odk_submissions')
+    ea = models.ForeignKey(EnumerationArea, related_name="odk_submissions",null=True, blank=True)
+    question_set = models.ForeignKey(QuestionSet, related_name='odk_submissions',null=True, blank=True)
     form_id = models.CharField(max_length=256)
     description = models.CharField(max_length=256, null=True, blank=True)
     instance_id = models.CharField(max_length=256)

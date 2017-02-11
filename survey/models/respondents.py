@@ -77,7 +77,7 @@ class GroupTestArgument(BaseModel):
 
 
 class SurveyParameterList(QuestionSet):             # basically used to tag survey grouping questions
-    batch = models.OneToOneField('Batch', related_name='parameter_list')
+    batch = models.OneToOneField('Batch', related_name='parameter_list',null=True, blank=True)
 
     class Meta:
         app_label = 'survey'

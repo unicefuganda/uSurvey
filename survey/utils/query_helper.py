@@ -1,5 +1,5 @@
 import re
-import pandas as pd
+# import pandas as pd
 from django.db import connection
 from django.db.models import Q
 
@@ -49,7 +49,7 @@ def get_filterset(objectset, query_string, search_fields):
     return objectset.distinct()
 
 
-def to_df(queryset, date_cols=None):
+def to_df(queryset):
     try:
         query, params = queryset.query.sql_with_params()
     except queryset.model.DoesNoteExist:
@@ -57,5 +57,5 @@ def to_df(queryset, date_cols=None):
         # query which will certainly be empty
         # e.g. Book.objects.filter(author__in=[])
         return pd.DataFrame()
-    return pd.io.sql.read_sql_query(query, connection, params=params, parse_dates=date_cols)
+    return pd.io.sql.read_sql_query(query, connection, params=params)
 

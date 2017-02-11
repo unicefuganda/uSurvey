@@ -16,7 +16,7 @@ class Indicator(BaseModel):
     name = models.CharField(max_length=255, null=False)
     # module = models.ForeignKey(QuestionModule, null=False, related_name='indicator')
     description = models.TextField(null=True)
-    parameter = models.ForeignKey(BatchQuestion, related_name='indicators')
+    parameter = models.ForeignKey(BatchQuestion, related_name='indicators', null=True, blank=True)
 
     def __unicode__(self):
         return self.name
