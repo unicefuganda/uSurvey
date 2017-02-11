@@ -1,0 +1,23 @@
+{% extends  horizontal_filter_form.html %}
+{% block postfilter %}
+    <script type="text/javascript">
+    $(function(){
+       {% for location_type in location_filter_types %}
+	    $('#id_{{ location_type }}').on('change', function () {
+	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
+	    	url = "{% url 'location_sub_types' %}";
+	        $.getJSON(url, params, function (data) {
+	        	$('#id_' + data.sub_type +' option').hide();
+	        	$('#id_' + data.sub_type +' option[value=""]').show();
+        		$.each(data.locations, function () {
+	                $('#id_' + data.sub_type +' option[value='+this.id+']').show();
+	            });
+        		$(' .chzn-select').trigger("liszt:updated");
+	        });
+
+	    });
+ 		{% endfor %}
+
+        });
+    </script>
+{% endblock %}
