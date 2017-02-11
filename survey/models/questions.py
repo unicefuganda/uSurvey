@@ -315,6 +315,9 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     def can_be_deleted(self):
         return True, ''
 
+    def all_questions(self):
+        return self.flow_questions
+
     def get_loop_story(self):
         """
         Basically returns all the loops which a question is involved in. This retains the queston order
