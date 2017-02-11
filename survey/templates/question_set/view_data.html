@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block search %}
-{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter'%}
+{% include "locations_filter_form.html" with a_form=locations_filter no_button=False filter_id='loc_filter' no_auto_refresh=True %}
 
 {% endblock %}
 {% block content_search %}

@@ -1,3 +1,4 @@
+import string
 from django import forms
 from django.forms import ModelForm
 from survey.models import Interviewer, ODKAccess, USSDAccess, BatchLocationStatus, Survey, EnumerationArea, SurveyAllocation
@@ -34,6 +35,8 @@ class InterviewerForm(ModelForm):
             except IndexError:
                 pass
         self.fields['ea'].queryset = eas
+        self.fields['survey'].empty_label = 'Select Survey'
+        #self.fields['survey'].empty_label = 'Select Survey'
 
     class Meta:
         model = Interviewer

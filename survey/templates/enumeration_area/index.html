@@ -7,7 +7,7 @@
   Enumeration Area Lists
 {% endblock %}
 {% block search %}
-{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=False filter_id='location_filter' %}
+{% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='location_filter' %}
 {% endblock %}
 {% block page_actions %}
     <!-- <button class="btn btn-white btn-warning btn-bold">
@@ -112,25 +112,7 @@
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
-	    <!--$("#a-ea-list").hide();-->
-	    <!-- -->
-	    <!--$('.location_filter').on('change', function () {-->
-	    	<!--{% for location_type in location_filter_types %}-->
-	    	   <!--var {{ location_type }}_selected = $('#id_{{ location_type }}').val();-->
-	    	<!--{% endfor %}-->
-	    	<!--url = "{% url 'enumeration_area_filter' %}";-->
-	        <!--params = { -->
-	        		<!--{% for location_type in location_filter_types %}-->
-	        			<!--{{ location_type }} : {{ location_type }}_selected,-->
-	 	    		<!--{% endfor %}	-->
-	        <!--}-->
-	        <!--$.getJSON(url, params, function (data) {-->
-	        	<!--$('.eas').hide();-->
-	            <!--$.each(data, function () {-->
-	            	<!--$('#ea-'+this.id).show();-->
-	            <!--});-->
-	        <!--});-->
-	    <!--});-->
+
 	    
 	$(document).ready(function() {    
      $('#ea').DataTable(
@@ -141,21 +123,6 @@
     }]
 });
 } );
-	    
-	    {% for location_type in location_filter_types %}
-	    $('#id_{{ location_type }}').on('change', function () {
-	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
-	    	url = "{% url 'location_sub_types' %}";
-	        $.getJSON(url, params, function (data) {
-	        	$('#id_' + data.sub_type +' option').hide();
-	        	$('#id_' + data.sub_type +' option[value=""]').show();
-        		$.each(data.locations, function () {
-	                $('#id_' + data.sub_type +' option[value='+this.id+']').show();
-	            });
-        		$(' .chzn-select').trigger("liszt:updated");  
-	        });
- 	  		 
-	    });
- 		{% endfor %}
+
     </script>
 {% endblock %}

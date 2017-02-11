@@ -4,7 +4,7 @@
 {{ title }}
 {% endblock %}
 {% block search %}
-{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
+{% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
 <br />
 {% endblock %}
 
@@ -57,26 +57,6 @@
     </script>
   <script type="text/javascript">
 
-  	{% for location_type in location_filter_types %}
-	$('#id_{{ location_type }}').on('change', function () {
-	    	params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};
-	    	url = "{% url 'location_sub_types' %}";
-	        $.getJSON(url, params, function (data) {
-	        	$('#id_' + data.sub_type).find('option').remove().end()
-	        	.append('<option value="">-------</option>').val('');
-        		$.each(data.locations, function () {
-        			$('#id_' + data.sub_type).append('<option value='+this.id+'>'+this.name+'</option>');
-	            });
-        		$(' .chzn-select').trigger("liszt:updated");
-	        });
-	    });
-  	{% endfor %}
-  	$("#id_level_of_education").append($('<option value="val"/>').text('--Select Level Of Education--'));
-    $("#id_level_of_education").val("val");
-    $("#id_language").append($('<option value="val"/>').text('--Select Preferred Language--'));
-    $("#id_language").val("val");
-  	/*$("#id_survey").append($('<option value="val"/>').text('--Select Survey--'));*/
-    $("#id_survey").val("val");
     $('.ea_filters').on('change', function () {
     	{% for location_type in location_filter_types %}
     	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
@@ -100,16 +80,5 @@
     });
 
   </script>
-
-  <script type="text/javascript">
-$(document).ready(function(){
-
-$("#id_survey option[value='']").text("--Select Survey--");
-        $("select#id_survey").val("");                
-  })
-
-
-  
-</script>
 
 {% endblock %}
