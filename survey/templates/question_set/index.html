@@ -26,7 +26,7 @@
 {% load pagination_tags %}
 {% include "search_form.html" %}
 {% load template_tags %}
-
+{% autopaginate question_sets 50 %}
 </div>
  <br />
  <div style="overflow-x: auto; overflow-y: auto; width: 100%;">
@@ -128,7 +128,6 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-{% autopaginate question_sets 10 %}
   {% paginate %}
 {% endblock %}
 
