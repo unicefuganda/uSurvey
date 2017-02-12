@@ -304,6 +304,7 @@ table.dataTable td {
 }
 .dataTables_wrapper .dataTables_length {
   float: left;
+  padding-top:10px;
 }
 .dataTables_wrapper .dataTables_filter {
   float: right;

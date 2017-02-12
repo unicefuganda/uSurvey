@@ -36,7 +36,6 @@
 {% load pagination_tags %}
 {% include "search_form.html" %}
 <br>
-<div style="overflow-x: auto; overflow-y: auto; width: 100%;">
 <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
 <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
  -->    
@@ -103,8 +102,7 @@
           </tr>
         {% endfor %}
       </tbody>
-    </table>
-    <div style="overflow-x: auto; overflow-y: auto; width: 100%;">
+    </table>    
 {% autopaginate interviewers 10 %}
 {% paginate %}
 {% endblock %}
@@ -153,13 +151,19 @@
     });
     
   $(document).ready(function() {
-     $('#datatables').DataTable(
-{
-   'aoColumnDefs': [{
+          
+    $('#datatables').DataTable( {
+        "scrollY":        "250px",
+        "scrollX":        '100%',
+        "scrollCollapse": true,
+        "paging":         true,
+        'aoColumnDefs': [{
         'bSortable': false,
         'aTargets': [-1] /* 1st one, start by the right */
     }]
-});   
+    } );
 } );
   </script>
+
+  
 {% endblock %}

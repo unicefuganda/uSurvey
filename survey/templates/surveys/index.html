@@ -12,7 +12,7 @@
 <script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
 <style type="text/css">
     .status {
-        width: 15px !important;
+        width: 50px !important;
         background-image: None !important;
     }
     th.status::after {
@@ -31,6 +31,7 @@
     border-radius: 70px;
     height: 10px;
     width: 10px;
+    margin-left: 15px;
 }
 #green_circle {
     background: #009948 none repeat scroll 0 0;
@@ -39,6 +40,7 @@
     margin-top: 5px;
     text-align: center;
     width: 10px;
+    margin-left: 15px;
 }
 #amber_circle {
     background: #ffcc00 none repeat scroll 0 0;
@@ -46,6 +48,7 @@
     height: 10px;
     margin-top: 5px;
     width: 10px;
+    margin-left: 15px;
 }
 
 </style>
@@ -181,15 +184,19 @@
     <script src="{{STATIC_URL}}js/survey.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">            
             $(document).ready(function() {
-    $('#datatables').DataTable(
-{
-   'aoColumnDefs': [{
+          
+    $('#datatables').DataTable( {
+        "scrollY":        "250px",
+        "scrollX":        '100%',
+        "scrollCollapse": true,
+        "paging":         true,
+        'aoColumnDefs': [{
         'bSortable': false,
         'aTargets': [-1] /* 1st one, start by the right */
     }]
-});    
+    } );
 } );
-        </script>
+  </script>
     <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
           <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
