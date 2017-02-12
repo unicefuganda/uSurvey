@@ -17,6 +17,7 @@ class Indicator(BaseModel):
     # module = models.ForeignKey(QuestionModule, null=False, related_name='indicator')
     description = models.TextField(null=True)
     batch = models.ForeignKey(Batch, related_name='indicators')
+    formulae = models.TextField()        # I'm allowing that the formula can contain long names
     # parameter = models.ForeignKey(BatchQuestion, related_name='indicators', null=True, blank=True)
 
     def __unicode__(self):

@@ -1,5 +1,6 @@
-from survey.forms.form_order_mixin import FormOrderMixin
 from django import forms
+from cacheops import cached_as
+from django import template
 from django.forms import ModelForm
 from survey.models import Indicator, Batch, QuestionModule, Survey, QuestionOption, IndicatorVariableCriteria, \
     IndicatorVariable
@@ -72,6 +73,10 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
         exclude = ['indicator', ]
         widgets = {'description': forms.Textarea(attrs={"rows": 2, "cols": 100}), }
 
+    def clean_name(self):
+        self.cleaned_data['name'] = self.cleaned_data['name'].replace(' ', '_')
+        return self.cleaned_data['name']
+
     def clean(self):
         validation_test = self.cleaned_data.get('validation_test', None)
         test_question = self.cleaned_data.get('test_question', None)
@@ -107,3 +112,13 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
             else:
                 criteria.arguments.create(position=0, param=self.cleaned_data['value'])
         return variable
+
+
+class IndicatorFormulaeForm(forms.ModelForm):
+
+    class Meta:
+        model = Indicator
+        include = ['formulae', ]
+
+    def clean_formulae(self):
+        pass

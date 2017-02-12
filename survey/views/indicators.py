@@ -1,7 +1,9 @@
+import json
+from django import template
 from django.utils.datastructures import SortedDict
 from django.contrib import messages
-from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import permission_required, login_required
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from survey.models import LocationType, Location, MultiChoiceAnswer, Interview
@@ -160,6 +162,15 @@ def view_indicator_variables(request, indicator_id):
     ])
     context = {'indicator': indicator, 'variables': indicator.variables.all()}
     return render(request, 'indicator/indicator_variable_list.html', context)
+
+
+@login_required
+def variables(request):
+    id = request.GET.get('id', None)
+    # return questions before last question
+    indicator = Indicator.get(pk=id)
+    json_dump = json.dumps(list(indicator.variables.values_list('name', )))
+    return HttpResponse(json_dump, content_type='application/json')
 
 
 def add_indicator_formular(request, indicator_id):
