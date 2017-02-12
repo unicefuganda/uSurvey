@@ -121,4 +121,14 @@ class IndicatorFormulaeForm(forms.ModelForm):
         fields = ['formulae', ]
 
     def clean_formulae(self):
-        pass
+        if self.instance.pk:
+            from asteval import Interpreter
+            aeval = Interpreter()
+            # basically substitute all place holders with 1 and see if it gives a valid math function
+            context = dict([(v.name, 1) for v in self.instance.variables.all()])
+            question_context = template.Context(context)
+            math_string =  template.Template(self.cleaned_data['formulae']).render(question_context)
+            aeval(math_string)
+            if len(aeval.error) > 0:
+               raise ValidationError(aeval.error[-1].get_error()[1])
+        return self.cleaned_data['formulae']

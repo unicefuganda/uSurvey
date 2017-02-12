@@ -38,3 +38,4 @@ django-cloneable
 numpy
 pandas
 django-debug-toolbar
+asteval

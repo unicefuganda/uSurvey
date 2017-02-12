@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from survey.models import LocationType, Location, MultiChoiceAnswer, Interview
-from survey.forms.indicator import IndicatorForm, IndicatorVariableForm
+from survey.forms.indicator import IndicatorForm, IndicatorVariableForm, IndicatorFormulaeForm
 from survey.forms.filters import IndicatorFilterForm, IndicatorMetricFilterForm
 from survey.models import Indicator, Survey, Answer, IndicatorVariable, IndicatorVariableCriteria
 from survey.forms.enumeration_area import LocationsFilterForm
@@ -41,10 +41,10 @@ def _process_form(indicator_filter_form, indicators):
         elif not batch_id.isdigit() and module_id.isdigit():
             indicators = indicators.filter(module=module_id)
         elif batch_id.isdigit() and not module_id.isdigit():
-            indicators = indicators.filter(parameter__qset__id=batch_id)
+            indicators = indicators.filter(batch__id=batch_id)
         elif survey_id.isdigit():
             batches = Survey.objects.get(id=survey_id).batches.values_list('id', flat=True)
-            indicators = indicators.filter(parameter__qset__id__in=batches)
+            indicators = indicators.filter(batch__id__in=batches)
     return indicators
 
 
@@ -169,12 +169,28 @@ def variables(request):
     id = request.GET.get('id', None)
     # return questions before last question
     indicator = Indicator.get(pk=id)
-    json_dump = json.dumps(list(indicator.variables.values_list('name', )))
+    json_dump = json.dumps(list(indicator.variables.values_list('name', flat=True)))
     return HttpResponse(json_dump, content_type='application/json')
 
 
-def add_indicator_formular(request, indicator_id):
-    return HttpResponseRedirect('../')
+@login_required
+@permission_required('auth.can_view_batches')
+def indicator_formula(request, indicator_id):
+    indicator = Indicator.get(id=indicator_id)
+    if request.method == 'POST':
+        formulae_form = IndicatorFormulaeForm(instance=indicator, data=request.POST)
+        if formulae_form.is_valid():
+            formulae_form.save()
+            messages.info(request, 'Formulae has been saved!')
+            return HttpResponseRedirect(reverse('list_indicator_page'))
+    else:
+        formulae_form = IndicatorFormulaeForm(instance=indicator)
+    request.breadcrumbs([
+        ('Indicator List', reverse('list_indicator_page')),
+    ])
+    context = {'indicator_form': formulae_form, 'title': 'Indicator Formulae',
+               'button_label': 'Save', 'cancel_url': reverse('list_indicator_page')}
+    return render(request, 'indicator/formulae.html', context)
 
 
 @permission_required('auth.can_view_batches')
