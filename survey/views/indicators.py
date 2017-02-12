@@ -138,10 +138,19 @@ def edit_indicator_variable(request, variable_id):
 
 
 @permission_required('auth.can_view_household_groups')
-def delete_indicator_variable(request, indicator_criteria_id):
-    get_object_or_404(IndicatorVariableCriteria, id=indicator_criteria_id).delete()
-    messages.info(request, 'condition removed successfully')
+def delete_indicator_variable(request, variable_id):
+    get_object_or_404(IndicatorVariable, id=variable_id).delete()
+    messages.info(request, 'Variable removed successfully')
     return HttpResponseRedirect(reverse('list_indicator_page'))
+
+
+@permission_required('auth.can_view_household_groups')
+def delete_indicator_criteria(request, indicator_criteria_id):
+    criterion = get_object_or_404(IndicatorVariableCriteria, id=indicator_criteria_id)
+    variable = criterion.variable
+    criterion.delete()
+    messages.info(request, 'condition removed successfully')
+    return HttpResponseRedirect(reverse('edit_indicator_variable', args=(variable.pk, )))
 
 
 def view_indicator_variables(request, indicator_id):

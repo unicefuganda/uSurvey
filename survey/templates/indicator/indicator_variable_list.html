@@ -56,40 +56,41 @@
                            <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i>
                        </button>
                         <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-                          <li><a href="{% url 'edit_indicator_variable' variable.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>View Variables</span></a></li>
+                          <li><a href="{% url 'edit_indicator_variable' variable.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="green"><i class="usur-icon fa fa-pencil-square-o bigger-120"></i>Edit Variable</span></a></li>
                           <li>
-                            <a href="#v_{{variable.pk}}" data-toggle="modal"><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>View filter ({{variable.criteria.count}})</span></a>
-                                <div class="modal fade" id="v_{{variable.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
-                                  <div class="modal-dialog">
-                                      <div class="modal-content">
-                                        <div class="modal-header">
-                                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                          <h4 class="modal-title">Filters on {{variable.name}}</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                          <table id="v_{{variable.pk}}" class="table centerTable ea_locations">
-                                              {% for condition in variable.criteria.all %}
-                                                  <tr>
-                                                      <td >
-                                                          {{ condition.test_question.identifier }}
-                                                      </td>
-                                                      <td >
-                                                          {{ condition.validation_test }}
-                                                      </td>
-                                                      <td>
-                                                          {{ condition.test_arguments|join_list:" and " }}
+                            <a href="#v_{{variable.pk}}" data-toggle="modal" class="add_batch"><span class="green"><i class="usur-icon fa fa-eye bigger-120"></i>View filter ({{variable.criteria.count}})</span></a>
 
-                                                      </td>
-                                                  </tr>
-                                              {% endfor %}
-                                          </table>
-                                        </div>
-                                      </div><!-- /.modal-content -->
-                                  </div><!-- /.modal-dialog -->
-                              </div><!-- /.modal -->
                           </li>
                         </ul>
                 </div>
+              <div class="modal fade" id="v_{{variable.pk}}" tabindex="-1" role="dialog"  aria-hidden="true">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                              <h4 class="modal-title">Filters on {{variable.name}}</h4>
+                            </div>
+                            <div class="modal-body">
+                              <table id="v1_{{variable.pk}}" class="table centerTable">
+                                  {% for condition in variable.criteria.all %}
+                                      <tr>
+                                          <td >
+                                              {{ condition.test_question.identifier }}
+                                          </td>
+                                          <td >
+                                              {{ condition.validation_test }}
+                                          </td>
+                                          <td>
+                                              {{ condition.test_arguments|join_list:" and " }}
+
+                                          </td>
+                                      </tr>
+                                  {% endfor %}
+                              </table>
+                            </div>
+                          </div><!-- /.modal-content -->
+                      </div><!-- /.modal-dialog -->
+                  </div><!-- /.modal -->
             </div>
           </td>
         </tr>
@@ -97,23 +98,7 @@
     </tbody>
   </table>
   </div>
-    <div class="modal fade" id="new_question_set" tabindex="-1" role="dialog"  aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">New {{ model.verbose_name.capitalize }}</h4>
-              </div>
-              <div class="modal-body">
-                {% if model.verbose_name == 'Batch' %}
-                    {% include "question_set/inline_new.html" with title="" model=model action=survey.id|get_url_with_ids:"new_batch_page"  button_label="Save"%}
-                {% else %}
-                    {% include "question_set/inline_new.html" with title="" model=model action="new_"|add:model.resolve_tag|add:"_page"|get_url_without_ids  button_label="Save"%}
-                {% endif %}
-              </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+
   {% paginate %}
 {% endblock %}
 
