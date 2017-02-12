@@ -89,15 +89,19 @@
     <script src="{{STATIC_URL}}js/survey.js" type="text/javascript" charset="utf-8"></script>    
             <script type="text/javascript">            
             $(document).ready(function() {
-    $('#datatables').DataTable(
-{
-   'aoColumnDefs': [{
+          
+    $('#datatables').DataTable( {
+        "scrollY":        "250px",
+        "scrollX":        '100%',
+        "scrollCollapse": true,
+        "paging":         true,
+        'aoColumnDefs': [{
         'bSortable': false,
         'aTargets': [-1] /* 1st one, start by the right */
     }]
-});
+    } );
 } );
-        </script>
+  </script>
 {% endblock %}
 
 

@@ -6,7 +6,6 @@
   {% block pre_table %}
 
   {% endblock %}
-<div style="overflow-x: auto; overflow-y: auto; width: 100%;">
   <table id="datatables" class="table table-striped table-bordered table-hover dataTable no-footer table-sort" role="grid" aria-describedby="dynamic-table_info">
     <thead>
     {% block table_head %}
@@ -17,8 +16,7 @@
     {% block table_body %}
     {% endblock %}
     </tbody>
-  </table>
-  </div>
+  </table>  
   {% paginate %}
   {% block post_table %}
 
