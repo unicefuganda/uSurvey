@@ -41,7 +41,7 @@ class IndicatorForm(ModelForm, FormOrderMixin):
 
     class Meta:
         model = Indicator
-        exclude = []
+        exclude = ['formulae']
 
 
 class IndicatorVariableForm(ModelForm, FormOrderMixin):
