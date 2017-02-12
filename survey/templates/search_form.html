@@ -113,3 +113,12 @@ h1 {
 </div>
 </form>
 </div>
+
+<script type="text/javascript">
+  var pathname = window.location.pathname; // Returns path only
+  var url      = window.location.href;
+  var host_name = window.location.hostname;
+  $(".close-icon").click(function(){    
+    window.location=pathname;
+}); 
+</script>
