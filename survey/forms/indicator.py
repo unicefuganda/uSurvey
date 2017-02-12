@@ -118,7 +118,7 @@ class IndicatorFormulaeForm(forms.ModelForm):
 
     class Meta:
         model = Indicator
-        include = ['formulae', ]
+        fields = ['formulae', ]
 
     def clean_formulae(self):
         pass
