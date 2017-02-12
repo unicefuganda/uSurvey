@@ -2,12 +2,12 @@ from django.utils.datastructures import SortedDict
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from survey.models import LocationType, Location, MultiChoiceAnswer, Interview
-from survey.forms.indicator import IndicatorForm, IndicatorCriteriaForm
+from survey.forms.indicator import IndicatorForm, IndicatorVariableForm
 from survey.forms.filters import IndicatorFilterForm, IndicatorMetricFilterForm
-from survey.models import Indicator, Survey, Answer
+from survey.models import Indicator, Survey, Answer, IndicatorVariable, IndicatorVariableCriteria
 from survey.forms.enumeration_area import LocationsFilterForm
 
 
@@ -39,10 +39,10 @@ def _process_form(indicator_filter_form, indicators):
         elif not batch_id.isdigit() and module_id.isdigit():
             indicators = indicators.filter(module=module_id)
         elif batch_id.isdigit() and not module_id.isdigit():
-            indicators = indicators.filter(batch=batch_id)
+            indicators = indicators.filter(parameter__qset__id=batch_id)
         elif survey_id.isdigit():
-            batches = Survey.objects.get(id=survey_id).batches.all()
-            indicators = indicators.filter(batch__in=batches)
+            batches = Survey.objects.get(id=survey_id).batches.values_list('id', flat=True)
+            indicators = indicators.filter(parameter__qset__id__in=batches)
     return indicators
 
 
@@ -84,29 +84,77 @@ def edit(request, indicator_id):
 
 
 @permission_required('auth.can_view_household_groups')
-def add_indicator_formular(request, indicator_id):
+def add_indicator_variable(request, indicator_id):
     response = None
     indicator = Indicator.get(pk=indicator_id)
-    criteria_form = IndicatorCriteriaForm(indicator)
+    variable_form = IndicatorVariableForm(indicator)
     if request.method == 'POST':
-        criteria_form = IndicatorCriteriaForm(indicator, data=request.POST)
-        if criteria_form.is_valid():
-            criteria_form.save()
-            messages.success(request, 'Criteria successfully saved.')
-            return HttpResponseRedirect('.')
-    context = {'criteria_form': criteria_form,
+        variable_form = IndicatorVariableForm(indicator, data=request.POST)
+        if variable_form.is_valid():
+            variable = variable_form.save()
+            messages.success(request, 'Variable successfully saved.')
+            return HttpResponseRedirect(reverse('edit_indicator_variable', args=(variable.pk, )))
+    context = {'variable_form': variable_form,
                'indicator': indicator,
-               'conditions': indicator.indicator_criteria.all(),
                'title': "Manage Indicator Criteria",
                'button_label': 'Save',
                'id': 'add_group_form',
                'cancel_url': reverse('list_indicator_page'),
-               'parameter_questions': indicator.parameter.e_qset.all_questions,
-               'condition_title': "New Eligibility Criteria"}
+               'parameter_questions': indicator.batch.all_questions,
+               'condition_title': "Conditions"}
+    request.breadcrumbs([
+        ('Indicators', reverse('list_indicator_page')),
+        ('Variable List', reverse('view_indicator_variables', args=(indicator_id, ))),
+    ])
+    return response or render(request, 'indicator/indicator_variable.html', context)
+
+
+@permission_required('auth.can_view_household_groups')
+def edit_indicator_variable(request, variable_id):
+    response = None
+    variable = IndicatorVariable.get(id=variable_id)
+    variable_form = IndicatorVariableForm(variable.indicator, instance=variable)
+    if request.method == 'POST':
+        variable_form = IndicatorVariableForm(variable.indicator, instance=variable, data=request.POST)
+        if variable_form.is_valid():
+            variable_form.save()
+            messages.success(request, 'Variable successfully saved.')
+            return HttpResponseRedirect(reverse('edit_indicator_variable', args=(variable.pk, )))
+    context = {'variable_form': variable_form,
+               'indicator': variable.indicator,
+               'title': "Manage Indicator Criteria",
+               'button_label': 'Save',
+               'id': 'add_group_form',
+               'cancel_url': reverse('list_indicator_page'),
+               'parameter_questions': variable.indicator.batch.all_questions,
+               'conditions': variable.criteria.all(),
+               'condition_title': "Conditions"}
+    request.breadcrumbs([
+        ('Indicators', reverse('list_indicator_page')),
+        ('Variable List', reverse('view_indicator_variables', args=(variable.indicator.pk, ))),
+
+    ])
+    return response or render(request, 'indicator/indicator_variable.html', context)
+
+
+@permission_required('auth.can_view_household_groups')
+def delete_indicator_variable(request, indicator_criteria_id):
+    get_object_or_404(IndicatorVariableCriteria, id=indicator_criteria_id).delete()
+    messages.info(request, 'condition removed successfully')
+    return HttpResponseRedirect(reverse('list_indicator_page'))
+
+
+def view_indicator_variables(request, indicator_id):
+    indicator = get_object_or_404(Indicator, id=indicator_id)
     request.breadcrumbs([
         ('Indicators', reverse('list_indicator_page')),
     ])
-    return response or render(request, 'indicator/indicator_formula.html', context)
+    context = {'indicator': indicator, 'variables': indicator.variables.all()}
+    return render(request, 'indicator/indicator_variable_list.html', context)
+
+
+def add_indicator_formular(request, indicator_id):
+    return HttpResponseRedirect('../')
 
 
 @permission_required('auth.can_view_batches')

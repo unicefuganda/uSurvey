@@ -16,7 +16,8 @@ class Indicator(BaseModel):
     name = models.CharField(max_length=255, null=False)
     # module = models.ForeignKey(QuestionModule, null=False, related_name='indicator')
     description = models.TextField(null=True)
-    parameter = models.ForeignKey(BatchQuestion, related_name='indicators', null=True, blank=True)
+    batch = models.ForeignKey(Batch, related_name='indicators')
+    # parameter = models.ForeignKey(BatchQuestion, related_name='indicators', null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -104,13 +105,26 @@ class Indicator(BaseModel):
     #         return self.compute_numerical_question_for_interviewers(interviewers)
 
 
-class IndicatorCriteria(BaseModel):
+class IndicatorVariable(BaseModel):
+    """This is used to store parameters used for indicator calculations.
+    Essential, it's used to filter our a subset of all responses and assign it a name
+    """
+    name = models.CharField(max_length=150)
+    description = models.TextField()
+    indicator = models.ForeignKey(Indicator, related_name='variables')
+
+    class Meta:
+        app_label = 'survey'
+        unique_together = ['name', 'indicator']
+
+
+class IndicatorVariableCriteria(BaseModel):
     VALIDATION_TESTS = [(validator.__name__, validator.__name__)
                         for validator in Answer.validators()]
-    indicator = models.ForeignKey(Indicator, related_name='indicator_criteria')
+    variable = models.ForeignKey(IndicatorVariable, related_name='criteria')
     # batch & parameter_list questions
-    test_question = models.ForeignKey(Question, related_name='indicator_criteria', verbose_name='parameter')
-    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS, verbose_name='operator')
+    test_question = models.ForeignKey(Question, related_name='indicator_criteria', verbose_name='Filter')
+    validation_test = models.CharField(max_length=200, choices=VALIDATION_TESTS, verbose_name='Condition')
 
     class Meta:
         app_label = 'survey'
@@ -140,7 +154,7 @@ class IndicatorCriteria(BaseModel):
 
 
 class IndicatorCriteriaTestArgument(BaseModel):
-    criteria = models.ForeignKey(IndicatorCriteria, related_name='arguments')
+    criteria = models.ForeignKey(IndicatorVariableCriteria, related_name='arguments')
     position = models.PositiveIntegerField()
     param = models.CharField(max_length=100)
 

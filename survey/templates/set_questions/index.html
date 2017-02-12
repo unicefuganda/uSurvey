@@ -244,10 +244,11 @@
                         <h4 class="modal-title">Confirmation Required</h4>
                       </div>
                       <div class="modal-body">
-                        <p>Looks like your questions has a {% if batch.has_loop %}Loop{% else %}Skip Logic{% endif %} attached. Updating the order would delete this.</p>
+                        <p>Questions has a {% if batch.has_loop %}Loop{% else %}Skip Logic{% endif %} attached. Updating the order would delete this.</p>
                          <p> Would you like to continue?</p>
                           <div class="form-actions">
                             <button type="submit" class="btn btn-primary submit btnforall" name="save_button"  data-disabled-text="{{ loading_text }}">Yes</button>
+                            <button type="button" class="btn btn-primary submit btnforall" data-dismiss="modal" aria-hidden="true">No</button>
                            </div>
                       </div>
                     </div><!-- /.modal-content -->

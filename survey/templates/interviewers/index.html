@@ -117,22 +117,7 @@
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
   <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
-  //$("#a-interviewer-list").hide();
-  <!--{% for location_type in location_filter_types %}-->
-	  <!--$('#id_{{ location_type }}').on('change', function () {-->
-	  	<!--params = { 'parent_loc' : $('#id_{{ location_type }}').val(), 'type' : '{{ location_type.pk }}'};-->
-	  	<!--url = "{% url 'location_sub_types' %}";-->
-	      <!--$.getJSON(url, params, function (data) {-->
-	 			<!--$('#id_' + data.sub_type +' option').hide();-->
-	 			<!--$('#id_' + data.sub_type +' option[value=""]').show();-->
-	  		<!--$.each(data.locations, function () {-->
-	              <!--$('#id_' + data.sub_type +' option[value='+this.id+']').show();-->
-	          <!--});-->
-	  		<!--$(' .chzn-select').trigger("liszt:updated");  -->
-	      <!--});-->
-	  <!--});-->
 
-	<!--{% endfor %}-->
     $('.ea_filter').on('change', function () {
     	{% for location_type in location_filter_types %}
     	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
