@@ -237,3 +237,11 @@ class QuestionSetResultsFilterForm(forms.Form):
         if self.data.get('survey', None):
             kwargs['survey__id'] = self.data['survey']
         return Interview.objects.filter(**kwargs)
+#
+# class SurveyStatusFilter(forms.Form):
+#     STARTED = 1
+#     ONGOING = 2
+#
+#     status = forms.ChoiceField(
+#         label='Status', widget=forms.Select(), choices=[(0, '-- All Status --'), (ACTIVE, 'Active'),
+#                                                         (DEACTIVATED, 'Deactivated')], required=False)
