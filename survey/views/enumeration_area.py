@@ -92,8 +92,10 @@ def location_sub_types(request):
         kwargs['parent__pk'] = request.GET['parent_loc']
     child_locations = Location.objects.filter(**kwargs)
     locations = child_locations.values('id', 'name', ).order_by('name')
+    parent_loc = child_locations[0].parent
+    eas = EnumerationArea.objects.filter(locations__in=parent_loc.get_leafnodes(True)).values('id', 'name')
     json_dump = json.dumps({'sub_type': child_locations[
-                           0].type.name, 'locations': list(locations)}, cls=DjangoJSONEncoder)
+                           0].type.name, 'locations': list(locations), 'eas': list(eas)}, cls=DjangoJSONEncoder)
     return HttpResponse(json_dump, content_type='application/json')
 
 

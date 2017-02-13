@@ -13,7 +13,19 @@
                     $('#id_' + data.sub_type).append('<option value='+this.id+'>'+this.name+'</option>');
                 });
                 $('.chzn-select').trigger("chosen:updated");
+                if($('#id_ea')) {
+                    $('#id_ea').empty();
+                    $(data.eas).each(function () {
+                            $("<option />", {
+                                val: this.id,
+                                text: this.name
+                            }).appendTo($('#id_ea'));
+                        });
+                        $('#id_ea').multiSelect("destroy").multiSelect();
+                 }
+
             });
+
             });
   	    {% endfor %}
         });

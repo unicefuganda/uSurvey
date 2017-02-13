@@ -55,30 +55,5 @@
             });
         })
     </script>
-  <script type="text/javascript">
-
-    $('.ea_filters').on('change', function () {
-    	{% for location_type in location_filter_types %}
-    	   var {{ location_type }}_selected = $('#id_{{ location_type }}').val();
-    	{% endfor %}
-    	var url = "{% url 'enumeration_area_filter' %}";
-        params = {
-        		{% for location_type in location_filter_types %}
-        			{{ location_type }} : {{ location_type }}_selected,
- 	    		{% endfor %}
-        }
-        $.getJSON(url, params, function (data) {
-        		$('#id_ea').empty();
-        		$(data).each(function () {
-					$("<option />", {
-						val: this.id,
-						text: this.name
-					}).appendTo($('#id_ea'));
-				});
-				$('#id_ea').multiSelect("destroy").multiSelect();
-	        });
-    });
-
-  </script>
 
 {% endblock %}
