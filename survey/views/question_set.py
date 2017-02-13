@@ -22,7 +22,7 @@ from survey.models import Interview
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 from survey.forms.question_set import get_question_set_form
 from survey.forms.question import get_question_form
-from survey.forms.filters import QuestionFilterForm
+from survey.forms.filters import QuestionFilterForm, QuestionSetResultsFilterForm
 from survey.odk.utils.odk_helper import get_zipped_dir
 from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 
@@ -128,17 +128,18 @@ def delete_qset_listingform(request, question_id):
 
 @login_required
 @permission_required('auth.can_view_aggregates')
-def view_data(request, qset_id, survey_id):
+def view_data(request, qset_id):
     try:
         qset = QuestionSet.get(pk=qset_id)
-        survey = Survey.get(id=survey_id)
         request.breadcrumbs(qset.edit_breadcrumbs(qset=qset))
-        params = request.GET
+        params = request.GET if request.method == 'GET' else request.POST
+        survey_filter = QuestionSetResultsFilterForm(qset, data=params)
         locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
+        interviews = survey_filter.get_interviews()
         if locations_filter.is_valid():
-            interviews = Interview.objects.filter(ea__in=locations_filter.get_enumerations(),
-                                                  question_set=qset).order_by('created')
-        context = {'qset': qset, 'survey': survey, 'interviews': interviews, 'locations_filter': locations_filter,
+            interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
+        context = {'qset': qset, 'survey_filter': survey_filter,
+                   'interviews': interviews, 'locations_filter': locations_filter,
                    'location_filter_types': LocationType.in_between()}
         return render(request, 'question_set/view_data.html', context)
     except QuestionSet.DoesNotExist:
@@ -208,15 +209,16 @@ def download_attachment(request, question_id, interview_id):
     return response
 
 
-def download_data(request, qset_id, survey_id):
+def download_data(request, qset_id):
     qset = QuestionSet.get(pk=qset_id)
-    survey = Survey.get(pk=survey_id)
-    locations_filter = LocationsFilterForm(data=request.GET)
+    params = request.GET if request.method == 'GET' else request.POST
+    survey_filter = QuestionSetResultsFilterForm(qset, data=params)
+    locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
+    interviews = survey_filter.get_interviews()
+    if locations_filter.is_valid():
+        interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
     last_selected_loc = locations_filter.last_location_selected
-    restricted_to = None
-    if last_selected_loc:
-        restricted_to = [last_selected_loc, ]
-    download_service = ResultsDownloadService(batch=qset, survey=survey, restrict_to=restricted_to)
+    download_service = ResultsDownloadService(batch=qset, interviews=interviews)
     file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
                           last_selected_loc else '', qset.name)
     reports_df = download_service.generate_interview_reports()

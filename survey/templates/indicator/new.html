@@ -4,6 +4,22 @@
 {% endblock %}
 {% block display_form_fields %}
     {% include "naked_form.html" with a_form=indicator_form %}
+    {% include "naked_form.html" with a_form=indicator_form %}
+    {% block post_form %}
+       <div class="modal fade" id="new_survey" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header" style="background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;" >
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" style="color: #fff">New Variable</h4>
+              </div>
+              <div class="modal-body">
+                {% include "surveys/indicator_variable.html" %}
+              </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+    {% endblock %}
 {% endblock %}
 {% block javascripts %}
 <style type="text/css">
@@ -14,15 +30,7 @@
 
     .dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 245px!important;}
 </style>
-<script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
-        <script type="text/javascript">
-                $(function(){
-                    $('#id_formulae').on('keyup', function(){
-                       make_suggestions('#id_formulae', "{% url 'indicator_variables' %}?id=" + {{indicator_form.instance.pk}});
-                       this.focus();
-                    });
-                });
-            </script>
+
 <script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
    $(document).ready(function() {
@@ -40,6 +48,15 @@
      });
     } );
 </script>
+<script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+                $(function(){
+                    $('#id_formulae').on('keyup', function(){
+                       make_suggestions('#id_formulae', "{% url 'indicator_variables' %}?id=" + {{indicator_form.instance.pk}});
+                       this.focus();
+                    });
+                });
+            </script>
 
 {% endblock %}
 

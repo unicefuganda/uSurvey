@@ -134,11 +134,7 @@
                                 <a href="{% url 'qset_questions_page' question_set.pk %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Edit"><span class="blue"><i class="usur-icon fa fa-question-circle bigger-120"></i>View/Edit Questions</span></a>
                             </li>
                             {% if question_set.interviews.count %}
-                            {% if model.verbose_name == 'Batch' %}
-                                <li><a href="{% url 'view_data_home' question_set.pk question_set.survey.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-table bigger-120"></i>View Data</span></a></li>
-                            {% else %}
-                                <li><a href="{% url 'listing_entries' question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-table bigger-120"></i>View Data</span></a></li>
-                            {% endif %}
+                                <li><a href="{% url 'view_data_home' question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-table bigger-120"></i>View Data</span></a></li>
                             {% endif %}
                             {% if question_set.verbose_name = 'Batch' and question_set.flow_questions %}
                             <li><a href="{% url 'batch_show_page' question_set.survey.id question_set.pk %}" class="tooltip-error" data-rel="tooltip" title=""><span class="red"><i class="usur-icon a fa fa-folder-open-o/fa fa-times-circle bigger-120"></i>Open/Close</span></a></li>

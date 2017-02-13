@@ -12,6 +12,7 @@ from survey.forms.form_order_mixin import FormOrderMixin
 class IndicatorForm(ModelForm, FormOrderMixin):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)
     batch = forms.ModelChoiceField(queryset=Batch.objects.none(), empty_label='Select Batch', required=False)
+    
 
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
@@ -26,7 +27,7 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             self.fields['batch'].queryset = Batch.objects.filter(
                 survey=self.data['survey'])
         self.fields['name'].label = 'Indicator'
-        self.order_fields(['name', 'description', 'survey', 'batch', ])
+        self.order_fields(['survey', 'batch', 'name', 'description', ])
 
     def clean(self):
         super(IndicatorForm, self).clean()

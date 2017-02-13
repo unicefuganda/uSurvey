@@ -1,6 +1,6 @@
 from django import forms
 from survey.models import RespondentGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, Location, \
-    LocationType, Indicator, BatchQuestion
+    LocationType, Indicator, BatchQuestion, Interview, QuestionSet
 from django.contrib.auth.handlers.modwsgi import groups_for_user
 MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
 DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 20
@@ -221,3 +221,19 @@ class MapFilterForm(forms.Form):
     #         self.fields['indicator'].queryset = Indicator.objects.filter(parameter__in=questions)
     #     if self.data.get('indicator', None):
     #         self.fields['parameter'].queryset = BatchQuestion.objects.fiter(indicators__id=self.data['indicator'])
+
+
+class QuestionSetResultsFilterForm(forms.Form):
+
+    def __init__(self, qset, *args, **kwargs):
+        super(QuestionSetResultsFilterForm, self).__init__(*args, **kwargs)
+        self.qset = QuestionSet.get(pk=qset.pk)
+        if hasattr(self.qset, 'survey') is False:
+            self.fields['survey'] = forms.ModelChoiceField(queryset=Survey.objects.all(),
+                                                           required=False, empty_label='Choose Survey')
+
+    def get_interviews(self):
+        kwargs = {'question_set': self.qset}
+        if self.data.get('survey', None):
+            kwargs['survey__id'] = self.data['survey']
+        return Interview.objects.filter(**kwargs)
