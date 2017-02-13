@@ -229,7 +229,7 @@ class QuestionSetResultsFilterForm(forms.Form):
         super(QuestionSetResultsFilterForm, self).__init__(*args, **kwargs)
         self.qset = QuestionSet.get(pk=qset.pk)
         if hasattr(self.qset, 'survey') is False:
-            self.fields['survey'] = forms.ModelChoiceField(queryset=Survey.objects.all(),
+            self.fields['survey'] = forms.ModelChoiceField(queryset=Survey.objects.filter(listing_form__pk=self.qset.pk),
                                                            required=False, empty_label='Choose Survey')
 
     def get_interviews(self):
