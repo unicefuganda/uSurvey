@@ -84,7 +84,7 @@ class LocationsFilterForm(Form):
             self.fields['enumeration_area'] = forms.ModelChoiceField(
                 queryset=eas)  # ChoiceField(choices=choices)
             self.fields['enumeration_area'].widget.attrs[
-                'class'] = 'location_filter chzn-select'
+                'class'] = 'location_filter chzn-select1'
             # self.fields['enumeration_area'].widget.attrs['style'] = 'width: 100px;'
             self.fields['enumeration_area'].required = False
         self.data._mutable = False

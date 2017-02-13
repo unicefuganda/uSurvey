@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block search %}
-{% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' %}
+{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_data_filter' %}
 {% include "horizontal_filter_form.html" with a_form=survey_filter no_button=True filter_id='survey_filter' %}
 
 {% endblock %}
@@ -70,7 +70,6 @@
 
 {% block javascripts %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
 
 <script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
 <script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
