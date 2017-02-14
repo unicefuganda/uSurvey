@@ -246,6 +246,8 @@ class SurveyResultsFilterForm(forms.Form):
     def __init__(self, model_class, *args, **kwargs):
         super(SurveyResultsFilterForm, self).__init__(*args, **kwargs)
         self.fields['question_set'].label = model_class.verbose_name()
+        self.fields['question_set'].widget.attrs['class'] = 'chzn-select'
+        self.fields['survey'].widget.attrs['class'] = 'chzn-select'
         model_queryset = model_class.objects.all()
         self.fields['question_set'].queryset = model_queryset
         if self.data.get('survey', None) and model_class == ListingTemplate:
