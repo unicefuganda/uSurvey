@@ -36,11 +36,14 @@ class RandomizationCriterion(BaseModel):
 
     @property
     def test_params(self):
-        return [t.param for t in self.arguments]
+        return [t.param for t in self.text_arguments]
+
+    def text_arguments(self):
+        return self.arguments.all()
 
     def params_display(self):
         params = []
-        for arg in self.arguments:
+        for arg in self.text_arguments:
             if self.question.answer_type == MultiChoiceAnswer.choice_name():
                 params.append(self.question.options.get(order=arg.param).text)
             else:
