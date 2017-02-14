@@ -4,7 +4,7 @@ $(function(){
 
 function make_suggestions(elem_selector, fetch_qset_ids_url) {
     var elem = document.querySelector(elem_selector);
-    if (new RegExp("^.*\{\{\s*$").test(elem.value)) {
+    if (new RegExp("^.*\{\{$").test(elem.value)) {
           $.get( fetch_qset_ids_url, function( list ) {
             if(antsmc2__aucomplete){
                antsmc2__aucomplete._list = list;
