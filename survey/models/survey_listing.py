@@ -58,7 +58,7 @@ class RandomizationCriterion(BaseModel):
     def qs_passes_test(self, value_key, queryset):
         answer_class = Answer.get_class(self.listing_question.answer_type)
         method = getattr(answer_class, 'fetch_%s' % self.validation_test, None)
-        return method(value_key, *test_params, qs=queryset)
+        return method(value_key, *self.test_params, qs=queryset)
 
     @property
     def test_arguments(self):

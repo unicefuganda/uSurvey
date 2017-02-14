@@ -290,7 +290,7 @@ class Answer(BaseModel):
         return upperlmt > answer >= lowerlmt
 
     @classmethod
-    def fetch_less_than(cls, answer_key, lowerlmt, upperlmt, qs=None):
+    def fetch_between(cls, answer_key, lowerlmt, upperlmt, qs=None):
         if qs:
             qs = cls.objects
         return qs.filter(**{'%s__lt' % answer_key: upperlmt, '%s__gte' % answer_key: lowerlmt})
