@@ -38,6 +38,7 @@ class RandomizationCriterion(BaseModel):
     def test_params(self):
         return [t.param for t in self.text_arguments]
 
+    @property
     def text_arguments(self):
         return self.arguments.all()
 
