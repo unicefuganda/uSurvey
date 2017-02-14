@@ -1,6 +1,6 @@
 from django import forms
 from survey.models import RespondentGroup, QuestionModule, Question, Batch, Survey, EnumerationArea, Location, \
-    LocationType, Indicator, BatchQuestion, Interview, QuestionSet
+    LocationType, Indicator, BatchQuestion, Interview, QuestionSet, ListingTemplate
 from django.contrib.auth.handlers.modwsgi import groups_for_user
 MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 1000
 DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE = 20
@@ -237,6 +237,31 @@ class QuestionSetResultsFilterForm(forms.Form):
         if self.data.get('survey', None):
             kwargs['survey__id'] = self.data['survey']
         return Interview.objects.filter(**kwargs)
+
+
+class SurveyResultsFilterForm(forms.Form):
+    selected_qset = None
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all())
+    question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.all())
+
+    def __init__(self, model_class, *args, **kwargs):
+        super(SurveyResultsFilterForm, self).__init__(*args, **kwargs)
+        self.fields['question_set'].label = model_class.verbose_name()
+        if self.data.get('survey', None) and model_class == ListingTemplate:
+            self.fields['question_set'].queryset = ListingTemplate.objects.filter(survey_settings__id=
+                                                                                  self.data['survey'])
+        elif self.data.get('survey', None) and model_class == Batch:
+            self.fields['question_set'].queryset = Batch.objects.filter(survey__id=self.data['survey'])
+
+
+    def get_interviews(self, interviews=Interview.objects):
+        kwargs = {}
+        if self.data.get('survey', None):
+            kwargs['survey__id'] = self.data['survey']
+        if self.data.get('question_set', None):
+            kwargs['question_set__id'] = self.data['question_set']
+        return interviews.filter(**kwargs)
+
 #
 # class SurveyStatusFilter(forms.Form):
 #     STARTED = 1

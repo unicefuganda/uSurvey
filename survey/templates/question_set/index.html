@@ -10,11 +10,6 @@
 <style type="text/css">
     .status {
         width: 50px !important;
-        background-image: None !important;
-    }
-    th.status::after {
-        background-image: None !important;
-        content: None !important;
     }
 #red_circle  {
     /*background: #d12a09 none repeat scroll 0 0;
@@ -75,7 +70,8 @@
   <table id="datatables" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
     <thead>
       <tr>
-        <th class="status">
+        <th class="sorting">
+            St.
         </th>
         <th class="sorting">
           Name
@@ -95,7 +91,7 @@
       {% for question_set in question_sets %}
         <tr>
           <td>
-              {% if question_set.is_open %}<div id="green_circle" title="Started"></div>{% elif question_set.interviews.count %}<div id="amber_circle" title="Closed"></div>{% else %}<div id="red_circle" title="Not Started"></div>{% endif %}
+              {% if question_set.is_open %}<div id="green_circle" title="Started"><span class="hide">S</span></div>{% elif question_set.interviews.count %}<div id="amber_circle" title="Closed"><span class="hide">C</span></div>{% else %}<div id="red_circle" title="Not Started"><span class="hide">N</span></div>{% endif %}
           </td>
           <td>
              <a href="{% url 'qset_questions_page' question_set.id %}">{{ question_set.name }}</a>

@@ -175,7 +175,7 @@ class SurveyAllocation(BaseModel):
 
     @classmethod
     def can_start_batch(cls, interviewer):
-        survey_allocations = interviewer.assignments.all()
+        survey_allocations = interviewer.unfinished_assignments
         completed = filter(lambda allocation: allocation.sample_size_reached(), survey_allocations)
         return (1.0 * len(completed))/len(survey_allocations) >= getattr(settings, 'EAS_PERCENT_TO_START_SURVEY', 0.5)
 

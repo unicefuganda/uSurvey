@@ -237,7 +237,7 @@ def submission(request):
         response['Location'] = request.build_absolute_uri(request.path)
         return response
     except NotEnoughData:
-        desc = u'Not enough data'
+        desc = u'Uploaded data is fewer than sample size'
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
                   _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
                       "interviewer": interviewer.name,

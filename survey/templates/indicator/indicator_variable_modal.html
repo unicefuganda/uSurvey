@@ -1,8 +1,6 @@
-{% extends "form.html" %}
-
-{% block title %}
-    Variable for {{indicator.name}}
-{% endblock %}
+<h3>
+  Create Variables for {{indicator.name}}
+</h3>
 
 {% block display_form_fields %}
 {% include "naked_form.html" with a_form=variable_form %}

@@ -13,11 +13,6 @@
 <style type="text/css">
     .status {
         width: 50px !important;
-        background-image: None !important;
-    }
-    th.status::after {
-        background-image: None !important;
-        content: None !important;
     }
 #red_circle  {
     /*background: #d12a09 none repeat scroll 0 0;
@@ -67,7 +62,8 @@
     {% block table_head %}
     <br>
       <tr>
-        <th class="status">
+        <th class="status sorting">
+            St.
         </th>
         <th class="sorting">
           Name
@@ -97,7 +93,7 @@
     {% for survey in surveys %}
         <tr>
          <td>
-              {% if survey.is_open %}<div id="green_circle" title="Started"></div>{% elif survey.interviews.count %}<div id="amber_circle" title="Closed"></div>{% else %}<div id="red_circle" title="Not Started"></div>{% endif %}
+              {% if survey.is_open %}<div id="green_circle" title="Started"><span class="hide">S</span></div>{% elif survey.interviews.count %}<div id="amber_circle" title="Closed"><span class="hide">C</span></div>{% else %}<div id="red_circle" title="Not Started"><span class="hide">N</span></div>{% endif %}
           </td>
           <td>
             <a href="{% url 'batch_index_page' survey.id %}">{{ survey.name }}</a>

@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% load template_tags %}
+{% block title %}
+  {{ qset.name }} Data
+{% endblock %}
+
+{% block search %}
+{% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_data_filter' %}
+{% include "horizontal_filter_form.html" with a_form=survey_filter no_button=True filter_id='survey_filter' %}
+
+{% endblock %}
+{% block content_search %}
+    {% include "search_form.html" %}
+{% endblock %}
+{% block page_actions %}
+
+{% endblock %}
+{% block content %}
+{% load pagination_tags %}
+{% autopaginate interviews 100 %}
+<br>
+<table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
+<!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
+ -->
+ <thead>
+        <tr role="row">
+            {% for loc_type in location_filter_types %}
+                <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">
+                    {{ loc_type.name }}
+                </th>
+            {% endfor %}
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Enumeration Area</th>
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Interviewer</th>
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Survey</th>
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">{{model_class.verbose_name}}</th>
+            {% for question in selected_qset.flow_questions %}
+            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">{{ question.identifier|upper }}</th>
+            {% endfor %}
+         </tr>
+    </thead>
+    <tbody>
+        {% for interview in interviews %}
+          <tr>
+            {% for loc in interview.ea.parent_locations %}
+              <td>
+                {{ loc.name }}
+              </td>
+            {% endfor %}
+           <td>
+            {{ interview.ea.name}}
+          </td>
+           <td>
+            {{ interview.interviewer.name}}
+          </td>
+          <td>
+            {{ interview.survey.name}}
+          </td>
+          <td>
+            {{ interview.question_set.name }}
+          </td>
+            {% for question in selected_qset.flow_questions %}
+              {% get_answer question interview as answer %}
+                <td>
+                    {{ answer }}
+                </td>
+           {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+{% paginate %}
+{% endblock %}
+
+{% block javascripts %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" type="text/css">
+
+<script src="{{ STATIC_URL }}/js/jquery.dataTables.js"></script>
+<script src="{{ STATIC_URL }}/js/dataTables.bootstrap.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{STATIC_URL}}js/location-widget.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}

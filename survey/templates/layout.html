@@ -198,9 +198,11 @@
 
                    <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Monitor</a>
                    <ul class="sub-menu">
-                   <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'survey_completion_rates' %}">Completion
-                                        Rates</a></li>
+                   <!-- li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'survey_completion_rates' %}">Completion
+                                        Rates</a></li -->
                   {% if perms.auth.view_completed_survey %}
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'view_listing_data' %}">Listing Data</a></li>
+                           <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'view_batch_data' %}">Batch Data</a></li>
                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'show_interviewer_completion_summary' %}"> Completion
                                         Summary</a></li>
                             {% endif %}

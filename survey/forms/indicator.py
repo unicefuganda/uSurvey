@@ -12,22 +12,21 @@ from survey.forms.form_order_mixin import FormOrderMixin
 class IndicatorForm(ModelForm, FormOrderMixin):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)
     batch = forms.ModelChoiceField(queryset=Batch.objects.none(), empty_label='Select Batch', required=False)
-    variables = forms.ModelMultipleChoiceField(queryset=BatchQuestion.objects.none())
+    variables = forms.ModelMultipleChoiceField(queryset=IndicatorVariable.objects.none())
 
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
         if kwargs.get('instance'):
-            batch = kwargs['instance'].parameter.qset
-            batch = Batch.get(pk=batch.pk)
+            batch = kwargs['instance'].batch
             survey = batch.survey
             self.fields['survey'].initial = survey
             self.fields['batch'].queryset = survey.batches
             self.fields['batch'].initial = batch
         if self.data.get('survey'):
-            self.fields['batch'].queryset = Batch.objects.filter(
-                survey=self.data['survey'])
+            self.fields['batch'].queryset = Batch.objects.filter(survey=self.data['survey'])
         self.fields['name'].label = 'Indicator'
         self.order_fields(['survey', 'batch', 'name', 'description', 'variables', 'formulae'])
+
 
     def clean(self):
         super(IndicatorForm, self).clean()
@@ -141,8 +140,8 @@ class IndicatorCriteriaForm(ModelForm, FormOrderMixin):
             self.fields['options'].choices = [(opt.order, opt.text) for opt in options]
 
     class Meta:
-        model = IndicatorVariable
-        exclude = ['indicator', ]
+        model = IndicatorVariableCriteria
+        exclude = ['variable', ]
         widgets = {'description': forms.Textarea(attrs={"rows": 2, "cols": 100}), }
 
     def clean(self):
@@ -167,6 +166,8 @@ class IndicatorCriteriaForm(ModelForm, FormOrderMixin):
 
     def save(self, *args, **kwargs):
         criteria = super(IndicatorCriteriaForm, self).save(commit=False)
+        criteria.variable = self.variable
+        criteria.save()
         validation_test = self.cleaned_data.get('validation_test', None)
         if validation_test == 'between':
             criteria.arguments.create(position=0, param=self.cleaned_data['min'])

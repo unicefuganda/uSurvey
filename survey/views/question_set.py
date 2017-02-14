@@ -22,7 +22,7 @@ from survey.models import Interview
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
 from survey.forms.question_set import get_question_set_form
 from survey.forms.question import get_question_form
-from survey.forms.filters import QuestionFilterForm, QuestionSetResultsFilterForm
+from survey.forms.filters import QuestionFilterForm, QuestionSetResultsFilterForm, SurveyResultsFilterForm
 from survey.odk.utils.odk_helper import get_zipped_dir
 from survey.services.results_download_service import ResultsDownloadService, ResultComposer
 
@@ -144,6 +144,37 @@ def view_data(request, qset_id):
         return render(request, 'question_set/view_data.html', context)
     except QuestionSet.DoesNotExist:
         return HttpResponseNotFound()
+
+
+@login_required
+@permission_required('auth.can_view_aggregates')
+def view_listing_data(request):
+    interviews = Interview.objects.filter(question_set__id__in=ListingTemplate.objects.values_list('id', flat=True))
+    return _view_qset_data(request, ListingTemplate, interviews)
+
+
+@login_required
+@permission_required('auth.can_view_aggregates')
+def view_batch_data(request):
+    interviews = Interview.objects.filter(question_set__id__in=Batch.objects.values_list('id', flat=True))
+    return _view_qset_data(request, Batch, interviews)
+
+
+def _view_qset_data(request, model_class, interviews):
+    params = request.GET if request.method == 'GET' else request.POST
+    survey_filter = SurveyResultsFilterForm(model_class, data=params)
+    locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
+    selected_qset = None
+    if survey_filter.is_valid():
+        interviews = survey_filter.get_interviews(interviews=interviews)
+        selected_qset = survey_filter.cleaned_data['question_set']
+    if locations_filter.is_valid():
+        interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
+    context = {'survey_filter': survey_filter,
+               'interviews': interviews, 'locations_filter': locations_filter,
+               'location_filter_types': LocationType.in_between(),
+               'selected_qset': selected_qset, 'model_class': model_class}
+    return render(request, 'question_set/view_all_data.html', context)
 
 
 

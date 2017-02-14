@@ -26,6 +26,7 @@ def new(request):
     request.breadcrumbs([
         ('Indicators', reverse('list_indicator_page')),
     ])
+
     return render(request, 'indicator/new.html',
                   {'indicator_form': indicator_form, 'title': 'Add Indicator', 'button_label': 'Create',
                    'cancel_url': reverse('list_indicator_page'), 'action': '/indicators/new/'})
