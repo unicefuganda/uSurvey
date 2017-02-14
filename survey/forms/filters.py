@@ -240,18 +240,19 @@ class QuestionSetResultsFilterForm(forms.Form):
 
 
 class SurveyResultsFilterForm(forms.Form):
-    selected_qset = None
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all())
-    question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.all())
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), required=False)
+    question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.all(), required=False)
 
     def __init__(self, model_class, *args, **kwargs):
         super(SurveyResultsFilterForm, self).__init__(*args, **kwargs)
         self.fields['question_set'].label = model_class.verbose_name()
+        model_queryset = model_class.objects.all()
+        self.fields['question_set'].queryset = model_queryset
         if self.data.get('survey', None) and model_class == ListingTemplate:
-            self.fields['question_set'].queryset = ListingTemplate.objects.filter(survey_settings__id=
+            self.fields['question_set'].queryset = model_queryset.filter(survey_settings__id=
                                                                                   self.data['survey'])
         elif self.data.get('survey', None) and model_class == Batch:
-            self.fields['question_set'].queryset = Batch.objects.filter(survey__id=self.data['survey'])
+            self.fields['question_set'].queryset = model_queryset.filter(survey__id=self.data['survey'])
 
 
     def get_interviews(self, interviews=Interview.objects):
