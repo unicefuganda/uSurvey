@@ -170,12 +170,15 @@ def _view_qset_data(request, model_class, interviews):
         selected_qset = survey_filter.cleaned_data['question_set']
     if locations_filter.is_valid():
         interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
+    search_fields = ['ea__name', 'survey__name', 'question_set__name']
+    if request.GET.has_key('q'):
+        interviews = get_filterset(interviews, request.GET['q'], search_fields)
     context = {'survey_filter': survey_filter,
                'interviews': interviews, 'locations_filter': locations_filter,
                'location_filter_types': LocationType.in_between(),
+               'placeholder': 'E.A., Survey, %s' % model_class.verbose_name(),
                'selected_qset': selected_qset, 'model_class': model_class}
     return render(request, 'question_set/view_all_data.html', context)
-
 
 
 @login_required
@@ -189,7 +192,7 @@ def listing_entries(request, qset_id):
         search_fields = ['name', ]
         if request.GET.has_key('q'):
             surveys = get_filterset(surveys, request.GET['q'], search_fields)
-        context = {'question_set': listing_qset, 'surveys': surveys, }
+        context = {'question_set': listing_qset, 'surveys': surveys, 'placeholder': 'name,'}
         return render(request, 'question_set/listing_entries.html', context)
     except ListingTemplate.DoesNotExist:
         return HttpResponseNotFound()
