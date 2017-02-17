@@ -13,6 +13,14 @@
     </div>
 {% endblock%}
 {% block display_form_fields %}
+<style type="text/css">
+	.control-label{
+		margin-left: 90px !important;
+	}	
+#ea_name{
+	margin-left: 55px !important;
+}
+</style>
 {% include "locations_filter_form.html" with a_form=locations_filter no_button=True filter_id='loc_filter' no_auto_refresh=True %}
 {% include "naked_form.html" with a_form=enumeration_area_form %}
 {% endblock %}
