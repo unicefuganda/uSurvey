@@ -24,7 +24,8 @@ def home(request):
                                                'shape_file_uri': settings.SHAPE_FILE_URI,
                                                'loc_field': settings.SHAPE_FILE_LOC_FIELD,
                                                'alt_loc_field': settings.SHAPE_FILE_LOC_ALT_FIELD,
-                                               'map_center': settings.MAP_CENTER})
+                                               'map_center': settings.MAP_CENTER,
+                                               'zoom_level': settings.MAP_ZOOM_LEVEL})
 
 
 def index(request):

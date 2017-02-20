@@ -7,3 +7,5 @@ def is_valid(params):
     if params.has_key('location') and params['location'] == '':
         return True
     return False
+
+

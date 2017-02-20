@@ -107,7 +107,7 @@ xmlns:jr="http://openrosa.org/javarosa">
   </model>
 </h:head>
 <h:body>
-    <select ref="/qset/surveyAllocation">
+    <select1 ref="/qset/surveyAllocation">
 		<label>Select EnumerationArea</label>
 		{% for assignment in assignments %}
 		<item>
@@ -115,7 +115,7 @@ xmlns:jr="http://openrosa.org/javarosa">
 			<value>{{ assignment.allocation_ea.name }}</value>
 		</item>
 		{% endfor %}
-	</select>
+	</select1>
 	{% if ea_samples %}
 		<group>
 			{% for ea_id, samples in ea_samples.items %}

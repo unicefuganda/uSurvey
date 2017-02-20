@@ -146,10 +146,15 @@ def completion_json(request, survey_id):
             location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
         else:
             location_type = LocationType.largest_unit()
+        divider = 1.0
         completion_rates = {}
+        has_sampling = survey.has_sampling
         #basically get interviews count
         for location in location_type.locations.all():
-            completion_rates[location.name.upper()] = Interview.interviews_in(location, survey).count()
+            if has_sampling and survey.is_open_for(location):
+                divider = EnumerationArea.objects.filter(locations__in=location.get_leafnodes()).count() * \
+                          survey.sample_size / 100.0
+            completion_rates[location.name.upper()] = Interview.interviews_in(location, survey).count() / divider
         return json.dumps(completion_rates, cls=DjangoJSONEncoder)
     json_dump = get_result_json()
     return HttpResponse(json_dump, content_type='application/json')

@@ -87,7 +87,7 @@
 {% block javascripts %}
     <script type="text/javascript">
         <!--$("#survey_map").height($(document).height() * 0.7);-->
-       var map = L.map('survey_map').setView([{{map_center}}], 7, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
+       var map = L.map('survey_map').setView([{{map_center}}], {{ zoom_level|default:6}}, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
     info = L.control(),
     legend = L.control({position: 'bottomright'}),
     geojson;

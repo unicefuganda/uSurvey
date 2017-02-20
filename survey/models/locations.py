@@ -44,7 +44,7 @@ class LocationType(MPTTModel, BaseModel):
     def smallest_unit(cls):
         try:
             root_node = cls.objects.get(parent=None)
-            return root_node.get_leafnodes(False)[0]
+            return root_node.get_leafnodes(False).get(parent__isnull=False)
         except cls.DoesNotExist, IndexError:
             return None
 
