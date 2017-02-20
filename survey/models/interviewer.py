@@ -30,20 +30,20 @@ class Interviewer(BaseModel):
     MALE = '1'
     FEMALE = '0'
     name = models.CharField(max_length=100, blank=False, null=False)
-    gender = models.CharField(default=MALE, verbose_name="Sex", choices=[
+    gender = models.CharField(default=MALE, verbose_name="Gender", choices=[
                               (MALE, "M"), (FEMALE, "F")], max_length=10)
 #     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(50)], null=True)
     date_of_birth = models.DateField(
         null=True, validators=[validate_min_date_of_birth, validate_max_date_of_birth])
     level_of_education = models.CharField(max_length=100, null=True, choices=LEVEL_OF_EDUCATION,
                                           blank=False, default='Primary',
-                                          verbose_name="Highest level of education completed")
+                                          verbose_name="Education")
     is_blocked = models.BooleanField(default=False)
     ea = models.ForeignKey('EnumerationArea', null=True,        # shall use this to track the interviewer present ea
                            related_name="interviewers", verbose_name='Enumeration Area', blank=True,
                            on_delete=models.SET_NULL)  # reporting mostly
     language = models.CharField(max_length=100, null=True, choices=LANGUAGES,
-                                blank=False, default='English', verbose_name="Preferred language of communication")
+                                blank=False, default='English', verbose_name="Preferred language")
     weights = models.FloatField(default=0, blank=False)
 
     class Meta:
