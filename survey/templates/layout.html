@@ -91,6 +91,7 @@
       <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet" />
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/bootstrap.css" type="text/css" media="all" />
       <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
+      <link id="theme_css" rel="stylesheet" href="{{ STATIC_URL }}toassets/light.css">
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/animate.css" type="text/css" media="all" />
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/preset.css" type="text/css" media="all" />
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/style_002.css" type="text/css" media="all" />
@@ -438,6 +439,7 @@
       <script src="{{STATIC_URL}}js/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}chosen/chosen.jquery.js"></script>
       <script src="{{ STATIC_URL }}bootstrap-switch/bootstrap-switch.js" type="text/javascript" charset="utf-8"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/theme.js"></script>
       <script src="{{ STATIC_URL }}multi-select/jquery.multi-select.js" type="text/javascript" charset="utf-8"></script>
       <script src="{{ STATIC_URL }}js/question_options.js" type="text/javascript" charset="utf-8"></script>
 
@@ -465,7 +467,7 @@
       <script type="text/javascript">
          if('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
       </script>
-      <script type="text/javascript">      
+      <!-- <script type="text/javascript">      
   $(document).ready(function(){
     $(".menuButton").click(function(){
     
@@ -475,7 +477,7 @@
   if ($(window).width() <= 991){
     $("#menu-main-menu").toggle('hide');
   }  
-</script>
+</script> -->
 <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
    </body>
 </html>
