@@ -158,7 +158,7 @@
                </div>
             </div>
             <nav class="mainMenu pull-left">
-               <div class="menuButton hidden-lg hidden-md">
+               <div class="menuButton">
                   <span></span>
                   <span></span>
                   <span></span>
@@ -472,6 +472,9 @@
       $("#menu-main-menu").toggle('slow');
     })
   })
+  if ($(window).width() <= 991){
+    $("#menu-main-menu").toggle('hide');
+  }  
 </script>
 <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
    </body>
