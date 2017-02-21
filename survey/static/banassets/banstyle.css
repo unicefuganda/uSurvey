@@ -4,11 +4,17 @@
 	/*width: 80%;*/
 	/*max-width: 1000px;*/
 	min-width: 260px;
-	height: 460px;
+	height: 340px;
 /*	border: 10px solid #fff;*/
 /*	border: 10px solid rgba(255,255,255,0.9);*/
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
+/*.sp-slideshow {
+    position: relative;
+	min-width: 260px;
+	height: 460px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}*/
 
 .sp-content {
     background: #7d7f72 url(../images/grid.png) repeat scroll 0 0;
