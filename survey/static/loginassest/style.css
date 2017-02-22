@@ -1404,7 +1404,7 @@ table.mc-table tbody .new .submissions a:before {
 }*/
 #header .logo {
     left: 15px;
-    margin: 25px;
+    margin: 10px;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);

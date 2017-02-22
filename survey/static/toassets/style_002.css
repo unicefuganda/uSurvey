@@ -72,8 +72,8 @@ Speacially design for uSurvey
 }
 .mainMenu > ul > li{
     display: inline-block;
-    padding-bottom: 20px;
-    padding-top: 13px;
+    /*padding-bottom: 20px;
+    padding-top: 13px;*/
     position: relative;
 }
 .mainMenu > ul > li > a{
@@ -145,7 +145,7 @@ display: inline-block;
     opacity: 0;
     padding: 10px 0;
     position: absolute;
-    right: 0;
+    right: 0px;
     text-align: left;
     top: 157px;
     transition: all 700ms ease-in-out 0s;
