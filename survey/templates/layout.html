@@ -17,6 +17,7 @@
 
       <!-- usur styles -->
       <link rel="stylesheet" href="{{ STATIC_URL }}assets/usur.css" />
+      <link rel="stylesheet" href="{{ STATIC_URL }}toassets/menstyle.css">
      <!-- <link rel="stylesheet" href="{{ STATIC_URL }}assets/formoid-solid-blue.css"> -->
    <style>
        .search {         
@@ -51,13 +52,17 @@
           right: 11px;
           /*width: 32px;*/
           height: 25px;
-          border: 1px solid #0099ff;
+          border: 6px solid #0099ff !important;
           background: #0099ff;
           text-align: center;
           color: #fff;
           border-radius: 5px;
           cursor: pointer;
           /*font-size: 20px;*/
+        }
+
+        .search-wrapper{
+          margin-right: -18px !important;
         }
 
         /*Resize the wrap to see the search bar change!*/
@@ -110,6 +115,8 @@
        <link rel="stylesheet" href="{{ STATIC_URL }}css/interview-status.css"/>
         <link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
         <script src="{{STATIC_URL}}js/select2.full.js"></script>
+        <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/menjs.js"></script>
 
        {% block extra_head %}
 
@@ -158,7 +165,7 @@
                   <a href="{% url 'main_page' %}"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
                </div>
             </div>
-            <nav class="mainMenu pull-left">
+            <!-- <nav class="mainMenu pull-left">
                <div class="menuButton">
                   <span></span>
                   <span></span>
@@ -166,8 +173,7 @@
                </div>
                 {% if perms.auth.can_view_interviewers %}
                 <ul id="menu-main-menu" class="iz_main_menu"><li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}">DashBoard</a>
-                   </li>
-                   <!-- <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="{% url 'about_page' %}">About</a></li> -->
+                   </li>                   
                    <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Design</a>
                     <ul class="sub-menu">
                     {% if perms.auth.can_view_batches %}
@@ -198,9 +204,7 @@
                    </li>
 
                    <li  class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-182"><a href="#">Monitor</a>
-                   <ul class="sub-menu">
-                   <!-- li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'survey_completion_rates' %}">Completion
-                                        Rates</a></li -->
+                   <ul class="sub-menu">                   
                   {% if perms.auth.view_completed_survey %}
                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'view_listing_data' %}">Listing Data</a></li>
                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'view_batch_data' %}">Batch Data</a></li>
@@ -259,8 +263,7 @@
                             {% has_super_powers request as has_powers %}
                              {% if user.is_authenticated %}
 
-                                <span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="margin-left: 75px;  background:  none !important; border: none !important;">
-                                   <!-- <i class="usur-icon fa fa-caret-down icon-only bigger-120"></i> -->
+                                <span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="margin-left: 75px;  background:  none !important; border: none !important;">                                   
                                    {% if has_powers %}
                                         <img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" title="Super Powers Activated">
                                     {% else %}
@@ -290,7 +293,155 @@
                              {% endif %}
                        </li>
                     </ul>
-                </nav>
+                </nav> -->
+                <nav id='cssmenu'>
+<div id="head-mobile"></div>
+<div class="button"></div>
+<ul>
+<!-- <li class='active'><a href='#'>HOME</a></li> -->
+{% if perms.auth.can_view_interviewers %}
+<li id="menu-item-120" class="menu-item menu-item-type-custom menu-item-object-custom menu-ancestor menu-parent menu-item-has-children menu-item-120"><a href="{% url 'home_page' %}">DASHBOARD</a>
+                   </li>
+{% endif%}     
+<li><a href='#'>DESAIGN</a>
+   <ul>      
+      {% if perms.auth.can_view_batches %}
+                            <li><a href="{% url 'survey_list_page' %}">Surveys</a></li>
+                            {% endif%}
+                    {% if perms.auth.can_enter_data %}
+                            <li><a href="{% url 'listing_template_home' %}">Listing Form</a></li>
+                            {% endif%}
+                    {% if perms.auth.can_enter_data %}
+                            <li><a href="{% url 'question_module_listing_page' %}">Modules</a></li>
+
+                            <li><a href="{% url 'respondent_groups_page' %}">Groups</a></li>
+                    <li><a href="{% url 'show_question_library' %}">Question
+                                                Library</a></li>
+                            
+                       {% endif %}
+   </ul>
+</li>
+
+
+
+<li><a href='#'>ADMINISTRATION</a>
+   <ul>      
+      <li>
+      <a href="{% url 'interviewers_page' %}">Interviewers</a>
+      </li>
+      <li>
+      <a href="{% url 'bulk_sms' %}">Notifications</a></li>
+      <li>
+      <a href="{% url 'simulator_page' %}">Data Entry</a>
+      </li>      
+   </ul>
+</li>
+
+<li><a href='#'>MONITOR</a>
+   <ul>      
+      {% if perms.auth.view_completed_survey %}
+                           <li>
+                           <a href="{% url 'view_listing_data' %}">Listing Data</a>
+                           </li>
+                           <li>
+                           <a href="{% url 'view_batch_data' %}">Batch Data</a>
+                           </li>
+                           <li>
+                           <a href="{% url 'show_interviewer_completion_summary' %}"> Completion
+                                        Summary</a>
+                           </li>
+      {% endif %}
+                       <li><a href="{% url 'odk_submission_list' %}">ODK submissions</a>
+                       </li>      
+   </ul>
+</li>
+
+{% if perms.auth.can_view_batches or perms.auth.view_completed_survey %}
+<li><a href='#'>ANALYSE</a>
+   <ul>      
+      <li>
+      <a href="{% url 'list_indicator_page' %}">Indicators</a>
+      </li>
+      <li>
+      <a href="{% url 'list_weights_page' %}">Location Weights</a>
+      </li>
+      {% endif %}    
+   </ul>
+</li>
+{% if perms.auth.can_view_aggregates %}
+<li><a href='#'>DOWNLOADS</a>
+   <ul>      
+      <li>
+      <a href="{% url 'download_excel' %}">Survey Data</a>
+      </li>
+      <li>
+      <a href="{% url 'interviewer_report_page' %}">Mobile Money Sheet</a>
+      </li>
+      {% endif %}    
+   </ul>
+</li>
+
+
+
+<li><a href='#'>SETTINGS</a>
+   <ul>      
+      {% if user.is_superuser == True %}
+      <li>
+      <a href="{% url 'users_index' %}">Users</a>
+      </li>
+      <li>
+      <a href="{% url 'enumeration_area_home' %}">Locations</a></li>
+      <li>
+      <a href="#">Setup</a>
+      </li>
+      {% else %}
+      <li>
+      <a href="{% url 'users_edit' user.id %}">Edit Profile</a>
+      </li>
+      {% endif %}    
+   </ul>
+</li>
+
+<li>
+{% has_super_powers request as has_powers %}
+{% if user.is_authenticated %}
+<span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="background:  none !important; border: none !important;">
+{% if has_powers %}
+<img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" title="Super Powers Activated">
+{% else %}
+<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" float="right">
+{% endif %}
+</span>
+<ul>
+<li>
+<a href="#">{% if user.first_name %}{{ user.first_name }} {% else %} Settings {% endif %}</a>
+</li>
+{% if perms.auth.can_have_super_powers %}
+{% if has_powers %}
+<li>
+<a href="{% url 'deactivate_super_powers_page' %}">Deactivate Power Mode</a>
+</li>
+{% else %}
+<li>
+<a href="{% url 'activate_super_powers_page' %}">Activate Power Mode</a>
+</li>
+{% endif %}
+{% endif %}
+<li>
+<a href="{% url 'password_change' %}">Change Password</a>
+</li>
+<li>
+<a href="{% url 'logout_page' %}">Logout</a>
+</li>
+{% else %}
+<a href="{% url 'login_page' %}">Login</a>
+{% endif %}
+</ul>
+</li>
+
+
+</ul>
+</nav>
             <div>
             </div>
             <div class="clearfix"></div>
@@ -301,8 +452,7 @@
     margin-right: 10px;">
                   <div class="fw-col-xs-12 fw-col-xs-12 col-sm-12  col-md-12  wow none animated" style="text-align: left ! important; padding-left: 0px; padding-right: 0px; visibility: visible;">
                   </div>
-                   <br />
-                  <!--<div class="row col-xs-4 col-lg-4" style="color:#09F; z-index:1;">-->
+                   <br />                  
                   <div class="row col-xs-12 col-md-8" id="xyz-breadcrumbs">
                       <h5 style="color:#09F; font-weight:none; max-width: 80%;">
                                 <a href="{% url 'home_page' %}">Home</a> &raquo;

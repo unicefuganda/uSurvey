@@ -11,6 +11,7 @@
     <link id="theme_css" rel="stylesheet" href="{{ STATIC_URL }}toassets/light.css">
     <link id="skin_css" rel="stylesheet" href="{{ STATIC_URL }}toassets/contentdefault.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}toassets/assets.css">
+        <link rel="stylesheet" href="{{ STATIC_URL }}toassets/menstyle.css">
               <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}banassets/banstyle.css">
       <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
       <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
@@ -25,7 +26,9 @@
       <link rel="stylesheet" href="{{ STATIC_URL }}css/dataTables.bootstrap.css" />
       <link rel="stylesheet" href="{{ STATIC_URL }}toassets/font-awesome.css" type="text/css" media="all">
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_005.js"></script>
-      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery.js"></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery.js"></script>      
+      <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+      <script type="text/javascript" src="{{ STATIC_URL }}toassets/menjs.js"></script>
 
       <style>
          .headerArea {
@@ -63,7 +66,7 @@
                   <a href="#"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
                </div>
             </div>
-            <nav class="mainMenu pull-left">
+            <!-- <nav class="mainMenu pull-left">
                <div class="menuButton">
                   <span></span>
                   <span></span>
@@ -91,7 +94,23 @@
                    <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right" ><a href="{% url 'login_page' %}">login</a></li>
                    {% endif%}
                </ul>
-            </nav>
+            </nav> -->
+            <nav id='cssmenu'>
+<div id="head-mobile"></div>
+<div class="button"></div>
+<ul>
+<!-- <li class='active'><a href='#'>HOME</a></li> -->
+<li><a href="#">HOME</a></li>
+<li><a href="#">DISCOVER</a></li>
+<li><a href="#">CONTACT</a></li>                  
+<li><a href="{% url 'about_page' %}">ABOUT</a></li>
+{% if user.is_authenticated %}
+                   <li id="menu-item-181" class="ulogin menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right"><a href="{% url 'home_page' %}">SURVEY</a></li>         
+{% else %}
+                   <li id="menu-item-181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-181 pull-right" ><a href="{% url 'login_page' %}">LOGIN</a></li>
+                   {% endif%}
+</ul>
+</nav>
            
             <div class="clearfix"></div>
          </header>
