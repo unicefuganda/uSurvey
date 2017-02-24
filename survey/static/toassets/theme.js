@@ -100,6 +100,7 @@ Theme usurvey
     });
     if ($(window).width() <= 991)
     {
+        $("#menu-main-menu").hide();
         $("ul li.hasChild > a").on('click', function (e) {
             e.preventDefault();
             $(this).next('.dropSub').slideToggle('slow');

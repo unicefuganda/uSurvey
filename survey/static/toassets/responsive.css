@@ -375,7 +375,7 @@ This is only usurvey
 }
 
 
-@media (min-width: 768px) and (max-width: 991px){
+@media (min-width: 768px) and (max-width: 1024px){
     /**************** Header ***************/
     .headerArea {
         height: inherit;
@@ -410,7 +410,7 @@ This is only usurvey
         display: block;
     }
     .mainMenu > ul > li:first-child > a {
-        padding: 3px 35px;
+        /*padding: 3px 35px;*/
     }
     .mainMenu > ul > li > a{
         border: none;
@@ -449,7 +449,7 @@ This is only usurvey
         top: 20px;
     }
     .mainMenu ul{
-        display: none;
+        /*display: none;*/
         -webkit-transition: none 0s;
         -moz-transition: none 0s;
         -ms-transition: none 0s;
@@ -889,7 +889,7 @@ This is only usurvey
         display: block;
     }
     .mainMenu > ul > li:first-child > a {
-        padding: 3px 35px;
+        /*padding: 3px 35px;*/
     }
     .mainMenu > ul > li > a{
         border: none;
@@ -907,7 +907,7 @@ This is only usurvey
     }
     .mainMenu > ul > li:last-child > a {
         border-right: 0 none;
-        padding: 3px 35px;
+        padding: 3px 253px;
     }
     .dropMenu > li > a {
         padding: 14px 0;
@@ -1548,7 +1548,6 @@ This is only usurvey
         top: -20px;
     }
 }
-
 @media (min-width: 481px) and (max-width: 767px){
     /**************** Homepage two ***************/
     /* Folio 1 */
@@ -1632,3 +1631,71 @@ This is only usurvey
         padding-right: 50px !important;
     }
 }
+
+@media (min-width: 360px) and (max-width: 767px){
+.mainMenu > ul > li:last-child > a {
+        border-right: 0 none;
+        padding: 3px 293px;
+    }
+    .sub-menu {
+    left: 80px;
+    }
+}
+@media (min-width: 375px) and (max-width: 667px){
+.mainMenu > ul > li:last-child > a {
+        border-right: 0 none;
+        padding: 3px 312px !important;
+    }
+    .sub-menu {
+    left: 80px;
+    }
+}
+@media (min-width: 412px) and (max-width: 732px){
+.mainMenu > ul > li:last-child > a {
+        border-right: 0 none;
+        padding: 3px 350px !important;
+    }
+    .sub-menu {
+    left: 80px;
+    }
+}
+/*@media (min-width: 512px) and (max-width: 965px){
+.mainMenu > ul > li:last-child > a {
+        border-right: 0 none;
+        padding: 3px 537px !important;
+    }
+}*/
+@media (min-width: 768px) and (max-width: 1024px){
+.mainMenu > ul > li:last-child > a {
+        border-right: 0 none;
+        padding: 3px 700px;
+    }
+    .sub-menu {
+    left: 80px;
+    }
+}
+@media (min-width: 769px) and (max-width: 1270px){
+.mainMenu > ul > li:last-child > a {
+    border-right: 0 none;
+    padding: 3px 733px;
+}
+.sub-menu {
+    left: 80px;
+    }
+}
+@media (min-width: 980px) and (max-width: 1269px){
+.mainMenu > ul > li:last-child > a {
+    border-right: 0 none;
+    padding: 3px 914px;
+}
+.sub-menu {
+    left: 80px;
+    }
+}
+}
+/*@media (min-width: 512px) and (max-width: 965px){
+.mainMenu > ul > li:last-child > a {
+        border-right: 0 none;
+        padding: 3px 537px !important;
+    }
+}*/
