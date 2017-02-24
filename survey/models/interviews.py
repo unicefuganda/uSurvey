@@ -30,13 +30,14 @@ def update_model_obj_serial(model_obj, serial_name, filter_criteria):
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name="interviews")
-    survey = models.ForeignKey('Survey', related_name='interviews',null=True, blank=True)
+    survey = models.ForeignKey('Survey', related_name='interviews', null=True, blank=True)
     question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)
     ea = models.ForeignKey(
         'EnumerationArea', related_name='interviews', db_index=True)    # repeated here for easy reporting
     interview_reference = models.ForeignKey('Interview', related_name='follow_up_interviews', null=True, blank=True)
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
+    #instance_id = models.CharField(max_length=200, null=True, blank=True)
     last_question = models.ForeignKey(
         "Question", related_name='ongoing', null=True, blank=True)
 
@@ -45,6 +46,11 @@ class Interview(BaseModel):
 
     def is_closed(self):
         return self.closure_date is not None
+
+    @property
+    def qset(self):
+        from survey.models.questions import QuestionSet
+        return QuestionSet.get(pk=self.question_set.pk)
 
     @property
     def has_started(self):
@@ -165,6 +171,11 @@ class Answer(BaseModel):
         return cls.objects.create(question=question, value=answer, question_type=question.__class__.type_name(),
                                   interview=interview, identifier=question.identifier,
                                   as_text=as_text, as_value=as_value)
+
+    def update(self, answer):
+        self.as_text = answer
+        self.as_value = answer
+        self.save()
 
     @classmethod
     def supported_answers(cls):
@@ -411,7 +422,7 @@ class ODKGeoPoint(Point):
 
 
 class TextAnswer(Answer):
-    value = models.CharField(max_length=100, blank=False, null=False)
+    value = models.CharField(max_length=200, blank=False, null=False)
 
     class Meta:
         app_label = 'survey'
@@ -434,12 +445,29 @@ class MultiChoiceAnswer(Answer):
     @classmethod
     def create(cls, interview, question, answer):
         try:
-            answer = int(answer)
-            answer = question.options.get(order=answer)
+            if str(answer).isdigit():
+                answer = int(answer)
+                answer = question.options.get(order=answer)
+            else:
+                answer = question.options.get(text__iexact=answer)
         except:
             pass
         return super(MultiChoiceAnswer, cls).create(interview, question, answer,
                                                     as_text=answer.text, as_value=answer.order)
+
+    def update(self, answer):
+        try:
+            if str(answer).isdigit():
+                answer = int(answer)
+                answer = self.options.get(order=answer)
+            else:
+                answer = self.options.get(text__iexact=answer)
+        except:
+            pass
+        self.as_text = answer.text
+        self.as_value = answer.order
+        self.value = answer
+        self.save()
 
     class Meta:
         app_label = 'survey'
@@ -522,7 +550,7 @@ class DateAnswer(Answer):
     def create(cls, interview, question, answer):
         raw_answer = answer
         if isinstance(answer, basestring):
-            answer = extract_date(answer, fuzzy=True)
+            answer = extract_date(answer)
         return super(DateAnswer, cls).create(interview, question, answer,
                                              as_text=raw_answer, as_value=raw_answer)
 
@@ -620,7 +648,7 @@ class NonResponseAnswer(BaseModel):
         'Household', related_name='non_response_answers')
     survey_listing = models.ForeignKey(
         'SurveyHouseholdListing', related_name='non_response_answers')
-    value = models.CharField(max_length=100, blank=False, null=False)
+    value = models.CharField(max_length=200, blank=False, null=False)
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name='non_response_answers')
 

@@ -403,7 +403,3 @@ try:
 except ImportError:
     pass
 
-if DEBUG:
-    INSTALLED_APPS.append('debug_toolbar')
-    MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware', ] + MIDDLEWARE_CLASSES
-    INTERNAL_IPS = ['127.0.0.1', ]

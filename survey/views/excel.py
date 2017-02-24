@@ -115,7 +115,7 @@ def download(request):
                 restricted_to = [last_selected_loc, ]
             if request.GET.get('action') == 'Email Spreadsheet':
                 composer = ResultComposer(request.user,
-                                          ResultsDownloadService(batch=batch,
+                                          ResultsDownloadService(batch,
                                                                  survey=survey,
                                                                  restrict_to=restricted_to,
                                                                  multi_display=multi_option))
@@ -123,7 +123,7 @@ def download(request):
                 messages.warning(
                     request, "Email would be sent to you shortly. This could take a while.")
             else:
-                download_service = ResultsDownloadService(batch=batch, survey=survey, restrict_to=restricted_to,
+                download_service = ResultsDownloadService(batch, survey=survey, restrict_to=restricted_to,
                                                           multi_display=multi_option)
                 file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
                                       last_selected_loc else '', batch.name if batch else survey.name)

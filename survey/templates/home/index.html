@@ -154,7 +154,7 @@ function loadInitialMap(){
                 property = feature.properties['{{alt_loc_field}}'];
               if(property)
                 property = property.toUpperCase();
-              feature.properties.rate = -2;
+              feature.properties.rate = {value: -2, description: ''};
             })
           });
        geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
@@ -173,7 +173,7 @@ function getColorFor(rate) {
 
 function style(feature) {
     return {
-        fillColor: getColorFor(feature.properties.rate),
+        fillColor: getColorFor(feature.properties.rate.value),
         weight: 2,
         opacity: 0.55,
         color: '#FD8D3C',
@@ -209,9 +209,9 @@ info.update = function (props) {
         property = props['{{alt_loc_field}}'];
     if(property)
        property = property.toUpperCase();
-    if(props.rate >-2){
-        rate = props.rate >-1 ? props.rate: 'Survey not opened.';
-        this._div.innerHTML += property +': '+ rate;
+    if(props.rate.value >-2){
+        rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
+        this._div.innerHTML += property +': '+ rate.description;
     }
     else{
         this._div.innerHTML = property;

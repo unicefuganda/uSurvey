@@ -149,12 +149,17 @@ def completion_json(request, survey_id):
         divider = 1.0
         completion_rates = {}
         has_sampling = survey.has_sampling
+        is_open = survey.is_open()
+        description = 'Responses'
         #basically get interviews count
         for location in location_type.locations.all():
-            if has_sampling and survey.is_open_for(location):
+            if has_sampling and is_open:
                 divider = EnumerationArea.objects.filter(locations__in=location.get_leafnodes()).count() * \
                           survey.sample_size / 100.0
-            completion_rates[location.name.upper()] = Interview.interviews_in(location, survey).count() / divider
+                description = 'Percent'
+            indicator_value = '' % Interview.interviews_in(location, survey).count() / divider
+            completion_rates[location.name.upper()] = {'value': '{0:.2f}'.format(indicator_value),
+                                                       'description': description}
         return json.dumps(completion_rates, cls=DjangoJSONEncoder)
     json_dump = get_result_json()
     return HttpResponse(json_dump, content_type='application/json')

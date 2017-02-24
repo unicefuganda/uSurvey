@@ -50,7 +50,7 @@ class LocationsFilterForm(Form):
         largest_unit = LocationType.largest_unit()
         locations = Location.objects.none()
         for location_type in LocationType.objects.all():
-            if location_type.parent is not None and location_type.is_leaf_node() == False:
+            if location_type.parent is not None:
                 kw = {'type': location_type}
                 parent_selection = data.get(location_type.parent.name, None)
                 if (locations and parent_selection) or location_type == largest_unit:
@@ -84,7 +84,7 @@ class LocationsFilterForm(Form):
             self.fields['enumeration_area'] = forms.ModelChoiceField(
                 queryset=eas)  # ChoiceField(choices=choices)
             self.fields['enumeration_area'].widget.attrs[
-                'class'] = 'location_filter chzn-select1'
+                'class'] = 'location_filter chzn-select'
             # self.fields['enumeration_area'].widget.attrs['style'] = 'width: 100px;'
             self.fields['enumeration_area'].required = False
         self.data._mutable = False
@@ -103,6 +103,8 @@ class LocationsFilterForm(Form):
         return get_leaf_locs(loc, ea)
 
     def get_enumerations(self):
+        if hasattr(self, 'cleaned_data') and self.cleaned_data.get('enumeration_area', None):
+            return EnumerationArea.objects.filter(pk=self.cleaned_data['enumeration_area'].pk)
         return EnumerationArea.objects.filter(locations__in=self.get_locations()).distinct().order_by('name')
 
 

@@ -2,6 +2,7 @@ import ast
 import os
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.safestring import mark_safe
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.core.serializers.json import DjangoJSONEncoder
@@ -138,9 +139,14 @@ def view_data(request, qset_id):
         interviews = survey_filter.get_interviews()
         if locations_filter.is_valid():
             interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
+        search_fields = ['ea__name', 'survey__name', 'question_set__name', 'answer__as_text', ]
+        if params.has_key('q'):
+            interviews = get_filterset(interviews, params['q'], search_fields)
         context = {'qset': qset, 'survey_filter': survey_filter,
                    'interviews': interviews, 'locations_filter': locations_filter,
-                   'location_filter_types': LocationType.in_between()}
+                   'location_filter_types': LocationType.in_between(),
+                   'placeholder': 'Response, EA, Survey, %s' % qset.verbose_name(),
+                  }
         return render(request, 'question_set/view_data.html', context)
     except QuestionSet.DoesNotExist:
         return HttpResponseNotFound()
@@ -165,20 +171,40 @@ def _view_qset_data(request, model_class, interviews):
     survey_filter = SurveyResultsFilterForm(model_class, data=params)
     locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
     selected_qset = None
+    survey = None
+    items_per_page = 50
+    try:
+        page_index = int(params.get('page', 0))
+    except:
+        page_index = 0
     if survey_filter.is_valid():
         interviews = survey_filter.get_interviews(interviews=interviews)
         selected_qset = survey_filter.cleaned_data['question_set']
+        survey = survey_filter.cleaned_data['survey']
     if locations_filter.is_valid():
         interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
-    search_fields = ['ea__name', 'survey__name', 'question_set__name']
+    search_fields = ['ea__name', 'survey__name', 'question_set__name', 'answer__as_text', ]
     if request.GET.has_key('q'):
         interviews = get_filterset(interviews, request.GET['q'], search_fields)
     context = {'survey_filter': survey_filter,
                'interviews': interviews, 'locations_filter': locations_filter,
                'location_filter_types': LocationType.in_between(),
-               'placeholder': 'E.A., Survey, %s' % model_class.verbose_name(),
-               'selected_qset': selected_qset, 'model_class': model_class}
+               'placeholder': 'Response, EA, Survey, %s' % model_class.verbose_name(),
+               'selected_qset': selected_qset, 'model_class': model_class,
+               'items_per_page': items_per_page}
+    if selected_qset and survey:
+        # page_start = page_index * items_per_page
+        # interviews = interviews[page_start: page_start + items_per_page]()
+        download_service = ResultsDownloadService(selected_qset, survey=survey, interviews=interviews,
+                                                  page_index=page_index, items_per_page=items_per_page)
+        df = download_service.get_interview_answers()
+        context['report'] = mark_safe(df.to_html(classes='table table-striped table-bordered table-hover table-sort',
+                                       max_rows=items_per_page))
     return render(request, 'question_set/view_all_data.html', context)
+
+
+def get_result():
+    pass
 
 
 @login_required
@@ -252,11 +278,11 @@ def download_data(request, qset_id):
     if locations_filter.is_valid():
         interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
     last_selected_loc = locations_filter.last_location_selected
-    download_service = ResultsDownloadService(batch=qset, interviews=interviews)
+    download_service = ResultsDownloadService(qset, interviews=interviews)
     file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
                           last_selected_loc else '', qset.name)
     reports_df = download_service.generate_interview_reports()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
-    reports_df.to_csv(response, date_format='%Y-%m-%d %H:%M:%S')   #exclude interview id
+    reports_df.to_csv(response, date_format='%Y-%m-%d %H:%M:%S', encoding='utf-8')   #exclude interview id
     return response

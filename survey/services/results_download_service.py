@@ -1,6 +1,7 @@
 import pandas as pd
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
+from django.db.models.sql.datastructures import EmptyResultSet
 from survey.models import LocationTypeDetails, Location, LocationType, Household, HouseholdMember, \
     HouseholdMemberGroup, Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer, QuestionOption, Interview
 from survey.utils.views_helper import get_ancestors
@@ -46,52 +47,56 @@ class ResultsDownloadService(object):
     AS_TEXT = 1
     AS_LABEL = 0
     answers = None
+    page_start = 0
+    items_per_page = None
 
-    def __init__(self, survey=None, batch=None, restrict_to=None, interviews=None, multi_display=AS_TEXT):
+    def __init__(self, batch, survey=None, restrict_to=None, interviews=None, multi_display=AS_TEXT, page_index=0,
+                 items_per_page=None, follow_ref=False):
         self.batch = batch
         self.survey = survey
         self.locations = []
+        self.follow_ref = follow_ref
+        if items_per_page:
+            self.page_start = page_index * items_per_page
+            self.items_per_page = items_per_page
+        if interviews is None:
+            interviews = Interview.objects.all()
+        kwargs = {'question_set__pk': batch.pk}
+        if survey:
+            kwargs['survey'] = survey
         if restrict_to:
-            map(lambda loc: self.locations.extend(
-                loc.get_leafnodes(include_self=True)), restrict_to)
-        self.interviews = interviews
+            map(lambda loc: self.locations.extend(loc.get_leafnodes(include_self=True)), restrict_to)
+            kwargs['ea__locations__in'] = self.locations
+        self.interviews = interviews.filter(**kwargs)
         self.multi_display = int(multi_display)
 
     def get_interview_answers(self):
         interview_list_args = ['created', 'ea__locations__name', 'ea__name', 'interviewer__name', 'id', ]
+        if self.follow_ref:
+            interview_list_args.append('interview_reference__id')
         parent_loc = 'ea__locations'
         for i in range(LocationType.objects.count() - 2):
             parent_loc = '%s__parent' % parent_loc
             interview_list_args.insert(1, '%s__name' % parent_loc)
-        interview_filter_args = {'question_set': self.batch}
-        if self.locations:
-            interview_filter_args['ea__locations__in'] = self.locations
         interview_query_args = list(interview_list_args)
-        answer_query_args = ['interview__id', 'identifier', ]
-        value = 'as_text'
-        if self.multi_display == self.AS_LABEL:
-            value = 'as_value'
-        answer_query_args.append(value)
-        answers_filter_args = {'question__qset__pk': self.batch.pk}
-        if self.survey:
-            answers_filter_args['interview__survey'] = self.survey
-        if self.interviews:
-            interview_queryset = self.interviews
-            answers_filter_args['interview__in'] = self.interviews
-        else:
-            interview_queryset = Interview.objects
-        interview_queryset= interview_queryset.filter(**interview_filter_args).values_list(*interview_query_args)
-        answers_queryset = Answer.objects.filter(**answers_filter_args).values_list(*answer_query_args)
-        interviews_df = to_df(interview_queryset, date_cols=['created'])
-        answers_df = to_df(answers_queryset)
-        answers_df.columns = ['id', 'identifier', value]
-        # not get pivot table of interview_id, identifier and question value
-        answers_report_df = answers_df.pivot(index='id', columns='identifier', values=value)
+        interview_queryset = self.interviews.values_list(*interview_query_args)
+        if self.items_per_page:
+            interview_queryset = interview_queryset[self.page_start: self.page_start + self.items_per_page]
+        try:
+            interviews_df = to_df(interview_queryset, date_cols=['created'])
+        except EmptyResultSet:
+            interviews_df = pd.DataFrame(columns=interview_query_args)
+        if self.follow_ref:
+            ref_answers_report_df = self._get_answer_df(interviews_df['interview_reference_id'])
+            reports_df = interviews_df.join(ref_answers_report_df, on='id', how='outer')
+        answers_report_df = self._get_answer_df(interviews_df['id'])
         reports_df = interviews_df.join(answers_report_df, on='id', how='outer')
         header_names = ['Created', ]
         location_names = list(LocationType.objects.get(parent__isnull=True).get_descendants(include_self=False))
         header_names.extend(location_names)
-        header_names.extend(['EA', 'interviewer__name', 'Interview_id', ])
+        header_names.extend(['EA', 'interviewer__name', ])
+        if self.follow_ref:
+            header_names.extend(list(ref_answers_report_df.columns)[1:])
         report_columns = header_names + [q.identifier for q in self.batch.all_questions
                                          if q.identifier in reports_df.columns]
         header_names.extend(list(reports_df.columns)[len(header_names):])
@@ -100,8 +105,28 @@ class ResultsDownloadService(object):
                              if identifier in header_names]
         reports_df.sort_values(['Created', ] + location_names + other_sort_fields)
         reports_df = reports_df[report_columns]
-        reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
+        try:
+            reports_df.Created = reports_df.Created.dt.tz_convert(settings.TIME_ZONE)
+        except:
+            pass        # just try to convert if possible. Else leave it
+        reports_df.index += self.page_start
         return reports_df
+
+    def _get_answer_df(self, interview_ids):
+        answer_query_args = ['interview__id', 'identifier', ]
+        value = 'as_text'
+        if self.multi_display == self.AS_LABEL:
+            value = 'as_value'
+        answer_query_args.append(value)
+        answers_queryset = Answer.objects.filter(interview__id__in=interview_ids).values_list(*answer_query_args)
+        try:
+            answer_columns = ['id', 'identifier', value]
+            answers_df = to_df(answers_queryset)
+            answers_df.columns = ['id', 'identifier', value]
+        except EmptyResultSet:
+            answers_df = pd.DataFrame(columns=answer_columns)
+        # not get pivot table of interview_id, identifier and question value
+        return answers_df.pivot(index='id', columns='identifier', values=value)
 
     def generate_interview_reports(self):
         return self.get_interview_answers()

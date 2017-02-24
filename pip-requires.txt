@@ -39,3 +39,4 @@ numpy
 pandas
 django-debug-toolbar
 asteval
+line_profiler
