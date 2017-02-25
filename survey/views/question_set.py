@@ -130,26 +130,14 @@ def delete_qset_listingform(request, question_id):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def view_data(request, qset_id):
-    try:
-        qset = QuestionSet.get(pk=qset_id)
-        request.breadcrumbs(qset.edit_breadcrumbs(qset=qset))
-        params = request.GET if request.method == 'GET' else request.POST
-        survey_filter = QuestionSetResultsFilterForm(qset, data=params)
-        locations_filter = LocationsFilterForm(data=request.GET, include_ea=True)
-        interviews = survey_filter.get_interviews()
-        if locations_filter.is_valid():
-            interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
-        search_fields = ['ea__name', 'survey__name', 'question_set__name', 'answer__as_text', ]
-        if params.has_key('q'):
-            interviews = get_filterset(interviews, params['q'], search_fields)
-        context = {'qset': qset, 'survey_filter': survey_filter,
-                   'interviews': interviews, 'locations_filter': locations_filter,
-                   'location_filter_types': LocationType.in_between(),
-                   'placeholder': 'Response, EA, Survey, %s' % qset.verbose_name(),
-                  }
-        return render(request, 'question_set/view_data.html', context)
-    except QuestionSet.DoesNotExist:
-        return HttpResponseNotFound()
+    qset = QuestionSet.get(pk=qset_id)
+    request.breadcrumbs(qset.edit_breadcrumbs(qset=qset))
+    request.GET = request.GET.copy()
+    request.GET['question_set'] = qset_id
+    if hasattr(qset, 'survey'):
+        request.GET['survey'] = qset.survey.id
+    return _view_qset_data(request, qset.__class__, Interview.objects.filter(question_set__id=qset_id))
+
 
 
 @login_required
