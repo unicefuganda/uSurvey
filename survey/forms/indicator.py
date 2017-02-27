@@ -2,42 +2,65 @@ from django import forms
 from cacheops import cached_as
 from django import template
 from django.forms import ModelForm
-from survey.models import Indicator, Batch, QuestionModule, Survey, QuestionOption, IndicatorVariableCriteria, \
+from survey.models import Indicator, QuestionSet, QuestionModule, Survey, QuestionOption, IndicatorVariableCriteria, \
     IndicatorVariable
 from survey.models import BatchQuestion, Question, Answer, MultiChoiceAnswer, MultiSelectAnswer, NumericalAnswer
 from django.core.exceptions import ValidationError
-from survey.forms.form_order_mixin import FormOrderMixin
+from survey.forms.form_helper import FormOrderMixin
+from survey.forms.form_helper import IconName
+
+
+class IndicatorVariablesField(forms.ModelMultipleChoiceField, IconName):
+    pass
 
 
 class IndicatorForm(ModelForm, FormOrderMixin):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)
-    batch = forms.ModelChoiceField(queryset=Batch.objects.none(), empty_label='Select Batch', required=False)
-    variables = forms.ModelMultipleChoiceField(queryset=IndicatorVariable.objects.none())
+    question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.none(), empty_label='Select Question set',
+                                          required=False)
+    variables = IndicatorVariablesField(queryset=IndicatorVariable.objects.none())
 
     def __init__(self, *args, **kwargs):
         super(IndicatorForm, self).__init__(*args, **kwargs)
         if kwargs.get('instance'):
-            batch = kwargs['instance'].batch
-            survey = batch.survey
+            qset = kwargs['instance'].question_set
+            survey = kwargs['instance'].survey
             self.fields['survey'].initial = survey
-            self.fields['batch'].queryset = survey.batches
-            self.fields['batch'].initial = batch
+            self.fields['question_set'].queryset = survey.batches
+            self.fields['question_set'].initial = survey.qsets
+            self.fields['variables'].initial = kwargs['instance'].variables.all()
+            self.fields['variables'].queryset = kwargs['instance'].variables.all()
+            self.fields['variables'].widget.attrs.update({'class': 'multi-select variables'})
+            self.fields['variables'].icon_name = 'add_variable_icon'
+            self.fields['variables'].icon_attrs.update({'data-toggle': "modal", 'data-target': "#add_variable"})
         if self.data.get('survey'):
-            self.fields['batch'].queryset = Batch.objects.filter(survey=self.data['survey'])
+            self.fields['question_set'].queryset = Survey.get(pk=self.data['survey']).qsets
         self.fields['name'].label = 'Indicator'
-        self.order_fields(['survey', 'batch', 'name', 'description', 'variables', 'formulae'])
-
+        self.order_fields(['survey', 'question_set', 'name', 'description', 'variables', 'formulae'])
 
     def clean(self):
         super(IndicatorForm, self).clean()
-        batch = self.cleaned_data.get('batch', None)
+        question_set = self.cleaned_data.get('question_set', None)
         survey = self.cleaned_data.get('survey', None)
-        if batch and batch.survey != survey:
-            message = "Batch %s does not belong to the selected Survey." % (
-                batch.name)
+        if question_set and survey.qsets.filter(id=question_set.id).exists():
+            message = "Question set %s does not belong to the selected Survey." % (
+                question_set.name)
             self._errors['batch'] = self.error_class([message])
-            del self.cleaned_data['batch']
+            del self.cleaned_data['question_set']
         return self.cleaned_data
+
+    def clean_formulae(self):
+        if self.instance.pk:
+            from asteval import Interpreter
+            aeval = Interpreter()
+            # basically substitute all place holders with 1 and see if it gives a valid math function
+            context = dict([(v.name, 1) for v in self.instance.variables.all()])
+            question_context = template.Context(context)
+            math_string =  template.Template(self.cleaned_data['formulae']).render(question_context)
+            aeval(math_string)
+            if len(aeval.error) > 0:
+               raise ValidationError(aeval.error[-1].get_error()[1])
+        return self.cleaned_data['formulae']
 
     class Meta:
         model = Indicator
@@ -60,10 +83,9 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
         self.indicator = indicator
         self.order_fields(['name', 'description', 'test_question', 'validation_test', 'options', 'value',
                            'min', 'max'])
-        self.fields['test_question'].queryset = Question.objects.filter(pk__in=[q.pk
-                                                                                for q in
-                                                                                indicator.batch.all_questions
-                                                                                ])
+        if self.indicator:
+            self.fields['test_question'].queryset = Question.objects.filter(pk__in=[q.pk for q in
+                                                                                    indicator.batch.all_questions])
         if self.data.get('test_question', []):
             options = QuestionOption.objects.filter(question__pk=self.data['test_question'])
             self.fields['options'].choices = [(opt.order, opt.text) for opt in options]

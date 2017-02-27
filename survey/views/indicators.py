@@ -13,6 +13,7 @@ from survey.models import Indicator, Survey, Answer, IndicatorVariable, Indicato
 from survey.forms.enumeration_area import LocationsFilterForm
 
 
+@login_required
 @permission_required('auth.can_view_batches')
 def new(request):
     indicator_form = IndicatorForm()
@@ -26,10 +27,10 @@ def new(request):
     request.breadcrumbs([
         ('Indicators', reverse('list_indicator_page')),
     ])
-
     return render(request, 'indicator/new.html',
                   {'indicator_form': indicator_form, 'title': 'Add Indicator', 'button_label': 'Create',
-                   'cancel_url': reverse('list_indicator_page'), 'action': '/indicators/new/'})
+                   'cancel_url': reverse('list_indicator_page'), 'action': reversed('new_indicator_page'),
+                   'variable_form': IndicatorVariableForm()})
 
 
 def _process_form(indicator_filter_form, indicators):
@@ -49,6 +50,7 @@ def _process_form(indicator_filter_form, indicators):
     return indicators
 
 
+@login_required
 @permission_required('auth.can_view_batches')
 def index(request):
     indicators = Indicator.objects.all()
@@ -59,6 +61,7 @@ def index(request):
                   {'indicators': indicators, 'indicator_filter_form': indicator_filter_form})
 
 
+@login_required
 @permission_required('auth.can_view_batches')
 def delete(request, indicator_id):
     indicator = Indicator.objects.get(id=indicator_id)
@@ -68,6 +71,7 @@ def delete(request, indicator_id):
     return HttpResponseRedirect('/indicators/')
 
 
+@login_required
 def edit(request, indicator_id):
     indicator = Indicator.objects.get(id=indicator_id)
     indicator_form = IndicatorForm(instance=indicator)
@@ -86,6 +90,7 @@ def edit(request, indicator_id):
     return render(request, 'indicator/new.html', context)
 
 
+@login_required
 @permission_required('auth.can_view_household_groups')
 def add_indicator_variable(request, indicator_id):
     response = None
@@ -112,6 +117,7 @@ def add_indicator_variable(request, indicator_id):
     return response or render(request, 'indicator/indicator_variable.html', context)
 
 
+@login_required
 @permission_required('auth.can_view_household_groups')
 def edit_indicator_variable(request, variable_id):
     response = None
@@ -140,6 +146,7 @@ def edit_indicator_variable(request, variable_id):
     return response or render(request, 'indicator/indicator_variable.html', context)
 
 
+@login_required
 @permission_required('auth.can_view_household_groups')
 def delete_indicator_variable(request, variable_id):
     get_object_or_404(IndicatorVariable, id=variable_id).delete()
@@ -147,6 +154,7 @@ def delete_indicator_variable(request, variable_id):
     return HttpResponseRedirect(reverse('list_indicator_page'))
 
 
+@login_required
 @permission_required('auth.can_view_household_groups')
 def delete_indicator_criteria(request, indicator_criteria_id):
     criterion = get_object_or_404(IndicatorVariableCriteria, id=indicator_criteria_id)

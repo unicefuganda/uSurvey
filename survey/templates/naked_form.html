@@ -51,6 +51,10 @@
     <div class="controls {{ field|is_radio }}">
     <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
       {{field}}
+        {% if field.field.icon_name %}
+            <div class="input-prepend" style="float: left;">
+                <span id="{{field.field.icon_name}}"{% for key, val in field.field.icon_attrs.items %} {{key}}="{{val}}"{% endfor %}><img src="{{field.field.icon_name}}.png" /></span></div>
+        {% endif %}
         <div id="{{field.auto_id}}_tip" class="help tip" style="color: #307ecc; margin-top: 5px; margin-left: 55px;">{{ field.help_text }}</div>
         {% if field.errors %}
         <label class="error" style="color:red;" >

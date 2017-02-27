@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from survey.forms.form_order_mixin import FormOrderMixin
+from survey.forms.form_helper import FormOrderMixin
 from survey.models import TextAnswer, MultiChoiceAnswer, NumericalAnswer, TemplateOption, RespondentGroupCondition
 from survey.models import Answer, NumericalAnswer, RespondentGroup, AnswerAccessDefinition, USSDAccess
 from survey.models import ParameterTemplate, MultiSelectAnswer, GroupTestArgument

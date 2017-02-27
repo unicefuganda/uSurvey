@@ -6,7 +6,7 @@ from django.conf import settings
 from survey.models import Question, BatchQuestion, QuestionSet
 from survey.models import QuestionOption, Batch, Answer, QuestionModule, \
     MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
-from survey.forms.form_order_mixin import FormOrderMixin
+from survey.forms.form_helper import FormOrderMixin
 
 
 def get_question_form(model_class):

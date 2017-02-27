@@ -5,7 +5,7 @@ from django import forms
 from survey.models import RandomizationCriterion, CriterionTestArgument, QuestionOption, ListingTemplate
 from survey.models import Answer, NumericalAnswer, TextAnswer, MultiChoiceAnswer, Interview
 from survey.forms.widgets import InlineRadioSelect
-from survey.forms.form_order_mixin import FormOrderMixin
+from survey.forms.form_helper import FormOrderMixin
 from survey.models import Survey, BatchCommencement, SurveyHouseholdListing, AnswerAccessDefinition, USSDAccess
 
 

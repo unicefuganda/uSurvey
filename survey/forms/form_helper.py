@@ -24,3 +24,15 @@ class FormOrderMixin(object):
                 pass
         fields.update(self.fields)  # add remaining fields in original order
         self.fields = fields
+
+
+class IconName(object):
+
+    def get_icon_name(self):
+        return self._icon_name
+
+    def set_icon_name(self, value):
+        self._icon_name = value
+
+    icon_name = property(get_icon_name, set_icon_name)
+    icon_attrs = {}

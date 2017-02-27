@@ -162,7 +162,7 @@ def _view_qset_data(request, model_class, interviews):
     survey = None
     items_per_page = 50
     try:
-        page_index = int(params.get('page', 0))
+        page_index = int(params.get('page', 1)) - 1
     except:
         page_index = 0
     if survey_filter.is_valid():

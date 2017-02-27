@@ -4,10 +4,10 @@ from django.utils.datastructures import SortedDict
 from survey.models.question_module import QuestionModule
 from survey.models.interviews import MultiChoiceAnswer, Answer
 from survey.models.surveys import Survey
-from survey.models import Batch
-from survey.models import BatchQuestion
-from survey.models import Question, Interview
-
+from survey.models.batch import Batch
+from survey.models.batch_questions import BatchQuestion
+from survey.models.questions import Question, QuestionSet
+from survey.models.interviews import Interview
 
 
 class Indicator(BaseModel):
@@ -16,7 +16,8 @@ class Indicator(BaseModel):
     name = models.CharField(max_length=255, null=False)
     # module = models.ForeignKey(QuestionModule, null=False, related_name='indicator')
     description = models.TextField(null=True)
-    batch = models.ForeignKey(Batch, related_name='indicators')
+    survey = models.ForeignKey(Survey, related_name='indicators')
+    question_set = models.ForeignKey(QuestionSet, related_name='indicators')
     formulae = models.TextField()        # I'm allowing that the formula can contain long names
     # parameter = models.ForeignKey(BatchQuestion, related_name='indicators', null=True, blank=True)
 
@@ -112,7 +113,11 @@ class IndicatorVariable(BaseModel):
     """
     name = models.CharField(max_length=150)
     description = models.TextField()
-    indicator = models.ForeignKey(Indicator, related_name='variables')
+    indicator = models.ForeignKey(Indicator, related_name='variables', null=True)   # just to accomodate creation of
+                                                                # variables then assigning them to indicators
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         app_label = 'survey'

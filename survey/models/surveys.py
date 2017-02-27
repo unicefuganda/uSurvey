@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from survey.models.locations import Location, LocationType
 
 
+
 class Survey(CloneableMixin, BaseModel):
     name = models.CharField(max_length=100, blank=False,
                             null=True, unique=True)
@@ -41,6 +42,21 @@ class Survey(CloneableMixin, BaseModel):
         if not survey.has_sampling:
             survey.sample_size = 0
         survey.save()
+
+    @property
+    def qsets(self):
+        ''' Returns all question sets associated with this survey. This includes all listing and batch questions.
+        :return:
+        '''
+        from survey.models import QuestionSet
+        qset_ids = []
+        if self.has_sampling:
+            if self.listing_form:
+                qset_ids.append(self.listing_form.id)
+            elif self.preferred_listing:
+                qset_ids.append(self.preferred_listing.listing_form.id)
+        qset_ids.extend(self.batches.values_list('id', flat=True))
+        QuestionSet.objects.filter(id__in=qset_ids)
 
     def is_open_for(self, location):
         all_batches = self.batches.all()

@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import Q
 from django import forms
-from form_order_mixin import FormOrderMixin
+from form_helper import FormOrderMixin
 from survey.models import Answer, MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, QuestionFlow, \
     Question, TextArgument, NumericalAnswer, TextAnswer, TemplateOption
 from survey.models import QuestionLoop, FixedLoopCount, PreviousAnswerCount
