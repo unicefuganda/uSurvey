@@ -64,7 +64,7 @@ nav{position:relative;width:980px;margin:0 auto;}
 #cssmenu ul ul ul li.active a{border-left:1px solid #333}
 #cssmenu > ul > li.has-sub > ul > li.active > a,#cssmenu > ul ul > li.has-sub > ul > li.active> a{border-top:1px solid #333}
 
-@media screen and (max-width:700px){
+@media screen and (max-width:1024px){
 .logo{top:0;left: 0;width:100%;height:46px;text-align:center;padding:10px 0 0 0 ;float:none}
 .logo2{display:none}
 nav{width:100%;}

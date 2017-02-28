@@ -74,7 +74,7 @@ img {
 header ul,footer ul,.top-bar ul,.lft-tools ul,.post-info ul,.recent-posts-widget ul,.center-v-menu ul,.pricing-tbl ul,.sidebar ul,ul.details,ul.comment-list,ul.list,.w-recent-posts ul{
 	list-style: outside none none;
     margin: 0;
-    padding: 29px 0 0;
+    /*padding: 29px 0 0;*/
 }
 .header-1 .top-nav > ul > li > a > span:before,.skew-nav > ul > li > a > span:before,.icon-box-1 .box-number span:after,.post-item .post-image:after,.post-item .lft-tools:before,.p-style2 figure:after,.p-style3 figure:after,.team-box.box-1 .team-img span,.rect-angles:before,
 .rect-angles:after,.rect-angles span:before,.rect-angles span:after,.team-box.box-1 .team-socials:after,.header-2 .top-nav > ul > li > a:before,.icon-bg:after,.icon-border:after,.steps-2 .step-title:after,.steps-4 .step-line:before{
