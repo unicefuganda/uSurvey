@@ -1,7 +1,7 @@
 *{margin:0;padding:0;text-decoration:none}
 body{background:#555;}
 header{position:relative;width:100%;background:#0099ff;}
-.logo{position:relative;z-index:123;padding:10px;font:18px verdana;color:#6DDB07;float:left;width:20%}
+.logo{position:relative;z-index:123;font:18px verdana;color:#6DDB07;float:left;width:20%}
 .logo a{color:#6DDB07;}
 nav{position:relative;width:980px;margin:0 auto;}
 /*#cssmenu,#cssmenu ul,#cssmenu ul li,#cssmenu ul li a,#cssmenu #head-mobile{border:0;list-style:none;line-height:1;display:block;position:relative;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}*/
@@ -11,7 +11,7 @@ nav{position:relative;width:980px;margin:0 auto;}
     display: block;
     line-height: 1;
     list-style: outside none none;
-    padding-top: 8px;
+    padding-top: 5px;
     position: relative;
     z-index: 9;
 }
@@ -20,22 +20,43 @@ nav{position:relative;width:980px;margin:0 auto;}
 #cssmenu{font-family:sans-serif;background:#0099ff}
 #cssmenu > ul > li{float:left}
 #cssmenu > ul > li > a{padding:17px;font-size:12px;letter-spacing:1px;text-decoration:none;color:#fff;font-weight:700;}
-#cssmenu > ul > li:hover > a,#cssmenu ul li.active a{color:#fff}
-#cssmenu > ul > li:hover,#cssmenu ul li.active:hover,#cssmenu ul li.active,#cssmenu ul li.has-sub.active:hover{background:#0073bf!important;-webkit-transition:background .3s ease;-ms-transition:background .3s ease;transition:background .3s ease;}
+#cssmenu > ul > li:hover > a,#cssmenu ul li.active a{color:yellow;}
+/*Removed Hover color*/
+/*#cssmenu > ul > li:hover,#cssmenu ul li.active:hover,#cssmenu ul li.active,#cssmenu ul li.has-sub.active:hover{background:#0073bf!important;-webkit-transition:background .3s ease;-ms-transition:background .3s ease;transition:background .3s ease;}*/
 #cssmenu > ul > li.has-sub > a{padding-right:24px}
 /*Removed Plush and minus functionality*/ 
 /*#cssmenu > ul > li.has-sub > a:after{position:absolute;top:22px;right:11px;width:8px;height:2px;display:block;background:#fff;content:''}*/
 /*#cssmenu > ul > li.has-sub > a:before{position:absolute;top:19px;right:14px;display:block;width:2px;height:8px;background:#fff;content:'';-webkit-transition:all .25s ease;-ms-transition:all .25s ease;transition:all .25s ease}*/
 #cssmenu > ul > li.has-sub:hover > a:before{top:23px;height:0}
-#cssmenu ul ul{position:absolute;left:-9999px}
-#cssmenu ul ul li{height:0;-webkit-transition:all .25s ease;-ms-transition:all .25s ease;background:#0073bf;transition:all .25s ease}
+#cssmenu ul ul{position:absolute;left:-9999px;margin-top: -5px;}
+#cssmenu ul ul li{height:0;-webkit-transition:all .25s ease;-ms-transition:all .25s ease;background:#0099ff;transition:all .25s ease}
 #cssmenu ul ul li:hover{}
 #cssmenu li:hover > ul{left:auto}
 #cssmenu li:hover > ul > li{height:35px}
 #cssmenu ul ul ul{margin-left:100%;top:0}
-#cssmenu ul ul li a{border-bottom:1px solid rgba(150,150,150,0.15);padding:11px 15px;width:170px;font-size:12px;text-decoration:none;color:#ddd;font-weight:400;}
+/*#cssmenu ul ul li a{border-bottom:1px solid rgba(150,150,150,0.15);padding:11px 15px;width:170px;font-size:12px;text-decoration:none;color:#fff;font-weight:400;}*/
+/*#cssmenu ul ul li a {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 400;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 11px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 166px;
+}*/
+#cssmenu ul ul li a {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 400;
+    padding: 11px 15px 8px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 166px;
+}
 #cssmenu ul ul li:last-child > a,#cssmenu ul ul li.last-item > a{border-bottom:0}
-#cssmenu ul ul li:hover > a,#cssmenu ul ul li a:hover{color:#fff}
+#cssmenu ul ul li:hover > a,#cssmenu ul ul li a:hover{color:yellow;}
 #cssmenu ul ul li.has-sub > a:after{position:absolute;top:16px;right:11px;width:8px;height:2px;display:block;background:#ddd;content:''}
 #cssmenu ul ul li.has-sub > a:before{position:absolute;top:13px;right:14px;display:block;width:2px;height:8px;background:#fff;content:'';-webkit-transition:all .25s ease;-ms-transition:all .25s ease;transition:all .25s ease}
 #cssmenu ul ul > li.has-sub:hover > a:before{top:17px;height:0}
@@ -64,7 +85,16 @@ nav{width:100%;}
 #cssmenu > ul > li.has-sub > a:after,#cssmenu > ul > li.has-sub > a:before,#cssmenu ul ul > li.has-sub > a:after,#cssmenu ul ul > li.has-sub > a:before{display:none}
 #cssmenu #head-mobile{display:block;padding:23px;color:#ddd;font-size:12px;font-weight:700}
 .button{width:55px;height:46px;position:absolute;right:0;top:0;cursor:pointer;z-index: 12399994;}
-.button:after{position:absolute;top:22px;right:20px;display:block;height:4px;width:20px;border-top:2px solid #dddddd;border-bottom:2px solid #dddddd;content:''}
+/*.button:after{position:absolute;top:22px;right:20px;display:block;height:4px;width:20px;border-top:2px solid #dddddd;border-bottom:2px solid #dddddd;content:''}*/
+.button:after {
+    border-bottom: 2px solid #dddddd;
+    content: "";
+    display: block;
+     position: absolute;
+    right: 20px;
+    top: 22px;
+    width: 20px;
+}
 .button:before{-webkit-transition:all .3s ease;-ms-transition:all .3s ease;transition:all .3s ease;position:absolute;top:16px;right:20px;display:block;height:2px;width:20px;background:#ddd;content:''}
 .button.menu-opened:after{-webkit-transition:all .3s ease;-ms-transition:all .3s ease;transition:all .3s ease;top:23px;border:0;height:2px;width:19px;background:#fff;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}
 .button.menu-opened:before{top:23px;background:#fff;width:19px;-webkit-transform:rotate(-45deg);-moz-transform:rotate(-45deg);-ms-transform:rotate(-45deg);-o-transform:rotate(-45deg);transform:rotate(-45deg)}
@@ -80,3 +110,4 @@ nav{width:100%;}
 #cssmenu ul ul ul li.active a{border-left:none}
 #cssmenu > ul > li.has-sub > ul > li.active > a,#cssmenu > ul ul > li.has-sub > ul > li.active > a{border-top:none}
 }
+/*header ul, footer ul, .top-bar ul, .lft-tools ul, .post-info ul, .recent-posts-widget ul, .center-v-menu ul, .pricing-tbl ul, .sidebar ul, ul.details, ul.comment-list, ul.list, .w-recent-posts ul {    list-style: outside none none;    margin: 0;    padding: 29px 0 0;}*/

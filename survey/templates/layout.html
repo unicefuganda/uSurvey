@@ -22,7 +22,7 @@
    <style>
        .search {         
          float: right;
-         margin-right: -7px;                  
+         margin-right: -2px;                  
         margin-top: 14px; 
         }
    div.table-header a {
@@ -125,7 +125,7 @@
       <style>
          .headerArea {
          background: #0099ff;
-		 border-bottom:13px solid #0073bf;
+		 border-bottom:6px solid #0073bf;
          }
       </style>
       <style>
@@ -407,9 +407,9 @@
 {% if user.is_authenticated %}
 <span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="background:  none !important; border: none !important;">
 {% if has_powers %}
-<img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" title="Super Powers Activated">
+<img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" style="margin-left: 14px;" title="Super Powers Activated">
 {% else %}
-<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" float="right">
+<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 14px;">
 {% endif %}
 </span>
 <ul>

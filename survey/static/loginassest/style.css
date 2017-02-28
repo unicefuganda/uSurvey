@@ -1388,7 +1388,7 @@ table.mc-table tbody .new .submissions a:before {
   z-index: 999;
   background-color: #0099ff;  
   height: 90px;
-  border-bottom: 13px solid #0073bf;
+  border-bottom: 6px solid #0073bf;
 }
 /*#header .logo {
   margin:15px;
