@@ -73,7 +73,10 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             selected_vars = IndicatorVariable.objects.filter(id__in=self.data.getlist('variables'))
             # basically substitute all place holders with random values just to see if it gives a valid math answer
             context = dict([(v.name, random.randint(1, 10000)) for v in selected_vars])
-            question_context = template.Context(context)
+            try:
+                question_context = template.Context(context)
+            except template.TemplateSyntaxError:
+                raise ValidationError('Only alpha numeric characters and under score are allowed as place holders')
             math_string = template.Template(self.cleaned_data['formulae']).render(question_context)
             aeval(math_string)
             if len(aeval.error) > 0:
