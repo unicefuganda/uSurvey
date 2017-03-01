@@ -39,6 +39,23 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
       </div><!-- /.modal -->
+   <div class="modal fade" id="remove-selected-variable" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Clear Variable</h4>
+                  </div>
+                  <div class="modal-body">
+                    <span class="alert_confirm">Confirm:</span> Are you surve you want to remove the selected Variables ?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary remove-selected-variable clear-button" href="#>" >Yes</a>
+                  </div>
+                </div>
+              </div>
+            </div>
     {% endblock %}
 {% block javascripts %}
 <style type="text/css">
@@ -60,6 +77,25 @@
                 $("#id_question_set").append($('<option />').val(this.id).text(this.name));
             });
         });
+     });
+     $('.remove-selected-variable').click(function(){
+          $('#id_variables :selected').each(function(){
+                $(this).remove();       //just remove it first
+                var url = "{% url 'ajax_delete_indicator_variable' %}?id="+$(this).val();
+                $.ajax({
+                    url : url,
+                    type: "GET",
+                    dataType : "html",
+                });
+
+            });
+            $('#remove-selected-variable').modal('hide');
+            $('#id_variables option').prop('selected', true);
+            return true;
+        });
+     $('#button').click(function() {
+        $('#id_variables option').prop('selected', true);
+        return true;
      });
      $("#id_question_set").change(function(){
         reload_test_questions();

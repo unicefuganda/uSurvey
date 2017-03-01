@@ -37,8 +37,9 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             IndicatorVariable.objects.filter(indicator__isnull=True).values_list('id', flat=True)
         )
         self.fields['variables'].queryset = self.available_variables()
-        self.fields['variables'].icon_name = 'add'
-        self.fields['variables'].icon_attrs.update({'data-toggle': "modal", 'data-target': "#add_variable"})
+        self.fields['variables'].icons = {'add': {'data-toggle': "modal", 'data-target': "#add_variable"},
+                                          'delete': {'data-toggle': "modal", 'data-target': "#remove-selected-variable"}
+                                          }
         if self.data.get('survey'):
             self.fields['question_set'].queryset = Survey.get(pk=self.data['survey']).qsets
         self.fields['name'].label = 'Indicator'

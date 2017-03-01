@@ -28,5 +28,4 @@ class FormOrderMixin(object):
 
 class IconName(object):
 
-    icon_name = None
-    icon_attrs = {}
+    icon_name = {}

@@ -191,6 +191,14 @@ def delete_indicator_variable(request, variable_id):
 
 @login_required
 @permission_required('auth.can_view_household_groups')
+def ajax_delete_indicator_variable(request):
+    if request.is_ajax():
+        variable_id = request.GET.get('id')
+        return delete_indicator_variable(request, variable_id)
+
+
+@login_required
+@permission_required('auth.can_view_household_groups')
 def delete_indicator_criteria(request, indicator_criteria_id):
     criterion = get_object_or_404(IndicatorVariableCriteria, id=indicator_criteria_id)
     variable = criterion.variable

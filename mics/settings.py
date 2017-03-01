@@ -238,6 +238,7 @@ CACHEOPS = {
     'survey.questionflow': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
     'survey.question': {'ops': ('fetch', ), 'timeout': CACHE_REFRESH_DURATION},
     'survey.respondentgroup': {'ops': (), 'timeout': CACHE_REFRESH_DURATION},
+    'survey.answer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     'survey.numericalanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     'survey.textanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
     'survey.multichoiceanswer': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION},
