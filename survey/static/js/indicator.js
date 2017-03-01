@@ -1,6 +1,6 @@
 ;
 jQuery(function($){
-    var batch = $("#id_batch");
+    var batch = $("#id_question_set");
     var parameter = $("#id_parameter");
     $("#id_filter_survey").on('change', updateBatchSelectField);
     $('#id_survey').on('change', updateBatchSelectField);

@@ -274,3 +274,44 @@ def download_data(request, qset_id):
     response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
     reports_df.to_csv(response, date_format='%Y-%m-%d %H:%M:%S', encoding='utf-8')   #exclude interview id
     return response
+
+
+@login_required
+def list_qsets(request):
+    if request.GET.get('survey_id'):
+        values = Survey.get(id=request.GET.get('survey_id')).qsets.values('id', 'name')
+    else:
+        values = QuestionSet.objects.values('id', 'name')
+    return HttpResponse(json.dumps(list(values)), content_type='application/json')
+
+
+@login_required
+def list_questions(request):
+    if request.GET.get('id'):
+        values = [{'id': q.id, 'identifier': q.identifier, 'text': q.text} for q
+                  in QuestionSet.get(id=request.GET.get('id')).all_questions]
+    else:
+        values = list(QuestionSet.objects.questions.values('id', 'identifier', 'text'))
+    return HttpResponse(json.dumps(list(values)), content_type='application/json')
+
+
+@login_required
+def question_validators(request):
+    values = {}
+    if request.GET.get('id'):
+        for question in QuestionSet.get(id=request.GET.get('id')).all_questions:
+            values['%s' % question.id] = [validator for validator in question.validator_names()]
+    elif request.GET.get('ques_id'):
+        values = Question.get(id=request.GET.get('ques_id')).validator_names()
+    return HttpResponse(json.dumps(values), content_type='application/json')
+
+
+@login_required
+def question_options(request):
+    values = {}
+    if request.GET.get('id'):
+        for question in QuestionSet.get(id=request.GET.get('id')).all_questions:
+            values['%s' % question.id] = dict([(opt.order, opt.text) for opt in question.options.all()])
+    elif request.GET.get('ques_id'):
+        values = dict(Question.get(id=request.GET.get('ques_id')).options.values_list('order', 'text'))
+    return HttpResponse(json.dumps(values), content_type='application/json')

@@ -2,11 +2,30 @@
 {% block title %}
     {{ title }}
 {% endblock %}
+{% block extra_head %}
+<link href="{{STATIC_URL}}css/select2.css" rel="stylesheet"/>
+<script src="{{STATIC_URL}}js/select2.full.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
+<script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
+<style type="text/css">
+    #id_test_question {
+        width: 90%;
+    }
+    .form-horizontal {
+        margin-top: 5px;
+    }
+    .form-horizontal .control-label {
+    padding-top: 7px !important;
+    margin-bottom: 0;
+    text-align: right;
+}
+</style>
+{% endblock %}
 {% block display_form_fields %}
     {% include "naked_form.html" with a_form=indicator_form %}
-    {% block post_form %}
 
-
+{% endblock %}
+    {% block non_form_content %}
        <div class="modal fade" id="add_variable" tabindex="-1" role="dialog"  aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -21,7 +40,6 @@
         </div><!-- /.modal-dialog -->
       </div><!-- /.modal -->
     {% endblock %}
-{% endblock %}
 {% block javascripts %}
 <style type="text/css">
     #id_description{
@@ -32,28 +50,49 @@
     .dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 245px!important;}
 </style>
 
-<script src="{{ STATIC_URL }}js/indicator.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
    $(document).ready(function() {
-   $("#id_survey").append($('<option value="val"/>').text('--Select Survey--'));
-   $("#id_survey").val("val");
-   $("#id_parameter").find('option').remove();
-    $("#id_parameter").append($('<option />').text('--Select Parameter--'));
-     $("#id_batch").change(function(){
-        var url = '{% url "list_batch_questions" %}' + '?id='+ $("#id_batch").val();
+     $("#id_survey").change(function(){
+        $("#id_question_set option:gt(0)").remove();
+        var url = '{% url "view_qsets" %}' + '?survey_id='+ $("#id_survey").val();
         $.getJSON(url, function (data) {
             $.each(data, function () {
-                $("#id_parameter").append($('<option />').val(this.id).text(this.identifier));
+                $("#id_question_set").append($('<option />').val(this.id).text(this.name));
             });
         });
      });
+     $("#id_question_set").change(function(){
+        reload_test_questions();
+     });
+
     } );
+    function reload_test_questions() {
+        $("#id_var_qset").val($("#id_question_set").val());
+        $("#id_test_question option").remove();
+        var url = '{% url "list_questions" %}' + '?id='+ $("#id_question_set").val();
+        $.getJSON(url, function (data) {
+            update_test_question_dropdown(data);
+        });
+     }
+    function update_test_question_dropdown(data) {
+        $('#id_test_question').append('<option value="">Question-Code'+id_text_delim+'Text</option>');
+        $.each(data, function (i, item) {
+            $('#id_test_question').append('<option value="' + item['id'] + '">' + item['identifier'] + id_text_delim + item['text'] + "</option>");
+        });
+        change_to_select2($('#id_test_question'));
+    }
 </script>
+
+<script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{STATIC_URL}}js/type-auto-suggest.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
                 $(function(){
                     $('#id_formulae').on('keyup', function(){
-                       make_suggestions('#id_formulae', "{% url 'indicator_variables' %}?id=" + {{indicator_form.instance.pk}});
+                        var vars = [];
+                        $('#id_variables :selected').each(function(i, selected){
+                          vars[i] = $(selected).val();
+                        });
+                       make_suggestions('#id_formulae', "{% url 'indicator_variables' %}?" + $.param({'var_id[]': vars}));
                        this.focus();
                     });
                 });

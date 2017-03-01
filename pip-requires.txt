@@ -39,4 +39,5 @@ numpy
 pandas
 django-debug-toolbar
 asteval
+plotly
 line_profiler

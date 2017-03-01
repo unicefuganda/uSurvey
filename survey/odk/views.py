@@ -237,7 +237,7 @@ def submission(request):
         response['Location'] = request.build_absolute_uri(request.path)
         return response
     except NotEnoughData:
-        desc = u'Uploaded data is  than sample size'
+        desc = settings.ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE
         audit_log(Actions.SUBMISSION_REQUESTED, request.user, interviewer,
                   _("Failed attempted to submit XML for form for interviewer: '%(interviewer)s'. desc: '%(desc)s'") % {
                       "interviewer": interviewer.name,
@@ -250,4 +250,4 @@ def submission(request):
                       "interviewer": interviewer.name,
                       "desc": str(ex)
                   }, {'desc': str(ex)}, request, logging.WARNING)
-        return OpenRosaServerError(u"An error occurred. Please try again")
+        return OpenRosaServerError(settings.ODK_ERROR_OCCURED)

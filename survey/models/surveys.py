@@ -56,7 +56,7 @@ class Survey(CloneableMixin, BaseModel):
             elif self.preferred_listing:
                 qset_ids.append(self.preferred_listing.listing_form.id)
         qset_ids.extend(self.batches.values_list('id', flat=True))
-        QuestionSet.objects.filter(id__in=qset_ids)
+        return QuestionSet.objects.filter(id__in=qset_ids)
 
     def is_open_for(self, location):
         all_batches = self.batches.all()

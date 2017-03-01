@@ -246,7 +246,7 @@ class Answer(BaseModel):
     def fetch_starts_with(cls, answer_key, txt, qs=None):
         if qs:
             qs = cls.objects
-        return qs.filter(**{'%s__istarts_with' % answer_key: str(txt)})
+        return qs.filter(**{'%s__istartswith' % answer_key: str(txt)})
 
     @classmethod
     def odk_starts_with(cls, node_path, value):
@@ -262,7 +262,7 @@ class Answer(BaseModel):
     def fetch_ends_with(cls, answer_key, txt, qs=None):
         if qs:
             qs = cls.objects
-        return qs.filter(**{'%s__iends_with' % answer_key: str(txt)})
+        return qs.filter(**{'%s__iendswith' % answer_key: str(txt)})
 
     @classmethod
     def odk_ends_with(cls, node_path, value):

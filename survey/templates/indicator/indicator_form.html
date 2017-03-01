@@ -1,0 +1,50 @@
+
+
+{% if variable_form.errors %}
+        <div id="non_field_errors" class="alert alert-error">{{ variable_form.non_field_errors }}</div>
+    {%  endif %}
+
+
+<form action="{% if v_form_action %}{{v_form_action}}{% else %}{% url 'add_variable' %}{% endif %}" method="post" accept-charset="utf-8" id="variable-form" class="form-horizontal {{ class }}">
+    {% csrf_token %}
+{% include "naked_form.html" with a_form=variable_form %}
+ {% if variable_form.instance.pk %}
+    <input type="hidden" value="{{variable_form.instance.pk}}" id="var-id" name="{{variable_form.instance.name}}"/>
+
+  {% endif %}
+<div class="form-actions">
+    <button id="var-button" type="button" class="btn btn-primary" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
+    {% if var_cancel_url %}
+      <a href="{{ var_cancel_url }}" class="btn btn-primary close cancel cancel-button" name="cancel_button" style=" padding-right: 5px;
+    padding-left: 5px;
+    padding-bottom: 1px;"  data-dismiss="modal">Cancel</a>
+    {% else %}
+        {% if variable_form.instance.pk %}
+          <a href="#delete_variable" data-toggle="modal" class="tooltip-info btn btn-primary clear" data-rel="tooltip" title="" data-original-title="Delete" name="cancel_button" id="cancel_{{ id }}" >Clear</a>
+        <div class="modal fade" id="delete_variable" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Clear Variable</h4>
+                  </div>
+                  <div class="modal-body">
+                    <span class="alert_confirm">Confirm:</span> Are you sure you want to Clear <strong><em>{{ variable_form.instance.name }}</em></strong>?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary delete-modal clear-button" href="{% url 'delete_indicator_variable' variable_form.instance.pk %}" >Yes</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a href="#" class="btn btn-primary done done-button btn btn-primary" name="cancel_button" id="done_{{ id }}">Done</a>
+        {% endif %}
+
+    {% endif %}
+  </div>
+</form>
+<div>
+ <h4>Settings for this Variable</h4>
+    {% include 'indicator/_view_criteria.html' %}
+</div>

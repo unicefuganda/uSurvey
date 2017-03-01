@@ -2,30 +2,34 @@
   Indicator Variables
 </h3>
 
-{% block display_form_fields %}
-{% include "naked_form.html" with a_form=variable_form %}
-
-{% endblock %}
-    {% block buttons %}
-  <div class="form-actions">
-    <button id="button" type="submit" class="btn btn-primary submit" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
-
-    {% if cancel_url %}
-      <a href="{{ cancel_url }}" class="btn btn-primary" name="cancel_button" class="cancel" style=" padding-right: 5px;
-    padding-left: 5px;
-    padding-bottom: 1px;">Cancel</a>
-    {% else %}
-      <a href="#" class="btn btn-primary" name="cancel_button" id="cancel_{{ id }}" class="cancel">Cancel</a>
-    {% endif %}
-  </div>
-    {% endblock %}
-
+    <div id="variable-form-body">
+        {% include "indicator/indicator_form.html"  with variable_form=variable_form %}
+    </div>
 {% block javascripts %}
         <script type="text/javascript">
             $(function(){
+                resetAll();
+                originalFormHTML = $('#variable-form-body').html();
+            });
+            function post_variable_form(){
+                    var postData = $('#variable-form').serializeArray();
+                    $.ajax({
+                        url : $('#variable-form').attr('action'),
+                        type: "POST",
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data : postData,
+                        dataType : "html",
+                        success: function( data ){
+                            $('#variable-form-body').html(data);
+                            resetAll();
+                        }
+                    });
+             };
+             var originalFormHTML = "";
+             function resetFields() {
                  if(!$('#id_value').val()) {
-                     $('#id_value-control-group').hide();
-                     $('#id_value').prop('disabled', true);
+                         $('#id_value-control-group').hide();
+                         $('#id_value').prop('disabled', true);
                  }
                  if(!$('#id_options').val()) {
                      $('#id_options-control-group').hide();
@@ -39,27 +43,24 @@
                      $('#id_max-control-group').hide();
                      $('#id_max').prop('disabled', true);
                  }
-                 var validate_options = {
-                    {% for question in parameter_questions %}
-                        '{{ question.pk }}' : [{% for validator in question.validator_names %}'{{ validator }}',{% endfor %}],
-                    {% endfor %}
-                 }
-                 var question_options = {
-                    {% for question in parameter_questions %}
-                        '{{ question.pk }}' : { {% for opt in question.options.all %}'{{ opt.order }}': '{{ opt.text }}',{% endfor %} },
-                    {% endfor %}
-                 }
-                 $('#id_test_question').change(function(){
-                    $('#id_validation_test option:gt(0)').remove();
-                    $.each(validate_options[$('#id_test_question').val()], function(key, value) {
-                      $('#id_validation_test').append($("<option></option>")
-                         .attr("value", value).text(value));
-                    });
-                   if(question_options[$('#id_test_question').val()])
-                        $.each(question_options[$('#id_test_question').val()], function(key, value) {
+             }
+             function resetChangeActions() {
+                $('#id_test_question').change(function(){
+                    var url = '{% url "question_options" %}' + '?ques_id='+ $("#id_test_question").val();
+                    $.getJSON(url, function (data) {
+                        $.each(data, function(key, value) {
                           $('#id_options').append($("<option></option>")
                              .attr("value", key).text(value));
                         });
+                    });
+                    url = '{% url "question_validators" %}' + '?ques_id='+ $("#id_test_question").val();
+                    $.getJSON(url, function (data) {
+                        $('#id_validation_test option:gt(0)').remove();
+                        $.each(data, function(key, value) {
+                          $('#id_validation_test').append($("<option></option>")
+                             .attr("value", value).text(value));
+                        });
+                    });
                 });
 
                 $('#id_validation_test').change(function(){
@@ -75,7 +76,7 @@
                              $('#id_max').prop('disabled', false);
                             break;
                         case('equals'):
-                            if(Object.keys(question_options[$('#id_test_question').val()]).length > 0){
+                            if($('#id_options option').length > 0){
                                 $('#id_options-control-group').show();
                                 $('#id_options').prop('disabled', false);
                                 $('#id_value-control-group').hide();
@@ -97,16 +98,63 @@
                              $('#id_max').prop('disabled', true);
                     }
                 });
-            });
-        </script>
-        <script src="{{STATIC_URL}}js/logic.js" type="text/javascript" charset="utf-8"></script>
-        <script type="text/javascript">
-            id_text_delim = '-';
-            change_to_select2( $('#id_test_question'));
+
+             }
+            function resetDeleteModal() {
+                $('.delete-modal').click(function(){
+                    $.ajax({
+                        url : $(this).attr('href'),
+                        type: "GET",
+                        dataType : "html",
+                        success: function( data ){
+                            $('#variable-form-body').html(data);
+                            $('#var-button').click(post_variable_form);
+                            resetAll();
+                        }
+                    });
+                    return false;
+                });
+            }
+            function resetClear() {
+                $('.clear-button').click(function(){
+                    $.ajax({
+                        url : $(this).attr('href'),
+                        type: "GET",
+                        dataType : "html",
+                        success: function( data ){
+                            $('#variable-form-body').html(data);
+                            $('#var-button').click(post_variable_form);
+                            resetAll();
+                        }
+                    });
+                    return false;
+                });
+            }
+             function resetDone() {
+
+                //if done, check if variable was created and assign it to this variable list
+                $('.done').click(function(){
+                    if($('#id_var-id')) {
+                        $('#id_variables').append($('<option>', {value:$('#var-id').attr('value'),
+                                                            text: $('#var-id').attr('name'),
+                                                            selected: 'selected'}));
+                         $('#variable-form-body').html(originalFormHTML);
+                         resetAll();
+                     }
+                    return true;
+                });
+             }
+             function resetAll() {
+                    reload_test_questions();
+                    resetFields();
+                    resetChangeActions();
+                    resetDeleteModal();
+                    resetClear();
+                    resetDone();
+                    $('#var-button').click(post_variable_form);
+                }
+
+
         </script>
 {% endblock %}
 
-{% block non_form_content %}
-    <h4>Settings for this Variable</h4>
-    {% include 'indicator/_view_criteria.html' %}
-{% endblock %}

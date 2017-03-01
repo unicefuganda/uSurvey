@@ -326,6 +326,10 @@ QUESTION_EXPORT_HEADERS = OrderedDict([
     ('module', 'Module')
 ])
 
+ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE = 'Uploaded Data is below sample size'
+ODK_ERROR_OCCURED = 'An error occurred pls try again'
+
+
 AGGREGATORS = [('testAggregator', 'testAggregator'), ]
 DEFAULT_AGGREGATOR = 'testAggregator'
 TWITTER_URL = 'https://twitter.com/unicefuganda'

@@ -1,3 +1,4 @@
+import random
 from django import forms
 from cacheops import cached_as
 from django import template
@@ -15,9 +16,8 @@ class IndicatorVariablesField(forms.ModelMultipleChoiceField, IconName):
 
 
 class IndicatorForm(ModelForm, FormOrderMixin):
-    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label=None)
-    question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.none(), empty_label='Select Question set',
-                                          required=False)
+    survey = forms.ModelChoiceField(queryset=Survey.objects.all(), empty_label='Select Survey')
+    question_set = forms.ModelChoiceField(queryset=QuestionSet.objects.none(), empty_label='Select Question set')
     variables = IndicatorVariablesField(queryset=IndicatorVariable.objects.none())
 
     def __init__(self, *args, **kwargs):
@@ -26,23 +26,36 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             qset = kwargs['instance'].question_set
             survey = kwargs['instance'].survey
             self.fields['survey'].initial = survey
-            self.fields['question_set'].queryset = survey.batches
+            self.fields['survey'].widget.attrs['readonly'] = 'readonly'
+            self.fields['question_set'].queryset = survey.batches.all()
             self.fields['question_set'].initial = survey.qsets
+            self.fields['question_set'].widget.attrs['readonly'] = 'readonly'
             self.fields['variables'].initial = kwargs['instance'].variables.all()
-            self.fields['variables'].queryset = kwargs['instance'].variables.all()
-            self.fields['variables'].widget.attrs.update({'class': 'multi-select variables'})
-            self.fields['variables'].icon_name = 'add_variable_icon'
-            self.fields['variables'].icon_attrs.update({'data-toggle': "modal", 'data-target': "#add_variable"})
+            # self.fields['variables'].queryset = kwargs['instance'].variables.all()
+        #self.fields['variables'].widget.attrs.update({'class': 'multi-select variables'})
+        var_ids = list(self.fields['variables'].queryset.values_list('id', flat=True)) + list(
+            IndicatorVariable.objects.filter(indicator__isnull=True).values_list('id', flat=True)
+        )
+        self.fields['variables'].queryset = self.available_variables()
+        self.fields['variables'].icon_name = 'add'
+        self.fields['variables'].icon_attrs.update({'data-toggle': "modal", 'data-target': "#add_variable"})
         if self.data.get('survey'):
             self.fields['question_set'].queryset = Survey.get(pk=self.data['survey']).qsets
         self.fields['name'].label = 'Indicator'
         self.order_fields(['survey', 'question_set', 'name', 'description', 'variables', 'formulae'])
 
+    def available_variables(self):
+        var_ids = list(IndicatorVariable.objects.filter(indicator__isnull=True).values_list('id', flat=True))
+        if self.instance:
+            var_ids.extend(self.instance.variables.values_list('id', flat=True))
+        return IndicatorVariable.objects.filter(id__in=var_ids)
+
+
     def clean(self):
         super(IndicatorForm, self).clean()
         question_set = self.cleaned_data.get('question_set', None)
         survey = self.cleaned_data.get('survey', None)
-        if question_set and survey.qsets.filter(id=question_set.id).exists():
+        if question_set and survey.qsets.filter(id=question_set.id).exists() is False:
             message = "Question set %s does not belong to the selected Survey." % (
                 question_set.name)
             self._errors['batch'] = self.error_class([message])
@@ -53,10 +66,11 @@ class IndicatorForm(ModelForm, FormOrderMixin):
         if self.instance.pk:
             from asteval import Interpreter
             aeval = Interpreter()
-            # basically substitute all place holders with 1 and see if it gives a valid math function
-            context = dict([(v.name, 1) for v in self.instance.variables.all()])
+            selected_vars = IndicatorVariable.objects.filter(id__in=self.data.getlist('variables'))
+            # basically substitute all place holders with random values just to see if it gives a valid math answer
+            context = dict([(v.name, random.randint(1, 10000)) for v in selected_vars])
             question_context = template.Context(context)
-            math_string =  template.Template(self.cleaned_data['formulae']).render(question_context)
+            math_string = template.Template(self.cleaned_data['formulae']).render(question_context)
             aeval(math_string)
             if len(aeval.error) > 0:
                raise ValidationError(aeval.error[-1].get_error()[1])
@@ -65,6 +79,14 @@ class IndicatorForm(ModelForm, FormOrderMixin):
     class Meta:
         model = Indicator
         exclude = []
+
+    def save(self, commit=True, *args, **kwargs):
+        instance = super(IndicatorForm, self).save(commit=commit, *args, **kwargs)
+        if commit:
+            self.cleaned_data['variables'].update(indicator=instance)
+            instance.variables.exclude(id__in=self.data.getlist('variables')).delete()
+            IndicatorVariable.objects.filter(indicator__isnull=True).delete()
+        return instance
 
 
 class IndicatorVariableForm(ModelForm, FormOrderMixin):
@@ -77,18 +99,27 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
     validation_test = forms.ChoiceField(choices=CHOICES, required=False,
                                         label='Operator')
     test_question = forms.ModelChoiceField(queryset=Question.objects.none(), required=False)
+    var_qset = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def __init__(self, indicator, *args, **kwargs):
         super(IndicatorVariableForm, self).__init__(*args, **kwargs)
         self.indicator = indicator
         self.order_fields(['name', 'description', 'test_question', 'validation_test', 'options', 'value',
-                           'min', 'max'])
+                           'min', 'max', 'var_qset'])
         if self.indicator:
             self.fields['test_question'].queryset = Question.objects.filter(pk__in=[q.pk for q in
-                                                                                    indicator.batch.all_questions])
+                                                                                    indicator.question_set.all_questions
+                                                                                    ])
+
         if self.data.get('test_question', []):
             options = QuestionOption.objects.filter(question__pk=self.data['test_question'])
             self.fields['options'].choices = [(opt.order, opt.text) for opt in options]
+
+        if self.data.get('var_qset', []):
+            self.fields['test_question'].queryset = Question.objects.filter(id__in=[q.id for q in
+                                                                                    QuestionSet.get(id=
+                                                                                                    self.data['var_qset']
+                                                                                                    ).all_questions])
 
     class Meta:
         model = IndicatorVariable
@@ -153,10 +184,11 @@ class IndicatorCriteriaForm(ModelForm, FormOrderMixin):
         self.variable = variable
         self.order_fields(['description', 'test_question', 'validation_test', 'options', 'value',
                            'min', 'max'])
-        self.fields['test_question'].queryset = Question.objects.filter(pk__in=[q.pk
-                                                                                for q in
-                                                                                variable.indicator.batch.all_questions
-                                                                                ])
+        if variable.indicator:
+            self.fields['test_question'].queryset = Question.objects.filter(pk__in=[q.pk
+                                                                                    for q in
+                                                                                    variable.indicator.batch.all_questions
+                                                                                    ])
         if self.data.get('test_question', []):
             options = QuestionOption.objects.filter(question__pk=self.data['test_question'])
             self.fields['options'].choices = [(opt.order, opt.text) for opt in options]

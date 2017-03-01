@@ -97,8 +97,8 @@ class ResultsDownloadService(object):
         header_names.extend(['EA', 'interviewer__name', ])
         if self.follow_ref:
             header_names.extend(list(ref_answers_report_df.columns)[1:])
-        report_columns = header_names + [q.identifier for q in self.batch.all_questions
-                                         if q.identifier in reports_df.columns]
+        report_columns = header_names[1:] + [q.identifier for q in self.batch.all_questions
+                                             if q.identifier in reports_df.columns] + ['Created', ]
         header_names.extend(list(reports_df.columns)[len(header_names):])
         reports_df.columns = header_names
         other_sort_fields = [identifier for identifier in self.batch.auto_fields.values_list('identifier', flat=True)

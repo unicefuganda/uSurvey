@@ -3,7 +3,7 @@
 {% block title %} Simple Indicator {% endblock %}
 {% block page_title %}Simple Indicator{% endblock %}
 {% block search %}
-{% include "indicator/indicator_metrics_filter.html" with a_form=locations_filter b_form=indicator_metric_form filter_button_name='Show results' filter_id='location_filter' method='post' %}
+{% include "indicator/indicator_metrics_filter.html" with a_form=locations_filter filter_button_name='Show results' filter_id='location_filter' method='post' %}
 <br />
 {% include "search_form.html" %}
 {% endblock %}
@@ -16,61 +16,12 @@
 {% endblock %}
 {% block content %}
 
-<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+{{ graph }}
+<br /><br />
 
-<table id="datatable"  class="table table-striped table-bordered table-hover table-sort ">
-    <thead>
-        <tr>
-            <th>{{report_location_type.name}}</th>
-            {% for option in options %}
-            <th>{{option}}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
+<div style="overflow-x:auto; width: 100%;">
+    <h4>{{indicator.REPORT_FIELD_NAME}} = {{indicator.formulae_string}}</h4>
+    {{ report }}
+</div>
 
-            {% for location_name, values in reports.items %}
-            <tr>
-                <th>{{ location_name }}</th>
-                {% for val in values %}
-                    <td>{{ val }}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-
-    </tbody>
-</table>
-{% endblock %}
-
-{% block javascripts %}
-
-<script type="text/javascript">
-       var data = [];
-       {% with location_names=reports.keys %}
-            {% with loc_values=reports.values %}
-              {% for option in options %}
-                data.push({
-                  x: [{% for loc_name in location_names %}"{{loc_name}}",{% endfor %}],
-                  y: [{% for loc_stats in loc_values %}{{loc_stats|current:forloop.parentloop.counter0}},{% endfor %}],
-                  name: "{{option}}",
-                  type: 'bar'
-                });
-              {% endfor %}
-            {% endwith %}
-       {% endwith %}
-    var layout = {barmode: 'group',
-                    title: '<b>{{ indicator.name }}</b><br /><span>Result for {{ selected_location.name.capitalize }} {{ selected_location.type.name.capitalize }}</span>',
-                    xaxis: {
-                            rangemode: 'nonnegative',
-                            autorange: true
-                          },
-                          yaxis: {
-                            rangemode: 'nonnegative',
-                            autorange: true,
-                            title: '{{metric}}',
-                          }
-                        };
-
-    Plotly.newPlot('container', data, layout);
-</script>
 {% endblock %}

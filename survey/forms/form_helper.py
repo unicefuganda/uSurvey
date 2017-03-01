@@ -28,11 +28,5 @@ class FormOrderMixin(object):
 
 class IconName(object):
 
-    def get_icon_name(self):
-        return self._icon_name
-
-    def set_icon_name(self, value):
-        self._icon_name = value
-
-    icon_name = property(get_icon_name, set_icon_name)
+    icon_name = None
     icon_attrs = {}

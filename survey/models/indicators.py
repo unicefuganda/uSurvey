@@ -1,6 +1,10 @@
-from survey.models.base import BaseModel
+import re
+import pandas as pd
+from asteval import Interpreter
+from django.template import Template, Context
 from django.db import models
 from django.utils.datastructures import SortedDict
+from survey.models.base import BaseModel
 from survey.models.question_module import QuestionModule
 from survey.models.interviews import MultiChoiceAnswer, Answer
 from survey.models.surveys import Survey
@@ -11,6 +15,7 @@ from survey.models.interviews import Interview
 
 
 class Indicator(BaseModel):
+    REPORT_FIELD_NAME = '[IndicatorValue]'
     PERCENTAGE = 1
     COUNT = 2
     name = models.CharField(max_length=255, null=False)
@@ -23,6 +28,13 @@ class Indicator(BaseModel):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def eqset(self):
+        '''Returns the exactt question set for this indicator
+        :return:
+        '''
+        return QuestionSet.get(id=self.question_set.id)
 
     def is_percentage_indicator(self):
         percentage_measure = [Indicator.MEASURE_CHOICES[
@@ -39,72 +51,68 @@ class Indicator(BaseModel):
             data[location] = self.compute_for_location(location)
         return data
 
-    def get_data(self, locations, metric, presenter, *args, **kxargs):
-        """Basically would be used to get presentation data for the indicators.
-        presenter is a function to be called as:
-        presenter(tabulated_data, child_location, loc_answers, options, factor, *args, **kwargs)
-        where tabulated_data is the data dict to be incrementally populated by presenter for a single child loc
-        loc_answers is just a filter set of answers for the particular child loc (after applying all criteria)
-        child_location is one loc under locations, factor is the multiple to the count of filtered answers
-        options is a queryset of QuestionOptions
-        *args and kwargs are essentially parameters passed on directly to the function
-        :param locations:
-        :param metric:
-        :param presenter: This is essentially a function to be called
+    def active_variables(self):
+        pattern = '{{ *([0-9a-zA-Z_]+) *}}'
+        return set(re.findall(pattern, self.formulae))
+
+    def get_indicator_value(self, var_row, evaluator):
+        math_string = Template(self.formulae).render(Context(var_row))
+        result = evaluator(math_string)
+        if len(evaluator.error) > 0:
+            return 'nan'
+        return result
+
+    def formulae_string(self):
+        return Template(self.formulae).render(Context(dict([(name, name) for name in self.active_variables()])))
+
+    def get_data(self, locations, *args, **kxargs):
+        """Used to get the compute indicator values.
+        :param locations: The locations of interest
         :param args:
-        :param kwargs:
+        :param kxargs:
         :return:
         """
         tabulated_data = SortedDict()
-        location_names = []
-        options = self.parameter.options.order_by('order')
-        answer_class = Answer.get_class(self.parameter.answer_type)
+        context = {}
+        variable_names = self.active_variables()
+        # options = self.parameter.options.order_by('order')
+        # answer_class = Answer.get_class(self.parameter.answer_type)
         kwargs = {}
-        if self.indicator_criteria.count():
-            kwargs['interview__in'] = self.applicable_interviews(locations)
+        report = {}
         for child_location in locations:
-            location_names.append(child_location.name)
-            kwargs.update({
-                'question__id': self.parameter.id,
-                'interview__ea__locations__in': child_location.get_leafnodes(include_self=True)
-            })
-            loc_answers = answer_class.objects.filter(**kwargs)
-            loc_total = loc_answers.count()
-            factor = 1
-            if loc_total > 0 and metric == Indicator.PERCENTAGE:
-                factor = float(100)/ loc_total
-            presenter(tabulated_data, child_location, loc_answers, options, factor, *args, **kxargs)
-            #tabulated_data[child_location.name] = loc_answers.filter(value__pk=option_id).count()*factor
-        return tabulated_data
-
-    def applicable_interviews(self, locations):
-        # the listed interviews in the ea
-        valid_interviews = Interview.objects.filter(ea__locations__in=locations,
-                                                    question_set__pk=self.parameter.qset.id,
-                                                    survey=self.parameter.e_qset.survey,
-                                                    ).values_list('id', flat=True)
-        # now get the interviews that meet the randomization criteria
-        for criterion in self.indicator_criteria.all():  # need to optimize this
-            answer_type = criterion.test_question.answer_type
-            if answer_type == MultiChoiceAnswer.choice_name():
-                value_key = 'value__text'
+            report[child_location.name] = [self.get_variable_value(child_location.get_leafnodes(include_self=True),
+                                                                   name) for name in variable_names]
+        df = pd.DataFrame(report).transpose()
+        if df.columns.shape[0] == len(variable_names):
+            df.columns = variable_names
+            if all(report.values()):
+                # now include the formula results per location
+                aeval = Interpreter()       # to avoid the recreating each time
+                df[self.REPORT_FIELD_NAME] = df.apply(self.get_indicator_value, axis=1, args=(aeval, ))
             else:
-                value_key = 'value'
-            answer_class = Answer.get_class(answer_type)
+                df[self.REPORT_FIELD_NAME] = 'nan'
+        else:
+            df = pd.DataFrame(columns=list(variable_names)+[self.REPORT_FIELD_NAME, ])
+        return df
+
+    def get_variable_value(self, locations, variable_name):
+        variable = self.variables.get(name__iexact=variable_name)
+        valid_interviews = Interview.objects.filter(ea__locations__in=locations,
+                                                    question_set__pk=self.question_set.id,
+                                                    survey=self.survey,
+                                                    ).values_list('id', flat=True)
+        for criterion in variable.criteria.all():
+            if criterion.test_question.answer_type == MultiChoiceAnswer.choice_name():
+                value_key = 'as_value'
+            else:
+                value_key = 'as_text'
             kwargs = {
-                'question': criterion.test_question,
+                'question__id': criterion.test_question.id,
                 'interview__id__in': valid_interviews
             }
-            valid_interviews = criterion.qs_passes_test(value_key, answer_class.objects.filter(**kwargs).
+            valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(**kwargs).
                                                         only('interview__id').values_list('interview__id', flat=True))
-        # return all the interviews that meet the criteria
-        return valid_interviews
-    # def compute_for_location(self, location):
-    #     interviewers = Interviewer.lives_under_location(location)
-    #     if self.numerator.is_multichoice():
-    #         return self.compute_multichoice_question_for_interviewers(interviewers)
-    #     else:
-    #         return self.compute_numerical_question_for_interviewers(interviewers)
+        return valid_interviews.count()
 
 
 class IndicatorVariable(BaseModel):
@@ -113,7 +121,8 @@ class IndicatorVariable(BaseModel):
     """
     name = models.CharField(max_length=150)
     description = models.TextField()
-    indicator = models.ForeignKey(Indicator, related_name='variables', null=True)   # just to accomodate creation of
+    indicator = models.ForeignKey(Indicator, related_name='variables', null=True,
+                                  blank=True)   # just to accomodate creation of
                                                                 # variables then assigning them to indicators
 
     def __unicode__(self):
