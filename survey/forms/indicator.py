@@ -2,6 +2,7 @@ import random
 from django import forms
 from cacheops import cached_as
 from django import template
+from django.template.defaultfilters import slugify
 from django.forms import ModelForm
 from survey.models import Indicator, QuestionSet, QuestionModule, Survey, QuestionOption, IndicatorVariableCriteria, \
     IndicatorVariable
@@ -130,7 +131,7 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
         widgets = {'description': forms.Textarea(attrs={"rows": 2, "cols": 100}), }
 
     def clean_name(self):
-        self.cleaned_data['name'] = self.cleaned_data['name'].replace(' ', '_')
+        self.cleaned_data['name'] = slugify(self.cleaned_data['name']).replace('-', '_')
         return self.cleaned_data['name']
 
     def clean(self):
