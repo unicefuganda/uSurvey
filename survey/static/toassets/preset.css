@@ -1,13 +1,18 @@
 /*
 this is for uSurvey
 /* Normalization */
-body, html{
+/*body, html{*/
    /*font-family: 'Open Sans', sans-serif;*/
-    font-weight: 400;
+ /*   font-weight: 400;
     line-height: 1;
     font-size: 13px;
     margin: 0;
     padding: 0;
+}*/
+body, html {
+    font-size: 1vw;
+    font-weight: 400;
+    line-height: 1;
 }  
 body{
     background: #fff url("../images/diagonal.png") repeat scroll center center;
