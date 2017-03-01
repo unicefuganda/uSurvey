@@ -75,9 +75,9 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             context = dict([(v.name, random.randint(1, 10000)) for v in selected_vars])
             try:
                 question_context = template.Context(context)
+                math_string = template.Template(self.cleaned_data['formulae']).render(question_context)
             except template.TemplateSyntaxError:
                 raise ValidationError('Only alpha numeric characters and under score are allowed as place holders')
-            math_string = template.Template(self.cleaned_data['formulae']).render(question_context)
             aeval(math_string)
             if len(aeval.error) > 0:
                raise ValidationError(aeval.error[-1].get_error()[1])
