@@ -54,7 +54,7 @@
         {% if field.field.icons %}
             <div class="input-prepend" style="display: inline-block;">
                 {% for icon, attrs in field.field.icons.items %}
-                    <span id="{{icon}}"{% for key, val in attrs.items %} {{key}}="{{val}}"{% endfor %}><img src="{{ STATIC_URL }}img/{{icon}}.png" /></span>
+                    <span {% for key, val in attrs.items %} {{key}}="{{val}}"{% endfor %}><img src="{{ STATIC_URL }}img/{{icon}}.png" /></span>
                 {% endfor %}
             </div>
         {% endif %}

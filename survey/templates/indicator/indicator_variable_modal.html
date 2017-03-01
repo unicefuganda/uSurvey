@@ -152,6 +152,14 @@
                     resetClear();
                     resetDone();
                     $('#var-button').click(post_variable_form);
+                    if($('#id_variables :selected').length > 0) {
+                        $('#edit_variable').show();
+                        $('#delete_variable').show();
+                    }
+                    else {
+                        $('#edit_variable').hide();
+                        $('#delete_variable').hide();
+                    }
                 }
 
 

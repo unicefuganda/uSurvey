@@ -21,7 +21,7 @@ from survey.forms.enumeration_area import LocationsFilterForm
 def new(request):
     indicator_form = IndicatorForm()
     if request.method == 'POST':
-        indicator_form = IndicatorForm(request.POST)
+        indicator_form = IndicatorForm(data=request.POST)
         if indicator_form.is_valid():
             indicator_form.save()
             messages.success(request, "Indicator successfully created.")
@@ -140,6 +140,11 @@ def _add_variable(request, indicator=None):
 def add_variable(request):
     return _add_variable(request)
 
+
+def ajax_edit_indicator_variable(request):
+    if request.is_ajax():
+        variable_id = request.GET.get('id')
+        return edit_indicator_variable(request, variable_id)
 
 @login_required
 @permission_required('auth.can_view_household_groups')
@@ -277,8 +282,9 @@ def simple_indicator(request, indicator_id):
                         y=reports_df[indicator.REPORT_FIELD_NAME], x0=0, y0=0,
                         name=indicator.name)
         data = go.Data([trace1])
+        margin = go.Margin(pad=15)
         layout = go.Layout(title=indicator.name, xaxis={'title': report_locations[0].type.name},
-                           yaxis={'title': 'Values per %s' % report_locations[0].type.name})
+                           yaxis={'title': 'Values per %s' % report_locations[0].type.name}, margin=margin)
         figure = go.Figure(data=data, layout=layout)
         graph_div = opy.plot(figure, auto_open=False, output_type='div')
         context['graph'] = mark_safe(graph_div)

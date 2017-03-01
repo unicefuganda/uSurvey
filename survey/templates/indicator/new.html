@@ -69,6 +69,7 @@
 
 <script type="text/javascript">
    $(document).ready(function() {
+     reload_test_questions();
      $("#id_survey").change(function(){
         $("#id_question_set option:gt(0)").remove();
         var url = '{% url "view_qsets" %}' + '?survey_id='+ $("#id_survey").val();
@@ -93,6 +94,20 @@
             $('#id_variables option').prop('selected', true);
             return true;
         });
+     $('#edit_variable').click(function() {
+        var url = "{% url 'ajax_edit_indicator_variable' %}?id="+$('#id_variables :selected').first().val();
+        $.ajax({
+                url : url,
+                type: "GET",
+                dataType : "html",
+                success: function( data ){
+                    $('#variable-form-body').html(data);
+                    $('#add_variable').modal('show');
+                    resetAll();
+                }
+            });
+        return true;
+     });
      $('#button').click(function() {
         $('#id_variables option').prop('selected', true);
         return true;
@@ -109,6 +124,10 @@
         $.getJSON(url, function (data) {
             update_test_question_dropdown(data);
         });
+        if($("#id_question_set").val())
+            $('#add_new_variable').show();
+        else
+            $('#add_new_variable').hide();
      }
     function update_test_question_dropdown(data) {
         $('#id_test_question').append('<option value="">Question-Code'+id_text_delim+'Text</option>');
@@ -125,7 +144,7 @@
                 $(function(){
                     $('#id_formulae').on('keyup', function(){
                         var vars = [];
-                        $('#id_variables :selected').each(function(i, selected){
+                        $('#id_variables option').each(function(i, selected){
                           vars[i] = $(selected).val();
                         });
                        make_suggestions('#id_formulae', "{% url 'indicator_variables' %}?" + $.param({'var_id[]': vars}));

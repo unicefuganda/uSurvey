@@ -31,14 +31,13 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             self.fields['question_set'].initial = survey.qsets
             self.fields['question_set'].widget.attrs['readonly'] = 'readonly'
             self.fields['variables'].initial = kwargs['instance'].variables.all()
-            # self.fields['variables'].queryset = kwargs['instance'].variables.all()
-        #self.fields['variables'].widget.attrs.update({'class': 'multi-select variables'})
-        var_ids = list(self.fields['variables'].queryset.values_list('id', flat=True)) + list(
-            IndicatorVariable.objects.filter(indicator__isnull=True).values_list('id', flat=True)
-        )
         self.fields['variables'].queryset = self.available_variables()
-        self.fields['variables'].icons = {'add': {'data-toggle': "modal", 'data-target': "#add_variable"},
-                                          'delete': {'data-toggle': "modal", 'data-target': "#remove-selected-variable"}
+        self.fields['variables'].icons = {'add': {'data-toggle': "modal", 'data-target': "#add_variable",
+                                                  'id': 'add_new_variable'},
+                                          'edit': {'data-toggle': "modal",
+                                                   'id': 'edit_variable'},
+                                          'delete': {'data-toggle': "modal", 'data-target': "#remove-selected-variable",
+                                                     'id': 'delete_variable'}
                                           }
         if self.data.get('survey'):
             self.fields['question_set'].queryset = Survey.get(pk=self.data['survey']).qsets
@@ -46,7 +45,10 @@ class IndicatorForm(ModelForm, FormOrderMixin):
         self.order_fields(['survey', 'question_set', 'name', 'description', 'variables', 'formulae'])
 
     def available_variables(self):
-        var_ids = list(IndicatorVariable.objects.filter(indicator__isnull=True).values_list('id', flat=True))
+        var_ids = []
+        if hasattr(self.data, 'getlist'):
+            var_ids.extend(IndicatorVariable.objects.filter(id__in=self.data.getlist('variables')
+                                                            ).values_list('id', flat=True))
         if self.instance:
             var_ids.extend(self.instance.variables.values_list('id', flat=True))
         return IndicatorVariable.objects.filter(id__in=var_ids)
