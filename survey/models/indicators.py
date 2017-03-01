@@ -102,7 +102,6 @@ class Indicator(BaseModel):
                                                     question_set__pk=self.question_set.id,
                                                     survey=self.survey,
                                                     ).values_list('id', flat=True)
-        #>import pdb; pdb.set_trace()
         for criterion in variable.criteria.all():
             if criterion.test_question.answer_type == MultiChoiceAnswer.choice_name():
                 value_key = 'as_value'
