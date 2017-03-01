@@ -80,7 +80,8 @@ class Indicator(BaseModel):
         kwargs = {}
         report = {}
         for child_location in locations:
-            report[child_location.name] = [self.get_variable_value(child_location.get_leafnodes(include_self=True),
+            target_locations = child_location.get_leafnodes(include_self=True)
+            report[child_location.name] = [self.get_variable_value(target_locations,
                                                                    name) for name in variable_names]
         df = pd.DataFrame(report).transpose()
         if df.columns.shape[0] == len(variable_names):
@@ -101,6 +102,7 @@ class Indicator(BaseModel):
                                                     question_set__pk=self.question_set.id,
                                                     survey=self.survey,
                                                     ).values_list('id', flat=True)
+        #>import pdb; pdb.set_trace()
         for criterion in variable.criteria.all():
             if criterion.test_question.answer_type == MultiChoiceAnswer.choice_name():
                 value_key = 'as_value'
@@ -164,8 +166,9 @@ class IndicatorVariableCriteria(BaseModel):
 
     def qs_passes_test(self, value_key, queryset):
         answer_class = Answer.get_class(self.test_question.answer_type)
-        method = getattr(answer_class, 'fetch_%s' % self.validation_test, None)
-        return method(value_key, *self.test_params, qs=queryset)
+        test_args = [answer_class.prep_value(val) for val in self.test_params]
+        method = getattr(Answer, 'fetch_%s' % self.validation_test, None)
+        return method(value_key, *test_args, qs=queryset)
 
 
 class IndicatorCriteriaTestArgument(BaseModel):

@@ -170,7 +170,15 @@ class Answer(BaseModel):
             pass
         return cls.objects.create(question=question, value=answer, question_type=question.__class__.type_name(),
                                   interview=interview, identifier=question.identifier,
-                                  as_text=as_text, as_value=as_value)
+                                  as_text=cls.prep_text(as_text), as_value=cls.prep_value(as_value))
+
+    @classmethod
+    def prep_value(cls, val):
+        return val
+
+    @classmethod
+    def prep_text(cls, text):
+        return text
 
     def update(self, answer):
         self.as_text = answer
@@ -214,7 +222,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_contains(cls, answer_key, txt, qs=None):
-        if qs:
+        if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__icontains' % answer_key: txt})
 
@@ -228,7 +236,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_equals(cls, answer_key, value, qs=None):
-        if qs:
+        if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__iexact' % answer_key: str(value)})
 
@@ -244,7 +252,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_starts_with(cls, answer_key, txt, qs=None):
-        if qs:
+        if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__istartswith' % answer_key: str(txt)})
 
@@ -260,7 +268,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_ends_with(cls, answer_key, txt, qs=None):
-        if qs:
+        if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__iendswith' % answer_key: str(txt)})
 
@@ -274,7 +282,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_greater_than(cls, answer_key, value, qs=None):
-        if qs:
+        if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__gt' % answer_key: value})
 
@@ -288,7 +296,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_less_than(cls, answer_key, value, qs=None):
-        if qs:
+        if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__lt' % answer_key: value})
 
@@ -302,7 +310,7 @@ class Answer(BaseModel):
 
     @classmethod
     def fetch_between(cls, answer_key, lowerlmt, upperlmt, qs=None):
-        if qs:
+        if qs is None:
             qs = cls.objects
         return qs.filter(**{'%s__lt' % answer_key: upperlmt, '%s__gte' % answer_key: lowerlmt})
 
@@ -363,11 +371,15 @@ class NumericalAnswer(Answer):
     def create(cls, interview, question, answer):
         try:
             value = int(answer)
-            text_value = str(value).zfill(9)     # zero fill to 1billion
+            text_value = cls.prep_value(value)    # zero fill to 1billion
         except Exception:
             raise
         return super(NumericalAnswer, cls).create(interview, question, answer,
                                                   as_text=text_value, as_value=text_value)
+
+    @classmethod
+    def prep_value(cls, val):
+        return str(val).zfill(9)
 
     @classmethod
     def greater_than(cls, answer, value):
