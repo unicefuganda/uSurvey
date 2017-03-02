@@ -52,7 +52,7 @@
     <label class="control-label" for="{{field.auto_id}}">{{field.label}}</label>
       {{field}}
         {% if field.field.icons %}
-            <div class="input-prepend" style="display: inline-block;">
+            <div class="input-prepend" style="display: inline-block; border: none;">
                 {% for icon, attrs in field.field.icons.items %}
                     <span {% for key, val in attrs.items %} {{key}}="{{val}}"{% endfor %}><img src="{{ STATIC_URL }}img/{{icon}}.png" /></span>
                 {% endfor %}
