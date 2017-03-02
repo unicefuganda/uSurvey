@@ -47,7 +47,7 @@
                     <h4 class="modal-title">Clear Variable</h4>
                   </div>
                   <div class="modal-body">
-                    <span class="alert_confirm">Confirm:</span> Are you surve you want to remove the selected Variables ?
+                    <span class="alert_confirm">Confirm:</span> Are you sure you want to remove the selected Variables?
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -70,6 +70,10 @@
 <script type="text/javascript">
    $(document).ready(function() {
      reload_test_questions();
+     {% if indicator_form.instance.pk %}
+        $("#id_survey").prop("disabled", true);
+        $("#id_question_set").prop("disabled", true);
+     {% endif %}
      $("#id_survey").change(function(){
         $("#id_question_set option:gt(0)").remove();
         var url = '{% url "view_qsets" %}' + '?survey_id='+ $("#id_survey").val();
@@ -110,6 +114,10 @@
      });
      $('#button').click(function() {
         $('#id_variables option').prop('selected', true);
+        {% if indicator_form.instance.pk %}
+            $("#id_survey").prop("disabled", false);
+            $("#id_question_set").prop("disabled", false);
+        {% endif %}
         return true;
      });
      $("#id_question_set").change(function(){

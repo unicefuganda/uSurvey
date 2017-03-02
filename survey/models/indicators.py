@@ -24,7 +24,7 @@ class Indicator(BaseModel):
     description = models.TextField(null=True)
     survey = models.ForeignKey(Survey, related_name='indicators')
     question_set = models.ForeignKey(QuestionSet, related_name='indicators')
-    diplay_on_dashboard = models.BooleanField(default=False)
+    display_on_dashboard = models.BooleanField(default=False)
     formulae = models.TextField()        # I'm allowing that the formula can contain long names
     # parameter = models.ForeignKey(BatchQuestion, related_name='indicators', null=True, blank=True)
 

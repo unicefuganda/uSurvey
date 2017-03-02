@@ -139,10 +139,23 @@
                                                             text: $('#var-id').attr('name'),
                                                             selected: 'selected'}));
                      }
+                    if($('#var-id') && $('#id_variables [value="'+$('#var-id').attr('value')+'"]').length > 0){
+                        $('#id_variables option[value="'+$('#var-id').attr('value')+'"]').prop('text', $('#var-id').attr('name'));
+                    }
                     $('#variable-form-body').html(originalFormHTML);
                     resetAll();
                     return true;
                 });
+             }
+             function resetVariablesButton() {
+                if($('#id_variables :selected').length > 0) {
+                    $('#edit_variable').show();
+                    $('#delete_variable').show();
+                }
+                else {
+                    $('#edit_variable').hide();
+                    $('#delete_variable').hide();
+                }
              }
              function resetAll() {
                     reload_test_questions();
@@ -152,14 +165,10 @@
                     resetClear();
                     resetDone();
                     $('#var-button').click(post_variable_form);
-                    if($('#id_variables :selected').length > 0) {
-                        $('#edit_variable').show();
-                        $('#delete_variable').show();
-                    }
-                    else {
-                        $('#edit_variable').hide();
-                        $('#delete_variable').hide();
-                    }
+                    resetVariablesButton();
+                    $('#id_variables').change(function() {
+                        resetVariablesButton();
+                    });
                 }
 
 

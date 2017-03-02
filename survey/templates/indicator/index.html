@@ -70,19 +70,19 @@
     <table id="datatables" class="table table-striped table-bordered table-hover dataTable">
         <thead>
           <tr>
-            <th class="status">
+            <th class="sorting">
                 Sts.
             </th>
-            <th>
+            <th class="sorting">
               Indicator
             </th>
-            <th>
+            <th class="sorting">
               Description
             </th>
-             <th>
+             <th class="sorting">
               Survey
             </th>
-            <th>
+            <th class="sorting">
               Batch
             </th>
               <th>
@@ -94,7 +94,7 @@
         {% for indicator in indicators %}
             <tr>
               <td>
-                  {% if indicator.batch.is_open %}<div id="green_circle" title="Started"></div>{% elif indicator.batch.interviews.count %}<div id="amber_circle" title="Closed"></div>{% else %}<div id="red_circle" title="Not Started"></div>{% endif %}
+                  {% if indicator.display_on_dashboard %}<div id="green_circle" title="Displayed"><span class="hide">D</span></div>{% else %}<div id="red_circle" title="Not Displayed"><span class="hide">N</span></div>{% endif %}
               </td>
                 <td>{{ indicator.name }}</td>
                 <td>{{ indicator.description }}</td>
