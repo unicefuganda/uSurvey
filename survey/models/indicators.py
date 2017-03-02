@@ -67,7 +67,7 @@ class Indicator(BaseModel):
     def formulae_string(self):
         return Template(self.formulae).render(Context(dict([(name, name) for name in self.active_variables()])))
 
-    def get_data(self, base_location, *args, **kxargs):
+    def get_data(self, locations, *args, **kxargs):
         """Used to get the compute indicator values.
         :param locations: The locations of interest
         :param args:
@@ -81,13 +81,13 @@ class Indicator(BaseModel):
         # answer_class = Answer.get_class(self.parameter.answer_type)
         kwargs = {}
         report = {}
-        # for child_location in locations:
-        #     target_locations = child_location.get_leafnodes(include_self=True)
-        #     report[child_location.name] = [self.get_variable_value(target_locations,
-        #                                                            name) for name in variable_names]
-        for name in variable_names:
-            report[name] = self.get_variable_aggregates(base_location, name)
-        df = pd.DataFrame(report)
+        for child_location in locations:
+            target_locations = child_location.get_leafnodes(include_self=True)
+            report[child_location.name] = [self.get_variable_value(target_locations,
+                                                                   name) for name in variable_names]
+        # for name in variable_names:
+        #     report[name] = self.get_variable_aggregates(base_location, name)
+        df = pd.DataFrame(report).transpose()
         if df.columns.shape[0] == len(variable_names):
             df.columns = variable_names
             # now include the formula results per location
