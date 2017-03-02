@@ -14,7 +14,18 @@
 {% block pre_form_content %}
 {% endblock %}
 
-
+<style type="text/css">
+  .dataTables_wrapper select {
+    margin-bottom: 0 !important;
+    margin-left: 0px !important;
+    padding: 4px !important;
+    margin-right: 4px !important;
+    width: 180px !important;
+}
+.dataTables_wrapper input[type="text"]{
+  width: 180px !important;
+}
+</style>
 <form action="{{ action }}" method="post" accept-charset="utf-8" id="{{ id }}" class="form-horizontal {{ class }}">
   {% csrf_token %}
 

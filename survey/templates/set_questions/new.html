@@ -53,7 +53,7 @@
   {% for option in options %}
    {% if option %}
     <div class="control-group options question-option">
-        <label class="control-label">Option <span class="number"> {{ option.order }}</span></label>
+        <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
         <div class="controls">
             <input type="text" maxlength="100" name="options" value="{{ option.text }}">
             <a href="javascript:;" class="btn btn-white btn-warning btn-bold add-option"><i class="ace-icon fa fa-plus bigger-120 orange"></i></i></a>

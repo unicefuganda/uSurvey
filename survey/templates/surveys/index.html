@@ -11,6 +11,10 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/awesomplete.css" />
 <script src="{{ STATIC_URL }}js/awesomplete.min.js" async></script>
 <style type="text/css">
+.dataTables_wrapper .row {
+    margin: 0!important;
+    display: none !important;
+  }
     .status {
         width: 50px !important;
     }
@@ -53,6 +57,13 @@
 {% endblock %}
 
 {% block page_actions %}
+<!-- Start LEGENDS -->
+<!-- <div style="margin-right: 200px">
+<span style="padding-left:25px; font-family:Open Sans; font-size:12px; color:gray;"><i class="fa fa-circle" aria-hidden="true"> Not Started</i></span>
+<span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:green;"><i class="fa fa-circle" aria-hidden="true"> Ongoing</i></span>
+<span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:#ff6600;"><i class="fa fa-circle" aria-hidden="true"> Completed</i></span>
+</div> -->
+<!-- End LEGENDS -->
 
 <div class="col-lg-12" style="margin-top: -18px;margin-left: 21px;">
         <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_survey"  id="add_survey">

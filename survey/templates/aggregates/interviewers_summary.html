@@ -4,12 +4,13 @@
   Interviewers List
 {% endblock %}
 {% block search %}
- {% include "search_form.html" %}
+ 
 {% include "horizontal_filter_form.html" with a_form=locations_filter no_button=True filter_id='locations_filter' %}
 <br />
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
+{% include "search_form.html" %}
 {% autopaginate interviewers 50 %}
 
 </div>
