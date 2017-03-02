@@ -254,8 +254,7 @@ def indicator_formula(request, indicator_id):
     return render(request, 'indicator/formulae.html', context)
 
 
-@permission_required('auth.can_view_batches')
-def simple_indicator(request, indicator_id):
+def _retrieve_data_frame(request, indicator_id):
     hierarchy_limit = 2
     selected_location = Location.objects.get(parent__isnull=True)
     params = request.GET or request.POST
@@ -263,22 +262,31 @@ def simple_indicator(request, indicator_id):
     first_level_location_analyzed = Location.objects.filter(
         type__name__iexact="country")[0]
     indicator = Indicator.objects.get(id=indicator_id)
-    request.breadcrumbs([
-        ('Indicator List', reverse('list_indicator_page')),
-    ])
-    if locations_filter.last_location_selected:
-        selected_location = locations_filter.last_location_selected
+    last_selected_loc = locations_filter.last_location_selected
+    if last_selected_loc:
+        selected_location = last_selected_loc
     report_locations = selected_location.get_children().order_by('name')
-    reports_df = indicator.get_data(report_locations)
-    # hence set the location where the report is based. i.e the child current selected location.
     context = {'request': request, 'indicator': indicator,
                'locations_filter': locations_filter,
                'selected_location': selected_location,
+               'report_locations': report_locations
                }
-    context['report'] = mark_safe(reports_df.to_html(
-        classes='table table-striped table-bordered table-hover table-sort'))
-    variable_names = indicator.active_variables()
+    return context, indicator.get_data(report_locations)
 
+
+@permission_required('auth.can_view_batches')
+def simple_indicator(request, indicator_id):
+    request.breadcrumbs([
+        ('Indicator List', reverse('list_indicator_page')),
+    ])
+    context, reports_df = _retrieve_data_frame(request, indicator_id)
+    indicator = context['indicator']
+    # hence set the location where the report is based. i.e the child current selected location.
+    context['report'] = mark_safe(reports_df.to_html(na_rep='-',
+                                                     classes='table table-striped table-bordered table-hover table-sort'
+                                                     ))
+    variable_names = indicator.active_variables()
+    report_locations = context['report_locations']
     def make_hover_text(row):
         return '<br />'.join(['%s: %s' % ( name, row[name]) for name in variable_names])
     reports_df['hover-text'] = reports_df.apply(make_hover_text, axis=1)
@@ -305,3 +313,15 @@ def simple_indicator(request, indicator_id):
     return render(request, 'indicator/simple_indicator.html', context)
 
 
+@login_required
+@permission_required('auth.can_view_batches')
+def download_indicator_analysis(request, indicator_id):
+    context, reports_df = _retrieve_data_frame(request, indicator_id)
+    last_selected_loc = context['selected_location']
+    indicator = context['indicator']
+    file_name = '%s%s' % ('%s-%s-' % (last_selected_loc.type.name, last_selected_loc.name) if
+                          last_selected_loc else '', indicator.name)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="%s.csv"' % file_name
+    reports_df.to_csv(response, date_format='%Y-%m-%d %H:%M:%S', encoding='utf-8')   #exclude interview id
+    return response

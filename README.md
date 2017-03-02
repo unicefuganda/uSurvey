@@ -13,6 +13,8 @@ Installation
 
 * It helps to install python-dev, libxml2-dev, libxslt1-dev, zlib1g-dev and libffi-dev (for a debian based system, the command would be *sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev libffi-dev*)
 
+* Also install libblas-dev liblapack-dev libatlas-base-dev gfortran (for a debian based system, the command would be sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran )
+
 * Execute the following commands from your installation directory:
 
         git clone https://github.com/unicefuganda/uSurvey.git
