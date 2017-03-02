@@ -288,7 +288,7 @@ def simple_indicator(request, indicator_id):
     variable_names = indicator.active_variables()
     report_locations = context['report_locations']
     def make_hover_text(row):
-        return '<br />'.join(['%s: %s' % ( name, row[name]) for name in variable_names])
+        return '<br />'.join(['%s: %d' % (name, row[name]) for name in variable_names])
     reports_df['hover-text'] = reports_df.apply(make_hover_text, axis=1)
     if report_locations:
         trace1 = go.Bar(x=reports_df.index,
