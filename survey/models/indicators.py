@@ -16,6 +16,7 @@ from survey.models.interviews import Interview
 
 class Indicator(BaseModel):
     REPORT_FIELD_NAME = '[IndicatorValue]'
+    DECIMAL_PLACES = 2
     PERCENTAGE = 1
     COUNT = 2
     name = models.CharField(max_length=255, null=False)
@@ -37,8 +38,7 @@ class Indicator(BaseModel):
         return QuestionSet.get(id=self.question_set.id)
 
     def is_percentage_indicator(self):
-        percentage_measure = [Indicator.MEASURE_CHOICES[
-            0][1], Indicator.MEASURE_CHOICES[0][0]]
+        percentage_measure = [Indicator.MEASURE_CHOICES[0][1], Indicator.MEASURE_CHOICES[0][0]]
         return self.measure in percentage_measure
 
     def get_matching_interviews(self, batch, loc):
@@ -59,8 +59,8 @@ class Indicator(BaseModel):
         math_string = Template(self.formulae).render(Context(var_row))
         result = evaluator(math_string)
         if len(evaluator.error) > 0:
-            return 'nan'
-        return result
+            return None
+        return round(result, self.DECIMAL_PLACES)
 
     def formulae_string(self):
         return Template(self.formulae).render(Context(dict([(name, name) for name in self.active_variables()])))
@@ -86,12 +86,9 @@ class Indicator(BaseModel):
         df = pd.DataFrame(report).transpose()
         if df.columns.shape[0] == len(variable_names):
             df.columns = variable_names
-            if all(report.values()):
-                # now include the formula results per location
-                aeval = Interpreter()       # to avoid the recreating each time
-                df[self.REPORT_FIELD_NAME] = df.apply(self.get_indicator_value, axis=1, args=(aeval, ))
-            else:
-                df[self.REPORT_FIELD_NAME] = 'nan'
+            # now include the formula results per location
+            aeval = Interpreter()       # to avoid the recreating each time
+            df[self.REPORT_FIELD_NAME] = df.apply(self.get_indicator_value, axis=1, args=(aeval, ))
         else:
             df = pd.DataFrame(columns=list(variable_names)+[self.REPORT_FIELD_NAME, ])
         return df
@@ -156,7 +153,6 @@ class IndicatorVariableCriteria(BaseModel):
                 params.append(self.question.options.get(order=arg.param).text)
             else:
                 params.append(arg.param)
-
         return params
 
     @property

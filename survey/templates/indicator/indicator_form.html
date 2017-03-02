@@ -12,7 +12,7 @@
     <input type="hidden" value="{{variable_form.instance.pk}}" id="var-id" name="{{variable_form.instance.name}}"/>
 
   {% endif %}
-<div class="form-actions">
+  <div class="form-actions">
     <button id="var-button" type="button" class="btn btn-primary" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
     {% if var_cancel_url %}
       <a href="{{ var_cancel_url }}" class="btn btn-primary close cancel cancel-button" name="cancel_button" style=" padding-right: 5px;
@@ -20,8 +20,17 @@
     padding-bottom: 1px;"  data-dismiss="modal">Cancel</a>
     {% else %}
         {% if variable_form.instance.pk %}
-          <a href="#delete_variable" data-toggle="modal" class="tooltip-info btn btn-primary clear" data-rel="tooltip" title="" data-original-title="Delete" name="cancel_button" id="cancel_{{ id }}" >Clear</a>
-        <div class="modal fade" id="delete_variable" tabindex="-1" role="dialog" aria-hidden="true">
+            <a href="#" class="btn btn-primary done done-button btn btn-primary" name="cancel_button" id="done_{{ id }}">Done</a>
+        {% endif %}
+
+    {% endif %}
+  </div>
+
+ <h4>Settings for this Variable</h4>
+    {% include 'indicator/_view_criteria.html' %}
+    {% if variable_form.instance.pk %}
+          <a href="#delete_variable_modal" data-toggle="modal" class="tooltip-info btn btn-primary clear" data-rel="tooltip" title="" data-original-title="Delete" name="cancel_button" id="cancel_{{ id }}" >Clear</a>
+        <div class="modal fade" id="delete_variable_modal" tabindex="-1" role="dialog" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -38,13 +47,5 @@
                 </div>
               </div>
             </div>
-            <a href="#" class="btn btn-primary done done-button btn btn-primary" name="cancel_button" id="done_{{ id }}">Done</a>
         {% endif %}
-
-    {% endif %}
-  </div>
 </form>
-<div>
- <h4>Settings for this Variable</h4>
-    {% include 'indicator/_view_criteria.html' %}
-</div>

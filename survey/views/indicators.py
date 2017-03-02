@@ -270,7 +270,7 @@ def simple_indicator(request, indicator_id):
         selected_location = locations_filter.last_location_selected
     report_locations = selected_location.get_children().order_by('name')
     reports_df = indicator.get_data(report_locations)
-        # hence set the location where the report is based. i.e the child current selected location.
+    # hence set the location where the report is based. i.e the child current selected location.
     context = {'request': request, 'indicator': indicator,
                'locations_filter': locations_filter,
                'selected_location': selected_location,
@@ -284,9 +284,18 @@ def simple_indicator(request, indicator_id):
         data = go.Data([trace1])
         margin = go.Margin(pad=15)
         layout = go.Layout(title=indicator.name, xaxis={'title': report_locations[0].type.name},
-                           yaxis={'title': 'Values per %s' % report_locations[0].type.name}, margin=margin)
+                           yaxis={'title': 'Values per %s' % report_locations[0].type.name,
+                                  'tickformat': ".2%s" % indicator.DECIMAL_PLACES},
+                           margin=margin,
+                           annotations=[dict(x=xi, y=yi,
+                                             text=str(yi),
+                                             xanchor='center',
+                                             yanchor='bottom',
+                                             showarrow=False,
+                                             ) for xi, yi in zip(reports_df.index,
+                                                                 reports_df[indicator.REPORT_FIELD_NAME])])
         figure = go.Figure(data=data, layout=layout)
-        graph_div = opy.plot(figure, auto_open=False, output_type='div')
+        graph_div = opy.plot(figure, auto_open=False, output_type='div', show_link=False)
         context['graph'] = mark_safe(graph_div)
     return render(request, 'indicator/simple_indicator.html', context)
 

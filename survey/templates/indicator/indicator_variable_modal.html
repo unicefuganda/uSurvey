@@ -134,13 +134,13 @@
 
                 //if done, check if variable was created and assign it to this variable list
                 $('.done').click(function(){
-                    if($('#id_var-id')) {
+                    if($('#var-id') && $('#id_variables [value="'+$('#var-id').attr('value')+'"]').length == 0) {
                         $('#id_variables').append($('<option>', {value:$('#var-id').attr('value'),
                                                             text: $('#var-id').attr('name'),
                                                             selected: 'selected'}));
-                         $('#variable-form-body').html(originalFormHTML);
-                         resetAll();
                      }
+                    $('#variable-form-body').html(originalFormHTML);
+                    resetAll();
                     return true;
                 });
              }
