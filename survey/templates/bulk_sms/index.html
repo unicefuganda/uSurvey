@@ -3,6 +3,12 @@
   Bulk Notifications
 {% endblock %}
 {% block content %}
+<style type="text/css">
+  .dataTables_wrapper .row {
+    margin: 0!important;
+    display: none !important;
+  }
+</style>
   <form action="{% url 'send_bulk_sms' %}" method="POST" accept-charset="utf-8" id="bulk-sms-form" class="form-vertical">
     {% csrf_token %}
     <div class="control-group">

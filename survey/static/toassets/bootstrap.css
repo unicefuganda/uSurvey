@@ -1630,9 +1630,9 @@ pre code {
 .form-actions {
   background-color: #fff;
   border-top: 1px solid #c3a0d9;
-  margin-bottom: 20px;
-  margin-top: 20px; 
-  padding: 19px 20px 20px;
+  margin-bottom: -17px;
+  margin-top: 10px; 
+  padding: 12px 20px 20px;
   /*text-align: center;*/
 }
 

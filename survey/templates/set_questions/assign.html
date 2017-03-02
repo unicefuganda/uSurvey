@@ -16,7 +16,14 @@
     	{% include "search_form.html" with id="library_search_form" placeholder='search with text or code' %}
     </div>
  </div>
-
+<style type="text/css">
+.table {    
+     margin-top: 0px !important; 
+}
+	.search {
+    margin-top: -50px !important;
+}
+</style>
  <div class="col-md-12">
 
  	<ul>
@@ -50,9 +57,9 @@
 
 					<table id="lib_questions_table" class="table table-hover" style="margin-top: 0px !important" >
 						<thead id="lib_questions_table_head">
-       <tr><th align="center" class="code" style="background: #307ecc !important;">CODE</th>
+       <tr><th align="center" class="code" style="background: #307ecc !important;border: 0 none; margin: 0;">CODE</th>
 
-<th align="left" class="question" style="background: #307ecc !important;">TEXT</th></tr>
+<th align="left" class="question" style="background: #307ecc !important;border: 0 none; margin: 0;">TEXT</th></tr>
 		</thead>
 						 <tbody id="lib_questions_table_body" class="lib_questions_table_body1">
 						{% for question in library_questions %}

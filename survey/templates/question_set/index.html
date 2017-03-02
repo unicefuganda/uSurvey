@@ -8,6 +8,10 @@
 {% endblock %}
 {% block extra_head %}
 <style type="text/css">
+.dataTables_wrapper .row {
+    margin: 0!important;
+    display: none !important;
+  }
     .status {
         width: 50px !important;
     }
@@ -52,10 +56,13 @@
 
 {% endblock %}
 {% block page_actions %}
-  <!--   <button class="btn btn-white btn-warning btn-bold">
-												<i class="ace-icon fa fa-plus bigger-120 orange"></i>
-												<a href="#new_question_set" data-toggle="modal"  class="" id="add_question_set">Create New {{ model.verbose_name }}</a>
-											</button> -->
+<!-- Start LEGENDS -->
+<!-- <div style="margin-right: 200px">
+<span style="padding-left:25px; font-family:Open Sans; font-size:12px; color:gray;"><i class="fa fa-circle" aria-hidden="true"> Not Started</i></span>
+<span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:green;"><i class="fa fa-circle" aria-hidden="true"> Ongoing</i></span>
+<span style="padding-left:8px; font-family:Open Sans; font-size:12px; color:#ff6600;"><i class="fa fa-circle" aria-hidden="true"> Completed</i></span>
+</div> -->
+<!-- End LEGENDS -->  
     <button class="btn btn-white btn-warning btn-bold" data-toggle="modal" data-target="#new_question_set"  id="add_question_set">
           <i class="ace-icon fa fa-plus bigger-120"></i>
                         Create New {{ model.verbose_name }}
