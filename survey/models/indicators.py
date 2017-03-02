@@ -3,6 +3,7 @@ import pandas as pd
 from asteval import Interpreter
 from django.template import Template, Context
 from django.db import models
+from django.db.models import Count
 from django.utils.datastructures import SortedDict
 from survey.models.base import BaseModel
 from survey.models.question_module import QuestionModule
@@ -66,7 +67,7 @@ class Indicator(BaseModel):
     def formulae_string(self):
         return Template(self.formulae).render(Context(dict([(name, name) for name in self.active_variables()])))
 
-    def get_data(self, locations, *args, **kxargs):
+    def get_data(self, base_location, *args, **kxargs):
         """Used to get the compute indicator values.
         :param locations: The locations of interest
         :param args:
@@ -80,11 +81,13 @@ class Indicator(BaseModel):
         # answer_class = Answer.get_class(self.parameter.answer_type)
         kwargs = {}
         report = {}
-        for child_location in locations:
-            target_locations = child_location.get_leafnodes(include_self=True)
-            report[child_location.name] = [self.get_variable_value(target_locations,
-                                                                   name) for name in variable_names]
-        df = pd.DataFrame(report).transpose()
+        # for child_location in locations:
+        #     target_locations = child_location.get_leafnodes(include_self=True)
+        #     report[child_location.name] = [self.get_variable_value(target_locations,
+        #                                                            name) for name in variable_names]
+        for name in variable_names:
+            report[name] = self.get_variable_aggregates(base_location, name)
+        df = pd.DataFrame(report)
         if df.columns.shape[0] == len(variable_names):
             df.columns = variable_names
             # now include the formula results per location
@@ -93,6 +96,29 @@ class Indicator(BaseModel):
         else:
             df = pd.DataFrame(columns=list(variable_names)+[self.REPORT_FIELD_NAME, ])
         return df
+
+    def get_variable_aggregates(self, base_location, variable_name):
+        variable = self.variables.get(name__iexact=variable_name)
+        ikwargs = {'question_set__pk': self.question_set.id, 'survey': self.survey}
+        parent_loc = 'ea__locations'
+        for i in base_location.type.get_descendants(include_self=False):    # just to know how many levels down
+            parent_loc = '%s__parent' % parent_loc
+        ikwargs['%s__id' % parent_loc] = base_location.id
+        valid_interviews = Interview.objects.filter(**ikwargs).values_list('id', flat=True)
+        for criterion in variable.criteria.all():
+            if criterion.test_question.answer_type == MultiChoiceAnswer.choice_name():
+                value_key = 'as_value'
+            else:
+                value_key = 'as_text'
+            kwargs = {
+                'question__id': criterion.test_question.id,
+                'interview__id__in': valid_interviews
+            }
+            valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(**kwargs).
+                                                        only('interview__id').values_list('interview__id', flat=True))
+        parent_loc = 'interview__%s__name' % parent_loc
+        aggregate = valid_interviews.values(parent_loc).annotate(total=Count(parent_loc))
+        return SortedDict([(d[parent_loc], d['total']) for d in aggregate])
 
     def get_variable_value(self, locations, variable_name):
         variable = self.variables.get(name__iexact=variable_name)
