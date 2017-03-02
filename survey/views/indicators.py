@@ -277,15 +277,20 @@ def simple_indicator(request, indicator_id):
                }
     context['report'] = mark_safe(reports_df.to_html(
         classes='table table-striped table-bordered table-hover table-sort'))
+    variable_names = indicator.active_variables()
+
+    def make_hover_text(row):
+        return '\n'.join(['%s %s'% (row[name], name) for name in variable_names])
+    reports_df['hover-text'] = reports_df.apply(make_hover_text, axis=1)
     if report_locations:
         trace1 = go.Bar(x=reports_df.index,
                         y=reports_df[indicator.REPORT_FIELD_NAME], x0=0, y0=0,
-                        name=indicator.name)
+                        name=indicator.name,
+                        text=reports_df['hover-text'],)
         data = go.Data([trace1])
         margin = go.Margin(pad=15)
         layout = go.Layout(title=indicator.name, xaxis={'title': report_locations[0].type.name},
-                           yaxis={'title': 'Values per %s' % report_locations[0].type.name,
-                                  'tickformat': ".2%s" % indicator.DECIMAL_PLACES},
+                           yaxis={'title': 'Values per %s' % report_locations[0].type.name},
                            margin=margin,
                            annotations=[dict(x=xi, y=yi,
                                              text=str(yi),
