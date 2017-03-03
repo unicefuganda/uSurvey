@@ -4,73 +4,89 @@
     {{ interviewer.name|capfirst }}'s Details
 {% endblock %}
 {% block content %}
+<style type="text/css">
+  .dataTables_wrapper .row {
+    margin: 0!important;
+    display: none !important;
+  }
 
-   <table class="table centerTable">
-  <tr>
-    <td style="text-align:left" valign="top" >Name</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.name|capfirst }}</td>
+  .table-box {border:1px #0099ff solid;width: 450px;margin: auto;}
+  .table-box .tr1{background: #fff; font-size: 13px;}
+  .table-box .tr1:hover{background: #d2def2;}
+  .table-box  .td1{background: #0099ff; width: 150px;text-align: right;font-weight: bold;color:#fff;}
+  .table-box  .td2{width: 300px;text-align: left;}
+  .table-header{width: 450px;margin:auto;background: none;color:#000;}
+  .cancel-btn{width: 450px;margin: auto;padding-left: 130px;margin-top: 15px;}
+
+  .btn-yellow{display: none !important;}
+
+
+</style>
+   <table border="1" class="table centerTable table-box">
+  <tr class="tr1">
+    <td class="td1" valign="top" >Name</td>
+    <td class="td2" valign="top" class="showdetails">{{ interviewer.name|capfirst }}</td>
   </tr>
 {% for access in interviewer.ussd_access %}
-  <tr>
-    <td style="text-align:left" valign="top">Mobile Number</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ access.user_identifier }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">Mobile Number</td>
+    <td class="td2" valign="top" class="showdetails">{{ access.user_identifier }}</td>
   </tr>
 {% endfor %}
 {% for access in interviewer.odk_access %}
-  <tr>
-    <td style="text-align:left" valign="top">ODK ID</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ access.user_identifier }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">ODK ID</td>
+    <td class="td2" valign="top" class="showdetails">{{ access.user_identifier }}</td>
   </tr>
-  <tr>
-    <td style="text-align:left" valign="top">ODK Token</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ access.odk_token }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">ODK Token</td>
+    <td class="td2" valign="top" class="showdetails">{{ access.odk_token }}</td>
   </tr>
 {% endfor %}
-  <tr>
-    <td style="text-align:left" valign="top">Date Of Birth</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.date_of_birth |format_date }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">Date Of Birth</td>
+    <td class="td2" valign="top" class="showdetails">{{ interviewer.date_of_birth |format_date }}</td>
   </tr>
-  <tr>
-    <td style="text-align:left" valign="top">Sex</td>
-    <td style="text-align:left" valign="top" class="showdetails">{% if interviewer.gender %}
+  <tr class="tr1">
+    <td class="td1" valign="top">Sex</td>
+    <td class="td2" valign="top" class="showdetails">{% if interviewer.gender %}
                 Male
             {% else %}
                 Female
             {% endif %}</td>
   </tr>
-  <tr>
-    <td style="text-align:left" valign="top">Education</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.level_of_education }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">Education</td>
+    <td class="td2" valign="top" class="showdetails">{{ interviewer.level_of_education }}</td>
   </tr>
-  <tr>
-    <td style="text-align:left" valign="top">Language</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.language }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">Language</td>
+    <td class="td2" valign="top" class="showdetails">{{ interviewer.language }}</td>
   </tr>
 {% for loc in interviewer.ea.parent_locations %}
-  <tr>
-    <td style="text-align:left" valign="top">{{ loc.type.name}}</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ loc.name}}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">{{ loc.type.name}}</td>
+    <td class="td2" valign="top" class="showdetails">{{ loc.name}}</td>
   </tr>
 {% endfor %}
-  <tr>
-    <td style="text-align:left" valign="top">Enumeration Area</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.ea }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">Enumeration Area</td>
+    <td class="td2" valign="top" class="showdetails">{{ interviewer.ea }}</td>
   </tr>
-  <tr>
-    <td style="text-align:left" valign="top">Allocated Surveys</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.allocated_surveys | display_list }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">Allocated Surveys</td>
+    <td class="td2" valign="top" class="showdetails">{{ interviewer.allocated_surveys | display_list }}</td>
   </tr>
-  <tr>
-    <td style="text-align:left" valign="top">Total Households</td>
-    <td style="text-align:left" valign="top" class="showdetails">{{ interviewer.ea.total_households }}</td>
+  <tr class="tr1">
+    <td class="td1" valign="top">Total Households</td>
+    <td class="td2" valign="top" class="showdetails">{{ interviewer.ea.total_households }}</td>
   </tr>
        <tr>
-    <td style="text-align:left" valign="top">&nbsp;</td>
-    <td style="text-align:left" valign="top">&nbsp;</td>
+    <td class="td1" valign="top">&nbsp;</td>
+    <td class="td2" valign="top">&nbsp;</td>
   </tr>
-  <tr>
-    <td style="text-align:left" valign="top">&nbsp;</td>
-    <td style="text-align:left" valign="top">
+  </table>
+    <div class="cancel-btn">
         {% if cancel_url %}
             <a href="{{ cancel_url }}" class="btn btn-primary"><i class="icon-chevron-left icon-white"></i> Back</a>
         {% else %}
@@ -79,9 +95,7 @@
         {% endif %}
         {% include 'interviewers/_action_button.html' with button_size="" interviewer=interviewer %}
 
-</td>
-  </tr>
-</table>
+</div>
 <br />
 <br />
 {% endblock %}
