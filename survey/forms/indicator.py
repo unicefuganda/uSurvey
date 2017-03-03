@@ -28,8 +28,8 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             survey = kwargs['instance'].survey
             self.fields['survey'].initial = survey
             self.fields['survey'].widget.attrs['readonly'] = 'readonly'
-            self.fields['question_set'].queryset = survey.batches.all()
-            self.fields['question_set'].initial = survey.qsets
+            self.fields['question_set'].queryset = survey.qsets
+            self.fields['question_set'].initial = qset
             self.fields['question_set'].widget.attrs['readonly'] = 'readonly'
             self.fields['variables'].initial = kwargs['instance'].variables.all()
         self.fields['variables'].queryset = self.available_variables()

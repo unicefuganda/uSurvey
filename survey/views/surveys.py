@@ -1,18 +1,22 @@
 import ast
+from functools import wraps
+from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
+from django.conf import settings
 from survey.models import Survey, Location, LocationType, Batch, RandomizationCriterion, \
     Interview, QuestionFlow, Question
 from survey.forms.surveys import SurveyForm, SamplingCriterionForm
 from survey.views.custom_decorators import handle_object_does_not_exist
 from survey.utils.query_helper import get_filterset
 from survey.models import EnumerationArea, LocationType, Location, BatchCommencement, SurveyHouseholdListing
+from survey.models import WebAccess
 from survey.forms.enumeration_area import EnumerationAreaForm, LocationsFilterForm
-from django.conf import settings
+from survey.forms.answer import get_answer_form
 
 
 @permission_required('auth.can_view_batches')
@@ -188,6 +192,63 @@ def wipe_survey_data(request, survey_id):
         Interview.objects.filter(survey=survey).delete()
         messages.info(request, 'Data has been cleared for %s' % survey.name)
     return HttpResponseRedirect(reverse('survey_list_page'))
+
+
+def http_interview_auth(func):
+    @wraps(func)
+    def _decorator(request, *args, **kwargs):
+        interview = None
+        survey_id = kwargs.pop('survey_id', None)
+        if request.COOKIES.has_key('survey_token_%s' % survey_id):
+            try:
+                interview = Interview.objects.get(token=request.COOKIES.get('survey_token_%s' % survey_id))
+            except Interview.DoesNotExist:
+                pass
+        if interview is None:
+            survey = get_object_or_404(Survey, pk=survey_id)
+            interview = Interview.objects.create(survey=survey, interview_channel=WebAccess.choice_name())
+            interview.last_question = survey.start_question
+            interview.save()
+        response = func(request, interview, *args, **kwargs)
+        response.set_cookie('survey_token_%s' % survey_id, interview.token)
+        return response
+    return _decorator
+
+
+@http_interview_auth
+@login_required
+def handle(request, interview):
+    if request.method == 'POST':
+        answer_form = get_answer_form(interview)(request.POST, request.FILES)
+        if answer_form.is_valid():
+            answer = answer_form.save()
+            last_question = interview.last_question
+            next_question = last_question.next_question(answer.to_text())
+            if next_question is None:
+                interview.closure_date = timezone.now()
+            else:
+                interview.last_question = next_question
+            interview.save()
+            answer_form = get_answer_form(interview)()
+
+    else:
+        answer_form = get_answer_form(interview)()
+    if interview.closure_date:
+        template_file = "interviews/completed.html"
+    else:
+        template_file = "interviews/answer.html"
+    context = {
+               'title': "%s Survey" % interview.survey,
+               'button_label': 'send',
+                'answer_form' : answer_form,
+                'interview' : interview,
+                'survey' : interview.survey,
+                'template_file': template_file,
+                'id' : 'interview_form',
+               }
+    if request.is_ajax():
+        return render(request, template_file, context)
+    return render(request, 'interviews/new.html', context)
 
 
 
