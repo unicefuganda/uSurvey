@@ -34,11 +34,11 @@ class IndicatorForm(ModelForm, FormOrderMixin):
             self.fields['variables'].initial = kwargs['instance'].variables.all()
         self.fields['variables'].queryset = self.available_variables()
         self.fields['variables'].icons = {'add': {'data-toggle': "modal", 'data-target': "#add_variable",
-                                                  'id': 'add_new_variable'},
-                                          'edit': {'data-toggle': "modal",
+                                                  'id': 'add_new_variable', 'title': 'Add Variable'},
+                                          'edit': {'data-toggle': "modal", 'title': 'Edit Variable',
                                                    'id': 'edit_variable'},
                                           'delete': {'data-toggle': "modal", 'data-target': "#remove-selected-variable",
-                                                     'id': 'delete_variable'}
+                                                     'id': 'delete_variable', 'title': 'Delete Variable'}
                                           }
         if self.data.get('survey'):
             self.fields['question_set'].queryset = Survey.get(pk=self.data['survey']).qsets

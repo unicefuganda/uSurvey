@@ -41,7 +41,7 @@
                     <span class="alert_confirm">Confirm:</span> Are you sure you want to Clear <strong><em>{{ variable_form.instance.name }}</em></strong>?
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary delete_variable_modal" onclick="$('#delete_variable_modal').modal('hide');">Cancel</button>
                     <a class="btn btn-primary delete-modal clear-button" href="{% url 'delete_indicator_variable' variable_form.instance.pk %}" >Yes</a>
                   </div>
                 </div>
