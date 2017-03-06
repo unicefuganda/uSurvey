@@ -1,0 +1,92 @@
+{% load template_tags %}
+<style type="text/css">
+    .dataTables_wrapper .row:first-child {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    background-color: #EFF3F8;
+}
+</style>
+<form id="{{ filter_id }}" action="{{ action }}" method="{% if method %}{{method}}{% else %}get{% endif %}" class="pull-left padded-bottom" accept-charset="utf-8">
+    {% if method and not method.lower == 'get' %}
+        {% csrf_token %}
+    {% endif %}
+    {% block prefilter %}
+
+    {% endblock %}
+    <div class="col-lg-1 col-md-1 {{ class }} horizontal-filter">
+        <div id="control-group">
+            {% for field in a_form.visible_fields %}
+                <td valign="top">
+                  <label for="{{field.auto_id}}" class="horititle text-center">{{ field.label }}</label>
+                 {% if field.label_tag|is_mobile_number %}
+                   <div class="input-prepend">
+                       <span class="add-on">{{ country_phone_code }}</span>
+                    </div>
+                  {% endif %}
+                   <span class="horiselect">{{field}}</span>
+                </td>
+            {% endfor %}
+            {% if not no_button %}
+                {% block submit_button %}
+                    <td class="downbutton2">
+                        <input type="submit" class="btn btn-primary" id="a-question-list" value="{%if filter_button_name %}{{filter_button_name}}{% else %}Refresh List{% endif %}" name="action" style=" border-left: 0px solid #0577e0 !important; padding: 3px; margin-top:5px; vertical-align: middle; margin-left: 20px !important" />
+                    </td>
+                {% endblock %}
+            {% endif %}
+        </div>
+        {% if show_errors %}
+        <tr id="error">
+            {% for field in a_form.visible_fields %}
+               {% if field.errors %}
+                <td valign="top">
+                   <label class="error">
+                            {% for error in field.errors %}
+                                {{ error}}
+                            {% endfor %}
+                   </label>
+                </td>
+               {% endif %}
+            {% endfor %}
+        </tr>
+        {% endif %}
+
+</div>
+{% block postfilter %}
+
+{% endblock %}
+
+</form>
+    <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
+{% if no_auto_refresh %}
+    <script type="text/javascript">
+    $(function(){
+        {% for field in a_form.visible_fields %}
+            $('#{{ field.auto_id }}').on('change', function () {
+                {% with a_form.visible_fields|next:forloop.counter0 as next %}
+                    $('#{{ next.auto_id }}').val('');
+                {% endwith %}
+            });
+        {% endfor %}
+        });
+    </script>
+
+{% else %}
+    {% block auto_refresh %}
+    <script type="text/javascript">
+    $(function(){
+        {% for field in a_form.visible_fields %}
+            $('#{{ field.auto_id }}').on('change', function () {
+                {% with a_form.visible_fields|next:forloop.counter0 as next %}
+                    $('#{{ next.auto_id }}').val('');
+                {% endwith %}
+                $('#{{ filter_id }}').submit();
+            });
+        {% endfor %}
+        });
+    </script>
+    {% endblock %}
+{% endif %}
+{% block extra_js %}
+
+{% endblock %}
+<br class="clear" />

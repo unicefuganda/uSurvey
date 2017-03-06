@@ -1,5 +1,12 @@
 {% load template_tags %}
 <style type="text/css">
+.table-header{
+  margin-bottom: 10px !important;
+}
+.dataTables_wrapper .row {
+    margin: 0!important;
+    display: none !important;
+  }
   .form-horizontal .control-label {
     padding-top: 7px !important;
     margin-bottom: 0;
@@ -7,16 +14,19 @@
 }
 #id_email{
    margin-left: 4px !important;
-   width: 180px !important;
+   width: 220px !important;
    height: 25px !important; 
   }
   #id_password1{
-   width: 190px !important;
+   width: 220px !important;
    height: 25px !important; 
   }
-  #id_password2{
-   width: 190px !important;
+  #id_password2, #id_username, #id_first_name, #id_last_name{
+   width: 220px !important;
    height: 25px !important; 
+  }
+  #id_mobile_number{
+    width: 195px !important;
   }
 </style>
 {% for field in form.visible_fields %}

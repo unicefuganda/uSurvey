@@ -20,8 +20,8 @@
 .dataTables_wrapper label {
     display: inline-block !important;
     font-size: 13px !important;
-    margin-top: 30px !important;
-    margin-left: -25px !important;
+    margin-top: 0px !important;
+    margin-left: 30px !important;
 }
 
         <!--#survey_map {
@@ -83,9 +83,19 @@
 {% endblock %}
 {% block content %}
 <div id="home_display">
-    <div id="survey_map" >
+
+    <div class="col-md-1">
+      {% include "dashboard_form.html" with a_form=map_filter no_button=True filter_id='map_filter' %}
     </div>
-        {% include "horizontal_filter_form.html" with a_form=map_filter no_button=True filter_id='map_filter' %}
+    <div class="col-md-8"><br/>
+       <div id="survey_map" >
+    </div>
+    </div>
+    <div class="col-md-2">
+      
+    </div>
+   
+        
 </div>
 {% endblock%}
 
@@ -94,7 +104,7 @@
         <!--$("#survey_map").height($(document).height() * 0.7);-->
        var map = L.map('survey_map').setView([{{map_center}}], {{ zoom_level|default:6}}, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
     info = L.control(),
-    legend = L.control({position: 'bottomright'}),
+    //legend = L.control({position: 'bottomright'}),
     geojson;
   osmAttrib='© uSurvey';
   var mapData = null;
@@ -255,7 +265,7 @@ var survey_selector = L.control({position: 'topleft'});
 
 legend.addTo(map);
 info.addTo(map);
-survey_selector.addTo(map)
+//survey_selector.addTo(map)
 
 function highlightAdminLevel(event){
     var layer = event.target

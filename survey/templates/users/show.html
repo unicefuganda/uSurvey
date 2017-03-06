@@ -3,59 +3,76 @@
   {{ the_user.get_full_name }}'s details
 {% endblock %}
 {% block content %}
-<h3 class="offset3">
+<style type="text/css">
+.dataTables_wrapper .row {
+    margin: 0!important;
+    display: none !important;
+}
+
+  .table-box {border:1px #0099ff solid;width: 450px;margin: auto;margin-bottom: 10px;}
+  .table-box .tr1{background: #fff; font-size: 13px;}
+  .table-box .tr1:hover{background: #d2def2;}
+  .table-box  .td1{background: #0099ff; width: 150px;text-align: right;font-weight: bold;color:#fff;}
+  .table-box  .td2{width: 300px;text-align: left;}
+  .table-header{width: 450px;margin:auto;background: none;color:#000;}
+  .cancel-btn{width: 450px;margin: auto;padding-left: 130px;margin-top: 15px;}
+
+  .btn-yellow{display: none !important;}  
+</style>
+<!-- <h3 class="offset3">
     {{ the_user.get_full_name|capfirst }}'s Details
-</h3>
-<table class="table centerTable">
+</h3> -->
+<!-- <table class="table centerTable"> -->
+<table border="1" class="table centerTable table-box">
 <tbody>
-<tr>
-  <td style="text-align:right" valign="top"> 
+<tr class="tr1">
+  <td class="td1" valign="top"> 
     Username
   </td>
-  <td style="text-align:left" valign="top" class="showdetails">
+  <td class="td2" valign="top" class="showdetails">
     {{ the_user.username }}
   </td>
   </tr>
 
-  <tr>
-  <td style="text-align:right" valign="top">
+  <tr class="tr1">
+  <td class="td1" valign="top">
     First name
   </td>
- <td style="text-align:left" valign="top" class="showdetails">
+ <td class="td2" valign="top" class="showdetails">
     {{ the_user.first_name}}
   </td>
   </tr>
 
-  <tr>
-  <td style="text-align:right" valign="top">
+  <tr class="tr1">
+  <td class="td1" valign="top">
     Last name
   </td>
-  <td style="text-align:left" valign="top" class="showdetails">
+  <td class="td2" valign="top" class="showdetails">
     {{ the_user.last_name }}
   </td>
   </tr>
 
-  <tr>
-  <td style="text-align:right" valign="top">
+  <tr class="tr1">
+  <td class="td1" valign="top">
     Mobile number
   </td>
-  <td style="text-align:left" valign="top" class="showdetails">
+  <td class="td2" valign="top" class="showdetails">
       {{ the_user.userprofile.mobile_number }}
   </td>
   </tr>
-  <tr>
-  <td style="text-align:right" valign="top">
+  <tr class="tr1">
+  <td class="td1" valign="top">
     Email
   </td>
-  <td style="text-align:left" valign="top" class="showdetails">
+  <td class="td2" valign="top" class="showdetails">
     {{ the_user.email }}
   </td>
   </tr>
-  <tr>
-  <td style="text-align:right" valign="top">
+  <tr class="tr1">
+  <td class="td1" valign="top">
     Groups
   </td>
-  <td style="text-align:left" valign="top" class="showdetails">
+  <td class="td2" valign="top" class="showdetails">
    {% for group in the_user.groups.all %}
     {{ group }}{% if not forloop.last %}, {% endif %}
    {% endfor %}
@@ -66,7 +83,7 @@
 
 <style type="text/css">
       .btn1 {  -webkit-border-radius: 0;  -moz-border-radius: 0;  border-radius: 0px;  font-family: Arial;  color: #ffffff;  font-size: 12px;  background: #3498db;  padding: 5px 10px 5px 10px;  text-decoration: none;}
-    .btn1:hover {  background: #3cb0fd;  text-decoration: none; color: #000;}
+    .btn1:hover {  background: #3cb0fd;  text-decoration: none; color: #000;}    
 </style>
 <div>
     <!-- {% if cancel_url %}
