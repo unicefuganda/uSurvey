@@ -147,12 +147,19 @@
                             {% endif %}
                             {% if model.verbose_name == 'Listing Form' %}
                             <li>
-                                <a href="{% url 'clone_qset_page' question_set.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-clone bigger-120"></i>Clone</span></a>
+                                
+
+                                <!--<a href="{% url 'clone_qset_page' question_set.id %}" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-clone bigger-120"></i>Clone</span></a>-->
+                                <a href="#clone_listing_form_{{question_set.id}}" data-toggle="modal" class="tooltip-info" data-rel="tooltip" title="" data-original-title="Clone"><span class="blue"><i class="usur-icon fa fa-clone bigger-120"></i>Clone</span></a>                           
+
+
                             </li>
                             {% endif %}
                         </ul>
                 </div>
             </div>
+
+          {% include "base/clone_modal.html" with object_name=question_set.name id=question_set.pk name="listing_form" url=question_set.id|get_url_with_ids:"clone_qset_page" %}
           </td>
         </tr>
       {% endfor %}

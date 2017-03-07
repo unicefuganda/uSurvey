@@ -211,6 +211,10 @@ urlpatterns = patterns('',
                            'survey.views.surveys.edit', name='edit_survey_page'),
                        url(r'^surveys/(?P<survey_id>\d+)/clone/$',
                            'survey.views.surveys.clone_survey', name='clone_survey_page'),
+                       url(r'^listing_form/(?P<qset_id>\d+)/clone/$',
+                           'survey.views.question_set.clone_qset', name='clone_qset_page'),
+                       
+
                        url(r'^qset/(?P<qset_id>\d+)/clone/$',
                            'survey.views.question_set.clone_qset', name='clone_qset_page'),
                        url(r'^surveys/(?P<survey_id>\d+)/delete/$',
