@@ -51,24 +51,9 @@
     <div class="controls {{ field|is_radio }}">
     <label class="control-label" for="{{field.auto_id}}">{{field.label}}
     </label>
-    {% if field.name == 'ea' %}
-      
-      <div class="row" style="padding-bottom:20px;">
-        <div class="col-md-2 col-sm-1">
-        </div>
-        <div class="col-md-3 col-sm-2">
-        <strong>All EA's</strong><span style="margin-left: 100px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><strong>Selected EA's</strong>
-        </div>
-        <div class="col-md-2 col-sm-1 "></div>
-        
-      </div>
-      {{field}}
-      
-    {%else%}
 
       {{field}}
 
-    {%endif%}
         {% if field.field.icons %}
             <div class="input-prepend" style="display: inline-block; border: none;">
                 {% for icon, attrs in field.field.icons.items %}

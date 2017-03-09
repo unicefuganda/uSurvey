@@ -53,9 +53,13 @@ class Indicator(BaseModel):
             data[location] = self.compute_for_location(location)
         return data
 
-    def active_variables(self):
+    @classmethod
+    def get_variables(cls, formulae):
         pattern = '{{ *([0-9a-zA-Z_]+) *}}'
-        return set(re.findall(pattern, self.formulae))
+        return set(re.findall(pattern, formulae))
+
+    def active_variables(self):
+        return Indicator.get_variables(self.formulae)
 
     def get_indicator_value(self, var_row, evaluator):
         math_string = Template(self.formulae).render(Context(var_row))

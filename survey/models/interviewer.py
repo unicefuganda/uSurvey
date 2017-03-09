@@ -145,7 +145,7 @@ class SurveyAllocation(BaseModel):
         app_label = 'survey'
 
     def __unicode__(self):
-        return self.survey.name
+        return self.allocation_ea.name      # because typically same survey multiple eas
 
     @classmethod
     def get_allocation(cls, interviewer, count=0):

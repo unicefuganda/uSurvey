@@ -327,7 +327,8 @@ QUESTION_EXPORT_HEADERS = OrderedDict([
     ('module', 'Module')
 ])
 
-ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE = 'Uploaded Data is below sample size'
+ODK_UPLOADED_DATA_BELOW_SAMPLE_SIZE = 'Uploaded Data is below sample size. Ensure to complete enough ' \
+                                      'entries in a single form'
 ODK_ERROR_OCCURED = 'An error occurred pls try again'
 
 
@@ -398,7 +399,8 @@ RQ_QUEUES = {
 SUPER_POWERS_DURATION= 1800
 SUPER_POWERS_KEY = 'auth:super_powers'
 
-
+INTERVIEWER_SESSION_NAMESPACE = '//interviewer/'
+ONLINE_SURVEY_TIME_OUT = 50000
 
 
 ##end USSD config ##

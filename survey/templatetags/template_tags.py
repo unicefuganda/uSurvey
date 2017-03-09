@@ -295,6 +295,12 @@ def households_for_open_survey(interviewer):
     return len([hs for hs in households if hs.get_head() is not None])
 
 
+@register.assignment_tag
+def build_question_text(text, context):
+    context = template.Context(context)
+    return template.Template(text).render(context)
+
+
 @register.filter
 def total_household_members(interviewer):
     households = interviewer.households.all()

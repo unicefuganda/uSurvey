@@ -60,6 +60,8 @@ urlpatterns = patterns('',
                            'survey.views.interviewer.check_mobile_number', name="check_mobile_number"),
                        url(r'^ussd/simulator', permission_required('auth.can_view_interviewers')
                            (TemplateView.as_view(template_name="ussd/simulator.html")), name='simulator_page'),
+                       url(r'^online/simulator/(?P<access_id>\d+)/$', 'survey.online.views.handle_session',
+                           name="online_view"),
                        url(r'^ussd', 'survey.ussd.handler.handle', name="ussd"),
                        url(r'^households/$', 'survey.views.household.list_households',
                            name="list_household_page"),
