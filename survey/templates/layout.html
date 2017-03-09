@@ -419,11 +419,11 @@
 {% if perms.auth.can_have_super_powers %}
 {% if has_powers %}
 <li>
-<a href="{% url 'deactivate_super_powers_page' %}">Deactivate Power Mode</a>
+<a href="{% url 'deactivate_super_powers_page' %}">Normal Power Mode</a>
 </li>
 {% else %}
 <li>
-<a href="{% url 'activate_super_powers_page' %}">Activate Power Mode</a>
+<a href="{% url 'activate_super_powers_page' %}">Power Mode</a>
 </li>
 {% endif %}
 {% endif %}
