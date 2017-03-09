@@ -87,4 +87,20 @@ $("#id_answer_type option[value='']").text("--Select Answer Type--");
   })
   
 </script>
+
+<script type="text/javascript">
+var newOptions = {
+    "Select Option" : "",
+    "Date Answer": "Date Answer",
+    "Text Answer": "Text Answer",
+    "Numerical Answer": "Numerical Answer",
+    "Multi Choice Answer":"Multi Choice Answer"
+};
+var $el = $("#id_answer_type");
+$el.empty(); // remove old options
+$.each(newOptions, function(key,value) {
+  $el.append($("<option></option>")
+     .attr("value", value).text(key));
+});
+</script>
 {% endblock %}

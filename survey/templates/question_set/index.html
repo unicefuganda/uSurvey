@@ -130,9 +130,11 @@
                      {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|add_string:survey.id|get_url_with_ids:"delete_qset" %}
                 {% else %}
 
-                <li><a href="{% url 'delete_qset_listingform' question_set.id %}" data-toggle="modal" class="tooltip-success" data-rel="tooltip" title=""><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a></li>
+                <li>
+                <a href="#delete_listing_{{question_set.id}}" class="tooltip-info" data-toggle="modal" data-rel="tooltip" title="" data-original-title="Delete"><span class="red"><i class="usur-icon fa fa-trash bigger-120"></i>Delete</span></a>
+                </li>
 
-                    {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name=question_set.verbose_name url=question_set.id|get_url_with_ids:"delete_qset_listingform" %}
+                    
 
                 {% endif %}
                 {% endif %}
@@ -158,7 +160,7 @@
                         </ul>
                 </div>
             </div>
-
+            {% include "base/delete_modal.html" with object_name=question_set.name id=question_set.id name="Listing" url=question_set.id|get_url_with_ids:"delete_qset_listingform" %}
           {% include "base/clone_modal.html" with object_name=question_set.name id=question_set.pk name="listing_form" url=question_set.id|get_url_with_ids:"clone_qset_page" %}
           </td>
         </tr>

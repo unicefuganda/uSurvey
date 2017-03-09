@@ -1,6 +1,14 @@
 {% load template_tags %}
 <!DOCTYPE html>
 <html lang="en"><head>
+<style type="text/css">
+    .form-email input, .form-password input {    
+    padding: 0 50px !important;
+}
+#id_username, #id_password{
+    text-align: center;
+}
+</style>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
      <!-- Google font -->
@@ -106,15 +114,15 @@ text-align: center;">
 
   {% endif %}                   
                         <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-                            <h2 class="text-uppercase">uSurvey</h2>
+                            <h2 style="font-family: Open-Sans">uSurvey</h2>
                             {% csrf_token %} <div>
                             <div class="form-email">
-                                 <label for="username" style="color: #fff">{{ form.username.label_tag }}</label>
+                                 <!-- <label for="username" style="color: #fff">{{ form.username.label_tag }}</label> -->
                                  {{ form.username }}
                                  </div>
                             </div>
                             <div class="form-password">
-                               <label  for="inputPassword" style="color: #fff">{{ form.password.label_tag }}</label>
+                               <!-- <label  for="inputPassword" style="color: #fff">{{ form.password.label_tag }}</label> -->
                               {{ form.password }}
                             </div>
                             <div class="form-check">
@@ -167,5 +175,11 @@ text-align: center;">
 <!-- END / PAGE WRAP -->
 
 <!-- Load jQuery -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+    
+$('#id_username').attr("placeholder","Username");
+$('#id_password').attr("placeholder","Password");
 
+</script>
 </body></html>
