@@ -1,0 +1,27 @@
+{% load template_tags %}
+<div>
+    {% if answer_form.errors %}
+        <div id="non_field_errors" class="alert alert-error">{{ answer_form.non_field_errors }}</div>
+    {%  endif %}
+    {% if interview.last_question.loops %}
+        <div class="loops">
+            {% for loop in interview.last_question.loops %}
+                {% build_question_text interview.last_question.text existing_answers as text %}
+            {% endfor %}
+        </div>
+    {%  endif %}
+    {% if answer_form.is_multipart %}
+    <form enctype="multipart/form-data" id="interview_form" method="post" action="" class="form-horizontal {{ class }}">
+    {% else %}
+    <form id="interview_form" method="post" action="" class="form-horizontal {{ class }}">
+    {% endif %}
+        {% csrf_token %}
+        {% build_question_text interview.last_question.text existing_answers as text %}
+        <h3>{{text}} ({{interview.last_question.answer_type}})</h3>
+        {% include "naked_form.html" with a_form=answer_form %}
+        <div class="form-actions">
+            <input type="submit" name="submit" value="send" class="btn btn-primary "/>
+        </div>
+    </form>
+</div>
+
