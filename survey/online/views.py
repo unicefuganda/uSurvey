@@ -172,9 +172,10 @@ def get_group_aware_next(request, answer, interview, session_data):
                     if validator is None:
                         raise ValueError('unsupported validator defined on listing question')
                     try:
+                        slogger.debug('parm val: %s, params: %s' % (param_value, condition.test_params))
                         is_valid = validator(param_value, *condition.test_params)
                     except:
-                        is_valid = False
+                        is_valid = True
                     if is_valid is False:
                         valid_group = False
                         break   # fail if any condition fails
