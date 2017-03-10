@@ -8,6 +8,10 @@
       padding-top: 0px !important;
       padding-bottom: 40px !important;
      }
+     @media only screen and (max-width:1920px) {
+    #cssmenu {
+       width: 100%
+    }
    </style>
       <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
       <meta charset="UTF-8" />
@@ -419,11 +423,11 @@
 {% if perms.auth.can_have_super_powers %}
 {% if has_powers %}
 <li>
-<a href="{% url 'deactivate_super_powers_page' %}">Normal Power Mode</a>
+<a href="{% url 'deactivate_super_powers_page' %}">De Activate Power Mode</a>
 </li>
 {% else %}
 <li>
-<a href="{% url 'activate_super_powers_page' %}">Power Mode</a>
+<a href="{% url 'activate_super_powers_page' %}">Active Power Mode</a>
 </li>
 {% endif %}
 {% endif %}

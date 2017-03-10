@@ -1,7 +1,7 @@
 *{margin:0;padding:0;text-decoration:none}
 body{background:#555;}
 header{position:relative;width:100%;background:#0099ff;}
-.logo{position:relative;z-index:123;font:18px verdana;color:#6DDB07;float:left;width:12%}
+.logo{position:relative;z-index:123;font:18px verdana;color:#6DDB07;float:left;width:12%;}
 .logo a{color:#6DDB07;}
 nav{position:relative;width:1220px;-moz-width:1100px;}
 /*#cssmenu,#cssmenu ul,#cssmenu ul li,#cssmenu ul li a,#cssmenu #head-mobile{border:0;list-style:none;line-height:1;display:block;position:relative;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}*/
@@ -50,7 +50,7 @@ nav{position:relative;width:1220px;-moz-width:1100px;}
     color: #fff;
     font-size: 11px;
     font-weight: 400;
-    padding: 11px 15px 8px;
+    padding: 3px 15px 8px;
     text-decoration: none;
     text-transform: uppercase;
     width: 166px;
