@@ -31,8 +31,7 @@ def get_answer_form(interview):
                 self.fields['value'] = forms.ModelChoiceField(queryset=question.options.all())
             if question.answer_type == MultiSelectAnswer.choice_name():
                 self.fields['value'] = forms.ModelMultipleChoiceField(queryset=question.options.all(),
-                                                                      widget=forms.SelectMultiple(attrs={
-                                                                          'class': 'multi-select'}))
+                                                                      widget=forms.CheckboxSelectMultiple)
             accept_types = {
                             AudioAnswer.choice_name(): 'audio/*',
                             VideoAnswer.choice_name(): 'video/*',
@@ -58,7 +57,7 @@ class SelectInterviewForm(forms.ModelForm):
                                                                        interviewer.unfinished_assignments])
         self.fields['survey'].empty_label = 'Select Survey'
         self.fields['question_set'].queryset = QuestionSet.objects.none()
-        self.fields['question_set'].empty_label = 'Select Question Set'
+        self.fields['question_set'].empty_label = 'Select Batch'
         self.fields['ea'].queryset = EnumerationArea.objects.filter(pk__in=[sa.allocation_ea.pk for sa in
                                                                             interviewer.unfinished_assignments])
         self.fields['ea'].empty_label = 'Select EA'

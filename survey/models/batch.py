@@ -130,10 +130,18 @@ class Batch(QuestionSet):
         """This is might be different from the flow questions because it might have group paramater questions if present
         :return:
         """
-        questions = OrderedSet(self.parameter_list.questions.all())
+        if self.parameter_list:
+            questions = OrderedSet(self.parameter_list.parameters)
+        else:
+            questions = OrderedSet()
         map(lambda q: questions.add(q), self.flow_questions)
         return questions
 
+    @property
+    def g_first_question(self):
+        questions = self.all_questions
+        if questions:
+            return Question.get(pk=questions[0].id)
 
 
 class BatchLocationStatus(BaseModel):

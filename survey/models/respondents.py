@@ -85,7 +85,11 @@ class ParameterQuestion(Question):
 
 
 class SurveyParameterList(QuestionSet):             # basically used to tag survey grouping questions
-    batch = models.OneToOneField('Batch', related_name='parameter_list',null=True, blank=True)
+    batch = models.OneToOneField('Batch', related_name='parameter_list', null=True, blank=True)
+
+    @property
+    def parameters(self):
+        return ParameterQuestion.objects.filter(qset=self)
 
     class Meta:
         app_label = 'survey'

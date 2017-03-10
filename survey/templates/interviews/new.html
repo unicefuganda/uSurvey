@@ -3,6 +3,17 @@
 {% block title %}
     {{ interview.survey }}
 {% endblock %}
+
+{% block extra_head %}
+<style>
+div.main-cont {
+  height: 10em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    }
+</style>
+{% endblock %}
     {% block content %}
         <div>
             <h3>{{access.interviewer}}</h3>
@@ -14,6 +25,7 @@
         {% include template_file %}
         </div>
     {% endblock %}
+
 
 
 {% block javascripts %}
@@ -29,6 +41,7 @@
             });
 
       function resetAll() {
+         $('#confirm_add_modal').modal('hide');
         var datepicker =  $('.datepicker');
         if(datepicker.datepicker)
         {
@@ -39,6 +52,7 @@
              yearRange: "-120:+nn"
              });
          }
+
          $('.multi-select').multiSelect();
         $(".submit").click(function(event) {
             event.preventDefault();
