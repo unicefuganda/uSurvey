@@ -29,7 +29,13 @@ nav{position:relative;width:1220px;-moz-width:1100px;}
 /*#cssmenu > ul > li.has-sub > a:before{position:absolute;top:19px;right:14px;display:block;width:2px;height:8px;background:#fff;content:'';-webkit-transition:all .25s ease;-ms-transition:all .25s ease;transition:all .25s ease}*/
 #cssmenu > ul > li.has-sub:hover > a:before{top:23px;height:0}
 #cssmenu ul ul{position:absolute;left:-9999px;margin-top: -5px;}
-#cssmenu ul ul li{height:0;-webkit-transition:all .25s ease;-ms-transition:all .25s ease;background:#0073bf;border-bottom: 1px solid #EDC;transition:all .25s ease}
+/*#cssmenu ul ul li{height:0;-webkit-transition:all .25s ease;-ms-transition:all .25s ease;background:#0073bf;border-bottom: 1px solid #EDC;transition:all .25s ease}*/
+#cssmenu ul ul li {
+    background: #0073bf none repeat scroll 0 0;
+    border-bottom: 1px solid #75aee6;
+    height: 0;
+    transition: all 0.25s ease 0s;
+}
 #cssmenu ul ul li:hover{}
 #cssmenu li:hover > ul{left:auto}
 #cssmenu li:hover > ul > li{height:35px}
@@ -50,10 +56,10 @@ nav{position:relative;width:1220px;-moz-width:1100px;}
     color: #fff;
     font-size: 11px;
     font-weight: 400;
-    padding: 3px 15px 8px;
+    padding: 8px;
     text-decoration: none;
     text-transform: uppercase;
-    width: 166px;
+    width: 150px;
 }
 #cssmenu ul ul li:last-child > a,#cssmenu ul ul li.last-item > a{border-bottom:0}
 #cssmenu ul ul li:hover > a,#cssmenu ul ul li a:hover{color:yellow;}
@@ -94,6 +100,18 @@ nav{width:100%;}
     right: 20px;
     top: 22px;
     width: 20px;
+}
+.button::before {
+    background: #ddd none repeat scroll 0 0;
+    content: "";
+    display: block;
+    height: 2px;
+    position: absolute;
+    right: 20px;
+    top: 18px;
+    transition: all 0.3s ease 0s;
+    width: 20px;
+    z-index: 99999;
 }
 .button:before{-webkit-transition:all .3s ease;-ms-transition:all .3s ease;transition:all .3s ease;position:absolute;top:16px;right:20px;display:block;height:2px;width:20px;background:#ddd;content:''}
 .button.menu-opened:after{-webkit-transition:all .3s ease;-ms-transition:all .3s ease;transition:all .3s ease;top:23px;border:0;height:2px;width:19px;background:#fff;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}

@@ -60,7 +60,7 @@
       <div class="">
          <!--================= Box Div Start ==================-->
          <!-- Header Area -->
-         <header class="headerArea">
+         <header class="headerFix">
             <div class="logo pull-left">
                <div class="logoImg">               
                   <a href="#"><img src="{{ STATIC_URL }}toassets/Logo_Main.png" alt="uSurvey"></a>
@@ -172,7 +172,10 @@
      
          </div>
       </div>
- <div class="secTriangle" style="background-image:url({{ STATIC_URL }}images/slider3.png);background-repeat: no-repeat; background-position: center center; height:40px;"></div>
+ <!-- <div class="secTriangle" style="background-image:url({{ STATIC_URL }}images/slider3.png);background-repeat: no-repeat; background-position: center; height:40px; z-index: 999;"></div> -->
+ <!-- <div class="secTriangle">
+ <img src="{{STATIC_URL}}images/slider3.png" / style="background-repeat: no-repeat; background-position: center; height:40px; z-index: 9999;position: relative;">
+ </div> -->
    </section>
   
       <section class="commonSection " style="background-color: #ffffff; background-repeat: no-repeat; ">
@@ -182,6 +185,9 @@
                <div class="fw-col-xs-12 fw-col-xs-12" style=" text-align: left!important;  ">
                
                   <div class="col-lg-10 col-lg-offset-1 col-sm-offset-1 col-sm-10 col-xs-12 text-center">
+                  <div class="secTriangle">
+ <img src="{{STATIC_URL}}images/slider3.png" / style="background-repeat: no-repeat; background-position: center center; height:40px; z-index: 9999;position: relative;">
+ </div>
                      <div class="singleTesti">
                         <h2 style="color:#002956; font-family:'Baloo Bhaina',cursive;">uSurvey</h2>
                      </div>
@@ -250,8 +256,8 @@
             <div class="container">
                <div class="row">
                   <div class="col-lg-12 col-sm-12 col-xs-12 text-center">
-                     <span><img src="{{ STATIC_URL }}images/bottomfooterlogo.jpg" style="width:158px;"></span>
-                     <p style="padding-bottom:10px;font-size:13px;">Copyright © 2016 <a href="#">UNICEF</a><span> and UBOS</span> </p>
+                     <span><img src="{{ STATIC_URL }}toassets/bottomfooter_logo.jpg"></span>
+                     <p style="padding-bottom:10px;font-size:10px;">Copyright © 2016 <a href="#">UNICEF</a><span> and UBOS</span> </p>
                   </div>
                   <div class="topSocial pull-right">
                      <ul>
@@ -272,6 +278,11 @@
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/bootstrap.js"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/jquery_002.js"></script>
       <script type="text/javascript" src="{{ STATIC_URL }}toassets/modernizr.js"></script>
-     
+     <style type="text/css">
+       .commonSection {    
+     padding: 0px 0 0px !important; 
+    
+}
+     </style>
    </body>
 </html>
