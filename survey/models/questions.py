@@ -88,13 +88,13 @@ class Question(CloneableMixin, GenericQuestion):
         for flow in flows:
             if flow.validation_test:
                 test_values = [arg.param for arg in flow.text_arguments]
-                if getattr(answer_class, flow.validation_test)(reply, *test_values) == True:
+                if getattr(answer_class, flow.validation_test)(reply, *test_values) is True:
                     resulting_flow = flow
                     break
             else:
                 resulting_flow = flow
-        if resulting_flow:
-            return resulting_flow.next_question
+        if resulting_flow and resulting_flow.next_question:
+            return Question.get(id=resulting_flow.next_question.id)     # better for it to know who it is
 
     def previous_inlines(self):
         return self.qset.previous_inlines(self)
@@ -490,6 +490,12 @@ class QuestionSet(CloneableMixin, BaseModel):   # can be qset, listing, responde
     @classmethod
     def new_breadcrumbs(cls, *args, **kwargs):
         return cls.edit_breadcrumbs(**kwargs)
+
+    @property
+    def g_first_question(self):
+        questions = self.all_questions
+        if questions:
+            return Question.get(pk=questions[0].id)
 
     def deep_clone(self, **attrs):
         batch = QuestionSet.get(pk=self.pk)

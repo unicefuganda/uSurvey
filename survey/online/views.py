@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 
-from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer)
+from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question)
 from survey.forms.answer import get_answer_form, SelectInterviewForm
 from .utils import get_entry, set_entry, delete_entry
 from survey.utils.logger import slogger
@@ -55,7 +55,8 @@ def start_interview(request, access, session_data):
             interview = interview_form.save(commit=False)
             interview.interviewer = interviewer
             interview.interview_channel = access
-            interview.last_question = interview.question_set.start_question
+            qset = QuestionSet.get(id=interview.question_set.id)       # distinquish listing from batch
+            interview.last_question = qset.g_first_question
             interview.save()
             session_data['interview'] = interview
             session_data['answers'] = {}
@@ -154,18 +155,16 @@ def get_group_aware_next(request, answer, interview, session_data):
     :return:
     """
 
-    def _get_group_next_question(question):
-        next_question = question.next_question(answer.to_text())
-        if next_question is None:
-            return next_question
-        elif next_question and question.group == next_question.group:
-            return next_question
-        else:
+    def _get_group_next_question(question, proposed_next):
+        next_question = proposed_next
+        if hasattr(question, 'group') and hasattr(next_question, 'group') \
+                and question.group != next_question.group:
             question_group = next_question.group
             if question_group:
                 qset = QuestionSet.get(pk=question.qset.pk)
                 valid_group = True
                 for condition in question_group.group_conditions.all():
+                    # we are interested in the qset param list with same identifier name as condition.test_question
                     test_question = qset.parameter_list.questions.get(identifier=condition.test_question.identifier)
                     param_value = session_data['answers'].get(test_question.identifier, '')
                     answer_class = Answer.get_class(condition.test_question.answer_type)
@@ -176,9 +175,9 @@ def get_group_aware_next(request, answer, interview, session_data):
                         valid_group = False
                         break   # fail if any condition fails
                 if valid_group is False:
-                    next_question = _get_group_next_question(next_question)
+                    next_question = _get_group_next_question(question, next_question.next_question(answer.to_text()))
         return next_question
-    return _get_group_next_question(interview.last_question)
+    return _get_group_next_question(interview.last_question, interview.last_question.next_question(answer.to_text()))
 
 
 

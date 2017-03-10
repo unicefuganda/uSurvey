@@ -9,7 +9,7 @@ from survey.models.locations import Location
 from survey.models.surveys import Survey
 from survey.models.base import BaseModel
 from survey.utils.views_helper import get_descendants
-from survey.models.questions import QuestionFlow, QuestionSet
+from survey.models.questions import QuestionFlow, QuestionSet, Question
 from survey.models.batch_questions import BatchQuestion
 from survey.forms.logic import LogicForm
 from survey.models.access_channels import InterviewerAccess
@@ -133,6 +133,7 @@ class Batch(QuestionSet):
         questions = OrderedSet(self.parameter_list.questions.all())
         map(lambda q: questions.add(q), self.flow_questions)
         return questions
+
 
 
 class BatchLocationStatus(BaseModel):

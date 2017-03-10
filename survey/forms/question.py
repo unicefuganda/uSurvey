@@ -97,7 +97,7 @@ def get_question_form(model_class):
             requested_identifiers = re.findall(pattern, label)
             if requested_identifiers:
                 ids = self.qset.questions.filter(identifier__in=requested_identifiers).values_list('identifier',
-                                                                                                        flat=True)
+                                                                                                   flat=True)
                 ids = list(ids)
                 # try:
                 #     qset = Batch.get(pk=self.qset.pk)

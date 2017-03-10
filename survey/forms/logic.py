@@ -110,9 +110,13 @@ class LogicForm(forms.Form):
         if self.cleaned_data['action'] in [self.ASK_SUBQUESTION, self.SKIP_TO, self.BACK_TO]:
             try:
                 int(self.cleaned_data.get('next_question', ''))
+                next_question = Question.get(pk=self.cleaned_data['next_question'])
+                if (hasattr(self.question, 'group') and hasattr(next_question, 'group')) \
+                        and (self.question.group != next_question.group):
+                    ValidationError('Assigning logic between questions of different groups is not allowed')
             except:
                 raise ValidationError('Next question is required for Skip or Sub questions')
-        return self.cleaned_data.get('next_question', '')
+        return next_question
 
     def clean(self):
         field_name = ""
@@ -133,7 +137,7 @@ class LogicForm(forms.Form):
                         raise ValidationError("This rule already exists.")
                 elif flow.text_arguments.filter(position=0, param=self.cleaned_data.get('value', '').strip()).exists():
                     raise ValidationError("This rule already exists.")
-                if flow.next_question and flow.next_question.pk == self.cleaned_data.get('next_question', ''):
+                if flow.next_question and flow.next_question == self.cleaned_data['next_question']:
                     raise ValidationError(
                         "Logic rule already exists to selected next question.")
 
@@ -142,8 +146,6 @@ class LogicForm(forms.Form):
     def save(self, *args, **kwargs):
         next_question = None
         desc = self._make_desc()
-        if self.cleaned_data['action'] in [self.ASK_SUBQUESTION, self.SKIP_TO, self.BACK_TO]:
-            next_question = Question.get(pk=self.cleaned_data['next_question'])
         if self.cleaned_data['action'] == self.REANSWER:
             next_question = self.question
         flow = QuestionFlow.objects.create(question=self.question,

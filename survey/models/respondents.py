@@ -3,7 +3,7 @@ from django.db import models
 from model_utils.managers import InheritanceManager
 from survey.models.base import BaseModel
 from survey.models.generics import TemplateQuestion, TemplateOption
-from survey.models.questions import Question, QuestionSet, QuestionOption
+from survey.models.questions import Question, QuestionSet, QuestionOption, QuestionFlow
 from survey.models.question_templates import QuestionTemplate
 from survey.models.interviews import Answer, MultiChoiceAnswer, MultiSelectAnswer
 
@@ -75,6 +75,15 @@ class GroupTestArgument(BaseModel):
         get_latest_by = 'position'
 
 
+class ParameterQuestion(Question):
+
+    def next_question(self, reply):
+        next_question = super(ParameterQuestion, self).next_question(reply)
+        if next_question is None and self.e_qset.batch:
+            next_question = self.e_qset.batch.start_question
+        return next_question
+
+
 class SurveyParameterList(QuestionSet):             # basically used to tag survey grouping questions
     batch = models.OneToOneField('Batch', related_name='parameter_list',null=True, blank=True)
 
@@ -102,11 +111,15 @@ class SurveyParameterList(QuestionSet):             # basically used to tag surv
         for group in groups:
             map(lambda condition: question_ids.append(condition.test_question.id), group.group_conditions.all())
         parameters = ParameterTemplate.objects.filter(id__in=question_ids).order_by('identifier')
+        prev_question = None
         for param in parameters:
             # going this route because param questions typically would be small
-            question = Question(**{'identifier': param.identifier, 'text': param.text,
-                                   'answer_type': param.answer_type, 'qset': param_list})
+            question = ParameterQuestion(**{'identifier': param.identifier, 'text': param.text,
+                                            'answer_type': param.answer_type, 'qset': param_list})
             question.save()
+            if prev_question:
+                QuestionFlow.objects.create(question=prev_question, next_question=question)
+            prev_question = question
             if question.answer_type in [MultiChoiceAnswer.choice_name(), MultiChoiceAnswer]:
                 for option in param.options.all():
                     QuestionOption.objects.create(order=option.order, text=option.text, question=question)
