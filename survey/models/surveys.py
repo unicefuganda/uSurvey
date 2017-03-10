@@ -9,7 +9,7 @@ from survey.models.locations import Location, LocationType
 class Survey(CloneableMixin, BaseModel):
     name = models.CharField(max_length=100, blank=False,
                             null=True, unique=True)
-    description = models.CharField(max_length=300, blank=True, null=True)
+    description = models.CharField(max_length=300, blank=False, null=True)
     has_sampling = models.BooleanField(
         default=True, verbose_name='Survey Type')
     # next three are only relevant for listing data. I believe it saves unnecessary extra tables to refer to them here

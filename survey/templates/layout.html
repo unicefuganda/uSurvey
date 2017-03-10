@@ -8,6 +8,10 @@
       padding-top: 0px !important;
       padding-bottom: 40px !important;
      }
+     @media only screen and (max-width:1920px) {
+    #cssmenu {
+       width: 100%
+    }
    </style>
       <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
       <meta charset="UTF-8" />
@@ -411,9 +415,9 @@
 {% if user.is_authenticated %}
 <span class="dropdown-toggle" data-toggle="dropdown" data-position="auto" style="background:  none !important; border: none !important;">
 {% if has_powers %}
-<img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" style="margin-left: 14px;" title="Super Powers Activated">
+<img src="{{ STATIC_URL }}images/userICON_admin.png" width="40px;" height="40px;" style="margin-left: 150px;" title="Super Powers Activated">
 {% else %}
-<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 14px;">
+<img src="{{ STATIC_URL }}images/userICON.png" width="40px;" height="40px;" style="margin-left: 150px;">
 {% endif %}
 </span>
 <ul>
@@ -423,11 +427,11 @@
 {% if perms.auth.can_have_super_powers %}
 {% if has_powers %}
 <li>
-<a href="{% url 'deactivate_super_powers_page' %}">Deactivate Power Mode</a>
+<a href="{% url 'deactivate_super_powers_page' %}">De Activate Power Mode</a>
 </li>
 {% else %}
 <li>
-<a href="{% url 'activate_super_powers_page' %}">Activate Power Mode</a>
+<a href="{% url 'activate_super_powers_page' %}">Active Power Mode</a>
 </li>
 {% endif %}
 {% endif %}

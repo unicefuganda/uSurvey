@@ -15,6 +15,14 @@
 {% endblock %}
 {% block display_form_fields %}
 	{% include "naked_form.html" with a_form=question_set_form %}
+
+
+	<style type="text/css">
+	
+	.dataTables_wrapper input[type="text"] {
+    width: 345px !important;
+}
+</style>
 {% endblock %}
 
 {% block javascripts %}

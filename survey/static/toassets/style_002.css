@@ -32,7 +32,8 @@ Speacially design for uSurvey
 }
 .logoImg img{
     width: auto;
-    margin-left: 4px;    
+    margin-left: 4px;
+    margin-top: 8px;    
 }
 .logo h2{
     float: left;

@@ -13,7 +13,7 @@
     {% block prefilter %}
 
     {% endblock %}
-    <div class="col-lg-1 col-md-1 {{ class }} horizontal-filter">
+    <div class="{{ class }}">
         <div id="control-group">
             {% for field in a_form.visible_fields %}
                 <td valign="top">

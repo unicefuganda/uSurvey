@@ -3779,7 +3779,7 @@ textarea{
 .no-padding{padding:0}
 .xs-padding{padding-top:20px;padding-bottom:20px}
 .sm-padding{padding-top:50px;padding-bottom:50px}
-.md-padding,.section{/*padding-top:80px;*/padding-bottom:25px}
+.md-padding,.section{padding-top:80px;padding-bottom:25px;}
 .lg-padding{padding-top:110px;padding-bottom:110px}
 .xl-padding{padding-top:150px;padding-bottom:150px}
 .inner-lg-container{padding:80px}
