@@ -20,8 +20,8 @@
 .dataTables_wrapper label {
     display: inline-block !important;
     font-size: 13px !important;
-    margin-top: 0px !important;
-    margin-left: 30px !important;
+    margin-top: 20px !important;
+    margin-left: -25px !important;
 }
         .rop {
          text-align:center;
@@ -44,7 +44,7 @@
             margin-left: auto;
             margin-right: auto;
             width: 500px;
-            margin-top: 10px;
+            margin-top: 40px;
         }
 @media only screen and (max-width:767px) {
     #survey_map {
@@ -73,10 +73,10 @@
 {% block content %}
 <div id="home_display">
 
-    <div class="col-md-1">
+    <div class="col-md-4">
       {% include "dashboard_form.html" with a_form=map_filter no_button=True filter_id='map_filter' %}
     </div>
-    <div class="col-md-8"><br/>
+    <div class="col-md-4"><br/>
        <div id="survey_map" >
     </div>
     </div>
