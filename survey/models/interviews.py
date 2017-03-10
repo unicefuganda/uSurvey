@@ -29,13 +29,13 @@ def update_model_obj_serial(model_obj, serial_name, filter_criteria):
 
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
-        "Interviewer", null=True, related_name="interviews")
-    survey = models.ForeignKey('Survey', related_name='interviews', null=True, blank=True)
+        "Interviewer", null=True, related_name="interviews")    # nullable for simulation & backend load
+    survey = models.ForeignKey('Survey', related_name='interviews', db_index=True)
     question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)
     ea = models.ForeignKey(
         'EnumerationArea', related_name='interviews', db_index=True)    # repeated here for easy reporting
     interview_reference = models.ForeignKey('Interview', related_name='follow_up_interviews', null=True, blank=True)
-    interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews')
+    interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews', null=True)
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
     #instance_id = models.CharField(max_length=200, null=True, blank=True)
     last_question = models.ForeignKey(
@@ -56,10 +56,8 @@ class Interview(BaseModel):
     def has_started(self):
         return self.last_question is not None
 
-    def get_anwser(self, question, capwords=True):
-        answer_class = Answer.get_class(question.answer_type)
-        answers = answer_class.objects.filter(
-            interview=self, question=question)
+    def get_answer(self, question, capwords=True):
+        answers = Answer.objects.filter(interview=self, question=question)
         if answers.exists():
             reply = unicode(answers[0].to_text())
             if capwords:

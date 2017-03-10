@@ -6,7 +6,8 @@
     {% if interview.last_question.loops %}
         <div class="loops">
             {% for loop in interview.last_question.loops %}
-                {% build_question_text interview.last_question.text existing_answers as text %}
+                {% get_answer loop.loop_starter interview as loop_count %}
+                 &raquo; {{ loop.loop_starter.identifier }} ({{loop_count}})
             {% endfor %}
         </div>
     {%  endif %}
@@ -20,7 +21,12 @@
         <h3>{{text}} ({{interview.last_question.answer_type}})</h3>
         {% include "naked_form.html" with a_form=answer_form %}
         <div class="form-actions">
-            <input type="submit" name="submit" value="send" class="btn btn-primary "/>
+            {% if interview.last_question.loop_ended and interview.last_question.loop_ended.repeat_logic == interview.last_question.oop_ended.USER_DEFINED %}
+                <strong>{{interview.last_question.loop_ended.loop_prompt}}</strong>&nbsp;<input type="submit" name="add_loop" value="Yes" class="submit btn btn-primary "/>
+                <input type="submit" name="submit" value="No" class="submit btn btn-primary "/>
+            {% else %}
+                <input type="submit" name="submit" value="send" class="submit btn btn-primary "/>
+            {% endif %}
         </div>
     </form>
 </div>

@@ -55,7 +55,6 @@ class RespondentGroupCondition(BaseModel):
                 params.append(self.question.options.get(order=arg.param).text)
             else:
                 params.append(arg.param)
-
         return params
 
     @property

@@ -110,8 +110,15 @@ def join_list(list, delimiter):
 
 
 @register.filter
-def get_value(dict, key):
-    return dict.get(key, "")
+def get_value(obj, key):
+    if isinstance(obj, dict):
+        return obj.get(key, "")
+    elif isinstance(key, basestring) and hasattr(obj, key):
+        return getattr(obj, key)
+    elif callable(obj):
+        return obj(key)
+
+
 
 
 @register.filter
@@ -272,7 +279,9 @@ def get_answer(question, interview):
                 return mark_safe('<a href="{% url download_qset_attachment %s %s %}">Download</a>' % (question.pk,
                                                                                                       interview.pk))
             else:
-                return answer_class.get(interview=interview, question=question).value
+                answer = answer_class.objects.filter(interview=interview, question=question).last()
+                if answer:
+                    return answer.value
         except answer_class.DoesNotExist:
             return ''
     return _get_answer()

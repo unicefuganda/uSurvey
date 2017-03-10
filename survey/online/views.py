@@ -1,51 +1,53 @@
 #!/usr/bin/env python
 __author__ = 'anthony <antsmc2@gmail.com>'
 from django.utils import timezone
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from survey.models import Interview, Interviewer, InterviewerAccess, WebAccess, QuestionLoop, AutoResponse
+
+from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer)
 from survey.forms.answer import get_answer_form, SelectInterviewForm
 from .utils import get_entry, set_entry, delete_entry
-from .logger import slogger
+from survey.utils.logger import slogger
 
 REQUEST_SESSION = 'req_session'
 
+
 @login_required
 def handle_session(request, access_id):
-    '''
+    """
     :param request
-    :param interviewer_id
+    :param access_id
     :return:
-    '''
+    """
     access = InterviewerAccess.get(id=access_id)
     slogger.debug('starting request with: %s' % locals())
-    session_data = get_entry(access.interviewer, REQUEST_SESSION, {})
+    session_data = get_entry(access, REQUEST_SESSION, {})
     slogger.info('fetched: %s. session data: %s' % (access.user_identifier, session_data))
     response = respond(access, request, session_data)
     slogger.info('the session %s, data: %s' % (access.user_identifier, session_data))
     if session_data:
-        set_entry(access.interviewer, REQUEST_SESSION, session_data)
+        set_entry(access, REQUEST_SESSION, session_data)
         slogger.info('updated: %s session data: %s' % (access.interviewer, session_data))
     else:
-        #session data has been cleared then remove the session space
-        delete_entry(access.interviewer)
-        slogger.info('removed: %s session data' % access.interviewer.pk)
+        # session data has been cleared then remove the session space
+        delete_entry(access)
+        slogger.info('removed: %s session data' % access.pk)
     return response
 
 
 def respond(access, request, session_data):
     interviewer = access.interviewer
-    # check if there is any active interview, if yes, ask interview froquestion
+    # check if there is any active interview, if yes, ask interview last question
     interview = session_data.get('interview')
     # if interview is Non show select EA form
     if interview is None:
-        return make_interview(request, access, session_data)
+        return start_interview(request, access, session_data)
     elif interview:
         return respond_interview(request, interview, session_data)
 
 
-def make_interview(request, access, session_data):
+def start_interview(request, access, session_data):
     interviewer = access.interviewer
     if request.method == 'POST':
         interview_form = SelectInterviewForm(interviewer, data=request.POST)
@@ -62,12 +64,10 @@ def make_interview(request, access, session_data):
     else:
         interview_form = SelectInterviewForm(interviewer)
     template_file = "interviews/answer.html"
-    context = {
-               'button_label': 'send',
-                'answer_form' : interview_form,
-                'template_file': template_file,
-                'access': access,
-                'id' : 'interview_form',
+    context = {'button_label': 'send', 'answer_form': interview_form,
+               'template_file': template_file,
+               'access': access,
+               'id': 'interview_form',
                }
     if request.is_ajax():
         return render(request, template_file, context)
@@ -81,21 +81,21 @@ def respond_interview(request, interview, session_data):
         if answer_form.is_valid():
             answer = answer_form.save()
             session_data['answers'][interview.last_question.identifier] = answer.to_text()
-            last_question = interview.last_question
-            next_question = last_question.next_question(answer.to_text())
+            loop_next = get_loop_next(request, interview, session_data)      # gets next loop quest for interview
+            if loop_next:
+                next_question = loop_next
+            else:
+                next_question = get_group_aware_next(request, answer, interview, session_data)
             if next_question is None:
                 interview.closure_date = timezone.now()
             else:
                 interview.last_question = next_question
-            sync_loop(request, interview, last_question, session_data)
             interview.save()
-            if hasattr(interview.last_question, 'loop_started'):
-                initial = {'value': session_data['loops'].get(interview.last_question.loop_started.id, 1)}
-            answer_form = get_answer_form(interview)(initial=initial)
+            return HttpResponseRedirect('.')
     else:
         if hasattr(interview.last_question, 'loop_started'):
             initial = {'value': session_data['loops'].get(interview.last_question.loop_started.id, 1)}
-        answer_form = get_answer_form(interview)(initial={})
+        answer_form = get_answer_form(interview)(initial=initial)
     if interview.closure_date:
         template_file = "interviews/completed.html"
         del session_data['interview']
@@ -121,29 +121,64 @@ def respond_interview(request, interview, session_data):
     return render(request, 'interviews/new.html', context)
 
 
-def sync_loop(request, interview, prev_question, session_data):
-    if hasattr(prev_question, 'loop_ended'):
-        loop = prev_question.loop_ended
+def get_loop_next(request, interview, session_data):
+    if hasattr(interview.last_question, 'loop_ended'):
+        loop = interview.last_question.loop_ended
         count = session_data['loops'].get(loop.id, 1)
+        loop_next = None
         if loop.repeat_logic in [QuestionLoop.FIXED_REPEATS, QuestionLoop.PREVIOUS_QUESTION]:
             if loop.repeat_logic == QuestionLoop.FIXED_REPEATS:
                 max_val = loop.fixedloopcount.value
             if loop.repeat_logic == QuestionLoop.PREVIOUS_QUESTION:
                 max_val = loop.previousanswercount.get_count(interview)
             if max_val > count:
-                interview.last_question = loop.loop_starter
-                session_data['loops'][loop.id] = count + 1
-                return True
-            elif session_data['loops'].has_key(loop.id):
-                del session_data['loops'][loop.id]
-        if loop.repeat_logic == QuestionLoop.USER_DEFINED:
-            add_loop = session_data.get('add_loop', False)
-            if add_loop:
-                interview.last_question = loop.loop_starter
-                return True
-            elif session_data.has_key('add_loop'):
-                del session_data['add_loop']
-        return False
+                loop_next = loop.loop_starter
+        else:
+            request_data = request.POST if request.method == 'POST' else request.GET
+            if loop.repeat_logic is None and request_data.has_key('add_loop'):
+                loop_next = loop.loop_starter
+        if loop_next:
+            session_data['loops'][loop.id] = count + 1
+        elif session_data['loops'].has_key(loop.id):
+            del session_data['loops'][loop.id]
+        return loop_next
+
+
+def get_group_aware_next(request, answer, interview, session_data):
+    """Recursively check if next question is appropriate as per the respondent group
+    Responded group would have been determined by the parameter list questions whose data is store in session_data
+    :param request:
+    :param answer:
+    :param interview:
+    :param session_data:
+    :return:
+    """
+
+    def _get_group_next_question(question):
+        next_question = question.next_question(answer.to_text())
+        if next_question is None:
+            return next_question
+        elif next_question and question.group == next_question.group:
+            return next_question
+        else:
+            question_group = next_question.group
+            if question_group:
+                qset = QuestionSet.get(pk=question.qset.pk)
+                valid_group = True
+                for condition in question_group.group_conditions.all():
+                    test_question = qset.parameter_list.questions.get(identifier=condition.test_question.identifier)
+                    param_value = session_data['answers'].get(test_question.identifier, '')
+                    answer_class = Answer.get_class(condition.test_question.answer_type)
+                    is_valid = getattr(answer_class, condition.validation_test, None)
+                    if is_valid is None:
+                        raise ValueError('unsupported validator defined on listing question')
+                    if is_valid(param_value, *condition.test_params) is False:
+                        valid_group = False
+                        break   # fail if any condition fails
+                if valid_group is False:
+                    next_question = _get_group_next_question(next_question)
+        return next_question
+    return _get_group_next_question(interview.last_question)
 
 
 

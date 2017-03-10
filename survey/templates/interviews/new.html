@@ -18,16 +18,7 @@
 
 {% block javascripts %}
 <script type="text/javascript">
-    var datepicker =  $('.datepicker');
-    if(datepicker.datepicker)
-    {
-         datepicker.datepicker({
-         changeMonth: true,
-         changeYear: true,
-         dateFormat: 'dd-mm-yy',
-         yearRange: "-120:+nn"
-         });
-     }
+
 </script>
     <script type="text/javascript" charset="utf-8">
        $(function(){
@@ -38,20 +29,33 @@
             });
 
       function resetAll() {
-        $('#interview_form').submit(function (event) {
-           event.preventDefault();
+        var datepicker =  $('.datepicker');
+        if(datepicker.datepicker)
+        {
+             datepicker.datepicker({
+             changeMonth: true,
+             changeYear: true,
+             dateFormat: 'dd-mm-yy',
+             yearRange: "-120:+nn"
+             });
+         }
+         $('.multi-select').multiSelect();
+        $(".submit").click(function(event) {
+            event.preventDefault();
             var data = new FormData();
-            arr = $(this).serializeArray();
+            var form = $(this).closest('form');
+            arr = form.serializeArray();
             $.each(arr, function(i, entry) {
                 data.append(entry.name, entry.value);
             });
+            data.append(this.name, this.value);
             $('input:file').each(function(i, file) {
                 $.each($(file)[0].files, function(i, f) {
                     data.append($(file).attr('name'), f);
                 });
             });
             $.ajax({
-                url: $(this).attr('action'),
+                url: form.attr('action'),
                 data: data,
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
                 cache: false,

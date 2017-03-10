@@ -30,7 +30,9 @@ def get_answer_form(interview):
             if question.answer_type == MultiChoiceAnswer.choice_name():
                 self.fields['value'] = forms.ModelChoiceField(queryset=question.options.all())
             if question.answer_type == MultiSelectAnswer.choice_name():
-                self.fields['value'] = forms.ModelMultipleChoiceField(queryset=question.options.all())
+                self.fields['value'] = forms.ModelMultipleChoiceField(queryset=question.options.all(),
+                                                                      widget=forms.SelectMultiple(attrs={
+                                                                          'class': 'multi-select'}))
             accept_types = {
                             AudioAnswer.choice_name(): 'audio/*',
                             VideoAnswer.choice_name(): 'video/*',

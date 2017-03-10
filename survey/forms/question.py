@@ -48,7 +48,7 @@ def get_question_form(model_class):
                 self.fields['group'].empty_label = 'Select Group'
 
             self.parent_question = parent_question
-            self.order_fields(['answer_type','module', 'group', 'identifier', 'text', 'mandatory'])
+            self.order_fields(['answer_type', 'module', 'group', 'identifier', 'text', 'mandatory'])
 
         class Meta:
             model = model_class
