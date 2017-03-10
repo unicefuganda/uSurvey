@@ -168,10 +168,14 @@ def get_group_aware_next(request, answer, interview, session_data):
                     test_question = qset.parameter_list.questions.get(identifier=condition.test_question.identifier)
                     param_value = session_data['answers'].get(test_question.identifier, '')
                     answer_class = Answer.get_class(condition.test_question.answer_type)
-                    is_valid = getattr(answer_class, condition.validation_test, None)
-                    if is_valid is None:
+                    validator = getattr(answer_class, condition.validation_test, None)
+                    if validator is None:
                         raise ValueError('unsupported validator defined on listing question')
-                    if is_valid(param_value, *condition.test_params) is False:
+                    try:
+                        is_valid = validator(param_value, *condition.test_params)
+                    except:
+                        is_valid = False
+                    if is_valid is False:
                         valid_group = False
                         break   # fail if any condition fails
                 if valid_group is False:
