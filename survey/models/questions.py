@@ -653,7 +653,8 @@ class PreviousAnswerCount(LoopCount):
     value = models.ForeignKey(Question, related_name='loop_count_identifier')
 
     def get_count(self, interview):
-        return interview.numericalanswer.filter(question=self.value).value      #  previous question must be numeric
+        #  previous question must be numeric
+        return NumericalAnswer.objects.filter(interview=interview, question=self.value).last().value
 
     def odk_get_count(self, interview):
         raise Exception('need to do!') #to do
