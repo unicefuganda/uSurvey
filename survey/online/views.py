@@ -106,16 +106,14 @@ def respond_interview(request, interview, session_data):
             del session_data['loops']
     else:
         template_file = "interviews/answer.html"
-    context = {
-               'title': "%s Survey" % interview.survey,
-               'button_label': 'send',
-                'answer_form' : answer_form,
-                'interview' : interview,
-                'survey': interview.survey,
-                'existing_answers': session_data['answers'],
-                'loops': session_data['loops'],
-                'template_file': template_file,
-                'id' : 'interview_form',
+    context = {'title': "%s Survey" % interview.survey,
+               'button_label': 'send', 'answer_form': answer_form,
+               'interview': interview,
+               'survey': interview.survey,
+               'existing_answers': session_data['answers'],
+               'loops': session_data['loops'],
+               'template_file': template_file,
+               'id': 'interview_form',
                }
     if request.is_ajax():
         return render(request, template_file, context)
