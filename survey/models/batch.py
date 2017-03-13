@@ -141,7 +141,7 @@ class Batch(QuestionSet):
     def g_first_question(self):
         questions = self.all_questions
         if questions:
-            return Question.get(pk=questions[0].id)
+            return questions[0]
 
 
 class BatchLocationStatus(BaseModel):
