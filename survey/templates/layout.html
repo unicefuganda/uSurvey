@@ -340,7 +340,7 @@
       <li>
       <a href="{% url 'bulk_sms' %}">Notifications</a></li>
       <li>
-      <a href="{% url 'simulator_page' %}">Data Entry</a>
+      <a href="{% url 'online_interviewer_view' %}">Data Entry</a>
       </li>      
    </ul>
 </li>
@@ -427,7 +427,7 @@
 {% if perms.auth.can_have_super_powers %}
 {% if has_powers %}
 <li>
-<a href="{% url 'deactivate_super_powers_page' %}">De Activate Power Mode</a>
+<a href="{% url 'deactivate_super_powers_page' %}">Deactivate Power Mode</a>
 </li>
 {% else %}
 <li>

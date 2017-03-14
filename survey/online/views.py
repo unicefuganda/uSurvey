@@ -3,6 +3,7 @@ __author__ = 'anthony <antsmc2@gmail.com>'
 from django.utils import timezone
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question, SurveyAllocation)
@@ -14,15 +15,15 @@ from survey.utils.logger import slogger
 REQUEST_SESSION = 'req_session'
 
 
+@login_required
 def get_access_details(request):
     request_data = request.GET if request.method == 'GET' else request.POST
     if 'uid' in request_data:
         access_form = UserAccessForm(data=request_data)
         if access_form.is_valid():
             access = access_form.cleaned_data['uid']
-            online_view = OnlineView()
-            online_view.start_interview = start_ussd_compat_interview
-            return online_view.handle_session(request, access_id=access.id)
+            return OnlineView(action_url=reverse('online_interviewer_view')).handle_session(request,
+                                                                                            access_id=access.id)
     else:
         access_form = UserAccessForm()
     template_file = "interviews/answer.html"
@@ -35,75 +36,50 @@ def get_access_details(request):
     return render(request, 'interviews/new.html', context)
 
 
-def start_ussd_compat_interview(online_view, request, access, session_data):
-    """Steps:
-    1. Select EA
-    2`. Select Batch if survey is ready for batch collection, else skip this step and select available listing/batch
-    3. Move to interview questions.
-    This func is expected to be called only when survey is open
-    :param online_view:
-    :param request:
-    :param access:
-    :param session_data:
-    :return:
-    """
-    interviewer = access.interviewer
-    request_data = request.GET if request.method == 'GET' else request.POST
-    if '_interview' in session_data:      # this options comes when there are multiple batches to choose from
-        survey = session_data['_interview'].survey
-        interview_form = SelectBatchForm(survey, data=request_data)
-        if interview_form.is_valid():
-            batch = interview_form.cleaned_data['batch']
-            interview = session_data['_interview']
-            interview.question_set = batch
-            del session_data['_interview']
-            return online_view.init_responses(request, interview, session_data)
-    elif 'interview' in session_data:       # though the interview value would be None
-        interview_form = SurveyAllocationForm(interviewer, data=request_data)
-        if interview_form.is_valid():
-            interview = interview_form.save(commit=False)
-            interview.interviewer = interviewer
-            interview.interview_channel = access
-            survey = interview.survey
-            survey_allocation = interview_form.selected_allocation()
-            if interview.survey.has_sampling and (SurveyAllocation.can_start_batch(interviewer) is False):
-                # go straight to listing form
-                listing_form = survey.listing_form
-                if listing_form is None:    # assuming preferred listing did not cover completed for allocated ea
-                    listing_form = survey.preferred_listing.listing_form
-                interview.question_set = listing_form
-                interview.last_question = listing_form.g_first_question
+def handle_session(request, access_id):
+    online_view = OnlineView(action_url=reverse('online_view',
+                                                args=(access_id, )))
+
+    online_view.start_interview = start_qset_interview(online_view)
+    return online_view.handle_session(request, access_id=access_id)
+
+
+def start_qset_interview(online_view):
+    def _start_interview(request, access, session_data):
+        interviewer = access.interviewer
+        request_data = request.GET if request.method == 'GET' else request.POST
+        if 'interview' in session_data:
+            interview_form = SelectInterviewForm(access, data=request_data)
+            if interview_form.is_valid():
+                interview = interview_form.save(commit=False)
+                interview.interviewer = interviewer
+                interview.interview_channel = access
+                qset = QuestionSet.get(id=interview.question_set.id)       # distinquish listing from batch
+                interview.last_question = qset.g_first_question
                 return online_view.init_responses(request, interview, session_data)
-            else:
-                # ask user to select the batch if batch is more than one
-                if survey_allocation.open_batches() > 1:
-                    session_data['_interview'] = interview      # semi formed, ask user to choose batch
-                    interview_form = SelectBatchForm(survey)
-                else:
-                    batch = survey_allocation.open_batches()[0]
-                    interview.question_set = batch
-                    interview.last_question = batch.g_first_question
-                    return online_view.init_responses(request, interview, session_data)
-    else:
-        interview_form = SurveyAllocationForm(interviewer)
-    session_data['interview'] = None
-    session_data['selected_qset'] = None
-    template_file = "interviews/answer.html"
-    context = {'button_label': 'send', 'answer_form': interview_form,
-               'template_file': template_file,
-               'access': access,
-               'id': 'interview_form',
-               }
-    if request.is_ajax():
-        return render(request, template_file, context)
-    return render(request, 'interviews/new.html', context)
+        else:
+            interview_form = SelectInterviewForm(access)
+        session_data['interview'] = None
+        template_file = "interviews/answer.html"
+        context = {'button_label': 'send', 'answer_form': interview_form,
+                   'template_file': template_file,
+                   'access': access,
+                   'id': 'interview_form',
+                   }
+        if request.is_ajax():
+            return render(request, template_file, context)
+        return render(request, 'interviews/new.html', context)
+    return _start_interview
 
 
-def handle_session(request, access_id=None):
-    return OnlineView().handle_session(request, access_id=access_id)
+def handle_interviewer_session(request, access_id=None):
+    pass
 
 
 class OnlineView(object):
+
+    def __init__(self, action_url='', *rgs, **kwargs):
+        self.action_url = action_url
 
     @method_decorator(login_required)
     def handle_session(self, request, access_id=None):
@@ -116,7 +92,6 @@ class OnlineView(object):
             uid = request.GET.get('uid') if request.method == 'GET' else request.POST.get('uid')
             access = InterviewerAccess.get(user_identifier=uid)
         else:
-
             access = InterviewerAccess.get(id=access_id)
         slogger.debug('starting request with: %s' % locals())
         session_data = get_entry(access, REQUEST_SESSION, {})
@@ -144,6 +119,7 @@ class OnlineView(object):
                        'template_file': template_file,
                        'access': access,
                        'id': 'interview_form',
+                       'action': self.action_url
                        }
             if request.is_ajax():
                 return render(request, template_file, context)
@@ -162,25 +138,64 @@ class OnlineView(object):
         return self.respond(interview.interview_channel, request, session_data)
 
     def start_interview(self, request, access, session_data):
+        """Steps:
+        1. Select EA
+        2`. Select Batch if survey is ready for batch collection, else skip this step and select available listing/batch
+        3. Move to interview questions.
+        This func is expected to be called only when survey is open
+        :param online_view:
+        :param request:
+        :param access:
+        :param session_data:
+        :return:
+        """
         interviewer = access.interviewer
         request_data = request.GET if request.method == 'GET' else request.POST
-        if 'interview' in session_data:
-            interview_form = SelectInterviewForm(interviewer, data=request_data)
+        if '_interview' in session_data:      # this options comes when there are multiple batches to choose from
+            survey = session_data['_interview'].survey
+            interview_form = SelectBatchForm(access, survey, data=request_data)
+            if interview_form.is_valid():
+                batch = interview_form.cleaned_data['batch']
+                interview = session_data['_interview']
+                interview.question_set = batch
+                interview.last_question = batch.g_first_question
+                del session_data['_interview']
+                return self.init_responses(request, interview, session_data)
+        elif 'interview' in session_data:       # though the interview value would be None
+            interview_form = SurveyAllocationForm(access, data=request_data)
             if interview_form.is_valid():
                 interview = interview_form.save(commit=False)
                 interview.interviewer = interviewer
                 interview.interview_channel = access
-                qset = QuestionSet.get(id=interview.question_set.id)       # distinquish listing from batch
-                interview.last_question = qset.g_first_question
-                return self.init_responses(request, interview, session_data)
+                survey = interview.survey
+                survey_allocation = interview_form.selected_allocation()
+                if interview.survey.has_sampling and (SurveyAllocation.can_start_batch(interviewer) is False):
+                    # go straight to listing form
+                    listing_form = survey.listing_form
+                    if listing_form is None:    # assuming preferred listing did not cover completed for allocated ea
+                        listing_form = survey.preferred_listing.listing_form
+                    interview.question_set = listing_form
+                    interview.last_question = listing_form.g_first_question
+                    return self.init_responses(request, interview, session_data)
+                else:
+                    # ask user to select the batch if batch is more than one
+                    if len(survey_allocation.open_batches()) > 1:
+                        session_data['_interview'] = interview      # semi formed, ask user to choose batch
+                        interview_form = SelectBatchForm(access, survey)
+                    else:
+                        batch = survey_allocation.open_batches()[0]
+                        interview.question_set = batch
+                        interview.last_question = batch.g_first_question
+                        return self.init_responses(request, interview, session_data)
         else:
-            interview_form = SelectInterviewForm(interviewer)
+            interview_form = SurveyAllocationForm(access)
         session_data['interview'] = None
         template_file = "interviews/answer.html"
         context = {'button_label': 'send', 'answer_form': interview_form,
                    'template_file': template_file,
                    'access': access,
                    'id': 'interview_form',
+                   'action': self.action_url
                    }
         if request.is_ajax():
             return render(request, template_file, context)
@@ -217,21 +232,26 @@ class OnlineView(object):
                 interview.delete()
             template_file = "interviews/completed.html"
             del session_data['interview']
-            if hasattr(session_data, 'answers'):
+            if 'answers' in session_data:
                 del session_data['answers']
-            if hasattr(session_data, 'loops'):
+            if 'loops' in session_data:
                 del session_data['loops']
+            if 'last_question' in session_data:
+                del session_data['last_question']
         else:
             template_file = "interviews/answer.html"
         context = {'title': "%s Survey" % interview.survey,
                    'button_label': 'send', 'answer_form': answer_form,
                    'interview': interview,
                    'survey': interview.survey,
-                   'existing_answers': session_data['answers'],
-                   'loops': session_data['loops'],
+                   'existing_answers': session_data.get('answers', []),
+                   'loops': session_data.get('loops', []),
                    'template_file': template_file,
                    'id': 'interview_form',
+                   'action': self.action_url
+
                    }
+
         if request.is_ajax():
             return render(request, template_file, context)
         return render(request, 'interviews/new.html', context)

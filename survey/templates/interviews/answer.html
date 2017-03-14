@@ -1,52 +1,57 @@
 {% load template_tags %}
-<div class="main-cont">
+<div class="previewstyle">
+    <h2>{{interview.question_set.name}}</h2>
     {% if answer_form.errors %}
         <div id="non_field_errors" class="alert alert-error">{{ answer_form.non_field_errors }}</div>
     {%  endif %}
     <br />
-    {% if answer_form.is_multipart %}
-    <form enctype="multipart/form-data" id="interview_form" method="post" action="" class="form-horizontal {{ class }}">
-    {% else %}
-    <form id="interview_form" method="post" action="" class="form-horizontal {{ class }}">
-    {% endif %}
-    <br />
-    {% if interview.last_question.loops %}
-        <div class="loops">
-            {% for loop in interview.last_question.loops %}
-                {% get_answer loop.loop_starter interview as loop_count %}
-                 &raquo; {{ loop.loop_starter.identifier }} ({{loop_count}})
-            {% endfor %}
-        </div>
-    {%  endif %}
-        {% csrf_token %}
-        {% build_question_text interview.last_question.text existing_answers as text %}
-        <h3>{{text}} ({{interview.last_question.answer_type}})</h3>
-        {% include "naked_form.html" with a_form=answer_form %}
-        <div class="form-actions">
-            {% if interview.last_question.loop_ended and interview.last_question.loop_ended.repeat_logic == interview.last_question.oop_ended.USER_DEFINED %}
-               <a href="#confirm_add_modal" data-toggle="modal" class="tooltip-info btn btn-primary clear" data-rel="tooltip" title="" data-original-title="Confirm">send</a>
-                <div class="modal fade" id="confirm_add_modal" tabindex="-1" role="dialog" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">Confirmation</h4>
-                      </div>
-                      <div class="modal-body">
-                          <br />
-                        <span class="alert_confirm">Confirm:</span> <strong><em>{{ interview.last_question.loop_ended.loop_prompt }}</em></strong>?
-                      </div>
-                      <div class="modal-footer">
-                        <input type="submit" class="submit1 btn btn-primary" value="No" />
-                        <input type="submit" name="add_loop" value="Yes" class="submit1 btn btn-primary "/>
+    <div id="form-section">
+        {% if answer_form.is_multipart %}
+        <form enctype="multipart/form-data" id="interview_form" method="post" action="{{action}}" class="form-horizontal {{ class }}">
+        {% else %}
+        <form id="interview_form" method="post" action="{{action}}" class="form-horizontal {{ class }}">
+        {% endif %}
+        <br />
+        {% if interview.last_question.loops %}
+            <div class="loops">
+                {% for loop in interview.last_question.loops %}
+                    {% get_answer loop.loop_starter interview as loop_count %}
+                     &raquo; {{ loop.loop_starter.identifier }} ({{loop_count}})
+                {% endfor %}
+            </div>
+        {%  endif %}
+            {% csrf_token %}
+           {% build_question_text interview.last_question.text existing_answers as text %}
+            {% if text %}
+             <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
+            {% endif %}
+            {% include "naked_form.html" with a_form=answer_form %}
+            <div class="form-actions">
+                {% if interview.last_question.loop_ended and interview.last_question.loop_ended.repeat_logic == interview.last_question.oop_ended.USER_DEFINED %}
+                   <a href="#confirm_add_modal" data-toggle="modal" class="tooltip-info btn btn-primary clear" data-rel="tooltip" title="" data-original-title="Confirm">send</a>
+                    <div class="modal fade" id="confirm_add_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Confirmation</h4>
+                          </div>
+                          <div class="modal-body">
+                              <br />
+                            <span class="alert_confirm">Confirm:</span> <strong><em>{{ interview.last_question.loop_ended.loop_prompt }}</em></strong>?
+                          </div>
+                          <div class="modal-footer">
+                            <input type="submit" class="submit1 btn btn-primary" value="No" />
+                            <input type="submit" name="add_loop" value="Yes" class="submit1 btn btn-primary "/>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-            {% else %}
-                <input type="submit" name="submit" value="send" class="submit btn btn-primary "/>
-            {% endif %}
-        </div>
-    </form>
+                {% else %}
+                    <input type="submit" name="submit" value="send" class="submit btn btn-primary "/>
+                {% endif %}
+            </div>
+        </form>
+    </div>
 </div>
 

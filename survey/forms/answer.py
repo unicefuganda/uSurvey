@@ -2,6 +2,7 @@ __author__ = 'anthony'
 
 from django.core.exceptions import ValidationError
 from django import forms
+from form_helper import FormOrderMixin
 from survey.forms.widgets import InlineRadioSelect
 from survey.models import Answer, Interview, VideoAnswer, AudioAnswer, ImageAnswer, TextAnswer, NumericalAnswer,\
     MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, SurveyAllocation, EnumerationArea, Survey, QuestionSet, \
@@ -21,12 +22,14 @@ def get_answer_form(interview):
 
         def __init__(self, *args, **kwargs):
             super(AnswerForm, self).__init__(*args, **kwargs)
+            self.fields['uid'] = forms.CharField(initial=interview.interview_channel.user_identifier,
+                                                 widget=forms.HiddenInput)
             if question.answer_type == DateAnswer.choice_name():
                 self.fields['value'] = forms.DateField(label='Answer',
                                                        input_formats=[settings.DATE_FORMAT,],
                                                        widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                                      'class': 'datepicker'},
-                                                           format=settings.DATE_FORMAT))
+                                                                              format=settings.DATE_FORMAT))
             if question.answer_type == MultiChoiceAnswer.choice_name():
                 self.fields['value'] = forms.ModelChoiceField(queryset=question.options.all(),
                                                               widget=forms.RadioSelect)
@@ -50,20 +53,34 @@ def get_answer_form(interview):
     return AnswerForm
 
 
-class SelectInterviewForm(forms.ModelForm):
-    #ea = forms.ModelChoiceField(queryset=EnumerationArea.objects.none(), empty_label='Select EA')
+class BaseSelectInterview(forms.ModelForm):
 
-    def __init__(self, interviewer, *args, **kwargs):
-        super(SelectInterviewForm, self).__init__(*args, **kwargs)
+    def __init__(self, access, *args, **kwargs):
+        super(BaseSelectInterview, self).__init__(*args, **kwargs)
+        if 'data' in kwargs:
+            kwargs['data']._mutable = True
+            kwargs['data']['uid'] = access.user_identifier
+            kwargs['data']._mutable = False
+        self.interviewer = access.interviewer
+        self.fields['uid'] = forms.CharField(initial=access.user_identifier, widget=forms.HiddenInput)
+
+    class Meta:
+        model = Interview
+        fields = []
+
+
+class SelectInterviewForm(BaseSelectInterview):
+
+    def __init__(self, access, *args, **kwargs):
+        super(SelectInterviewForm, self).__init__(access, *args, **kwargs)
         self.fields['survey'].queryset = Survey.objects.filter(pk__in=[sa.survey.pk for sa in
-                                                                       interviewer.unfinished_assignments])
+                                                                       self.interviewer.unfinished_assignments])
         self.fields['survey'].empty_label = 'Select Survey'
-
         self.fields['question_set'].label = 'Batch'
         self.fields['question_set'].queryset = QuestionSet.objects.none()
         self.fields['question_set'].empty_label = 'Select Batch'
         self.fields['ea'].queryset = EnumerationArea.objects.filter(pk__in=[sa.allocation_ea.pk for sa in
-                                                                            interviewer.unfinished_assignments])
+                                                                            self.interviewer.unfinished_assignments])
         self.fields['ea'].empty_label = 'Select EA'
         # self.fields['test_data'].initial = True
         # self.fields['ea'].widget.attrs['class']+ = 'chzn-select'
@@ -86,48 +103,50 @@ class UserAccessForm(forms.Form):
         return access
 
 
-class SurveyAllocationForm(forms.ModelForm):
+class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin):
     #ea = forms.ModelChoiceField(queryset=EnumerationArea.objects.none(), empty_label='Select EA')
-    ea = forms.ChoiceField()
+    ea = forms.ChoiceField(widget=forms.RadioSelect)
 
-
-    def __init__(self, interviewer, *args, **kwargs):
-        super(SurveyAllocationForm, self).__init__(*args, **kwargs)
-        self.interviewer = interviewer
+    def __init__(self, access, *args, **kwargs):
+        super(SurveyAllocationForm, self).__init__(access, *args, **kwargs)
         self.fields['ea'].choices = [(idx+1, sa.allocation_ea.name) for idx, sa in
-                                     enumerate(interviewer.unfinished_assignments.order_by('name'))]
+                                     enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
+        self.order_fields(['ea', 'test_data'])
         # self.fields['ea'].empty_label = 'Select EA'
-        self.fields['ea'].widget = forms.RadioSelect
+        #self.fields['ea'].widget = forms.RadioSelect()
 
     def clean_ea(self):
-        selected = self.cleaned_data['ea']
-        return self.interviewer.unfinished_assignments.order_by('name')[selected - 1].allocated_ea
+        selected = int(self.cleaned_data['ea'])
+        return self.interviewer.unfinished_assignments.order_by('allocation_ea__name')[selected - 1].allocation_ea
 
     def selected_allocation(self):
         if self.is_valid():
-            selected = self.cleaned_data['ea']
-            return self.interviewer.unfinished_assignments.order_by('name')[selected - 1]
+            selected = int(self.data['ea'])
+            return self.interviewer.unfinished_assignments.order_by('allocation_ea__name')[selected - 1]
 
     def save(self, commit=True):
         instance = super(SurveyAllocationForm, self).save(commit=commit)
         instance.survey = self.selected_allocation().survey
+        instance.ea = self.cleaned_data['ea']
         instance.interviewer = self.interviewer
+        return instance
 
     class Meta:
         model = Interview
-        fields = ['ea', 'test_data']
+        fields = ['test_data']
 
 
-class SelectBatchForm(forms.Form):
+class SelectBatchForm(BaseSelectInterview):
 
-    def __init__(self, survey, *args, **kwargs):
+    def __init__(self, access, survey, *args, **kwargs):
+        super(SelectBatchForm, self).__init__(access, *args, **kwargs)
         self.survey = survey
         self.fields['batch'] = forms.ChoiceField()
         self.fields['batch'].choices = [(idx+1, batch.name) for idx, batch in
                                         enumerate(survey.batches.all().order_by('name'))]
 
     def clean_batch(self):
-        selected = self.cleaned_data['batch']
+        selected = int(self.cleaned_data['batch'])
         return self.survey.batches.all().order_by('name')[selected-1]
 
 
