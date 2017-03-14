@@ -67,25 +67,23 @@ def get_question_form(model_class):
                 self.cleaned_data['options'] = options
             return options
 
-        # def clean_prev_question(self):
-        #     prev_question = self.cleaned_data['prev_question']
-        #     try:
-        #         prev_question = Question.get(pk=prev_question)
-        #     except Exception, ex:
-        #         raise ValidationError('Misconfigured form')
-        #     return prev_question
-
         def clean_identifier(self):
             identifier = self.cleaned_data['identifier']
             pattern = '^[a-zA-Z][0-9a-zA-Z_]+$'
             if re.match(pattern, identifier) is None:
                 raise ValidationError('Identifier must start with a letter, and must contain alphanumeric values or _')
-            if Question.objects.filter(identifier=identifier, qset__pk=self.qset.pk).exists():
+            if Question.objects.filter(identifier__iexact=identifier, qset__pk=self.qset.pk).exists():
                 if self.instance and self.instance.identifier == identifier:
                     pass
                 else:
                     raise ValidationError(
-                        'Identifier already in use for this %s' % model_class.type_name())
+                        '%s already in use for this %s' % (identifier, model_class.type_name()))
+            # if this is a batch question also check if there are parameter questions with this name
+            qset = QuestionSet.get(id=self.qset.pk)
+            if hasattr(qset, 'parameter_list') and qset.parameter_list and \
+                    qset.parameter_list.parameters.filter(identifier__iexact=identifier).exists():
+                raise ValidationError('%s is already in captured as a group parameter for this %s' %
+                                      (identifier, model_class.type_name()))
             return self.cleaned_data['identifier']
 
         def clean_text(self):
@@ -99,13 +97,6 @@ def get_question_form(model_class):
                 ids = self.qset.questions.filter(identifier__in=requested_identifiers).values_list('identifier',
                                                                                                    flat=True)
                 ids = list(ids)
-                # try:
-                #     qset = Batch.get(pk=self.qset.pk)
-                #     if hasattr(qset, 'parameter_list'):
-                #         ids += list(qset.parameter_list.questions.filter(identifier__in=requested_identifiers).
-                #                     values_list('identifier', flat=True))
-                # except Batch.DoesNotExist:
-                #     pass
                 if len(set(ids)) != len(set(requested_identifiers)):
                     raise ValidationError('%s is not in %s' %
                                           (', '.join(set(requested_identifiers).difference(ids)), self.qset.name))

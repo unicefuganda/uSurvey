@@ -37,6 +37,7 @@ class Interview(BaseModel):
     interview_reference = models.ForeignKey('Interview', related_name='follow_up_interviews', null=True, blank=True)
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews', null=True)
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
+    test_data = models.BooleanField(default=False)
     #instance_id = models.CharField(max_length=200, null=True, blank=True)
     last_question = models.ForeignKey(
         "Question", related_name='ongoing', null=True, blank=True)

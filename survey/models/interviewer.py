@@ -173,11 +173,20 @@ class SurveyAllocation(BaseModel):
     def min_eas_is_covered(self, loc):
         pass
 
+    def open_batches(self):
+        return [batch for batch in self.survey.batches.all() if
+                batch.is_open_for(self.allocation_ea.locations.all()[0])]
+
     @classmethod
     def can_start_batch(cls, interviewer):
         survey_allocations = interviewer.unfinished_assignments
-        completed = filter(lambda allocation: allocation.sample_size_reached(), survey_allocations)
-        return (1.0 * len(completed))/len(survey_allocations) >= getattr(settings, 'EAS_PERCENT_TO_START_SURVEY', 0.5)
+        if survey_allocations.first().survey.has_sampling:
+            # essentially allocation usually happens with same survey at a time
+            completed = filter(lambda allocation: allocation.sample_size_reached(), survey_allocations)
+            return (1.0 * len(completed))/survey_allocations.count() >= getattr(settings,
+                                                                                'EAS_PERCENT_TO_START_SURVEY', 0.5)
+        else:
+            return True
 
     def is_valid(self):
         '''
@@ -188,7 +197,10 @@ class SurveyAllocation(BaseModel):
 
     def sample_size_reached(self):
         from survey.models import Interview
-        return Interview.objects.filter(interviewer=self.interviewer, survey=self.survey,
+        survey = self.survey.preferred_listing
+        if self.survey.preferred_listing:
+            survey = self.survey.preferred_listing
+        return Interview.objects.filter(interviewer=self.interviewer, survey__in=[survey, self.survey],
                                         ea=self.allocation_ea).count() >= self.survey.sample_size
 
     def batches_enabled(self):
