@@ -31,7 +31,7 @@ On the ‘Listing Form’ page one can view all the Listings created in the appl
 
 <b>Total Respondents</b>: once the listing operation is completed, this column will be updated with the count of participants/ respondents.
 
-<b>Action</b>: Each of the Listing items has following Actions: ‘Edit’, ‘Delete’, ‘View/Edit Questions’, ‘View Data’ and ‘Clone’
+<b>Action</b>: Each of the Listing has following Actions: ‘Edit’, ‘Delete’, ‘View/Edit Questions’, ‘View Data’ and ‘Clone’
 
 <b>Actions in Listing Form</b>:
 
@@ -39,7 +39,7 @@ On the ‘Listing Form’ page one can view all the Listings created in the appl
 
 * Delete Listing: click on, Action Item ‘Delete, the entire Listing is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
 
-* View/Edit Questions in Listing: click on, Action Item ‘View/Edit Questions’, user navigates to ‘Listing Questions’ page to View or Edit Respective Questions in Listing
+* View/Edit Questions in Listing: click on, Action Item ‘View/Edit Questions’, navigates to ‘Listing Questions’ page to View or Edit Respective Questions in Listing
 
 * Clone a Listing: click on, Action Item ‘Clone’, an another copy of same Listing Form is created along with Listing Questions, except existing Looping and Logic
 
@@ -85,7 +85,7 @@ To select the Question from Library List to Listing, just Click on “Code” or
 Questions in the list can be rearranged.<br>
 To change the order of the Question, just select the Question to drag and drop at the required new position/order, then click on ‘Update Question Order’ button at bottom of the Questions table.
 
-On the ‘Listing Questions’ page one can view all the Questions created in that particular Listing, each of these Questions has Action items to ‘Edit’, ‘Insert Question’, ‘Add Logic’, ‘Start/Edit Loop’, ‘Remove Loop’ – only for the Questions that has Answer Type “Auto Generated” and ‘View Options’- only for Multiple Choice Questions.
+On the ‘Listing Questions’ page one can view all the Questions created in that particular Listing, each of these Questions has Actions to ‘Edit’, ‘Insert Question’, ‘Add Logic’, ‘Start/Edit Loop’, ‘Remove Loop’ – only for the Questions that has Answer Type “Auto Generated” and ‘View Options’- only for Multiple Choice Questions.
 
 <b>Actions for Listing Questions</b>:
 
@@ -127,7 +127,7 @@ click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ 
 * select “Question at which loop should end” from dropdown ‘Loop end at’ and 
 * in ‘Loop Prompt’ Text Box, write some message about, instructing the loop flow,
 * then click on ‘Save’ button to create loop. 
-Now you will be viewing a looping representation on ‘Listing Questions’ page in the ‘Code’ column of the ‘Questions’ table, 
+Now you will be viewing a looping representation on ‘Listing Questions’ page in the ‘Code’ column of the ‘Questions’ table 
 
 <b>Loop Representation</b>:
 * “Light Green Bar” icon represents Loop - START, 
@@ -162,7 +162,7 @@ To do this, select option “Ask Sub-Question” than you will find a button wit
 click on it to create a Sub-Question, same like create question, once you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
 beside it, now select the “Sub-Question” and click on ‘Save’ button.
  
-* ‘Skip To’ - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
+* ‘Skip To’ - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the intermediate Question. 
 
 <b>How to Apply Logic to a Question?</b>
 
