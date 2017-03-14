@@ -57,7 +57,19 @@
         {% if field.field.icons %}
             <div class="input-prepend" style="display: inline-block; border: none;">
                 {% for icon, attrs in field.field.icons.items %}
-                    <span {% for key, val in attrs.items %} {{key}}="{{val}}"{% endfor %}><img src="{{ STATIC_URL }}img/{{icon}}.png" /></span>
+                    <span {% for key, val in attrs.items %} {{key}}="{{val}}"{% endfor %} style="padding: 2px 5px;cursor: pointer;">
+                    {% if forloop.counter == 1 %}
+                      <span style="color:blue"><i class="fa fa-edit"></i></span>
+                    {%elif forloop.counter == 2  %}
+
+                    <span style="color:green"><i class="fa fa-plus"></i></span>
+                    {%elif forloop.counter == 3  %}
+                    <span style="color:red">
+                    <i class="fa fa-minus"></i>
+                    </span>
+                    {%endif%}
+
+                    </span>
                 {% endfor %}
             </div>
         {% endif %}

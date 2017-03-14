@@ -100,7 +100,8 @@
 					</div><!-- /.modal -->
 	  </td>
          <td>
-		{{ interviewer.allocated_surveys | display_list }}
+		<!-- {{ interviewer.allocated_surveys | display_list }} -->
+    {{ interviewer.survey_name }}
 	  </td>
             <td>
                 {% include 'interviewers/_action_button.html' with button_size="btn-mini" %}

@@ -2,91 +2,149 @@
 {% load template_tags %}
 {% block title %}
     {{ interviewer.name|capfirst }}'s Details
+<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
 <style type="text/css">
-  .dataTables_wrapper .row {
-    margin: 0!important;
-    display: none !important;
+  .control-label{
+    font-weight: bold;
   }
-
-  .table-box {border:1px #0099ff solid;width: 450px;margin: auto;}
-  .table-box .tr1{background: #fff; font-size: 13px;}
-  .table-box .tr1:hover{background: #d2def2;}
-  .table-box  .td1{background: #0099ff; width: 150px;text-align: right;font-weight: bold;color:#fff;}
-  .table-box  .td2{width: 300px;text-align: left;}
-  .table-header{width: 450px;margin:auto;background: none;color:#000;}
-  .cancel-btn{width: 450px;margin: auto;padding-left: 130px;margin-top: 15px;}
-
   .btn-yellow{display: none !important;}
+  </style>
+
+<div class="container">
+  <div class="row-fluid">
+      <form class="form-horizontal">
+        <fieldset>
+        {% if interviewer.odk_access %}
+          <div id="legend">
+            <legend class="">Credentials</legend>
+          </div>
+     {% for access in interviewer.odk_access %}          
+          <div class="control-group">
+            <label class="control-label"  for="username">ODK ID</label>
+            <div class="controls">
+              {{ access.user_identifier }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">ODK Token</label>
+            <div class="controls">
+              {{ access.odk_token }}
+            </div>
+          </div>
+     {% endfor %}
+     {% endif %}
+      <div id="legend">
+            <legend class="">Profile</legend>
+          </div>
 
 
-</style>
-   <table border="1" class="table centerTable table-box">
-  <tr class="tr1">
-    <td class="td1" valign="top" >Name</td>
-    <td class="td2" valign="top" class="showdetails">{{ interviewer.name|capfirst }}</td>
-  </tr>
+          <div class="control-group">
+            <label class="control-label"  for="username">Name</label>
+            <div class="controls">
+              {{ interviewer.name|capfirst }}
+            </div>
+          </div>
+
 {% for access in interviewer.ussd_access %}
-  <tr class="tr1">
-    <td class="td1" valign="top">Mobile Number</td>
-    <td class="td2" valign="top" class="showdetails">{{ access.user_identifier }}</td>
-  </tr>
-{% endfor %}
-{% for access in interviewer.odk_access %}
-  <tr class="tr1">
-    <td class="td1" valign="top">ODK ID</td>
-    <td class="td2" valign="top" class="showdetails">{{ access.user_identifier }}</td>
-  </tr>
-  <tr class="tr1">
-    <td class="td1" valign="top">ODK Token</td>
-    <td class="td2" valign="top" class="showdetails">{{ access.odk_token }}</td>
-  </tr>
-{% endfor %}
-  <tr class="tr1">
-    <td class="td1" valign="top">Date Of Birth</td>
-    <td class="td2" valign="top" class="showdetails">{{ interviewer.date_of_birth |format_date }}</td>
-  </tr>
-  <tr class="tr1">
-    <td class="td1" valign="top">Sex</td>
-    <td class="td2" valign="top" class="showdetails">{% if interviewer.gender %}
+          <div class="control-group">
+            <label class="control-label"  for="username">Mobile Number</label>
+            <div class="controls">
+              {{ access.user_identifier }}
+            </div>
+          </div>
+{% endfor %}          
+          <div class="control-group">
+            <label class="control-label"  for="username">Date Of Birth</label>
+            <div class="controls">
+              {{ interviewer.date_of_birth |format_date }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Sex</label>
+            <div class="controls">
+              {% if interviewer.gender %}
                 Male
             {% else %}
                 Female
-            {% endif %}</td>
-  </tr>
-  <tr class="tr1">
-    <td class="td1" valign="top">Education</td>
-    <td class="td2" valign="top" class="showdetails">{{ interviewer.level_of_education }}</td>
-  </tr>
-  <tr class="tr1">
-    <td class="td1" valign="top">Language</td>
-    <td class="td2" valign="top" class="showdetails">{{ interviewer.language }}</td>
-  </tr>
+            {% endif %}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Education</label>
+            <div class="controls">
+              {{ interviewer.level_of_education }}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"  for="username">Language</label>
+            <div class="controls">
+              {{ interviewer.language }}
+            </div>
+          </div>
+
+          <div id="legend">
+            <legend class="">Survey Details</legend>
+          </div>
 {% for loc in interviewer.ea.parent_locations %}
-  <tr class="tr1">
-    <td class="td1" valign="top">{{ loc.type.name}}</td>
-    <td class="td2" valign="top" class="showdetails">{{ loc.name}}</td>
-  </tr>
-{% endfor %}
-  <tr class="tr1">
-    <td class="td1" valign="top">Enumeration Area</td>
-    <td class="td2" valign="top" class="showdetails">{{ interviewer.ea }}</td>
-  </tr>
-  <tr class="tr1">
-    <td class="td1" valign="top">Allocated Surveys</td>
-    <td class="td2" valign="top" class="showdetails">{{ interviewer.allocated_surveys | display_list }}</td>
-  </tr>
-  <tr class="tr1">
-    <td class="td1" valign="top">Total Households</td>
-    <td class="td2" valign="top" class="showdetails">{{ interviewer.ea.total_households }}</td>
-  </tr>
-       <tr>
-    <td class="td1" valign="top">&nbsp;</td>
-    <td class="td2" valign="top">&nbsp;</td>
-  </tr>
-  </table>
-    <div class="cancel-btn">
+          <div class="control-group">
+            <label class="control-label"  for="username">{{ loc.type.name }}</label>
+            <div class="controls">
+              {{ loc.name}}
+            </div>
+          </div>
+{% endfor %}          
+          <div class="control-group">
+            <label class="control-label"  for="username">Enumeration Area</label>
+            <div class="controls">
+              {{ interviewer.ea }}
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"  for="username">Allocated Surveys</label>
+            <div class="controls">
+              {{ interviewer.allocated_surveys | display_list }}
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label"  for="username">Total Households</label>
+            <div class="controls">
+              {{ interviewer.ea.total_households }}
+            </div>
+          </div>
+        </fieldset>
+      </form>
+      <form class="form-horizontal">
+        <fieldset>          
+          <div class="cancel-btn" style="text-align: center;">
+        {% if cancel_url %}
+            <a href="{{ cancel_url }}" class="btn btn-primary"><i class="icon-chevron-left icon-white"></i> Back</a>
+        {% else %}
+            <a href="javascript:window.history.back()" class="btn btn-inverse"><i
+                    class="icon-chevron-left icon-white" style="background-color: #307ecc"></i> Back</a>
+        {% endif %}
+        {% include 'interviewers/_action_button.html' with button_size="" interviewer=interviewer %}
+
+</div>    
+        </fieldset>
+      </form>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
+<!--     <div class="cancel-btn">
         {% if cancel_url %}
             <a href="{{ cancel_url }}" class="btn btn-primary"><i class="icon-chevron-left icon-white"></i> Back</a>
         {% else %}
@@ -97,5 +155,5 @@
 
 </div>
 <br />
-<br />
+<br /> -->
 {% endblock %}

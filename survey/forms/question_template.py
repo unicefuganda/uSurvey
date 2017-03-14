@@ -5,11 +5,13 @@ from django.conf import settings
 from survey.models import QuestionTemplate, TemplateOption, Answer, QuestionModule, \
     HouseholdMemberGroup, MultiChoiceAnswer, MultiSelectAnswer, QuestionFlow, AnswerAccessDefinition
 from survey.models import ParameterTemplate
+from survey.forms.form_helper import FormOrderMixin
+
 
 
 def get_question_templates_form(model_class):
 
-    class TemplateForm(ModelForm):
+    class TemplateForm(ModelForm,FormOrderMixin):
 
         options = forms.CharField(
             max_length=50, widget=forms.HiddenInput(), required=False)
@@ -29,7 +31,8 @@ def get_question_templates_form(model_class):
                 self.answer_map[defi.answer_type] = self.answer_map.get(
                     defi.answer_type, [])
                 self.answer_map[defi.answer_type].append(defi.channel)
-
+            self.order_fields(['module', 'text',
+                                    'identifier', 'answer_type']) 
         class Meta:
             model = model_class
             exclude = []
