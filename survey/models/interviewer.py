@@ -6,6 +6,7 @@ from survey.interviewer_configs import LEVEL_OF_EDUCATION, LANGUAGES, INTERVIEWE
 from survey.models.base import BaseModel
 from survey.models.access_channels import USSDAccess, ODKAccess, InterviewerAccess
 from survey.models.locations import Location
+from survey.models.interviews import Interview
 import random
 from django.core.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
@@ -123,7 +124,11 @@ class Interviewer(BaseModel):
 
     def allocated_surveys(self):
         return self.assignments.filter(status=SurveyAllocation.PENDING, allocation_ea=self.ea)
-
+   
+    def survey_name(self):
+        ea_obj = SurveyAllocation.objects.filter(interviewer_id=self.id)
+        return ea_obj[0].survey.name
+        
 
 class SurveyAllocation(BaseModel):
     LISTING = 1

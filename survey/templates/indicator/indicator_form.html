@@ -13,14 +13,14 @@
 
   {% endif %}
   <div class="form-actions">
-    <button id="var-button" type="button" class="btn btn-primary" name="save_button" data-disabled-text="{{ loading_text }}">Save</button>
+    <button id="var-button" type="button" class="btn btn-primary" name="save_button" data-disabled-text="{{ loading_text }}">Add</button>
     {% if var_cancel_url %}
       <a href="{{ var_cancel_url }}" class="btn btn-primary close cancel cancel-button" name="cancel_button" style=" padding-right: 5px;
     padding-left: 5px;
     padding-bottom: 1px;"  data-dismiss="modal">Cancel</a>
     {% else %}
         {% if variable_form.instance.pk %}
-            <a href="#" class="btn btn-primary done done-button btn btn-primary" name="cancel_button" id="done_{{ id }}">Done</a>
+            <a href="#" class="btn btn-primary done done-button btn btn-primary" name="cancel_button" id="done_{{ id }}">Save</a>
         {% endif %}
 
     {% endif %}

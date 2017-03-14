@@ -101,7 +101,7 @@ class IndicatorVariableForm(ModelForm, FormOrderMixin):
     max = forms.IntegerField(required=False)
     value = forms.CharField(required=False)
     options = forms.ChoiceField(choices=[], required=False)
-    CHOICES = [('', '--------------------')]
+    CHOICES = [('', 'Select Operator')]
     CHOICES.extend(IndicatorVariableCriteria.VALIDATION_TESTS)
     validation_test = forms.ChoiceField(choices=CHOICES, required=False,
                                         label='Operator')
