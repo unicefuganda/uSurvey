@@ -64,8 +64,8 @@ Click on, ‘Add Question’ button at top right of the particular Listing page,
 <b>Variables Name</b>: This is an identifier for Question, type a code for Question
 
 <b>Text</b>: Is the actual Question, Write a Question. While typing a question, auto suggestion feature is available, which will prompt with the ‘Variable Name’ of preceding questions, that helps to include “answered text of preceding question” in framing this question. 
-i.e. just type, double curly brackets to automatically insert ‘Variable Name’ from preceding questions, 
-Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name, 
+i.e. just type, double curly brackets to automatically insert ‘Variable Name’ from preceding questions,<br>
+Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name,<br>
 Like: {{structure_address}}
  
 <b>Answer Type</b>: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”
@@ -130,9 +130,9 @@ click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ 
 Now you will be viewing a looping representation on ‘Listing Questions’ page in the ‘Code’ column of the ‘Questions’ table, 
 
 <b>Loop Representation</b>:
-“Light Green Bar” icon represents Loop - START, 
-“Red Bar” icon represents Loop - END,
-“Green Bar” icon represents Loop - CONTINUATION
+* “Light Green Bar” icon represents Loop - START, 
+* “Red Bar” icon represents Loop - END,
+* “Green Bar” icon represents Loop - CONTINUATION
 
 <b>Remove Loop</b>:
 
@@ -153,14 +153,16 @@ one has to define the Logic here for respective question by satisfying the condi
 
 <b>Then</b>: Based up on the ‘Eligible Criteria’ and ‘Attribute’ Value chosen, the condition for Question is applied here with following options:
   
-‘Reconfirm’ – Prompts with conformation Question to validate the Answer 
+* ‘Reconfirm’ – Prompts with conformation Question to validate the Answer 
 
-‘End Interview’ – Skips the intermediate Question and moves to end of the questioner.
+* ‘End Interview’ – Skips the intermediate Question and moves to end of the questioner.
  
-‘Ask Sub-Question’ – Provides the option to Create a New Question based upon the ‘Attribute’ value. To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this, click on it to start creating a New Question same as creating a normal question, one you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
+* ‘Ask Sub-Question’ – Provides the option to Create a Sub-Question based upon the ‘Attribute’ value.
+To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this,
+click on it to start creating a Sub-Question same as creating a normal question, one you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
 beside it, now select the “Sub-Question” and click on ‘Save’ button.
  
-‘Skip To’ - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
+* ‘Skip To’ - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
 
 <b>How to Apply Logic to a Question?</b>
 
@@ -172,8 +174,8 @@ Which shows the created logic for this particular question and has option to ‘
 <b>Edit Logic</b>: 
 In the ‘Listing Form Questions Template’ page, Questions that has Logic are represented with hyperlink, click on the respective Question, that shows options to ‘View logic’, ‘Edit’ and ‘Delete’
 
-View Logic – click to view the Logic that is Applied for this particular question
+* View Logic – click to view the Logic that is Applied for this particular question
 
-Edit Logic – click to Edit the existing Logic that is Applied for this particular question
+* Edit Logic – click to Edit the existing Logic that is Applied for this particular question
 
-Delete Logic - click to Remove the Logic that is Applied for this particular question
+* Delete Logic - click to Remove the Logic that is Applied for this particular question
