@@ -77,12 +77,12 @@ A Question in Listing is created by filling above all fields, finally click on �
 <b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Question from Question
 Library’ where one can select the Questions from Library into Listing, by sorting out using ‘Search with text’ and ‘Question Type’ methods. 
 
-To select the Question from Library List to Listing, just Click on “Code” or “Text” to move Question between tables (Library << / >> Listing List), then click on ‘Save’ button at bottom to Add Questions to Listing.
+To select the Question from Library List to Listing, just Click on “Code” or “Text” to move Question between <br> tables (Library << / >> Listing List), then click on ‘Save’ button at bottom to Add Questions to Listing.
 
 <b>Export Questions</b>: On click, ‘Export Questions’ button, user can download the Listing Questions in “.csv” file format.
 
 <b>Update Question Order</b>: 
-Questions in the list can be rearranged. 
+Questions in the list can be rearranged.<br>
 To change the order of the Question, just select the Question to drag and drop at the required new position/order, then click on ‘Update Question Order’ button at bottom of the Questions table.
 
 On the ‘Listing Questions’ page one can view all the Questions created in that particular Listing, each of these Questions has Action items to ‘Edit’, ‘Insert Question’, ‘Add Logic’, ‘Start/Edit Loop’, ‘Remove Loop’ – only for the Questions that has Answer Type “Auto Generated” and ‘View Options’- only for Multiple Choice Questions.
@@ -157,9 +157,9 @@ one has to define the Logic here for respective question by satisfying the condi
 
 * ‘End Interview’ – Skips the intermediate Question and moves to end of the questioner.
  
-* ‘Ask Sub-Question’ – Provides the option to Create a Sub-Question based upon the ‘Attribute’ value.
-To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this,
-click on it to start creating a Sub-Question same as creating a normal question, one you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
+* ‘Ask Sub-Question’ – Provides an option to Create a Sub-Question based upon the ‘Attribute’ value.<br>
+To do this, select option “Ask Sub-Question” than you will find a button with name ‘Add Sub-Question’ beside this, <br>
+click on it to create a Sub-Question, same like create question, once you click on ‘Save’ button, you will find this Sub-Question in the dropdown ‘Choose Question’ 
 beside it, now select the “Sub-Question” and click on ‘Save’ button.
  
 * ‘Skip To’ - Provides the option to jump to any particular/ consecutive question in the list, by skipping / avoiding the    intermediate Question. 
@@ -168,7 +168,7 @@ beside it, now select the “Sub-Question” and click on ‘Save’ button.
 
 Click on, Action Item, ‘Add Logic’ this will open a form where one can create a Logic for Question, by providing ‘Eligible Criteria’, ‘Attribute’ Value, and ‘Then’ as per the condition required, then click on ‘Save’ button to create Logic.  
 
-In the same page, logic that is created is shown in table “Existing Logic”.
+In the same page, logic that is created can be seen in table “Existing Logic”.
 Which shows the created logic for this particular question and has option to ‘Delete’ the applied Logic
 
 <b>Edit Logic</b>: 
