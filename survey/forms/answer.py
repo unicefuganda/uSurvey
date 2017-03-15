@@ -6,15 +6,22 @@ from form_helper import FormOrderMixin
 from survey.forms.widgets import InlineRadioSelect
 from survey.models import Answer, Interview, VideoAnswer, AudioAnswer, ImageAnswer, TextAnswer, NumericalAnswer,\
     MultiChoiceAnswer, MultiSelectAnswer, DateAnswer, SurveyAllocation, EnumerationArea, Survey, QuestionSet, \
-    Interviewer, InterviewerAccess
+    Interviewer, InterviewerAccess, USSDAccess, QuestionOption
 from django.conf import settings
+
+
+class USSDSerializable(object):
+
+    def render_extra_ussd(self):
+        pass
 
 
 def get_answer_form(interview):
     question = interview.last_question
     answer_class = Answer.get_class(question.answer_type)
+    access = InterviewerAccess.get(id=interview.interview_channel.id)
 
-    class AnswerForm(forms.ModelForm):
+    class AnswerForm(forms.ModelForm, USSDSerializable):
 
         class Meta:
             model = answer_class
@@ -22,7 +29,7 @@ def get_answer_form(interview):
 
         def __init__(self, *args, **kwargs):
             super(AnswerForm, self).__init__(*args, **kwargs)
-            self.fields['uid'] = forms.CharField(initial=interview.interview_channel.user_identifier,
+            self.fields['uid'] = forms.CharField(initial=access.user_identifier,
                                                  widget=forms.HiddenInput)
             if question.answer_type == DateAnswer.choice_name():
                 self.fields['value'] = forms.DateField(label='Answer',
@@ -30,9 +37,12 @@ def get_answer_form(interview):
                                                        widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                                      'class': 'datepicker'},
                                                                               format=settings.DATE_FORMAT))
-            if question.answer_type == MultiChoiceAnswer.choice_name():
-                self.fields['value'] = forms.ModelChoiceField(queryset=question.options.all(),
-                                                              widget=forms.RadioSelect)
+            if question.answer_type == MultiChoiceAnswer.choice_name() and \
+                            access.choice_name() == USSDAccess.choice_name():
+                self.fields['value'] = forms.IntegerField()
+            elif question.answer_type == MultiChoiceAnswer.choice_name():
+                self.fields['value'] = forms.ChoiceField(choices=[(opt.order, opt.text) for opt
+                                                                  in question.options.all()], widget=forms.RadioSelect)
                 self.fields['value'].empty_label = None
             if question.answer_type == MultiSelectAnswer.choice_name():
                 self.fields['value'] = forms.ModelMultipleChoiceField(queryset=question.options.all(),
@@ -46,6 +56,20 @@ def get_answer_form(interview):
                 self.fields['value'].widget.attrs = {'accept': accept_types.get(question.answer_type,
                                                                                 '|'.join(accept_types.values()))}
             self.fields['value'].label = 'Answer'
+
+        def render_extra_ussd(self):
+            text = []
+            if question.options.count() > 0:
+                map(lambda opt: text.append('%s: %s' % (opt.order, opt.text)), question.options.all())
+            return '\n'.join(text)
+
+        def clean_value(self):
+            if question.answer_type == MultiChoiceAnswer.choice_name():
+                try:
+                    self.cleaned_data['value'] = question.options.get(order=self.cleaned_data['value'])
+                except QuestionOption.DoesNotExist:
+                    raise ValidationError('Please select a valid option')
+            return self.cleaned_data['value']
 
         def save(self, *args, **kwargs):
             return answer_class.create(interview, question, self.cleaned_data['value'])
@@ -104,7 +128,6 @@ class UserAccessForm(forms.Form):
 
 
 class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin):
-    #ea = forms.ModelChoiceField(queryset=EnumerationArea.objects.none(), empty_label='Select EA')
     ea = forms.ChoiceField(widget=forms.RadioSelect)
 
     def __init__(self, access, *args, **kwargs):
@@ -133,7 +156,7 @@ class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin):
 
     class Meta:
         model = Interview
-        fields = ['test_data']
+        fields = ['test_data', ]
 
 
 class SelectBatchForm(BaseSelectInterview):

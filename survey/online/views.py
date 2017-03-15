@@ -6,13 +6,23 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question, SurveyAllocation)
+from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
+                           SurveyAllocation, AnswerAccessDefinition)
 from survey.forms.answer import (get_answer_form, SelectInterviewForm, UserAccessForm,
                                  SurveyAllocationForm, SelectBatchForm)
 from .utils import get_entry, set_entry, delete_entry
 from survey.utils.logger import slogger
 
 REQUEST_SESSION = 'req_session'
+
+
+def get_display_format(request):
+    request_data = request.GET if request.method == 'GET' else request.POST
+    return request_data.get('format', 'html').lower()
+
+
+def show_only_answer_form(request):
+    return request.is_ajax() or get_display_format(request) == 'text'
 
 
 @login_required
@@ -31,7 +41,8 @@ def get_access_details(request):
                'template_file': template_file,
                'id': 'interview_form',
                }
-    if request.is_ajax():
+    if show_only_answer_form(request):
+        context['display_format'] = get_display_format(request)
         return render(request, template_file, context)
     return render(request, 'interviews/new.html', context)
 
@@ -66,7 +77,8 @@ def start_qset_interview(online_view):
                    'access': access,
                    'id': 'interview_form',
                    }
-        if request.is_ajax():
+        if show_only_answer_form(request):
+            context['display_format'] = get_display_format(request)
             return render(request, template_file, context)
         return render(request, 'interviews/new.html', context)
     return _start_interview
@@ -121,13 +133,14 @@ class OnlineView(object):
                        'id': 'interview_form',
                        'action': self.action_url
                        }
-            if request.is_ajax():
+            if show_only_answer_form(request):
+                context['display_format'] = get_display_format(request)
                 return render(request, template_file, context)
             return render(request, 'interviews/new.html', context)
         elif interview is None:
             return self.start_interview(request, access, session_data)
         elif interview:
-            return self.respond_interview(request, interview, session_data)
+            return self.respond_interview(request, access, interview, session_data)
 
     def init_responses(self, request, interview, session_data):
         interview.save()
@@ -197,11 +210,12 @@ class OnlineView(object):
                    'id': 'interview_form',
                    'action': self.action_url
                    }
-        if request.is_ajax():
+        if show_only_answer_form(request):
+            context['display_format'] = get_display_format(request)
             return render(request, template_file, context)
         return render(request, 'interviews/new.html', context)
 
-    def respond_interview(self, request, interview, session_data):
+    def respond_interview(self, request, access, interview, session_data):
         initial = {}
         request_data = request.GET if request.method == 'GET' else request.POST
         if str(session_data['last_question']) == str(interview.last_question.id):
@@ -244,6 +258,7 @@ class OnlineView(object):
                    'button_label': 'send', 'answer_form': answer_form,
                    'interview': interview,
                    'survey': interview.survey,
+                   'access': access,
                    'existing_answers': session_data.get('answers', []),
                    'loops': session_data.get('loops', []),
                    'template_file': template_file,
@@ -252,7 +267,9 @@ class OnlineView(object):
 
                    }
 
-        if request.is_ajax():
+        if show_only_answer_form(request):
+            #>import pdb; pdb.set_trace()
+            context['display_format'] = get_display_format(request)
             return render(request, template_file, context)
         return render(request, 'interviews/new.html', context)
 
@@ -287,9 +304,12 @@ class OnlineView(object):
         :param session_data:
         :return:
         """
-
+        access = InterviewerAccess.get(pk=interview.interview_channel.pk)
         def _get_group_next_question(question, proposed_next):
             next_question = proposed_next
+            if next_question and AnswerAccessDefinition.is_valid(access.choice_name(),
+                                                                 next_question.answer_type) is False:
+                next_question = _get_group_next_question(question, next_question.next_question(answer.to_text()))
             if hasattr(question, 'group') and hasattr(next_question, 'group') \
                     and question.group != next_question.group:
                 question_group = next_question.group
@@ -315,7 +335,8 @@ class OnlineView(object):
                     if valid_group is False:
                         next_question = _get_group_next_question(question, next_question.next_question(answer.to_text()))
             return next_question
-        return _get_group_next_question(interview.last_question, interview.last_question.next_question(answer.to_text()))
+        return _get_group_next_question(interview.last_question,
+                                        interview.last_question.next_question(answer.to_text()))
 
 
 

@@ -1,4 +1,11 @@
 {% load template_tags %}
+{% if access.choice_name == 'Ussd Access' and display_format == 'text' %}
+    {% build_question_text interview.last_question.text existing_answers as text %}
+    {% if text %}
+         {{text}} ({{interview.last_question.answer_type}})
+         {{ answer_form.render_extra_ussd }}
+    {% endif %}
+{% else %}
 <div class="previewstyle">
     <h2>{{interview.question_set.name}}</h2>
     {% if answer_form.errors %}
@@ -24,6 +31,9 @@
            {% build_question_text interview.last_question.text existing_answers as text %}
             {% if text %}
              <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
+            {% endif %}
+            {% if access.choice_name == 'Ussd Access' %}
+                {{ answer_form.render_extra_ussd }}
             {% endif %}
             {% include "naked_form.html" with a_form=answer_form %}
             <div class="form-actions">
@@ -55,3 +65,4 @@
     </div>
 </div>
 
+{% endif %}
