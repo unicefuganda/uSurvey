@@ -8,16 +8,16 @@ The Listing is generally carried out by field staff other than interviewers, as 
 
 Listing is available from main menu under <b>Design</b> >> <b>Listing Form</b>
 
-Listing Template is set of Questions that can be customized/configured for any survey by reusing same Listing template.
+Listing is a set of Questions that can be customized/configured for any survey by reusing same Listing.
 
 ###Creating New Listing
 To create a new Listing, click on the ‘Create New Listing Form’ button at top right of the Listing page, that opens a form to create a new Listing, which has following elements; 
 
 <b>Elements of Listing form</b>
 
-* <b>Name</b> Is Listing Name, which is a unique identity to a Listing and is a mandatory field.   
-* <b>Description</b> write about the importance of the Listing in short.  
-* <b>Access channels</b> This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
+* <b>Name</b>: Is Listing Name, which is a unique identity to a Listing and is a mandatory field.   
+* <b>Description</b>: write about the importance of the Listing in short.  
+* <b>Access channels</b>: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
 
 A Listing Form is created by filling above all fields, finally clicking on ‘Save’ button to create Listing.
   
@@ -49,11 +49,12 @@ On the ‘Listing Form’ page one can view all the Listings created in the appl
 
 On the ‘Listing Form’ page you can view all the Listings created in the application. 
 
-To add new questions to a Listing can be done in 2 ways.
-1.	Click on the Listing Name
-2.	Click on Actions Drop down and select the item ‘View/Edit Questions’ 
+To add new questions in Listing can be done in 2 ways
 
-One can also select the questions from ‘Questions Library’ to add to Listing, using ‘Select Questions’ 
+1. Click on the Listing Name
+2. Click on Actions Drop down and select the item ‘View/Edit Questions’ 
+
+One can also select the questions from ‘Questions Library’ to add into Listing, using ‘Select Questions’ 
 
 <b>Add Questions in Listing Form</b>:
 
@@ -77,7 +78,7 @@ A Question in Listing is created by filling above all fields, finally click on �
 <b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Question from Question
 Library’ where one can select the Questions from Library into Listing, by sorting out using ‘Search with text’ and ‘Question Type’ methods. 
 
-To select the Question from Library List to Listing, just Click on “Code” or “Text” to move Question between <br> tables (Library << / >> Listing List), then click on ‘Save’ button at bottom to Add Questions to Listing.
+To select the Question from Library List to Listing, just Click on “Code” or “Text” to move Question between tables (Library << / >> Listing List), then click on ‘Save’ button at bottom to Add Questions to Listing.
 
 <b>Export Questions</b>: On click, ‘Export Questions’ button, user can download the Listing Questions in “.csv” file format.
 
@@ -122,15 +123,17 @@ To define the Looping concept, first of all one has to understand about terms th
 ###How to create a Loop?
 One should be very careful while creating a loop, first of all analyze how a loop has to be created, using ‘Repeat logic’ and where to ‘End Loop’, as defined above select accordingly from ‘Repeat logic’ and ‘Loop end at’ to define a loop.
 
-click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ page, now create loop as follows: 
-* select “Logic Type” from dropdown ‘Repeat logic’, 
-* select “Question at which loop should end” from dropdown ‘Loop end at’ and 
+click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ page, now create loop as follows:
+* select “Logic Type” from dropdown ‘Repeat logic’,
+* select “Question at which loop should end” from dropdown ‘Loop end at’ and
 * in ‘Loop Prompt’ Text Box, write some message about, instructing the loop flow,
-* then click on ‘Save’ button to create loop. 
+* then click on ‘Save’ button to create loop
+
 Now you will be viewing a looping representation on ‘Listing Questions’ page in the ‘Code’ column of the ‘Questions’ table 
 
 <b>Loop Representation</b>:
-* “Light Green Bar” icon represents Loop - START, 
+
+* “Light Green Bar” icon represents Loop - START,
 * “Red Bar” icon represents Loop - END,
 * “Green Bar” icon represents Loop - CONTINUATION
 
