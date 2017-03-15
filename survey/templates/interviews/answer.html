@@ -33,7 +33,7 @@
              <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
             {% endif %}
             {% if access.choice_name == 'Ussd Access' %}
-                {{ answer_form.render_extra_ussd }}
+                {{ answer_form.render_extra_ussd_html }}
             {% endif %}
             {% include "naked_form.html" with a_form=answer_form %}
             <div class="form-actions">

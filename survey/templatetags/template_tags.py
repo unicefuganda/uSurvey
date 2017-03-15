@@ -1,7 +1,12 @@
 import string
 import re
+import redis
 from collections import OrderedDict
 from cacheops import cached_as
+from dateutil import relativedelta
+from datetime import date
+import json
+import inspect
 from django import template
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -14,13 +19,8 @@ from survey.models import VideoAnswer, AudioAnswer, ImageAnswer, QuestionSet, Su
 from survey.odk.utils.log import logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
-from dateutil import relativedelta
-from datetime import date
-import json
-import inspect
 from django.utils import html
 from survey.forms.logic import LogicForm
-import redis
 
 store = redis.Redis()
 

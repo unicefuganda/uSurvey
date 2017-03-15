@@ -1,6 +1,7 @@
 __author__ = 'anthony'
 
 from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
 from django import forms
 from form_helper import FormOrderMixin
 from survey.forms.widgets import InlineRadioSelect
@@ -13,6 +14,9 @@ from django.conf import settings
 class USSDSerializable(object):
 
     def render_extra_ussd(self):
+        pass
+
+    def render_extra_ussd_html(self):
         pass
 
 
@@ -61,7 +65,13 @@ def get_answer_form(interview):
             text = []
             if question.options.count() > 0:
                 map(lambda opt: text.append('%s: %s' % (opt.order, opt.text)), question.options.all())
-            return '\n'.join(text)
+            return mark_safe('\n'.join(text))
+
+        def render_extra_ussd_html(self):
+            text = []
+            if question.options.count() > 0:
+                map(lambda opt: text.append('%s: %s' % (opt.order, opt.text)), question.options.all())
+            return mark_safe('<br />'.join(text))
 
         def clean_value(self):
             if question.answer_type == MultiChoiceAnswer.choice_name():
