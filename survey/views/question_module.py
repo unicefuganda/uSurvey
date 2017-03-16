@@ -5,6 +5,7 @@ from django.shortcuts import render
 from survey.forms.question_module_form import QuestionModuleForm
 from survey.models import QuestionModule, Question
 from django.core.urlresolvers import reverse
+from survey.utils.query_helper import get_filterset
 
 
 @login_required
@@ -29,6 +30,9 @@ def new(request):
 @permission_required('auth.can_view_batches')
 def index(request):
     all_question_modules = QuestionModule.objects.all()
+    search_fields = ['name', 'description']
+    if request.GET.has_key('q'):
+        all_question_modules = get_filterset(all_question_modules, request.GET['q'], search_fields)
     context = {'question_modules': all_question_modules}
     return render(request, "question_module/index.html", context)
 

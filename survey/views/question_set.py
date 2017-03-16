@@ -124,6 +124,7 @@ def delete_qset_listingform(request, question_id):
                        "%s cannot be deleted because it already has interviews." % qset.verbose_name())
     else:
         qset.delete()
+    messages.success(request, "Listing form successfully deleted.")
     return HttpResponseRedirect(reverse('%s_home' % qset.resolve_tag()))
 
 

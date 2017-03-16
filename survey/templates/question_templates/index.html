@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 {% if question.options.all %}
-                    <div class="modal fade hide" id="view_options_{{ question.id }}" tabindex="-1" role="dialog"
+                    <div class="modal fade " id="view_options_{{ question.id }}" tabindex="-1" role="dialog"
                          aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -127,7 +127,9 @@
                                     <h4 class="modal-title">{{ question.text }}</h4>
                                 </div>
                                 <div class="modal-body">
+                                <br/>
                                     {% include 'questions/_view_question_options.html' %}
+                                    <br/>
                                     <a href="#" class="btn btn-primary pull-right"
                                        id="close_view_options_{{ question.id }}" data-dismiss="modal">Close</a>
                                 </div>
