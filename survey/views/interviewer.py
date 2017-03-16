@@ -137,6 +137,9 @@ def list_interviewers(request):
 @permission_required('survey.view_completed_survey')
 def show_completion_summary(request, interviewer_id):
     interviewer = Interviewer.objects.get(pk=interviewer_id)
+    request.breadcrumbs([
+        ('Interviewers', reverse('interviewers_page')),
+    ])
     return render(request, 'interviewers/completion_summary.html', {'interviewer': interviewer})
 
 

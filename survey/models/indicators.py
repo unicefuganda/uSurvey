@@ -13,6 +13,7 @@ from survey.models.batch import Batch
 from survey.models.batch_questions import BatchQuestion
 from survey.models.questions import Question, QuestionSet
 from survey.models.interviews import Interview
+from survey.models.locations import Location
 
 
 class Indicator(BaseModel):
@@ -70,6 +71,10 @@ class Indicator(BaseModel):
 
     def formulae_string(self):
         return Template(self.formulae).render(Context(dict([(name, name) for name in self.active_variables()])))
+
+    def country_wide_value(self):
+        country = Location.country()
+        return self.get_data([country, ])['[IndicatorValue]'][0]
 
     def get_data(self, locations, *args, **kxargs):
         """Used to get the compute indicator values.

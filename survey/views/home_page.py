@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth import logout
 from survey.forms.aboutus_form import AboutUsForm
-from survey.models import Survey, AboutUs
+from survey.models import Survey, AboutUs, Indicator
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -25,7 +25,9 @@ def home(request):
                                                'loc_field': settings.SHAPE_FILE_LOC_FIELD,
                                                'alt_loc_field': settings.SHAPE_FILE_LOC_ALT_FIELD,
                                                'map_center': settings.MAP_CENTER,
-                                               'zoom_level': settings.MAP_ZOOM_LEVEL})
+                                               'zoom_level': settings.MAP_ZOOM_LEVEL,
+                                               'display_indicators':
+                                                   Indicator.objects.filter(display_on_dashboard=True)})
 
 
 def index(request):

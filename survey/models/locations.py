@@ -87,6 +87,10 @@ class Location(MPTTModel, BaseModel):
     def tree_parent(self):
         return self.parent
 
+    @classmethod
+    def country(cls):
+        return Location.objects.get(parent__isnull=True)
+
     def is_sub_location(self, location):
         return location.is_ancestor_of(self)
 

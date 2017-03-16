@@ -1,0 +1,77 @@
+
+<div>
+    <!-- div>
+        <h3>{{access.interviewer}}</h3>
+        <form>
+        {{interviewer_form}}
+        </form>
+    </div -->
+
+    <div id="answer_section" class="block">
+    {% include template_file %}
+    </div>
+    <script type="text/javascript" charset="utf-8">
+       $(function(){
+                resetAll();
+                {% if interview %}
+                    $('.table-header').html('{{interview.survey.name}}');
+                {% endif %}
+            });
+
+      function resetAll() {
+         if('modal' in $('#confirm_add_modal')) $('#confirm_add_modal').modal('hide');
+        var datepicker =  $('.datepicker');
+        if(datepicker.datepicker)
+        {
+             datepicker.datepicker({
+             changeMonth: true,
+             changeYear: true,
+             dateFormat: 'dd-mm-yy',
+             yearRange: "-120:+nn"
+             });
+         }
+
+         if('multiSelect' in $('.multi-select')) $('.multi-select').multiSelect();
+        $("#interview_form .submit").click(function(event) {
+            event.preventDefault();
+            var data = new FormData();
+            var form = $(this).closest('form');
+            arr = form.serializeArray();
+            $.each(arr, function(i, entry) {
+                data.append(entry.name, entry.value);
+            });
+            data.append(this.name, this.value);
+            $('input:file').each(function(i, file) {
+                $.each($(file)[0].files, function(i, f) {
+                    data.append($(file).attr('name'), f);
+                });
+            });
+            $.ajax({
+                url: '{{action}}',
+                data: data,
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                dataType : "html",
+                success: function(data){
+                    $('#answer_section').html(data);
+                    resetAll();
+                }
+            });
+        });
+        if($("#id_survey").change)
+            $("#id_survey").change(function(){
+                $("#id_question_set option:gt(0)").remove();
+                var url = '{% url "view_qsets" %}' + '?survey_id='+ $("#id_survey").val();
+                $.getJSON(url, function (data) {
+                    $.each(data, function () {
+                        $("#id_question_set").append($('<option />').val(this.id).text(this.name));
+                    });
+                });
+             });
+     }
+    </script>
+</div>
+

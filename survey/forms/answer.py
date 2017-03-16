@@ -103,27 +103,41 @@ class BaseSelectInterview(forms.ModelForm):
         fields = []
 
 
-class SelectInterviewForm(BaseSelectInterview):
+class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
+    """Just looks like answer form. But used to confirm whether to continue loop for user selected loop scenarios
+    """
+    ADD_MORE = 1
+    DO_NOT_ADD = 2
+    value = forms.ChoiceField(choices=[(ADD_MORE, 'Yes'), (DO_NOT_ADD, 'No')], widget=forms.RadioSelect)
 
-    def __init__(self, access, *args, **kwargs):
-        super(SelectInterviewForm, self).__init__(access, *args, **kwargs)
-        self.fields['survey'].queryset = Survey.objects.filter(pk__in=[sa.survey.pk for sa in
-                                                                       self.interviewer.unfinished_assignments])
-        self.fields['survey'].empty_label = 'Select Survey'
-        self.fields['question_set'].label = 'Batch'
-        self.fields['question_set'].queryset = QuestionSet.objects.none()
-        self.fields['question_set'].empty_label = 'Select Batch'
-        self.fields['ea'].queryset = EnumerationArea.objects.filter(pk__in=[sa.allocation_ea.pk for sa in
-                                                                            self.interviewer.unfinished_assignments])
-        self.fields['ea'].empty_label = 'Select EA'
-        # self.fields['test_data'].initial = True
-        # self.fields['ea'].widget.attrs['class']+ = 'chzn-select'
-        if self.data.get('survey'):
-            self.fields['question_set'].queryset = Survey.objects.get(pk=self.data['survey']).qsets
+    def render_extra_ussd(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        return mark_safe('\n'.join(text))
+
+    def render_extra_ussd_html(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        return mark_safe('<br />'.join(text))
 
     class Meta:
         model = Interview
-        fields = ['survey', 'question_set', 'ea', 'test_data']
+        fields = []
+
+class TestFlowInterviewForm(BaseSelectInterview):
+
+    def __init__(self, access, qset, *args, **kwargs):
+        super(TestFlowInterviewForm, self).__init__(access, *args, **kwargs)
+        self.fields['survey'].queryset = Survey.objects.filter(pk__in=[sa.survey.pk for sa in
+                                                                       self.interviewer.unfinished_assignments])
+        self.fields['survey'].empty_label = 'Select Survey'
+        self.fields['ea'].queryset = EnumerationArea.objects.filter(pk__in=[sa.allocation_ea.pk for sa in
+                                                                            self.interviewer.unfinished_assignments])
+        self.fields['ea'].empty_label = 'Select EA'
+
+    class Meta:
+        model = Interview
+        fields = ['survey', 'ea', ]
 
 
 class UserAccessForm(forms.Form):

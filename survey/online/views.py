@@ -7,9 +7,9 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
-                           SurveyAllocation, AnswerAccessDefinition)
-from survey.forms.answer import (get_answer_form, SelectInterviewForm, UserAccessForm,
-                                 SurveyAllocationForm, SelectBatchForm)
+                           SurveyAllocation, AnswerAccessDefinition, ODKAccess)
+from survey.forms.answer import (get_answer_form, TestFlowInterviewForm, UserAccessForm,
+                                 SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
 from .utils import get_entry, set_entry, delete_entry
 from survey.utils.logger import slogger
 
@@ -55,21 +55,39 @@ def handle_session(request, access_id):
     return online_view.handle_session(request, access_id=access_id)
 
 
-def start_qset_interview(online_view):
+@login_required
+def test_flow(request, qset_id):
+    """This one is just used to test a flow.
+    It simply takes the first ODK access and uses it.
+    Caution: would fail if no ODK credentials is defined in the system.
+    :param request:
+    :return:
+    """
+    access = ODKAccess.objects.first()
+    online_view = OnlineView(action_url=reverse('online_view',
+                                                args=(qset_id, )))
+    qset = QuestionSet.get(id=qset_id)
+    online_view.start_interview = start_qset_interview(online_view, qset)
+    return online_view.handle_session(request, access_id=access.id)
+
+
+def start_qset_interview(online_view, qset):
+
     def _start_interview(request, access, session_data):
         interviewer = access.interviewer
         request_data = request.GET if request.method == 'GET' else request.POST
         if 'interview' in session_data:
-            interview_form = SelectInterviewForm(access, data=request_data)
+            interview_form = TestFlowInterviewForm(access, qset, data=request_data)
             if interview_form.is_valid():
                 interview = interview_form.save(commit=False)
                 interview.interviewer = interviewer
                 interview.interview_channel = access
-                qset = QuestionSet.get(id=interview.question_set.id)       # distinquish listing from batch
                 interview.last_question = qset.g_first_question
+                interview.test_data = True
+                interview.question_set = qset
                 return online_view.init_responses(request, interview, session_data)
         else:
-            interview_form = SelectInterviewForm(access)
+            interview_form = TestFlowInterviewForm(access, qset)
         session_data['interview'] = None
         template_file = "interviews/answer.html"
         context = {'button_label': 'send', 'answer_form': interview_form,
@@ -217,25 +235,25 @@ class OnlineView(object):
 
     def respond_interview(self, request, access, interview, session_data):
         initial = {}
+        answer = None
         request_data = request.GET if request.method == 'GET' else request.POST
         if str(session_data['last_question']) == str(interview.last_question.id):
-            answer_form = get_answer_form(interview)(request_data, request.FILES)
-            if answer_form.is_valid():
-                commit = True
-                answer = answer_form.save()     # even for test data, to make sure the answer can actually save
-                session_data['answers'][interview.last_question.identifier] = answer.to_text()
-                loop_next = self.get_loop_next(request, interview, session_data)      # gets next loop quest for interview
-                if loop_next:
-                    next_question = loop_next
-                else:
-                    next_question = self.get_group_aware_next(request, answer, interview, session_data)
-                if next_question is None:
-                    interview.closure_date = timezone.now()
-                    session_data['last_question'] = None
-                else:
-                    interview.last_question = next_question
-                interview.save()
-                return self.respond(interview.interview_channel, request, session_data)
+            if 'prompt_user_loop' not in session_data.get('loops', []):
+                answer_form = get_answer_form(interview)(request_data, request.FILES)
+                if answer_form.is_valid():
+                    commit = True
+                    answer = answer_form.save()     # even for test data, to make sure the answer can actually save
+                    session_data['answers'][interview.last_question.identifier] = answer.to_text()
+            next_question = self.get_loop_next(request, interview, session_data)    # gets next loop quest for interview
+            if answer and next_question is None:
+                next_question = self.get_group_aware_next(request, answer, interview, session_data)
+            if next_question is None:
+                interview.closure_date = timezone.now()
+                session_data['last_question'] = None
+            else:
+                interview.last_question = next_question
+            interview.save()
+            return self.respond(interview.interview_channel, request, session_data)
         else:
             if hasattr(interview.last_question, 'loop_started'):
                 initial = {'value': session_data['loops'].get(interview.last_question.loop_started.id, 1)}
@@ -254,6 +272,8 @@ class OnlineView(object):
                 del session_data['last_question']
         else:
             template_file = "interviews/answer.html"
+        if 'prompt_user_loop' in session_data.get('loops', []):
+            answer_form = AddMoreLoopForm(access)
         context = {'title': "%s Survey" % interview.survey,
                    'button_label': 'send', 'answer_form': answer_form,
                    'interview': interview,
@@ -263,12 +283,10 @@ class OnlineView(object):
                    'loops': session_data.get('loops', []),
                    'template_file': template_file,
                    'id': 'interview_form',
-                   'action': self.action_url
-
+                   'action': self.action_url,
                    }
 
         if show_only_answer_form(request):
-            #>import pdb; pdb.set_trace()
             context['display_format'] = get_display_format(request)
             return render(request, template_file, context)
         return render(request, 'interviews/new.html', context)
@@ -277,6 +295,7 @@ class OnlineView(object):
         if hasattr(interview.last_question, 'loop_ended'):
             loop = interview.last_question.loop_ended
             count = session_data['loops'].get(loop.id, 1)
+
             loop_next = None
             if loop.repeat_logic in [QuestionLoop.FIXED_REPEATS, QuestionLoop.PREVIOUS_QUESTION]:
                 if loop.repeat_logic == QuestionLoop.FIXED_REPEATS:
@@ -285,11 +304,27 @@ class OnlineView(object):
                     max_val = loop.previousanswercount.get_count(interview)
                 if max_val > count:
                     loop_next = loop.loop_starter
-            else:
+            else:   # user selected loop
                 request_data = request.POST if request.method == 'POST' else request.GET
-                if loop.repeat_logic is None and 'add_loop' in request_data:
-                    loop_next = loop.loop_starter
-            if loop_next:
+                # some funky logic here.
+                # if it's a user selected loop, session attribute add_loop is set.
+                # if so, attempt to validate, the selection and accordingly repeat loop or not.
+                # else set the add_loop attribute. And provide the loop form needed for validation
+                if loop.repeat_logic is None:
+                    if 'prompt_user_loop' in session_data.get('loops', []):
+                        add_more_form = AddMoreLoopForm(interview.interview_channel, data=request_data)
+                        if add_more_form.is_valid():
+                            if int(add_more_form.cleaned_data['value']) == AddMoreLoopForm.ADD_MORE:
+                                loop_next = loop.loop_starter
+                            else:
+                                loop_next = None
+                            del session_data['loops']['prompt_user_loop']
+                    else:
+                        session_data['loops']['prompt_user_loop'] = loop.loop_prompt
+            if 'prompt_user_loop' in session_data.get('loops', []):     # if you have to prompt the user to cont loop...
+                loop_next = loop.loop_ender         # stay at last loop question
+                session_data['last_question'] = None
+            elif loop_next:     # not prompt
                 session_data['loops'][loop.id] = count + 1
             elif loop.id in session_data['loops']:
                 del session_data['loops'][loop.id]

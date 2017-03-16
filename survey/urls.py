@@ -60,7 +60,7 @@ urlpatterns = patterns('',
                            'survey.views.interviewer.check_mobile_number', name="check_mobile_number"),
                        url(r'^ussd/simulator', permission_required('auth.can_view_interviewers')
                            (TemplateView.as_view(template_name="ussd/simulator.html")), name='simulator_page'),
-                       url(r'^online/simulator/(?P<access_id>\d+)/$', 'survey.online.views.handle_session',
+                       url(r'^online/simulator/(?P<qset_id>\d+)/$', 'survey.online.views.test_flow',
                            name="online_view"),
                        url(r'^online/interviewer/participation/$', 'survey.online.views.get_access_details',
                            name="online_interviewer_view"),

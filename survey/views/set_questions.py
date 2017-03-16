@@ -13,9 +13,10 @@ from survey.forms.filters import QuestionFilterForm,  \
     MAX_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE, DEFAULT_NUMBER_OF_QUESTION_DISPLAYED_PER_PAGE
 from survey.models import Question, QuestionSet
 from survey.models import Batch, QuestionTemplate, QuestionFlow, TextArgument, TemplateOption, QuestionSet
-from survey.models import QuestionModule, QuestionOption, QuestionLoop
+from survey.models import QuestionModule, QuestionOption, QuestionLoop, ODKAccess
 from survey.forms.question import get_question_form  # , QuestionFlowForm
 from survey.forms.batch import BatchQuestionsForm
+from survey.forms.answer import TestFlowInterviewForm
 from survey.services.export_questions import get_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open
@@ -62,6 +63,9 @@ def index(request, qset_id):
     context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page': max_per_page,
                'question_filter_form': question_filter_form,
                'placeholder': 'identifier, text',
+               'template_file': 'interviews/answer.html',
+               'answer_form': TestFlowInterviewForm(ODKAccess.objects.first(), batch),   # caution atleast on ODK access
+               #  at least on access must exist
                }
     return render(request, 'set_questions/index.html', context)
 

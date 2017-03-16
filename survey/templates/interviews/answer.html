@@ -19,7 +19,7 @@
         <form id="interview_form" method="post" action="{{action}}" class="form-horizontal {{ class }}">
         {% endif %}
         <br />
-        {% if interview.last_question.loops %}
+        {% if interview.last_question.loops and access.choice_name != 'Ussd Access' %}
             <div class="loops">
                 {% for loop in interview.last_question.loops %}
                     {% get_answer loop.loop_starter interview as loop_count %}
@@ -28,38 +28,21 @@
             </div>
         {%  endif %}
             {% csrf_token %}
-           {% build_question_text interview.last_question.text existing_answers as text %}
-            {% if text %}
-             <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
+            {% if 'prompt_user_loop' in loops %}
+                <div class="subh">{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}</div>
+            {% else %}
+                {% build_question_text interview.last_question.text existing_answers as text %}
+               {% if text %}
+                 <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
+               {% endif %}
             {% endif %}
+
             {% if access.choice_name == 'Ussd Access' %}
                 {{ answer_form.render_extra_ussd_html }}
             {% endif %}
             {% include "naked_form.html" with a_form=answer_form %}
             <div class="form-actions">
-                {% if interview.last_question.loop_ended and interview.last_question.loop_ended.repeat_logic == interview.last_question.oop_ended.USER_DEFINED %}
-                   <a href="#confirm_add_modal" data-toggle="modal" class="tooltip-info btn btn-primary clear" data-rel="tooltip" title="" data-original-title="Confirm">send</a>
-                    <div class="modal fade" id="confirm_add_modal" tabindex="-1" role="dialog" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title">Confirmation</h4>
-                          </div>
-                          <div class="modal-body">
-                              <br />
-                            <span class="alert_confirm">Confirm:</span> <strong><em>{{ interview.last_question.loop_ended.loop_prompt }}</em></strong>?
-                          </div>
-                          <div class="modal-footer">
-                            <input type="submit" class="submit1 btn btn-primary" value="No" />
-                            <input type="submit" name="add_loop" value="Yes" class="submit1 btn btn-primary "/>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                {% else %}
-                    <input type="submit" name="submit" value="send" class="submit btn btn-primary "/>
-                {% endif %}
+                <input type="submit" name="submit" value="send" class="submit btn btn-primary "/>
             </div>
         </form>
     </div>
