@@ -33,101 +33,103 @@
 		</ul>
 <div class="row" style="margin-right: -15px;
     margin-left: -15px;background: none;border-bottom: none;">
-	<div class="col-md-6">
-<table class="table" style="
-    margin-bottom: 0px !important; margin-top: 0px !important">
-<thead id="lib_questions_table_head">
-<tr >
-	<th colspan="2" class="text-center" style="
-    /*color: #707070;*/
-    background: #307ecc !important;
-    font-weight: 400;
-    border-left-color: #ddd;
-   color: #fff;
-    font-family: "Open Sans",sans-serif;
-    font-size: 13px;">LIBRARY QUESTIONS</th>
-
-</tr>
-
-</thead>
- </table>
-
-
-<div class="batch_assignment" >
-
-					<table id="lib_questions_table" class="table table-hover" style="margin-top: 0px !important" >
-						<thead id="lib_questions_table_head">
-       <tr><th align="center" class="code" style="background: #307ecc !important;border: 0 none; margin: 0;">CODE</th>
-
-<th align="left" class="question" style="background: #307ecc !important;border: 0 none; margin: 0;">TEXT</th></tr>
-		</thead>
-						 <tbody id="lib_questions_table_body" class="lib_questions_table_body1">
-						{% for question in library_questions %}
-							<tr id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move" class="ms-selectable">
-								<td class="tabletrtd code"><a href="#">
-											<input type="hidden" name="identifier" value="{{question.identifier}}" />
-											<input type="hidden" name="text" value="{{question.text}}" />
-											<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
-											<input type="hidden" name="module" value="{{question.module}}" />
-											<input type="hidden" name="group" value="{{question.group}}" />
-										{{question.identifier}}</a>
-								</td>
-								<td class="tabletrtd question"><a href="#">{{question.text}}</a></td>
-							</tr>
-						{% endfor %}
-						 </tbody>
-					</table>
-</div>
-
-{% endblock %}
-{% block display_form_fields %}
-	</div>
-
-
-
-	<div class="col-md-6">
-
-
-	<table class="table" style="
-    margin-bottom: 0px !important; margin-top: 0px !important">
-<thead id="lib_questions_table_head">
-<tr >
-	<th colspan="2" class="text-center" style="
-    background: #307ecc !important;
-    color: #fff;
-    font-weight: 400;
-    border-left-color: #ddd;
-   
-    font-family: "Open Sans",sans-serif;
-    font-size: 13px;">BATCH QUESTIONS</th>
-
-</tr>
-<tr><th align="center" class="code" style="background: #307ecc !important; color: #fff !important">CODE</th>
-
-<th align="left" class="question" style="background: #307ecc !important; color: #fff !important">TEXT</th></tr>
-</thead>
- </table>
 	
+	<div class="col-md-6">
+		<table class="table" style="
+		    margin-bottom: 0px !important; margin-top: 0px !important">
+		<thead id="lib_questions_table_head">
+		<tr >
+			<th colspan="2" class="text-center" style="
+		    /*color: #707070;*/
+		    background: #307ecc !important;
+		    font-weight: 400;
+		    border-left-color: #ddd;
+		   color: #fff;
+		    font-family: 'Open Sans',sans-serif;
+		    font-size: 13px;">LIBRARY QUESTIONS</th>
+
+		</tr>
+
+		</thead>
+		 </table>
 
 
+		<div class="batch_assignment" >
 
-		   		<div class="batch_assignment"  >
-						<table id="batch_questions" class="table table-hover"  width="100%">
-							
-							<thead id="batch_questions_head">
-        
-	</thead>
-							<tbody id="batch_questions_body" class="lib_questions_table_body1"></tbody>
-						</table>
-					</div>
+			<table id="lib_questions_table" class="table table-hover" style="margin-top: 0px !important" >
+								<thead id="lib_questions_table_head">
+		       <tr><th align="center" class="code" style="background: #307ecc !important;border: 0 none; margin: 0;">CODE</th>
 
-				<input type="hidden" value="{{ batch.id }}" id="batch_id">
-		  
-
+		<th align="left" class="question" style="background: #307ecc !important;border: 0 none; margin: 0;">TEXT</th></tr>
+				</thead>
+								 <tbody id="lib_questions_table_body" class="lib_questions_table_body1">
+								{% for question in library_questions %}
+									<tr id="{{question.pk}}-selectable" onclick="Move(this);" title="click to move" class="ms-selectable">
+										<td class="tabletrtd code"><a href="#">
+													<input type="hidden" name="identifier" value="{{question.identifier}}" />
+													<input type="hidden" name="text" value="{{question.text}}" />
+													<input type="hidden" name="answer_type" value="{{question.answer_type}}" />
+													<input type="hidden" name="module" value="{{question.module}}" />
+													<input type="hidden" name="group" value="{{question.group}}" />
+												{{question.identifier}}</a>
+										</td>
+										<td class="tabletrtd question"><a href="#">{{question.text}}</a></td>
+									</tr>
+								{% endfor %}
+								 </tbody>
+							</table>
+			</div>
 
 	</div>
+	{% endblock %}
+	{% block display_form_fields %}
+		
 
-</div>
+
+
+		<div class="col-md-6">
+
+
+		<table class="table" style="
+	    margin-bottom: 0px !important; margin-top: 0px !important">
+	<thead id="lib_questions_table_head">
+	<tr >
+		<th colspan="2" class="text-center" style="
+	    background: #307ecc !important;
+	    color: #fff;
+	    font-weight: 400;
+	    border-left-color: #ddd;
+	   
+	    font-family: 'Open Sans',sans-serif;
+	    font-size: 13px;">BATCH QUESTIONS</th>
+
+	</tr>
+	<tr><th align="center" class="code" style="background: #307ecc !important; color: #fff !important">CODE</th>
+
+	<th align="left" class="question" style="background: #307ecc !important; color: #fff !important">TEXT</th></tr>
+	</thead>
+	 </table>
+		
+
+
+
+			   		<div class="batch_assignment"  >
+							<table id="batch_questions" class="table table-hover"  width="100%">
+								
+								<thead id="batch_questions_head">
+	        
+		</thead>
+								<tbody id="batch_questions_body" class="lib_questions_table_body1"></tbody>
+							</table>
+						</div>
+
+					<input type="hidden" value="{{ batch.id }}" id="batch_id">
+			  
+
+
+		</div>
+
+	</div>
 
  </div>
 

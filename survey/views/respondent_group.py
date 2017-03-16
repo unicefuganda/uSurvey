@@ -13,7 +13,7 @@ from survey.forms.question_module_form import QuestionModuleForm
 from survey.models.question_templates import QuestionTemplate
 from survey.models import QuestionModule, Question
 from survey.utils.views_helper import contains_key
-
+from survey.utils.query_helper import get_filterset
 
 @permission_required('auth.can_view_household_groups')
 def conditions(request):
@@ -25,6 +25,9 @@ def conditions(request):
 @permission_required('auth.can_view_interviewers')
 def index(request):
     groups = RespondentGroup.objects.all()
+    search_fields = ['name', 'description']
+    if request.GET.has_key('q'):
+        groups = get_filterset(groups, request.GET['q'], search_fields)
     return render(request, 'respondent_groups/index.html', {'groups': groups, 'request': request})
 
 
@@ -207,4 +210,4 @@ def delete_condition(request, condition_id):
     print err
   messages.success(request, "Criteria successfully deleted.")
   # return HttpResponseRedirect("/conditions/")
-  return HttpResponseRedirect("/groups/new/")
+  return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

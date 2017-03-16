@@ -320,6 +320,7 @@ def assign(request, qset_id):
         return HttpResponseRedirect(reverse('qset_questions_page', args=(batch.pk, )))
     if request.method == 'POST':
         data = dict(request.POST)
+        print data
         last_question = batch.last_question_inline()
         lib_questions = QuestionTemplate.objects.filter(
             identifier__in=data.get('identifier', ''))
@@ -354,11 +355,21 @@ def assign(request, qset_id):
     question_filter_form = QuestionFilterForm()
 #     library_questions =  question_filter_form.filter(library_questions)
     breadcrumbs = Question.edit_breadcrumbs(qset=batch)
+    page_name = ''
     if breadcrumbs:
+        if breadcrumbs[0][0] == 'Listing Form':
+            page_name = 'Listing'
+        else:
+            page_name = 'Batch'
         request.breadcrumbs(breadcrumbs)
+
+
+    print breadcrumbs
     context = {'batch_questions_form': unicode(BatchQuestionsForm()), 'batch': batch,
                'button_label': 'Save', 'id': 'assign-question-to-batch-form',
-               'library_questions': library_questions, 'question_filter_form': question_filter_form}
+               'library_questions': library_questions, 'question_filter_form': question_filter_form,
+               'page_name' : page_name
+               }
     return render(request, 'set_questions/assign.html',
                   context)
 

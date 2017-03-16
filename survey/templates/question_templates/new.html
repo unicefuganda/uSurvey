@@ -21,6 +21,7 @@
             <span id="text-counter"></span>
         </div>
   </div> -->
+
 {% include "naked_form.html" with a_form=questionform %}
 {% if options %}
   {% for option in options %}
@@ -70,11 +71,7 @@
     $("#id_answer_type").val("val");
     $("#id_module").append($('<option value="val"/>').text('--Select Module--'));
     $("#id_module").val("val");*/
-    $('#id_answer_type').change(function(){
-        help_text = channel_map[$('#id_answer_type').val()].join(' and ');
-       // alert($('#id_answer_type_tip').val());
-       $('#id_answer_type_tip').text(help_text);
-    });
+    
 </script>
 <script type="text/javascript">
 $(document).ready(function(){
@@ -82,9 +79,7 @@ $(document).ready(function(){
 $("#id_module option[value='']").text("--Select Module--");
         $("select#id_module").val("");
 
-$("#id_answer_type option[value='']").text("--Select Answer Type--");
-        $("select#id_answer_type").val("");        
-  })
+
   
 </script>
 
@@ -102,5 +97,10 @@ $.each(newOptions, function(key,value) {
   $el.append($("<option></option>")
      .attr("value", value).text(key));
 });
+
+{% if questionform.answer_type.value %}
+  $("#id_answer_type").val('{{questionform.answer_type.value}}').attr("selected", "selected");
+  $(".controls>a").hide();
+{%endif%}
 </script>
 {% endblock %}
