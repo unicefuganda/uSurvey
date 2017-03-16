@@ -4,6 +4,9 @@
    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 
     <style>
+        #indicators {
+            float: right;
+        }
         <!--.leaflet-container {
             background-color:rgba(255,0,0,0.0);
         }-->
@@ -80,37 +83,39 @@
        <div id="survey_map" >
     </div>
     </div>
-    <div class="col-md-2">
+    <div id="indicators" class="col-md-2">
 
         <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
 <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
  -->
- <thead>
-        <tr role="row">
-            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Indicator Name</th>
-            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending">Survey</th>
-            <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Value</th>
-            <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Details</th>
-         </tr>
-    </thead>
-    <tbody>
-        {% for indicator in display_indicators %}
-          <tr>
-            <td>
-              <a href="{% url 'simple_indicator_chart_page' indicator.pk %}">{{ indicator.name }}</a>
-            </td>
-            <td>
-              {{ indicator.survey }}
-            </td>
-            <td>
-               {{ indicator.country_wide_value }}
-            </td>
-            <td>
-              <a href="{% url 'simple_indicator_chart_page' indicator.pk %}">Details</a>
-            </td>
-          </tr>
-       {% endfor %}
-    </div>
+         <thead>
+                <tr role="row">
+                    <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Indicator Name</th>
+                    <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending">Survey</th>
+                    <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Value</th>
+                    <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Details</th>
+                 </tr>
+            </thead>
+            <tbody>
+                {% for indicator in display_indicators %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'simple_indicator_chart_page' indicator.pk %}">{{ indicator.name }}</a>
+                    </td>
+                    <td>
+                      {{ indicator.survey }}
+                    </td>
+                    <td>
+                       {{ indicator.country_wide_value }}
+                    </td>
+                    <td>
+                      <a href="{% url 'simple_indicator_chart_page' indicator.pk %}">Details</a>
+                    </td>
+                  </tr>
+               {% endfor %}
+             </tbody>
+    </table>
+  </div>
    
         
 </div>
