@@ -173,7 +173,7 @@ def _view_qset_data(request, model_class, interviews):
     if locations_filter.is_valid():
         interviews = interviews.filter(ea__in=locations_filter.get_enumerations()).order_by('created')
     search_fields = ['ea__name', 'survey__name', 'question_set__name', 'answer__as_text', ]
-    if request.GET.has_key('q'):
+    if 'q' in request.GET:
         interviews = get_filterset(interviews, request.GET['q'], search_fields)
     context = {'survey_filter': survey_filter,
                'interviews': interviews, 'locations_filter': locations_filter,
@@ -188,7 +188,7 @@ def _view_qset_data(request, model_class, interviews):
                                                   page_index=page_index, items_per_page=items_per_page)
         df = download_service.get_interview_answers()
         context['report'] = mark_safe(df.to_html(classes='table table-striped table-bordered table-hover table-sort',
-                                       max_rows=items_per_page))
+                                                 max_rows=items_per_page))
     return render(request, 'question_set/view_all_data.html', context)
 
 

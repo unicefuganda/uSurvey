@@ -141,7 +141,7 @@ class Indicator(BaseModel):
             else:
                 value_key = 'as_text'
             kwargs = {
-                'question__id': criterion.test_question.id,
+                'question__identifier__iexact': criterion.test_question.identifier,
                 'interview__id__in': valid_interviews
             }
             valid_interviews = criterion.qs_passes_test(value_key, Answer.objects.filter(**kwargs).

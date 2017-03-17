@@ -9,7 +9,9 @@
 
 {% endblock %}
 {% block content_search %}
+{% if report %}
     {% include "search_form.html" %}
+{% endif %}
 {% endblock %}
 {% block page_actions %}
 {% if selected_qset %}
@@ -22,64 +24,14 @@
 {% endblock %}
 {% block content %}
 {% load pagination_tags %}
+{% if report %}
 {% autopaginate interviews items_per_page %}
 <br>
 <div style="overflow-x:auto; width: 100%;">
-{% if report %}
     {{ report }}
-{% else %}
-<table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
-<!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
- -->
- <thead>
-        <tr role="row">
-            {% for loc_type in location_filter_types %}
-                <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">
-                    {{ loc_type.name }}
-                </th>
-            {% endfor %}
-            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Enumeration Area</th>
-            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Interviewer</th>
-            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">Survey</th>
-            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">{{model_class.verbose_name}}</th>
-            {% for question in selected_qset.flow_questions %}
-            <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Update	: activate to sort column ascending">{{ question.identifier|upper }}</th>
-            {% endfor %}
-         </tr>
-    </thead>
-    <tbody>
-        {% for interview in interviews %}
-          <tr>
-            {% for loc in interview.ea.parent_locations %}
-              <td>
-                {{ loc.name }}
-              </td>
-            {% endfor %}
-           <td>
-            {{ interview.ea.name}}
-          </td>
-           <td>
-            {{ interview.interviewer.name}}
-          </td>
-          <td>
-            {{ interview.survey.name}}
-          </td>
-          <td>
-            {{ interview.question_set.name }}
-          </td>
-            {% for question in selected_qset.flow_questions %}
-              {% get_answer question interview as answer %}
-                <td>
-                    {{ answer }}
-                </td>
-           {% endfor %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-{% endif %}
 </div>
 {% paginate %}
+{% endif %}
 {% endblock %}
 
 {% block javascripts %}
