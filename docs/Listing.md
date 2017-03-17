@@ -1,12 +1,10 @@
 ###Listing
-<hr style="style1{
- border-top: 1px solid #8c8b8b;
-}">
+<hr style="color:#8c8b8b">
 The Listing is generally carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts. This pre-process has the following benefits
 
 1. It creates a common set of common questions to be asked before any survey is captured, as a one-time effort. For instance, the demographic details of household residents is required before conducting any household survey. Such data can be captured as part of the Listing.
 
-2.	By creating a separate Listing the system gives the user flexibility to use the same Listing for multiple surveys.
+2. By creating a separate Listing the system gives the user flexibility to use the same Listing for multiple surveys.
 
 Listing is available from main menu under <b>Design</b> >> <b>Listing Form</b>
 
