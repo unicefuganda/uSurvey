@@ -1,51 +1,152 @@
+
+
+{% load template_tags %}
+
 {% load template_tags %}
 {% if access.choice_name == 'Ussd Access' and display_format == 'text' %}
-    {% build_question_text interview.last_question.text existing_answers as text %}
-    {% if text %}
-         {{text}} ({{interview.last_question.answer_type}})
-         {{ answer_form.render_extra_ussd }}
-    {% endif %}
+{% build_question_text interview.last_question.text existing_answers as text %}
+{% if text %}
+{{text}} ({{interview.last_question.answer_type}})
+{{ answer_form.render_extra_ussd }}
+{% endif %}
 {% else %}
-<div class="previewstyle">
-    <h2>{{interview.question_set.name}}</h2>
-    {% if answer_form.errors %}
-        <div id="non_field_errors" class="alert alert-error">{{ answer_form.non_field_errors }}</div>
-    {%  endif %}
-    <br />
-    <div id="form-section">
-        {% if answer_form.is_multipart %}
-        <form enctype="multipart/form-data" id="interview_form" method="post" action="{{action}}" class="form-horizontal {{ class }}">
-        {% else %}
-        <form id="interview_form" method="post" action="{{action}}" class="form-horizontal {{ class }}">
-        {% endif %}
-        <br />
-        {% if interview.last_question.loops and access.choice_name != 'Ussd Access' %}
-            <div class="loops">
-                {% for loop in interview.last_question.loops %}
-                    {% get_answer loop.loop_starter interview as loop_count %}
-                     &raquo; {{ loop.loop_starter.identifier }} ({{loop_count}})
-                {% endfor %}
-            </div>
-        {%  endif %}
-            {% csrf_token %}
-            {% if 'prompt_user_loop' in loops %}
-                <div class="subh">{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}</div>
-            {% else %}
-                {% build_question_text interview.last_question.text existing_answers as text %}
-               {% if text %}
-                 <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
-               {% endif %}
-            {% endif %}
+<div class="row">
+   <div class="row">
+      <div class="col-md-6">
+         <!-- Table Start Here- -->
 
-            {% if access.choice_name == 'Ussd Access' %}
-                {{ answer_form.render_extra_ussd_html }}
-            {% endif %}
-            {% include "naked_form.html" with a_form=answer_form %}
-            <div class="form-actions">
-                <input type="submit" name="submit" value="send" class="submit btn btn-primary "/>
+
+
+         <!-- Table Start End- -->
+
+      </div>
+      <div class="col-md-6">
+         <!-- Mobile view start-->
+         <div class="iphone_bg">
+            <div class="geni">
+               <div id="answer_section" class="block">
+                  <div class="previewstyle">
+                     <h2>{{interview.question_set.name}}</h2>
+                     {% if answer_form.errors %}
+                     <div id="non_field_errors" class="alert alert-error">{{ answer_form.non_field_errors }}</div>
+                     {%  endif %}
+                     <br>
+                     <div id="form-section">
+                        {% if answer_form.is_multipart %}
+                        <form enctype="multipart/form-data" id="interview_form" method="post" action="{{action}}" class="form-horizontal {{ class }}">
+                           {% else %}
+                        <form id="interview_form" method="post" action="{{action}}" class="form-horizontal {{ class }}">
+                           {% endif %}
+                           {% if interview.last_question.loops and access.choice_name != 'Ussd Access' %}
+                           <div class="loops">
+                              {% for loop in interview.last_question.loops %}
+                              {% get_answer loop.loop_starter interview as loop_count %}
+                              &raquo; {{ loop.loop_starter.identifier }} ({{loop_count}})
+                              {% endfor %}
+                           </div>
+                           {%  endif %}
+                           <br>
+                           {% csrf_token %}
+                           {% if 'prompt_user_loop' in loops %}
+                           <div class="subh">{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}</div>
+                           {% else %}
+                           {% build_question_text interview.last_question.text existing_answers as text %}
+                           {% if text %}
+                           <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
+                           {% endif %}
+                           {% endif %}
+                           <div id="id_uid-control-group" class="control-group" >
+                              <!-- <br /><br /> -->
+                              <div class="controls exod">
+                                 {% if access.choice_name == 'Ussd Access' %}
+                                 {{ answer_form.render_extra_ussd_html }}
+                                 {% endif %}
+                                 {% include "naked_form.html" with a_form=answer_form %}
+                              </div>
+                           </div>
+                           <div class="form-actions">
+                              <input type="submit" name="submit" value="send" class="submit btn btn-primary "/>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
             </div>
-        </form>
-    </div>
+         </div>
+         <!-- Mobile View End-->
+      </div>
+   </div>
 </div>
 
+<style type="text/css">
+   .iphone_bg {
+   width: 100%;
+   height: 639px;
+   margin: auto;
+   background: url('/static/img/iphone.png') no-repeat center;
+   }
+   .geni {
+   width:247px; 
+   margin:0px auto; 
+   padding-top:57px; 
+   padding-left:6px; 
+   z-index:1;
+   }
+   .exod {
+   text-algin:center;
+   margin-bottom:5px;  
+   }
+   #id_gender{
+   display: inline-block;
+   vertical-align: middle;
+   margin-bottom: -6px;
+   }
+   #id_gender_0{
+   margin: 0px !important;
+   }
+   #id_gender_1{
+   margin: 0px !important;
+   }
+   #id_access_channels{
+   display: inline-block;
+   vertical-align: middle;
+   }
+   #text-counter{
+   margin-left: 10px !important;
+   }
+   .ms-container{
+   margin-left: auto;
+   margin-right: auto;
+   width: 915px;
+   }
+   .ms-list{
+   margin-top: -14px !important;
+   }
+   .inline pos-rel > open {
+   display: none !important;
+   }
+   .exod {
+   text-algin:center;
+   margin-bottom:5px;  
+   }
+   .previewstyle {
+   border: 1px solid #307ecc;
+   height: 370px;
+    padding-top: 20px;
+   min-height: 300px;
+   text-align: left;
+   padding-left: 15px;
+   width: 100%;
+   background:#fff;
+   }
+   .form-horizontal .control-label {
+    padding-top:25px;text-align: center;}
+    .int-part{margin-top: -25px;}
+</style>
+<script type="text/javascript">
+   $(document).ready(function(){
+     $('.controls textarea ').after($('<span id="text-counter"></span>'));
+   })
+</script>
 {% endif %}
+

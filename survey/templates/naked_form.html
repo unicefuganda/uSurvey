@@ -46,7 +46,61 @@
     display: none !important;
   }
   </style>
-  <div id="{{field.auto_id}}-control-group" class="control-group" style="margin-top: 15px;">
+  <style type="text/css">
+    .iphone_bg {
+    width: 100%;
+    height: 639px;
+    margin: auto;
+    background: url('/static/img/iphone.png') no-repeat center;
+    }
+    .geni {
+    width:247px; 
+    margin:0px auto; 
+    padding-top:57px; 
+    padding-left:6px; 
+    z-index:1;
+    }
+    .exod {
+    text-algin:center;
+    margin-bottom:5px;  
+    }
+    #id_gender{
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: -6px;
+    }
+    #id_gender_0{
+    margin: 0px !important;
+    }
+    #id_gender_1{
+    margin: 0px !important;
+    }
+    #id_access_channels{
+    display: inline-block;
+    vertical-align: middle;
+    }
+    #text-counter{
+    margin-left: 10px !important;
+    }
+    .ms-container{
+    margin-left: auto;
+    margin-right: auto;
+    width: 915px;
+    }
+    .ms-list{
+    margin-top: -14px !important;
+    }
+    .inline pos-rel > open {
+    display: none !important;
+    }
+    .exod {
+    text-algin:center;
+    margin-bottom:5px;  
+    }
+
+.int-part{margin-top: 10px;}
+</style>
+  <div id="{{field.auto_id}}-control-group" class="control-group int-part">
       <!-- <br /><br /> -->
     <div class="controls {{ field|is_radio }}">
     <label class="control-label" for="{{field.auto_id}}">{{field.label}}

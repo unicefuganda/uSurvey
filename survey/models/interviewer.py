@@ -127,7 +127,10 @@ class Interviewer(BaseModel):
    
     def survey_name(self):
         ea_obj = SurveyAllocation.objects.filter(interviewer_id=self.id)
-        return ea_obj[0].survey.name
+        survey_name  = ''
+        if ea_obj:
+            survey_name = ea_obj[0].survey.name
+        return survey_name
         
 
 class SurveyAllocation(BaseModel):

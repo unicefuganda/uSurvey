@@ -44,6 +44,7 @@ def get_access_details(request):
     if show_only_answer_form(request):
         context['display_format'] = get_display_format(request)
         return render(request, template_file, context)
+    print "hello"
     return render(request, 'interviews/new.html', context)
 
 

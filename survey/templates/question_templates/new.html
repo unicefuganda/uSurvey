@@ -26,6 +26,7 @@
 {% if options %}
   {% for option in options %}
    {% if option %}
+   {{option}}
     <div class="control-group options question-option">
         <label style="margin-top:10px;" class="control-label col-md-4">Option <span class="number"> {{ option.order }}</span></label>
         <div class="controls">
@@ -100,7 +101,7 @@ $.each(newOptions, function(key,value) {
 
 {% if questionform.answer_type.value %}
   $("#id_answer_type").val('{{questionform.answer_type.value}}').attr("selected", "selected");
-  $(".controls>a").hide();
+  //$(".controls>a").hide();
 {%endif%}
 </script>
 {% endblock %}
