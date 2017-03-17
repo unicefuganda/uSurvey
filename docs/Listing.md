@@ -16,7 +16,7 @@ Listing is a set of Questions that can be customized/configured for any survey b
 
 To create a new Listing, click on the ‘Create New Listing Form’ button at top right of the Listing page, that opens a form to create a new Listing, which has following elements; 
 
-<b>Elements of Listing form<br>
+<b>Elements of Listing form</b><br>
 
 * <b>Name</b>: Is Listing Name, which is a unique identity to a Listing and is a mandatory field.   
 * <b>Description</b>: write about the importance of the Listing in short.  
