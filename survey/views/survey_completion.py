@@ -137,7 +137,8 @@ def show(request):
 def completion_json(request, survey_id):
     @cached_as(Survey.objects.filter(id=survey_id))
     def get_result_json():
-        """Basically get all the response count for this survey on the largest admin unit
+        """Basically if survey is sampled and we are now in batch collection phase, display percentage completion.
+        For listing or census data collection, just show count
         :return:
         """
         survey = Survey.objects.get(id=survey_id)
@@ -169,42 +170,9 @@ def completion_json(request, survey_id):
 @login_required
 @permission_required('auth.can_view_aggregates')
 def json_summary(request):
-    survey_id = request.GET['survey']
-    indicator_id = request.GET.get('indicator')
-    option_id = request.GET.get('parameter')
-    metric = request.GET.get('metric', None)
-    try:
-        indicator_id = int(indicator_id)
-        option_id = int(option_id)
-    except ValueError:
-        indicator_id = None
-        option_id = None
-        metric = None
-    if not (indicator_id and option_id):
-        return completion_json(request, survey_id)
-
-    # @cached_as(Survey.objects.filter(id=survey_id),
-    #            Indicator.objects.filter(id=indicator_id),
-    #            QuestionOption.objects.filter(id=option_id), extra=metric)
-    def get_result_json():
-        """Basically get all the response count for this survey on the largest admin unit
-        :return:
-        """
-        survey = Survey.objects.get(id=survey_id)
-        indicator = Indicator.get(pk=indicator_id)
-        country = LocationType.objects.get(parent__isnull=True)
-        if hasattr(settings, 'MAP_ADMIN_LEVEL'):
-            location_type = country.get_descendants()[settings.MAP_ADMIN_LEVEL - 1]
-        else:
-            location_type = LocationType.largest_unit()
-        data = indicator.get_data(location_type.locations.all(), metric, presenter, option_id)
-        return json.dumps(data, cls=DjangoJSONEncoder)
-    json_dump = get_result_json()
-    return HttpResponse(json_dump, content_type='application/json')
-
-
-def presenter(tabulated_data, child_location, loc_answers, options, factor, option_id):
-    tabulated_data[child_location.name] = loc_answers.filter(value__pk=option_id).count()*factor
+    request_data = request.GET if request.method == 'GET' else request.POST
+    survey_id = request_data['survey']
+    return completion_json(request, survey_id)
 
 
 @login_required

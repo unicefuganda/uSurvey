@@ -4,28 +4,32 @@
    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 
     <style>
-        #indicators {
-            float: right;
+        .map-show {
+            width: 70%
+            display: inline-block;
         }
-        <!--.leaflet-container {
-            background-color:rgba(255,0,0,0.0);
-        }-->
+
+        #indicators {
+            width: 30%;
+            display: inline-block;
+        }
+
         .leaflet-container {
-    margin-bottom: 10px;
-    margin-left: 384px;
-     overflow: hidden;
-}
+        margin-bottom: 10px;
+        margin-left: 384px;
+         overflow: hidden;
+        }
 
-.dataTables_wrapper .row:first-child {
-    display: none;
-  }
+        .dataTables_wrapper .row:first-child {
+            display: none;
+          }
 
-.dataTables_wrapper label {
-    display: inline-block !important;
-    font-size: 13px !important;
-    margin-top: 20px !important;
-    margin-left: -25px !important;
-}
+        .dataTables_wrapper label {
+            display: inline-block !important;
+            font-size: 13px !important;
+            margin-top: 20px !important;
+            margin-left: -25px !important;
+        }
         .rop {
          text-align:center;
          }
@@ -75,15 +79,15 @@
 {% endblock %}
 {% block content %}
 <div id="home_display">
-
-    <div class="col-md-4">
-      {% include "dashboard_form.html" with a_form=map_filter no_button=True filter_id='map_filter' %}
+    <div class="map-show">
+        <div class="col-md-4">
+            {{map_filter}}
+        </div>
+        <div class="col-md-4"><br/>
+           <div id="survey_map" />
+        </div>
     </div>
-    <div class="col-md-4"><br/>
-       <div id="survey_map" >
-    </div>
-    </div>
-    <div id="indicators" class="col-md-2">
+    <div id="indicators" class="indicators">
 
         <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
 <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
@@ -116,7 +120,7 @@
              </tbody>
     </table>
   </div>
-   
+
         
 </div>
 {% endblock%}
@@ -132,40 +136,15 @@
   var mapData = null;
 
 $(function(){
-    $(".map-filter").on('change', function(){
+    $("#id_survey").on('change', function(){
         getCompletionFor();
     });
-    $('#id_survey').on('change', function(){
-        updateIndicators();
-    });
-    $('#id_indicator').on('change', function(){
-        updateParameters();
-    });
-    //getCompletionFor();
     loadInitialMap();
 });
 
-function updateIndicators() {
-    var url = '{% url "survey_indicators" %}?survey=' + $("#id_survey").val();
-    $.get(url, function( datas ) {
-       $('#id_indicator').find("option:gt(0)").remove();
-       $.each(datas, function (i, data) {
-            $('#id_indicator').append('<option value="' + data['id'] + '">' + data['name'] + "</option>");
-        });
-    });
-}
-
-function updateParameters() {
-    $.get( '{% url "survey_parameters" %}?indicator=' + $("#id_indicator").val(), function( datas ) {
-       $('#id_parameter').find("option:gt(0)").remove();
-       $.each(datas, function (i, data) {
-            $('#id_parameter').append('<option value="' + data['id'] + '">' + data['name'] + "</option>");
-        });
-    });
-}
 
 function getCompletionFor(){
-    var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val()+'&indicator='+$("#id_indicator").val()+'&parameter='+$("#id_parameter").val()+'&metric='+$("#id_metric").val();
+    var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val();
     $.getJSON(survey_url, function (rate_data) {
       $.each(mapData, function(element){
          mapData.features.map(function(feature){
