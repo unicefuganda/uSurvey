@@ -7,6 +7,7 @@ pages:
 - Set up Guide: installation.md
 - Deployment Guide: deployment_guide.md
 - Site Map: Site_Map.md
+- uSurvey User Manual: uSurvey_manual.md
 - Tests: tests.md
 - Listing: Listing.md
 #theme: readthedocs

@@ -3,9 +3,9 @@
 * **Dashboard**
 
 * **Design** 
-   * [Survey](http://usurvey.unicefuganda.org/surveys/)
+   * [Survey](./Survey.md)
    * [Listing](./Listing.md)
-   * [Modules](http://usurvey.unicefuganda.org/modules/)
+   * [Modules](./Modules.md)
    * [Groups](./Groups.md)
    * [Question Library](http://usurvey.unicefuganda.org/question_library/)
 
