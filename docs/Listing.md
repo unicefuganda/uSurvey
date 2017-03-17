@@ -1,4 +1,5 @@
 ###Listing
+<----------
 
 The Listing is generally carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts. This pre-process has the following benefits
 
@@ -13,13 +14,15 @@ Listing is a set of Questions that can be customized/configured for any survey b
 ###Creating New Listing
 To create a new Listing, click on the ‘Create New Listing Form’ button at top right of the Listing page, that opens a form to create a new Listing, which has following elements; 
 
-<b>Elements of Listing form</b>
+<b>Elements of Listing form<br>
 
 * <b>Name</b>: Is Listing Name, which is a unique identity to a Listing and is a mandatory field.   
 * <b>Description</b>: write about the importance of the Listing in short.  
 * <b>Access channels</b>: This will identify on which channel this survey has to be conducted and has two channel ODK and USSD
 
 A Listing Form is created by filling above all fields, finally clicking on ‘Save’ button to create Listing.
+
+<b>Search</b>: One can find Listings in the application, using the search bar at top right side of this Listing Form page, by providing Name or description.
   
 On the ‘Listing Form’ page one can view all the Listings created in the application, in a tabular form with following column names:
 
@@ -38,6 +41,7 @@ On the ‘Listing Form’ page one can view all the Listings created in the appl
 * Edit Listing: click on, Action Item ‘Edit’, User can Edit only the name of the Listing, Description and selection of Access channels (OBK, USSD)
 
 * Delete Listing: click on, Action Item ‘Delete, the entire Listing is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently.
+This option is not available for completed listing
 
 * View/Edit Questions in Listing: click on, Action Item ‘View/Edit Questions’, navigates to ‘Listing Questions’ page to View or Edit Respective Questions in Listing
 
@@ -65,28 +69,35 @@ Click on, ‘Add Question’ button at top right of the particular Listing page,
 <b>Variables Name</b>: This is an identifier for Question, type a code for Question
 
 <b>Text</b>: Is the actual Question, Write a Question. While typing a question, auto suggestion feature is available, which will prompt with the ‘Variable Name’ of preceding questions, that helps to include “answered text of preceding question” in framing this question. 
-i.e. just type, double curly brackets to automatically insert ‘Variable Name’ from preceding questions,<br>
+i.e. just type, double curly brackets to automatically prompt with the ‘Variable Name’ from preceding questions,<br>
 Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name,<br>
 Like: {{structure_address}}
  
 <b>Answer Type</b>: Select an Answer Type from dropdown list, such that Question has to be answered in any one of these formats only, that is ‘Answer type’ should be: “Audio, Auto Generate, Date, Geo Point, Image, Multi choice, Multi Select, Numeric, Text and Video”
 
-<b>Mandatory</b>: To mark the Question has to answered compulsory. 
+<b>Mandatory</b>: To mark the Question, that has to answered compulsory. 
 
 A Question in Listing is created by filling above all fields, finally click on ‘Save’ button to Add Question in Listing or click on ‘Save and Add More’ button to continue adding another Question to the same Listing or click on ‘Save and Update Library’ to add same to the ‘Questions Library’.
 
-<b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Question from Question
-Library’ where one can select the Questions from Library into Listing, by sorting out using ‘Search with text’ and ‘Question Type’ methods. 
+<b>Select Question</b>: On click, ‘Select Question’ button, User navigates to ‘Select Library Questions’ page where one can Add the Library Questions into Listing. 
 
-To select the Question from Library List to Listing, just Click on “Code” or “Text” to move Question between tables (Library << / >> Listing List), then click on ‘Save’ button at bottom to Add Questions to Listing.
+To Add Question from Library to Listing, just Click on “Code” or “Text” to move Question between (Library Questions << / >> Listing Questions) tables, then click on ‘Save’ button at bottom of this page, to finish adding Questions to Listing.
+
+<b>Search</b>: One can find Questions in Library by two ways:
+<b>Sort</b> questions using ‘Answer Type’ dropdown at top left side of this page. Or
+<b>Search</b> using the search bar at top right side of this page, by providing text or code.
 
 <b>Export Questions</b>: On click, ‘Export Questions’ button, user can download the Listing Questions in “.csv” file format.
 
 <b>Update Question Order</b>: 
-Questions in the list can be rearranged.<br>
-To change the order of the Question, just select the Question to drag and drop at the required new position/order, then click on ‘Update Question Order’ button at bottom of the Questions table.
+Questions in the table can be rearranged.<br>
+To change the order of the Question in table, just select the Question then drag (move up or down) and drop at new position/order you want to in the table, then click on ‘Update Question Order’ button at bottom of the Questions table.
 
-On the ‘Listing Questions’ page one can view all the Questions created in that particular Listing, each of these Questions has Actions to ‘Edit’, ‘Insert Question’, ‘Add Logic’, ‘Start/Edit Loop’, ‘Remove Loop’ – only for the Questions that has Answer Type “Auto Generated” and ‘View Options’- only for Multiple Choice Questions.
+On the ‘Listing Questions’ page one can view all the Questions created in that particular Listing.
+
+<b>Search</b>: One can find Questions in Listing by two ways:<br>
+<b>Sort</b> questions using ‘Answer Type’ dropdown at top left side of this page. Or<br>
+<b>Search</b> using the search bar at top right side of this page, by providing text or code.
 
 <b>Actions for Listing Questions</b>:
 
