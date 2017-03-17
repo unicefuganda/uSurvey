@@ -11,8 +11,7 @@ Listing is available from main menu under <b>Design</b> >> <b>Listing Form</b>
 
 Listing is a set of Questions that can be customized/configured for any survey by reusing same Listing.
 
-###Creating New Listing
-<----------
+###Creating New Listing <----------
 
 To create a new Listing, click on the ‘Create New Listing Form’ button at top right of the Listing page, that opens a form to create a new Listing, which has following elements; 
 
