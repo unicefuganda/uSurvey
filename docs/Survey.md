@@ -25,25 +25,25 @@ To create a New Survey, click on ‘Create New Survey’ button at top right of 
 If Survey Type is “Sampled”, Survey uses Sample size and Listing 
 If Survey Type is “Census”, Survey doesn’t need Sample size and Listing.
  
-•	Sample size: Provide survey sample size
-•	Preferred Listing: select an existing Listing or
-•	Listing Form: select Newly created Listing
-•	Randomly selected data label: You need to include one listing response identifier in double curly brackets.
- i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing,
-Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name, 
+• Sample size: Provide survey sample size
+• Preferred Listing: select an existing Listing Or
+• Listing Form: select Newly created Listing
+• Randomly selected data label: You need to include one listing response identifier in double curly brackets.
+ i.e. just type, double curly brackets to automatically insert ‘Variable Name’ in above selected Listing
+Ex: type {{ , system prompts with ‘Variable Name’ then select any one to insert Variable Name 
 Like: {{house_number}}
 
 A New Survey is created by providing above fields and click on ‘Save’ button to Create a Survey. 
 
-Search: One can find Surveys in the application, using the search bar at top right side of this survey page, by providing Name or description.
+<b>Search</b>: One can find Surveys in the application, using the search bar at top right side of this survey page, by providing Name or description.
 
 On the ‘Survey’ page one can view all the Survey created in the application, in a tabular form with following column names:
 
-Sts: Represents Status of the Survey by color indicator, that means each of the Color code indicates that Gray – Not Started; Green – Ongoing; Amber – Completed
+<b>Sts</b>: Represents Status of the Survey by color indicator, that means each of the Color code indicates that Gray – Not Started; Green – Ongoing; Amber – Completed
 
-Name: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.   
+<b>Name</b>: Is Name of a Survey, which is a unique identity to represent Survey and is a mandatory field.   
 
-Description: A short description about Listing
+<b>Description</b>: A short description about Listing
 
 Type: Survey type Sampled or Census
 
