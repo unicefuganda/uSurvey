@@ -8,7 +8,10 @@ pages:
 - Deployment Guide: deployment_guide.md
 - Site Map: Site_Map.md
 - uSurvey User Manual: uSurvey_manual.md
-- Tests: tests.md
+- Groups: Groups.md
+- Modules: Modules.md
 - Listing: Listing.md
+- Survey: Survey.md
+- Tests: tests.md
 #theme: readthedocs
 theme: cerulean
