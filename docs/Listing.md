@@ -1,5 +1,5 @@
 ###Listing
-<hr style="Color:Green;"><hr/>
+<hr>
 The Listing is generally carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts. This pre-process has the following benefits
 
 1. It creates a common set of common questions to be asked before any survey is captured, as a one-time effort. For instance, the demographic details of household residents is required before conducting any household survey. Such data can be captured as part of the Listing.
@@ -10,8 +10,8 @@ Listing is available from main menu under <b>Design</b> >> <b>Listing Form</b>
 
 Listing is a set of Questions that can be customized/configured for any survey by reusing same Listing.
 
-###Creating New Listing <----------
-
+###Creating New Listing
+<hr>
 To create a new Listing, click on the ‘Create New Listing Form’ button at top right of the Listing page, that opens a form to create a new Listing, which has following elements; 
 
 <b>Elements of Listing form</b><br>
@@ -132,6 +132,7 @@ To define the Looping concept, first of all one has to understand about terms th
 * <b>Loop Prompt</b>: This is a message prompt shown on Mobile App during the time of capturing this details. This message will help the Interviewer to proceed further.
 
 ###How to create a Loop?
+<hr>
 One should be very careful while creating a loop, first of all analyze how a loop has to be created, using ‘Repeat logic’ and where to ‘End Loop’, as defined above select accordingly from ‘Repeat logic’ and ‘Loop end at’ to define a loop.
 
 click on, Action Item ‘Start/Edit Loop’ which will take to ‘Start Loop’ page, now create loop as follows:
