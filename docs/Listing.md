@@ -1,5 +1,5 @@
 ###Listing
-<hr style="color:#8c8b8b">
+<hr style="color:#8c8b8b;">
 The Listing is generally carried out by field staff other than interviewers, as a separate field operation conducted before the survey starts. This pre-process has the following benefits
 
 1. It creates a common set of common questions to be asked before any survey is captured, as a one-time effort. For instance, the demographic details of household residents is required before conducting any household survey. Such data can be captured as part of the Listing.
@@ -144,7 +144,7 @@ Now you will be viewing a looping representation on ‘Listing Questions’ page
 
 <b>Loop Representation</b>:
 
-* <span style="color:Green">Light Green Bar</span> icon represents Loop - START,
+* <span style="color:Green;font-weight:bold;">Light Green Bar</span> icon represents Loop - START,
 * “Red Bar” icon represents Loop - END,
 * “Green Bar” icon represents Loop - CONTINUATION
 
