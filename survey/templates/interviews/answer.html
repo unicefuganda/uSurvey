@@ -26,7 +26,7 @@
             <div class="geni">
                <div id="answer_section" class="block">
                   <div class="previewstyle">
-                     <h2>{{interview.question_set.name}}</h2>
+                     <h4>{{interview.question_set.name}}</h4>
                      {% if answer_form.errors %}
                      <div id="non_field_errors" class="alert alert-error">{{ answer_form.non_field_errors }}</div>
                      {%  endif %}
@@ -51,9 +51,9 @@
                            <div class="subh">{% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}</div>
                            {% else %}
                            {% build_question_text interview.last_question.text existing_answers as text %}
-                           {% if text %}
-                           <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
-                           {% endif %}
+                              {% if text %}
+                              <div class="subh">{{text}} ({{interview.last_question.answer_type}})</div>
+                              {% endif %}
                            {% endif %}
                            <div id="id_uid-control-group" class="control-group" >
                               <!-- <br /><br /> -->
