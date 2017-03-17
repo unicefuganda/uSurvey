@@ -45,15 +45,15 @@ On the ‘Survey’ page one can view all the Survey created in the application,
 
 <b>Description</b>: A short description about Listing
 
-Type: Survey type Sampled or Census
+<b>Type</b>: Survey type Sampled or Census
 
-Sample size: Provide survey sample size
+<b>Sample size</b>: Provide survey sample size
 
-Total Respondents: once the Survey is completed, this column will be updated with the count of participants/ respondents.
+<b>Total Respondents</b>: once the Survey is completed, this column will be updated with the count of participants/ respondents.
 
 Eas Covered: Count of Enumeration areas covered in this particular survey.
 
-Actions in Survey:
+<b>Actions in Survey</b>:
 
 •	Edit Survey: click on, Action Item ‘Edit’, User can Edit all fields in the Survey.
 •	Delete Survey: click on, Action Item ‘Delete, the entire Survey is removed, before deleting you will be prompted with conformation to delete, click ‘Yes’ to Delete permanently. This option is not available for completed Survey.
