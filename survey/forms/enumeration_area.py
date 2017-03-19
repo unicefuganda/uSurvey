@@ -49,27 +49,26 @@ class LocationsFilterForm(Form):
         last_selected_pk = None
         largest_unit = LocationType.largest_unit()
         locations = Location.objects.none()
-        for location_type in LocationType.objects.all():
-            if location_type.parent is not None:
-                kw = {'type': location_type}
-                parent_selection = data.get(location_type.parent.name, None)
-                if (locations and parent_selection) or location_type == largest_unit:
-                    if parent_selection:
-                        last_selected_pk = data.get(
-                            location_type.name, None) or parent_selection
-                        kw['parent__pk'] = parent_selection
-                    locations = Location.objects.filter(**kw).only('id', 'name').order_by('name')
-                else:
-                    self.data[location_type.name] = ''
-                    locations = Location.objects.none()
-                # choices = [(loc.pk, loc.name) for loc in locations]
-                # choices.insert(0, ('', '--- Select %s ---' % location_type.name))
-                self.fields[location_type.name] = forms.ModelChoiceField(
-                    queryset=locations)  # forms.ChoiceField(choices=choices)
-                self.fields[location_type.name].required = False
-                self.fields[location_type.name].empty_label = '-- Select %s --' % location_type.name
-                self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filters chzn-select'
-                # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
+        for location_type in LocationType.in_between():
+            kw = {'type': location_type}
+            parent_selection = data.get(location_type.parent.name, None)
+            if (locations and parent_selection) or location_type == largest_unit:
+                if parent_selection:
+                    last_selected_pk = data.get(
+                        location_type.name, None) or parent_selection
+                    kw['parent__pk'] = parent_selection
+                locations = Location.objects.filter(**kw).only('id', 'name').order_by('name')
+            else:
+                self.data[location_type.name] = ''
+                locations = Location.objects.none()
+            # choices = [(loc.pk, loc.name) for loc in locations]
+            # choices.insert(0, ('', '--- Select %s ---' % location_type.name))
+            self.fields[location_type.name] = forms.ModelChoiceField(
+                queryset=locations)  # forms.ChoiceField(choices=choices)
+            self.fields[location_type.name].required = False
+            self.fields[location_type.name].empty_label = '-- Select %s --' % location_type.name
+            self.fields[location_type.name].widget.attrs['class'] = 'location_filter ea_filters chzn-select'
+            # self.fields[location_type.name].widget.attrs['style'] = 'width: 100px;'
         if last_selected_pk:
             self.last_location_selected = Location.objects.get(
                 pk=last_selected_pk)

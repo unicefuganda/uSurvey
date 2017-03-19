@@ -208,7 +208,8 @@ class SurveyAllocation(BaseModel):
         survey = self.survey.preferred_listing
         if self.survey.preferred_listing:
             survey = self.survey.preferred_listing
-        return Interview.objects.filter(interviewer=self.interviewer, survey__in=[survey, self.survey],
+        # more than one interviewer can result in the sample size for that EA
+        return Interview.objects.filter( survey__in=[survey, self.survey],
                                         ea=self.allocation_ea).count() >= self.survey.sample_size
 
     def batches_enabled(self):
