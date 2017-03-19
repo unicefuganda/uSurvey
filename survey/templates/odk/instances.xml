@@ -1,0 +1,52 @@
+<qset id="{{ interview.question_set.pk }}" >{% load template_tags %}
+     <meta>
+       <instanceID>{{ interview.instance_id }}</instanceID>
+       {% get_answer interview.question_set.start_question interview as answer %}
+       <instanceName>{{ answer }} - {{interview.question_set.name}} - {{assignment.allocation_ea.name}} </instanceName>
+     </meta>
+     <disName>{{answer}}</disName>
+     <interview>{{interview.pk}}</interview>
+	   <type>{% if interview.qset.survey %}
+           {{ SurveyAllocation.COMPLETED }}
+        {% else %}
+            {{ SurveyAllocation.PENDING }}
+        {% endif %}</type>
+	   <surveyAllocation>{{assignment.allocation_ea.name}}</surveyAllocation>
+	   <qset{{ interview.question_set.pk }}>
+	   {% if ea_samples %}
+	     <sampleData>
+			 <selectedSample />
+		   {% for ea_id, samples in ea_samples.items %}
+				<iq{{ ea_id }} />
+			{% endfor %}
+		</sampleData>
+	   {% endif %}
+			<questions>
+				{% if qset.parameter_list %}
+				   <groupQuestions>
+					   {% for question in qset.parameter_list.questions.all %}
+					   		{% get_question_value question answers_dict as value %}
+							<q{{question.pk}}>{{value}}</q{{question.pk}}>
+					   {% endfor %}
+				   </groupQuestions>
+				   {% endif %}
+				<surveyQuestions>
+					{% for question in qset.questions_inline %}
+						{% get_question_value question answers_dict as value %}
+							{% if question.loop_started %}
+							   <q{{question.pk}}q{{question.loop_started.loop_ender.pk}}>
+								<id{{ question.loop_started.pk }} />
+						   {% endif %}
+									<q{{question.pk}}>{{value}}</q{{question.pk}}>
+									{% for sub_question in question.direct_sub_questions %}
+										{% get_question_value sub_question answers_dict as svalue %}
+										<q{{sub_question.pk}}>{{svalue}}</q{{sub_question.pk}}>
+									{% endfor %}
+						   {% if question.loop_ended %}
+							   </q{{question.loop_ended.loop_starter.pk}}q{{question.pk}}>
+						   {% endif %}
+					{% endfor %}
+				</surveyQuestions>
+			</questions>
+	   </qset{{ interview.question_set.pk }}>
+   </qset>

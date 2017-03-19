@@ -259,6 +259,11 @@ def trim(value):
     return value.strip()
 
 
+@register.assignment_tag
+def get_question_value(question, answers_dict):
+    return answers_dict.get(question.pk)
+
+
 @register.filter
 def household_completed_percent(interviewer):
     households = interviewer.households.all()

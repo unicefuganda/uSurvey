@@ -42,6 +42,7 @@ FORM_ID_PATH = '//qset/@id'
 FORM_TYPE_PATH = '//qset/type'
 FORM_ASSIGNMENT_PATH = '//qset/surveyAllocation'
 ANSWER_NODE_PATH = '//qset/qset{{ qset_id }}'
+INTERVIEW_ID_PATH = '//qset/interview'
 # default content length for submission requests
 DEFAULT_CONTENT_LENGTH = 10000000
 MAX_DISPLAY_PER_COLLECTOR = 1000
@@ -68,6 +69,10 @@ def _get_nodes(search_path, tree=None, xml_string=None):
     except Exception, ex:
         logger.error('Error retrieving path: %s, Desc: %s' %
                      (search_path, str(ex)))
+
+
+def _get_interview_id(survey_tree):
+    return _get_nodes(INTERVIEW_ID_PATH, tree=survey_tree)[0].text
 
 
 @job('odk', connection=get_connection())
@@ -107,7 +112,7 @@ def process_answers(xml, qset, access_channel, question_map, survey_allocation, 
             raise NotEnoughData()
         save_answers(qset, access_channel, question_map, answers, survey_allocation,
                      survey_parameters=survey_parameters, reference_interview=reference_interview,
-                     media_files=media_files)
+                     media_files=media_files, interview_id=_get_interview_id(survey_tree))
         if survey.has_sampling:
             survey_allocation.stage = SurveyAllocation.SURVEY
             survey_allocation.save()
@@ -137,30 +142,42 @@ def get_answers(node, qset, question_map):
 
 
 def save_answers(qset, access_channel, question_map, answers, survey_allocation, survey_parameters=None,
-                 reference_interview=None, media_files=None):
+                 reference_interview=None, media_files=None, interview_id=None):
     survey = survey_allocation.survey
     ea = survey_allocation.allocation_ea
     interviewer = access_channel.interviewer
 
     def _save_record(record):
-        interview = Interview.objects.create(survey=survey, question_set=qset,
-                                             ea=ea,
-                                             interviewer=interviewer,
-                                             interview_channel=access_channel,
-                                             closure_date=timezone.now(),
-                                             interview_reference_id=reference_interview)
+        try:
+            interview = Interview.objects.get(id=interview_id)
+            interview.interviewer = interviewer
+            interview.interview_channel = access_channel
+            interview.save()
+        except Interview.DoesNotExist:
+            interview, _ = Interview.objects.get_or_create(survey=survey, question_set=qset,
+                                                           ea=ea,
+                                                           interviewer=interviewer,
+                                                           interview_channel=access_channel,
+                                                           closure_date=timezone.now(),
+                                                           interview_reference_id=reference_interview)
         map(lambda (q_id, answer): _save_answer(interview, q_id, answer), record.items())
         if survey_parameters:
             map(lambda (q_id, answer): _save_answer(interview, q_id, answer), survey_parameters.items())
 
     def _save_answer(interview, q_id, answer):
         question = question_map.get(q_id, None)
-        if question:
+        if question and answer:
             answer_class = Answer.get_class(question.answer_type)
             if question.answer_type in [AudioAnswer.choice_name(), ImageAnswer.choice_name(),
                                         VideoAnswer.choice_name()]:
                 answer = media_files.get(answer, None)
-            answer_class.create(interview, question, answer)
+            try:
+                old_answer = answer_class.objects.get(interview=interview, question=question)
+                old_answer.update(answer)
+            except answer_class.DoesNotExist:
+                answer_class.create(interview, question, answer)
+            except Exception, ex:
+                print 'exception: %s' % str(ex)
     map(_save_record, answers)
 
 

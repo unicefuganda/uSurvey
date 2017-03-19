@@ -143,6 +143,10 @@ class Interview(BaseModel):
             kwargs['survey'] = survey
         return Interview.objects.filter(**kwargs)
 
+    @classmethod
+    def interviews(cls, survey):
+        return Interview.objects.filter(survey=survey)
+
     class Meta:
         app_label = 'survey'
 

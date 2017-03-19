@@ -25,8 +25,8 @@ from survey.odk.utils.odk_helper import get_survey_allocation, process_submissio
     response_with_mimetype_and_name, OpenRosaResponseBadRequest, OpenRosaRequestForbidden, OpenRosaRequestConflict, \
     OpenRosaResponseNotAllowed, OpenRosaResponse, OpenRosaResponseNotFound, OpenRosaServerError, \
     BaseOpenRosaResponse, HttpResponseNotAuthorized, http_digest_interviewer_auth, NotEnoughData
-from survey.models import Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing, \
-    HouseholdListing, SurveyAllocation, ODKFileDownload
+from survey.models import (Survey, Interviewer, Household, ODKSubmission, Answer, Batch, SurveyHouseholdListing,
+                           HouseholdListing, SurveyAllocation, ODKFileDownload, Interview, QuestionSet)
 from survey.models import ListingSample
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
@@ -104,6 +104,50 @@ def submission_list(request):
     return render(request, 'odk/submission_list.html', {'submissions': odk_submissions,
                                                         'placeholder': 'interviewer, house, member, survey',
                                                         'request': request})
+
+
+@http_digest_interviewer_auth
+@require_GET
+def instances_form_list(request):
+    """ This is where ODK Collect gets its download list.
+    """
+    interviewer = request.user
+    interviews = Interview.objects.filter(ea__in=[a.allocation_ea for a in interviewer.unfinished_assignments],
+                                          survey=interviewer.unfinished_assignments.first().survey)
+    content = render_to_string("odk/instances_xformsList.xml", {
+        'interviewer': interviewer,
+        'interviews': interviews,
+        'request': request,
+    })
+    response = BaseOpenRosaResponse(content)
+    response.status_code = 200
+    return response
+
+
+@http_digest_interviewer_auth
+def download_odk_interviews(request, interview_id):
+    interviewer = request.user
+    interview = Interview.get(pk=interview_id)
+    answers_dict = {}
+    map(lambda a: answers_dict.update({a.question.pk: a.as_value}), interview.answer.all())
+    survey = interview.survey
+    ea = interview.ea
+    ea_samples = {}
+    assignments = get_survey_allocation(interviewer)
+    if survey.has_sampling:
+       ea_samples[ea.pk] = ListingSample.samples(survey, ea)
+    content = render_to_string("odk/instances.xml", {
+        'interviewer': interviewer,
+        'interview': interview,
+        'qset': QuestionSet.get(pk=interview.question_set.pk),
+        'assignment': assignments[0],           # intentional let it fail if nothing
+        'request': request,
+        'answers_dict': answers_dict,
+        'SurveyAllocation': SurveyAllocation,
+    })
+    response = BaseOpenRosaResponse(content)
+    response.status_code = 200
+    return response
 
 
 @http_digest_interviewer_auth

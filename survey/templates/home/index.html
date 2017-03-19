@@ -146,33 +146,32 @@ $(function(){
 function getCompletionFor(){
     var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val();
     $.getJSON(survey_url, function (rate_data) {
-      $.each(mapData, function(element){
-         mapData.features.map(function(feature){
+        mapData.features.map(function(feature){
           var property = feature.properties['{{loc_field}}'];
-          if(property === undefined)
+          if(!property)
             property = feature.properties['{{alt_loc_field}}'];
-          if(property)
+          if(property && property.toUpperCase() in rate_data) {
             property = property.toUpperCase();
-          feature.properties.rate = rate_data[property]
-        })
-      });
+            feature.properties.rate = rate_data[property];
+          }
+          else
+              feature.properties.rate = {'value': 0, description: ''};
+        });
        geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
     });
 }
 
 function loadInitialMap(){
     $.getJSON("{{shape_file_uri}}", function (data) {
-          mapData = data;
-          $.each(data, function(element){
-             data.features.map(function(feature){
-              var property = feature.properties['{{loc_field}}'];
-              if(property === undefined)
-                property = feature.properties['{{alt_loc_field}}'];
-              if(property)
-                property = property.toUpperCase();
-              feature.properties.rate = {value: -2, description: ''};
-            })
-          });
+         mapData = data;
+         data.features.map(function(feature){
+          var property = feature.properties['{{loc_field}}'];
+          if(property === undefined)
+            property = feature.properties['{{alt_loc_field}}'];
+          if(property)
+            property = property.toUpperCase();
+          feature.properties.rate = {value: -2, description: ''};
+        })
        geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
       });
 }
@@ -188,14 +187,18 @@ function getColorFor(rate) {
     }
 
 function style(feature) {
-    return {
-        fillColor: getColorFor(feature.properties.rate.value),
-        weight: 2,
-        opacity: 0.55,
-        color: '#FD8D3C',
-        dashArray: '3',
-        fillOpacity: 1
-    };
+   try {
+        return {
+            fillColor: getColorFor(feature.properties.rate.value),
+            weight: 2,
+            opacity: 0.55,
+            color: '#FD8D3C',
+            dashArray: '3',
+            fillOpacity: 1
+        };
+    }catch(err){
+
+    }
 }
 
 function onEachFeature(feature, layer) {
@@ -213,26 +216,20 @@ info.onAdd = function (map) {
 };
 info.update = function (props) {
   this._div.innerHTML = '';
-  if($('#id_indicator').val()) {
-    this._div.innerHTML += "<h5> "+ $("#id_indicator option:selected").text() + '</h5><br />';
-   }
-   this._div.innerHTML += $("#id_metric option:selected").text()+ '&nbsp;';
-  if($('#id_parameter').val())
-     this._div.innerHTML += ':&nbsp;Respondents saying: ' + $('#id_parameter').val();
   if(typeof props != 'undefined'){
     var property = props['{{loc_field}}'];
-    if(property === undefined)
+    if(!property)
         property = props['{{alt_loc_field}}'];
-    if(property)
+    if(property) {
        property = property.toUpperCase();
-    if(props.rate.value >-2){
-        rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
-        this._div.innerHTML += property +': '+ rate.description;
+        if(props.rate.value >-2){
+            rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
+            this._div.innerHTML += property +': '+ rate.description;
+        }
+        else{
+            this._div.innerHTML = property;
+        }
     }
-    else{
-        this._div.innerHTML = property;
-    }
-
   }
 };
 
@@ -253,16 +250,16 @@ legend.onAdd = function (map) {
     return div;
 };
 
-var survey_selector = L.control({position: 'topleft'});
+<!--var survey_selector = L.control({position: 'topleft'});-->
 
-    survey_selector.onAdd = function(map){
-        var selector_div = L.DomUtil.create('div', 'survey');
-        var surveysHtml = $('#map_filter');
-        $(selector_div).html(surveysHtml.html());
-        $(surveysHtml).removeAttr('class', 'hide')
-        $(surveysHtml).remove()
-        return selector_div;
-    }
+    <!--survey_selector.onAdd = function(map){-->
+        <!--var selector_div = L.DomUtil.create('div', 'survey');-->
+        <!--var surveysHtml = $('#map_filter');-->
+        <!--$(selector_div).html(surveysHtml.html());-->
+        <!--$(surveysHtml).removeAttr('class', 'hide')-->
+        <!--$(surveysHtml).remove()-->
+        <!--return selector_div;-->
+    <!--}-->
 
 legend.addTo(map);
 info.addTo(map);
