@@ -352,15 +352,36 @@ class Answer(BaseModel):
 class AutoResponse(Answer):
     """Shall be used to capture responses auto generated
     """
-    value = models.PositiveIntegerField(null=True)
+    value = models.CharField(null=True, max_length=100)
 
     class Meta:
         app_label = 'survey'
         abstract = False
 
     @classmethod
+    def prep_value(cls, val):
+        return str(val).zfill(9)
+
+    @classmethod
     def choice_name(cls):
         return 'Auto Generated'
+
+    @classmethod
+    def create(cls, interview, question, answer):
+        """Anwer shall be auto prepended with interviewer name
+                :param interview:
+        :param question:
+        :param answer:
+        :return:
+        """
+        try:
+            value = int(answer)
+            text_value = '%s-%s' % (interview.interview_channel.user_identifier,
+                                    cls.prep_value(value))    # zero fill to 1billion
+        except Exception:
+            raise
+        return super(AutoResponse, cls).create(interview, question, answer,
+                                               as_text=text_value, as_value=text_value)
 
 
 class NumericalAnswer(Answer):
