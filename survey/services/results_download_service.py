@@ -126,7 +126,7 @@ class ResultsDownloadService(object):
         except EmptyResultSet:
             answers_df = pd.DataFrame(columns=answer_columns)
         # not get pivot table of interview_id, identifier and question value
-        return answers_df.pivot(index='id', columns='identifier', values=value)
+        return answers_df.pivot_table(index='id', columns='identifier', values=value, aggfunc=','.join)
 
     def generate_interview_reports(self):
         return self.get_interview_answers()
