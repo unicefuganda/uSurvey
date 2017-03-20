@@ -355,7 +355,7 @@ SHAPE_FILE_LOC_FIELD = 'DNAME_2010'
 SHAPE_FILE_LOC_ALT_FIELD = 'DNAME_2006'
 MAP_CENTER = '1.34,32.683525'           # must be in format for log lat. see: http://geojson.org/geojson-spec.html
 MAP_ADMIN_LEVEL = 1      # 0 for country level, 1 first level below country, 2 for second level etc.
-MAP_ZOOM_LEVEL = 4
+MAP_ZOOM_LEVEL = 7
 
 RESULT_REFRESH_FREQ = 6
 MEMORIZE_TIMEOUT = 120

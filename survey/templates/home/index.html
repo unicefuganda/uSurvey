@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block extra_head %}
-<link rel="stylesheet" href="/static/css/leaflet.css" />
-   <script src="/static/js/leaflet.js"></script>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 
     <style>
         .map-show {
@@ -15,9 +15,9 @@
         }
 
         .leaflet-container {
-        margin-bottom: 10px;
-        margin-left: 384px;
-         overflow: hidden;
+            margin-bottom: 10px;
+            margin-left: 384px;
+            background-color:rgba(255,0,0,0.0);
         }
 
         .dataTables_wrapper .row:first-child {
@@ -82,11 +82,12 @@
     <div class="map-show">
         <div class="col-md-2"><br/>
             <div id="map-controls">
-            
                 {{map_filter}}
             </div><br/>
 
-            <div id="legend"></div>
+            <div id="map-legend"></div>
+            <br />
+            <div id="info-update"></div>
 
         </div>
 
@@ -156,7 +157,7 @@ var legend = null;
 var grades = [20, 40, 60, 80, 100];
 var step = null;
 
-function updateLegend(max) {
+function updateLegend2(max) {
     var oldLegend = legend;
     legend = L.control({position: 'bottomright'});
     if(max < 25)
@@ -183,7 +184,7 @@ function updateLegend(max) {
     legend.addTo(map);
 }
 
-function updateLegend1(max) {
+function updateLegend(max) {
     if(max < 25)
         max = 25;       //just to make sure it is divisible into 5 places.
     step = max/5.
@@ -247,7 +248,7 @@ function getColorFor(rate) {
            rate > 20 && rate <= 40  ? '#FC4E2A' :
            rate > 0  && rate <= 20  ? '#FD8D3C' :
            rate == 0 ? '#FFFFFF':
-           '#D1D0CE';
+           '#307ECC';
     }
 
 function style(feature) {
@@ -295,7 +296,8 @@ info.onAdd = function (map) {
   return this._div;
 };
 info.update = function (props) {
-  this._div.innerHTML = '';
+  var div = document.getElementById('info-update');
+  div.innerHTML = '';
   if(typeof props != 'undefined'){
     var property = props['{{loc_field}}'];
     if(!property)
@@ -304,15 +306,15 @@ info.update = function (props) {
        property = property.toUpperCase();
         if('total_eas' in props.rate){
             rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
-            this._div.innerHTML += '<h3>' + property +'</h3>';
-            this._div.innerHTML += '<br /><strong>Interviews</strong>' +': '+ props.rate.total_interviews;
-            this._div.innerHTML += '<br /><strong>Total EAs</strong>' +': '+ props.rate.total_eas;
-            this._div.innerHTML += '<br /><strong>Interviews (Per EA)</strong>' +': '+ props.rate.value;
-            this._div.innerHTML += '<br /><strong>Interviewed EAs</strong>' +': '+ props.rate.active_eas;
-            this._div.innerHTML += '<br /><strong>Per Interviewed EA (Ave)</strong>' +': '+ props.rate.per_active_ea;
+            div.innerHTML += '<h3>' + property +'</h3>';
+            div.innerHTML += '<br /><strong>Interviews</strong>' +': '+ props.rate.total_interviews;
+            div.innerHTML += '<br /><strong>Total EAs</strong>' +': '+ props.rate.total_eas;
+            div.innerHTML += '<br /><strong>Interviews (Per EA)</strong>' +': '+ props.rate.value;
+            div.innerHTML += '<br /><strong>Interviewed EAs</strong>' +': '+ props.rate.active_eas;
+            div.innerHTML += '<br /><strong>Per Interviewed EA (Ave)</strong>' +': '+ props.rate.per_active_ea;
         }
         else{
-            this._div.innerHTML = '<h3>' + property +'</h3>';
+            div.innerHTML = '<h3>' + property +'</h3>';
         }
     }
   }
