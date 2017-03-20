@@ -80,22 +80,18 @@
 {% block content %}
 <div id="home_display">
     <div class="map-show">
-<<<<<<< HEAD
         <div class="col-md-2"><br/>
-            {{map_filter}}
-        </div>
-        <div class="col-md-6">
-=======
-        <div id="map-controls">
-            <div class="col-md-4">
+            <div id="map-controls">
+            
                 {{map_filter}}
-            </div>
-            <br />
-            <div id="map-legend">
-            </div>
+            </div><br/>
+
+            <div id="legend"></div>
+
         </div>
-        <div class="col-md-4">
->>>>>>> 084adcf40def7901ce22ee1d43c33f4e600fbd5c
+
+        <div class="col-md-6">
+
            <div id="survey_map" />
         </div>
     </div>
@@ -135,7 +131,6 @@
   </div>
 </div>
        </div> 
-</div>
 {% endblock%}
 
 {% block javascripts %}
