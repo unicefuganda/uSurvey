@@ -143,8 +143,42 @@ $(function(){
 });
 
 
+
+var legend = null;
+
+function updateLegend(max) {
+    var oldLegend = legend;
+    legend = L.control({position: 'bottomright'});
+    if(max < 25)
+        max = 25;       //just to make sure it is divisible into 5 places.
+    var step = max/5.
+
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend');
+        div.innerHTML = '';
+       grades = [20, 40, 60, 80, 100];
+        div.innerHTML += "<strong>Interview per EA</strong><br />"
+            + '<i style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
+        for (var i = 0; i < 4; i++) {
+            div.innerHTML += '<i style="background:' + getColorFor(grades[i]) + '"></i> ';
+            div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
+        }
+        div.innerHTML += '<i style="background:' + getColorFor(grades[4]) + '"></i> ';
+        div.innerHTML += Math.floor(4*step) +" and Above";
+        return div;
+    };
+    try {
+        if(oldLegend)
+            map.removeControl(oldLegend);
+    }catch(err){}
+    legend.addTo(map);
+}
+
 function getCompletionFor(){
+    if(!$("#id_survey").val())
+        return resetMap();
     var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val();
+    max_rate = 0;
     $.getJSON(survey_url, function (rate_data) {
         mapData.features.map(function(feature){
           var property = feature.properties['{{loc_field}}'];
@@ -153,28 +187,33 @@ function getCompletionFor(){
           if(property && property.toUpperCase() in rate_data) {
             property = property.toUpperCase();
             feature.properties.rate = rate_data[property];
+            max_rate = Math.max(max_rate, rate_data[property].value);
           }
           else
               feature.properties.rate = {'value': 0, description: ''};
         });
        geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
+       //update legend
+        updateLegend(max_rate);
     });
+
 }
 
 function loadInitialMap(){
     $.getJSON("{{shape_file_uri}}", function (data) {
          mapData = data;
-         data.features.map(function(feature){
-          var property = feature.properties['{{loc_field}}'];
-          if(property === undefined)
-            property = feature.properties['{{alt_loc_field}}'];
-          if(property)
-            property = property.toUpperCase();
-          feature.properties.rate = {value: -2, description: ''};
-        })
-       geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
+         resetMap();
       });
 }
+
+
+function resetMap() {
+    mapData.features.map(function(feature){
+            feature.properties.rate = {value: null};
+        });
+       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
+}
+
 
 function getColorFor(rate) {
     return rate > 80 && rate <= 100 ? '#800026' :
@@ -189,7 +228,7 @@ function getColorFor(rate) {
 function style(feature) {
    try {
         return {
-            fillColor: getColorFor(feature.properties.rate.value),
+            fillColor: getColorFor(feature.properties.rate.value/5),
             weight: 2,
             opacity: 0.55,
             color: '#FD8D3C',
@@ -222,33 +261,20 @@ info.update = function (props) {
         property = props['{{alt_loc_field}}'];
     if(property) {
        property = property.toUpperCase();
-        if(props.rate.value >-2){
+        if('total_eas' in props.rate){
             rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
-            this._div.innerHTML += property +': '+ rate.description;
+            this._div.innerHTML += '<h3>' + property +'</h3>';
+            this._div.innerHTML += '<br /><strong>Interviews</strong>' +': '+ props.rate.total_interviews;
+            this._div.innerHTML += '<br /><strong>Total EAs</strong>' +': '+ props.rate.total_eas;
+            this._div.innerHTML += '<br /><strong>Interviews per EA</strong>' +': '+ props.rate.value;
         }
         else{
-            this._div.innerHTML = property;
+            this._div.innerHTML = '<h3>' + property +'</h3>';
         }
     }
   }
 };
 
-var legend = L.control({position: 'bottomright'});
-
-legend.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'info legend'),
-        grades = [0,20, 40, 60, 80, 100];
-    div.innerHTML += "<h3>Key</h3>"
-        + '<i style="background:' + getColorFor(-1) + '"></i>'+ " Survey not opened<br/>";
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + getColorFor(grades[i] + 1) + '"></i> ';
-        if(typeof  grades[i] != 'undefined' && typeof  grades[i +1] != 'undefined'){
-            div.innerHTML += grades[i] +" &mdash; "+ (grades[i + 1]) + "<br/>"
-        }
-    }
-    return div;
-};
 
 <!--var survey_selector = L.control({position: 'topleft'});-->
 
@@ -261,8 +287,7 @@ legend.onAdd = function (map) {
         <!--return selector_div;-->
     <!--}-->
 
-legend.addTo(map);
-info.addTo(map);
+
 //survey_selector.addTo(map)
 
 function highlightAdminLevel(event){
@@ -280,13 +305,15 @@ function highlightAdminLevel(event){
     info.update(layer.feature.properties)
 }
 
+info.addTo(map);
+
 function zoomAdminLevel(event){
     map.fitBounds(event.target.getBounds());
     var layer = event.target;
     var adminLevel = layer.feature.properties['{{loc_field}}'];
     if(!adminLevel)
          adminLevel = layer.feature.properties['{{alt_loc_field}}'];
-    alert('AdminLevel: ' + adminLevel);
+    //alert('AdminLevel: ' + adminLevel);
 
 }
 

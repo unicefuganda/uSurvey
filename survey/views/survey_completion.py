@@ -151,14 +151,12 @@ def completion_json(request, survey_id):
         completion_rates = {}
         has_sampling = survey.has_sampling
         is_open = survey.is_open()
-        description = 'Responses'
-        total = Interview.interviews(survey).distinct('id').count() or 1.0
         #basically get interviews count
         for location in location_type.locations.all():
             description = 'Percentage Responses'
             total_eas = EnumerationArea.under_(location).count()
             total_interviews = Interview.interviews_in(location, survey).distinct('id').count()
-            indicator_value =  float(total_interviews) / total_eas
+            indicator_value = float(total_interviews) / total_eas
             completion_rates[location.name.upper()] = {'value': '{0:.2f}'.format(indicator_value),
                                                        'total_eas': total_eas,
                                                        'total_interviews': total_interviews}
