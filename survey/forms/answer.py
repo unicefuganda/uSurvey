@@ -159,8 +159,6 @@ class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin):
         self.fields['ea'].choices = [(idx+1, sa.allocation_ea.name) for idx, sa in
                                      enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
         self.order_fields(['ea', 'test_data'])
-        # self.fields['ea'].empty_label = 'Select EA'
-        #self.fields['ea'].widget = forms.RadioSelect()
 
     def clean_ea(self):
         selected = int(self.cleaned_data['ea'])

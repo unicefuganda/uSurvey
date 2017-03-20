@@ -4,28 +4,32 @@
    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 
     <style>
-        #indicators {
-            float: right;
+        .map-show {
+            width: 70%
+            display: inline-block;
         }
-        <!--.leaflet-container {
-            background-color:rgba(255,0,0,0.0);
-        }-->
+
+        #indicators {
+            width: 30%;
+            display: inline-block;
+        }
+
         .leaflet-container {
-    margin-bottom: 10px;
-    margin-left: 384px;
-     overflow: hidden;
-}
+        margin-bottom: 10px;
+        margin-left: 384px;
+         overflow: hidden;
+        }
 
-.dataTables_wrapper .row:first-child {
-    display: none;
-  }
+        .dataTables_wrapper .row:first-child {
+            display: none;
+          }
 
-.dataTables_wrapper label {
-    display: inline-block !important;
-    font-size: 13px !important;
-    margin-top: 20px !important;
-    margin-left: -25px !important;
-}
+        .dataTables_wrapper label {
+            display: inline-block !important;
+            font-size: 13px !important;
+            margin-top: 20px !important;
+            margin-left: -25px !important;
+        }
         .rop {
          text-align:center;
          }
@@ -75,15 +79,15 @@
 {% endblock %}
 {% block content %}
 <div id="home_display">
-
-    <div class="col-md-4">
-      {% include "dashboard_form.html" with a_form=map_filter no_button=True filter_id='map_filter' %}
+    <div class="map-show">
+        <div class="col-md-4">
+            {{map_filter}}
+        </div>
+        <div class="col-md-4"><br/>
+           <div id="survey_map" />
+        </div>
     </div>
-    <div class="col-md-4"><br/>
-       <div id="survey_map" >
-    </div>
-    </div>
-    <div id="indicators" class="col-md-2">
+    <div id="indicators" class="indicators">
 
         <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
 <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
@@ -116,7 +120,7 @@
              </tbody>
     </table>
   </div>
-   
+
         
 </div>
 {% endblock%}
@@ -132,71 +136,84 @@
   var mapData = null;
 
 $(function(){
-    $(".map-filter").on('change', function(){
+    $("#id_survey").on('change', function(){
         getCompletionFor();
     });
-    $('#id_survey').on('change', function(){
-        updateIndicators();
-    });
-    $('#id_indicator').on('change', function(){
-        updateParameters();
-    });
-    //getCompletionFor();
     loadInitialMap();
 });
 
-function updateIndicators() {
-    var url = '{% url "survey_indicators" %}?survey=' + $("#id_survey").val();
-    $.get(url, function( datas ) {
-       $('#id_indicator').find("option:gt(0)").remove();
-       $.each(datas, function (i, data) {
-            $('#id_indicator').append('<option value="' + data['id'] + '">' + data['name'] + "</option>");
-        });
-    });
-}
 
-function updateParameters() {
-    $.get( '{% url "survey_parameters" %}?indicator=' + $("#id_indicator").val(), function( datas ) {
-       $('#id_parameter').find("option:gt(0)").remove();
-       $.each(datas, function (i, data) {
-            $('#id_parameter').append('<option value="' + data['id'] + '">' + data['name'] + "</option>");
-        });
-    });
+
+var legend = null;
+
+function updateLegend(max) {
+    var oldLegend = legend;
+    legend = L.control({position: 'bottomright'});
+    if(max < 25)
+        max = 25;       //just to make sure it is divisible into 5 places.
+    var step = max/5.
+
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend');
+        div.innerHTML = '';
+       grades = [20, 40, 60, 80, 100];
+        div.innerHTML += "<strong>Interview per EA</strong><br />"
+            + '<i style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
+        for (var i = 0; i < 4; i++) {
+            div.innerHTML += '<i style="background:' + getColorFor(grades[i]) + '"></i> ';
+            div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
+        }
+        div.innerHTML += '<i style="background:' + getColorFor(grades[4]) + '"></i> ';
+        div.innerHTML += Math.floor(4*step) +" and Above";
+        return div;
+    };
+    try {
+        if(oldLegend)
+            map.removeControl(oldLegend);
+    }catch(err){}
+    legend.addTo(map);
 }
 
 function getCompletionFor(){
-    var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val()+'&indicator='+$("#id_indicator").val()+'&parameter='+$("#id_parameter").val()+'&metric='+$("#id_metric").val();
+    if(!$("#id_survey").val())
+        return resetMap();
+    var survey_url = "{% url 'survey_json_summary' %}?survey=" + $("#id_survey").val();
+    max_rate = 0;
     $.getJSON(survey_url, function (rate_data) {
-      $.each(mapData, function(element){
-         mapData.features.map(function(feature){
+        mapData.features.map(function(feature){
           var property = feature.properties['{{loc_field}}'];
-          if(property === undefined)
+          if(!property)
             property = feature.properties['{{alt_loc_field}}'];
-          if(property)
+          if(property && property.toUpperCase() in rate_data) {
             property = property.toUpperCase();
-          feature.properties.rate = rate_data[property]
-        })
-      });
+            feature.properties.rate = rate_data[property];
+            max_rate = Math.max(max_rate, rate_data[property].value);
+          }
+          else
+              feature.properties.rate = {'value': 0, description: ''};
+        });
        geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
+       //update legend
+        updateLegend(max_rate);
     });
+
 }
 
 function loadInitialMap(){
     $.getJSON("{{shape_file_uri}}", function (data) {
-          mapData = data;
-          $.each(data, function(element){
-             data.features.map(function(feature){
-              var property = feature.properties['{{loc_field}}'];
-              if(property === undefined)
-                property = feature.properties['{{alt_loc_field}}'];
-              if(property)
-                property = property.toUpperCase();
-              feature.properties.rate = {value: -2, description: ''};
-            })
-          });
-       geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
+         mapData = data;
+         resetMap();
       });
 }
+
+
+function resetMap() {
+    mapData.features.map(function(feature){
+            feature.properties.rate = {value: null};
+        });
+       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
+}
+
 
 function getColorFor(rate) {
     return rate > 80 && rate <= 100 ? '#800026' :
@@ -209,14 +226,18 @@ function getColorFor(rate) {
     }
 
 function style(feature) {
-    return {
-        fillColor: getColorFor(feature.properties.rate.value),
-        weight: 2,
-        opacity: 0.55,
-        color: '#FD8D3C',
-        dashArray: '3',
-        fillOpacity: 1
-    };
+   try {
+        return {
+            fillColor: getColorFor(feature.properties.rate.value/5),
+            weight: 2,
+            opacity: 0.55,
+            color: '#FD8D3C',
+            dashArray: '3',
+            fillOpacity: 1
+        };
+    }catch(err){
+
+    }
 }
 
 function onEachFeature(feature, layer) {
@@ -234,59 +255,39 @@ info.onAdd = function (map) {
 };
 info.update = function (props) {
   this._div.innerHTML = '';
-  if($('#id_indicator').val()) {
-    this._div.innerHTML += "<h5> "+ $("#id_indicator option:selected").text() + '</h5><br />';
-   }
-   this._div.innerHTML += $("#id_metric option:selected").text()+ '&nbsp;';
-  if($('#id_parameter').val())
-     this._div.innerHTML += ':&nbsp;Respondents saying: ' + $('#id_parameter').val();
   if(typeof props != 'undefined'){
     var property = props['{{loc_field}}'];
-    if(property === undefined)
+    if(!property)
         property = props['{{alt_loc_field}}'];
-    if(property)
+    if(property) {
        property = property.toUpperCase();
-    if(props.rate.value >-2){
-        rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
-        this._div.innerHTML += property +': '+ rate.description;
+        if('total_eas' in props.rate){
+            rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
+            this._div.innerHTML += '<h3>' + property +'</h3>';
+            this._div.innerHTML += '<br /><strong>Interviews</strong>' +': '+ props.rate.total_interviews;
+            this._div.innerHTML += '<br /><strong>Total EAs</strong>' +': '+ props.rate.total_eas;
+            this._div.innerHTML += '<br /><strong>Interviews per EA</strong>' +': '+ props.rate.value;
+        }
+        else{
+            this._div.innerHTML = '<h3>' + property +'</h3>';
+        }
     }
-    else{
-        this._div.innerHTML = property;
-    }
-
   }
 };
 
-var legend = L.control({position: 'bottomright'});
 
-legend.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'info legend'),
-        grades = [0,20, 40, 60, 80, 100];
-    div.innerHTML += "<h3>Key</h3>"
-        + '<i style="background:' + getColorFor(-1) + '"></i>'+ " Survey not opened<br/>";
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + getColorFor(grades[i] + 1) + '"></i> ';
-        if(typeof  grades[i] != 'undefined' && typeof  grades[i +1] != 'undefined'){
-            div.innerHTML += grades[i] +" &mdash; "+ (grades[i + 1]) + "<br/>"
-        }
-    }
-    return div;
-};
+<!--var survey_selector = L.control({position: 'topleft'});-->
 
-var survey_selector = L.control({position: 'topleft'});
+    <!--survey_selector.onAdd = function(map){-->
+        <!--var selector_div = L.DomUtil.create('div', 'survey');-->
+        <!--var surveysHtml = $('#map_filter');-->
+        <!--$(selector_div).html(surveysHtml.html());-->
+        <!--$(surveysHtml).removeAttr('class', 'hide')-->
+        <!--$(surveysHtml).remove()-->
+        <!--return selector_div;-->
+    <!--}-->
 
-    survey_selector.onAdd = function(map){
-        var selector_div = L.DomUtil.create('div', 'survey');
-        var surveysHtml = $('#map_filter');
-        $(selector_div).html(surveysHtml.html());
-        $(surveysHtml).removeAttr('class', 'hide')
-        $(surveysHtml).remove()
-        return selector_div;
-    }
 
-legend.addTo(map);
-info.addTo(map);
 //survey_selector.addTo(map)
 
 function highlightAdminLevel(event){
@@ -304,13 +305,15 @@ function highlightAdminLevel(event){
     info.update(layer.feature.properties)
 }
 
+info.addTo(map);
+
 function zoomAdminLevel(event){
     map.fitBounds(event.target.getBounds());
     var layer = event.target;
     var adminLevel = layer.feature.properties['{{loc_field}}'];
     if(!adminLevel)
          adminLevel = layer.feature.properties['{{alt_loc_field}}'];
-    alert('AdminLevel: ' + adminLevel);
+    //alert('AdminLevel: ' + adminLevel);
 
 }
 

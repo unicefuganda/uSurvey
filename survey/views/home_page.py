@@ -16,6 +16,9 @@ from survey.forms.filters import MapFilterForm
 @login_required
 def home(request):
     map_filter = MapFilterForm(request.GET)
+    in_kwargs = {'display_on_dashboard': True}
+    if request.GET.get('survey'):
+        in_kwargs['survey__id'] = request.GET['survey']
     return render(request, 'home/index.html', {'surveys': Survey.objects.all().order_by('name'),
                                                'title': settings.PROJECT_TITLE,
                                                'twitter_token': settings.TWITTER_TOKEN,
@@ -27,7 +30,7 @@ def home(request):
                                                'map_center': settings.MAP_CENTER,
                                                'zoom_level': settings.MAP_ZOOM_LEVEL,
                                                'display_indicators':
-                                                   Indicator.objects.filter(display_on_dashboard=True)})
+                                                   Indicator.objects.filter(**in_kwargs)})
 
 
 def index(request):

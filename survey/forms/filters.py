@@ -203,24 +203,7 @@ class IndicatorMetricFilterForm(forms.Form):
 
 class MapFilterForm(forms.Form):
     survey = forms.ModelChoiceField(queryset=Survey.objects.all(), required=False, empty_label='Choose Survey',
-                                    widget=forms.Select(attrs={'class': 'map-filter'}))
-    # indicator = forms.ModelChoiceField(Indicator.objects.none(), required=False, empty_label='Choose Indicator',
-    #                                    widget=forms.Select(attrs={'class': 'map-filter'}))
-    # # parameter = forms.ModelChoiceField(queryset=BatchQuestion.objects.none(), empty_label='Choose Paramater',
-    # #                                    widget=forms.Select(attrs={'class': 'map-filter'}))
-    # metric = forms.ChoiceField(choices=[(Indicator.PERCENTAGE, 'Percentage'), (Indicator.COUNT, 'Count')],
-    #                            initial=Indicator.PERCENTAGE, required=False,
-    #                            widget=forms.Select(attrs={'class': 'map-filter'}))
-
-    # def __init__(self, *args, **kwargs):
-    #     super(MapFilterForm, self).__init__( *args, **kwargs)
-    #     if self.data.get('survey', None):
-    #         questions = []
-    #         survey_id = self.data['survey']
-    #         map(lambda b: questions.extend(list(b.questions.all())), Batch.objects.filter(survey__id=survey_id))
-    #         self.fields['indicator'].queryset = Indicator.objects.filter(parameter__in=questions)
-    #     if self.data.get('indicator', None):
-    #         self.fields['parameter'].queryset = BatchQuestion.objects.fiter(indicators__id=self.data['indicator'])
+                                    widget=forms.Select(attrs={'class': 'map-filter chzn-select'}), label='')
 
 
 class QuestionSetResultsFilterForm(forms.Form):
@@ -264,12 +247,3 @@ class SurveyResultsFilterForm(forms.Form):
         if self.data.get('question_set', None):
             kwargs['question_set__id'] = self.data['question_set']
         return interviews.filter(**kwargs)
-
-#
-# class SurveyStatusFilter(forms.Form):
-#     STARTED = 1
-#     ONGOING = 2
-#
-#     status = forms.ChoiceField(
-#         label='Status', widget=forms.Select(), choices=[(0, '-- All Status --'), (ACTIVE, 'Active'),
-#                                                         (DEACTIVATED, 'Deactivated')], required=False)
