@@ -146,18 +146,19 @@ $(function(){
 
 
 var legend = null;
+var grades = [20, 40, 60, 80, 100];
+var step = null;
 
 function updateLegend(max) {
     var oldLegend = legend;
     legend = L.control({position: 'bottomright'});
     if(max < 25)
         max = 25;       //just to make sure it is divisible into 5 places.
-    var step = max/5.
+    step = max/5.
 
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'info legend');
         div.innerHTML = '';
-       grades = [20, 40, 60, 80, 100];
         div.innerHTML += "<strong>Interview per EA</strong><br />"
             + '<i style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
         for (var i = 0; i < 4; i++) {
@@ -193,9 +194,9 @@ function getCompletionFor(){
           else
               feature.properties.rate = {'value': 0, description: ''};
         });
-       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
        //update legend
         updateLegend(max_rate);
+       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
     });
 
 }
@@ -227,9 +228,11 @@ function getColorFor(rate) {
     }
 
 function style(feature) {
+   var i = Math.floor(feature.properties.rate.value/step);
+   //console.info('i: ' + i + 'grade: ' + grades[i-1] + 'rate: ' + feature.properties.rate.value + ' step: ' + step );
    try {
         return {
-            fillColor: getColorFor(feature.properties.rate.value/5),
+            fillColor: getColorFor(grades[i-1]),
             weight: 2,
             opacity: 0.55,
             color: '#FD8D3C',
