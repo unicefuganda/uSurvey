@@ -103,8 +103,8 @@
  -->
          <thead>
                 <tr role="row">
-                    <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Indicator Name</th>
                     <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending">Survey</th>
+                    <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Indicator</th>
                     <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Value</th>
                     <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Details</th>
                  </tr>
@@ -113,10 +113,10 @@
                 {% for indicator in display_indicators %}
                   <tr>
                     <td>
-                      <a href="{% url 'simple_indicator_chart_page' indicator.pk %}">{{ indicator.name }}</a>
+                      {{ indicator.survey }}
                     </td>
                     <td>
-                      {{ indicator.survey }}
+                      <a href="{% url 'simple_indicator_chart_page' indicator.pk %}">{{ indicator.name }}</a>
                     </td>
                     <td>
                        {{ indicator.country_wide_value }}
