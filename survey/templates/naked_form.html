@@ -105,8 +105,19 @@
     <div class="controls {{ field|is_radio }}">
     <label class="control-label" for="{{field.auto_id}}">{{field.label}}
     </label>
-
+    
+      {% if field.name == 'formulae' %}
       {{field}}
+       <div class="input-prepend" style="display: inline-block; border: none;">
+     
+          
+    <button type="button" id="math_validate" class="btn btn-primary">Validate Formulae</button>
+    <div id="formule_msg" ></div>
+    </div>
+      {%else%}
+        {{field}}
+      {%endif%}
+
 
         {% if field.field.icons %}
             <div class="input-prepend" style="display: inline-block; border: none;">

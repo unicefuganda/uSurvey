@@ -24,11 +24,12 @@
         text-align: left;
         width: 150px;
     }
+    .text-danger{color: red;}
 </style>
 {% endblock %}
 {% block display_form_fields %}
     {% include "naked_form.html" with a_form=indicator_form %}
-
+    
 {% endblock %}
     {% block non_form_content %}
        <div class="modal fade" id="add_variable" tabindex="-1" role="dialog"  aria-hidden="true">
@@ -73,6 +74,26 @@
     .dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {    margin-bottom: 0 !important;    margin-left: 4px!important;    margin-right: 4px!important;    margin-top: 0px !important;    padding: 3px !important;    width: 245px!important; line-height: 22px;
 }
 </style>
+
+
+
+<script type="text/javascript">
+   
+$('#math_validate').on('click', function() {
+  var indicator_id = $('#id_formulae').val();
+  $("#formule_msg").empty();
+  try{
+    eval(indicator_id);
+    $("#formule_msg").append("Valid Formulae Expression");
+    $("#formule_msg").attr("class","text-success");
+  } catch (e) {
+    $("#formule_msg").append("Invalid Formulae Expression");
+    $("#formule_msg").attr("class","text-danger");
+  }
+  
+});
+
+</script>
 
 <script type="text/javascript">
    $(document).ready(function() {
@@ -167,6 +188,7 @@
                     });
                 });
             </script>
+
 
 {% endblock %}
 
