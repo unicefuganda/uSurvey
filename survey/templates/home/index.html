@@ -268,11 +268,25 @@ function style(feature) {
 }
 
 function onEachFeature(feature, layer) {
+/*    var property = feature.properties['{{loc_field}}'];
+ if(!property)
+    property = feature.properties['{{alt_loc_field}}'];
+    if(property) {
+        property = property.toUpperCase();
+        var label = L.marker(layer.getBounds().getCenter(), {
+          icon: L.divIcon({
+            className: property,
+            html: '<span style="font-size: x-small;">'+property+'</span>',
+            iconSize: [25, 20]
+          })
+            }).addTo(map);
+    }*/
     layer.on({
       mouseover: highlightAdminLevel,
       click: zoomAdminLevel,
       mouseout: resetAdminLevelHighlight
   });
+
 }
 
 info.onAdd = function (map) {
