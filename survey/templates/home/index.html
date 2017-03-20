@@ -14,6 +14,12 @@
             
         }
 
+        .map-legend {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+        }
+
         .leaflet-container {
             margin-bottom: 10px;
             margin-left: 384px;
@@ -107,7 +113,6 @@
                     <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Price: activate to sort column ascending">Survey</th>
                     <th class="sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Domain: activate to sort column ascending">Indicator</th>
                     <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Value</th>
-                    <th class="hidden-480 sorting" tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1" aria-label="Clicks: activate to sort column ascending">Details</th>
                  </tr>
             </thead>
             <tbody>
@@ -191,12 +196,12 @@ function updateLegend(max) {
     var div = document.getElementById('map-legend');
     div.innerHTML = '';
     div.innerHTML += "<strong>Interview per EA</strong><br />"
-        + '<i style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
+        + '<i class="map-legend" style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
     for (var i = 0; i < 4; i++) {
-        div.innerHTML += '<i style="background:' + getColorFor(grades[i]) + ';"></i> ';
+        div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[i]) + ';"></i> ';
         div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
     }
-    div.innerHTML += '<i style="background:' + getColorFor(grades[4]) + '"></i> ';
+    div.innerHTML += '<i class="map-legend" style="background:' + getColorFor(grades[4]) + '"></i> ';
     div.innerHTML += Math.floor(4*step) +" and Above";
 }
 
