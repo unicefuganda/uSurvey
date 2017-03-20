@@ -80,10 +80,15 @@
 {% block content %}
 <div id="home_display">
     <div class="map-show">
-        <div class="col-md-4">
-            {{map_filter}}
+        <div id="map-controls">
+            <div class="col-md-4">
+                {{map_filter}}
+            </div>
+            <br />
+            <div id="map-legend">
+            </div>
         </div>
-        <div class="col-md-4"><br/>
+        <div class="col-md-4">
            <div id="survey_map" />
         </div>
     </div>
@@ -173,6 +178,22 @@ function updateLegend(max) {
             map.removeControl(oldLegend);
     }catch(err){}
     legend.addTo(map);
+}
+
+function updateLegend1(max) {
+    if(max < 25)
+        max = 25;       //just to make sure it is divisible into 5 places.
+    step = max/5.
+    var div = document.getElementById('map-legend');
+    div.innerHTML = '';
+    div.innerHTML += "<strong>Interview per EA</strong><br />"
+        + '<i style="background:' + getColorFor(null) + '"></i>'+ " Survey not opened<br/>";
+    for (var i = 0; i < 4; i++) {
+        div.innerHTML += '<i style="background:' + getColorFor(grades[i]) + ';"></i> ';
+        div.innerHTML += Math.floor(i*step) +" &mdash; "+ Math.floor((i + 1)*step) + "<br/>";
+    }
+    div.innerHTML += '<i style="background:' + getColorFor(grades[4]) + '"></i> ';
+    div.innerHTML += Math.floor(4*step) +" and Above";
 }
 
 function getCompletionFor(){
@@ -269,7 +290,9 @@ info.update = function (props) {
             this._div.innerHTML += '<h3>' + property +'</h3>';
             this._div.innerHTML += '<br /><strong>Interviews</strong>' +': '+ props.rate.total_interviews;
             this._div.innerHTML += '<br /><strong>Total EAs</strong>' +': '+ props.rate.total_eas;
-            this._div.innerHTML += '<br /><strong>Interviews per EA</strong>' +': '+ props.rate.value;
+            this._div.innerHTML += '<br /><strong>Interviews (Per EA)</strong>' +': '+ props.rate.value;
+            this._div.innerHTML += '<br /><strong>Interviewed EAs</strong>' +': '+ props.rate.active_eas;
+            this._div.innerHTML += '<br /><strong>Per Interviewed EA (Ave)</strong>' +': '+ props.rate.per_active_ea;
         }
         else{
             this._div.innerHTML = '<h3>' + property +'</h3>';
