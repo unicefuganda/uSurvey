@@ -5,13 +5,13 @@
 
     <style>
         .map-show {
-            width: 70%
+            width: 80%
             display: inline-block;
         }
 
         #indicators {
-            width: 30%;
-            display: inline-block;
+            
+            
         }
 
         .leaflet-container {
@@ -80,15 +80,16 @@
 {% block content %}
 <div id="home_display">
     <div class="map-show">
-        <div class="col-md-4">
+        <div class="col-md-2"><br/>
             {{map_filter}}
         </div>
-        <div class="col-md-4"><br/>
+        <div class="col-md-6">
            <div id="survey_map" />
         </div>
     </div>
+    <div class="col-md-4">
     <div id="indicators" class="indicators">
-
+        <div class="table-responsive">
         <table id="datatables" class="table table-striped table-bordered table-hover table-sort ">
 <!-- <table id="" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid" aria-describedby="dynamic-table_info">
  -->
@@ -120,8 +121,8 @@
              </tbody>
     </table>
   </div>
-
-        
+</div>
+       </div> 
 </div>
 {% endblock%}
 
