@@ -193,9 +193,9 @@ function getCompletionFor(){
           else
               feature.properties.rate = {'value': 0, description: ''};
         });
-       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
        //update legend
         updateLegend(max_rate);
+       geojson = L.geoJson(mapData, {style: style, onEachFeature: onEachFeature}).addTo(map);
     });
 
 }
@@ -228,9 +228,10 @@ function getColorFor(rate) {
 
 function style(feature) {
    var i = Math.floor(feature.properties.rate.value/step);
+   //console.info('i: ' + i + 'grade: ' + grades[i-1] + 'rate: ' + feature.properties.rate.value + ' step: ' + step );
    try {
         return {
-            fillColor: getColorFor(i),
+            fillColor: getColorFor(grades[i-1]),
             weight: 2,
             opacity: 0.55,
             color: '#FD8D3C',
