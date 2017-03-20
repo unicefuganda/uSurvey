@@ -156,9 +156,13 @@ def completion_json(request, survey_id):
             description = 'Percentage Responses'
             total_eas = EnumerationArea.under_(location).count()
             total_interviews = Interview.interviews_in(location, survey).distinct('id').count()
+            active_eas = Interview.interviews_in(location, survey).distinct('ea').count()
             indicator_value = float(total_interviews) / total_eas
             completion_rates[location.name.upper()] = {'value': '{0:.2f}'.format(indicator_value),
                                                        'total_eas': total_eas,
+                                                       'active_eas': active_eas,
+                                                       'per_active_ea': '{0:.2f}'.format(float(total_interviews)/
+                                                                                         active_eas),
                                                        'total_interviews': total_interviews}
         return json.dumps(completion_rates, cls=DjangoJSONEncoder)
     json_dump = get_result_json()
