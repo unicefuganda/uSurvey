@@ -6,6 +6,13 @@
     background-color: #EFF3F8;
 }
 
+.dataTables_wrapper .row:last-child {
+     border-bottom: none !important; 
+     padding-top: 0px !important; 
+     padding-bottom: 0px !important; 
+    background-color: #EFF3F8;
+}
+
 </style>
 <form id="{{ filter_id }}" action="{{ action }}" method="{% if method %}{{method}}{% else %}get{% endif %}" class="" accept-charset="utf-8">
     {% if method and not method.lower == 'get' %}
