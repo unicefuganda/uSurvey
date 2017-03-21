@@ -115,10 +115,11 @@ class SamplingCriterionForm(forms.ModelForm, FormOrderMixin):
         super(SamplingCriterionForm, self).clean()
         validation_test = self.cleaned_data.get('validation_test', None)
         listing_question = self.cleaned_data.get('listing_question', None)
-        answer_class = Answer.get_class(listing_question.answer_type)
-        method = getattr(answer_class, validation_test, None)
-        if method is None:
-            raise ValidationError('unsupported validator defined on listing question')
+        if listing_question:
+            answer_class = Answer.get_class(listing_question.answer_type)
+            method = getattr(answer_class, validation_test, None)
+            if method is None:
+                raise ValidationError('unsupported validator defined on listing question')
         if validation_test == 'between':
             if self.cleaned_data.get('min', False) is False or self.cleaned_data.get('max', False) is False:
                 raise ValidationError('min and max values required for between condition')
