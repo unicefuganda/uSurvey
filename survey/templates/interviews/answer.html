@@ -143,10 +143,21 @@
     padding-top:25px;text-align: center;}
     .int-part{margin-top: -25px;}
 </style>
+<script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+  jQuery(function($) {
+      $(".datepicker").datepicker({
+       changeMonth: true,
+       changeYear: true,
+       dateFormat: 'dd-mm-yy',
+       yearRange: "-120:+nn"
+     });
+  });
+  </script>
 <script type="text/javascript">
    $(document).ready(function(){
      $('.controls textarea ').after($('<span id="text-counter"></span>'));
-   })
+     });
 </script>
 {% endif %}
 

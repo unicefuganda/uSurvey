@@ -2,6 +2,7 @@ import os
 import string
 from datetime import datetime
 from django_rq import job
+from django.contrib.auth.models import User
 from dateutil.parser import parse as extract_date
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -37,6 +38,7 @@ class Interview(BaseModel):
     interview_reference = models.ForeignKey('Interview', related_name='follow_up_interviews', null=True, blank=True)
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews', null=True)
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
+    uploaded_by = models.ForeignKey(User, null=True, blank=True)     # just used to capture preview/data entry tester
     test_data = models.BooleanField(default=False)
     #instance_id = models.CharField(max_length=200, null=True, blank=True)
     last_question = models.ForeignKey(
@@ -174,6 +176,9 @@ class Answer(BaseModel):
         return cls.objects.create(question=question, value=answer, question_type=question.__class__.type_name(),
                                   interview=interview, identifier=question.identifier,
                                   as_text=cls.prep_text(as_text), as_value=cls.prep_value(as_value))
+
+    def __unicode__(self):
+        return unicode(self.as_text)
 
     @classmethod
     def prep_value(cls, val):
@@ -376,12 +381,14 @@ class AutoResponse(Answer):
         """
         try:
             value = int(answer)
-            text_value = '%s-%s' % (interview.interview_channel.user_identifier,
-                                    cls.prep_value(value))    # zero fill to 1billion
+            prefix = 'flow-test'
+            if interview.interview_channel:
+                prefix = interview.interview_channel.user_identifier
+            text_value = '%s-%s' % (prefix, cls.prep_value(value))    # zero fill to 1billion
         except Exception:
             raise
         return super(AutoResponse, cls).create(interview, question, answer,
-                                               as_text=text_value, as_value=text_value)
+                                               as_text=value, as_value=text_value)
 
 
 class NumericalAnswer(Answer):
@@ -399,7 +406,7 @@ class NumericalAnswer(Answer):
         except Exception:
             raise
         return super(NumericalAnswer, cls).create(interview, question, answer,
-                                                  as_text=text_value, as_value=text_value)
+                                                  as_text=value, as_value=text_value)
 
     @classmethod
     def prep_value(cls, val):

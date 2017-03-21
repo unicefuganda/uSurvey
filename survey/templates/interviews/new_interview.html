@@ -20,16 +20,6 @@
 
       function resetAll() {
          if('modal' in $('#confirm_add_modal')) $('#confirm_add_modal').modal('hide');
-        var datepicker =  $('.datepicker');
-        if(datepicker.datepicker)
-        {
-             datepicker.datepicker({
-             changeMonth: true,
-             changeYear: true,
-             dateFormat: 'dd-mm-yy',
-             yearRange: "-120:+nn"
-             });
-         }
 
          if('multiSelect' in $('.multi-select')) $('.multi-select').multiSelect();
         $("#interview_form .submit").click(function(event) {

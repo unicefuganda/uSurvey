@@ -63,8 +63,7 @@ def index(request, qset_id):
     context = {'questions': questions, 'request': request, 'batch': batch, 'max_question_per_page': max_per_page,
                'question_filter_form': question_filter_form,
                'placeholder': 'identifier, text',
-               'template_file': 'interviews/answer.html',
-               'answer_form': TestFlowInterviewForm(ODKAccess.objects.first(), batch),   # caution atleast on ODK access
+               'template_file': 'interviews/answer.html',   # caution atleast on ODK access
                #  at least on access must exist
                }
     return render(request, 'set_questions/index.html', context)

@@ -20,10 +20,13 @@ class USSDSerializable(object):
         pass
 
 
-def get_answer_form(interview):
+def get_answer_form(interview, access=None):
     question = interview.last_question
     answer_class = Answer.get_class(question.answer_type)
-    access = InterviewerAccess.get(id=interview.interview_channel.id)
+    if access is None:
+        access = InterviewerAccess.get(id=interview.interview_channel.id)
+    else:
+        access = access
 
     class AnswerForm(forms.ModelForm, USSDSerializable):
 
@@ -89,18 +92,29 @@ def get_answer_form(interview):
 
 class BaseSelectInterview(forms.ModelForm):
 
-    def __init__(self, access, *args, **kwargs):
+    def __init__(self, request, access, *args, **kwargs):
         super(BaseSelectInterview, self).__init__(*args, **kwargs)
         if 'data' in kwargs:
             kwargs['data']._mutable = True
             kwargs['data']['uid'] = access.user_identifier
             kwargs['data']._mutable = False
+        self.user = request.user
         self.interviewer = access.interviewer
         self.fields['uid'] = forms.CharField(initial=access.user_identifier, widget=forms.HiddenInput)
 
     class Meta:
         model = Interview
         fields = []
+
+    def save(self, commit=True):
+        if self.user:
+            instance = super(BaseSelectInterview, self).save(commit=False)
+            instance.uploaded_by = self.user
+            if commit:
+                instance.save()
+            return instance
+        else:
+            return super(BaseSelectInterview, self).save(commit=commit)
 
 
 class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
@@ -124,10 +138,11 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
         model = Interview
         fields = []
 
+
 class TestFlowInterviewForm(BaseSelectInterview):
 
-    def __init__(self, access, qset, *args, **kwargs):
-        super(TestFlowInterviewForm, self).__init__(access, *args, **kwargs)
+    def __init__(self, request, access, qset, *args, **kwargs):
+        super(TestFlowInterviewForm, self).__init__(request, access, *args, **kwargs)
         self.fields['survey'].queryset = Survey.objects.filter(pk__in=[sa.survey.pk for sa in
                                                                        self.interviewer.unfinished_assignments])
         self.fields['survey'].empty_label = 'Select Survey'
@@ -154,8 +169,8 @@ class UserAccessForm(forms.Form):
 class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin):
     ea = forms.ChoiceField(widget=forms.RadioSelect)
 
-    def __init__(self, access, *args, **kwargs):
-        super(SurveyAllocationForm, self).__init__(access, *args, **kwargs)
+    def __init__(self, request, access, *args, **kwargs):
+        super(SurveyAllocationForm, self).__init__(request, access, *args, **kwargs)
         self.fields['ea'].choices = [(idx+1, sa.allocation_ea.name) for idx, sa in
                                      enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
         self.order_fields(['ea', 'test_data'])
@@ -183,8 +198,8 @@ class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin):
 
 class SelectBatchForm(BaseSelectInterview):
 
-    def __init__(self, access, survey, *args, **kwargs):
-        super(SelectBatchForm, self).__init__(access, *args, **kwargs)
+    def __init__(self, request, access, survey, *args, **kwargs):
+        super(SelectBatchForm, self).__init__(request, access, *args, **kwargs)
         self.survey = survey
         self.fields['batch'] = forms.ChoiceField()
         self.fields['batch'].choices = [(idx+1, batch.name) for idx, batch in
