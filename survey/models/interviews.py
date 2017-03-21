@@ -30,10 +30,10 @@ def update_model_obj_serial(model_obj, serial_name, filter_criteria):
 class Interview(BaseModel):
     interviewer = models.ForeignKey(
         "Interviewer", null=True, related_name="interviews")    # nullable for simulation & backend load
-    survey = models.ForeignKey('Survey', related_name='interviews', db_index=True)
-    question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)
     ea = models.ForeignKey(
-        'EnumerationArea', related_name='interviews', db_index=True)    # repeated here for easy reporting
+        'EnumerationArea', related_name='interviews', db_index=True, null=True)    # repeated here for easy reporting
+    survey = models.ForeignKey('Survey', related_name='interviews', db_index=True, null=True)
+    question_set = models.ForeignKey('QuestionSet', related_name='interviews', db_index=True)
     interview_reference = models.ForeignKey('Interview', related_name='follow_up_interviews', null=True, blank=True)
     interview_channel = models.ForeignKey(InterviewerAccess, related_name='interviews', null=True)
     closure_date = models.DateTimeField(null=True, blank=True, editable=False)
@@ -43,7 +43,7 @@ class Interview(BaseModel):
         "Question", related_name='ongoing', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s-%s: %s' % (self.interviewer.name, self.householdmember.first_name, self.batch.name)
+        return '%s: %s' % (self.id, self.batch.name)
 
     def is_closed(self):
         return self.closure_date is not None

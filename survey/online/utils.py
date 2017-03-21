@@ -21,5 +21,5 @@ def set_entry(access, key, value):
 
 def delete_entry(access):
     CANCEL_PATH = '%(np)s/%(access_id)s/' % {'np': settings.INTERVIEWER_SESSION_NAMESPACE,
-                                                'access_id': access.pk,}
+                                             'access_id': access.pk,}
     cache.delete_pattern('%s*' % CANCEL_PATH)
