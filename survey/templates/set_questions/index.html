@@ -32,7 +32,7 @@
 <div class="col-lg-16">
         <a href="#test_flow" style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" data-toggle="modal">
                         <i class="ace-icon fa bigger-120"></i>
-                         Test Flow</a>
+                         Preview</a>
         <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="{% url 'export_questions_in_qset' batch.id %}">
                         <i class="ace-icon fa fa-external-link bigger-120"></i>
                          Export Questions</a>
@@ -54,7 +54,7 @@
             <div class="modal-content">
               <div class="modal-header" style="background-color: #3498DB;border-top: 1px solid #70B6E5;border-bottom: 5px solid #2372A7;" >
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" style="color: #fff">Test Flow</h4>
+                <h4 class="modal-title" style="color: #fff">Preview</h4>
               </div>
               <div class="modal-body">
                 {% include "interviews/new_interview.html" with action=batch.id|get_url_with_ids:"online_view" %}
