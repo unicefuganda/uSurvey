@@ -109,7 +109,7 @@ def handle_interviewer_session(request, access_id=None):
 
 class OnlineView(object):
 
-    def __init__(self, action_url='', *rgs, **kwargs):
+    def __init__(self, action_url='', *args, **kwargs):
         self.action_url = action_url
 
     @method_decorator(login_required)
