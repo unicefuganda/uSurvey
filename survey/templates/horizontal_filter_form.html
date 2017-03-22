@@ -5,41 +5,26 @@
     padding-bottom: 0px !important;
     background-color: #EFF3F8;
 }
-
-.dataTables_wrapper .row:last-child {
-     border-bottom: none !important; 
-     padding-top: 0px !important; 
-     padding-bottom: 0px !important; 
-    background-color: #EFF3F8;
-}
-
 </style>
-<form id="{{ filter_id }}" action="{{ action }}" method="{% if method %}{{method}}{% else %}get{% endif %}" class="" accept-charset="utf-8">
+<form id="{{ filter_id }}" action="{{ action }}" method="{% if method %}{{method}}{% else %}get{% endif %}" class="pull-left padded-bottom" accept-charset="utf-8">
     {% if method and not method.lower == 'get' %}
         {% csrf_token %}
     {% endif %}
     {% block prefilter %}
 
     {% endblock %}
-
-    {% block postfilter %}
-
-    {% endblock %}
-    
-
-    <div class="row {{ class }}">
-        <div>
+    <div class="col-lg-12 col-xs-1 col-md-1 {{ class }} horizontal-filter">
+        <div id="control-group">
             {% for field in a_form.visible_fields %}
-                <div class="col-md-2">
-                  <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label><br/>
+                <td valign="top">
+                  <label for="{{field.auto_id}}" class="horititle">{{ field.label }}</label>
                  {% if field.label_tag|is_mobile_number %}
                    <div class="input-prepend">
                        <span class="add-on">{{ country_phone_code }}</span>
                     </div>
                   {% endif %}
                    <span class="horiselect">{{field}}</span>
-                   </div>
-                
+                </td>
             {% endfor %}
             {% if not no_button %}
                 {% block submit_button %}
@@ -66,15 +51,11 @@
         {% endif %}
 
 </div>
+{% block postfilter %}
 
+{% endblock %}
 
 </form>
-
-
-
-<style type="text/css">
-    .horititle{font-weight: 500;}
-</style>
     <script src="{{ STATIC_URL }}/js/jquery-2.0.0.min.js" type="text/javascript" charset="utf-8"></script>
 {% if no_auto_refresh %}
     <script type="text/javascript">

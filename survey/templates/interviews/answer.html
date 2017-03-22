@@ -36,11 +36,11 @@ Welcome {{access.interviewer.name}}!
             <div class="geni">
                <div id="answer_section" class="block">
                   <div class="previewstyle">
-                     <h4>{{interview.question_set.name}}</h4>
+                     <h5>{{interview.question_set.name}}</h5>
                      {% if answer_form.errors %}
                      <div id="non_field_errors" class="alert alert-error">{{ answer_form.non_field_errors }}</div>
                      {%  endif %}
-                     <br>
+                     
                      <div id="form-section">
                         {% if answer_form.is_multipart %}
                         <form enctype="multipart/form-data" id="interview_form" method="post" action="{{action}}" class="form-horizontal {{ class }}">
@@ -103,7 +103,7 @@ Welcome {{access.interviewer.name}}!
    z-index:1;
    }
    .exod {
-   text-algin:center;
+  
    margin-bottom:5px;  
    }
    #id_gender{
@@ -141,17 +141,29 @@ Welcome {{access.interviewer.name}}!
    }
    .previewstyle {
    border: 1px solid #307ecc;
-   height: 370px;
+   height: 360px;
     padding-top: 20px;
    min-height: 300px;
    text-align: left;
    padding-left: 15px;
+   padding-right: 15px;
    width: 100%;
    background:#fff;
    }
    .form-horizontal .control-label {
-    padding-top:25px;text-align: center;}
+    padding-top:25px;text-align: left;}
     .int-part{margin-top: -25px;}
+     .dataTables_wrapper input[type="text"] {
+    margin:  0px;
+}
+.error{padding-top: 3px;font-size: 11px;font-weight: normal;}
+label {
+    
+    margin-bottom: 2px;
+   
+}
+.controls{font-weight: bold;}
+
 </style>
 <script src="{{ STATIC_URL }}js/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">

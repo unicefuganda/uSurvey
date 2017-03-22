@@ -304,10 +304,14 @@ h6,
   -o-transition: all 0.3s linear 0s;
   transition: all 0.3s linear 0s;
 }
-.btn-style-1,
+/*.btn-style-1,
 .btn-style-1:focus {
   background-color: #37ABF2;
   color: #fff;
+}*/
+.btn-style-1, .btn-style-1:focus {
+    background-color: #57c24a;
+    color: #fff;
 }
 .btn-style-2,
 .btn-style-2:focus {
@@ -1330,7 +1334,7 @@ table.mc-table tbody .new .submissions a:before {
 .bg-featured-request-teacher {
   background-image: url('../images/bg/parallax-1.jpg');
 }
-.awe-overlay {
+/*.awe-overlay {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -1338,6 +1342,15 @@ table.mc-table tbody .new .submissions a:before {
   left: 0;
   background-color: #288feb;
   z-index: -2;
+}*/
+.awe-overlay {
+    background-color: #659d5e;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -2;
 }
 .overlay-color-1 {
   background-color: #11538C;
