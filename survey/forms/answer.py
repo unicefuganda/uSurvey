@@ -146,6 +146,7 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
         else:
             self.fields['value'] = forms.ChoiceField(choices=self.CHOICES, widget=forms.RadioSelect)
 
+
     def render_extra_ussd(self):
         text = []
         map(lambda choice: text.append('%s: %s' % choice), self.CHOICES)
@@ -198,6 +199,7 @@ class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin, USSDSerializable
             self.fields['value'] = forms.IntegerField()
         else:
             self.fields['value'] = forms.ChoiceField(widget=forms.RadioSelect)
+        self.fields['value'].label = 'Select EA'
         self.fields['value'].choices = self.CHOICES
         self.order_fields(['value', 'test_data'])
 
@@ -243,6 +245,7 @@ class SelectBatchForm(BaseSelectInterview, USSDSerializable):
         self.fields['value'] = forms.ChoiceField()
         self.fields['value'].choices = [(idx+1, batch.name) for idx, batch in
                                         enumerate(survey.batches.all().order_by('name'))]
+        self.fields['value'].label = 'Select Batch'
 
     def clean_batch(self):
         selected = int(self.cleaned_data['value'])
