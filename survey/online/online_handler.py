@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess, Interviewer, Interview)
-from survey.forms.answer import (get_answer_form, UserAccessForm,
+from survey.forms.answer import (get_answer_form, UserAccessForm, UssdTimeoutForm,
                                  SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
 from .utils import get_entry, set_entry, delete_entry
 from survey.utils.logger import slogger
@@ -134,8 +134,8 @@ class OnlineHandler(object):
                    'template_file': template_file,
                    'id': 'interview_form',
                    'action': self.action_url,
+                   'timeout_form': UssdTimeoutForm()
                    }
-
         if show_only_answer_form(request):
             context['display_format'] = get_display_format(request)
             return render(request, template_file, context)

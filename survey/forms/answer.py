@@ -77,6 +77,7 @@ def get_answer_form(interview, access=None):
                 map(lambda opt: text.append('%s: %s' % (opt.order, opt.text)), question.options.all())
             elif hasattr(interview.last_question, 'loop_started'):
                 text.append('%s: %s' % (question.text, self.initial.get('value', 1)))
+                text.append('Enter any key to continue')
             return mark_safe('\n'.join(text))
 
         def render_extra_ussd_html(self):
@@ -187,6 +188,12 @@ class UserAccessForm(forms.Form):
         except InterviewerAccess.DoesNotExist:
             raise ValidationError('No such user')
         return access
+
+
+class UssdTimeoutForm(forms.Form):
+    use_timeout = forms.ChoiceField(widget=forms.RadioSelect,
+                                    choices=[(1, 'Use Timeout'), (2, 'No Timeout')],
+                                    initial=2, label='')
 
 
 class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin, USSDSerializable):
