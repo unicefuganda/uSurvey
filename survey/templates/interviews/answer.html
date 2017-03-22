@@ -1,14 +1,24 @@
-
-
 {% load template_tags %}
-
-{% load template_tags %}
-{% if access.choice_name == 'Ussd Access' and display_format == 'text' %}
-{% build_question_text interview.last_question.text existing_answers as text %}
-{% if text %}
-{{text}} ({{interview.last_question.answer_type}})
+{% if display_format == 'text' %}
+  {% if answer_form.errors %}
+      {{answer_form.text_error}}
+  {% endif %}
+   {% if interview %}
+      {{ answer_form.render_prepend_ussd }}
+      {% if 'prompt_user_loop' in loops %}
+         {% if loops.prompt_user_loop %}{{loops.prompt_user_loop}}{% else %}Do you want to add another Loop?{% endif %}
+         {{ answer_form.render_extra_ussd }}
+      {% else %}
+         {% build_question_text interview.last_question.text existing_answers as text %}
+         {% if text %}
+         {{text}} ({{interview.last_question.answer_type}})
+         {{ answer_form.render_extra_ussd }}
+         {% endif %}
+      {% endif %}
+   {% else %}
+Welcome {{access.interviewer.name}}!
 {{ answer_form.render_extra_ussd }}
-{% endif %}
+    {% endif %}
 {% else %}
 <div class="row">
    <div class="row">

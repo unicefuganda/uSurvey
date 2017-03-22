@@ -16,7 +16,6 @@ from survey.models import Batch, QuestionTemplate, QuestionFlow, TextArgument, T
 from survey.models import QuestionModule, QuestionOption, QuestionLoop, ODKAccess
 from survey.forms.question import get_question_form  # , QuestionFlowForm
 from survey.forms.batch import BatchQuestionsForm
-from survey.forms.answer import TestFlowInterviewForm
 from survey.services.export_questions import get_question_as_dump
 from survey.utils.query_helper import get_filterset
 from survey.views.custom_decorators import not_allowed_when_batch_is_open

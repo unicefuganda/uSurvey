@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess, Interviewer, Interview)
-from survey.forms.answer import (get_answer_form, TestFlowInterviewForm, UserAccessForm,
+from survey.forms.answer import (get_answer_form, UserAccessForm,
                                  SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
 from .utils import get_entry, set_entry, delete_entry
 from survey.utils.logger import slogger
@@ -19,7 +19,7 @@ REQUEST_SESSION = 'req_session'
 
 def get_display_format(request):
     request_data = request.GET if request.method == 'GET' else request.POST
-    return request_data.get('format', 'html').lower()
+    return request_data.get('format', 'text').lower()
 
 
 def show_only_answer_form(request):
@@ -83,6 +83,11 @@ class OnlineHandler(object):
         answer = None
         access = self.access
         request_data = request.GET if request.method == 'GET' else request.POST
+        if hasattr(interview.last_question, 'loop_started'):
+            initial = {'value': session_data['loops'].get(interview.last_question.loop_started.id, 1)}
+            if 'value' in request_data:
+                request_data = request_data.copy()
+                request_data['value'] = initial['value']
         if str(session_data['last_question']) == str(interview.last_question.id):
             answer_form = get_answer_form(interview, access)(request_data, request.FILES)
             if answer_form.is_valid():
@@ -101,8 +106,6 @@ class OnlineHandler(object):
                 interview.save()
                 return self.respond(request, session_data)
         else:
-            if hasattr(interview.last_question, 'loop_started'):
-                initial = {'value': session_data['loops'].get(interview.last_question.loop_started.id, 1)}
             answer_form = get_answer_form(interview, access)(initial=initial)
             session_data['last_question'] = interview.last_question.id
         if interview.closure_date:
@@ -205,7 +208,7 @@ class OnlineHandler(object):
                     for condition in question_group.group_conditions.all():
                         # we are interested in the qset param list with same identifier name as condition.test_question
                         test_question = qset.parameter_list.questions.get(identifier=condition.test_question.identifier)
-                        param_value = '' # use answer.asvalue
+                        param_value = ''            # use answer.as value
                         if session_data['answers'].get(test_question.identifier, None):
                             param_value = session_data['answers'][test_question.identifier].as_value
                         answer_class = Answer.get_class(condition.test_question.answer_type)

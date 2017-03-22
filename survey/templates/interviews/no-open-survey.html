@@ -1,3 +1,7 @@
+{% if display_format == 'text' %}
+No open survey at this time!
+Enter any key to return to main.
+{% else %}
 <div class="content">
     <h4>No open survey at this time!</h4>
 
@@ -9,3 +13,4 @@
          Done</a>
     </div>
 </div>
+{% endif %}

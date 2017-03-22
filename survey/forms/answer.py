@@ -13,11 +13,18 @@ from django.conf import settings
 
 class USSDSerializable(object):
 
+    def render_prepend_ussd(self):
+        return ''
+
     def render_extra_ussd(self):
         pass
 
     def render_extra_ussd_html(self):
         pass
+
+    def text_error(self):
+        if self.errors:
+            return self.errors['value'][0]
 
 
 def get_answer_form(interview, access=None):
@@ -68,12 +75,16 @@ def get_answer_form(interview, access=None):
             text = []
             if question.options.count() > 0:
                 map(lambda opt: text.append('%s: %s' % (opt.order, opt.text)), question.options.all())
+            elif hasattr(interview.last_question, 'loop_started'):
+                text.append('%s: %s' % (question.text, self.initial.get('value', 1)))
             return mark_safe('\n'.join(text))
 
         def render_extra_ussd_html(self):
             text = []
             if question.options.count() > 0:
                 map(lambda opt: text.append('%s: %s' % (opt.order, opt.text)), question.options.all())
+            elif hasattr(interview.last_question, 'loop_started'):
+                text.append('%s: %s' % (question.text, self.initial.get('value', 1)))
             return mark_safe('<br />'.join(text))
 
         def clean_value(self):
@@ -98,7 +109,10 @@ class BaseSelectInterview(forms.ModelForm):
             kwargs['data']._mutable = True
             kwargs['data']['uid'] = access.user_identifier
             kwargs['data']._mutable = False
-        self.user = request.user
+        if request.user.is_authenticated():
+            self.user = request.user
+        else:
+            self.user = None
         self.interviewer = access.interviewer
         self.fields['uid'] = forms.CharField(initial=access.user_identifier, widget=forms.HiddenInput)
 
@@ -138,21 +152,21 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
         model = Interview
         fields = []
 
-
-class TestFlowInterviewForm(BaseSelectInterview):
-
-    def __init__(self, request, access, qset, *args, **kwargs):
-        super(TestFlowInterviewForm, self).__init__(request, access, *args, **kwargs)
-        self.fields['survey'].queryset = Survey.objects.filter(pk__in=[sa.survey.pk for sa in
-                                                                       self.interviewer.unfinished_assignments])
-        self.fields['survey'].empty_label = 'Select Survey'
-        self.fields['ea'].queryset = EnumerationArea.objects.filter(pk__in=[sa.allocation_ea.pk for sa in
-                                                                            self.interviewer.unfinished_assignments])
-        self.fields['ea'].empty_label = 'Select EA'
-
-    class Meta:
-        model = Interview
-        fields = ['survey', 'ea', ]
+#
+# class TestFlowInterviewForm(BaseSelectInterview):
+#
+#     def __init__(self, request, access, qset, *args, **kwargs):
+#         super(TestFlowInterviewForm, self).__init__(request, access, *args, **kwargs)
+#         self.fields['survey'].queryset = Survey.objects.filter(pk__in=[sa.survey.pk for sa in
+#                                                                        self.interviewer.unfinished_assignments])
+#         self.fields['survey'].empty_label = 'Select Survey'
+#         self.fields['ea'].queryset = EnumerationArea.objects.filter(pk__in=[sa.allocation_ea.pk for sa in
+#                                                                             self.interviewer.unfinished_assignments])
+#         self.fields['ea'].empty_label = 'Select EA'
+#
+#     class Meta:
+#         model = Interview
+#         fields = ['survey', 'ea', ]
 
 
 class UserAccessForm(forms.Form):
@@ -166,28 +180,41 @@ class UserAccessForm(forms.Form):
         return access
 
 
-class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin):
-    ea = forms.ChoiceField(widget=forms.RadioSelect)
+class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin, USSDSerializable):
+    value = forms.ChoiceField(widget=forms.RadioSelect)
 
     def __init__(self, request, access, *args, **kwargs):
         super(SurveyAllocationForm, self).__init__(request, access, *args, **kwargs)
-        self.fields['ea'].choices = [(idx+1, sa.allocation_ea.name) for idx, sa in
+        self.fields['value'].choices = [(idx+1, sa.allocation_ea.name) for idx, sa in
                                      enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
-        self.order_fields(['ea', 'test_data'])
+        self.order_fields(['value', 'test_data'])
 
-    def clean_ea(self):
-        selected = int(self.cleaned_data['ea'])
+    def render_prepend_ussd(self):
+        return 'Select EA'
+
+    def render_extra_ussd(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        return mark_safe('\n'.join(text))
+
+    def render_extra_ussd_html(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        return mark_safe('<br />'.join(text))
+
+    def clean_value(self):
+        selected = int(self.cleaned_data['value'])
         return self.interviewer.unfinished_assignments.order_by('allocation_ea__name')[selected - 1].allocation_ea
 
     def selected_allocation(self):
         if self.is_valid():
-            selected = int(self.data['ea'])
+            selected = int(self.data['value'])
             return self.interviewer.unfinished_assignments.order_by('allocation_ea__name')[selected - 1]
 
     def save(self, commit=True):
         instance = super(SurveyAllocationForm, self).save(commit=commit)
         instance.survey = self.selected_allocation().survey
-        instance.ea = self.cleaned_data['ea']
+        instance.ea = self.cleaned_data['value']
         instance.interviewer = self.interviewer
         return instance
 
@@ -196,18 +223,31 @@ class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin):
         fields = ['test_data', ]
 
 
-class SelectBatchForm(BaseSelectInterview):
+class SelectBatchForm(BaseSelectInterview, USSDSerializable):
 
     def __init__(self, request, access, survey, *args, **kwargs):
         super(SelectBatchForm, self).__init__(request, access, *args, **kwargs)
         self.survey = survey
-        self.fields['batch'] = forms.ChoiceField()
-        self.fields['batch'].choices = [(idx+1, batch.name) for idx, batch in
+        self.fields['value'] = forms.ChoiceField()
+        self.fields['value'].choices = [(idx+1, batch.name) for idx, batch in
                                         enumerate(survey.batches.all().order_by('name'))]
 
     def clean_batch(self):
-        selected = int(self.cleaned_data['batch'])
+        selected = int(self.cleaned_data['value'])
         return self.survey.batches.all().order_by('name')[selected-1]
+
+    def render_prepend_ussd(self):
+        return 'Select Batch'
+
+    def render_extra_ussd(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        return mark_safe('\n'.join(text))
+
+    def render_extra_ussd_html(self):
+        text = []
+        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        return mark_safe('<br />'.join(text))
 
 
 class SelectInterviewerForm(forms.Form):

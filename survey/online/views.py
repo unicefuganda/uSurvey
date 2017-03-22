@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
                            SurveyAllocation, AnswerAccessDefinition, ODKAccess)
-from survey.forms.answer import (get_answer_form, TestFlowInterviewForm, UserAccessForm,
+from survey.forms.answer import (get_answer_form, UserAccessForm,
                                  SurveyAllocationForm, SelectBatchForm, AddMoreLoopForm)
 from .online_handler import OnlineHandler, show_only_answer_form, get_display_format
 
