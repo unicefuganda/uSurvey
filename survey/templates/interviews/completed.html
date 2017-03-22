@@ -2,17 +2,23 @@
 Survey Completed.
 Enter any key to return to main.
 {% else %}
-<div class="previewstyle">
-<div class="content">
-    <h4>Survey {{interview.question_set.name}} completed.</h4>
+<div class="iphone_bg">
+    <div class="geni">
+       <div id="answer_section" class="block">
+            <div class="previewstyle">
+            <div class="content">
+                <h4>Survey {{interview.question_set.name}} completed.</h4>
 
-</div>
-<div class="form-actions">
-    <div class="col-lg-12">
-        <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="." >
-        <i class="ace-icon fa fa-plus bigger-120"></i>
-         Done</a>
+            </div>
+            <div class="form-actions">
+                <div class="col-lg-12">
+                    <a style="padding-left: 4px;padding-right: 3px;" class="btn btn-white btn-warning btn-bold" href="." >
+                    <i class="ace-icon fa fa-plus bigger-120"></i>
+                     Done</a>
+                </div>
+            </div>
+            </div>
+       </div>
     </div>
-</div>
 </div>
 {% endif %}
