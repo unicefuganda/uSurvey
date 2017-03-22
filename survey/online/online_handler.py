@@ -19,7 +19,7 @@ REQUEST_SESSION = 'req_session'
 
 def get_display_format(request):
     request_data = request.GET if request.method == 'GET' else request.POST
-    return request_data.get('format', 'text').lower()
+    return request_data.get('format', 'html').lower()
 
 
 def show_only_answer_form(request):

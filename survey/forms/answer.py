@@ -47,7 +47,7 @@ def get_answer_form(interview, access=None):
                                                  widget=forms.HiddenInput)
             if question.answer_type == DateAnswer.choice_name():
                 self.fields['value'] = forms.DateField(label='Answer',
-                                                       input_formats=[settings.DATE_FORMAT,],
+                                                       input_formats=[settings.DATE_FORMAT, ],
                                                        widget=forms.DateInput(attrs={'placeholder': 'Date Of Birth',
                                                                                      'class': 'datepicker'},
                                                                               format=settings.DATE_FORMAT))
@@ -105,6 +105,7 @@ class BaseSelectInterview(forms.ModelForm):
 
     def __init__(self, request, access, *args, **kwargs):
         super(BaseSelectInterview, self).__init__(*args, **kwargs)
+        self.access = access
         if 'data' in kwargs:
             kwargs['data']._mutable = True
             kwargs['data']['uid'] = access.user_identifier
@@ -136,16 +137,23 @@ class AddMoreLoopForm(BaseSelectInterview, USSDSerializable):
     """
     ADD_MORE = 1
     DO_NOT_ADD = 2
-    value = forms.ChoiceField(choices=[(ADD_MORE, 'Yes'), (DO_NOT_ADD, 'No')], widget=forms.RadioSelect)
+    CHOICES = [(ADD_MORE, 'Yes'), (DO_NOT_ADD, 'No')]
+
+    def __init__(self, request, access, *args, **kwargs):
+        super(AddMoreLoopForm, self).__init__(request, access, *args, **kwargs)
+        if self.access.choice_name() == USSDAccess.choice_name():
+            self.fields['value'] = forms.IntegerField()
+        else:
+            self.fields['value'] = forms.ChoiceField(choices=self.CHOICES, widget=forms.RadioSelect)
 
     def render_extra_ussd(self):
         text = []
-        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        map(lambda choice: text.append('%s: %s' % choice), self.CHOICES)
         return mark_safe('\n'.join(text))
 
     def render_extra_ussd_html(self):
         text = []
-        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        map(lambda choice: text.append('%s: %s' % choice), self.CHOICES)
         return mark_safe('<br />'.join(text))
 
     class Meta:
@@ -181,12 +189,16 @@ class UserAccessForm(forms.Form):
 
 
 class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin, USSDSerializable):
-    value = forms.ChoiceField(widget=forms.RadioSelect)
 
     def __init__(self, request, access, *args, **kwargs):
         super(SurveyAllocationForm, self).__init__(request, access, *args, **kwargs)
-        self.fields['value'].choices = [(idx+1, sa.allocation_ea.name) for idx, sa in
-                                     enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
+        self.CHOICES = [(idx+1, sa.allocation_ea.name) for idx, sa in
+                        enumerate(self.interviewer.unfinished_assignments.order_by('allocation_ea__name'))]
+        if self.access.choice_name() == USSDAccess.choice_name():
+            self.fields['value'] = forms.IntegerField()
+        else:
+            self.fields['value'] = forms.ChoiceField(widget=forms.RadioSelect)
+        self.fields['value'].choices = self.CHOICES
         self.order_fields(['value', 'test_data'])
 
     def render_prepend_ussd(self):
@@ -194,12 +206,12 @@ class SurveyAllocationForm(BaseSelectInterview, FormOrderMixin, USSDSerializable
 
     def render_extra_ussd(self):
         text = []
-        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        map(lambda choice: text.append('%s: %s' % choice), self.CHOICES)
         return mark_safe('\n'.join(text))
 
     def render_extra_ussd_html(self):
         text = []
-        map(lambda choice: text.append('%s: %s' % choice), self.fields['value'].choices)
+        map(lambda choice: text.append('%s: %s' % choice), self.CHOICES)
         return mark_safe('<br />'.join(text))
 
     def clean_value(self):
