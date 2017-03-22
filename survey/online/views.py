@@ -3,6 +3,7 @@ __author__ = 'anthony <antsmc2@gmail.com>'
 from django.utils import timezone
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from survey.models import (InterviewerAccess, QuestionLoop, QuestionSet, Answer, Question,
@@ -12,6 +13,7 @@ from survey.forms.answer import (get_answer_form, TestFlowInterviewForm, UserAcc
 from .online_handler import OnlineHandler, show_only_answer_form, get_display_format
 
 
+@login_required
 def get_access_details(request):
     request_data = request.GET if request.method == 'GET' else request.POST
     if 'uid' in request_data:
