@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block extra_head %}
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+
 
     <style>
         .map-show {
@@ -77,7 +78,9 @@
     padding: 6px 8px;
 }
 .info h4 { margin: 0 0 5px; color: #777; }
-.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }</style>
+.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7;}
+.ptop{padding-top: 10px;}
+</style>
 
 {% endblock %}
 {% block title %}
@@ -90,10 +93,10 @@
             <div id="map-controls">
                 {{map_filter}}
             </div><br/>
-
+            <div id="info-update"></div><br />
             <div id="map-legend"></div>
-            <br />
-            <div id="info-update"></div>
+            
+            
 
         </div>
 
@@ -305,7 +308,7 @@ info.update = function (props) {
        property = property.toUpperCase();
         if('total_eas' in props.rate){
             rate = props.rate.value >-1 ? props.rate.value: 'Survey not opened.';
-            div.innerHTML += '<h3>' + property +'</h3>';
+            div.innerHTML += '<h4>' + property +'</h4>';
             div.innerHTML += '<br /><strong>Interviews</strong>' +': '+ props.rate.total_interviews;
             div.innerHTML += '<br /><strong>Total EAs</strong>' +': '+ props.rate.total_eas;
             div.innerHTML += '<br /><strong>Interviews (Per EA)</strong>' +': '+ props.rate.value;
@@ -313,7 +316,7 @@ info.update = function (props) {
             div.innerHTML += '<br /><strong>Per Interviewed EA (Ave)</strong>' +': '+ props.rate.per_active_ea;
         }
         else{
-            div.innerHTML = '<h3>' + property +'</h3>';
+            div.innerHTML = '<h4>' + property +'</h4>';
         }
     }
   }
