@@ -10,11 +10,6 @@
             display: inline-block;
         }
 
-        #indicators {
-            
-            
-        }
-
         .map-legend {
             width: 16px;
             height: 16px;
@@ -51,9 +46,13 @@
             margin-left: 384px;
              overflow: hidden;
         }
+        /*
+        1px solid #c5c5c6;
+        5px 5px 5px #dbddde;
+        */
         #survey_map {
-            border: 1px solid #c5c5c6;
-            box-shadow: 5px 5px 5px #dbddde;
+            border: None;
+            box-shadow: None;
             height: 500px;
             margin-left: auto;
             margin-right: auto;
@@ -139,7 +138,7 @@
 {% block javascripts %}
     <script type="text/javascript">
         <!--$("#survey_map").height($(document).height() * 0.7);-->
-       var map = L.map('survey_map').setView([{{map_center}}], {{ zoom_level|default:6}}, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
+       var map = L.map('survey_map', {attributionControl:false}).setView([{{map_center}}], {{ zoom_level|default:6}}, {zoomControl: true, doubleClickZoom: false, scrollWheelZoom:false}),
     info = L.control(),
     //legend = L.control({position: 'bottomright'}),
     geojson;
@@ -292,11 +291,7 @@ function onEachFeature(feature, layer) {
 
 }
 
-info.onAdd = function (map) {
-  this._div = L.DomUtil.create('div', 'info');
-  this.update();
-  return this._div;
-};
+
 info.update = function (props) {
   var div = document.getElementById('info-update');
   div.innerHTML = '';
@@ -336,6 +331,7 @@ info.update = function (props) {
 
 
 //survey_selector.addTo(map)
+        //fillColor: '#307ECC',
 
 function highlightAdminLevel(event){
     var layer = event.target
@@ -343,6 +339,7 @@ function highlightAdminLevel(event){
         weight: 3,
         color:'#666',
         dashArray: '',
+        fillColor: '#95bee5',
         fillOpacity: 0.3
     })
    if (!L.Browser.ie && !L.Browser.opera) {
@@ -360,7 +357,6 @@ function zoomAdminLevel(event){
     var adminLevel = layer.feature.properties['{{loc_field}}'];
     if(!adminLevel)
          adminLevel = layer.feature.properties['{{alt_loc_field}}'];
-    //alert('AdminLevel: ' + adminLevel);
 
 }
 
